@@ -43,7 +43,7 @@ test('should trigger the onChange callback with the proper value', async () => {
   expect(input).not.toBe(null)
   fireEvent.change(input, { target: { value: '2.30' } })
   expect(changeHandler).toHaveBeenCalledTimes(1)
-  expect(changeHandler).toHaveBeenCalledWith({ name: defaultProps.name, value: expectedValue })
+  expect(changeHandler).toHaveBeenCalledWith({ formattedValue: '2.30', name: defaultProps.name, value: expectedValue })
 })
 
 test('should change when value changes', async () => {
@@ -74,7 +74,7 @@ test('should allow entering an empty string', async () => {
   expect(input).not.toBe(null)
   fireEvent.change(input, { target: { value: '' } })
   expect(changeHandler).toHaveBeenCalledTimes(1)
-  expect(changeHandler).toHaveBeenCalledWith({ name: defaultProps.name, value: expectedValue })
+  expect(changeHandler).toHaveBeenCalledWith({ formattedValue: '0', name: defaultProps.name, value: expectedValue })
 })
 
 test('should allow initialize with an empty string', async () => {
