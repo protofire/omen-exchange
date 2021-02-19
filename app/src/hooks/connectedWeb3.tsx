@@ -90,7 +90,7 @@ export const ConnectedWeb3: React.FC = props => {
     return null
   }
 
-  // TODO: make this switchable, can go back to mainnet or whatever
+  // TODO: make a hook to make this switchable, e.g. can go back to mainnet
   // eslint-disable-next-line
   let provider = new ethers.providers.JsonRpcProvider('https://dai.poa.network/')
   const netId = 100
