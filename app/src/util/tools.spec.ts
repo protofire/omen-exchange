@@ -2,7 +2,7 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
 
-import { getContractAddress, getNativeAsset } from './networks'
+import { getContractAddress, getNativeAsset, getToken } from './networks'
 import {
   bigMax,
   bigMin,
@@ -21,13 +21,17 @@ import {
   divBN,
   formatNumber,
   formatToShortNumber,
+  getBaseTokenForCToken,
+  getCTokenForToken,
   getIndexSets,
+  getInitialCollateral,
   getScalarTitle,
   getUnit,
   isDust,
   isObjectEqual,
   isScalarMarket,
   limitDecimalPlaces,
+  roundNumberStringToSignificantDigits,
   truncateStringInTheMiddle as truncate,
 } from './tools'
 import { Token } from './types'
