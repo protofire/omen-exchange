@@ -1,8 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { formatBigNumber, formatNumber, reverseArray } from '../../../../util/tools'
 import { BalanceItem } from '../../../../util/types'
+import { RadioInput } from '../../../common'
 
 const PositionSelectionBoxWrapper = styled.div`
   height: 88px;
@@ -26,44 +27,44 @@ const PositionSelectionLeft = styled.div`
   align-items: center;
 `
 
-const PositionSelectionRadio = styled.input`
-  width: 20px;
-  height: 20px;
-  border: ${props => props.theme.borders.radioButton};
-`
-
 const PositionSelectionTitle = styled.p`
   text-transform: capitalize;
   margin: 0;
   margin-left: 12px;
+  font-size: ${props => props.theme.textfield.fontSize};
+  color: ${props => props.theme.textfield.color};
 `
 
 const PositionSelectionAmount = styled.p`
   margin: 0;
+  font-size: ${props => props.theme.textfield.fontSize};
+  color: ${props => props.theme.colors.textColor};
 `
 
 interface Props {
   balances: BalanceItem[]
+  positionIndex: number
   setBalanceItem: React.Dispatch<React.SetStateAction<BalanceItem>>
   setPositionIndex: React.Dispatch<React.SetStateAction<number>>
 }
 
 export const PositionSelectionBox = (props: Props) => {
-  const { balances, setBalanceItem, setPositionIndex } = props
+  const { balances, positionIndex, setBalanceItem, setPositionIndex } = props
 
   console.log(balances)
+  const reversedBalances: BalanceItem[] = reverseArray(balances)
 
   const renderPositionSelectionItem = (balance: BalanceItem) => {
     return (
       <PositionSelectionBoxItem>
         <PositionSelectionLeft>
-          <PositionSelectionRadio
-            name="position"
+          <RadioInput
+            checked={balances.indexOf(balance) === positionIndex}
+            name={'position'}
             onClick={() => {
               setBalanceItem(balance)
               setPositionIndex(balances.indexOf(balance))
             }}
-            type="radio"
           />
           <PositionSelectionTitle>{balance.outcomeName}</PositionSelectionTitle>
         </PositionSelectionLeft>
@@ -74,7 +75,7 @@ export const PositionSelectionBox = (props: Props) => {
 
   return (
     <PositionSelectionBoxWrapper>
-      {balances.map(balance => renderPositionSelectionItem(balance))}
+      {reversedBalances.map(balance => renderPositionSelectionItem(balance))}
     </PositionSelectionBoxWrapper>
   )
 }

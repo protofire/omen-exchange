@@ -597,3 +597,11 @@ export const getInitialCollateral = (networkId: number, collateral: Token): Toke
     }
   }
 }
+
+export const reverseArray = (array: any[]): any[] => {
+  const newArray = []
+  for (let i = array.length - 1; i >= 0; i--) {
+    newArray.push(array[i])
+  }
+  return newArray
+}

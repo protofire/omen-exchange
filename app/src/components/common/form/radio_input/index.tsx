@@ -9,19 +9,24 @@ const Wrapper = styled.div`
 `
 
 const Radio = styled.div<{ outcomeIndex: number; checked: boolean }>`
-  background-color: ${props => (props.checked ? getOutcomeColor(props.outcomeIndex).darker : '#fff')};
-  border-color: ${props =>
-    getOutcomeColor(props.outcomeIndex).darker
-      ? getOutcomeColor(props.outcomeIndex).darker
-      : props.theme.colors.primary};
   border-radius: 50%;
-  border-style: solid;
-  border-width: 2px;
-  box-shadow: inset 0 0 0 2px #fff;
-  height: 20px;
-  opacity: ${props => (props.checked ? '1' : '0.5')};
-  transition: all 0.15s linear;
   width: 20px;
+  height: 20px;
+  ${props =>
+    props.outcomeIndex > -1
+      ? `background-color: ${props.checked ? getOutcomeColor(props.outcomeIndex).darker : '#fff'};
+    border-color: ${
+      getOutcomeColor(props.outcomeIndex).darker
+        ? getOutcomeColor(props.outcomeIndex).darker
+        : props.theme.colors.primary
+    };
+    border-style: solid;
+    border-width: 2px;
+    box-shadow: inset 0 0 0 2px #fff;
+    transition: all 0.15s linear;
+    opacity: ${props.checked ? '1' : '0.5'};`
+      : `border: ${props.checked ? props.theme.borders.radioButton : props.theme.borders.radioButtonDisabled}
+    `}
 `
 
 const Input = styled.input`
@@ -39,7 +44,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   checked?: boolean
   disabled?: boolean
   name: string
-  outcomeIndex: number
+  outcomeIndex?: number
   value?: any
 }
 
@@ -47,7 +52,7 @@ export const RadioInput: React.FC<Props> = (props: Props) => {
   const { checked = false, disabled, name, onChange, outcomeIndex, value, ...restProps } = props
   return (
     <Wrapper {...restProps}>
-      <Radio checked={checked} outcomeIndex={outcomeIndex} />
+      <Radio checked={checked} outcomeIndex={outcomeIndex || -1} />
       <Input checked={checked} disabled={disabled} name={name} onChange={onChange} type="radio" value={value} />
     </Wrapper>
   )
