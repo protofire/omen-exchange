@@ -27,6 +27,7 @@ import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GenericError, TabsGrid } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
+import { PositionSelectionBox } from '../../common/position_selection_box'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
@@ -236,8 +237,8 @@ export const ScalarMarketSell = (props: Props) => {
       />
       <GridTransactionDetails>
         <div>
-          <TabsGrid>
-            <ButtonTab
+          {/* <TabsGrid> */}
+          {/* <ButtonTab
               active={(positionIndex === 0 && !isShortTabDisabled) || (isLongTabDisabled && !isShortTabDisabled)}
               disabled={isShortTabDisabled}
               onClick={() => {
@@ -257,7 +258,12 @@ export const ScalarMarketSell = (props: Props) => {
             >
               Long
             </ButtonTab>
-          </TabsGrid>
+          </TabsGrid> */}
+          <PositionSelectionBox
+            balances={balances}
+            setBalanceItem={setBalanceItem}
+            setPositionIndex={setPositionIndex}
+          />
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput

@@ -149,6 +149,7 @@ const theme = {
     borderDisabled: '#E8EAF6',
     borderLineDisabled: '1px solid #E8EAF6',
     commonBorderRadius: '6px',
+    radioButton: '4px solid #7986CB',
   },
   slider: {
     idle: '#E8EAF6',
