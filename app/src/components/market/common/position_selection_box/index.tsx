@@ -57,7 +57,12 @@ export const PositionSelectionBox = (props: Props) => {
   const renderPositionSelectionItem = (balance: BalanceItem) => {
     return (
       <PositionSelectionBoxItem>
-        <PositionSelectionLeft>
+        <PositionSelectionLeft
+          onClick={() => {
+            setBalanceItem(balance)
+            setPositionIndex(balances.indexOf(balance))
+          }}
+        >
           <RadioInput
             checked={balances.indexOf(balance) === positionIndex}
             name={'position'}
