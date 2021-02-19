@@ -530,13 +530,13 @@ describe('tools', () => {
   })
 
   describe('calcPrediction', () => {
-    const testCases: [[string, BigNumber, BigNumber, number], number][] = [
-      [['0.04', parseUnits('0', 18), parseUnits('1', 18), 18], 0.04],
-      [['0.5', parseUnits('5', 18), parseUnits('105', 18), 18], 55],
-      [['0.75', parseUnits('3', 6), parseUnits('43', 6), 6], 33],
+    const testCases: [[string, BigNumber, BigNumber], number][] = [
+      [['0.04', parseUnits('0', 18), parseUnits('1', 18)], 0.04],
+      [['0.5', parseUnits('5', 18), parseUnits('105', 18)], 55],
+      [['0.75', parseUnits('3', 18), parseUnits('43', 18)], 33],
     ]
-    for (const [[probability, lowerBound, upperBound, decimals], result] of testCases) {
-      const prediction = calcPrediction(probability, lowerBound, upperBound, decimals)
+    for (const [[probability, lowerBound, upperBound], result] of testCases) {
+      const prediction = calcPrediction(probability, lowerBound, upperBound)
 
       expect(prediction).toStrictEqual(result)
     }
@@ -614,6 +614,7 @@ describe('tools', () => {
       expect(result).toStrictEqual(cTokenValue)
     }
   })
+
   describe('getScalarTitle', () => {
     const testCases: [[string], string][] = [
       [['Some random sclar market? [test]'], 'Some random sclar market?'],
