@@ -85,8 +85,8 @@ const CustomDropdownItem = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
-  font-size: 14px;
-  line-height: 16px;
+  font-size: ${props => props.theme.fonts.defaultSize};
+  line-height: ${props => props.theme.fonts.defaultLineHeight};
   display: flex;
   align-items: center;
   letter-spacing: 0.4px;
@@ -102,7 +102,6 @@ const StatusBage = styled.div<{ status: boolean }>`
   height: 6px;
   margin-right: 8px;
   border-radius: 3px;
-  // background-color: #55ac68;
   background-color: ${props => (props.status ? props.theme.message.colors.ok : props.theme.message.colors.error)};
 `
 
@@ -110,6 +109,7 @@ const Input = styled.input`
   width: 100%;
   margin-top: 20px;
   padding: 12px 20px;
+  padding: ${props => `${props.theme.textfield.paddingVertical} ${props.theme.textfield.paddingHorizontal}`};
   border: 1px solid ${props => props.theme.colors.tertiary};
   box-sizing: border-box;
   border-radius: 8px;
