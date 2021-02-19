@@ -17,7 +17,6 @@ const WalletConnect = new WalletConnectConnector({
   supportedNetworkURLs,
   defaultNetwork: 1,
 })
-console.log(infuraNetworkURL)
 
 const Infura = new NetworkOnlyConnector({
   providerURL: infuraNetworkURL,

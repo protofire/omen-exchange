@@ -1,10 +1,10 @@
-import React, { useState } from 'react'
+import axios from 'axios'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
-import { Textfield } from '../../../../omen-exchange/app/src/components/common/form/textfield'
 import { useConnectedWeb3Context } from '../../../hooks'
-import { getChainSpecificAlternativeUrls, networkIds, supportedNetworkURLs } from '../../../util/networks'
+import { getChainSpecificAlternativeUrls } from '../../../util/networks'
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { ListCard } from '../../market/common/list_card/index'
@@ -96,12 +96,13 @@ const CustomDropdownItem = styled.div`
   }
 `
 
-const StatusBage = styled.div`
+const StatusBage = styled.div<{ status: boolean }>`
   width: 6px;
   height: 6px;
   margin-right: 8px;
   border-radius: 3px;
-  background-color: #55ac68;
+  // background-color: #55ac68;
+  background-color: ${props => (props.status ? props.theme.message.colors.ok : props.theme.message.colors.error)};
 `
 
 const Input = styled.input`
@@ -112,18 +113,28 @@ const Input = styled.input`
   box-sizing: border-box;
   border-radius: 8px;
 `
+function isValidHttpUrl(data: string) {
+  let url
 
+  try {
+    url = new URL(data)
+  } catch (_) {
+    return false
+  }
+
+  return url.protocol === 'http:' || url.protocol === 'https:'
+}
 const SettingsViewContainer = () => {
   const history = useHistory()
   const context = useConnectedWeb3Context()
 
   const [current, setCurrent] = useState(0)
   const [url, setUrl] = useState<string>('')
+  const [onlineStatus, setOnlineStatus] = useState<boolean>(false)
 
   const urlObject = getChainSpecificAlternativeUrls(context.networkId)
-  console.log(urlObject)
 
-  const replacment = urlObject.map((item, index) => {
+  const dropdownItem = urlObject.map((item, index) => {
     return {
       title: item.name,
       image: item.name === 'Infura' ? imgInfura : undefined,
@@ -134,16 +145,15 @@ const SettingsViewContainer = () => {
     }
   })
 
-  console.log(replacment.length)
-  replacment.push({
+  dropdownItem.push({
     title: 'Custom',
     image: undefined,
     onClick: () => {
-      setCurrent(replacment.length - 1)
+      setCurrent(dropdownItem.length - 1)
     },
   })
-  console.log(current)
-  const filterItems = replacment.map((item, index) => {
+
+  const filterItems = dropdownItem.map(item => {
     // console.log(index)
     return {
       content: (
@@ -156,6 +166,34 @@ const SettingsViewContainer = () => {
       onClick: item.onClick,
     }
   })
+  const checkRpcStatus = async () => {
+    try {
+      await axios.post(url, {
+        id: +new Date(),
+        jsonrpc: '2.0',
+        method: 'eth_getBlockByNumber',
+        params: ['latest', true],
+      })
+
+      setOnlineStatus(true)
+      return true
+    } catch (e) {
+      setOnlineStatus(false)
+
+      return false
+    }
+  }
+  useEffect(() => {
+    if (url.length === 0 && current !== dropdownItem.length - 1) {
+      setUrl(urlObject[current].rpcUrl)
+    }
+    if (!isValidHttpUrl(url)) {
+      return
+    }
+
+    checkRpcStatus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [url])
 
   return (
     <ListCard style={{ minHeight: 'initial' }}>
@@ -168,15 +206,15 @@ const SettingsViewContainer = () => {
           <Column>
             <Text>RPC Endpoint</Text>
             <StatusSection>
-              <StatusBage />
-              <TextLighter>Status: OK</TextLighter>
+              <StatusBage status={onlineStatus} />
+              <TextLighter>Status: {onlineStatus ? 'OK' : 'Unavailable'}</TextLighter>
             </StatusSection>
           </Column>
           <FiltersControls>
             <NodeDropdown currentItem={current} dirty dropdownPosition={DropdownPosition.center} items={filterItems} />
           </FiltersControls>
         </Row>
-        {current === replacment.length - 1 && (
+        {current === dropdownItem.length - 1 && (
           <Input onChange={event => setUrl(event.target.value)} placeholder="Paste your RPC URL"></Input>
         )}
       </MainContent>
@@ -199,9 +237,9 @@ const SettingsViewContainer = () => {
             Set to Default
           </ButtonRound>
           <ButtonRound
-            onClick={() => {
-              console.log(sessionStorage.getItem('rpcAddress'))
-              console.log(networkIds)
+            disabled={!isValidHttpUrl(url)}
+            onClick={async () => {
+              if (!(await checkRpcStatus())) return
 
               sessionStorage.setItem(
                 'rpcAddress',

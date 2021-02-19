@@ -96,6 +96,7 @@ const networks: { [K in NetworkId]: Network } = {
       },
       { rpcUrl: 'https://cloudflare-eth.com/', name: 'Cloudflare' },
       { rpcUrl: 'https://blockscout.com', name: 'BlockScout' },
+      { rpcUrl: 'https://web3.1inch.exchange/', name: '1inch' },
     ],
     graphHttpUri: GRAPH_MAINNET_HTTP,
     graphWsUri: GRAPH_MAINNET_WS,
@@ -272,12 +273,9 @@ export const getChainSpecificAlternativeUrls = (networkId: number) => {
   return networks[networkId].alternativeUrls
 }
 if (sessionStorage.getItem('rpcAddress')) {
-  console.log('inside gargantua')
   const data = JSON.parse(<string>sessionStorage.getItem('rpcAddress'))
-  console.log(data.url)
   const network: NetworkId = data.network
   networks[network].url = data.url
-  console.log(networks[network])
 }
 
 export const supportedNetworkIds = Object.keys(networks).map(Number) as NetworkId[]

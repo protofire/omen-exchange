@@ -44,8 +44,6 @@ export const ConnectedWeb3: React.FC = props => {
   const rpcAddress: string | null = localStorage.getItem('rpcAddress')
 
   useEffect(() => {
-    console.log(rpcAddress)
-    console.log(library)
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
     if (safeAppInfo) {
