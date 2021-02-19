@@ -1,12 +1,11 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedCPKContext, useGraphMarketUserTxData } from '../../../../../hooks'
+import { useCompoundService, useConnectedCPKContext, useGraphMarketUserTxData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
-import { CompoundService } from '../../../../../services/compound_service'
 import { getNativeAsset, getToken } from '../../../../../util/networks'
 import { getSharesInBaseToken, getUnit, isDust } from '../../../../../util/tools'
 import {
@@ -129,31 +128,11 @@ const Wrapper = (props: Props) => {
     totalPoolShares,
   } = marketMakerData
   const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
-  const { account, library: provider, networkId } = context
-  const [compoundService, setCompoundService] = useState<Maybe<CompoundService>>(null)
+  const { networkId } = context
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
+  const { compoundService: CompoundService } = useCompoundService(collateral, context)
+  const compoundService = CompoundService || null
 
-  useMemo(() => {
-    const getResult = async () => {
-      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
-      await compoundServiceObject.init()
-      setCompoundService(compoundServiceObject)
-    }
-    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-      getResult()
-    }
-  }, [collateral.address, account, collateral.symbol, provider])
-
-  useEffect(() => {
-    const getResult = async () => {
-      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
-      await compoundServiceObject.init()
-      setCompoundService(compoundServiceObject)
-    }
-    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-      getResult()
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const setCurrentDisplayCollateral = () => {
     // if collateral is a cToken then convert the collateral and balances to underlying token
     const collateralSymbol = collateral.symbol.toLowerCase()
@@ -340,7 +319,7 @@ const Wrapper = (props: Props) => {
   return (
     <>
       <TopCard>
-        <MarketTopDetailsOpen compoundService={compoundService} marketMakerData={marketMakerData} />
+        <MarketTopDetailsOpen marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
         <MarketNavigation
@@ -449,7 +428,6 @@ const Wrapper = (props: Props) => {
         )}
         {currentTab === MarketDetailsTab.pool && (
           <MarketPoolLiquidityContainer
-            compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             fetchGraphMarketUserTxData={fetchGraphMarketUserTxData}
             isScalar={isScalar}
@@ -460,7 +438,6 @@ const Wrapper = (props: Props) => {
         {currentTab === MarketDetailsTab.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
         {currentTab === MarketDetailsTab.buy && (
           <MarketBuyContainer
-            compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             fetchGraphMarketUserTxData={fetchGraphMarketUserTxData}
             isScalar={isScalar}
@@ -470,7 +447,6 @@ const Wrapper = (props: Props) => {
         )}
         {currentTab === MarketDetailsTab.sell && (
           <MarketSellContainer
-            compoundService={compoundService}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             fetchGraphMarketUserTxData={fetchGraphMarketUserTxData}
             isScalar={isScalar}
