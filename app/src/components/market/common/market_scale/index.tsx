@@ -191,13 +191,14 @@ const ScaleTooltip = styled.div<{ static: boolean | undefined; xValue: number }>
   left: ${({ xValue }) => xValue}%;
   transform: translateX(-50%);
   background-color: ${({ theme }) => theme.colors.mainBodyBackground};
-  border-radius: ${({ theme }) => theme.borders.commonBorderRadius};
-  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.05);
-  border: 1px solid ${({ theme }) => theme.borders.tooltip};
+  border-radius: ${props => (props.static ? '4px' : props.theme.borders.commonBorderRadius)};
+  box-shadow: ${props => (props.static ? '' : '0px 0px 4px rgba(0, 0, 0, 0.05)')};
+  border: 1px solid ${props => (props.static ? props.theme.borders.borderDisabled : props.theme.borders.tooltip)};
   white-space: nowrap;
   opacity: 0;
   transition: 0.2s opacity;
   ${props => props.static && 'opacity: 1;'}
+  color: ${props => (props.static ? props.theme.colors.textColorDark : props.theme.colors.black)};
 `
 
 const ScaleTooltipMessage = styled.p`

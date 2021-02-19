@@ -108,6 +108,7 @@ const theme = {
     verticalDivider: '#e8eaf6',
     clickable: '#7986CB',
     red: '#E57373',
+    black: '000',
   },
   message: {
     colors: {
