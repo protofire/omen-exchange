@@ -28,6 +28,7 @@ import {
   isObjectEqual,
   isScalarMarket,
   limitDecimalPlaces,
+  reverseArray,
   truncateStringInTheMiddle as truncate,
 } from './tools'
 import { Token } from './types'
@@ -614,6 +615,7 @@ describe('tools', () => {
       expect(result).toStrictEqual(cTokenValue)
     }
   })
+
   describe('getScalarTitle', () => {
     const testCases: [[string], string][] = [
       [['Some random sclar market? [test]'], 'Some random sclar market?'],
@@ -622,6 +624,23 @@ describe('tools', () => {
     for (const [[value], result] of testCases) {
       const modifiedTitle = getScalarTitle(value)
       expect(result).toStrictEqual(modifiedTitle)
+    }
+  })
+
+  describe('reverseArray', () => {
+    const testCases: [any[], any[]][] = [
+      [
+        [1, 2, 3],
+        [3, 2, 1],
+      ],
+      [
+        ['a', 2, 'hello'],
+        ['hello', 2, 'a'],
+      ],
+    ]
+    for (const [array, result] of testCases) {
+      const reversedArray = reverseArray(array)
+      expect(result).toStrictEqual(reversedArray)
     }
   })
 })
