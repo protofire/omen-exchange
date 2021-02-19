@@ -7,6 +7,7 @@ import styled from 'styled-components'
 import { DOCUMENT_FAQ } from '../../../../common/constants'
 import {
   useCollateralBalance,
+  useCompoundService,
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
@@ -15,7 +16,6 @@ import {
   useFundingBalance,
   useSymbol,
 } from '../../../../hooks'
-import { CompoundService } from '../../../../services/compound_service'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
@@ -59,7 +59,6 @@ import { WarningMessage } from '../../common/warning_message'
 import { UserPoolData } from './user_pool_data'
 
 interface Props extends RouteComponentProps<any> {
-  compoundService: CompoundService | null
   marketMakerData: MarketMakerData
   theme?: any
   switchMarketTab: (arg0: MarketDetailsTab) => void
@@ -88,7 +87,7 @@ const SetAllowanceStyled = styled(SetAllowance)`
 const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
-  const { compoundService, fetchGraphMarketMakerData, marketMakerData } = props
+  const { fetchGraphMarketMakerData, marketMakerData } = props
   const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
   const history = useHistory()
   const context = useConnectedWeb3Context()
@@ -108,6 +107,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       ? nativeAsset
       : marketMakerData.collateral
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
+
+  const { compoundService: CompoundService } = useCompoundService(collateral, context)
+  const compoundService = CompoundService || null
 
   const [amountToFund, setAmountToFund] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
