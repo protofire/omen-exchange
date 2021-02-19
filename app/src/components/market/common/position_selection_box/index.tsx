@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { formatBigNumber, formatNumber, reverseArray } from '../../../../util/tools'
+import { formatBigNumber, formatNumber, isDust, reverseArray } from '../../../../util/tools'
 import { BalanceItem } from '../../../../util/types'
 import { RadioInput } from '../../../common'
 
@@ -60,12 +60,15 @@ export const PositionSelectionBox = (props: Props) => {
       <PositionSelectionBoxItem>
         <PositionSelectionLeft
           onClick={() => {
-            setBalanceItem(balance)
-            setPositionIndex(balances.indexOf(balance))
+            if (!isDust(balance.shares, decimals)) {
+              setBalanceItem(balance)
+              setPositionIndex(balances.indexOf(balance))
+            }
           }}
         >
           <RadioInput
             checked={balances.indexOf(balance) === positionIndex}
+            disabled={isDust(balance.shares, decimals)}
             name={'position'}
             onClick={() => {
               setBalanceItem(balance)
