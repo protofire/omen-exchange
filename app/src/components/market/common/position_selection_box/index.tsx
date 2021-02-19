@@ -46,10 +46,11 @@ interface Props {
   positionIndex: number
   setBalanceItem: React.Dispatch<React.SetStateAction<BalanceItem>>
   setPositionIndex: React.Dispatch<React.SetStateAction<number>>
+  decimals: number
 }
 
 export const PositionSelectionBox = (props: Props) => {
-  const { balances, positionIndex, setBalanceItem, setPositionIndex } = props
+  const { balances, decimals, positionIndex, setBalanceItem, setPositionIndex } = props
 
   console.log(balances)
   const reversedBalances: BalanceItem[] = reverseArray(balances)
@@ -74,7 +75,9 @@ export const PositionSelectionBox = (props: Props) => {
           />
           <PositionSelectionTitle>{balance.outcomeName}</PositionSelectionTitle>
         </PositionSelectionLeft>
-        <PositionSelectionAmount>{formatNumber(formatBigNumber(balance.shares, 18))} Shares</PositionSelectionAmount>
+        <PositionSelectionAmount>
+          {formatNumber(formatBigNumber(balance.shares, decimals))} Shares
+        </PositionSelectionAmount>
       </PositionSelectionBoxItem>
     )
   }

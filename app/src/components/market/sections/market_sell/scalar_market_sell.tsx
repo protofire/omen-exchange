@@ -261,6 +261,7 @@ export const ScalarMarketSell = (props: Props) => {
           </TabsGrid> */}
           <PositionSelectionBox
             balances={balances}
+            decimals={collateral.decimals}
             positionIndex={positionIndex}
             setBalanceItem={setBalanceItem}
             setPositionIndex={setPositionIndex}
