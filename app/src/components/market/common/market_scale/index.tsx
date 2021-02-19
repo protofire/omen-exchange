@@ -9,6 +9,7 @@ import {
   BalanceItem,
   LiquidityObject,
   LiquidityType,
+  MarketDetailsTab,
   Status,
   Token,
   TradeObject,
@@ -28,6 +29,7 @@ const ScaleWrapper = styled.div<{
   borderBottom: boolean | undefined
   borderTop: boolean | undefined
   valueBoxes: boolean | undefined
+  compressed: boolean | undefined
 }>`
   display: flex;
   flex-direction: column;
@@ -39,6 +41,7 @@ const ScaleWrapper = styled.div<{
   padding-right: 25px;
   position: relative;
   ${props => props.borderTop && `border-top: 1px solid ${props.theme.scale.border}; padding-top: 24px; height: 202px;`};
+  ${props => props.compressed && 'height: auto; padding-bottom: 24px;'}
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     ${props => props.valueBoxes && 'padding-bottom: 24px; height: 278px;'}
@@ -181,7 +184,7 @@ const ScaleDot = styled.div<{ xValue: number; positive?: Maybe<boolean> }>`
   margin-top: calc((${SCALE_HEIGHT} - ${DOT_SIZE}) / 2);
 `
 
-const ScaleTooltip = styled.div<{ xValue: number }>`
+const ScaleTooltip = styled.div<{ static: boolean | undefined; xValue: number }>`
   position: absolute;
   padding: 5px 8px;
   top: -42px;
@@ -194,6 +197,7 @@ const ScaleTooltip = styled.div<{ xValue: number }>`
   white-space: nowrap;
   opacity: 0;
   transition: 0.2s opacity;
+  ${props => props.static && 'opacity: 1;'}
 `
 
 const ScaleTooltipMessage = styled.p`
@@ -229,6 +233,7 @@ interface Props {
   liquidityAmount?: Maybe<BigNumber>
   additionalShares?: Maybe<number>
   additionalSharesType?: Maybe<AdditionalSharesType>
+  currentTab?: MarketDetailsTab
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
@@ -240,6 +245,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     borderTop,
     collateral,
     currentPrediction,
+    currentTab,
     fee,
     liquidityAmount,
     liquidityTxs,
@@ -467,7 +473,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const deactivateTooltip = () => {
     const scaleTooltip: HTMLElement | null = document.querySelector('#scale-tooltip')
-    if (scaleTooltip) {
+    if (scaleTooltip && currentTab !== MarketDetailsTab.sell) {
       scaleTooltip.style.opacity = '0'
     }
   }
@@ -487,6 +493,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     !collateral ||
     (isDust(shortShares || new BigNumber(0), collateral.decimals) &&
       isDust(longShares || new BigNumber(0), collateral.decimals))
+
+  const showSingleValueBox =
+    !isAmountInputted && !(additionalShares && additionalShares > 0.000001) && currentTab !== MarketDetailsTab.sell
+
+  console.log(currentTab)
 
   const singleValueBoxData = [
     {
@@ -541,7 +552,12 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <ScaleWrapper borderBottom={isPositionTableDisabled} borderTop={borderTop} valueBoxes={isAmountInputted}>
+      <ScaleWrapper
+        borderBottom={isPositionTableDisabled}
+        borderTop={borderTop}
+        compressed={currentTab === MarketDetailsTab.sell}
+        valueBoxes={isAmountInputted}
+      >
         <ScaleTitleWrapper>
           <ScaleTitle>
             {formatNumber(lowerBoundNumber.toString())} {unit}
@@ -556,7 +572,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         </ScaleTitleWrapper>
         <Scale>
           <ScaleBallContainer>
-            <ScaleTooltip id="scale-tooltip" xValue={scaleValue || 0}>
+            <ScaleTooltip id="scale-tooltip" static={currentTab === MarketDetailsTab.sell} xValue={scaleValue || 0}>
               <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString())} ${unit}`}</ScaleTooltipMessage>
             </ScaleTooltip>
             <ScaleBall xValue={scaleValue}>
@@ -618,9 +634,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
             </>
           )}
-          {!isAmountInputted && !(additionalShares && additionalShares > 0.000001) && (
-            <ValueBoxes valueBoxData={singleValueBoxData} />
-          )}
+          {showSingleValueBox && <ValueBoxes valueBoxData={singleValueBoxData} />}
         </Scale>
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
         {liquidityAmount && liquidityAmount.gt(0) && additionalShares && additionalShares > 0.000001 && (
