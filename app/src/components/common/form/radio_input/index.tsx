@@ -44,7 +44,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   checked?: boolean
   disabled?: boolean
   name: string
-  outcomeIndex?: number
+  outcomeIndex: number
   value?: any
 }
 
