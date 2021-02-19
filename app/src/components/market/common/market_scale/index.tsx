@@ -489,7 +489,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: startingPointTitle,
       xValue: currentPrediction
         ? Number(currentPrediction)
-        : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound, 18),
+        : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound, 18) / 100,
     },
   ]
 
