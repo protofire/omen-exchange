@@ -65,6 +65,7 @@ export const PositionSelectionBox = (props: Props) => {
               setBalanceItem(balance)
               setPositionIndex(balances.indexOf(balance))
             }}
+            outcomeIndex={-1}
           />
           <PositionSelectionTitle>{balance.outcomeName}</PositionSelectionTitle>
         </PositionSelectionLeft>

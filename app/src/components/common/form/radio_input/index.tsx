@@ -50,9 +50,10 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 
 export const RadioInput: React.FC<Props> = (props: Props) => {
   const { checked = false, disabled, name, onChange, outcomeIndex, value, ...restProps } = props
+  console.log(outcomeIndex)
   return (
     <Wrapper {...restProps}>
-      <Radio checked={checked} outcomeIndex={outcomeIndex || -1} />
+      <Radio checked={checked} outcomeIndex={outcomeIndex} />
       <Input checked={checked} disabled={disabled} name={name} onChange={onChange} type="radio" value={value} />
     </Wrapper>
   )
