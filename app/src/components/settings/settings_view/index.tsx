@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../hooks'
 import { getChainSpecificAlternativeUrls } from '../../../util/networks'
+import { isValidHttpUrl } from '../../../util/tools'
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { ListCard } from '../../market/common/list_card/index'
@@ -113,17 +114,7 @@ const Input = styled.input`
   box-sizing: border-box;
   border-radius: 8px;
 `
-function isValidHttpUrl(data: string) {
-  let url
 
-  try {
-    url = new URL(data)
-  } catch (_) {
-    return false
-  }
-
-  return url.protocol === 'http:' || url.protocol === 'https:'
-}
 const SettingsViewContainer = () => {
   const history = useHistory()
   const context = useConnectedWeb3Context()

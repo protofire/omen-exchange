@@ -28,6 +28,17 @@ export const formatDate = (date: Date, utcAdd = true): string => {
     .tz('UTC')
     .format(`YYYY-MM-DD - HH:mm${utcAdd ? ' [UTC]' : ''}`)
 }
+export const isValidHttpUrl = (data: string): boolean => {
+  let url
+
+  try {
+    url = new URL(data)
+  } catch (_) {
+    return false
+  }
+
+  return url.protocol === 'http:' || url.protocol === 'https:'
+}
 
 export const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {
   if (!date) {
