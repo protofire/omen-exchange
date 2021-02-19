@@ -20,7 +20,6 @@ import {
   XDAI_LOCATION,
   XDAI_NETWORKS,
 } from '../../common/constants'
-import { SettingsPage } from '../../pages'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
 import { Disclaimer } from '../common/disclaimer'
 import { Footer } from '../common/layout/footer'
@@ -29,6 +28,7 @@ import { SwitchNetworkModal } from '../common/switch_network_modal'
 import { MarketRoutes } from '../market/routes/market_routes'
 import { MarketWizardCreatorContainer } from '../market/sections/market_create/market_wizard_creator_container'
 import { MarketHomeContainer } from '../market/sections/market_list/market_home_container'
+import { SettingsViewContainer } from '../settings/settings_view'
 
 const RedirectToHome = () => <Redirect to="/" />
 export const Main: React.FC = () => {
@@ -89,7 +89,7 @@ export const Main: React.FC = () => {
                 <Route exact path="/">
                   <Redirect to="/liquidity" />
                 </Route>
-                <Route component={SettingsPage} exact path="/settings" />
+                <Route component={SettingsViewContainer} exact path="/settings" />
                 <Route component={MarketHomeContainer} path="/24h-volume" />
                 <Route component={MarketHomeContainer} path="/volume" />
                 <Route component={MarketHomeContainer} path="/newest" />
