@@ -4,10 +4,11 @@ import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../hooks'
-import { getChainSpecificAlternativeUrls } from '../../../util/networks'
+import { getChainSpecificAlternativeUrls, getInfuraUrl } from '../../../util/networks'
 import { isValidHttpUrl } from '../../../util/tools'
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
+import { TextfieldCSS } from '../../common/form/textfield'
 import { ListCard } from '../../market/common/list_card/index'
 import imgInfura from '../assets/images/Infura.svg'
 
@@ -106,13 +107,9 @@ const StatusBage = styled.div<{ status: boolean }>`
 `
 
 const Input = styled.input`
-  width: 100%;
   margin-top: 20px;
-  padding: 12px 20px;
-  padding: ${props => `${props.theme.textfield.paddingVertical} ${props.theme.textfield.paddingHorizontal}`};
-  border: 1px solid ${props => props.theme.colors.tertiary};
-  box-sizing: border-box;
-  border-radius: 8px;
+
+  ${TextfieldCSS};
 `
 
 const SettingsViewContainer = () => {
@@ -121,7 +118,9 @@ const SettingsViewContainer = () => {
 
   const [current, setCurrent] = useState(0)
   const [url, setUrl] = useState<string>('')
+  const [isValidUrl, setIsValidUrl] = useState<boolean>(false)
   const [onlineStatus, setOnlineStatus] = useState<boolean>(false)
+  const [inputPlaceholder, setInputPlaceholder] = useState<string>('')
 
   const urlObject = getChainSpecificAlternativeUrls(context.networkId)
 
@@ -178,13 +177,29 @@ const SettingsViewContainer = () => {
     if (url.length === 0 && current !== dropdownItem.length - 1) {
       setUrl(urlObject[current].rpcUrl)
     }
-    if (!isValidHttpUrl(url)) {
+    const isValid = isValidHttpUrl(url)
+    setIsValidUrl(isValid)
+    if (!isValid) {
       return
     }
 
     checkRpcStatus()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url])
+  useEffect(() => {
+    if (sessionStorage.getItem('rpcAddress')) {
+      const data = JSON.parse(sessionStorage.getItem('rpcAddress') as string)
+      setUrl(data.url)
+
+      if (data.network === context.networkId) {
+        setCurrent(data.index)
+        if (data.index === dropdownItem.length - 1) {
+          setInputPlaceholder(data.url)
+        }
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <ListCard style={{ minHeight: 'initial' }}>
@@ -206,7 +221,13 @@ const SettingsViewContainer = () => {
           </FiltersControls>
         </Row>
         {current === dropdownItem.length - 1 && (
-          <Input onChange={event => setUrl(event.target.value)} placeholder="Paste your RPC URL"></Input>
+          <Input
+            onChange={event => {
+              setUrl(event.target.value)
+              if (current === dropdownItem.length - 1) setInputPlaceholder(event.target.value)
+            }}
+            placeholder={inputPlaceholder ? inputPlaceholder : 'Paste your RPC URL'}
+          ></Input>
         )}
       </MainContent>
 
@@ -228,7 +249,7 @@ const SettingsViewContainer = () => {
             Set to Default
           </ButtonRound>
           <ButtonRound
-            disabled={!isValidHttpUrl(url)}
+            disabled={!isValidUrl || getInfuraUrl(context.networkId) === url}
             onClick={async () => {
               if (!(await checkRpcStatus())) return
 
@@ -237,9 +258,9 @@ const SettingsViewContainer = () => {
                 JSON.stringify({
                   url: url,
                   network: context.networkId,
+                  index: current,
                 }),
               )
-              history.replace('/')
               window.location.reload()
             }}
           >
