@@ -575,8 +575,8 @@ describe('tools', () => {
   describe('getInitialCollateral', () => {
     const testCases: [[number, Token], Token][] = [
       [[1, getNativeAsset(1)], getNativeAsset(1)],
-      [[3, getNativeAsset(4)], getNativeAsset(4)],
-      [[3, getToken(4, 'ceth' as KnownToken)], getNativeAsset(4)],
+      [[4, getNativeAsset(4)], getNativeAsset(4)],
+      [[4, getToken(4, 'ceth' as KnownToken)], getNativeAsset(4)],
       [[77, getNativeAsset(77)], getNativeAsset(77)],
       [[100, getNativeAsset(100)], getNativeAsset(100)],
     ]
