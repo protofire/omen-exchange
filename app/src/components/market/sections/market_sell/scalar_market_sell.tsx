@@ -14,17 +14,16 @@ import {
   formatBigNumber,
   formatNumber,
   getUnit,
-  isDust,
   mulBN,
 } from '../../../../util/tools'
 import { BalanceItem, MarketDetailsTab, MarketMakerData, Status } from '../../../../util/types'
-import { Button, ButtonContainer, ButtonTab } from '../../../button'
+import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { GenericError, TabsGrid } from '../../common/common_styled'
+import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
 import { PositionSelectionBox } from '../../common/position_selection_box'
@@ -216,9 +215,6 @@ export const ScalarMarketSell = (props: Props) => {
     amountError !== null ||
     isNegativeAmountShares
 
-  const isShortTabDisabled = isDust(balances[0].shares, collateral.decimals)
-  const isLongTabDisabled = isDust(balances[1].shares, collateral.decimals)
-
   const isNewPrediction =
     formattedNewPrediction !== 0 && formattedNewPrediction !== Number(outcomeTokenMarginalPrices[1].substring(0, 20))
 
@@ -239,28 +235,6 @@ export const ScalarMarketSell = (props: Props) => {
       />
       <GridTransactionDetails>
         <div>
-          {/* <TabsGrid> */}
-          {/* <ButtonTab
-              active={(positionIndex === 0 && !isShortTabDisabled) || (isLongTabDisabled && !isShortTabDisabled)}
-              disabled={isShortTabDisabled}
-              onClick={() => {
-                setBalanceItem(balances[0])
-                setPositionIndex(0)
-              }}
-            >
-              Short
-            </ButtonTab>
-            <ButtonTab
-              active={(positionIndex === 1 && !isLongTabDisabled) || (isShortTabDisabled && !isLongTabDisabled)}
-              disabled={isLongTabDisabled}
-              onClick={() => {
-                setBalanceItem(balances[1])
-                setPositionIndex(1)
-              }}
-            >
-              Long
-            </ButtonTab>
-          </TabsGrid> */}
           <PositionSelectionBox
             balances={balances}
             decimals={collateral.decimals}

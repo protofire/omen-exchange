@@ -52,7 +52,6 @@ interface Props {
 export const PositionSelectionBox = (props: Props) => {
   const { balances, decimals, positionIndex, setBalanceItem, setPositionIndex } = props
 
-  console.log(balances)
   const reversedBalances: BalanceItem[] = reverseArray(balances)
 
   const renderPositionSelectionItem = (balance: BalanceItem) => {

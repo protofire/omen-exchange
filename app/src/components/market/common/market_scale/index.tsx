@@ -498,8 +498,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const showSingleValueBox =
     !isAmountInputted && !(additionalShares && additionalShares > 0.000001) && currentTab !== MarketDetailsTab.sell
 
-  console.log(currentTab)
-
   const singleValueBoxData = [
     {
       title: `${
