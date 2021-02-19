@@ -7,14 +7,14 @@ const MainScrollStyled = styled.div`
   flex-direction: column;
   flex-grow: 1;
   align-items: center;
-  overflow: auto;
   padding-bottom: 15px;
   padding-top: 30px;
   position: relative;
   z-index: 2;
-  overflow-x: hidden;
-  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
-    padding-top: 57px;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    overflow: auto;
+    overflow-x: hidden;
   }
 `
 
