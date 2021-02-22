@@ -16,7 +16,7 @@ interface StandardTransaction {
   data: string
 }
 
-interface Transaction {
+export interface Transaction {
   operation?: OperationType
   to: Address
   value?: string
