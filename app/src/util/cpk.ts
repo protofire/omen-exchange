@@ -8,6 +8,7 @@ import { Web3Provider } from 'ethers/providers'
 
 import { proxyFactoryAbi } from '../abi/proxy_factory'
 import { BiconomyService } from '../services/biconomy'
+import { SafeService } from '../services/safe'
 
 import { getCPKAddresses } from './networks'
 
@@ -25,6 +26,11 @@ interface Transaction {
   to: Address
   value?: string
   data?: string
+}
+
+interface TransactionResult {
+  hash?: string
+  safeTxHash?: string
 }
 
 const defaultTxOperation = OperationType.Call
@@ -45,12 +51,12 @@ function standardizeTransaction(tx: Transaction): StandardTransaction {
 class OCPK extends CPK {
   transactionManager: any
 
-  constructor(opts?: CPKConfig) {
+  constructor(opts?: any) {
     super(opts)
     this.transactionManager = opts.transactionManager
   }
 
-  async execTransactions(transactions: Transaction[], options?: ExecOptions): Promise<TransactionResult> {
+  async execTransactions(transactions: Transaction[], options?: any): Promise<TransactionResult> {
     if (!this.address) {
       throw new Error('CPK address uninitialized')
     }
@@ -143,7 +149,7 @@ class OCPK extends CPK {
   }
 }
 
-export const zeroAddress = `0x${'0'.repeat(40)}`
+export const zeroAddress = '0x0000000000000000000000000000000000000000'
 
 class BiconomyTransactionManager {
   get config() {
@@ -152,17 +158,12 @@ class BiconomyTransactionManager {
     }
   }
 
-  async execTransactions({
-    contracts,
-    ethLibAdapter,
-    isDeployed,
-    ownerAccount,
-    safeExecTxParams,
-  }: ExecTransactionProps) {
+  // @ts-expect-error ignore
+  async execTransactions({ contracts, ethLibAdapter, isDeployed, ownerAccount, safeExecTxParams }) {
+    // build params
     const proxyFactoryAddress = contracts.proxyFactory.address
     const proxyAddress = contracts.safeContract.address
     const masterCopyAddress = contracts.masterCopyAddress
-
     const { data, operation, to } = safeExecTxParams
     const value = '0'
     const safeTxGas = 0
@@ -172,16 +173,12 @@ class BiconomyTransactionManager {
     const refundReceiver = zeroAddress
     const from = ownerAccount
 
-    // TODO: get nonce dynamically
-    const nonce = isDeployed ? 1 : 0
+    // get safe transaction nonce
+    const safe = new SafeService(proxyAddress, ethLibAdapter.signer)
+    const nonce = isDeployed ? await safe.getNonce() : 0
 
-    const proxyFactory = new ethers.Contract(
-      proxyFactoryAddress,
-      proxyFactoryAbi,
-      new ethers.providers.JsonRpcProvider('https://dai.poa.network/'),
-    )
-
-    // get transaction hash to sign
+    // get safe transaction hash to sign
+    const proxyFactory = new ethers.Contract(proxyFactoryAddress, proxyFactoryAbi, ethLibAdapter.signer)
     const txHash = await proxyFactory.getTransactionHash(
       proxyAddress,
       to,
@@ -195,13 +192,14 @@ class BiconomyTransactionManager {
       refundReceiver,
       nonce,
     )
-    console.log({ txHash })
 
-    // sign transaciton hash
+    // sign transaction hash
     const signature = await this.signTransactionHash(ethLibAdapter, txHash)
 
+    // execute transaction through biconomy
     const biconomy = new BiconomyService()
 
+    // if proxy is already deployed, exec tx directly, otherwise deploy proxy first
     if (isDeployed) {
       return biconomy.execTransaction({
         data,
@@ -236,6 +234,7 @@ class BiconomyTransactionManager {
 
   private async signTransactionHash(ethLibAdapter: any, txHash: string) {
     const messageArray = ethers.utils.arrayify(txHash)
+    // sign transaction with the real, underlying mainnet signer
     let sig = await ethLibAdapter.signer.signer.signMessage(messageArray)
     let sigV = parseInt(sig.slice(-2), 16)
 
@@ -257,19 +256,19 @@ class BiconomyTransactionManager {
   }
 }
 
-export const createCPK = async (provider: Web3Provider) => {
+export const createCPK = async (provider: Web3Provider, relay: boolean) => {
   const signer = provider.getSigner()
   const network = await provider.getNetwork()
   const cpkAddresses = getCPKAddresses(network.chainId)
+
+  // TODO: if relay, use different network addresses. atm xdai addresses are overriden
   const networks = cpkAddresses
     ? {
         [network.chainId]: cpkAddresses,
       }
     : {}
 
-  // TODO: change transaction manager depending on mode
-  const transactionManager = new BiconomyTransactionManager()
-  // const transactionManager = new CpkTransactionManager()
+  const transactionManager = relay ? new BiconomyTransactionManager() : new CpkTransactionManager()
   const cpk = new OCPK({ ethLibAdapter: new EthersAdapter({ ethers, signer }), transactionManager, networks })
   await cpk.init()
   return cpk

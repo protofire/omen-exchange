@@ -4,8 +4,14 @@ import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts, useSymbol } from '../../../../hooks'
-import { CPKService, MarketMakerService } from '../../../../services'
+import {
+  useAsyncDerivedValue,
+  useConnectedCPKContext,
+  useConnectedWeb3Context,
+  useContracts,
+  useSymbol,
+} from '../../../../hooks'
+import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import {
   calcSellAmountInCollateral,
@@ -53,7 +59,7 @@ interface Props {
 export const ScalarMarketSell = (props: Props) => {
   const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
-  const { library: provider } = context
+  const cpk = useConnectedCPKContext()
 
   const {
     address: marketMakerAddress,
@@ -160,12 +166,14 @@ export const ScalarMarketSell = (props: Props) => {
         return
       }
 
+      if (!cpk) {
+        return
+      }
+
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
       setMessage(`Selling ${sharesAmount} shares ...`)
-
-      const cpk = await CPKService.create(provider)
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,

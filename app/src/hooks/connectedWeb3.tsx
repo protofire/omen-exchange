@@ -15,6 +15,8 @@ export interface ConnectedWeb3Context {
   library: providers.Web3Provider
   networkId: number
   rawWeb3Context: any
+  relay: boolean
+  toggleRelay: () => void
 }
 
 const ConnectedWeb3Context = React.createContext<Maybe<ConnectedWeb3Context>>(null)
@@ -40,7 +42,11 @@ export const ConnectedWeb3: React.FC = props => {
   const [networkId, setNetworkId] = useState<number | null>(null)
   const safeAppInfo = useSafeApp()
   const context = useWeb3Context()
+
   const { account, active, error, library } = context
+
+  const [relay, setRelay] = useState(true)
+  const toggleRelay = () => setRelay(!relay)
 
   useEffect(() => {
     let isSubscribed = true
@@ -90,32 +96,35 @@ export const ConnectedWeb3: React.FC = props => {
     return null
   }
 
-  // TODO: make a hook to make this switchable, e.g. can go back to mainnet
-  // eslint-disable-next-line
-  let provider = new ethers.providers.JsonRpcProvider('https://dai.poa.network/')
-  const netId = 100
+  let netId = networkId
+  let provider = library
 
-  const signer = library.getSigner()
-  const fakeSigner = {
-    provider,
-    getAccount: signer.getAccount,
-    getAddress: () => account,
-    _ethersType: 'Signer',
-    signer: signer,
+  if (relay) {
+    // override connected provider
+    provider = new ethers.providers.JsonRpcProvider('https://dai.poa.network/')
+    netId = 100
+    const signer = library.getSigner()
+    const fakeSigner = {
+      provider,
+      getAccount: signer.getAccount,
+      getAddress: () => account,
+      _ethersType: 'Signer',
+      // the real signer for later use
+      signer: signer,
+    }
+    provider.signer = fakeSigner
+    provider.getSigner = () => fakeSigner
   }
-  // @ts-expect-error ignore
-  provider.signer = fakeSigner
-  // @ts-expect-error ignore
-  provider.getSigner = () => fakeSigner
 
-  // provider = library
   const value = {
     account: account || null,
     library: provider,
     networkId: netId,
     rawWeb3Context: context,
+    relay,
+    toggleRelay,
   }
-  // @ts-expect-error ignore
+
   return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
 }
 

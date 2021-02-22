@@ -17,14 +17,14 @@ export const useConnectedCPKContext = () => React.useContext(ConnectedCPKContext
  */
 export const ConnectedCPK: React.FC = props => {
   const [cpk, setCpk] = useState<Maybe<CPKService>>(null)
-  const { account, library } = useConnectedWeb3Context()
+  const { account, library, relay } = useConnectedWeb3Context()
   useEffect(() => {
     if (account && library) {
-      createCPK(library)
+      createCPK(library, relay)
         .then(cpk => new CPKService(cpk, library))
         .then(setCpk)
     }
-  }, [account, library])
+  }, [account, library, relay])
 
   return <ConnectedCPKContext.Provider value={cpk}>{props.children}</ConnectedCPKContext.Provider>
 }

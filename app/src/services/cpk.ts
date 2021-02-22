@@ -1,11 +1,9 @@
 import SafeAppsSDK from '@gnosis.pm/safe-apps-sdk'
-import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
-import { createCPK } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
   getContractAddress,
@@ -29,6 +27,7 @@ import { MarketMakerFactoryService } from './market_maker_factory'
 import { OracleService } from './oracle'
 import { OvmService } from './ovm'
 import { RealitioService } from './realitio'
+import { SafeService } from './safe'
 import { UnwrapTokenService } from './unwrap_token'
 
 const logger = getLogger('Services::CPKService')
@@ -105,14 +104,6 @@ interface TxOptions {
   gas?: number
 }
 
-const proxyAbi = [
-  'function masterCopy() external view returns (address)',
-  'function changeMasterCopy(address _masterCopy) external',
-  'function swapOwner(address prevOwner, address oldOwner, address newOwner) external',
-  'function getOwners() public view returns (address[] memory)',
-  'function getThreshold() public view returns (uint256)',
-]
-
 const fallbackMultisigTransactionReceipt: TransactionReceipt = {
   byzantium: true,
 }
@@ -131,17 +122,12 @@ interface CreateMarketResult {
 class CPKService {
   cpk: any
   provider: Web3Provider
-  proxy: any
+  safe: SafeService
 
   constructor(cpk: any, provider: Web3Provider) {
     this.cpk = cpk
     this.provider = provider
-    this.proxy = new ethers.Contract(cpk.address, proxyAbi, provider.getSigner())
-  }
-
-  static async create(provider: Web3Provider) {
-    const cpk = await createCPK(provider)
-    return new CPKService(cpk, provider)
+    this.safe = new SafeService(cpk.address, provider)
   }
 
   get address(): string {
@@ -156,7 +142,7 @@ class CPKService {
       transactionReceipt = await this.provider.waitForTransaction(txObject.hash)
     } else {
       // transaction through the safe app sdk
-      const threshold = await this.proxy.getThreshold()
+      const threshold = await this.safe.getThreshold()
       if (threshold.toNumber() === 1 && txObject.safeTxHash) {
         logger.log(`Safe transaction hash: ${txObject.safeTxHash}`)
         const sdk = new SafeAppsSDK()
@@ -1174,7 +1160,7 @@ class CPKService {
     }
     const deployed = await this.cpk.isProxyDeployed()
     if (deployed) {
-      const implementation = await this.proxy.masterCopy()
+      const implementation = await this.safe.getMasterCopy()
       if (implementation.toLowerCase() === getTargetSafeImplementation(network.chainId).toLowerCase()) {
         return true
       }
@@ -1192,7 +1178,7 @@ class CPKService {
       const transactions = [
         {
           to: this.cpk.address,
-          data: this.proxy.interface.functions.changeMasterCopy.encode([targetGnosisSafeImplementation]),
+          data: this.safe.encodeChangeMasterCopy(targetGnosisSafeImplementation),
         },
       ]
       const txObject = await this.cpk.execTransactions(transactions, txOptions)

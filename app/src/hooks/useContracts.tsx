@@ -10,7 +10,7 @@ import {
   OracleService,
   RealitioService,
 } from '../services'
-import { getContractAddress, networkIds } from '../util/networks'
+import { getContractAddress } from '../util/networks'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 

@@ -38,9 +38,8 @@ class BiconomyService {
       },
       body: JSON.stringify(payload),
     })
-    // TODO: unpack transaction hash
-    const json = await response.json()
-    return json
+    const { txHash } = await response.json()
+    return { hash: txHash }
   }
 
   createProxyAndExecTransaction = async ({
