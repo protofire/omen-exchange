@@ -261,7 +261,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const showSetAllowance =
     collateral.address !== pseudoNativeAssetAddress &&
-    !cpk?.cpk.isSafeApp() &&
+    !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, 18, 4)))
@@ -310,7 +310,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     Number(sharesTotal) == 0 ||
     (status !== Status.Ready && status !== Status.Error) ||
     amount?.isZero() ||
-    (!cpk?.cpk.isSafeApp() &&
+    (!cpk?.isSafeApp &&
       collateral.address !== pseudoNativeAssetAddress &&
       displayCollateral.address !== pseudoNativeAssetAddress &&
       hasEnoughAllowance !== Ternary.True) ||
