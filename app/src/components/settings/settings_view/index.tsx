@@ -10,7 +10,8 @@ import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { TextfieldCSS } from '../../common/form/textfield'
 import { ListCard } from '../../market/common/list_card/index'
-import imgInfura from '../assets/images/Infura.svg'
+import Cloudflare from '../assets/images/Cloudflare.svg'
+import Infura from '../assets/images/Infura.svg'
 
 const TopContent = styled.div`
   padding: 24px;
@@ -98,7 +99,7 @@ const CustomDropdownItem = styled.div`
   }
 `
 
-const StatusBage = styled.div<{ status: boolean }>`
+const StatusBadge = styled.div<{ status: boolean }>`
   width: 6px;
   height: 6px;
   margin-right: 8px;
@@ -124,10 +125,10 @@ const SettingsViewContainer = () => {
 
   const urlObject = getChainSpecificAlternativeUrls(context.networkId)
 
-  const dropdownItem = urlObject.map((item, index) => {
+  const dropdownItems = urlObject.map((item, index) => {
     return {
       title: item.name,
-      image: item.name === 'Infura' ? imgInfura : undefined,
+      image: item.name === 'Infura' ? Infura : item.name === 'Cloudflare' ? Cloudflare : undefined,
       onClick: () => {
         setCurrent(index)
         setUrl(item.rpcUrl)
@@ -135,16 +136,15 @@ const SettingsViewContainer = () => {
     }
   })
 
-  dropdownItem.push({
+  dropdownItems.push({
     title: 'Custom',
     image: undefined,
     onClick: () => {
-      setCurrent(dropdownItem.length - 1)
+      setCurrent(dropdownItems.length - 1)
     },
   })
 
-  const filterItems = dropdownItem.map(item => {
-    // console.log(index)
+  const filterItems = dropdownItems.map(item => {
     return {
       content: (
         <CustomDropdownItem onClick={item.onClick}>
@@ -161,7 +161,7 @@ const SettingsViewContainer = () => {
       await axios.post(url, {
         id: +new Date(),
         jsonrpc: '2.0',
-        method: 'eth_getBlockByNumber',
+        method: 'eth_blockNumber',
         params: ['latest', true],
       })
 
@@ -174,7 +174,7 @@ const SettingsViewContainer = () => {
     }
   }
   useEffect(() => {
-    if (url.length === 0 && current !== dropdownItem.length - 1) {
+    if (url.length === 0 && current !== dropdownItems.length - 1) {
       setUrl(urlObject[current].rpcUrl)
     }
     const isValid = isValidHttpUrl(url)
@@ -193,7 +193,7 @@ const SettingsViewContainer = () => {
 
       if (data.network === context.networkId) {
         setCurrent(data.index)
-        if (data.index === dropdownItem.length - 1) {
+        if (data.index === dropdownItems.length - 1) {
           setInputPlaceholder(data.url)
         }
       }
@@ -212,7 +212,7 @@ const SettingsViewContainer = () => {
           <Column>
             <Text>RPC Endpoint</Text>
             <StatusSection>
-              <StatusBage status={onlineStatus} />
+              <StatusBadge status={onlineStatus} />
               <TextLighter>Status: {onlineStatus ? 'OK' : 'Unavailable'}</TextLighter>
             </StatusSection>
           </Column>
@@ -220,11 +220,11 @@ const SettingsViewContainer = () => {
             <NodeDropdown currentItem={current} dirty dropdownPosition={DropdownPosition.center} items={filterItems} />
           </FiltersControls>
         </Row>
-        {current === dropdownItem.length - 1 && (
+        {current === dropdownItems.length - 1 && (
           <Input
             onChange={event => {
               setUrl(event.target.value)
-              if (current === dropdownItem.length - 1) setInputPlaceholder(event.target.value)
+              if (current === dropdownItems.length - 1) setInputPlaceholder(event.target.value)
             }}
             placeholder={inputPlaceholder ? inputPlaceholder : 'Paste your RPC URL'}
           ></Input>
