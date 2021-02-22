@@ -29,8 +29,7 @@ const Radio = styled.div<{ outcomeIndex: number; checked: boolean }>`
     `}
 `
 
-const Input = styled.input`
-  cursor: pointer;
+const Input = styled.input<{ disabled: boolean | undefined }>`
   height: 100%;
   left: 0;
   opacity: 0;
@@ -38,6 +37,7 @@ const Input = styled.input`
   top: 0;
   width: 100%;
   z-index: 5;
+  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
