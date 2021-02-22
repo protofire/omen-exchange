@@ -293,7 +293,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       ? newPrediction * 100
       : currentPrediction
       ? Number(currentPrediction) * 100
-      : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound, 18),
+      : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound),
   )
   const [scaleValuePrediction, setScaleValuePrediction] = useState(currentPredictionNumber || newPredictionNumber)
   const [yourPayout, setYourPayout] = useState(0)
@@ -375,7 +375,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         ? newPrediction * 100
         : currentPrediction
         ? Number(currentPrediction) * 100
-        : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound, 18),
+        : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound),
     )
     setScaleValuePrediction(
       calcPrediction(newPrediction?.toString() || currentPrediction?.toString() || '', lowerBound, upperBound),
@@ -489,7 +489,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: startingPointTitle,
       xValue: currentPrediction
         ? Number(currentPrediction)
-        : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound, 18) / 100,
+        : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound) / 100,
     },
   ]
 

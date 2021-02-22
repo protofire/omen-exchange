@@ -159,7 +159,6 @@ export const ScalarMarketSell = (props: Props) => {
       parseUnits(newPrediction.toString(), 18),
       scalarLow || new BigNumber(0),
       scalarHigh || new BigNumber(0),
-      18,
     ) / 100
 
   const finish = async () => {
