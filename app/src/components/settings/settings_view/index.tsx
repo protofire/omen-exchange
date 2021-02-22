@@ -9,9 +9,8 @@ import { isValidHttpUrl } from '../../../util/tools'
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { TextfieldCSS } from '../../common/form/textfield'
+import { IconCloudflare, IconInfura } from '../../common/icons'
 import { ListCard } from '../../market/common/list_card/index'
-import Cloudflare from '../assets/images/Cloudflare.svg'
-import Infura from '../assets/images/Infura.svg'
 
 const TopContent = styled.div`
   padding: 24px;
@@ -112,6 +111,9 @@ const Input = styled.input`
 
   ${TextfieldCSS};
 `
+const ImageWrap = styled.div`
+  margin-right: 10px;
+`
 
 const SettingsViewContainer = () => {
   const history = useHistory()
@@ -128,7 +130,7 @@ const SettingsViewContainer = () => {
   const dropdownItems = urlObject.map((item, index) => {
     return {
       title: item.name,
-      image: item.name === 'Infura' ? Infura : item.name === 'Cloudflare' ? Cloudflare : undefined,
+      image: item.name === 'Infura' ? <IconInfura /> : item.name === 'Cloudflare' ? <IconCloudflare /> : undefined,
       onClick: () => {
         setCurrent(index)
         setUrl(item.rpcUrl)
@@ -148,7 +150,7 @@ const SettingsViewContainer = () => {
     return {
       content: (
         <CustomDropdownItem onClick={item.onClick}>
-          {item.image && <img alt="node" src={item.image} />}
+          {item.image && <ImageWrap>{item.image}</ImageWrap>}
           {item.title}
         </CustomDropdownItem>
       ),
