@@ -7,7 +7,16 @@ import { useConnectedWeb3Context, useSymbol } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getTokenFromAddress } from '../../../../util/networks'
-import { calcPrice, formatBigNumber, formatNumber, formatToShortNumber, isScalarMarket } from '../../../../util/tools'
+import {
+  calcPrediction,
+  calcPrice,
+  formatBigNumber,
+  formatNumber,
+  formatToShortNumber,
+  getScalarTitle,
+  getUnit,
+  isScalarMarket,
+} from '../../../../util/tools'
 import { MarketMakerDataItem, Token } from '../../../../util/types'
 import { IconStar } from '../../../common/icons/IconStar'
 
@@ -138,19 +147,20 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
   let currentPrediction
   let unit
+  let scalarTitle
+
   if (isScalar) {
-    unit = title.split('[')[1].split(']')[0]
-    const lowerBoundNumber = scalarLow && Number(formatBigNumber(scalarLow, 18))
-    const upperBoundNumber = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
-    currentPrediction =
-      Number(outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : '0') *
-        ((upperBoundNumber || 0) - (lowerBoundNumber || 0)) +
-      (lowerBoundNumber || 0)
+    unit = getUnit(title)
+    scalarTitle = getScalarTitle(title)
+
+    if (outcomeTokenMarginalPrices && scalarLow && scalarHigh) {
+      currentPrediction = calcPrediction(outcomeTokenMarginalPrices[1], scalarLow, scalarHigh)
+    }
   }
 
   return (
     <Wrapper to={`/${address}`}>
-      <Title>{title}</Title>
+      <Title>{isScalar ? scalarTitle : title}</Title>
       <Info>
         <IconStar></IconStar>
         <Outcome>
@@ -172,7 +182,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
                     formatBigNumber(runningDailyVolumeByHour[Math.floor(Date.now() / (1000 * 60 * 60)) % 24], decimals),
                   )
                 : 0
-            } ${symbol} - 24hr Volume`}
+            } ${symbol} - 24h Volume`}
           {currentFilter.sortBy === 'usdLiquidityParameter' &&
             `${formatToShortNumber(formattedLiquidity)} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}

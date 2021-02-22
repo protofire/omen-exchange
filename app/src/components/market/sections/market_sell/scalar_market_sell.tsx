@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -14,7 +14,9 @@ import {
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import {
+  calcPrediction,
   calcSellAmountInCollateral,
+  calcXValue,
   computeBalanceAfterTrade,
   formatBigNumber,
   formatNumber,
@@ -83,9 +85,6 @@ export const ScalarMarketSell = (props: Props) => {
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
 
-  const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
-  const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
-
   const symbol = useSymbol(collateral)
 
   useEffect(() => {
@@ -142,12 +141,16 @@ export const ScalarMarketSell = (props: Props) => {
       const potentialValue = mulBN(amountToSell, 1 / (1 - marketFeeWithTwoDecimals))
       const costFee = potentialValue.sub(amountToSell)
 
-      const newPrediction = pricesAfterTrade[1] * ((upperBound || 0) - (lowerBound || 0)) + (lowerBound || 0)
+      const newPrediction = calcPrediction(
+        pricesAfterTrade[1].toString(),
+        scalarLow || new BigNumber(0),
+        scalarHigh || new BigNumber(0),
+      )
 
       logger.log(`Amount to sell ${amountToSell}`)
       return [costFee, newPrediction, amountToSell, potentialValue]
     },
-    [balances, positionIndex, lowerBound, upperBound, fee],
+    [balances, positionIndex, scalarLow, scalarHigh, fee],
   )
 
   const [costFee, newPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(
@@ -157,7 +160,13 @@ export const ScalarMarketSell = (props: Props) => {
   )
 
   const formattedNewPrediction =
-    newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
+    newPrediction &&
+    calcXValue(
+      parseUnits(newPrediction.toString(), 18),
+      scalarLow || new BigNumber(0),
+      scalarHigh || new BigNumber(0),
+      18,
+    ) / 100
 
   const finish = async () => {
     const outcomeIndex = positionIndex
@@ -224,7 +233,6 @@ export const ScalarMarketSell = (props: Props) => {
   return (
     <>
       <MarketScale
-        amount={potentialValue}
         borderTop={true}
         collateral={collateral}
         currentPrediction={isNewPrediction ? String(formattedNewPrediction) : outcomeTokenMarginalPrices[1]}
@@ -232,6 +240,7 @@ export const ScalarMarketSell = (props: Props) => {
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
         startingPointTitle={isNewPrediction ? 'New prediction' : 'Current prediction'}
+        tradeAmount={potentialValue}
         unit={getUnit(question.title)}
         upperBound={scalarHigh || new BigNumber(0)}
       />

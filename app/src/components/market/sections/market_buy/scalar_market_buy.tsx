@@ -1,6 +1,6 @@
 import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -18,7 +18,15 @@ import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import { computeBalanceAfterTrade, formatBigNumber, formatNumber, getUnit, mulBN } from '../../../../util/tools'
+import {
+  calcPrediction,
+  calcXValue,
+  computeBalanceAfterTrade,
+  formatBigNumber,
+  formatNumber,
+  getUnit,
+  mulBN,
+} from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -111,9 +119,6 @@ export const ScalarMarketBuy = (props: Props) => {
   const collateralBalance = maybeCollateralBalance || Zero
   const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
 
-  const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
-  const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
-
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount, collateral.decimals).includes('-'))
   }, [amount, collateral.decimals])
@@ -166,11 +171,15 @@ export const ScalarMarketBuy = (props: Props) => {
       )
       const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
 
-      const newPrediction = pricesAfterTrade[1] * ((upperBound || 0) - (lowerBound || 0)) + (lowerBound || 0)
+      const newPrediction = calcPrediction(
+        pricesAfterTrade[1].toString(),
+        scalarLow || new BigNumber(0),
+        scalarHigh || new BigNumber(0),
+      )
 
       return [tradedShares, newPrediction, amount]
     },
-    [balances, marketMaker, positionIndex, lowerBound, upperBound],
+    [balances, marketMaker, positionIndex, scalarLow, scalarHigh],
   )
 
   const [tradedShares, newPrediction, debouncedAmount] = useAsyncDerivedValue(
@@ -180,7 +189,13 @@ export const ScalarMarketBuy = (props: Props) => {
   )
 
   const formattedNewPrediction =
-    newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
+    newPrediction &&
+    calcXValue(
+      parseUnits(newPrediction.toString(), 18),
+      scalarLow || new BigNumber(0),
+      scalarHigh || new BigNumber(0),
+      18,
+    ) / 100
 
   const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
   const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
@@ -270,7 +285,6 @@ export const ScalarMarketBuy = (props: Props) => {
   return (
     <>
       <MarketScale
-        amount={amount}
         amountShares={tradedShares}
         borderTop={true}
         collateral={collateral}
@@ -281,6 +295,7 @@ export const ScalarMarketBuy = (props: Props) => {
         newPrediction={formattedNewPrediction}
         short={activeTab === Tabs.short}
         startingPointTitle={'Current prediction'}
+        tradeAmount={amount}
         unit={getUnit(question.title)}
         upperBound={scalarHigh || new BigNumber(0)}
       />

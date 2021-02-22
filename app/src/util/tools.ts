@@ -492,6 +492,11 @@ export const getUnit = (title: string): string => {
   const unit = splitTitle[splitTitle.length - 1].split(']')[0]
   return unit
 }
+export const getScalarTitle = (title: string): string => {
+  const unit = getUnit(title)
+  const scalarTitle = title.substring(0, title.length - (unit.length + 3))
+  return scalarTitle
+}
 
 export const getMarketRelatedQuestionFilter = (
   marketsRelatedQuestion: MarketTokenPair[],
@@ -524,6 +529,49 @@ export const onChangeMarketCurrency = (
       history.replace(`/${selectedMarket.id}`)
     }
   }
+}
+
+export const calcXValue = (
+  currentPrediction: BigNumber,
+  lowerBound: BigNumber,
+  upperBound: BigNumber,
+  decimals: number,
+) => {
+  const currentPredictionNumber = Number(formatBigNumber(currentPrediction, decimals))
+  const lowerBoundNumber = Number(formatBigNumber(lowerBound, decimals))
+  const upperBoundNumber = Number(formatBigNumber(upperBound, decimals))
+  const xValue = ((currentPredictionNumber - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100
+  return xValue
+}
+
+export const calcPrediction = (probability: string, lowerBound: BigNumber, upperBound: BigNumber) => {
+  const probabilityNumber = Number(probability)
+  const lowerBoundNumber = Number(formatBigNumber(lowerBound, 18, 18))
+  const upperBoundNumber = Number(formatBigNumber(upperBound, 18, 18))
+  const prediction = probabilityNumber * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
+  return prediction
+}
+
+export const bigMax = (array: Big[]) => {
+  let len = array.length
+  let maxValue = new Big(0)
+  while (len--) {
+    if (array[len].gt(maxValue)) {
+      maxValue = array[len]
+    }
+  }
+  return maxValue
+}
+
+export const bigMin = (array: Big[]) => {
+  let len = array.length
+  let minValue
+  while (len--) {
+    if (!minValue || array[len].lt(minValue)) {
+      minValue = array[len]
+    }
+  }
+  return minValue
 }
 
 /**
