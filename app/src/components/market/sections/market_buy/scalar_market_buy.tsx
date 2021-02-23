@@ -194,7 +194,6 @@ export const ScalarMarketBuy = (props: Props) => {
       parseUnits(newPrediction.toString(), 18),
       scalarLow || new BigNumber(0),
       scalarHigh || new BigNumber(0),
-      18,
     ) / 100
 
   const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
@@ -214,7 +213,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const showSetAllowance =
     collateral.address !== pseudoNativeAssetAddress &&
-    !cpk?.cpk.isSafeApp() &&
+    !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
@@ -231,7 +230,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const isBuyDisabled =
     (status !== Status.Ready && status !== Status.Error) ||
     amount.isZero() ||
-    (!cpk?.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
+    (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount
 

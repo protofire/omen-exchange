@@ -521,13 +521,13 @@ describe('tools', () => {
   })
 
   describe('calcXValue', () => {
-    const testCases: [[BigNumber, BigNumber, BigNumber, number], number][] = [
-      [[parseUnits('5', 18), parseUnits('0', 18), parseUnits('10', 18), 18], 50],
-      [[parseUnits('40', 18), parseUnits('5', 18), parseUnits('105', 18), 18], 35],
-      [[parseUnits('2', 6), parseUnits('0', 6), parseUnits('10', 6), 6], 20],
+    const testCases: [[BigNumber, BigNumber, BigNumber], number][] = [
+      [[parseUnits('5', 18), parseUnits('0', 18), parseUnits('10', 18)], 50],
+      [[parseUnits('40', 18), parseUnits('5', 18), parseUnits('105', 18)], 35],
+      [[parseUnits('2', 18), parseUnits('0', 18), parseUnits('10', 18)], 20],
     ]
-    for (const [[currentPrediction, lowerBound, upperBound, decimals], result] of testCases) {
-      const xValue = calcXValue(currentPrediction, lowerBound, upperBound, decimals)
+    for (const [[currentPrediction, lowerBound, upperBound], result] of testCases) {
+      const xValue = calcXValue(currentPrediction, lowerBound, upperBound)
 
       expect(xValue).toStrictEqual(result)
     }
