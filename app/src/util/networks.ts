@@ -34,6 +34,13 @@ export const networkIds = {
   XDAI: 100,
 } as const
 
+export const networkNames = {
+  1: 'MAINNET',
+  4: 'RINKEBY',
+  77: 'SOKOL',
+  100: 'XDAI',
+} as const
+
 type CPKAddresses = {
   masterCopyAddress: string
   proxyFactoryAddress: string
@@ -766,4 +773,11 @@ export const waitForBlockToSync = async (networkId: number, blockNum: number) =>
     block = await getGraphMeta(networkId)
     await waitABit()
   }
+}
+
+export const getBySafeTx = async (networkId: number, safeTxHash: string) => {
+  const networkName = (networkNames as any)[networkId].toLowerCase()
+  const txServiceUrl = `https://safe-transaction.${networkName}.gnosis.io/api/v1`
+  const result = await axios.get(`${txServiceUrl}/transactions/${safeTxHash}`)
+  return result.data
 }

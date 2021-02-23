@@ -2,7 +2,7 @@ import { ethers, providers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
-import connectors from '../util/connectors'
+import connectors, { handleGsMultiSend } from '../util/connectors'
 import { getLogger } from '../util/logger'
 import { getInfuraUrl, networkIds } from '../util/networks'
 
@@ -70,12 +70,17 @@ export const ConnectedWeb3: React.FC = props => {
       context.setConnector('Infura')
     }
 
+    handleGsMultiSend()
+
     // disabled block tracker
-    const infura = connectors['Infura']
-    // @ts-expect-error ignore
-    if (infura.engine && infura.engine._blockTracker && infura.engine._blockTracker._isRunning) {
-      // @ts-expect-error ignore
-      infura.engine.stop()
+    if (context.connector) {
+      if (
+        context.connector.engine &&
+        context.connector.engine._blockTracker &&
+        context.connector.engine._blockTracker._isRunning
+      ) {
+        context.connector.engine.stop()
+      }
     }
 
     const checkIfReady = async () => {
