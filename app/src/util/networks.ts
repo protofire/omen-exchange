@@ -233,9 +233,8 @@ const networks: { [K in NetworkId]: Network } = {
     alternativeUrls: [
       {
         rpcUrl: 'https://rpc.xdaichain.com/',
-        name: 'xDai',
+        name: 'Blockscout',
       },
-      { rpcUrl: 'https://xdai-archive.blockscout.com', name: 'Blockscout' },
     ],
     graphHttpUri: GRAPH_XDAI_HTTP,
     graphWsUri: GRAPH_XDAI_WS,
