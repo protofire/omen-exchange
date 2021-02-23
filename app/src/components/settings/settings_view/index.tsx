@@ -9,7 +9,7 @@ import { isValidHttpUrl } from '../../../util/tools'
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { TextfieldCSS } from '../../common/form/textfield'
-import { IconCloudflare, IconInfura } from '../../common/icons'
+import { IconBlockscout, IconCloudflare, IconInfura } from '../../common/icons'
 import { ListCard } from '../../market/common/list_card/index'
 
 const TopContent = styled.div`
@@ -130,7 +130,16 @@ const SettingsViewContainer = () => {
   const dropdownItems = urlObject.map((item, index) => {
     return {
       title: item.name,
-      image: item.name === 'Infura' ? <IconInfura /> : item.name === 'Cloudflare' ? <IconCloudflare /> : undefined,
+      image:
+        item.name === 'Infura' ? (
+          <IconInfura />
+        ) : item.name === 'Cloudflare' ? (
+          <IconCloudflare />
+        ) : item.name === 'Blockscout' ? (
+          <IconBlockscout />
+        ) : (
+          undefined
+        ),
       onClick: () => {
         setCurrent(index)
         setUrl(item.rpcUrl)
