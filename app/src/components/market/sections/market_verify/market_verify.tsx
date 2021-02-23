@@ -112,7 +112,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   if (!loading && errorMessage) return <GenericError>{errorMessage || 'Failed to fetch curation data'}</GenericError>
 
   const verificationBtnDisabled =
-    loading || typeof selection !== 'number' || !ovmAddress || verificationState != 1 || (cpk && cpk.cpk.isSafeApp())
+    loading || typeof selection !== 'number' || !ovmAddress || verificationState != 1 || cpk?.isSafeApp
   return (
     <MarketVerification>
       {loading || !data ? (

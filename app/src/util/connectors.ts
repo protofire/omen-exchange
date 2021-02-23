@@ -5,6 +5,8 @@ import { Connectors } from 'web3-react'
 
 import { getInfuraUrl, infuraNetworkURL, supportedNetworkIds, supportedNetworkURLs } from '../util/networks'
 
+import { Transaction } from './cpk'
+
 const { InjectedConnector, NetworkOnlyConnector, WalletConnectConnector } = Connectors
 
 const MetaMask = new InjectedConnector({
@@ -17,6 +19,47 @@ const WalletConnect = new WalletConnectConnector({
   supportedNetworkURLs,
   defaultNetwork: 1,
 })
+
+interface Payload {
+  method: string
+  params: Transaction[]
+}
+
+type End = (error?: string, safeTxHash?: string) => number
+
+/**
+ *  adds a handler for the gs_multi_send method to the wallet connect provider
+ */
+export function handleGsMultiSend() {
+  // @ts-expect-error ignore
+  const subprovider = WalletConnect.walletConnectSubprovider
+
+  if (subprovider && !WalletConnect.gs_multi_send) {
+    WalletConnect.gs_multi_send = true
+    const handleRequest = subprovider.handleRequest
+
+    subprovider.handleRequest = function(payload: Payload, next: () => void, end: End) {
+      if (payload.method === 'gs_multi_send') {
+        const gsMultiSend = async () => {
+          const request = subprovider._walletConnector._formatRequest({
+            method: payload.method,
+            params: payload.params.map(tx => ({ ...tx, value: tx.value && tx.value.toString() })),
+          })
+          try {
+            const safeTxHash = await subprovider._walletConnector._sendCallRequest(request)
+            return end(undefined, safeTxHash)
+          } catch (error) {
+            return end(error)
+          }
+        }
+        return gsMultiSend()
+      }
+
+      // eslint-disable-next-line
+      return handleRequest.apply(this, arguments)
+    }
+  }
+}
 
 const Infura = new NetworkOnlyConnector({
   providerURL: infuraNetworkURL,
