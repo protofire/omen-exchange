@@ -53,8 +53,9 @@ const MarketWizardCreatorContainer: FC = () => {
           return
         }
         setMarketCreationStatus(MarketCreationStatus.creatingAMarket())
+
         if (
-          !cpk.cpk.isSafeApp() &&
+          !cpk.isSafeApp &&
           marketData.collateral.address !== pseudoNativeAssetAddress &&
           marketData.userInputCollateral.address !== pseudoNativeAssetAddress
         ) {
