@@ -592,3 +592,8 @@ export const getInitialCollateral = (networkId: number, collateral: Token): Toke
     }
   }
 }
+
+export const reverseArray = (array: any[]): any[] => {
+  const newArray = array.map((e, i, a) => a[a.length - 1 - i])
+  return newArray
+}

@@ -6,6 +6,7 @@ import { MarketSell } from './market_sell'
 import { ScalarMarketSell } from './scalar_market_sell'
 
 interface Props {
+  currentTab: MarketDetailsTab
   isScalar: boolean
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
