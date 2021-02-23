@@ -213,7 +213,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const showSetAllowance =
     collateral.address !== pseudoNativeAssetAddress &&
-    !cpk?.cpk.isSafeApp() &&
+    !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
@@ -230,7 +230,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const isBuyDisabled =
     (status !== Status.Ready && status !== Status.Error) ||
     amount.isZero() ||
-    (!cpk?.cpk.isSafeApp() && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
+    (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount
 
