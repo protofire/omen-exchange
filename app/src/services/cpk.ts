@@ -1,4 +1,3 @@
-import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'

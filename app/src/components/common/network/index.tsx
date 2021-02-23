@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
+import { useWeb3Context } from 'web3-react/dist'
 
-import { useConnectedWeb3Context } from '../../../hooks'
 import { truncateStringInTheMiddle } from '../../../util/tools'
 
 import { ConnectionIcon } from './img/ConnectionIcon'
@@ -30,7 +30,7 @@ const ConnectionStatusDot = styled.div`
 `
 
 export const Network: React.FC = props => {
-  const context = useConnectedWeb3Context()
+  const context = useWeb3Context()
   const { account } = context
 
   if (!account) {
