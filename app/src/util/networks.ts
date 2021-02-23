@@ -64,6 +64,7 @@ interface Network {
     omenVerifiedMarkets: string
   }
   cpk?: CPKAddresses
+  relayProxyFactoryAddress?: string
   wrapToken: string
   targetSafeImplementation: string
   nativeAsset: Token
@@ -222,10 +223,11 @@ const networks: { [K in NetworkId]: Network } = {
     },
     cpk: {
       masterCopyAddress: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
-      proxyFactoryAddress: '0x9D3760EC184a5092D3D5010396faada954183847',
+      proxyFactoryAddress: '0x3049b84bbC3EB2C375547CAc0D77da032d3d1981',
       multiSendAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
       fallbackHandlerAddress: '0x602DF5F404f86469459D5e604CDa43A2cdFb7580',
     },
+    relayProxyFactoryAddress: '0x9D3760EC184a5092D3D5010396faada954183847',
     wrapToken: 'wxdai',
     nativeAsset: {
       address: pseudoNativeAssetAddress,
@@ -668,6 +670,15 @@ export const getCPKAddresses = (networkId: number): Maybe<CPKAddresses> => {
 
   const cpkAddresses = networks[networkId].cpk
   return cpkAddresses || null
+}
+
+export const getRelayProxyFactory = (networkId: number): Maybe<string> => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  const proxyFactoryAddress = networks[networkId].relayProxyFactoryAddress
+  return proxyFactoryAddress || null
 }
 
 export const getGraphUris = (networkId: number): { httpUri: string; wsUri: string } => {

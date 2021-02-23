@@ -4,7 +4,7 @@ import { useWeb3Context } from 'web3-react'
 
 import connectors from '../util/connectors'
 import { getLogger } from '../util/logger'
-import { networkIds } from '../util/networks'
+import { getInfuraUrl, networkIds } from '../util/networks'
 
 import { useSafeApp } from './useSafeApp'
 
@@ -98,11 +98,13 @@ export const ConnectedWeb3: React.FC = props => {
 
   let netId = networkId
   let provider = library
+  let isRelay = false
 
-  if (relay) {
+  if (relay && networkId === networkIds.MAINNET) {
     // override connected provider
-    provider = new ethers.providers.JsonRpcProvider('https://dai.poa.network/')
-    netId = 100
+    isRelay = true
+    netId = networkIds.XDAI
+    provider = new ethers.providers.JsonRpcProvider(getInfuraUrl(netId))
     const signer = library.getSigner()
     const fakeSigner = {
       provider,
@@ -121,7 +123,7 @@ export const ConnectedWeb3: React.FC = props => {
     library: provider,
     networkId: netId,
     rawWeb3Context: context,
-    relay,
+    relay: isRelay,
     toggleRelay,
   }
 

@@ -10,7 +10,7 @@ import { proxyFactoryAbi } from '../abi/proxy_factory'
 import { BiconomyService } from '../services/biconomy'
 import { SafeService } from '../services/safe'
 
-import { getCPKAddresses } from './networks'
+import { getCPKAddresses, getRelayProxyFactory } from './networks'
 
 type Address = string
 
@@ -261,12 +261,19 @@ export const createCPK = async (provider: Web3Provider, relay: boolean) => {
   const network = await provider.getNetwork()
   const cpkAddresses = getCPKAddresses(network.chainId)
 
-  // TODO: if relay, use different network addresses. atm xdai addresses are overriden
   const networks = cpkAddresses
     ? {
         [network.chainId]: cpkAddresses,
       }
     : {}
+
+  // update proxy factory if relay is enabled
+  if (relay) {
+    const relayProxyFactoryAddress = getRelayProxyFactory(network.chainId)
+    if (relayProxyFactoryAddress) {
+      networks[network.chainId].proxyFactoryAddress = relayProxyFactoryAddress
+    }
+  }
 
   const transactionManager = relay ? new BiconomyTransactionManager() : new CpkTransactionManager()
   const cpk = new OCPK({ ethLibAdapter: new EthersAdapter({ ethers, signer }), transactionManager, networks })
