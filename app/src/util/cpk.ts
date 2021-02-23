@@ -1,5 +1,6 @@
 import CPK, { OperationType } from 'contract-proxy-kit/lib/esm'
 import multiSendAbi from 'contract-proxy-kit/lib/esm/abis/MultiSendAbi.json'
+import safeAbi from 'contract-proxy-kit/lib/esm/abis/SafeAbi.json'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import CpkTransactionManager from 'contract-proxy-kit/lib/esm/transactionManagers/CpkTransactionManager'
 import { getHexDataLength, joinHexData } from 'contract-proxy-kit/lib/esm/utils/hexData'
@@ -10,7 +11,7 @@ import { proxyFactoryAbi } from '../abi/proxy_factory'
 import { BiconomyService } from '../services/biconomy'
 import { SafeService } from '../services/safe'
 
-import { getCPKAddresses, getRelayProxyFactory } from './networks'
+import { getCPKAddresses, getRelayProxyFactory, networkIds } from './networks'
 
 type Address = string
 
@@ -46,14 +47,43 @@ function standardizeTransaction(tx: Transaction): StandardTransaction {
   }
 }
 
+// keccak256(toUtf8Bytes('Contract Proxy Kit'))
+const predeterminedSaltNonce = '0xcfe33a586323e7325be6aa6ecd8b4600d232a9037e83c8ece69413b777dabe65'
+
 // Omen CPK monkey patch
 // @ts-expect-error ignore
 class OCPK extends CPK {
   transactionManager: any
+  relay: boolean
+  owner?: string
 
   constructor(opts?: any) {
     super(opts)
     this.transactionManager = opts.transactionManager
+    this.relay = this.transactionManager.config.name === 'BiconomyTransactionManager'
+  }
+
+  async init() {
+    await super.init()
+    if (this.ethLibAdapter) {
+      this.owner = await this.ethLibAdapter?.getAccount()
+    }
+  }
+
+  get contract(): any {
+    if (this.relay && this.owner) {
+      return this.ethLibAdapter?.getContract(safeAbi, this.owner)
+    }
+    // @ts-expect-error ignore
+    return super.contract
+  }
+
+  get address(): string {
+    if (this.relay && this.owner) {
+      return this.owner
+    }
+    // @ts-expect-error ignore
+    return super.address
   }
 
   async execTransactions(transactions: Transaction[], options?: any): Promise<TransactionResult> {
@@ -216,8 +246,6 @@ class BiconomyTransactionManager {
         value,
       })
     } else {
-      // keccak256(toUtf8Bytes('Contract Proxy Kit'))
-      const predeterminedSaltNonce = '0xcfe33a586323e7325be6aa6ecd8b4600d232a9037e83c8ece69413b777dabe65'
       return biconomy.createProxyAndExecTransaction({
         data,
         from,
@@ -279,6 +307,28 @@ export const createCPK = async (provider: Web3Provider, relay: boolean) => {
   const cpk = new OCPK({ ethLibAdapter: new EthersAdapter({ ethers, signer }), transactionManager, networks })
   await cpk.init()
   return cpk
+}
+
+// for calcRelayProxyAddress to be sync we need to hardcode proxy code
+const proxyCreationCode = `0x608060405234801561001057600080fd5b506040516101e73803806101e78339818101604052602081101561003357600080fd5b8101908080519060200190929190505050600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156100ca576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260248152602001806101c36024913960400191505060405180910390fd5b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505060aa806101196000396000f3fe608060405273ffffffffffffffffffffffffffffffffffffffff600054167fa619486e0000000000000000000000000000000000000000000000000000000060003514156050578060005260206000f35b3660008037600080366000845af43d6000803e60008114156070573d6000fd5b3d6000f3fea265627a7a723158204c807779ddbfed51d1cf24bb162a9434af4e2c5b76610190e5201a10c9e1845664736f6c63430005100032496e76616c6964206d617374657220636f707920616464726573732070726f7669646564`
+
+export const calcRelayProxyAddress = (account: string, provider: any) => {
+  const ethLibAdapter = new EthersAdapter({ ethers, signer: { provider } })
+  const relayProxyFactoryAddress = getRelayProxyFactory(networkIds.XDAI)
+  const cpkAddresses = getCPKAddresses(networkIds.XDAI)
+  if (relayProxyFactoryAddress && cpkAddresses) {
+    const saltNonce = predeterminedSaltNonce
+    const salt = ethLibAdapter.keccak256(ethLibAdapter.abiEncode(['address', 'uint256'], [account, saltNonce]))
+    const initCode = ethLibAdapter.abiEncodePacked(
+      { type: 'bytes', value: proxyCreationCode },
+      {
+        type: 'bytes',
+        value: ethLibAdapter.abiEncode(['address'], [cpkAddresses.masterCopyAddress]),
+      },
+    )
+    const proxyAddress = ethLibAdapter.calcCreate2Address(relayProxyFactoryAddress, salt, initCode)
+    return proxyAddress
+  }
 }
 
 export default OCPK

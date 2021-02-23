@@ -135,7 +135,7 @@ class CPKService {
   }
 
   get isSafeApp(): boolean {
-    if (this.cpk.isConnectedToSafe || this.cpk.isSafeApp()) {
+    if (this.cpk.relay || this.cpk.isConnectedToSafe || this.cpk.isSafeApp()) {
       return true
     }
     return false
