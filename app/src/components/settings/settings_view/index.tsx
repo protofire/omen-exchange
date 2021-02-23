@@ -91,6 +91,7 @@ const CustomDropdownItem = styled.div`
   display: flex;
   align-items: center;
   letter-spacing: 0.4px;
+  height: 24px;
   color: ${props => props.theme.colors.textColorDark};
 
   img {
