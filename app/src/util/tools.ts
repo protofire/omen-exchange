@@ -531,15 +531,10 @@ export const onChangeMarketCurrency = (
   }
 }
 
-export const calcXValue = (
-  currentPrediction: BigNumber,
-  lowerBound: BigNumber,
-  upperBound: BigNumber,
-  decimals: number,
-) => {
-  const currentPredictionNumber = Number(formatBigNumber(currentPrediction, decimals))
-  const lowerBoundNumber = Number(formatBigNumber(lowerBound, decimals))
-  const upperBoundNumber = Number(formatBigNumber(upperBound, decimals))
+export const calcXValue = (currentPrediction: BigNumber, lowerBound: BigNumber, upperBound: BigNumber) => {
+  const currentPredictionNumber = Number(formatBigNumber(currentPrediction, 18))
+  const lowerBoundNumber = Number(formatBigNumber(lowerBound, 18))
+  const upperBoundNumber = Number(formatBigNumber(upperBound, 18))
   const xValue = ((currentPredictionNumber - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100
   return xValue
 }
