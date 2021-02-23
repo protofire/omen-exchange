@@ -1,4 +1,5 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
+import axios from 'axios'
 import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
@@ -27,6 +28,23 @@ export const formatDate = (date: Date, utcAdd = true): string => {
   return moment(date)
     .tz('UTC')
     .format(`YYYY-MM-DD - HH:mm${utcAdd ? ' [UTC]' : ''}`)
+}
+export const checkRpcStatus = async (customUrl: string, setStatus: any) => {
+  try {
+    await axios.post(customUrl, {
+      id: +new Date(),
+      jsonrpc: '2.0',
+      method: 'eth_blockNumber',
+      params: ['latest', true],
+    })
+
+    setStatus(true)
+    return true
+  } catch (e) {
+    setStatus(false)
+
+    return false
+  }
 }
 export const isValidHttpUrl = (data: string): boolean => {
   let url

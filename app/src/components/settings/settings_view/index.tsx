@@ -1,11 +1,10 @@
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../hooks'
 import { getChainSpecificAlternativeUrls, getInfuraUrl } from '../../../util/networks'
-import { isValidHttpUrl } from '../../../util/tools'
+import { checkRpcStatus, isValidHttpUrl } from '../../../util/tools'
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { TextfieldCSS } from '../../common/form/textfield'
@@ -168,23 +167,7 @@ const SettingsViewContainer = () => {
       onClick: item.onClick,
     }
   })
-  const checkRpcStatus = async () => {
-    try {
-      await axios.post(url, {
-        id: +new Date(),
-        jsonrpc: '2.0',
-        method: 'eth_blockNumber',
-        params: ['latest', true],
-      })
 
-      setOnlineStatus(true)
-      return true
-    } catch (e) {
-      setOnlineStatus(false)
-
-      return false
-    }
-  }
   useEffect(() => {
     if (url.length === 0 && current !== dropdownItems.length - 1) {
       setUrl(urlObject[current].rpcUrl)
@@ -195,7 +178,7 @@ const SettingsViewContainer = () => {
       return
     }
 
-    checkRpcStatus()
+    checkRpcStatus(url, setOnlineStatus)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url])
   useEffect(() => {
@@ -263,7 +246,7 @@ const SettingsViewContainer = () => {
           <ButtonRound
             disabled={!isValidUrl || getInfuraUrl(context.networkId) === url}
             onClick={async () => {
-              if (!(await checkRpcStatus())) return
+              if (!(await checkRpcStatus(url, setOnlineStatus))) return
 
               sessionStorage.setItem(
                 'rpcAddress',
