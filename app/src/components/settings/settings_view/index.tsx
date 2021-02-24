@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useHistory } from 'react-router'
+import { withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { MAIN_NETWORKS, RINKEBY_NETWORKS, SOKOL_NETWORKS, XDAI_NETWORKS } from '../../../common/constants'
@@ -117,12 +117,15 @@ const ImageWrap = styled.div`
 `
 interface Props {
   history?: any
-  networkId: any
+
+  networkId?: any
 }
 
-const SettingsViewContainer = ({ history, networkId }: Props) => {
-  console.log(history)
-  console.log(networkId, typeof networkId)
+const SettingsViewContainer = (props: Props) => {
+  console.log(props.history)
+  const networkId = props.networkId
+  console.log(networkId)
+
   const network = RINKEBY_NETWORKS.includes(networkId)
     ? networkIds.RINKEBY
     : SOKOL_NETWORKS.includes(networkId)
@@ -243,10 +246,12 @@ const SettingsViewContainer = ({ history, networkId }: Props) => {
       </MainContent>
 
       <BottomContent>
-        {history && (
+        {props.history && (
           <ButtonRound
             onClick={() => {
-              history.push('/')
+              props.history.push('/')
+
+              console.log('clickeds')
             }}
           >
             Back
@@ -286,4 +291,6 @@ const SettingsViewContainer = ({ history, networkId }: Props) => {
   )
 }
 
-export { SettingsViewContainer }
+// export { SettingsViewContainer }
+export const SettingsWithRouter = withRouter(SettingsViewContainer)
+export default SettingsViewContainer

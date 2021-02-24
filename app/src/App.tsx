@@ -8,10 +8,8 @@ import 'react-datepicker/dist/react-datepicker.css'
 import 'sanitize.css'
 
 import { MAIN_NETWORKS, RINKEBY_NETWORKS, SOKOL_NETWORKS, XDAI_NETWORKS } from './common/constants'
-import { Footer } from './components/common/layout/footer'
-import { Header } from './components/common/layout/header'
 import { Main } from './components/main'
-import { SettingsViewContainer } from './components/settings/settings_view'
+import SettingsViewContainer from './components/settings/settings_view'
 import { ApolloProviderWrapper } from './contexts/Apollo'
 import { ConnectedCPK, ConnectedWeb3 } from './hooks'
 import balanceReducer from './store/reducer'
@@ -50,7 +48,7 @@ const App: React.FC = () => {
             <SettingsViewContainer networkId={networkId} />
           </>
         ) : (
-          <ConnectedWeb3>
+          <ConnectedWeb3 setStatus={setStatus}>
             <ConnectedCPK>
               <ApolloProviderWrapper>
                 <Provider store={store}>
