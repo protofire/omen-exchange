@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { ButtonCSS, ButtonProps, ButtonType } from '../button_styling_types'
 
 const Wrapper = styled.button<ButtonSelectableProps>`
-  ${ButtonCSS}
+  ${ButtonCSS};
 
   border-color: transparent !important;
   border-radius: 6px;

@@ -47,10 +47,15 @@ Wrapper.defaultProps = {
 
 interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   active?: boolean
+  ref?: any
 }
 
 export const ButtonRound: React.FC<Props> = props => {
-  const { children, ...restProps } = props
+  const { children, ref, ...restProps } = props
 
-  return <Wrapper {...restProps}>{children}</Wrapper>
+  return (
+    <Wrapper ref={ref} {...restProps}>
+      {children}
+    </Wrapper>
+  )
 }

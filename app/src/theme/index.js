@@ -108,6 +108,7 @@ const theme = {
     verticalDivider: '#e8eaf6',
     clickable: '#7986CB',
     red: '#E57373',
+    gold: '#f9a606',
     black: '#000',
   },
   message: {
