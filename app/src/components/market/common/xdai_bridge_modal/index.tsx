@@ -196,6 +196,8 @@ export const XdaiBridgeTransfer = (props: Prop) => {
             onClick={() => {
               setTransferState(!transferState)
               transferFunction()
+              setAmount(Zero)
+              setAmountToDisplay('')
             }}
           >
             Transfer
