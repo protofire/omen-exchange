@@ -95,7 +95,7 @@ export const pseudoNativeAssetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeE
 const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
     label: 'Mainnet',
-    url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+    url: `https://mainnet.infura.io/v3/s${INFURA_PROJECT_ID}`,
     alternativeUrls: [
       {
         rpcUrl: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
@@ -274,7 +274,7 @@ const networks: { [K in NetworkId]: Network } = {
 
 export const getChainSpecificAlternativeUrls = (networkId: number) => {
   if (!validNetworkId(networkId)) {
-    throw new Error(`Unsupported network id: '${networkId}'`)
+    return false
   }
   return networks[networkId].alternativeUrls
 }

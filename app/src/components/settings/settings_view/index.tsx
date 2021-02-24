@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../hooks'
-import { getChainSpecificAlternativeUrls, getInfuraUrl } from '../../../util/networks'
+import { MAIN_NETWORKS, RINKEBY_NETWORKS, SOKOL_NETWORKS, XDAI_NETWORKS } from '../../../common/constants'
+import { getChainSpecificAlternativeUrls, getInfuraUrl, networkIds } from '../../../util/networks'
 import { checkRpcStatus, isValidHttpUrl } from '../../../util/tools'
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
@@ -55,6 +55,7 @@ const TextLighter = styled.p`
 
 const ButtonRow = styled.div`
   display: flex;
+  margin-left: auto;
 
   button:first-child {
     margin-right: 12px;
@@ -114,10 +115,23 @@ const Input = styled.input`
 const ImageWrap = styled.div`
   margin-right: 10px;
 `
+interface Props {
+  history?: any
+  networkId: any
+}
 
-const SettingsViewContainer = () => {
-  const history = useHistory()
-  const context = useConnectedWeb3Context()
+const SettingsViewContainer = ({ history, networkId }: Props) => {
+  console.log(history)
+  console.log(networkId, typeof networkId)
+  const network = RINKEBY_NETWORKS.includes(networkId)
+    ? networkIds.RINKEBY
+    : SOKOL_NETWORKS.includes(networkId)
+    ? networkIds.SOKOL
+    : MAIN_NETWORKS.includes(networkId)
+    ? networkIds.MAINNET
+    : XDAI_NETWORKS.includes(networkId)
+    ? networkIds.XDAI
+    : networkId
 
   const [current, setCurrent] = useState(0)
   const [url, setUrl] = useState<string>('')
@@ -125,27 +139,29 @@ const SettingsViewContainer = () => {
   const [onlineStatus, setOnlineStatus] = useState<boolean>(false)
   const [inputPlaceholder, setInputPlaceholder] = useState<string>('')
 
-  const urlObject = getChainSpecificAlternativeUrls(context.networkId)
-
-  const dropdownItems = urlObject.map((item, index) => {
-    return {
-      title: item.name,
-      image:
-        item.name === 'Infura' ? (
-          <IconInfura />
-        ) : item.name === 'Cloudflare' ? (
-          <IconCloudflare />
-        ) : item.name === 'Blockscout' ? (
-          <IconBlockscout />
-        ) : (
-          undefined
-        ),
-      onClick: () => {
-        setCurrent(index)
-        setUrl(item.rpcUrl)
-      },
-    }
-  })
+  const urlObject = getChainSpecificAlternativeUrls(network)
+  let dropdownItems: any[] = []
+  if (urlObject) {
+    dropdownItems = urlObject.map((item, index) => {
+      return {
+        title: item.name,
+        image:
+          item.name === 'Infura' ? (
+            <IconInfura />
+          ) : item.name === 'Cloudflare' ? (
+            <IconCloudflare />
+          ) : item.name === 'Blockscout' ? (
+            <IconBlockscout />
+          ) : (
+            undefined
+          ),
+        onClick: () => {
+          setCurrent(index)
+          setUrl(item.rpcUrl)
+        },
+      }
+    })
+  }
 
   dropdownItems.push({
     title: 'Custom',
@@ -169,7 +185,7 @@ const SettingsViewContainer = () => {
   })
 
   useEffect(() => {
-    if (url.length === 0 && current !== dropdownItems.length - 1) {
+    if (url.length === 0 && current !== dropdownItems.length - 1 && urlObject) {
       setUrl(urlObject[current].rpcUrl)
     }
     const isValid = isValidHttpUrl(url)
@@ -186,7 +202,7 @@ const SettingsViewContainer = () => {
       const data = JSON.parse(sessionStorage.getItem('rpcAddress') as string)
       setUrl(data.url)
 
-      if (data.network === context.networkId) {
+      if (data.network === networkId) {
         setCurrent(data.index)
         if (data.index === dropdownItems.length - 1) {
           setInputPlaceholder(data.url)
@@ -227,24 +243,27 @@ const SettingsViewContainer = () => {
       </MainContent>
 
       <BottomContent>
-        <ButtonRound
-          onClick={() => {
-            history.push('/')
-          }}
-        >
-          Back
-        </ButtonRound>
+        {history && (
+          <ButtonRound
+            onClick={() => {
+              history.push('/')
+            }}
+          >
+            Back
+          </ButtonRound>
+        )}
+
         <ButtonRow>
           <ButtonRound
             onClick={() => {
               setCurrent(0)
-              setUrl(urlObject[0].rpcUrl)
+              urlObject && setUrl(urlObject[0].rpcUrl)
             }}
           >
             Set to Default
           </ButtonRound>
           <ButtonRound
-            disabled={!isValidUrl || getInfuraUrl(context.networkId) === url}
+            disabled={!isValidUrl || getInfuraUrl(network) === url || !onlineStatus}
             onClick={async () => {
               if (!(await checkRpcStatus(url, setOnlineStatus))) return
 
@@ -252,7 +271,7 @@ const SettingsViewContainer = () => {
                 'rpcAddress',
                 JSON.stringify({
                   url: url,
-                  network: context.networkId,
+                  network: network,
                   index: current,
                 }),
               )

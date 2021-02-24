@@ -31,16 +31,21 @@ export const formatDate = (date: Date, utcAdd = true): string => {
 }
 export const checkRpcStatus = async (customUrl: string, setStatus: any) => {
   try {
-    await axios.post(customUrl, {
+    const response = await axios.post(customUrl, {
       id: +new Date(),
       jsonrpc: '2.0',
-      method: 'eth_blockNumber',
+      method: 'eth_getBlockByNumber',
       params: ['latest', true],
     })
-
+    if (response.data.error) {
+      setStatus(false)
+      return false
+    }
+    console.log(response)
     setStatus(true)
     return true
   } catch (e) {
+    console.log(e)
     setStatus(false)
 
     return false
