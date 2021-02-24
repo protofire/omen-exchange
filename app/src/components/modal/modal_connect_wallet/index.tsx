@@ -10,7 +10,7 @@ import { networkIds } from '../../../util/networks'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
-import { MadeBy, OmenLogo, Spinner } from '../../common'
+import { Spinner } from '../../common'
 import { IconArrowBack, IconClose } from '../../common/icons'
 import { IconOmen } from '../../common/icons/IconOmen'
 
@@ -282,7 +282,6 @@ export const ModalConnectWallet = (props: Props) => {
             </>
           )}
         </ContentWrapper>
-        <MadeBy />
       </Modal>
     </>
   )
