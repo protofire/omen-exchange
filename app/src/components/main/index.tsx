@@ -20,7 +20,9 @@ import {
   XDAI_LOCATION,
   XDAI_NETWORKS,
 } from '../../common/constants'
+import { useXdaiBridge } from '../../hooks/useXdaiBridge'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
+import { ClaimDaiModal } from '../common/claim_dai_modal'
 import { Disclaimer } from '../common/disclaimer'
 import { Footer } from '../common/layout/footer'
 import { Header } from '../common/layout/header'
@@ -33,6 +35,8 @@ const RedirectToHome = () => <Redirect to="/" />
 export const Main: React.FC = () => {
   const context = useWeb3Context()
   const windowObj: any = window
+  const [claimState, setClaimState] = useState(false)
+
   const host = window.location.hostname
   let defaultChainID = 1
   if (host === XDAI_LOCATION) {
@@ -40,6 +44,7 @@ export const Main: React.FC = () => {
   }
   const [networkId, setNetworkId] = useState(windowObj.ethereum ? windowObj.ethereum.chainId : defaultChainID)
   const [wrongNetwork, setWrongNetwork] = useState(false)
+  const { unclaimedAmount } = useXdaiBridge()
 
   if (windowObj.ethereum) {
     windowObj.ethereum.on('chainChanged', (chainId: string) => {
@@ -65,6 +70,7 @@ export const Main: React.FC = () => {
   return (
     <>
       {wrongNetwork && <SwitchNetworkModal currentNetworkId={networkId} />}
+      {claimState && <ClaimDaiModal setClaim={setClaimState} unclaimedAmount={unclaimedAmount}></ClaimDaiModal>}
       <Router>
         <MainWrapper>
           <Helmet>
@@ -80,7 +86,7 @@ export const Main: React.FC = () => {
             <meta content={TWITTER_SITE} name="twitter:site" />
             <link href={`${OG_IMAGE}`} rel="icon" type="image/png" />
           </Helmet>
-          <Header />
+          <Header setClaim={setClaimState} />
           <MainScroll>
             {context.error && <WrongNetworkMessage />}
             {!context.error && (
