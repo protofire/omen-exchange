@@ -6,7 +6,7 @@ const Wrapper = styled.svg<{ hoverEffect: boolean | undefined }>`
 
   &:hover {
     .path {
-      ${props => props.hoverEffect && 'fill: #37474F;'}
+      ${props => props.hoverEffect && `fill: ${props.theme.colors.primaryLight};`}
     }
   }
 
