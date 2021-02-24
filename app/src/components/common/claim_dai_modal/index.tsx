@@ -49,18 +49,6 @@ const Reversed = styled.div`
 
 export const ClaimDaiModal = (props: any) => {
   const { claimLatestToken, transactionHash, transactionStep } = useXdaiBridge()
-  //to test state just uncomment code below here and uncomment mikana in the claim button below as well as remove transactin Step for xDai bridge
-  // let mikana = 3
-  // const transactionStep =
-  //   mikana === 1
-  //     ? State.transactionSubmitted
-  //     : mikana === 2
-  //     ? State.transactionConfirmed
-  //     : mikana === 3
-  //     ? State.waitingConfirmation
-  //     : mikana === 4
-  //     ? State.error
-  //     : State.idle
 
   useEffect(() => {
     if (transactionStep === State.error) props.setClaim(false)

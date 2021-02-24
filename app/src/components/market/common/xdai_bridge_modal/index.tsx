@@ -117,7 +117,7 @@ const StakeText = styled.a`
 
 export const XdaiBridgeTransfer = (props: Prop) => {
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
-  const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
+  const [amount, setAmount] = useState<BigNumber>(Zero)
 
   const { networkId } = useConnectedWeb3Context()
   const { decimals } = knownTokens['dai']
@@ -196,8 +196,8 @@ export const XdaiBridgeTransfer = (props: Prop) => {
             onClick={() => {
               setTransferState(!transferState)
               transferFunction()
+              setAmountToDisplay(' ')
               setAmount(Zero)
-              setAmountToDisplay('')
             }}
           >
             Transfer
