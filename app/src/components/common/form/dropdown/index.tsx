@@ -70,7 +70,7 @@ const DropdownVariantPillCSS = css`
 `
 
 const DropdownVariantCardCSS = css`
-  ${CardCSS}
+  ${CardCSS};
   flex: 1;
   padding: 14px 25px;
   position: relative;
@@ -121,12 +121,12 @@ const DropdownButton = styled.div`
   }
 `
 
-const DropdownButtonRight = styled.div`
+const DropdownButtonRight = styled.div<{ omitRightButtonMargin?: boolean }>`
   display: flex;
   align-items: center;
 
   & > * + * {
-    margin-left: 10px;
+    ${props => !props.omitRightButtonMargin && 'margin-left:10px;'};
   }
 `
 
@@ -305,6 +305,7 @@ export interface DropdownItemProps {
   secondaryText?: React.ReactNode | string
   extraContent?: string
   onClick?: () => void
+  visibility?: boolean
 }
 
 interface Props extends DOMAttributes<HTMLDivElement> {
@@ -317,6 +318,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   items: any
   placeholder?: React.ReactNode | string | undefined
   maxHeight?: boolean
+  omitRightButtonMargin?: boolean
 }
 
 export const Dropdown: React.FC<Props> = props => {
@@ -328,6 +330,7 @@ export const Dropdown: React.FC<Props> = props => {
     dropdownDirection,
     dropdownPosition,
     items,
+    omitRightButtonMargin,
     placeholder,
     maxHeight = false,
     ...restProps
@@ -367,7 +370,9 @@ export const Dropdown: React.FC<Props> = props => {
   }, [isOpen, dropdownItemsRef?.current?.scrollHeight, dropdownContainerRef?.current?.clientHeight])
 
   const optionClick = useCallback((onClick: (() => void) | undefined, itemIndex: number) => {
-    if (!onClick) return
+    if (!onClick) {
+      return
+    }
 
     setCurrentItemIndex(itemIndex)
     onClick()
@@ -405,7 +410,8 @@ export const Dropdown: React.FC<Props> = props => {
             {placeholder && !isDirty ? placeholder : activeItem.content}
             {!!activeItem.secondaryText && !extraContent && <SecondaryText>{activeItem.secondaryText}</SecondaryText>}
           </CurrentItem>
-          <DropdownButtonRight>
+
+          <DropdownButtonRight omitRightButtonMargin={omitRightButtonMargin}>
             <CurrentItemExtra>{extraContent}</CurrentItemExtra>
             {!disabled && (
               <ChevronWrapper>
@@ -430,6 +436,7 @@ export const Dropdown: React.FC<Props> = props => {
             style={{ paddingRight: dropdownPaddingRight }}
           >
             {items.map((item: DropdownItemProps, index: string) => {
+              if (item.visibility) return
               return (
                 <Item
                   active={parseInt(index) === itemIndex}
