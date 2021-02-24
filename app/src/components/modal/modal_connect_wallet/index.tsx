@@ -4,16 +4,13 @@ import Modal from 'react-modal'
 import styled, { css, withTheme } from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
-import { XDAI_NETWORKS } from '../../../common/constants'
 import { getLogger } from '../../../util/logger'
-import { networkIds } from '../../../util/networks'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
 import { IconArrowBack, IconArrowRight, IconClose, IconOmen } from '../../common/icons'
 
-import AuthereumSVG from './img/authereum.svg'
 import MetaMaskSVG from './img/metamask.svg'
 import WalletConnectSVG from './img/wallet_connect.svg'
 
@@ -96,11 +93,6 @@ const IconMetaMask = styled.span`
 const IconWalletConnect = styled.span`
   ${Icon}
   background-image: url('${WalletConnectSVG}');
-`
-
-const IconAuthereum = styled.span`
-  ${Icon}
-  background-image: url('${AuthereumSVG}');
 `
 
 const Text = styled.span`
@@ -243,13 +235,8 @@ export const ModalConnectWallet = (props: Props) => {
     connectingText = 'Opening QR for Wallet Connect'
   }
 
-  const windowObj: any = window
-
   const disableMetamask: boolean = !isMetamaskEnabled || false
   const disableWalletConnect = false
-  const disableAuthereum =
-    XDAI_NETWORKS.includes(windowObj.ethereum && windowObj.ethereum.chainId) ||
-    (networkIds as any)[location.host.split('.')[0].toUpperCase()] === networkIds.XDAI
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
