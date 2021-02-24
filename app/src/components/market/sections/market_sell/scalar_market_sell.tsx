@@ -1,32 +1,32 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts, useSymbol } from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import {
+  calcPrediction,
   calcSellAmountInCollateral,
+  calcXValue,
   computeBalanceAfterTrade,
   formatBigNumber,
   formatNumber,
   getUnit,
-  isDust,
   mulBN,
 } from '../../../../util/tools'
 import { BalanceItem, MarketDetailsTab, MarketMakerData, Status } from '../../../../util/types'
-import { Button, ButtonContainer, ButtonTab } from '../../../button'
+import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { GenericError, TabsGrid } from '../../common/common_styled'
+import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
-import { TokenBalance } from '../../common/token_balance'
+import { PositionSelectionBox } from '../../common/position_selection_box'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
@@ -44,6 +44,7 @@ const StyledButtonContainer = styled(ButtonContainer)`
 const logger = getLogger('Scalar Market::Sell')
 
 interface Props {
+  currentTab: MarketDetailsTab
   fetchGraphMarketMakerData: () => Promise<void>
   fetchGraphMarketUserTxData: () => Promise<void>
   marketMakerData: MarketMakerData
@@ -51,7 +52,7 @@ interface Props {
 }
 
 export const ScalarMarketSell = (props: Props) => {
-  const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
+  const { currentTab, fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
   const { library: provider } = context
 
@@ -76,9 +77,6 @@ export const ScalarMarketSell = (props: Props) => {
   const [amountShares, setAmountShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
-
-  const lowerBound = scalarLow && Number(formatBigNumber(scalarLow, 18))
-  const upperBound = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
 
   const symbol = useSymbol(collateral)
 
@@ -136,12 +134,16 @@ export const ScalarMarketSell = (props: Props) => {
       const potentialValue = mulBN(amountToSell, 1 / (1 - marketFeeWithTwoDecimals))
       const costFee = potentialValue.sub(amountToSell)
 
-      const newPrediction = pricesAfterTrade[1] * ((upperBound || 0) - (lowerBound || 0)) + (lowerBound || 0)
+      const newPrediction = calcPrediction(
+        pricesAfterTrade[1].toString(),
+        scalarLow || new BigNumber(0),
+        scalarHigh || new BigNumber(0),
+      )
 
       logger.log(`Amount to sell ${amountToSell}`)
       return [costFee, newPrediction, amountToSell, potentialValue]
     },
-    [balances, positionIndex, lowerBound, upperBound, fee],
+    [balances, positionIndex, scalarLow, scalarHigh, fee],
   )
 
   const [costFee, newPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(
@@ -151,7 +153,12 @@ export const ScalarMarketSell = (props: Props) => {
   )
 
   const formattedNewPrediction =
-    newPrediction && (newPrediction - (lowerBound || 0)) / ((upperBound || 0) - (lowerBound || 0))
+    newPrediction &&
+    calcXValue(
+      parseUnits(newPrediction.toString(), 18),
+      scalarLow || new BigNumber(0),
+      scalarHigh || new BigNumber(0),
+    ) / 100
 
   const finish = async () => {
     const outcomeIndex = positionIndex
@@ -207,9 +214,6 @@ export const ScalarMarketSell = (props: Props) => {
     amountError !== null ||
     isNegativeAmountShares
 
-  const isShortTabDisabled = isDust(balances[0].shares, collateral.decimals)
-  const isLongTabDisabled = isDust(balances[1].shares, collateral.decimals)
-
   const isNewPrediction =
     formattedNewPrediction !== 0 && formattedNewPrediction !== Number(outcomeTokenMarginalPrices[1].substring(0, 20))
 
@@ -219,6 +223,7 @@ export const ScalarMarketSell = (props: Props) => {
         borderTop={true}
         collateral={collateral}
         currentPrediction={isNewPrediction ? String(formattedNewPrediction) : outcomeTokenMarginalPrices[1]}
+        currentTab={currentTab}
         long={positionIndex === 1}
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
@@ -229,30 +234,13 @@ export const ScalarMarketSell = (props: Props) => {
       />
       <GridTransactionDetails>
         <div>
-          <TabsGrid>
-            <ButtonTab
-              active={(positionIndex === 0 && !isShortTabDisabled) || (isLongTabDisabled && !isShortTabDisabled)}
-              disabled={isShortTabDisabled}
-              onClick={() => {
-                setBalanceItem(balances[0])
-                setPositionIndex(0)
-              }}
-            >
-              Short
-            </ButtonTab>
-            <ButtonTab
-              active={(positionIndex === 1 && !isLongTabDisabled) || (isShortTabDisabled && !isLongTabDisabled)}
-              disabled={isLongTabDisabled}
-              onClick={() => {
-                setBalanceItem(balances[1])
-                setPositionIndex(1)
-              }}
-            >
-              Long
-            </ButtonTab>
-          </TabsGrid>
-          <TokenBalance text="Your Shares" value={formatNumber(selectedOutcomeBalance)} />
-          <ReactTooltip id="walletBalanceTooltip" />
+          <PositionSelectionBox
+            balances={balances}
+            decimals={collateral.decimals}
+            positionIndex={positionIndex}
+            setBalanceItem={setBalanceItem}
+            setPositionIndex={setPositionIndex}
+          />
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput

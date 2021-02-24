@@ -3,17 +3,19 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
-import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
+import { calcPrediction, calcXValue, formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import {
   AdditionalSharesType,
   BalanceItem,
   LiquidityObject,
   LiquidityType,
+  MarketDetailsTab,
   Status,
   Token,
   TradeObject,
   TradeType,
 } from '../../../../util/types'
+import { IconDraggable } from '../../../common/icons'
 import { SCALE_HEIGHT } from '../common_styled'
 import { PositionTable } from '../position_table'
 
@@ -27,6 +29,7 @@ const ScaleWrapper = styled.div<{
   borderBottom: boolean | undefined
   borderTop: boolean | undefined
   valueBoxes: boolean | undefined
+  compressed: boolean | undefined
 }>`
   display: flex;
   flex-direction: column;
@@ -38,6 +41,7 @@ const ScaleWrapper = styled.div<{
   padding-right: 25px;
   position: relative;
   ${props => props.borderTop && `border-top: 1px solid ${props.theme.scale.border}; padding-top: 24px; height: 202px;`};
+  ${props => props.compressed && 'height: auto; padding-bottom: 24px;'}
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     ${props => props.valueBoxes && 'padding-bottom: 24px; height: 278px;'}
@@ -125,13 +129,24 @@ const ScaleBallContainer = styled.div`
   width: 100%;
 `
 
-const ScaleBall = styled.input`
+const ScaleBall = styled.div<{ xValue: number }>`
+  height: ${BALL_SIZE};
+  width: ${BALL_SIZE};
+  position: absolute;
+  z-index: 4;
+  left: calc(${props => props.xValue}% - ${BALL_SIZE} / 2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+const ScaleSlider = styled.input`
   height: ${SCALE_HEIGHT};
   width: calc(100% + ${BALL_SIZE});
   background: none;
   outline: none;
   -webkit-appearance: none;
-  z-index: 4;
+  z-index: 5;
   position: absolute;
   left: calc(-${BALL_SIZE} / 2);
   right: calc(-${BALL_SIZE} / 2);
@@ -141,8 +156,6 @@ const ScaleBall = styled.input`
     height: ${BALL_SIZE};
     width: ${BALL_SIZE};
     border-radius: 50%;
-    border: 3px solid ${props => props.theme.scale.ballBorder};
-    background: ${props => props.theme.scale.ballBackground};
     cursor: pointer;
   }
 
@@ -150,8 +163,6 @@ const ScaleBall = styled.input`
     height: ${BALL_SIZE};
     width: ${BALL_SIZE};
     border-radius: 50%;
-    border: 3px solid ${props => props.theme.scale.ballBorder};
-    background: ${props => props.theme.scale.ballBackground};
     cursor: pointer;
   }
 `
@@ -173,19 +184,21 @@ const ScaleDot = styled.div<{ xValue: number; positive?: Maybe<boolean> }>`
   margin-top: calc((${SCALE_HEIGHT} - ${DOT_SIZE}) / 2);
 `
 
-const ScaleTooltip = styled.div<{ xValue: number }>`
+const ScaleTooltip = styled.div<{ static: boolean | undefined; xValue: number }>`
   position: absolute;
   padding: 5px 8px;
   top: -42px;
   left: ${({ xValue }) => xValue}%;
   transform: translateX(-50%);
   background-color: ${({ theme }) => theme.colors.mainBodyBackground};
-  border-radius: ${({ theme }) => theme.borders.commonBorderRadius};
-  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.05);
-  border: 1px solid ${({ theme }) => theme.borders.tooltip};
+  border-radius: ${props => (props.static ? '4px' : props.theme.borders.commonBorderRadius)};
+  box-shadow: ${props => (props.static ? '' : '0px 0px 4px rgba(0, 0, 0, 0.05)')};
+  border: 1px solid ${props => (props.static ? props.theme.borders.borderDisabled : props.theme.borders.tooltip)};
   white-space: nowrap;
   opacity: 0;
   transition: 0.2s opacity;
+  ${props => props.static && 'opacity: 1;'}
+  color: ${props => (props.static ? props.theme.colors.textColorDark : props.theme.colors.black)};
 `
 
 const ScaleTooltipMessage = styled.p`
@@ -221,6 +234,7 @@ interface Props {
   liquidityAmount?: Maybe<BigNumber>
   additionalShares?: Maybe<number>
   additionalSharesType?: Maybe<AdditionalSharesType>
+  currentTab?: MarketDetailsTab
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
@@ -232,6 +246,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     borderTop,
     collateral,
     currentPrediction,
+    currentTab,
     fee,
     liquidityAmount,
     liquidityTxs,
@@ -253,8 +268,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, 18))
   const startingPointNumber = startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), 18))
 
-  const currentPredictionNumber = Number(currentPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
-  const newPredictionNumber = Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
+  const currentPredictionNumber = calcPrediction(currentPrediction || '', lowerBound, upperBound)
+  const newPredictionNumber = calcPrediction(newPrediction?.toString() || '', lowerBound, upperBound)
 
   const amountSharesNumber =
     collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals))
@@ -293,7 +308,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       ? newPrediction * 100
       : currentPrediction
       ? Number(currentPrediction) * 100
-      : ((startingPointNumber || 0 - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
+      : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound),
   )
   const [scaleValuePrediction, setScaleValuePrediction] = useState(currentPredictionNumber || newPredictionNumber)
   const [yourPayout, setYourPayout] = useState(0)
@@ -366,7 +381,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
   const handleScaleBallChange = () => {
     setScaleValue(Number(scaleBall?.value))
-    setScaleValuePrediction((Number(scaleBall?.value) / 100) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
+    setScaleValuePrediction(calcPrediction((Number(scaleBall?.value) / 100).toString(), lowerBound, upperBound))
   }
 
   useEffect(() => {
@@ -375,40 +390,57 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         ? newPrediction * 100
         : currentPrediction
         ? Number(currentPrediction) * 100
-        : (((startingPointNumber || 0) - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100,
+        : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound),
     )
-    setScaleValuePrediction(Number(newPrediction) * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber)
-  }, [newPrediction, currentPrediction, lowerBoundNumber, startingPointNumber, upperBoundNumber])
+    setScaleValuePrediction(
+      calcPrediction(newPrediction?.toString() || currentPrediction?.toString() || '', lowerBound, upperBound),
+    )
+  }, [
+    newPrediction,
+    currentPrediction,
+    lowerBoundNumber,
+    startingPoint,
+    startingPointNumber,
+    upperBoundNumber,
+    lowerBound,
+    upperBound,
+  ])
+
+  const calcPayout = (shares: number, percentage: number) => {
+    const payout = shares * (percentage / 100)
+    return payout
+  }
+
+  const calcProfit = (shares: number, percentage: number, amount: number) => {
+    const profit = shares * (percentage / 100) - amount
+    return profit
+  }
+
+  const calcProfitPercentage = (shares: number, percentage: number, amount: number) => {
+    const profitPercentage = ((shares * (percentage / 100)) / amount - 1) * 100
+    profitPercentage < -100 ? -100 : profitPercentage
+    return profitPercentage
+  }
 
   useEffect(() => {
     if (long) {
-      // Calculate total payout by mulitplying shares amount by scale position
-      setYourPayout((amountSharesNumber || 0) * (scaleValue / 100))
-      // Calculate profit by subtracting amount paid from payout
-      setProfitLoss((amountSharesNumber || 0) * (scaleValue / 100) - (tradeAmountNumber || 0))
+      setYourPayout(calcPayout(amountSharesNumber || 0, scaleValue))
+      setProfitLoss(calcProfit(amountSharesNumber || 0, scaleValue, tradeAmountNumber || 0))
     } else if (short) {
-      // Calculate total payout by mulitplying shares amount by scale position
-      setYourPayout((amountSharesNumber || 0) * (1 - scaleValue / 100))
-      // Calculate profit by subtracting amount paid from payout
-      setProfitLoss((amountSharesNumber || 0) * (1 - scaleValue / 100) - (tradeAmountNumber || 0))
+      setYourPayout(calcPayout(amountSharesNumber || 0, 100 - scaleValue))
+      setProfitLoss(calcProfit(amountSharesNumber || 0, 100 - scaleValue, tradeAmountNumber || 0))
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
         const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
-        const shortPayoutAmount = (shortSharesNumber || 0) * (1 - scaleValue / 100)
-        const shortProfit = shortPayoutAmount - totalShortPriceNumber
-        const shortProfitRatio = shortPayoutAmount / totalShortPriceNumber - 1
-        setShortPayout(shortPayoutAmount)
-        setShortProfitAmount(shortProfit)
-        setShortProfitPercentage(shortProfitRatio * 100 < -100 ? -100 : shortProfitRatio * 100)
+        setShortPayout(calcPayout(shortSharesNumber || 0, 100 - scaleValue))
+        setShortProfitAmount(calcProfit(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
+        setShortProfitPercentage(calcProfitPercentage(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
         const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
-        const longPayoutAmount = (longSharesNumber || 0) * (scaleValue / 100)
-        const longProfit = longPayoutAmount - totalLongPriceNumber
-        const longProfitRatio = longPayoutAmount / totalLongPriceNumber - 1
-        setLongPayout(longPayoutAmount)
-        setLongProfitAmount(longProfit)
-        setLongProfitPercentage(longProfitRatio * 100 < -100 ? -100 : longProfitRatio * 100)
+        setLongPayout(calcPayout(longSharesNumber || 0, scaleValue))
+        setLongProfitAmount(calcProfit(longSharesNumber || 0, scaleValue, totalLongPriceNumber))
+        setLongProfitPercentage(calcProfitPercentage(longSharesNumber || 0, scaleValue, totalLongPriceNumber))
       }
     }
   }, [
@@ -442,7 +474,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const deactivateTooltip = () => {
     const scaleTooltip: HTMLElement | null = document.querySelector('#scale-tooltip')
-    if (scaleTooltip) {
+    if (scaleTooltip && currentTab !== MarketDetailsTab.sell) {
       scaleTooltip.style.opacity = '0'
     }
   }
@@ -463,6 +495,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     (isDust(shortShares || new BigNumber(0), collateral.decimals) &&
       isDust(longShares || new BigNumber(0), collateral.decimals))
 
+  const showSingleValueBox =
+    !isAmountInputted && !(additionalShares && additionalShares > 0.000001) && currentTab !== MarketDetailsTab.sell
+
   const singleValueBoxData = [
     {
       title: `${
@@ -472,7 +507,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: startingPointTitle,
       xValue: currentPrediction
         ? Number(currentPrediction)
-        : (Number(startingPoint) - Number(lowerBound)) / (Number(upperBound) - Number(lowerBound)),
+        : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound) / 100,
     },
   ]
 
@@ -516,7 +551,12 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <ScaleWrapper borderBottom={isPositionTableDisabled} borderTop={borderTop} valueBoxes={isAmountInputted}>
+      <ScaleWrapper
+        borderBottom={isPositionTableDisabled}
+        borderTop={borderTop}
+        compressed={currentTab === MarketDetailsTab.sell}
+        valueBoxes={isAmountInputted}
+      >
         <ScaleTitleWrapper>
           <ScaleTitle>
             {formatNumber(lowerBoundNumber.toString())} {unit}
@@ -526,15 +566,18 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
             {` ${unit}`}
           </ScaleTitle>
           <ScaleTitle>
-            {upperBound && formatBigNumber(upperBound, 18)} {unit}
+            {formatNumber(upperBoundNumber.toString())} {unit}
           </ScaleTitle>
         </ScaleTitleWrapper>
         <Scale>
           <ScaleBallContainer>
-            <ScaleTooltip id="scale-tooltip" xValue={scaleValue || 0}>
+            <ScaleTooltip id="scale-tooltip" static={currentTab === MarketDetailsTab.sell} xValue={scaleValue || 0}>
               <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString())} ${unit}`}</ScaleTooltipMessage>
             </ScaleTooltip>
-            <ScaleBall
+            <ScaleBall xValue={scaleValue}>
+              <IconDraggable />
+            </ScaleBall>
+            <ScaleSlider
               className="scale-ball"
               disabled={!isSliderEnabled}
               max="100"
@@ -590,9 +633,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
             </>
           )}
-          {!isAmountInputted && !(additionalShares && additionalShares > 0.000001) && (
-            <ValueBoxes valueBoxData={singleValueBoxData} />
-          )}
+          {showSingleValueBox && <ValueBoxes valueBoxData={singleValueBoxData} />}
         </Scale>
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
         {liquidityAmount && liquidityAmount.gt(0) && additionalShares && additionalShares > 0.000001 && (

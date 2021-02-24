@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import theme from '../../../../theme'
 import { getOutcomeColor } from '../../../../theme/utils'
-import { formatBigNumber } from '../../../../util/tools'
+import { calcPrediction, calcPrice } from '../../../../util/tools'
 import { Button } from '../../../button/button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { OutcomeItemLittleBallOfJoyAndDifferentColors } from '../common_styled'
@@ -113,20 +113,18 @@ export const HistoryChart: React.FC<Props> = ({
 }) => {
   const history = useHistory()
 
-  const scalarLowNumber = scalarLow && Number(formatBigNumber(scalarLow, 18))
-  const scalarHighNumber = scalarHigh && Number(formatBigNumber(scalarHigh, 18))
-
   const toScaleValue = (decimal: number, fixed = 0) => {
-    return `${(decimal * ((scalarHighNumber || 0) - (scalarLowNumber || 0)) + (scalarLowNumber || 0)).toFixed(
+    return `${calcPrediction(decimal.toString(), scalarLow || new BigNumber(0), scalarHigh || new BigNumber(0)).toFixed(
       fixed,
     )} ${unit}`
   }
 
   const renderScalarTooltipContent = (o: any) => {
     const { label, payload } = o
-    const prediction = (
-      payload[0]?.value * ((scalarHighNumber || 0) - (scalarLowNumber || 0)) +
-      (scalarLowNumber || 0)
+    const prediction = calcPrediction(
+      payload[0]?.value,
+      scalarLow || new BigNumber(0),
+      scalarHigh || new BigNumber(0),
     ).toFixed(2)
     return (
       <ChartTooltip>

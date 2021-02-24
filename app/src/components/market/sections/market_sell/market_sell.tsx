@@ -7,13 +7,13 @@ import styled from 'styled-components'
 
 import {
   useAsyncDerivedValue,
+  useCompoundService,
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
   useSymbol,
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
-import { CompoundService } from '../../../../services/compound_service'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken } from '../../../../util/networks'
 import {
@@ -60,7 +60,6 @@ const StyledButtonContainer = styled(ButtonContainer)`
 const logger = getLogger('Market::Sell')
 
 interface Props extends RouteComponentProps<any> {
-  compoundService: CompoundService | null
   fetchGraphMarketMakerData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
@@ -70,7 +69,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
-  const { compoundService, fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
+  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
@@ -92,6 +91,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
   const { networkId } = context
+  const { compoundService: CompoundService } = useCompoundService(collateral, context)
+  const compoundService = CompoundService || null
+
   const baseCollateral = getInitialCollateral(networkId, collateral)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)

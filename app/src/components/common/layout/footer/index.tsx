@@ -17,6 +17,7 @@ const Wrapper = styled.div<{ paddingBottomSmall?: boolean }>`
   padding-bottom: ${props => (props.paddingBottomSmall ? '10px' : '30px')};
   padding-top: 10px;
   width: 100%;
+  position: relative;
 `
 
 const Link = styled.a`

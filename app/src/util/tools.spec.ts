@@ -1,8 +1,8 @@
 /* eslint-env jest */
 import Big from 'big.js'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
 
-import { getContractAddress, getNativeAsset } from './networks'
+import { getContractAddress, getNativeAsset, getToken } from './networks'
 import {
   bigMax,
   bigMin,
@@ -12,8 +12,10 @@ import {
   calcInitialFundingSendAmounts,
   calcNetCost,
   calcPoolTokens,
+  calcPrediction,
   calcPrice,
   calcSellAmountInCollateral,
+  calcXValue,
   calculateSharesBought,
   clampBigNumber,
   computeBalanceAfterTrade,
@@ -24,13 +26,20 @@ import {
   formatNumber,
   formatTimestampToDate,
   formatToShortNumber,
+  getBaseTokenForCToken,
+  getCTokenForToken,
   getIndexSets,
+  getInitialCollateral,
   getScalarTitle,
   getUnit,
   isDust,
   isObjectEqual,
   isScalarMarket,
   limitDecimalPlaces,
+  reverseArray,
+  roundNumberStringToSignificantDigits,
+  signaturesFormatted,
+  strip0x,
   truncateStringInTheMiddle as truncate,
 } from './tools'
 import { Token } from './types'
@@ -81,7 +90,18 @@ describe('tools', () => {
       })
     }
   })
-
+  describe('strip0x', () => {
+    const testCases: any = [
+      ['0x8b4dec1a0afb6eb5e98c7103aa94b34b2fc0a1ee', '8b4dec1a0afb6eb5e98c7103aa94b34b2fc0a1ee'],
+      ['0xb9c764114c5619a95d7f232594e3b8dddf95b9cf', 'b9c764114c5619a95d7f232594e3b8dddf95b9cf'],
+    ]
+    for (const [address, testCase] of testCases) {
+      it('should strip 0x', () => {
+        const stripped = strip0x(address)
+        expect(stripped).toBe(testCase)
+      })
+    }
+  })
   describe('calcNetCost', () => {
     const testCases: any = [
       [[100, 0.5, 200, 0.5, 0], 132],
@@ -176,6 +196,19 @@ describe('tools', () => {
     it('should return an empty array when all the odds are equal', () => {
       expect(calcDistributionHint([50, 50])).toEqual([])
       expect(calcDistributionHint([100 / 3, 100 / 3, 100 / 3])).toEqual([])
+    })
+  })
+  describe('xDaiSignaturesFormatted', () => {
+    const result =
+      '0x031b1b1caac5732b8905bbc30f4c4ca680d0287b97ff8576cf40c68ce6af4686a0426d91cf4b1dbb0edb29d279bc6737216f148907e3265ab8473aa7a86e9bf4ecbb50e5d5d74999642e8d0216b5283546e840cc893e0e29e291cc26ae1d612f83ec88235e6364e2c9df0f911ab73d8176e803bb067ca3e35323d2429ec00c53d3fc5e0e58f9655bb999ac578db1da0ceda42f415ef085768f9a98803f4eaeee3d2681967a505e1aec565b15dcf14a248ad0edc61bfd9bb7b763a4a310cbb539d04c342f'
+    const signatures = [
+      '0xaac5732b8905bbc30f4c4ca680d0287b97ff8576cf40c68ce6af4686a0426d915e6364e2c9df0f911ab73d8176e803bb067ca3e35323d2429ec00c53d3fc5e0e1b',
+      '0xcf4b1dbb0edb29d279bc6737216f148907e3265ab8473aa7a86e9bf4ecbb50e558f9655bb999ac578db1da0ceda42f415ef085768f9a98803f4eaeee3d2681961b',
+      '0xd5d74999642e8d0216b5283546e840cc893e0e29e291cc26ae1d612f83ec88237a505e1aec565b15dcf14a248ad0edc61bfd9bb7b763a4a310cbb539d04c342f1c',
+    ]
+    it('should return signatures formatted', () => {
+      const formmated = signaturesFormatted(signatures)
+      expect(result).toMatch(formmated)
     })
   })
 
@@ -583,6 +616,32 @@ describe('tools', () => {
     }
   })
 
+  describe('calcXValue', () => {
+    const testCases: [[BigNumber, BigNumber, BigNumber], number][] = [
+      [[parseUnits('5', 18), parseUnits('0', 18), parseUnits('10', 18)], 50],
+      [[parseUnits('40', 18), parseUnits('5', 18), parseUnits('105', 18)], 35],
+      [[parseUnits('2', 18), parseUnits('0', 18), parseUnits('10', 18)], 20],
+    ]
+    for (const [[currentPrediction, lowerBound, upperBound], result] of testCases) {
+      const xValue = calcXValue(currentPrediction, lowerBound, upperBound)
+
+      expect(xValue).toStrictEqual(result)
+    }
+  })
+
+  describe('calcPrediction', () => {
+    const testCases: [[string, BigNumber, BigNumber], number][] = [
+      [['0.04', parseUnits('0', 18), parseUnits('1', 18)], 0.04],
+      [['0.5', parseUnits('5', 18), parseUnits('105', 18)], 55],
+      [['0.75', parseUnits('3', 18), parseUnits('43', 18)], 33],
+    ]
+    for (const [[probability, lowerBound, upperBound], result] of testCases) {
+      const prediction = calcPrediction(probability, lowerBound, upperBound)
+
+      expect(prediction).toStrictEqual(result)
+    }
+  })
+
   describe('bigMax', () => {
     const testCases: [Big[], Big][] = [
       [[new Big(0), new Big(1)], new Big(1)],
@@ -612,8 +671,8 @@ describe('tools', () => {
   describe('getInitialCollateral', () => {
     const testCases: [[number, Token], Token][] = [
       [[1, getNativeAsset(1)], getNativeAsset(1)],
-      [[3, getNativeAsset(4)], getNativeAsset(4)],
-      [[3, getToken(4, 'ceth' as KnownToken)], getNativeAsset(4)],
+      [[4, getNativeAsset(4)], getNativeAsset(4)],
+      [[4, getToken(4, 'ceth' as KnownToken)], getNativeAsset(4)],
       [[77, getNativeAsset(77)], getNativeAsset(77)],
       [[100, getNativeAsset(100)], getNativeAsset(100)],
     ]
@@ -655,6 +714,7 @@ describe('tools', () => {
       expect(result).toStrictEqual(cTokenValue)
     }
   })
+
   describe('getScalarTitle', () => {
     const testCases: [[string], string][] = [
       [['Some random sclar market? [test]'], 'Some random sclar market?'],
@@ -663,6 +723,23 @@ describe('tools', () => {
     for (const [[value], result] of testCases) {
       const modifiedTitle = getScalarTitle(value)
       expect(result).toStrictEqual(modifiedTitle)
+    }
+  })
+
+  describe('reverseArray', () => {
+    const testCases: [any[], any[]][] = [
+      [
+        [1, 2, 3],
+        [3, 2, 1],
+      ],
+      [
+        ['a', 2, 'hello'],
+        ['hello', 2, 'a'],
+      ],
+    ]
+    for (const [array, result] of testCases) {
+      const reversedArray = reverseArray(array)
+      expect(result).toStrictEqual(reversedArray)
     }
   })
 })

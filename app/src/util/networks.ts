@@ -34,6 +34,13 @@ export const networkIds = {
   XDAI: 100,
 } as const
 
+export const networkNames = {
+  1: 'MAINNET',
+  4: 'RINKEBY',
+  77: 'SOKOL',
+  100: 'XDAI',
+} as const
+
 type CPKAddresses = {
   masterCopyAddress: string
   proxyFactoryAddress: string
@@ -200,7 +207,7 @@ const networks: { [K in NetworkId]: Network } = {
   },
   [networkIds.XDAI]: {
     label: 'xDai',
-    url: 'https://rpc.xdaichain.com/',
+    url: 'https://dai.poa.network/',
     graphHttpUri: GRAPH_XDAI_HTTP,
     graphWsUri: GRAPH_XDAI_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
@@ -755,4 +762,11 @@ export const waitForBlockToSync = async (networkId: number, blockNum: number) =>
     block = await getGraphMeta(networkId)
     await waitABit()
   }
+}
+
+export const getBySafeTx = async (networkId: number, safeTxHash: string) => {
+  const networkName = (networkNames as any)[networkId].toLowerCase()
+  const txServiceUrl = `https://safe-transaction.${networkName}.gnosis.io/api/v1`
+  const result = await axios.get(`${txServiceUrl}/transactions/${safeTxHash}`)
+  return result.data
 }

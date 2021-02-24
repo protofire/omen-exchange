@@ -10,6 +10,7 @@ import { DOCUMENT_VALIDITY_RULES } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
+  useCompoundService,
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
@@ -17,7 +18,7 @@ import {
   useCpkProxy,
   useSymbol,
 } from '../../../../hooks'
-import { CompoundService, MarketMakerService } from '../../../../services'
+import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
@@ -70,7 +71,6 @@ const StyledButtonContainer = styled(ButtonContainer)`
 const logger = getLogger('Market::Buy')
 
 interface Props extends RouteComponentProps<any> {
-  compoundService: CompoundService | null
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
@@ -84,7 +84,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
-  const { compoundService, fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
+  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, fee, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
@@ -96,6 +96,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       : marketMakerData.collateral
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
   const collateralSymbol = collateral.symbol.toLowerCase()
+
+  const { compoundService: CompoundService } = useCompoundService(collateral, context)
+  const compoundService = CompoundService || null
 
   const baseCollateral = getInitialCollateral(networkId, collateral)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
@@ -258,7 +261,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const showSetAllowance =
     collateral.address !== pseudoNativeAssetAddress &&
-    !cpk?.cpk.isSafeApp() &&
+    !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
   const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, 18, 4)))
@@ -307,7 +310,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     Number(sharesTotal) == 0 ||
     (status !== Status.Ready && status !== Status.Error) ||
     amount?.isZero() ||
-    (!cpk?.cpk.isSafeApp() &&
+    (!cpk?.isSafeApp &&
       collateral.address !== pseudoNativeAssetAddress &&
       displayCollateral.address !== pseudoNativeAssetAddress &&
       hasEnoughAllowance !== Ternary.True) ||

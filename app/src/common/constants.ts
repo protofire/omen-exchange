@@ -11,6 +11,7 @@ export const FETCH_EVENTS_CHUNK_SIZE = parseInt('500000', 10)
 
 const MAX_OUTCOMES = parseInt('8', 10)
 export const MAX_OUTCOME_ALLOWED = MAX_OUTCOMES > 256 ? 256 : MAX_OUTCOMES
+export const CONFIRMATION_COUNT = 8
 
 export const UINT_TEMPLATE_ID = 1
 export const SINGLE_SELECT_TEMPLATE_ID = 2
@@ -66,6 +67,10 @@ export const KLEROS_CURATE_GRAPH_MAINNET_WS = 'wss://api.thegraph.com/subgraphs/
 export const KLEROS_CURATE_GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/kleros/curate-rinkeby'
 export const KLEROS_CURATE_GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/name/kleros/curate-rinkeby'
 
+//xDai transaction data subgraphs
+export const XDAI_HOME_BRIDGE = 'https://api.thegraph.com/subgraphs/name/maxaleks/home-bridge-xdai'
+export const XDAI_FOREIGN_BRIDGE = 'https://api.thegraph.com/subgraphs/name/maxaleks/foreign-bridge-mainnet'
+
 export const IPFS_GATEWAY = 'https://ipfs.kleros.io'
 
 export const Logo = OmenLogo
@@ -104,3 +109,6 @@ export const XDAI_LOCATION = 'xdai.omen.eth.link'
 
 export const MAIN_NETWORKS = ['1', '0x1', '4', '0x4']
 export const XDAI_NETWORKS = ['100', '0x64', '77', '0x4d']
+
+export const XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS = '0x7301CFA0e1756B71869E93d4e4Dca5c7d0eb0AA6'
+export const DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS = '0x4aa42145Aa6Ebf72e164C9bBC74fbD3788045016'
