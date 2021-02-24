@@ -65,8 +65,24 @@ const ButtonStyled = styled(Button)`
     opacity: 0.6;
   }
 
+  .arrow-path {
+    transition: 0.2s fill;
+  }
+
+  &:hover {
+    border-bottom: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+
+    .arrow-path {
+      fill: ${props => props.theme.colors.primaryLight};
+    }
+  }
+
   &:first-child {
     border-top: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+
+    &:hover {
+      border-top: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+    }
   }
 `
 
