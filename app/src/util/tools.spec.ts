@@ -2,7 +2,7 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
 
-import { getContractAddress, getNativeAsset } from './networks'
+import { getContractAddress, getNativeAsset, getToken } from './networks'
 import {
   bigMax,
   bigMin,
@@ -21,13 +21,18 @@ import {
   divBN,
   formatNumber,
   formatToShortNumber,
+  getBaseTokenForCToken,
+  getCTokenForToken,
   getIndexSets,
+  getInitialCollateral,
   getScalarTitle,
   getUnit,
   isDust,
   isObjectEqual,
   isScalarMarket,
   limitDecimalPlaces,
+  reverseArray,
+  roundNumberStringToSignificantDigits,
   signaturesFormatted,
   strip0x,
   truncateStringInTheMiddle as truncate,
@@ -543,26 +548,26 @@ describe('tools', () => {
   })
 
   describe('calcXValue', () => {
-    const testCases: [[BigNumber, BigNumber, BigNumber, number], number][] = [
-      [[parseUnits('5', 18), parseUnits('0', 18), parseUnits('10', 18), 18], 50],
-      [[parseUnits('40', 18), parseUnits('5', 18), parseUnits('105', 18), 18], 35],
-      [[parseUnits('2', 6), parseUnits('0', 6), parseUnits('10', 6), 6], 20],
+    const testCases: [[BigNumber, BigNumber, BigNumber], number][] = [
+      [[parseUnits('5', 18), parseUnits('0', 18), parseUnits('10', 18)], 50],
+      [[parseUnits('40', 18), parseUnits('5', 18), parseUnits('105', 18)], 35],
+      [[parseUnits('2', 18), parseUnits('0', 18), parseUnits('10', 18)], 20],
     ]
-    for (const [[currentPrediction, lowerBound, upperBound, decimals], result] of testCases) {
-      const xValue = calcXValue(currentPrediction, lowerBound, upperBound, decimals)
+    for (const [[currentPrediction, lowerBound, upperBound], result] of testCases) {
+      const xValue = calcXValue(currentPrediction, lowerBound, upperBound)
 
       expect(xValue).toStrictEqual(result)
     }
   })
 
   describe('calcPrediction', () => {
-    const testCases: [[string, BigNumber, BigNumber, number], number][] = [
-      [['0.04', parseUnits('0', 18), parseUnits('1', 18), 18], 0.04],
-      [['0.5', parseUnits('5', 18), parseUnits('105', 18), 18], 55],
-      [['0.75', parseUnits('3', 6), parseUnits('43', 6), 6], 33],
+    const testCases: [[string, BigNumber, BigNumber], number][] = [
+      [['0.04', parseUnits('0', 18), parseUnits('1', 18)], 0.04],
+      [['0.5', parseUnits('5', 18), parseUnits('105', 18)], 55],
+      [['0.75', parseUnits('3', 18), parseUnits('43', 18)], 33],
     ]
-    for (const [[probability, lowerBound, upperBound, decimals], result] of testCases) {
-      const prediction = calcPrediction(probability, lowerBound, upperBound, decimals)
+    for (const [[probability, lowerBound, upperBound], result] of testCases) {
+      const prediction = calcPrediction(probability, lowerBound, upperBound)
 
       expect(prediction).toStrictEqual(result)
     }
@@ -597,8 +602,8 @@ describe('tools', () => {
   describe('getInitialCollateral', () => {
     const testCases: [[number, Token], Token][] = [
       [[1, getNativeAsset(1)], getNativeAsset(1)],
-      [[3, getNativeAsset(4)], getNativeAsset(4)],
-      [[3, getToken(4, 'ceth' as KnownToken)], getNativeAsset(4)],
+      [[4, getNativeAsset(4)], getNativeAsset(4)],
+      [[4, getToken(4, 'ceth' as KnownToken)], getNativeAsset(4)],
       [[77, getNativeAsset(77)], getNativeAsset(77)],
       [[100, getNativeAsset(100)], getNativeAsset(100)],
     ]
@@ -640,6 +645,7 @@ describe('tools', () => {
       expect(result).toStrictEqual(cTokenValue)
     }
   })
+
   describe('getScalarTitle', () => {
     const testCases: [[string], string][] = [
       [['Some random sclar market? [test]'], 'Some random sclar market?'],
@@ -648,6 +654,23 @@ describe('tools', () => {
     for (const [[value], result] of testCases) {
       const modifiedTitle = getScalarTitle(value)
       expect(result).toStrictEqual(modifiedTitle)
+    }
+  })
+
+  describe('reverseArray', () => {
+    const testCases: [any[], any[]][] = [
+      [
+        [1, 2, 3],
+        [3, 2, 1],
+      ],
+      [
+        ['a', 2, 'hello'],
+        ['hello', 2, 'a'],
+      ],
+    ]
+    for (const [array, result] of testCases) {
+      const reversedArray = reverseArray(array)
+      expect(result).toStrictEqual(reversedArray)
     }
   })
 })
