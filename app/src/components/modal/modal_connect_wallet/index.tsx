@@ -10,7 +10,9 @@ import { networkIds } from '../../../util/networks'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
-import { MadeBy, Spinner } from '../../common'
+import { MadeBy, OmenLogo, Spinner } from '../../common'
+import { IconArrowBack, IconClose } from '../../common/icons'
+import { IconOmen } from '../../common/icons/IconOmen'
 
 import AuthereumSVG from './img/authereum.svg'
 import MetaMaskSVG from './img/metamask.svg'
@@ -22,9 +24,15 @@ const ContentWrapper = styled.div`
   align-items: center;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  min-height: 230px;
-  padding: 15px 0 0;
+  justify-content: flex-start;
+`
+
+const ModalNavigation = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between
+  width: 100%;
+  padding: 5px;
 `
 
 const Buttons = styled.div`
@@ -232,6 +240,11 @@ export const ModalConnectWallet = (props: Props) => {
         style={theme.connectWalletModal}
       >
         <ContentWrapper>
+          <ModalNavigation>
+            <IconArrowBack />
+            <IconClose />
+          </ModalNavigation>
+          <IconOmen />
           {isConnectingToWallet ? (
             <>
               <Spinner />
