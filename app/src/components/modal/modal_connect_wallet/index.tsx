@@ -268,8 +268,8 @@ export const ModalConnectWallet = (props: Props) => {
       >
         <ContentWrapper>
           <ModalNavigation>
-            {isConnectingToWallet ? <IconArrowBack hoverEffect={true} /> : <div></div>}
-            <IconClose hoverEffect={true} />
+            {isConnectingToWallet ? <IconArrowBack hoverEffect={true} onClick={resetEverything} /> : <div></div>}
+            <IconClose hoverEffect={true} onClick={onClickCloseButton} />
           </ModalNavigation>
           <IconOmen />
           <HeaderText>{isConnectingToWallet ? 'Unlock Wallet' : 'Connect a Wallet'}</HeaderText>
