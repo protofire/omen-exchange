@@ -33,6 +33,13 @@ const ModalNavigation = styled.div`
   justify-content: space-between
   width: 100%;
   padding: 5px;
+  margin-bottom: 14px;
+`
+
+const HeaderText = styled.p`
+  font-size: 16px;
+  font-weight: 500;
+  color: ${props => props.theme.colors.textColorDark};
 `
 
 const Buttons = styled.div`
@@ -245,6 +252,7 @@ export const ModalConnectWallet = (props: Props) => {
             <IconClose />
           </ModalNavigation>
           <IconOmen />
+          <HeaderText>{isConnectingToWallet ? 'Unlock Wallet' : 'Connect a wallet'}</HeaderText>
           {isConnectingToWallet ? (
             <>
               <Spinner />
