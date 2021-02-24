@@ -1,6 +1,7 @@
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
 import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
-import styled, { css } from 'styled-components'
+import Modal from 'react-modal'
+import styled, { css, withTheme } from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
 import { XDAI_NETWORKS } from '../../../common/constants'
@@ -10,7 +11,6 @@ import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { MadeBy, Spinner } from '../../common'
-import { ModalWrapper } from '../../modal/modal_wrapper'
 
 import AuthereumSVG from './img/authereum.svg'
 import MetaMaskSVG from './img/metamask.svg'
@@ -114,6 +114,7 @@ const ConnectButton = (props: ButtonProps) => {
 interface Props extends HTMLAttributes<HTMLDivElement> {
   isOpen: boolean
   onClose: () => void
+  theme?: any
 }
 
 export const ModalConnectWallet = (props: Props) => {
@@ -121,7 +122,7 @@ export const ModalConnectWallet = (props: Props) => {
   const [connectingToWalletConnect, setConnectingToWalletConnect] = useState(false)
   const [connectingToMetamask, setConnectingToMetamask] = useState(false)
   const [connectingToAuthereum, setConnectingToAuthereum] = useState(false)
-  const { isOpen, onClose } = props
+  const { isOpen, onClose, theme } = props
 
   if (context.error) {
     logger.error('Error in web3 context', context.error)
@@ -218,13 +219,17 @@ export const ModalConnectWallet = (props: Props) => {
     XDAI_NETWORKS.includes(windowObj.ethereum && windowObj.ethereum.chainId) ||
     (networkIds as any)[location.host.split('.')[0].toUpperCase()] === networkIds.XDAI
 
+  React.useEffect(() => {
+    Modal.setAppElement('#root')
+  }, [])
+
   return (
     <>
-      <ModalWrapper
+      <Modal
         isOpen={!context.account && isOpen}
         onRequestClose={onClickCloseButton}
         shouldCloseOnOverlayClick={!isConnectingToWallet}
-        title={connectingToMetamask ? 'Connecting...' : 'Connect a Wallet'}
+        style={theme.connectWalletModal}
       >
         <ContentWrapper>
           {isConnectingToWallet ? (
@@ -265,7 +270,9 @@ export const ModalConnectWallet = (props: Props) => {
           )}
         </ContentWrapper>
         <MadeBy />
-      </ModalWrapper>
+      </Modal>
     </>
   )
 }
+
+export const ModalConnectWalletWrapper = withTheme(ModalConnectWallet)

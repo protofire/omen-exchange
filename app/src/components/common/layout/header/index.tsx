@@ -9,7 +9,7 @@ import { Logo } from '../../../../common/constants'
 import { ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
-import { ModalConnectWallet } from '../../../modal'
+import { ModalConnectWalletWrapper } from '../../../modal'
 import { IconAdd, IconClose } from '../../icons'
 
 const HeaderWrapper = styled.div`
@@ -199,7 +199,7 @@ const HeaderContainer: React.FC<RouteComponentProps> = (props: RouteComponentPro
             </>
           )}
         </ContentsRight>
-        <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />
+        <ModalConnectWalletWrapper isOpen={isModalOpen} onClose={() => setModalState(false)} />
       </HeaderInner>
     </HeaderWrapper>
   )
