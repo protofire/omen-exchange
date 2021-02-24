@@ -265,7 +265,7 @@ export const ModalConnectWallet = (props: Props) => {
       >
         <ContentWrapper>
           <ModalNavigation>
-            <IconArrowBack />
+            {isConnectingToWallet ? <IconArrowBack /> : <div></div>}
             <IconClose />
           </ModalNavigation>
           <IconOmen />
@@ -294,14 +294,6 @@ export const ModalConnectWallet = (props: Props) => {
                     onClickWallet(Wallet.WalletConnect)
                   }}
                   text="Wallet Connect"
-                />
-                <ConnectButton
-                  disabled={disableAuthereum}
-                  icon={<IconAuthereum />}
-                  onClick={() => {
-                    onClickWallet(Wallet.Authereum)
-                  }}
-                  text="Authereum"
                 />
               </Buttons>
             </>
