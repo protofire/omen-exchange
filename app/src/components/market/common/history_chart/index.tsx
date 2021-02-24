@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import theme from '../../../../theme'
 import { getOutcomeColor } from '../../../../theme/utils'
-import { calcPrediction, calcPrice } from '../../../../util/tools'
+import { calcPrediction } from '../../../../util/tools'
 import { Button } from '../../../button/button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { OutcomeItemLittleBallOfJoyAndDifferentColors } from '../common_styled'
