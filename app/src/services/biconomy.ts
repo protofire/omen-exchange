@@ -1,5 +1,8 @@
+import axios from 'axios'
+
 interface CreateProxyAndExecParams {
   data: string
+  fallbackHandlerAddress: string
   from: string
   masterCopyAddress: string
   operation: string
@@ -18,6 +21,7 @@ interface ExecTransactionParams {
   gasToken: string
   operation: string
   proxyAddress: string
+  proxyFactoryAddress: string
   refundReceiver: string
   safeTxGas: number
   signature: string
@@ -30,20 +34,26 @@ class BiconomyService {
 
   request = async (payload: any) => {
     const BICONOMY_API_KEY = 'MPEEl225y.19edc8a0-06f9-444b-b6bc-c1b7ca6bdc31'
-    const response = await fetch(`https://api.biconomy.io/api/v2/meta-tx/native`, {
+    const url = 'https://api.biconomy.io/api/v2/meta-tx/native'
+    const response = await axios(url, {
       method: 'POST',
       headers: {
         'x-api-key': BICONOMY_API_KEY,
         'Content-Type': 'application/json;charset=utf-8',
       },
-      body: JSON.stringify(payload),
+      data: JSON.stringify(payload),
     })
-    const { txHash } = await response.json()
-    return { hash: txHash }
+    if (response.status !== 200) {
+      throw new Error(response.data.message)
+    } else {
+      const { txHash } = response.data
+      return { hash: txHash }
+    }
   }
 
   createProxyAndExecTransaction = async ({
     data,
+    fallbackHandlerAddress,
     from,
     masterCopyAddress,
     operation,
@@ -53,12 +63,22 @@ class BiconomyService {
     to,
     value,
   }: CreateProxyAndExecParams) => {
-    const METHOD_API_ID = 'ed29e00e-f3d1-4a53-8c2c-92b6597182a5'
+    const METHOD_API_ID = '6aa2f830-cc0b-4b4c-a183-e96a046a9800'
     return this.request({
       to: proxyFactoryAddress,
       gasLimit: this.gasLimit,
       apiId: METHOD_API_ID,
-      params: [masterCopyAddress, predeterminedSaltNonce, to, value, data, operation, from, signature],
+      params: [
+        masterCopyAddress,
+        predeterminedSaltNonce,
+        fallbackHandlerAddress,
+        to,
+        value,
+        data,
+        operation,
+        from,
+        signature,
+      ],
       from,
     })
   }
@@ -71,18 +91,31 @@ class BiconomyService {
     gasToken,
     operation,
     proxyAddress,
+    proxyFactoryAddress,
     refundReceiver,
     safeTxGas,
     signature,
     to,
     value,
   }: ExecTransactionParams) => {
-    const METHOD_API_ID = '78dc94f7-4420-4275-862f-e3ab17c4d38e'
+    const METHOD_API_ID = 'cfcd8ae2-776b-4bcb-87f6-2bf33930dd4a'
     return this.request({
-      to: proxyAddress,
+      to: proxyFactoryAddress,
       gasLimit: this.gasLimit,
       apiId: METHOD_API_ID,
-      params: [to, value, data, operation, safeTxGas, dataGas, gasPrice, gasToken, refundReceiver, signature],
+      params: [
+        proxyAddress,
+        to,
+        value,
+        data,
+        operation,
+        safeTxGas,
+        dataGas,
+        gasPrice,
+        gasToken,
+        refundReceiver,
+        signature,
+      ],
       from,
     })
   }

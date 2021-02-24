@@ -234,7 +234,7 @@ const networks: { [K in NetworkId]: Network } = {
       multiSendAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
       fallbackHandlerAddress: '0x602DF5F404f86469459D5e604CDa43A2cdFb7580',
     },
-    relayProxyFactoryAddress: '0x9D3760EC184a5092D3D5010396faada954183847',
+    relayProxyFactoryAddress: '0xcfE14ACabA3EFAAc33CECa7Adf4bE22eb3079b70',
     wrapToken: 'wxdai',
     nativeAsset: {
       address: pseudoNativeAssetAddress,

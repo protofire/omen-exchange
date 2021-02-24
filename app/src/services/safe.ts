@@ -32,6 +32,10 @@ class SafeService {
   getNonce = async (): Promise<number> => {
     return this.safe.nonce()
   }
+
+  getOwners = async (): Promise<number> => {
+    return this.safe.getOwners()
+  }
 }
 
 export { SafeService }

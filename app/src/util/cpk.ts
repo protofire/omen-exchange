@@ -189,11 +189,12 @@ class BiconomyTransactionManager {
   }
 
   // @ts-expect-error ignore
-  async execTransactions({ contracts, ethLibAdapter, isDeployed, ownerAccount, safeExecTxParams }) {
+  async execTransactions({ contracts, ethLibAdapter, isDeployed, safeExecTxParams }) {
     // build params
     const proxyFactoryAddress = contracts.proxyFactory.address
     const proxyAddress = contracts.safeContract.address
     const masterCopyAddress = contracts.masterCopyAddress
+    const fallbackHandlerAddress = contracts.fallbackHandlerAddress
     const { data, operation, to } = safeExecTxParams
     const value = '0'
     const safeTxGas = 0
@@ -201,7 +202,7 @@ class BiconomyTransactionManager {
     const gasPrice = 0
     const gasToken = zeroAddress
     const refundReceiver = zeroAddress
-    const from = ownerAccount
+    const from = await ethLibAdapter.signer.signer.getAddress()
 
     // get safe transaction nonce
     const safe = new SafeService(proxyAddress, ethLibAdapter.signer)
@@ -238,6 +239,7 @@ class BiconomyTransactionManager {
         gasPrice,
         gasToken,
         operation,
+        proxyFactoryAddress,
         proxyAddress,
         refundReceiver,
         safeTxGas,
@@ -248,6 +250,7 @@ class BiconomyTransactionManager {
     } else {
       return biconomy.createProxyAndExecTransaction({
         data,
+        fallbackHandlerAddress,
         from,
         masterCopyAddress,
         operation,
@@ -309,8 +312,8 @@ export const createCPK = async (provider: Web3Provider, relay: boolean) => {
   return cpk
 }
 
-// for calcRelayProxyAddress to be sync we need to hardcode proxy code
-const proxyCreationCode = `0x608060405234801561001057600080fd5b506040516101e73803806101e78339818101604052602081101561003357600080fd5b8101908080519060200190929190505050600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156100ca576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260248152602001806101c36024913960400191505060405180910390fd5b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505060aa806101196000396000f3fe608060405273ffffffffffffffffffffffffffffffffffffffff600054167fa619486e0000000000000000000000000000000000000000000000000000000060003514156050578060005260206000f35b3660008037600080366000845af43d6000803e60008114156070573d6000fd5b3d6000f3fea265627a7a723158204c807779ddbfed51d1cf24bb162a9434af4e2c5b76610190e5201a10c9e1845664736f6c63430005100032496e76616c6964206d617374657220636f707920616464726573732070726f7669646564`
+// for calcRelayProxyAddress to be sync we need to hardcode proxy code, needs to be updated if we deploy a new proxy factory
+const proxyCreationCode = `0x608060405234801561001057600080fd5b506040516101e73803806101e78339818101604052602081101561003357600080fd5b8101908080519060200190929190505050600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156100ca576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260248152602001806101c36024913960400191505060405180910390fd5b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505060aa806101196000396000f3fe608060405273ffffffffffffffffffffffffffffffffffffffff600054167fa619486e0000000000000000000000000000000000000000000000000000000060003514156050578060005260206000f35b3660008037600080366000845af43d6000803e60008114156070573d6000fd5b3d6000f3fea265627a7a72315820f0e71a41c59612a715b6b0edbc18b51b74798f8cafce357cdc14183e612c32c164736f6c63430005100032496e76616c6964206d617374657220636f707920616464726573732070726f7669646564`
 
 export const calcRelayProxyAddress = (account: string, provider: any) => {
   const ethLibAdapter = new EthersAdapter({ ethers, signer: { provider } })
