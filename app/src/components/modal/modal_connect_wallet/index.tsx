@@ -11,8 +11,7 @@ import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
-import { IconArrowBack, IconClose } from '../../common/icons'
-import { IconOmen } from '../../common/icons/IconOmen'
+import { IconArrowBack, IconArrowRight, IconClose, IconOmen } from '../../common/icons'
 
 import AuthereumSVG from './img/authereum.svg'
 import MetaMaskSVG from './img/metamask.svg'
@@ -25,6 +24,7 @@ const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  width: 100%;
 `
 
 const ModalNavigation = styled.div`
@@ -40,10 +40,13 @@ const HeaderText = styled.p`
   font-size: 16px;
   font-weight: 500;
   color: ${props => props.theme.colors.textColorDark};
+  margin-top: 10px;
+  margin-bottom: 48px;
 `
 
 const Buttons = styled.div`
   margin-top: auto;
+  width: 100%;
 
   &:last-child {
     margin-top: 0;
@@ -51,17 +54,28 @@ const Buttons = styled.div`
 `
 
 const ButtonStyled = styled(Button)`
-  margin-bottom: 14px;
-  width: 200px;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+  border-radius: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
   &[disabled] {
     cursor: not-allowed;
     opacity: 0.6;
   }
 
-  &:last-child {
-    margin-bottom: 0;
+  &:first-child {
+    border-top: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
   }
+`
+
+const ButtonLeft = styled.div`
+  display: flex;
+  align-items: center;
 `
 
 const Icon = css`
@@ -120,8 +134,11 @@ const ConnectButton = (props: ButtonProps) => {
 
   return (
     <ButtonStyled buttonType={ButtonType.secondaryLine} disabled={disabled} onClick={onClick}>
-      {icon}
-      <Text>{text}</Text>
+      <ButtonLeft>
+        {icon}
+        <Text>{text}</Text>
+      </ButtonLeft>
+      <IconArrowRight />
     </ButtonStyled>
   )
 }
@@ -252,7 +269,7 @@ export const ModalConnectWallet = (props: Props) => {
             <IconClose />
           </ModalNavigation>
           <IconOmen />
-          <HeaderText>{isConnectingToWallet ? 'Unlock Wallet' : 'Connect a wallet'}</HeaderText>
+          <HeaderText>{isConnectingToWallet ? 'Unlock Wallet' : 'Connect a Wallet'}</HeaderText>
           {isConnectingToWallet ? (
             <>
               <Spinner />
