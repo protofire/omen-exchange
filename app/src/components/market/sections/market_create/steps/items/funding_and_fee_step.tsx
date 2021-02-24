@@ -243,7 +243,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const isETHNetwork = () => {
     return context.networkId === networkIds.MAINNET || context.networkId === networkIds.RINKEBY
   }
-  if (currentTokenSymbol in CompoundEnabledTokenType && isETHNetwork() && state !== 'SCALAR') {
+  if (currentTokenSymbol in CompoundEnabledTokenType && isETHNetwork()) {
     showAddCompoundService = true
   }
   useEffect(() => {
@@ -308,7 +308,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       const interestRate = await getCompoundInterestRate(userInputCollateral.symbol.toLowerCase())
       setCompoundInterestRate(interestRate.toFixed(2))
     }
-    if (userInputCollateral.symbol.toLowerCase() in CompoundEnabledTokenType && isETHNetwork() && state !== 'SCALAR') {
+    if (userInputCollateral.symbol.toLowerCase() in CompoundEnabledTokenType && isETHNetwork()) {
       getInterestRate(userInputCollateral)
     }
   }, [isServiceChecked, userInputCollateral, collateral]) // eslint-disable-line react-hooks/exhaustive-deps

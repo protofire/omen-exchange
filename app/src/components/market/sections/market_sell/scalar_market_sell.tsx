@@ -4,9 +4,16 @@ import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts, useSymbol } from '../../../../hooks'
+import {
+  useAsyncDerivedValue,
+  useCompoundService,
+  useConnectedWeb3Context,
+  useContracts,
+  useSymbol,
+} from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
+import { getNativeAsset, getWrapToken } from '../../../../util/networks'
 import {
   calcPrediction,
   calcSellAmountInCollateral,
@@ -14,11 +21,19 @@ import {
   computeBalanceAfterTrade,
   formatBigNumber,
   formatNumber,
+  getInitialCollateral,
   getUnit,
   isDust,
   mulBN,
 } from '../../../../util/tools'
-import { BalanceItem, MarketDetailsTab, MarketMakerData, Status } from '../../../../util/types'
+import {
+  BalanceItem,
+  CompoundTokenType,
+  MarketDetailsTab,
+  MarketMakerData,
+  Status,
+  Token,
+} from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -28,6 +43,7 @@ import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GenericError, TabsGrid } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
+import { SwitchTransactionToken } from '../../common/switch_transaction_token'
 import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
@@ -78,8 +94,20 @@ export const ScalarMarketSell = (props: Props) => {
   const [amountShares, setAmountShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
+  const { networkId } = context
+  const baseCollateral = getInitialCollateral(networkId, collateral)
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
+  const collateralSymbol = collateral.symbol.toLowerCase()
+  const symbol = useSymbol(displayCollateral)
 
-  const symbol = useSymbol(collateral)
+  const { compoundService: CompoundService } = useCompoundService(collateral, context)
+  const compoundService = CompoundService || null
+
+  const wrapToken = getWrapToken(context.networkId)
+  let displayTotalSymbol = symbol
+  if (collateral.address === displayCollateral.address && collateral.address === wrapToken.address) {
+    displayTotalSymbol = displayCollateral.symbol
+  }
 
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
@@ -162,6 +190,27 @@ export const ScalarMarketSell = (props: Props) => {
       18,
     ) / 100
 
+  let potentialValueNormalized = potentialValue
+  let costFeeNormalized = costFee
+  let normalizedTradedCollateral = tradedCollateral
+  if (displayCollateral.address !== collateral.address && compoundService) {
+    if (potentialValue && potentialValue.gt(0)) {
+      potentialValueNormalized = compoundService.calculateCTokenToBaseExchange(displayCollateral, potentialValue)
+    } else {
+      potentialValueNormalized = new BigNumber('0')
+    }
+    if (costFee && costFee.gt(0)) {
+      costFeeNormalized = compoundService.calculateCTokenToBaseExchange(displayCollateral, costFee)
+    } else {
+      costFeeNormalized = new BigNumber('0')
+    }
+    if (tradedCollateral && tradedCollateral.gt(0)) {
+      normalizedTradedCollateral = compoundService.calculateCTokenToBaseExchange(displayCollateral, tradedCollateral)
+    } else {
+      normalizedTradedCollateral = new BigNumber('0')
+    }
+  }
+
   const finish = async () => {
     const outcomeIndex = positionIndex
     try {
@@ -171,8 +220,13 @@ export const ScalarMarketSell = (props: Props) => {
 
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
 
+      let displaySharesAmount = sharesAmount
+      if (collateral.symbol.toLowerCase() in CompoundTokenType && amountShares && compoundService) {
+        const displaySharesAmountValue = compoundService.calculateCTokenToBaseExchange(baseCollateral, amountShares)
+        displaySharesAmount = formatBigNumber(displaySharesAmountValue || Zero, baseCollateral.decimals)
+      }
       setStatus(Status.Loading)
-      setMessage(`Selling ${sharesAmount} shares ...`)
+      setMessage(`Selling ${displaySharesAmount} shares...`)
 
       const cpk = await CPKService.create(provider)
 
@@ -215,6 +269,38 @@ export const ScalarMarketSell = (props: Props) => {
     amountShares?.isZero() ||
     amountError !== null ||
     isNegativeAmountShares
+
+  let toggleCollateral = collateral
+  if (collateralSymbol in CompoundTokenType) {
+    if (collateral.address === displayCollateral.address) {
+      toggleCollateral = baseCollateral
+    } else {
+      toggleCollateral = collateral
+    }
+  } else {
+    if (collateral.address === wrapToken.address) {
+      if (displayCollateral.address === wrapToken.address) {
+        toggleCollateral = getNativeAsset(context.networkId)
+      } else {
+        toggleCollateral = getWrapToken(context.networkId)
+      }
+    }
+  }
+  const setToggleCollateral = () => {
+    if (collateralSymbol in CompoundTokenType) {
+      if (displayCollateral.address === baseCollateral.address) {
+        setDisplayCollateral(collateral)
+      } else {
+        setDisplayCollateral(baseCollateral)
+      }
+    } else {
+      if (displayCollateral.address === wrapToken.address) {
+        setDisplayCollateral(getNativeAsset(context.networkId))
+      } else {
+        setDisplayCollateral(getWrapToken(context.networkId))
+      }
+    }
+  }
 
   const isShortTabDisabled = isDust(balances[0].shares, collateral.decimals)
   const isLongTabDisabled = isDust(balances[1].shares, collateral.decimals)
@@ -297,15 +383,19 @@ export const ScalarMarketSell = (props: Props) => {
               state={ValueStates.success}
               title={'Revenue'}
               value={
-                potentialValue
-                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${symbol}`
+                potentialValueNormalized
+                  ? `${formatNumber(formatBigNumber(potentialValueNormalized, displayCollateral.decimals, 2))} 
+                  ${symbol}`
                   : '0.00'
               }
             />
             <TransactionDetailsRow
               title={'Fee'}
-              value={`${costFee ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, 2)) : '0.00'}
-                ${symbol}`}
+              value={`${
+                costFeeNormalized
+                  ? formatNumber(formatBigNumber(costFeeNormalized.mul(-1), displayCollateral.decimals, 2))
+                  : '0.00'
+              } ${symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
@@ -320,9 +410,16 @@ export const ScalarMarketSell = (props: Props) => {
               }
               title={'Total'}
               value={`${
-                tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
-              } ${symbol}`}
+                normalizedTradedCollateral
+                  ? formatNumber(formatBigNumber(normalizedTradedCollateral, displayCollateral.decimals, 2))
+                  : '0.00'
+              } ${displayTotalSymbol}`}
             />
+            {collateral.address === wrapToken.address || collateralSymbol in CompoundTokenType ? (
+              <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollateral} />
+            ) : (
+              <span />
+            )}
           </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>

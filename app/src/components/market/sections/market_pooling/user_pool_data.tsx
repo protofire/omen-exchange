@@ -2,8 +2,9 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
-import { Token } from '../../../../util/types'
+import { useCompoundService, useConnectedWeb3Context } from '../../../../hooks'
+import { formatBigNumber, formatNumber, getInitialCollateral } from '../../../../util/tools'
+import { CompoundTokenType, Token } from '../../../../util/types'
 import { TitleValue } from '../../../common'
 import { ValueStates } from '../../common/transaction_details_row'
 
@@ -61,31 +62,42 @@ interface Props {
 }
 
 export const UserPoolData: React.FC<Props> = (props: Props) => {
-  const { collateral, symbol, totalEarnings, totalPoolShares, totalUserLiquidity, userEarnings } = props
+  const { collateral, totalEarnings, totalPoolShares, totalUserLiquidity, userEarnings } = props
+  const context = useConnectedWeb3Context()
+  const { networkId } = context
+  const baseCollateral = getInitialCollateral(networkId, collateral)
+  let displayUserLiquidity = totalUserLiquidity
+  let displayPoolTokens = totalPoolShares
+  let displayUserEarnings = userEarnings
+  let displayTotalEarnings = totalEarnings
+  const { compoundService: CompoundService } = useCompoundService(collateral, context)
+  const compoundService = CompoundService || null
+  if (collateral.symbol.toLowerCase() in CompoundTokenType && compoundService) {
+    displayUserLiquidity = compoundService.calculateCTokenToBaseExchange(collateral, totalUserLiquidity)
+    displayPoolTokens = compoundService.calculateCTokenToBaseExchange(collateral, totalPoolShares)
+    displayUserEarnings = compoundService.calculateCTokenToBaseExchange(collateral, userEarnings)
+    displayTotalEarnings = compoundService.calculateCTokenToBaseExchange(collateral, totalEarnings)
+  }
+  const userLiquidityFormatted = formatNumber(formatBigNumber(displayUserLiquidity, baseCollateral.decimals))
+  const poolTokensFormatted = formatNumber(formatBigNumber(displayPoolTokens, baseCollateral.decimals))
 
   return (
     <UserData>
+      <UserDataTitleValue title="Your Liquidity" value={`${userLiquidityFormatted} ${baseCollateral.symbol}`} />
+      <UserDataTitleValue title="Total Pool Tokens" value={`${poolTokensFormatted}`} />
       <UserDataTitleValue
-        title="Your Liquidity"
-        value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${symbol}`}
-      />
-      <UserDataTitleValue
-        title="Total Pool Tokens"
-        value={`${formatNumber(formatBigNumber(totalPoolShares, collateral.decimals))}`}
-      />
-      <UserDataTitleValue
-        state={userEarnings.gt(0) ? ValueStates.success : undefined}
+        state={displayUserEarnings.gt(0) ? ValueStates.success : undefined}
         title="Your Earnings"
-        value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
-          formatBigNumber(userEarnings, collateral.decimals),
-        )} ${symbol}`}
+        value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatNumber(
+          formatBigNumber(displayUserEarnings, baseCollateral.decimals),
+        )} ${baseCollateral.symbol}`}
       />
       <UserDataTitleValue
-        state={totalEarnings.gt(0) ? ValueStates.success : undefined}
+        state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
         title="Total Earnings"
-        value={`${totalEarnings.gt(0) ? '+' : ''}${formatNumber(
-          formatBigNumber(totalEarnings, collateral.decimals),
-        )} ${symbol}`}
+        value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
+          formatBigNumber(displayTotalEarnings, baseCollateral.decimals),
+        )} ${baseCollateral.symbol}`}
       />
     </UserData>
   )
