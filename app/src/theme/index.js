@@ -391,7 +391,7 @@ const theme = {
     },
     overlay: {
       alignItems: 'unset',
-      backgroundColor: 'rgba(0, 0, 0, 0.06)',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
       display: 'flex',
       justifyContent: 'center',
       overflow: 'auto',
