@@ -110,6 +110,7 @@ const theme = {
     red: '#E57373',
     gold: '#f9a606',
     black: '#000',
+    lightBackground: '#FCFDFD',
   },
   message: {
     colors: {

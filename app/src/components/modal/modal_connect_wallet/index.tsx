@@ -71,6 +71,7 @@ const ButtonStyled = styled(Button)`
 
   &:hover {
     border-bottom: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+    background: ${props => props.theme.colors.lightBackground};
 
     .arrow-path {
       fill: ${props => props.theme.colors.primaryLight};
