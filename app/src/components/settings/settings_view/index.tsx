@@ -163,6 +163,7 @@ const SettingsViewContainer = (props: Props) => {
     image: undefined,
     onClick: () => {
       setCurrent(dropdownItems.length - 1)
+      setUrl('')
     },
   })
 
@@ -260,7 +261,7 @@ const SettingsViewContainer = (props: Props) => {
           </ButtonRound>
           <ButtonRound
             disabled={
-              url.length !== 0 || !isValidUrl || (network !== -1 && getInfuraUrl(network) === url) || !onlineStatus
+              url.length === 0 || !isValidUrl || (network !== -1 && getInfuraUrl(network) === url) || !onlineStatus
             }
             onClick={async () => {
               if (!(await checkRpcStatus(url, setOnlineStatus))) return
