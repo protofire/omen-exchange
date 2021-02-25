@@ -245,7 +245,7 @@ export const ModalConnectWallet = (props: Props) => {
   const isConnectingToWallet = connectingToMetamask || connectingToWalletConnect || connectingToAuthereum
   let connectingText = `Connecting to wallet`
   if (connectingToMetamask) {
-    connectingText = 'Waiting for Approval on Metamask'
+    connectingText = 'Requesting permission on Metamask'
   }
   if (connectingToWalletConnect) {
     connectingText = 'Opening QR for Wallet Connect'
