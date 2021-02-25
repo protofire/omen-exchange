@@ -110,7 +110,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged --allow-empty",
-      "pre-push": "yarn lint:check && yarn prettier:check && yarn test"
+      "pre-push": "yarn lint:check && yarn prettier:check && yarn test --coverage --watchAll=false"
     }
   },
   "jest": {
