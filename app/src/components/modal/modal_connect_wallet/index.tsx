@@ -9,7 +9,7 @@ import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
-import { IconArrowBack, IconArrowRight, IconClose, IconOmen } from '../../common/icons'
+import { IconArrowBack, IconArrowRightLong, IconClose, IconOmen } from '../../common/icons'
 
 import MetaMaskSVG from './img/metamask.svg'
 import WalletConnectSVG from './img/wallet_connect.svg'
@@ -146,7 +146,7 @@ const ConnectButton = (props: ButtonProps) => {
         {icon}
         <Text>{text}</Text>
       </ButtonLeft>
-      <IconArrowRight />
+      <IconArrowRightLong />
     </ButtonStyled>
   )
 }
