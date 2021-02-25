@@ -7,9 +7,9 @@ import { IMPORT_QUESTION_ID_KEY, MARKET_FEE } from '../../../../common/constants
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { queryTopCategories } from '../../../../queries/markets_home'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
-import { getArbitrator, getDefaultArbitrator, getDefaultToken } from '../../../../util/networks'
+import { getArbitrator, getDefaultArbitrator, getDefaultGelatoData, getDefaultToken } from '../../../../util/networks'
 import { limitDecimalPlaces } from '../../../../util/tools'
-import { Arbitrator, GraphResponseTopCategories, MarketData, Question, Token } from '../../../../util/types'
+import { Arbitrator, GelatoData, GraphResponseTopCategories, MarketData, Question, Token } from '../../../../util/types'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 
 import { AskQuestionStep, FundingAndFeeStep, MenuStep } from './steps'
@@ -29,6 +29,7 @@ export const MarketWizardCreator = (props: Props) => {
 
   const defaultCollateral = getDefaultToken(networkId)
   const defaultArbitrator = getDefaultArbitrator(networkId)
+  const defaultGelatoData = getDefaultGelatoData(networkId)
 
   const getImportQuestionId = () => {
     const reQuestionId = /(0x[0-9A-Fa-f]{64})/
@@ -61,6 +62,7 @@ export const MarketWizardCreator = (props: Props) => {
     ],
     question: '',
     resolution: null,
+    gelatoData: defaultGelatoData,
     spread: MARKET_FEE,
     lowerBound: null,
     upperBound: null,
@@ -270,6 +272,21 @@ export const MarketWizardCreator = (props: Props) => {
     }
     setMarketdata(newMarketData)
   }
+  const handleGelatoDataChange = (gelatoData: GelatoData) => {
+    const newMarketData = {
+      ...marketData,
+      gelatoData,
+    }
+    setMarketdata(newMarketData)
+  }
+
+  const handleGelatoDataInputChange = (input: Date | null) => {
+    const newMarketData = {
+      ...marketData,
+    }
+    newMarketData.gelatoData.input = input
+    setMarketdata(newMarketData)
+  }
 
   const submit = (isScalar: boolean) => {
     callback(marketData as MarketData, isScalar)
@@ -283,6 +300,8 @@ export const MarketWizardCreator = (props: Props) => {
             back={back}
             handleChange={handleChange}
             handleCollateralChange={handleCollateralChange}
+            handleGelatoDataChange={handleGelatoDataChange}
+            handleGelatoDataInputChange={handleGelatoDataInputChange}
             handleTradingFeeChange={handleTradingFeeChange}
             marketCreationStatus={marketCreationStatus}
             resetTradingFee={resetTradingFee}

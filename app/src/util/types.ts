@@ -187,6 +187,12 @@ export interface Arbitrator {
   url: string
 }
 
+export interface GelatoData {
+  id: KnownGelatoCondition
+  shouldSubmit: boolean
+  input: Date | null
+}
+
 export enum Wallet {
   MetaMask = 'MetaMask',
   WalletConnect = 'WalletConnect',
@@ -200,6 +206,7 @@ export interface MarketData {
   question: string
   category: string
   resolution: Date | null
+  gelatoData: GelatoData
   arbitrator: Arbitrator
   spread: number
   funding: BigNumber

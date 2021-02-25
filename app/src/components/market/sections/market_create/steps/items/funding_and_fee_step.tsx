@@ -1,6 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent, useEffect, useMemo, useState } from 'react'
+import React, { ChangeEvent, useCallback, useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 
@@ -8,12 +8,14 @@ import {
   DEFAULT_TOKEN_ADDRESS,
   DEFAULT_TOKEN_ADDRESS_RINKEBY,
   DOCUMENT_FAQ,
+  GELATO_ACTIVATED,
   MAX_MARKET_FEE,
 } from '../../../../../../common/constants'
 import {
   useCollateralBalance,
   useConnectedCPKContext,
   useConnectedWeb3Context,
+  useContracts,
   useCpkAllowance,
   useCpkProxy,
 } from '../../../../../../hooks'
@@ -23,7 +25,7 @@ import { MarketCreationStatus } from '../../../../../../util/market_creation_sta
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
-import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
+import { Arbitrator, GelatoData, Ternary, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
@@ -48,6 +50,7 @@ import {
 import { CreateCard } from '../../../../common/create_card'
 import { CurrencySelector } from '../../../../common/currency_selector'
 import { DisplayArbitrator } from '../../../../common/display_arbitrator'
+import { GelatoScheduler } from '../../../../common/gelato_scheduler'
 import { GridTransactionDetails } from '../../../../common/grid_transaction_details'
 import { MarketScale } from '../../../../common/market_scale'
 import { SetAllowance } from '../../../../common/set_allowance'
@@ -174,6 +177,7 @@ interface Props {
     arbitrator: Arbitrator
     spread: number
     funding: BigNumber
+    gelatoData: GelatoData
     outcomes: Outcome[]
     loadedQuestionId: Maybe<string>
     verifyLabel?: string
@@ -185,6 +189,8 @@ interface Props {
   marketCreationStatus: MarketCreationStatus
   handleCollateralChange: (collateral: Token) => void
   handleTradingFeeChange: (fee: string) => void
+  handleGelatoDataChange: (gelatoData: GelatoData) => any
+  handleGelatoDataInputChange: (newDate: Date | null) => any
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   resetTradingFee: () => void
   state: string
@@ -196,12 +202,16 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
   const { account, library: provider } = context
+  const { gelato } = useContracts(context)
+
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const {
     back,
     handleChange,
     handleCollateralChange,
+    handleGelatoDataChange,
+    handleGelatoDataInputChange,
     handleTradingFeeChange,
     marketCreationStatus,
     resetTradingFee,
@@ -270,6 +280,21 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     setCollateralBalanceFormatted(formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5))
     // eslint-disable-next-line
   }, [maybeCollateralBalance])
+
+  const [belowGelatoMinimum, setBelowGelatoMinimum] = useState(false)
+  const [gelatoMinimum, setGelatoMinimum] = useState<number>(0)
+
+  const checkGelatoMinimum = useCallback(async () => {
+    if (cpk) {
+      const { belowMinimum, minimum } = await cpk.isBelowGelatoMinimum(funding, collateral, gelato)
+      setBelowGelatoMinimum(belowMinimum)
+      setGelatoMinimum(minimum)
+    }
+  }, [cpk, collateral, funding, gelato])
+
+  useEffect(() => {
+    checkGelatoMinimum()
+  }, [checkGelatoMinimum])
 
   useEffect(() => {
     setIsNegativeDepositAmount(formatBigNumber(funding, collateral.decimals).includes('-'))
@@ -513,6 +538,18 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             hyperlinkDescription={''}
           />
         )}
+        {GELATO_ACTIVATED && state !== 'SCALAR' && (
+          <GelatoScheduler
+            belowMinimum={belowGelatoMinimum}
+            collateralSymbol={collateral.symbol}
+            gelatoData={values.gelatoData}
+            handleGelatoDataChange={handleGelatoDataChange}
+            handleGelatoDataInputChange={handleGelatoDataInputChange}
+            isScheduled={false}
+            minimum={gelatoMinimum}
+            resolution={values.resolution !== null ? values.resolution : new Date()}
+          />
+        )}
         {showSetAllowance && (
           <SetAllowance
             collateral={collateral}
@@ -568,7 +605,13 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         </StyledButtonContainerFullWidth>
       </CreateCardBottom>
       {!MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus) ? (
-        <FullLoading message={`${marketCreationStatus._type}...`} />
+        <FullLoading
+          message={
+            values.gelatoData.shouldSubmit && !belowGelatoMinimum
+              ? `${marketCreationStatus._type} and scheduling auto-withdraw with Gelato...`
+              : `${marketCreationStatus._type}...`
+          }
+        />
       ) : null}
     </>
   )

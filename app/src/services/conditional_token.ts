@@ -102,6 +102,18 @@ class ConditionalTokenService {
     return event.values.questionId
   }
 
+  // Get position Ids
+  getPositionIds = async (numOutcomes: number, conditionId: string, collateralAddress: string): Promise<number[]> => {
+    const indexSet = getIndexSets(numOutcomes)
+    const positionIds = []
+    for (const index of indexSet) {
+      const collectionId = await this.getCollectionIdForOutcome(conditionId, index)
+      const positionId = await this.getPositionId(collateralAddress, collectionId)
+      positionIds.push(positionId)
+    }
+    return positionIds
+  }
+
   setApprovalForAll = async (spender: string): Promise<TransactionReceipt> => {
     const transactionObject = await this.contract.setApprovalForAll(spender, true)
     return this.provider.waitForTransaction(transactionObject.hash)

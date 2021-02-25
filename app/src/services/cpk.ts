@@ -1,3 +1,4 @@
+import { TaskReceiptWrapper } from '@gelatonetwork/core'
 import SafeAppsSDK from '@gnosis.pm/safe-apps-sdk'
 import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
@@ -15,10 +16,11 @@ import {
   waitForBlockToSync,
 } from '../util/networks'
 import { calcDistributionHint, clampBigNumber, waitABit } from '../util/tools'
-import { MarketData, Question, Token } from '../util/types'
+import { GelatoData, MarketData, Question, /*TaskReceiptWrapper, */ Token } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
 import { ERC20Service } from './erc20'
+import { GelatoService } from './gelato'
 import { MarketMakerService } from './market_maker'
 import { MarketMakerFactoryService } from './market_maker_factory'
 import { OracleService } from './oracle'
@@ -46,12 +48,19 @@ interface CPKCreateMarketParams {
   conditionalTokens: ConditionalTokenService
   realitio: RealitioService
   marketMakerFactory: MarketMakerFactoryService
+  gelato: GelatoService | null
 }
 
 interface CPKAddFundingParams {
   amount: BigNumber
+  priorCollateralAmount: BigNumber
   collateral: Token
   marketMaker: MarketMakerService
+  gelato: GelatoService | null
+  gelatoData: GelatoData | null
+  conditionalTokens: ConditionalTokenService
+  conditionId: string
+  submittedTaskReceiptWrapper: TaskReceiptWrapper | null
 }
 
 interface CPKRemoveFundingParams {
@@ -63,6 +72,8 @@ interface CPKRemoveFundingParams {
   marketMaker: MarketMakerService
   outcomesCount: number
   sharesToBurn: BigNumber
+  taskReceiptWrapper: TaskReceiptWrapper | null
+  gelato: GelatoService | null
 }
 
 interface CPKRedeemParams {
@@ -258,12 +269,13 @@ class CPKService {
 
   createMarket = async ({
     conditionalTokens,
+    gelato,
     marketData,
     marketMakerFactory,
     realitio,
   }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
-      const { arbitrator, category, loadedQuestionId, outcomes, question, resolution, spread } = marketData
+      const { arbitrator, category, gelatoData, loadedQuestionId, outcomes, question, resolution, spread } = marketData
 
       if (!resolution) {
         throw new Error('Resolution time was not specified')
@@ -284,7 +296,7 @@ class CPKService {
       const txOptions: TxOptions = {}
 
       if (this.cpk.isSafeApp() || marketData.collateral.address === pseudoNativeAssetAddress) {
-        txOptions.gas = 1200000
+        txOptions.gas = 1250000
       }
 
       let collateral
@@ -381,7 +393,7 @@ class CPKService {
         this.cpk.address,
         spread,
       )
-      logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
+
       const distributionHint = calcDistributionHint(marketData.outcomes.map(o => o.probability))
       transactions.push({
         to: marketMakerFactory.address,
@@ -395,6 +407,21 @@ class CPKService {
           distributionHint,
         ),
       })
+      if (gelatoData.shouldSubmit && gelato !== null) {
+        const gelatoTransactions = await this.addGelatoSubmitTransaction(
+          marketData.funding,
+          Zero, // no prior funding, new market
+          gelatoData,
+          gelato,
+          outcomes.length,
+          conditionalTokens,
+          conditionId,
+          collateral,
+          predictedMarketMakerAddress,
+          account,
+        )
+        transactions.push(...gelatoTransactions)
+      }
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
       const transaction = await this.waitForTransaction(txObject)
@@ -660,7 +687,17 @@ class CPKService {
     }
   }
 
-  addFunding = async ({ amount, collateral, marketMaker }: CPKAddFundingParams): Promise<TransactionReceipt> => {
+  addFunding = async ({
+    amount,
+    collateral,
+    conditionId,
+    conditionalTokens,
+    gelato,
+    gelatoData,
+    marketMaker,
+    priorCollateralAmount,
+    submittedTaskReceiptWrapper,
+  }: CPKAddFundingParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
@@ -676,10 +713,10 @@ class CPKService {
         txOptions.gas = 500000
       }
 
-      let collateralAddress
+      let fixedCollateral
       if (collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
-        collateralAddress = getWrapToken(networkId).address
+        fixedCollateral = getWrapToken(networkId)
 
         // we need to send the funding amount in native ether
         if (!this.cpk.isSafeApp()) {
@@ -688,15 +725,15 @@ class CPKService {
 
         // Step 0: Wrap ether
         transactions.push({
-          to: collateralAddress,
+          to: fixedCollateral.address,
           value: amount,
         })
       } else {
-        collateralAddress = collateral.address
+        fixedCollateral = collateral
       }
 
       // Check  if the allowance of the CPK to the market maker is enough.
-      const collateralService = new ERC20Service(this.provider, account, collateralAddress)
+      const collateralService = new ERC20Service(this.provider, account, fixedCollateral.address)
 
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
@@ -707,7 +744,7 @@ class CPKService {
       if (!hasCPKEnoughAlowance) {
         // Step 1:  Approve unlimited amount to be transferred to the market maker
         transactions.push({
-          to: collateralAddress,
+          to: fixedCollateral.address,
           data: ERC20Service.encodeApproveUnlimited(marketMaker.address),
         })
       }
@@ -728,6 +765,35 @@ class CPKService {
         data: MarketMakerService.encodeAddFunding(amount),
       })
 
+      // Submit Gelato Task if selection is enabled and no other task was submitted beforehand
+      // @dev => Assuming only one task can be submitted for each market
+      if (
+        gelatoData !== null &&
+        gelato !== null &&
+        ((gelatoData.shouldSubmit && !submittedTaskReceiptWrapper) ||
+          (gelatoData.shouldSubmit &&
+            submittedTaskReceiptWrapper &&
+            submittedTaskReceiptWrapper.status !== 'awaitingExec'))
+      ) {
+        const outcomesSlotCount = await conditionalTokens.getOutcomeSlotCount(conditionId)
+        const outcomeSlotCountInt = parseInt(outcomesSlotCount.toString())
+
+        // Step 5: Submit Auto-Withdraw Task to Gelato
+        const gelatoTransactions = await this.addGelatoSubmitTransaction(
+          amount,
+          priorCollateralAmount,
+          gelatoData,
+          gelato,
+          outcomeSlotCountInt,
+          conditionalTokens,
+          conditionId,
+          fixedCollateral,
+          marketMaker.address,
+          account,
+        )
+        transactions.push(...gelatoTransactions)
+      }
+
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
       return this.waitForTransaction(txObject)
     } catch (err) {
@@ -742,9 +808,11 @@ class CPKService {
     conditionId,
     conditionalTokens,
     earnings,
+    gelato,
     marketMaker,
     outcomesCount,
     sharesToBurn,
+    taskReceiptWrapper,
   }: CPKRemoveFundingParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
@@ -766,6 +834,16 @@ class CPKService {
       }
 
       const transactions = [removeFundingTx, mergePositionsTx]
+
+      // If Gelato task is still active
+      if (gelato !== null && taskReceiptWrapper && taskReceiptWrapper.status === 'awaitingExec') {
+        // Cancel Gelato Task when withdrawing
+        const cancelTaskData = gelato.encodeCancelTask(taskReceiptWrapper.taskReceipt)
+        transactions.push({
+          to: gelato.addresses.gelatoCore,
+          data: cancelTaskData,
+        })
+      }
 
       const txOptions: TxOptions = {}
 
@@ -890,6 +968,79 @@ class CPKService {
     } catch (err) {
       logger.error(`Error trying to update proxy`, err.message)
       throw err
+    }
+  }
+
+  addGelatoSubmitTransaction = async (
+    collateralAmount: BigNumber,
+    priorCollateralAmount: BigNumber,
+    gelatoData: GelatoData,
+    gelato: GelatoService,
+    outcomeCount: number,
+    conditionalTokens: ConditionalTokenService,
+    conditionId: string,
+    collateralToken: Token,
+    marketMakerAddress: string,
+    account: string,
+  ) => {
+    const transactions = []
+
+    const { belowMinimum, minimum } = await this.isBelowGelatoMinimum(
+      collateralAmount,
+      collateralToken,
+      gelato,
+      priorCollateralAmount,
+    )
+
+    if (belowMinimum) {
+      logger.warn(`below gelato minimum ${minimum} ${collateralToken.symbol}, not using Gelato`)
+      return []
+    }
+
+    // Step 6: Enable Gelato Core as a module if not already done
+    const isGelatoWhitelistedModule = await gelato.isGelatoWhitelistedModule(this.cpk.address)
+    if (!isGelatoWhitelistedModule) {
+      const enableModuleData = await gelato.encodeWhitelistGelatoAsModule()
+      transactions.push({
+        to: this.cpk.address,
+        data: enableModuleData,
+      })
+    }
+
+    // Step 7: If automatic withdraw was selected, submit automatic Withdrawal Task to Gelato
+    const submitTaskData = await gelato.encodeSubmitTimeBasedWithdrawalTask({
+      gelatoData,
+      conditionalTokensAddress: conditionalTokens.address,
+      fpmmAddress: marketMakerAddress,
+      positionIds: await conditionalTokens.getPositionIds(outcomeCount, conditionId, collateralToken.address),
+      conditionId,
+      collateralTokenAddress: collateralToken.address,
+      receiver: account,
+    })
+
+    transactions.push({
+      to: gelato.addresses.gelatoCore,
+      data: submitTaskData,
+    })
+
+    return transactions
+  }
+
+  isBelowGelatoMinimum = async (
+    amount: BigNumber,
+    collateralToken: Token,
+    gelato: GelatoService,
+    priorAmount?: BigNumber,
+  ) => {
+    if (!priorAmount) {
+      priorAmount = Zero
+    }
+    const minDepositAmount = await gelato.minimumTokenAmount(collateralToken.address, collateralToken.decimals)
+    const depositAmount = Number(ethers.utils.formatUnits(amount, collateralToken.decimals))
+    const priorDepositAmount = Number(ethers.utils.formatUnits(priorAmount, collateralToken.decimals))
+    return {
+      belowMinimum: minDepositAmount > depositAmount + priorDepositAmount,
+      minimum: minDepositAmount - priorDepositAmount,
     }
   }
 }
