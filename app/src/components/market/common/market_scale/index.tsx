@@ -9,11 +9,13 @@ import {
   BalanceItem,
   LiquidityObject,
   LiquidityType,
+  MarketDetailsTab,
   Status,
   Token,
   TradeObject,
   TradeType,
 } from '../../../../util/types'
+import { IconDraggable } from '../../../common/icons'
 import { SCALE_HEIGHT } from '../common_styled'
 import { PositionTable } from '../position_table'
 
@@ -27,6 +29,7 @@ const ScaleWrapper = styled.div<{
   borderBottom: boolean | undefined
   borderTop: boolean | undefined
   valueBoxes: boolean | undefined
+  compressed: boolean | undefined
 }>`
   display: flex;
   flex-direction: column;
@@ -38,6 +41,7 @@ const ScaleWrapper = styled.div<{
   padding-right: 25px;
   position: relative;
   ${props => props.borderTop && `border-top: 1px solid ${props.theme.scale.border}; padding-top: 24px; height: 202px;`};
+  ${props => props.compressed && 'height: auto; padding-bottom: 24px;'}
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     ${props => props.valueBoxes && 'padding-bottom: 24px; height: 278px;'}
@@ -125,13 +129,24 @@ const ScaleBallContainer = styled.div`
   width: 100%;
 `
 
-const ScaleBall = styled.input`
+const ScaleBall = styled.div<{ xValue: number }>`
+  height: ${BALL_SIZE};
+  width: ${BALL_SIZE};
+  position: absolute;
+  z-index: 4;
+  left: calc(${props => props.xValue}% - ${BALL_SIZE} / 2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+const ScaleSlider = styled.input`
   height: ${SCALE_HEIGHT};
   width: calc(100% + ${BALL_SIZE});
   background: none;
   outline: none;
   -webkit-appearance: none;
-  z-index: 4;
+  z-index: 5;
   position: absolute;
   left: calc(-${BALL_SIZE} / 2);
   right: calc(-${BALL_SIZE} / 2);
@@ -141,8 +156,6 @@ const ScaleBall = styled.input`
     height: ${BALL_SIZE};
     width: ${BALL_SIZE};
     border-radius: 50%;
-    border: 3px solid ${props => props.theme.scale.ballBorder};
-    background: ${props => props.theme.scale.ballBackground};
     cursor: pointer;
   }
 
@@ -150,8 +163,6 @@ const ScaleBall = styled.input`
     height: ${BALL_SIZE};
     width: ${BALL_SIZE};
     border-radius: 50%;
-    border: 3px solid ${props => props.theme.scale.ballBorder};
-    background: ${props => props.theme.scale.ballBackground};
     cursor: pointer;
   }
 `
@@ -173,19 +184,21 @@ const ScaleDot = styled.div<{ xValue: number; positive?: Maybe<boolean> }>`
   margin-top: calc((${SCALE_HEIGHT} - ${DOT_SIZE}) / 2);
 `
 
-const ScaleTooltip = styled.div<{ xValue: number }>`
+const ScaleTooltip = styled.div<{ static: boolean | undefined; xValue: number }>`
   position: absolute;
   padding: 5px 8px;
   top: -42px;
   left: ${({ xValue }) => xValue}%;
   transform: translateX(-50%);
   background-color: ${({ theme }) => theme.colors.mainBodyBackground};
-  border-radius: ${({ theme }) => theme.borders.commonBorderRadius};
-  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.05);
-  border: 1px solid ${({ theme }) => theme.borders.tooltip};
+  border-radius: ${props => (props.static ? '4px' : props.theme.borders.commonBorderRadius)};
+  box-shadow: ${props => (props.static ? '' : '0px 0px 4px rgba(0, 0, 0, 0.05)')};
+  border: 1px solid ${props => (props.static ? props.theme.borders.borderDisabled : props.theme.borders.tooltip)};
   white-space: nowrap;
   opacity: 0;
   transition: 0.2s opacity;
+  ${props => props.static && 'opacity: 1;'}
+  color: ${props => (props.static ? props.theme.colors.textColorDark : props.theme.colors.black)};
 `
 
 const ScaleTooltipMessage = styled.p`
@@ -221,6 +234,7 @@ interface Props {
   liquidityAmount?: Maybe<BigNumber>
   additionalShares?: Maybe<number>
   additionalSharesType?: Maybe<AdditionalSharesType>
+  currentTab?: MarketDetailsTab
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
@@ -232,6 +246,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     borderTop,
     collateral,
     currentPrediction,
+    currentTab,
     fee,
     liquidityAmount,
     liquidityTxs,
@@ -459,7 +474,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const deactivateTooltip = () => {
     const scaleTooltip: HTMLElement | null = document.querySelector('#scale-tooltip')
-    if (scaleTooltip) {
+    if (scaleTooltip && currentTab !== MarketDetailsTab.sell) {
       scaleTooltip.style.opacity = '0'
     }
   }
@@ -479,6 +494,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     !collateral ||
     (isDust(shortShares || new BigNumber(0), collateral.decimals) &&
       isDust(longShares || new BigNumber(0), collateral.decimals))
+
+  const showSingleValueBox =
+    !isAmountInputted && !(additionalShares && additionalShares > 0.000001) && currentTab !== MarketDetailsTab.sell
 
   const singleValueBoxData = [
     {
@@ -533,7 +551,12 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <ScaleWrapper borderBottom={isPositionTableDisabled} borderTop={borderTop} valueBoxes={isAmountInputted}>
+      <ScaleWrapper
+        borderBottom={isPositionTableDisabled}
+        borderTop={borderTop}
+        compressed={currentTab === MarketDetailsTab.sell}
+        valueBoxes={isAmountInputted}
+      >
         <ScaleTitleWrapper>
           <ScaleTitle>
             {formatNumber(lowerBoundNumber.toString())} {unit}
@@ -548,10 +571,13 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         </ScaleTitleWrapper>
         <Scale>
           <ScaleBallContainer>
-            <ScaleTooltip id="scale-tooltip" xValue={scaleValue || 0}>
+            <ScaleTooltip id="scale-tooltip" static={currentTab === MarketDetailsTab.sell} xValue={scaleValue || 0}>
               <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString())} ${unit}`}</ScaleTooltipMessage>
             </ScaleTooltip>
-            <ScaleBall
+            <ScaleBall xValue={scaleValue}>
+              <IconDraggable />
+            </ScaleBall>
+            <ScaleSlider
               className="scale-ball"
               disabled={!isSliderEnabled}
               max="100"
@@ -607,9 +633,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
             </>
           )}
-          {!isAmountInputted && !(additionalShares && additionalShares > 0.000001) && (
-            <ValueBoxes valueBoxData={singleValueBoxData} />
-          )}
+          {showSingleValueBox && <ValueBoxes valueBoxData={singleValueBoxData} />}
         </Scale>
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
         {liquidityAmount && liquidityAmount.gt(0) && additionalShares && additionalShares > 0.000001 && (

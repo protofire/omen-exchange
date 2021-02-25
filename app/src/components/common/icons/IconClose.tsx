@@ -18,25 +18,27 @@ const Wrapper = styled.svg<{ hoverEffect: boolean | undefined }>`
 interface Props {
   hoverEffect?: boolean
   onClick?: () => void
+  size?: string
+  color?: string
 }
 
 export const IconClose = (props: Props) => {
-  const { hoverEffect = false, onClick } = props
+  const { color = '#37474F', hoverEffect = false, onClick, size = '24' } = props
 
   return (
     <Wrapper
       fill="none"
-      height="24"
+      height={size}
       hoverEffect={hoverEffect}
       onClick={onClick}
       viewBox="0 0 24 24"
-      width="24"
+      width={size}
       xmlns="http://www.w3.org/2000/svg"
     >
       <path
         className="path"
         d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"
-        fill={hoverEffect ? '#DCDFF2' : '#37474F'}
+        fill={hoverEffect ? '#DCDFF2' : color}
       />
     </Wrapper>
   )

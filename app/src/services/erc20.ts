@@ -37,6 +37,10 @@ class ERC20Service {
     return this.contract.address
   }
 
+  get getContract(): Contract {
+    return this.contract
+  }
+
   /**
    * @returns A boolean indicating if `spender` has enough allowance to transfer `neededAmount` tokens from `spender`.
    */
@@ -136,6 +140,12 @@ class ERC20Service {
     const approveInterface = new utils.Interface(erc20Abi)
 
     return approveInterface.functions.approve.encode([spenderAccount, amount])
+  }
+
+  static encodedBalanceOf = (account: string): string => {
+    const balanceInterface = new utils.Interface(erc20Abi)
+
+    return balanceInterface.functions.balanceOf.encode([account])
   }
 
   static encodeApproveUnlimited = (spenderAccount: string): string => {
