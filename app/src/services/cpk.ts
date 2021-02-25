@@ -3,6 +3,7 @@ import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
+import { XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
 import { getLogger } from '../util/logger'
 import {
   getBySafeTx,
@@ -1215,17 +1216,35 @@ class CPKService {
       throw e
     }
   }
+
   sendXdaiToBridge = async (amount: BigNumber) => {
     try {
-      const xDaiService = new XdaiService(this.provider)
-      const transaction = await xDaiService.sendXdaiToBridge(amount)
+      if (this.cpk.relay) {
+        const transactions = []
 
-      return transaction
+        // get mainnet relay signer
+        const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
+
+        // transfer to the user address
+        transactions.push({
+          to: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
+          data: XdaiService.encodeRelayTokens(to),
+          value: amount,
+        })
+
+        const txObject = await this.cpk.execTransactions(transactions)
+        return this.provider.waitForTransaction(txObject.hash)
+      } else {
+        const xDaiService = new XdaiService(this.provider)
+        const transaction = await xDaiService.sendXdaiToBridge(amount)
+        return transaction
+      }
     } catch (e) {
       logger.error(`Error trying to send XDai to bridge address`, e.message)
       throw e
     }
   }
+
   fetchLatestUnclaimedTransactions = async () => {
     try {
       const xDaiService = new XdaiService(this.provider)
@@ -1237,6 +1256,7 @@ class CPKService {
       throw e
     }
   }
+
   claimDaiTokens = async () => {
     try {
       const { message } = await this.fetchLatestUnclaimedTransactions()

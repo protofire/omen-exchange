@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { Contract, ethers } from 'ethers'
+import { Contract, ethers, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import {
@@ -26,6 +26,15 @@ const abi = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
+  {
+    type: 'function',
+    stateMutability: 'payable',
+    payable: true,
+    outputs: [],
+    name: 'relayTokens',
+    inputs: [{ type: 'address', name: '_receiver' }],
+    constant: false,
+  },
 ]
 
 class XdaiService {
@@ -50,6 +59,7 @@ class XdaiService {
     const signer = this.provider.getSigner()
     return new ethers.Contract(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, this.abi, signer)
   }
+
   generateSendTransaction = async (amount: BigNumber, contract: Contract) => {
     try {
       const transaction = await contract.transfer(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, amount)
@@ -58,6 +68,7 @@ class XdaiService {
       throw new Error('Failed at generating transaction!')
     }
   }
+
   sendXdaiToBridge = async (amount: BigNumber) => {
     try {
       const signer = this.provider.getSigner()
@@ -76,6 +87,13 @@ class XdaiService {
       throw new Error('Failed at generating transaction!')
     }
   }
+
+  static encodeRelayTokens = (receiver: string): string => {
+    const transferFromInterface = new utils.Interface(abi)
+
+    return transferFromInterface.functions.relayTokens.encode([receiver])
+  }
+
   claimDaiTokens = async (functionData: any, contract: any) => {
     try {
       const transaction = await contract.executeSignatures(functionData.message, functionData.signatures)
@@ -85,6 +103,7 @@ class XdaiService {
       throw new Error('Failed at generating transaction!')
     }
   }
+
   fetchCrossChainBalance = async (chain: number) => {
     try {
       const userAddress = await this.provider.getSigner().getAddress()
@@ -116,6 +135,7 @@ class XdaiService {
       throw new Error(`Error while fetching cross chain balance ${e}`)
     }
   }
+
   fetchXdaiTransactionData = async () => {
     try {
       const queryForeign = `
