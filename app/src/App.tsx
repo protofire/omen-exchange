@@ -7,7 +7,17 @@ import Web3Provider from 'web3-react'
 import 'react-datepicker/dist/react-datepicker.css'
 import 'sanitize.css'
 
-import { MAIN_NETWORKS, RINKEBY_NETWORKS, SOKOL_NETWORKS, XDAI_NETWORKS } from './common/constants'
+import { MAINNET_LOCATION, XDAI_LOCATION } from './common/constants'
+import { IconSettings } from './components/common/icons'
+import {
+  ButtonSettings,
+  ContentsLeft,
+  ContentsRight,
+  HeaderInner,
+  HeaderWrapper,
+  LogoWrapper,
+} from './components/common/layout/header'
+import { OmenLogo } from './components/common/logos/omen'
 import { Main } from './components/main'
 import SettingsViewContainer from './components/settings/settings_view'
 import { ApolloProviderWrapper } from './contexts/Apollo'
@@ -17,34 +27,45 @@ import theme from './theme'
 import { GlobalStyle } from './theme/global_style'
 import connectors from './util/connectors'
 import { getInfuraUrl, networkIds } from './util/networks'
-import { checkRpcStatus } from './util/tools'
+import { checkRpcStatus, getNetworkFromChain } from './util/tools'
 
 const store = configureStore({ reducer: balanceReducer })
 
 const App: React.FC = () => {
   const windowObj: any = window
-  console.log(windowObj.ethereum.chainId)
-  const networkId = windowObj.ethereum.chainId
-  console.log(networkId)
+
+  const ethereum = windowObj.ethereum
+  const networkId = ethereum.chainId
   const [status, setStatus] = useState(true)
-  const network = RINKEBY_NETWORKS.includes(networkId)
-    ? networkIds.RINKEBY
-    : SOKOL_NETWORKS.includes(networkId)
-    ? networkIds.SOKOL
-    : MAIN_NETWORKS.includes(networkId)
-    ? networkIds.MAINNET
-    : XDAI_NETWORKS.includes(networkId)
-    ? networkIds.XDAI
-    : null
+  const network = getNetworkFromChain(networkId)
+
   useEffect(() => {
-    if (network) checkRpcStatus(getInfuraUrl(network), setStatus)
-  }, [])
-  console.log(status)
+    if (location.host === MAINNET_LOCATION) network === networkIds.MAINNET
+    if (location.host === XDAI_LOCATION) network === networkIds.XDAI
+
+    if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ethereum])
+
   return (
     <ThemeProvider theme={theme}>
       <Web3Provider connectors={connectors} libraryName="ethers.js">
         {!status ? (
           <>
+            <HeaderWrapper>
+              <HeaderInner>
+                <ContentsLeft>
+                  <LogoWrapper as="div">
+                    <OmenLogo />
+                  </LogoWrapper>
+                </ContentsLeft>
+                <ContentsRight>
+                  <ButtonSettings>
+                    <IconSettings />
+                  </ButtonSettings>
+                </ContentsRight>
+              </HeaderInner>
+            </HeaderWrapper>
             <SettingsViewContainer networkId={networkId} />
           </>
         ) : (

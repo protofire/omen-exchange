@@ -39,7 +39,7 @@ interface Props {
  * Component used to render components that depend on Web3 being available. These components can then
  * `useConnectedWeb3Context` safely to get web3 stuff without having to null check it.
  */
-export const ConnectedWeb3: React.FC = (props: Props) => {
+export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   const [networkId, setNetworkId] = useState<number | null>(null)
   const safeAppInfo = useSafeApp()
   const context = useWeb3Context()
@@ -96,7 +96,7 @@ export const ConnectedWeb3: React.FC = (props: Props) => {
   }, [context, library, active, error, networkId, safeAppInfo, rpcAddress])
 
   if (!networkId || !library) {
-    props.setStatus(false)
+    props.setStatus(true)
     return null
   }
 
@@ -106,12 +106,13 @@ export const ConnectedWeb3: React.FC = (props: Props) => {
     networkId,
     rawWeb3Context: context,
   }
-
+  props.setStatus(true)
   return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
 }
 
-export const WhenConnected: React.FC = props => {
+export const WhenConnected: React.FC<Props> = props => {
   const { account } = useConnectedWeb3Context()
 
+  props.setStatus(true)
   return <>{account && props.children}</>
 }

@@ -23,7 +23,7 @@ import { DaiIcon } from '../../icons/currencies'
 import { XdaiIcon } from '../../icons/currencies/XdaiIcon'
 import { Network } from '../../network'
 
-const HeaderWrapper = styled.div`
+export const HeaderWrapper = styled.div`
   align-items: flex-end;
   background: ${props => props.theme.header.backgroundColor};
   display: flex;
@@ -40,7 +40,7 @@ const HeaderWrapper = styled.div`
   }
 `
 
-const HeaderInner = styled.div`
+export const HeaderInner = styled.div`
   align-items: center;
   display: flex;
   flex-direction: row;
@@ -57,7 +57,7 @@ const HeaderInner = styled.div`
   }
 `
 
-const LogoWrapper = styled(NavLink)`
+export const LogoWrapper = styled(NavLink)`
   max-width: 90px;
   min-width: fit-content;
 `
@@ -127,7 +127,7 @@ const ButtonWrapper = styled.div`
   ${ButtonCSS}
 `
 
-const ButtonSettings = styled(ButtonRound)`
+export const ButtonSettings = styled(ButtonRound)`
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-left: 12px;
     width: 40px;
@@ -136,7 +136,7 @@ const ButtonSettings = styled(ButtonRound)`
   }
 `
 
-const ContentsLeft = styled.div`
+export const ContentsLeft = styled.div`
   align-items: center;
   display: flex;
   margin: auto auto auto 0;
@@ -146,7 +146,7 @@ const ContentsLeft = styled.div`
   }
 `
 
-const ContentsRight = styled.div`
+export const ContentsRight = styled.div`
   align-items: center;
   display: flex;
   flex-wrap: wrap;

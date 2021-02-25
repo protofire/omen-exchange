@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { MAIN_NETWORKS, RINKEBY_NETWORKS, SOKOL_NETWORKS, XDAI_NETWORKS } from '../../../common/constants'
-import { getChainSpecificAlternativeUrls, getInfuraUrl, networkIds } from '../../../util/networks'
-import { checkRpcStatus, isValidHttpUrl } from '../../../util/tools'
+import { getChainSpecificAlternativeUrls, getInfuraUrl } from '../../../util/networks'
+import { checkRpcStatus, getNetworkFromChain, isValidHttpUrl } from '../../../util/tools'
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { TextfieldCSS } from '../../common/form/textfield'
@@ -112,6 +110,10 @@ const Input = styled.input`
 
   ${TextfieldCSS};
 `
+const SettingsWrapper = styled(ListCard)`
+  margin-top: 116px;
+  min-height: initial;
+`
 const ImageWrap = styled.div`
   margin-right: 10px;
 `
@@ -122,19 +124,9 @@ interface Props {
 }
 
 const SettingsViewContainer = (props: Props) => {
-  console.log(props.history)
   const networkId = props.networkId
-  console.log(networkId)
 
-  const network = RINKEBY_NETWORKS.includes(networkId)
-    ? networkIds.RINKEBY
-    : SOKOL_NETWORKS.includes(networkId)
-    ? networkIds.SOKOL
-    : MAIN_NETWORKS.includes(networkId)
-    ? networkIds.MAINNET
-    : XDAI_NETWORKS.includes(networkId)
-    ? networkIds.XDAI
-    : networkId
+  const network = getNetworkFromChain(networkId)
 
   const [current, setCurrent] = useState(0)
   const [url, setUrl] = useState<string>('')
@@ -194,6 +186,7 @@ const SettingsViewContainer = (props: Props) => {
     const isValid = isValidHttpUrl(url)
     setIsValidUrl(isValid)
     if (!isValid) {
+      setOnlineStatus(false)
       return
     }
 
@@ -216,7 +209,7 @@ const SettingsViewContainer = (props: Props) => {
   }, [])
 
   return (
-    <ListCard style={{ minHeight: 'initial' }}>
+    <SettingsWrapper>
       <TopContent>
         <Text>Settings</Text>
       </TopContent>
@@ -250,8 +243,6 @@ const SettingsViewContainer = (props: Props) => {
           <ButtonRound
             onClick={() => {
               props.history.push('/')
-
-              console.log('clickeds')
             }}
           >
             Back
@@ -268,7 +259,9 @@ const SettingsViewContainer = (props: Props) => {
             Set to Default
           </ButtonRound>
           <ButtonRound
-            disabled={!isValidUrl || getInfuraUrl(network) === url || !onlineStatus}
+            disabled={
+              url.length !== 0 || !isValidUrl || (network !== -1 && getInfuraUrl(network) === url) || !onlineStatus
+            }
             onClick={async () => {
               if (!(await checkRpcStatus(url, setOnlineStatus))) return
 
@@ -287,10 +280,8 @@ const SettingsViewContainer = (props: Props) => {
           </ButtonRound>
         </ButtonRow>
       </BottomContent>
-    </ListCard>
+    </SettingsWrapper>
   )
 }
 
-// export { SettingsViewContainer }
-export const SettingsWithRouter = withRouter(SettingsViewContainer)
 export default SettingsViewContainer

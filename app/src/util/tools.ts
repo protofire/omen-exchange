@@ -4,7 +4,7 @@ import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
-import { CONFIRMATION_COUNT } from '../common/constants'
+import { CONFIRMATION_COUNT, MAIN_NETWORKS, RINKEBY_NETWORKS, SOKOL_NETWORKS, XDAI_NETWORKS } from '../common/constants'
 import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
 import { CPKService } from '../services'
 import { CompoundService } from '../services/compound_service'
@@ -72,11 +72,10 @@ export const checkRpcStatus = async (customUrl: string, setStatus: any) => {
       setStatus(false)
       return false
     }
-    console.log(response)
+
     setStatus(true)
     return true
   } catch (e) {
-    console.log(e)
     setStatus(false)
 
     return false
@@ -92,6 +91,19 @@ export const isValidHttpUrl = (data: string): boolean => {
   }
 
   return url.protocol === 'http:' || url.protocol === 'https:'
+}
+
+export const getNetworkFromChain = (chain: string) => {
+  const network = RINKEBY_NETWORKS.includes(chain)
+    ? networkIds.RINKEBY
+    : SOKOL_NETWORKS.includes(chain)
+    ? networkIds.SOKOL
+    : MAIN_NETWORKS.includes(chain)
+    ? networkIds.MAINNET
+    : XDAI_NETWORKS.includes(chain)
+    ? networkIds.XDAI
+    : -1
+  return network
 }
 
 export const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {
