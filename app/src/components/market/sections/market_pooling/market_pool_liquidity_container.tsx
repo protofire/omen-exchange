@@ -1,3 +1,4 @@
+import { TaskReceipt } from '@gelatonetwork/core'
 import React from 'react'
 
 import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
@@ -7,6 +8,10 @@ import { ScalarMarketPoolLiquidity } from './scalar_market_pool_liquidity'
 
 interface Props {
   marketMakerData: MarketMakerData
+  gelatoTask?: {
+    submittedTaskReceipt: TaskReceipt
+    withdrawDate: Date
+  }
   fetchGraphMarketMakerData: () => Promise<void>
   fetchGraphMarketUserTxData: () => Promise<void>
   switchMarketTab: (arg0: MarketDetailsTab) => void

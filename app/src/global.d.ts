@@ -13,3 +13,5 @@ declare type Maybe<T> = T | null
 declare type KnownToken = 'cdai' | 'cbat' | 'ceth' | 'cusdc' | 'cusdt' | 'cwbtc' | 'cuni' | 'usdc' | 'dai' | 'weth' | 'owl' | 'chai' | 'gno' | 'pnk' | 'dxd' | 'wspoa' | 'wxdai'
 
 declare type KnownArbitrator = 'kleros' | 'dxdao' | 'unknown'
+
+declare type KnownGelatoCondition = 'time'

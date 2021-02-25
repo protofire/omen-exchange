@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import {
   DEFAULT_ARBITRATOR,
+  DEFAULT_GELATO_CONDITION,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
   EARLIEST_RINKEBY_BLOCK_TO_CHECK,
   GRAPH_MAINNET_HTTP,
@@ -23,7 +24,7 @@ import { entries, isNotNull } from '../util/type-utils'
 
 import { getImageUrl } from './token'
 import { waitABit } from './tools'
-import { Arbitrator, Token } from './types'
+import { Arbitrator, GelatoData, Token } from './types'
 
 export type NetworkId = 1 | 4 | 77 | 100
 
@@ -528,6 +529,12 @@ interface KnownArbitratorData {
   isSelectionEnabled: boolean
 }
 
+interface KnownGelatoConditionData {
+  id: string
+  shouldSubmit: boolean
+  input: Date | null
+}
+
 export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData } = {
   kleros: {
     name: 'Kleros',
@@ -556,6 +563,14 @@ export const knownArbitrators: { [name in KnownArbitrator]: KnownArbitratorData 
   },
 }
 
+export const knownGelatoConditions: { [name in KnownGelatoCondition]: KnownGelatoConditionData } = {
+  time: {
+    id: 'time',
+    shouldSubmit: false,
+    input: null,
+  },
+}
+
 export const getArbitrator = (networkId: number, arbitratorId: KnownArbitrator): Arbitrator => {
   const arbitrator = knownArbitrators[arbitratorId]
   const address = arbitrator.addresses[networkId]
@@ -573,12 +588,30 @@ export const getArbitrator = (networkId: number, arbitratorId: KnownArbitrator):
   }
 }
 
+export const getGelatoCondition = (conditionId: KnownGelatoCondition): GelatoData => {
+  const condition = knownGelatoConditions[conditionId]
+
+  return {
+    id: conditionId,
+    shouldSubmit: condition.shouldSubmit,
+    input: null,
+  }
+}
+
 export const getDefaultArbitrator = (networkId: number): Arbitrator => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
 
   return getArbitrator(networkId, DEFAULT_ARBITRATOR)
+}
+
+export const getDefaultGelatoData = (networkId: number): GelatoData => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  return getGelatoCondition(DEFAULT_GELATO_CONDITION)
 }
 
 export const getArbitratorFromAddress = (networkId: number, address: string): Arbitrator => {
@@ -664,6 +697,25 @@ export const getArbitratorsByNetwork = (networkId: number): Arbitrator[] => {
         }
       }
       return null
+    })
+    .filter(isNotNull)
+}
+
+export const getGelatoConditionByNetwork = (networkId: number): GelatoData[] => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  return Object.values(knownGelatoConditions)
+    .map(condition => {
+      const { input, shouldSubmit } = condition
+      const id = condition.id as KnownGelatoCondition
+
+      return {
+        id,
+        input,
+        shouldSubmit,
+      }
     })
     .filter(isNotNull)
 }
