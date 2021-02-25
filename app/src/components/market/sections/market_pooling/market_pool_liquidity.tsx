@@ -20,11 +20,13 @@ import {
 import { useGelatoSubmittedTasks } from '../../../../hooks/useGelatoSubmittedTasks'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-<<<<<<< HEAD
-import { getNativeAsset, getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
-=======
-import { getDefaultGelatoData, getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
->>>>>>> integrate gelato auto withdraw service
+import {
+  getDefaultGelatoData,
+  getNativeAsset,
+  getToken,
+  getWrapToken,
+  pseudoNativeAssetAddress,
+} from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   calcAddFundingSendAmounts,
@@ -37,11 +39,8 @@ import {
   getSharesInBaseToken,
 } from '../../../../util/tools'
 import {
-<<<<<<< HEAD
   CompoundTokenType,
-=======
   GelatoData,
->>>>>>> integrate gelato auto withdraw service
   MarketDetailsTab,
   MarketMakerData,
   OutcomeTableValue,
@@ -276,8 +275,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
 
-<<<<<<< HEAD
-=======
   const symbol = collateral.address === pseudoNativeAssetAddress ? wrapToken.symbol : collateral.symbol
   const checkGelatoMinimum = useCallback(async () => {
     if (cpk && amountToFund) {
@@ -296,7 +293,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     checkGelatoMinimum()
   }, [checkGelatoMinimum])
 
->>>>>>> integrate gelato auto withdraw service
   const addFunding = async () => {
     setModalTitle('Deposit Funds')
 
@@ -324,9 +320,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         fundsAmount = formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)
       }
       setStatus(Status.Loading)
-<<<<<<< HEAD
-      setMessage(`Depositing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
-=======
       withGelato && !belowGelatoMinimum
         ? setMessage(
             `Depositing funds: ${fundsAmount} ${symbol}\n
@@ -344,19 +337,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       }
 
       const conditionId = await marketMaker.getConditionId()
->>>>>>> integrate gelato auto withdraw service
 
       setIsTransactionProcessing(true)
       await cpk.addFunding({
-<<<<<<< HEAD
-        amount: amountToFundNormalized || Zero,
-        compoundService,
-        collateral,
-        marketMaker,
-        useBaseToken,
-=======
         amount: amountToFund || Zero,
         priorCollateralAmount: totalUserLiquidity,
+        compoundService,
         collateral,
         marketMaker,
         gelato,
@@ -364,7 +350,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         conditionalTokens,
         conditionId,
         submittedTaskReceiptWrapper,
->>>>>>> integrate gelato auto withdraw service
+        useBaseToken,
       })
 
       await fetchGraphMarketMakerData()
@@ -374,16 +360,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setAmountToFund(null)
       setAmountToFundDisplay('')
-<<<<<<< HEAD
       setAmountToFundNormalized(null)
       setStatus(Status.Ready)
       setMessage(`Successfully deposited ${fundsAmount} ${displayCollateral.symbol}`)
       setIsTransactionProcessing(false)
-=======
       withGelato && !belowGelatoMinimum
         ? setMessage(`Successfully deposited ${fundsAmount} ${symbol}\n and scheduled auto-withdraw`)
         : setMessage(`Successfully deposited ${fundsAmount} ${symbol}`)
->>>>>>> integrate gelato auto withdraw service
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to deposit funds.`)
@@ -403,7 +386,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       }
       setStatus(Status.Loading)
 
-<<<<<<< HEAD
       let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
       if (
         compoundService &&
@@ -417,14 +399,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         fundsAmount = formatBigNumber(displayDepositedTokensTotal || Zero, displayCollateral.decimals)
       }
       setMessage(`Withdrawing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
-=======
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
 
       withGelato
         ? setMessage(`Withdrawing funds: ${fundsAmount} ${symbol}\n
         and cancel future auto-withdraw`)
         : setMessage(`Withdrawing funds: ${fundsAmount} ${symbol}...`)
->>>>>>> integrate gelato auto withdraw service
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
@@ -447,12 +427,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         marketMaker,
         outcomesCount: balances.length,
         sharesToBurn: amountToRemove || Zero,
-<<<<<<< HEAD
         useBaseToken,
-=======
         taskReceiptWrapper: submittedTaskReceiptWrapper,
         gelato,
->>>>>>> integrate gelato auto withdraw service
       })
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
@@ -461,15 +438,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
-<<<<<<< HEAD
       setAmountToRemoveNormalized(null)
       setStatus(Status.Ready)
-      setMessage(`Successfully withdrew ${fundsAmount} ${displayCollateral.symbol}`)
-=======
       withGelato
         ? setMessage(`Successfully withdrew ${fundsAmount} ${symbol}\n and canceled auto-withdraw`)
         : setMessage(`Successfully withdrew ${fundsAmount} ${symbol}`)
->>>>>>> integrate gelato auto withdraw service
       setIsModalTransactionResultOpen(true)
       setIsTransactionProcessing(false)
     } catch (err) {
@@ -624,7 +597,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 
-<<<<<<< HEAD
   let toggleCollateral = collateral
 
   if (collateralSymbol in CompoundTokenType) {
@@ -677,18 +649,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     setWithdrawAmountToRemove(new BigNumber('0'))
     setActiveTab(tab)
   }
-=======
-  const currencyFilters =
-    collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress
-      ? [wrapToken.address.toLowerCase(), pseudoNativeAssetAddress.toLowerCase()]
-      : []
+
   useEffect(() => {
     if (withdrawDate != null && (gelatoData.input == null || gelatoData.input.toString() != withdrawDate.toString())) {
       const gelatoDataCopy = { ...gelatoData, input: withdrawDate }
       setGelatoData(gelatoDataCopy)
     }
   }, [gelatoData, withdrawDate])
->>>>>>> integrate gelato auto withdraw service
 
   return (
     <>

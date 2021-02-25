@@ -6,15 +6,15 @@ import { IMPORT_QUESTION_ID_KEY, MARKET_FEE } from '../../../../common/constants
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { queryTopCategories } from '../../../../queries/markets_home'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
-<<<<<<< HEAD
-import { getArbitrator, getDefaultArbitrator, getDefaultToken, getToken } from '../../../../util/networks'
+import {
+  getArbitrator,
+  getDefaultArbitrator,
+  getDefaultGelatoData,
+  getDefaultToken,
+  getToken,
+} from '../../../../util/networks'
 import { getCTokenForToken, limitDecimalPlaces } from '../../../../util/tools'
-import { Arbitrator, GraphResponseTopCategories, MarketData, Question, Token } from '../../../../util/types'
-=======
-import { getArbitrator, getDefaultArbitrator, getDefaultGelatoData, getDefaultToken } from '../../../../util/networks'
-import { limitDecimalPlaces } from '../../../../util/tools'
 import { Arbitrator, GelatoData, GraphResponseTopCategories, MarketData, Question, Token } from '../../../../util/types'
->>>>>>> integrate gelato auto withdraw service
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 
 import { AskQuestionStep, FundingAndFeeStep, MenuStep } from './steps'

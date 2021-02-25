@@ -97,11 +97,8 @@ const MarketWizardCreatorContainer: FC = () => {
             conditionalTokens,
             realitio,
             marketMakerFactory,
-<<<<<<< HEAD
             useCompoundReserve,
-=======
             gelato,
->>>>>>> integrate gelato auto withdraw service
           })
           setMarketMakerAddress(marketMakerAddress)
           setMarketCreationStatus(MarketCreationStatus.done())

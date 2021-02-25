@@ -26,11 +26,7 @@ import { MarketCreationStatus } from '../../../../../../util/market_creation_sta
 import { getNativeAsset, networkIds, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
-<<<<<<< HEAD
-import { Arbitrator, CompoundEnabledTokenType, Ternary, Token } from '../../../../../../util/types'
-=======
-import { Arbitrator, GelatoData, Ternary, Token } from '../../../../../../util/types'
->>>>>>> integrate gelato auto withdraw service
+import { Arbitrator, CompoundEnabledTokenType, GelatoData, Ternary, Token } from '../../../../../../util/types'
 import { Button } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
@@ -197,12 +193,9 @@ interface Props {
   getCompoundInterestRate: (userInputCollateral: string) => Promise<number>
   handleCollateralChange: (collateral: Token, amount: BigNumber) => void
   handleTradingFeeChange: (fee: string) => void
-<<<<<<< HEAD
   handleUseCompoundReserveChange: (useCompoundReserve: boolean) => void
-=======
   handleGelatoDataChange: (gelatoData: GelatoData) => any
   handleGelatoDataInputChange: (newDate: Date | null) => any
->>>>>>> integrate gelato auto withdraw service
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
   resetTradingFee: () => void
   state: string
@@ -599,14 +592,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             hyperlinkDescription={''}
           />
         )}
-<<<<<<< HEAD
-        {showAddCompoundService && (
-          <AddCompoundService
-            compoundInterestRate={compoundInterestRate}
-            currentToken={userInputCollateral.symbol}
-            isServiceChecked={isServiceChecked}
-            toggleServiceCheck={toggleServiceCheck}
-=======
         {GELATO_ACTIVATED && state !== 'SCALAR' && (
           <GelatoScheduler
             belowMinimum={belowGelatoMinimum}
@@ -617,7 +602,14 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             isScheduled={false}
             minimum={gelatoMinimum}
             resolution={values.resolution !== null ? values.resolution : new Date()}
->>>>>>> integrate gelato auto withdraw service
+          />
+        )}
+        {showAddCompoundService && (
+          <AddCompoundService
+            compoundInterestRate={compoundInterestRate}
+            currentToken={userInputCollateral.symbol}
+            isServiceChecked={isServiceChecked}
+            toggleServiceCheck={toggleServiceCheck}
           />
         )}
         {showSetAllowance && (

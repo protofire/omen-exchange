@@ -1,5 +1,4 @@
 import { TaskReceiptWrapper } from '@gelatonetwork/core'
-import SafeAppsSDK from '@gnosis.pm/safe-apps-sdk'
 import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
@@ -905,7 +904,7 @@ class CPKService {
     marketMaker,
     priorCollateralAmount,
     submittedTaskReceiptWrapper,
-    useBaseToken
+    useBaseToken,
   }: CPKAddFundingParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
@@ -1067,7 +1066,7 @@ class CPKService {
     outcomesCount,
     sharesToBurn,
     taskReceiptWrapper,
-    useBaseToken
+    useBaseToken,
   }: CPKRemoveFundingParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
