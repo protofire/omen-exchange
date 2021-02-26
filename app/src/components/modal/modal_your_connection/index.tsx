@@ -6,7 +6,7 @@ import { useConnectedWeb3Context } from '../../../hooks'
 import { truncateStringInTheMiddle } from '../../../util/tools'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
-import { IconClose } from '../../common/icons'
+import { IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
 import { ConnectionIcon } from '../../common/network/img/ConnectionIcon'
 import { ContentWrapper, ModalNavigation } from '../common_styled'
 
@@ -43,6 +43,22 @@ const TopCardHeaderLeft = styled.div`
 const ConnectionIconWrapper = styled.div`
   height: 28px;
   width: 28px;
+  position: relative;
+`
+
+const ConnectorCircle = styled.div`
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  border: ${props => props.theme.borders.borderLineDisabled};
+  background: #fff;
+  z-index: 2;
+  position: absolute;
+  bottom: 0;
+  right: -4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 `
 
 const AccountInfo = styled.div`
@@ -82,7 +98,14 @@ export const ModalYourConnection = (props: Props) => {
     Modal.setAppElement('#root')
   }, [])
 
-  console.log(context)
+  const connectorIcon =
+    context.rawWeb3Context.connectorName === 'MetaMask' ? (
+      <IconMetaMask />
+    ) : context.rawWeb3Context.connectorName === 'WalletConnect' ? (
+      <IconWalletConnect />
+    ) : (
+      <></>
+    )
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.connectionModal}>
@@ -95,11 +118,11 @@ export const ModalYourConnection = (props: Props) => {
           <TopCardHeader>
             <TopCardHeaderLeft>
               <ConnectionIconWrapper>
+                <ConnectorCircle>{connectorIcon}</ConnectorCircle>
                 <ConnectionIcon scale="1.4" />
               </ConnectionIconWrapper>
               <AccountInfo>
                 <AccountInfoAddress>{truncateStringInTheMiddle(account || '', 5, 3)}</AccountInfoAddress>
-                {/* TODO: Replace hardcoded wallet */}
                 <AccountInfoWallet>{context.rawWeb3Context.connectorName}</AccountInfoWallet>
               </AccountInfo>
             </TopCardHeaderLeft>
