@@ -36,6 +36,7 @@
     "@types/react-tooltip": "^3.9.3",
     "@types/recharts": "^1.8.10",
     "@types/styled-components": "^4.1.18",
+    "@ukstv/jazzicon-react": "^1.0.0",
     "@walletconnect/qrcode-modal": "^1.0.0-beta.35",
     "@walletconnect/web3-subprovider": "^1.0.0-beta.1",
     "apollo-cache-inmemory": "^1.6.5",
