@@ -82,6 +82,8 @@ export const ModalYourConnection = (props: Props) => {
     Modal.setAppElement('#root')
   }, [])
 
+  console.log(context)
+
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.connectionModal}>
       <ContentWrapper>
@@ -98,7 +100,7 @@ export const ModalYourConnection = (props: Props) => {
               <AccountInfo>
                 <AccountInfoAddress>{truncateStringInTheMiddle(account || '', 5, 3)}</AccountInfoAddress>
                 {/* TODO: Replace hardcoded wallet */}
-                <AccountInfoWallet>Metamask</AccountInfoWallet>
+                <AccountInfoWallet>{context.rawWeb3Context.connectorName}</AccountInfoWallet>
               </AccountInfo>
             </TopCardHeaderLeft>
             {/* TODO: Add onClick */}
