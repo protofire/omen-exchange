@@ -236,13 +236,13 @@ export const waitForConfirmations = async (
 ) => {
   let receipt
 
-  if (network === networkIds.XDAI) receipt = await cpk.waitForTransaction({ hash: transaction })
+  if (network === networkIds.XDAI) receipt = await cpk.waitForTransaction(transaction)
   else receipt = await cpk.waitForTransaction(transaction)
 
   while (receipt.confirmations && receipt.confirmations <= CONFIRMATION_COUNT) {
     setNumberOfConfirmations(receipt.confirmations)
     await waitABit(2000)
-    if (network === networkIds.XDAI) receipt = await cpk.waitForTransaction({ hash: transaction })
+    if (network === networkIds.XDAI) receipt = await cpk.waitForTransaction(transaction)
     else receipt = await cpk.waitForTransaction(transaction)
   }
   return

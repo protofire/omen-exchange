@@ -63,7 +63,7 @@ class ERC20Service {
     const transactionObject = await this.contract.approve(spender, amount, {
       value: '0x0',
     })
-    logger.log(`Approve transaccion hash: ${transactionObject.hash}`)
+    logger.log(`Approve transaction hash: ${transactionObject.hash}`)
     return this.provider.waitForTransaction(transactionObject.hash)
   }
 
@@ -74,7 +74,7 @@ class ERC20Service {
     const transactionObject = await this.contract.approve(spender, ethers.constants.MaxUint256, {
       value: '0x0',
     })
-    logger.log(`Approve unlimited transaccion hash: ${transactionObject.hash}`)
+    logger.log(`Approve unlimited transaction hash: ${transactionObject.hash}`)
     return this.provider.waitForTransaction(transactionObject.hash)
   }
 

@@ -208,7 +208,7 @@ const networks: { [K in NetworkId]: Network } = {
   },
   [networkIds.XDAI]: {
     label: 'xDai',
-    url: 'https://dai.poa.network/',
+    url: 'https://rpc.xdaichain.com/',
     graphHttpUri: GRAPH_XDAI_HTTP,
     graphWsUri: GRAPH_XDAI_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
@@ -234,7 +234,7 @@ const networks: { [K in NetworkId]: Network } = {
       multiSendAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
       fallbackHandlerAddress: '0x602DF5F404f86469459D5e604CDa43A2cdFb7580',
     },
-    relayProxyFactoryAddress: '0xcfE14ACabA3EFAAc33CECa7Adf4bE22eb3079b70',
+    relayProxyFactoryAddress: '0x7b9756f8A7f4208fE42FE8DE8a8CC5aA9A03f356',
     wrapToken: 'wxdai',
     nativeAsset: {
       address: pseudoNativeAssetAddress,

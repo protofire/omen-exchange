@@ -139,10 +139,6 @@ class OCPK extends CPK {
   }
 
   private getSafeExecTxParams(transactions: Transaction[]): StandardTransaction {
-    if (transactions.length === 1) {
-      return standardizeTransaction(transactions[0])
-    }
-
     if (!this.multiSend) {
       throw new Error('CPK MultiSend uninitialized')
     }
@@ -312,8 +308,8 @@ export const createCPK = async (provider: Web3Provider, relay: boolean) => {
   return cpk
 }
 
-// for calcRelayProxyAddress to be sync we need to hardcode proxy code, needs to be updated if we deploy a new proxy factory
-const proxyCreationCode = `0x608060405234801561001057600080fd5b506040516101e73803806101e78339818101604052602081101561003357600080fd5b8101908080519060200190929190505050600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156100ca576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260248152602001806101c36024913960400191505060405180910390fd5b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505060aa806101196000396000f3fe608060405273ffffffffffffffffffffffffffffffffffffffff600054167fa619486e0000000000000000000000000000000000000000000000000000000060003514156050578060005260206000f35b3660008037600080366000845af43d6000803e60008114156070573d6000fd5b3d6000f3fea265627a7a72315820f0e71a41c59612a715b6b0edbc18b51b74798f8cafce357cdc14183e612c32c164736f6c63430005100032496e76616c6964206d617374657220636f707920616464726573732070726f7669646564`
+// for calcRelayProxyAddress to be sync we need to hardcode proxy code, this needs to be updated if we deploy a new proxy factory
+const proxyCreationCode = `0x608060405234801561001057600080fd5b506040516101e73803806101e78339818101604052602081101561003357600080fd5b8101908080519060200190929190505050600073ffffffffffffffffffffffffffffffffffffffff168173ffffffffffffffffffffffffffffffffffffffff1614156100ca576040517f08c379a00000000000000000000000000000000000000000000000000000000081526004018080602001828103825260248152602001806101c36024913960400191505060405180910390fd5b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055505060aa806101196000396000f3fe608060405273ffffffffffffffffffffffffffffffffffffffff600054167fa619486e0000000000000000000000000000000000000000000000000000000060003514156050578060005260206000f35b3660008037600080366000845af43d6000803e60008114156070573d6000fd5b3d6000f3fea265627a7a72315820cac3d62bfce6ec8b54a3201159f745e39db8fa84029fbcaa233ea75c5ceaac8264736f6c63430005100032496e76616c6964206d617374657220636f707920616464726573732070726f7669646564`
 
 export const calcRelayProxyAddress = (account: string, provider: any) => {
   const ethLibAdapter = new EthersAdapter({ ethers, signer: { provider } })
@@ -331,6 +327,16 @@ export const calcRelayProxyAddress = (account: string, provider: any) => {
     )
     const proxyAddress = ethLibAdapter.calcCreate2Address(relayProxyFactoryAddress, salt, initCode)
     return proxyAddress
+  }
+}
+
+export const verifyProxyAddress = async (owner: string, proxyAddress: string, cpk: any) => {
+  const proxyFactoryAddress = cpk.proxyFactory.address
+  const masterCopyAddress = cpk.masterCopyAddress
+  const proxyFactory = new ethers.Contract(proxyFactoryAddress, proxyFactoryAbi, cpk.ethLibAdapter.signer)
+  const computedProxyAddress = await proxyFactory.computeProxyAddress(owner, predeterminedSaltNonce, masterCopyAddress)
+  if (computedProxyAddress !== proxyAddress) {
+    throw new Error(`Proxy address is incorrect, expected ${computedProxyAddress} but got ${proxyAddress}`)
   }
 }
 

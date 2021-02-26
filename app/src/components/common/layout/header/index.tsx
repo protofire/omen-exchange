@@ -182,13 +182,12 @@ interface ExtendsHistory extends RouteComponentProps {
 }
 
 const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
-  const { account, library: provider, networkId } = useConnectedWeb3Context()
+  const { account, library: provider, networkId, relay } = useConnectedWeb3Context()
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
   const [claimState, setClaimState] = useState<boolean>(false)
   const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
-
   const disableConnectButton = isModalOpen
 
   const headerDropdownItems: Array<DropdownItemProps> = [
@@ -206,7 +205,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           <ClaimAmount>{formatBigNumber(unclaimedAmount, 18, 2)} DAI</ClaimAmount>
         </ClaimWrapper>
       ),
-      visibility: networkId !== 1 || !claimState,
+      visibility: (networkId !== 1 && !relay) || !claimState,
     },
 
     {
@@ -227,7 +226,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
       }
       setClaimState(false)
     }
-    if (networkId === 1) {
+    if (networkId === 1 || relay) {
       fetchUnclaimedAssets()
     } else {
       setUnclaimedAmount(Zero)

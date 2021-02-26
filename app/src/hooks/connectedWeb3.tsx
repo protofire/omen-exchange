@@ -123,6 +123,7 @@ export const ConnectedWeb3: React.FC = props => {
     }
     provider.signer = fakeSigner
     provider.getSigner = () => fakeSigner
+    provider.relay = isRelay
   }
 
   const value = {

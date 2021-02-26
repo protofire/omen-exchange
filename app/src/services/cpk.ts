@@ -4,6 +4,7 @@ import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
 import { XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
+import { verifyProxyAddress } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
   getBySafeTx,
@@ -1206,11 +1207,23 @@ class CPKService {
 
   sendDaiToBridge = async (amount: BigNumber) => {
     try {
-      const xDaiService = new XdaiService(this.provider)
-      const contract = await xDaiService.generateErc20ContractInstance()
-      const transaction = await xDaiService.generateSendTransaction(amount, contract)
+      if (this.cpk.relay) {
+        const xDaiService = new XdaiService(this.cpk.ethLibAdapter.signer.signer.provider)
+        const contract = await xDaiService.generateXdaiBridgeContractInstance()
+        const sender = await this.cpk.ethLibAdapter.signer.signer.getAddress()
+        const receiver = this.cpk.address
 
-      return transaction
+        // verify proxy address before deposit
+        await verifyProxyAddress(sender, receiver, this.cpk)
+
+        const transaction = await contract.relayTokens(sender, receiver, amount)
+        return transaction.hash
+      } else {
+        const xDaiService = new XdaiService(this.provider)
+        const contract = await xDaiService.generateErc20ContractInstance()
+        const transaction = await xDaiService.generateSendTransaction(amount, contract)
+        return transaction
+      }
     } catch (e) {
       logger.error(`Error trying to send Dai to bridge address`, e.message)
       throw e
@@ -1225,7 +1238,7 @@ class CPKService {
         // get mainnet relay signer
         const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
 
-        // transfer to the user address
+        // relay to signer address on mainnet
         transactions.push({
           to: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
           data: XdaiService.encodeRelayTokens(to),
@@ -1233,7 +1246,7 @@ class CPKService {
         })
 
         const txObject = await this.cpk.execTransactions(transactions)
-        return this.provider.waitForTransaction(txObject.hash)
+        return txObject.hash
       } else {
         const xDaiService = new XdaiService(this.provider)
         const transaction = await xDaiService.sendXdaiToBridge(amount)
@@ -1263,7 +1276,11 @@ class CPKService {
       const signatures = signaturesFormatted(message.signatures)
       const xDaiService = new XdaiService(this.provider)
       const contract = await xDaiService.generateXdaiBridgeContractInstance()
-      return await xDaiService.claimDaiTokens({ message: message.content, signatures: signatures }, contract)
+      const transaction = await xDaiService.claimDaiTokens(
+        { message: message.content, signatures: signatures },
+        contract,
+      )
+      return transaction
     } catch (e) {
       logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)
       throw e

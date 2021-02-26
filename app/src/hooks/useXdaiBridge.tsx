@@ -33,7 +33,7 @@ interface Prop {
 
 export const useXdaiBridge = (amount?: BigNumber): Prop => {
   const [transactionStep, setTransactionStep] = useState<State>(State.idle)
-  const { account, library: provider, networkId } = useConnectedWeb3Context()
+  const { account, library: provider, networkId, relay } = useConnectedWeb3Context()
   const [xDaiBalance, setXdaiBalance] = useState<BigNumber>(Zero)
   const [daiBalance, setDaiBalance] = useState<BigNumber>(Zero)
   const [numberOfConfirmations, setNumberOfConfirmations] = useState<any>(0)
@@ -83,6 +83,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
       console.error(`Error while transferring! ${err}`)
     }
   }
+
   const claimLatestToken = async () => {
     try {
       if (!cpk) return
@@ -105,11 +106,9 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
   const fetchBalance = async () => {
     try {
       const xDaiService = new XdaiService(provider)
-
       const responseXdai = await xDaiService.fetchCrossChainBalance(100)
 
       setXdaiBalance(bigNumberify(responseXdai))
-
       const responseDai = await xDaiService.fetchCrossChainBalance(1)
 
       setDaiBalance(bigNumberify(responseDai))
@@ -132,7 +131,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
 
   useEffect(() => {
     fetchBalance()
-    if (networkId === networkIds.MAINNET) {
+    if (networkId === networkIds.MAINNET || relay) {
       fetchUnclaimedAssets()
     }
 
