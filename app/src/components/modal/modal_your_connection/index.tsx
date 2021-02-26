@@ -4,17 +4,25 @@ import styled, { withTheme } from 'styled-components'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   isOpen: boolean
+  onClose: () => void
   theme?: any
 }
 
 export const ModalYourConnection = (props: Props) => {
-  const { isOpen, theme } = props
+  const { isOpen, onClose, theme } = props
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
   }, [])
 
-  return <Modal isOpen={isOpen} style={theme.connectionModal}></Modal>
+  return (
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onClose}
+      shouldCloseOnOverlayClick={true}
+      style={theme.connectionModal}
+    ></Modal>
+  )
 }
 
 export const ModalYourConnectionWrapper = withTheme(ModalYourConnection)

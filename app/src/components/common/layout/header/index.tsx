@@ -199,11 +199,12 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   const { account, library: provider, networkId } = useConnectedWeb3Context()
 
   const { history, ...restProps } = props
-  const [isModalOpen, setModalState] = useState(false)
+  const [isConnectWalletModalOpen, setConnectWalletModalState] = useState(false)
+  const [isYourConnectionModalOpen, setYourConnectionModalState] = useState(false)
   const [claimState, setClaimState] = useState<boolean>(false)
   const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
 
-  const disableConnectButton = isModalOpen
+  const disableConnectButton = isConnectWalletModalOpen
 
   // const headerDropdownItems: Array<DropdownItemProps> = [
   //   {
@@ -343,16 +344,20 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             >
               <ButtonConnectWalletStyled
                 disabled={disableConnectButton}
-                modalState={isModalOpen}
+                modalState={isConnectWalletModalOpen}
                 onClick={() => {
-                  setModalState(true)
+                  setConnectWalletModalState(true)
                 }}
               />
               {disableConnectButton && <ReactTooltip id="connectButtonTooltip" />}
             </ButtonWrapper>
           )}
           {account && (
-            <HeaderButton>
+            <HeaderButton
+              onClick={() => {
+                setYourConnectionModalState(true)
+              }}
+            >
               {/* TODO: Remove hardcoded balance */}
               <DepositedBalance>0.00 DAI</DepositedBalance>
               <HeaderButtonDivider />
@@ -360,8 +365,14 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             </HeaderButton>
           )}
         </ContentsRight>
-        <ModalYourConnectionWrapper isOpen={true} />
-        <ModalConnectWalletWrapper isOpen={isModalOpen} onClose={() => setModalState(false)} />
+        <ModalYourConnectionWrapper
+          isOpen={isYourConnectionModalOpen}
+          onClose={() => setYourConnectionModalState(false)}
+        />
+        <ModalConnectWalletWrapper
+          isOpen={isConnectWalletModalOpen}
+          onClose={() => setConnectWalletModalState(false)}
+        />
       </HeaderInner>
     </HeaderWrapper>
   )
