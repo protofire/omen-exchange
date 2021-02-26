@@ -12,7 +12,7 @@ import { useOutsideAlerter } from '../../../../hooks/useOutsideAlerter'
 import { XdaiService } from '../../../../services'
 import { networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
-import { ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
+import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { XdaiBridgeTransfer } from '../../../market/common/xdai_bridge_modal'
@@ -109,6 +109,7 @@ const ButtonCreateMobile = styled(ButtonCircle)`
 
 const ButtonCSS = css`
   margin: 0 0 0 5px;
+  padding: 12px 14px;
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-left: 12px;
 
@@ -148,8 +149,20 @@ const ContentsRight = styled.div`
   }
 `
 
-const HeaderDropdown = styled(Dropdown)`
+const HeaderButton = styled(Button)`
   ${ButtonCSS};
+`
+
+const DepositedBalance = styled.p`
+  font-size: ${props => props.theme.fonts.defaultSize};
+  color: ${props => props.theme.colors.textColorLighter};
+`
+
+const HeaderButtonDivider = styled.div`
+  height: 16px;
+  width: 1px;
+  margin: 0 12px;
+  background: ${props => props.theme.borders.borderDisabled};
 `
 
 const CloseIconWrapper = styled.div`
@@ -191,28 +204,28 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
 
   const disableConnectButton = isModalOpen
 
-  const headerDropdownItems: Array<DropdownItemProps> = [
-    {
-      content: (
-        <ClaimWrapper
-          onClick={() => {
-            props.setClaim(true)
-          }}
-        >
-          <ClaimText>
-            <GoldDot />
-            Claim
-          </ClaimText>
-          <ClaimAmount>{formatBigNumber(unclaimedAmount, 18, 2)} DAI</ClaimAmount>
-        </ClaimWrapper>
-      ),
-      visibility: networkId !== 1 || !claimState,
-    },
+  // const headerDropdownItems: Array<DropdownItemProps> = [
+  //   {
+  //     content: (
+  //       <ClaimWrapper
+  //         onClick={() => {
+  //           props.setClaim(true)
+  //         }}
+  //       >
+  //         <ClaimText>
+  //           <GoldDot />
+  //           Claim
+  //         </ClaimText>
+  //         <ClaimAmount>{formatBigNumber(unclaimedAmount, 18, 2)} DAI</ClaimAmount>
+  //       </ClaimWrapper>
+  //     ),
+  //     visibility: networkId !== 1 || !claimState,
+  //   },
 
-    {
-      content: <ButtonDisconnectWallet />,
-    },
-  ]
+  //   {
+  //     content: <ButtonDisconnectWallet />,
+  //   },
+  // ]
 
   useEffect(() => {
     const fetchUnclaimedAssets = async () => {
@@ -338,15 +351,12 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             </ButtonWrapper>
           )}
           {account && (
-            <>
-              <HeaderDropdown
-                currentItem={headerDropdownItems.length + 1}
-                dropdownPosition={DropdownPosition.center}
-                items={headerDropdownItems}
-                omitRightButtonMargin={true}
-                placeholder={<Network claim={claimState} />}
-              />
-            </>
+            <HeaderButton>
+              {/* TODO: Remove hardcoded balance */}
+              <DepositedBalance>0.00 DAI</DepositedBalance>
+              <HeaderButtonDivider />
+              <Network claim={claimState} />
+            </HeaderButton>
           )}
         </ContentsRight>
         <ModalConnectWalletWrapper isOpen={isModalOpen} onClose={() => setModalState(false)} />
