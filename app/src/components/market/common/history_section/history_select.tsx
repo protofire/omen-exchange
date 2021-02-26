@@ -11,7 +11,7 @@ import {
 } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
 import { calcPrice, calcSellAmountInCollateral, formatBigNumber, formatTimestampToDate } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
-import { Button, ButtonSelectable } from '../../../button'
+import { ButtonRound, ButtonSelectable } from '../../../button'
 import { Dropdown, DropdownPosition } from '../../../common/form/dropdown'
 import { HistoryChart } from '../history_chart'
 import { HistoryTable } from '../history_table'
@@ -24,7 +24,7 @@ export const commonWrapperCSS = css`
 `
 const DropdownMenu = styled(Dropdown)`
   margin-left: auto;
-  width: 33%;
+  min-width: 164px;
 `
 
 const NoData = styled.div`
@@ -91,10 +91,9 @@ const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
     margin-left: 0;
   }
 `
-const ButtonSelect = styled(Button)<{ active: boolean }>`
+const ButtonSelect = styled(ButtonRound)`
   margin-right: 10px;
   padding: 20px 15px;
-  ${props => (props.active ? `border-color:${props.theme.colors.borderColorDark}` : '')};
 `
 
 export const History_select: React.FC<Props> = ({
@@ -136,7 +135,7 @@ export const History_select: React.FC<Props> = ({
   const [type, setType] = useState<HistoryType>(HistoryType.All)
   const DropdownItems = [
     {
-      content: 'All',
+      content: 'All Activities',
       onClick: () => {
         setType(HistoryType.All)
       },

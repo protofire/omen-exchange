@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
 import { formatBigNumber, formatHistoryDate, formatHistoryUser } from '../../../../util/tools'
-import { Button } from '../../../button'
+import { ButtonRound } from '../../../button'
 import { ConnectionIcon } from '../../../common/network/img/ConnectionIcon'
 import { InlineLoading } from '../../../loading/inline_loading'
 
@@ -30,6 +30,9 @@ const HistoryColumns = styled.div<{ firstRow?: boolean }>`
     padding-right: 0px;
     text-align: end;
     color: ${({ firstRow }) => (firstRow ? '' : '#7986cb')};
+    &:hover {
+      ${({ firstRow, theme }) => (firstRow ? '' : `color:${theme.colors.primaryLight};`)};
+    }
   }
   &:nth-child(4) {
     overflow: auto;
@@ -37,8 +40,7 @@ const HistoryColumns = styled.div<{ firstRow?: boolean }>`
     white-space: unset;
   }
 `
-const PaginationButton = styled(Button)<{ marginLeft?: string }>`
-  padding: 12px 20px;
+const PaginationButton = styled(ButtonRound)<{ marginLeft?: string }>`
   ${props => (props.marginLeft ? `margin-left:${props.marginLeft}px;` : '')}
 `
 const Pagination = styled.div`
