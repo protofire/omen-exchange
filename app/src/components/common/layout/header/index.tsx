@@ -17,6 +17,7 @@ import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { XdaiBridgeTransfer } from '../../../market/common/xdai_bridge_modal'
 import { ModalConnectWalletWrapper } from '../../../modal'
+import { ModalYourConnectionWrapper } from '../../../modal/modal_your_connection'
 import { IconAdd, IconClose } from '../../icons'
 import { IconArrowRight } from '../../icons/IconArrowRight'
 import { DaiIcon } from '../../icons/currencies'
@@ -359,6 +360,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             </HeaderButton>
           )}
         </ContentsRight>
+        <ModalYourConnectionWrapper isOpen={true} />
         <ModalConnectWalletWrapper isOpen={isModalOpen} onClose={() => setModalState(false)} />
       </HeaderInner>
     </HeaderWrapper>
