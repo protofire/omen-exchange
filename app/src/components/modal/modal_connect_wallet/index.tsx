@@ -276,7 +276,7 @@ export const ModalConnectWallet = (props: Props) => {
           <HeaderText>{isConnectingToWallet ? 'Unlock Wallet' : 'Connect a Wallet'}</HeaderText>
           {isConnectingToWallet ? (
             <>
-              <Spinner size="64px" />
+              <Spinner big={true} />
               <ConnectingText>{connectingText}</ConnectingText>
             </>
           ) : (
