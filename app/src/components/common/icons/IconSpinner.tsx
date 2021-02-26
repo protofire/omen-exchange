@@ -11,7 +11,7 @@ export const IconSpinner = (props: Props) => {
       <circle cx="20" cy="20" r="19" stroke="#E8EAF6" strokeWidth="2" />
       <path
         d="M20 39C30.4934 39 39 30.4934 39 20C39 9.50659 30.4934 1 20 1C9.50659 1 1 9.50659 1 20"
-        stroke="#3F51B5"
+        stroke="#7986CB"
         strokeWidth="2"
       />
     </svg>
