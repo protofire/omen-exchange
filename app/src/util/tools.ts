@@ -3,11 +3,13 @@ import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
+import { CONFIRMATION_COUNT } from '../common/constants'
 import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
+import { CPKService } from '../services'
 import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'
-import { getContractAddress, getNativeAsset, getToken, getWrapToken } from './networks'
+import { getContractAddress, getNativeAsset, getToken, getWrapToken, networkIds } from './networks'
 import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token } from './types'
 
 const logger = getLogger('Tools')
@@ -21,6 +23,35 @@ export const truncateStringInTheMiddle = (str: string, strPositionStart: number,
     return `${str.substr(0, strPositionStart)}...${str.substr(str.length - strPositionEnd, str.length)}`
   }
   return str
+}
+
+export const strip0x = (input: string) => {
+  return input.replace(/^0x/, '')
+}
+export const signatureToVRS = (rawSignature: string) => {
+  const signature = strip0x(rawSignature)
+  const v = signature.substr(64 * 2)
+  const r = signature.substr(0, 32 * 2)
+  const s = signature.substr(32 * 2, 32 * 2)
+  return { v, r, s }
+}
+export const packSignatures = (array: any) => {
+  const length = array.length.toString()
+
+  const msgLength = length.length === 1 ? `0${length}` : length
+  let v = ''
+  let r = ''
+  let s = ''
+  array.forEach((e: any) => {
+    v = v.concat(e.v)
+    r = r.concat(e.r)
+    s = s.concat(e.s)
+  })
+  return `0x${msgLength}${v}${r}${s}`
+}
+
+export const signaturesFormatted = (signatures: string[]) => {
+  return packSignatures(signatures.map(s => signatureToVRS(s)))
 }
 
 export const formatDate = (date: Date, utcAdd = true): string => {
@@ -195,6 +226,26 @@ export const isAddress = (address: string): boolean => {
     return false
   }
   return true
+}
+
+export const waitForConfirmations = async (
+  transaction: any,
+  cpk: CPKService,
+  setNumberOfConfirmations: any,
+  network: number,
+) => {
+  let receipt
+
+  if (network === networkIds.XDAI) receipt = await cpk.waitForTransaction({ hash: transaction })
+  else receipt = await cpk.waitForTransaction(transaction)
+
+  while (receipt.confirmations && receipt.confirmations <= CONFIRMATION_COUNT) {
+    setNumberOfConfirmations(receipt.confirmations)
+    await waitABit(2000)
+    if (network === networkIds.XDAI) receipt = await cpk.waitForTransaction({ hash: transaction })
+    else receipt = await cpk.waitForTransaction(transaction)
+  }
+  return
 }
 
 export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string =>
@@ -535,15 +586,10 @@ export const onChangeMarketCurrency = (
   }
 }
 
-export const calcXValue = (
-  currentPrediction: BigNumber,
-  lowerBound: BigNumber,
-  upperBound: BigNumber,
-  decimals: number,
-) => {
-  const currentPredictionNumber = Number(formatBigNumber(currentPrediction, decimals))
-  const lowerBoundNumber = Number(formatBigNumber(lowerBound, decimals))
-  const upperBoundNumber = Number(formatBigNumber(upperBound, decimals))
+export const calcXValue = (currentPrediction: BigNumber, lowerBound: BigNumber, upperBound: BigNumber) => {
+  const currentPredictionNumber = Number(formatBigNumber(currentPrediction, 18))
+  const lowerBoundNumber = Number(formatBigNumber(lowerBound, 18))
+  const upperBoundNumber = Number(formatBigNumber(upperBound, 18))
   const xValue = ((currentPredictionNumber - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100
   return xValue
 }
@@ -600,4 +646,9 @@ export const getInitialCollateral = (networkId: number, collateral: Token): Toke
       return collateral
     }
   }
+}
+
+export const reverseArray = (array: any[]): any[] => {
+  const newArray = array.map((e, i, a) => a[a.length - 1 - i])
+  return newArray
 }

@@ -18,7 +18,13 @@ import {
   pseudoNativeAssetAddress,
   waitForBlockToSync,
 } from '../util/networks'
-import { calcDistributionHint, clampBigNumber, getBaseTokenForCToken, waitABit } from '../util/tools'
+import {
+  calcDistributionHint,
+  clampBigNumber,
+  getBaseTokenForCToken,
+  signaturesFormatted,
+  waitABit,
+} from '../util/tools'
 import { MarketData, Question, Token } from '../util/types'
 
 import { CompoundService } from './compound_service'
@@ -30,6 +36,7 @@ import { OracleService } from './oracle'
 import { OvmService } from './ovm'
 import { RealitioService } from './realitio'
 import { UnwrapTokenService } from './unwrap_token'
+import { XdaiService } from './xdai'
 
 const logger = getLogger('Services::CPKService')
 
@@ -1254,6 +1261,53 @@ class CPKService {
     } catch (err) {
       logger.error(`Error trying to update proxy`, err.message)
       throw err
+    }
+  }
+
+  sendDaiToBridge = async (amount: BigNumber) => {
+    try {
+      const xDaiService = new XdaiService(this.provider)
+      const contract = await xDaiService.generateErc20ContractInstance()
+      const transaction = await xDaiService.generateSendTransaction(amount, contract)
+
+      return transaction
+    } catch (e) {
+      logger.error(`Error trying to send Dai to bridge address`, e.message)
+      throw e
+    }
+  }
+  sendXdaiToBridge = async (amount: BigNumber) => {
+    try {
+      const xDaiService = new XdaiService(this.provider)
+      const transaction = await xDaiService.sendXdaiToBridge(amount)
+
+      return transaction
+    } catch (e) {
+      logger.error(`Error trying to send XDai to bridge address`, e.message)
+      throw e
+    }
+  }
+  fetchLatestUnclaimedTransactions = async () => {
+    try {
+      const xDaiService = new XdaiService(this.provider)
+      const data = await xDaiService.fetchXdaiTransactionData()
+
+      return data
+    } catch (e) {
+      logger.error('Error fetching xDai subgraph data', e.message)
+      throw e
+    }
+  }
+  claimDaiTokens = async () => {
+    try {
+      const { message } = await this.fetchLatestUnclaimedTransactions()
+      const signatures = signaturesFormatted(message.signatures)
+      const xDaiService = new XdaiService(this.provider)
+      const contract = await xDaiService.generateXdaiBridgeContractInstance()
+      return await xDaiService.claimDaiTokens({ message: message.content, signatures: signatures }, contract)
+    } catch (e) {
+      logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)
+      throw e
     }
   }
 }

@@ -6,7 +6,7 @@ import { CompoundTokenType, Token } from '../util/types'
 import { ConnectedWeb3Context } from './connectedWeb3'
 
 export const useCompoundService = (
-  collateral: Token,
+  collateral: Token | null,
   context: ConnectedWeb3Context,
 ): {
   compoundService: Maybe<CompoundService>
@@ -24,16 +24,16 @@ export const useCompoundService = (
   }
 
   useMemo(() => {
-    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+    if (collateral && collateral.symbol && collateral.symbol.toLowerCase() in CompoundTokenType) {
       const compoundService = new CompoundService(collateral.address, collateral.symbol, provider, account)
       setCompoundService(compoundService)
       fetchCompoundService()
     }
     // eslint-disable-next-line
-  }, [collateral.address, account, collateral.symbol, provider])
+  }, [collateral?.address, account, collateral?.symbol, provider])
 
   useEffect(() => {
-    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+    if (collateral && collateral.symbol && collateral.symbol.toLowerCase() in CompoundTokenType) {
       const compoundService = new CompoundService(collateral.address, collateral.symbol, provider, account)
       setCompoundService(compoundService)
       fetchCompoundService()

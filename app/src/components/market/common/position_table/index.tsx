@@ -2,9 +2,10 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { useSymbol } from '../../../../hooks'
-import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
-import { BalanceItem, PositionTableValue, Token } from '../../../../util/types'
+import { useConnectedWeb3Context, useSymbol } from '../../../../hooks'
+import { getNativeAsset, getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { formatBigNumber, formatNumber, getBaseTokenForCToken, isDust } from '../../../../util/tools'
+import { BalanceItem, CompoundTokenType, PositionTableValue, Token } from '../../../../util/types'
 import { TD, THead, TR, Table } from '../../../common'
 import {
   OutcomeItemLittleBallOfJoyAndDifferentColors,
@@ -54,7 +55,19 @@ export const PositionTable = (props: Props) => {
     shortProfitLossPercentage,
   } = props
 
-  const symbol = useSymbol(collateral)
+  let symbol = useSymbol(collateral)
+  const context = useConnectedWeb3Context()
+  const { account, library: provider, networkId } = context
+  let baseCollateral = collateral
+  if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+    if (collateral.symbol.toLowerCase() === 'ceth') {
+      baseCollateral = getNativeAsset(networkId)
+    } else {
+      const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
+      baseCollateral = getToken(networkId, baseCollateralSymbol)
+    }
+    symbol = baseCollateral.symbol
+  }
 
   const shortShares = balances[0].shares
   const longShares = balances[1].shares

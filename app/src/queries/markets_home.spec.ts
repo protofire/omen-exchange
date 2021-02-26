@@ -19,7 +19,7 @@ const getExpectedQuery = (whereClause: string) => {
 test('Query markets with default options', () => {
   const query = buildQueryMarkets(DEFAULT_OPTIONS)
   const expectedQuery = getExpectedQuery(
-    'openingTimestamp_gt: $now, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee, timeout_gte: 86400, curatedByDxDaoOrKleros: true',
+    'openingTimestamp_gt: $now, arbitrator_in: $knownArbitrators, templateId_in: ["0", "1", "2", "6"], fee_lte: $fee, timeout_gte: 86400, curatedByDxDaoOrKleros: true',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -31,7 +31,7 @@ test('Query markets', () => {
     category: 'SimpleQuestions',
   })
   const expectedQuery = getExpectedQuery(
-    'category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee, timeout_gte: 86400, curatedByDxDaoOrKleros: true',
+    'category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "1", "2", "6"], fee_lte: $fee, timeout_gte: 86400, curatedByDxDaoOrKleros: true',
   )
   expect(query).toBe(expectedQuery)
 })
@@ -71,7 +71,7 @@ test('Query finalizing markets', () => {
     category: 'SimpleQuestions',
   })
   const expectedQuery = getExpectedQuery(
-    'openingTimestamp_lt: $now, isPendingArbitration: false, answerFinalizedTimestamp_gt: $now, currentAnswer_not: null, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "2", "6"], fee_lte: $fee, timeout_gte: 86400, curatedByDxDaoOrKleros: true',
+    'openingTimestamp_lt: $now, isPendingArbitration: false, answerFinalizedTimestamp_gt: $now, currentAnswer_not: null, category: $category, arbitrator_in: $knownArbitrators, templateId_in: ["0", "1", "2", "6"], fee_lte: $fee, timeout_gte: 86400, curatedByDxDaoOrKleros: true',
   )
 
   expect(query).toBe(expectedQuery)

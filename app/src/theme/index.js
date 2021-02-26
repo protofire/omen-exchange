@@ -108,6 +108,8 @@ const theme = {
     verticalDivider: '#e8eaf6',
     clickable: '#7986CB',
     red: '#E57373',
+    gold: '#f9a606',
+    black: '#000',
   },
   message: {
     colors: {
@@ -149,6 +151,8 @@ const theme = {
     borderDisabled: '#E8EAF6',
     borderLineDisabled: '1px solid #E8EAF6',
     commonBorderRadius: '6px',
+    radioButton: '4px solid #7986CB',
+    radioButtonDisabled: '1px solid #ECEFF1',
   },
   slider: {
     idle: '#E8EAF6',
@@ -390,7 +394,7 @@ const theme = {
   scale: {
     bar: '#e8eaf6',
     box: '#e8eaf6',
-    ballBorder: '#7986cb',
+    ballBorder: '#DCDFF2',
     ballBackground: '#fff',
     border: '#E8EAF6',
     positive: '#80CBC4',

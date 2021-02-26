@@ -1,7 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import {
@@ -22,8 +21,8 @@ import {
   formatBigNumber,
   formatNumber,
   getInitialCollateral,
+  getSharesInBaseToken,
   getUnit,
-  isDust,
   mulBN,
 } from '../../../../util/tools'
 import {
@@ -40,9 +39,10 @@ import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
-import { GenericError, TabsGrid } from '../../common/common_styled'
+import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
+import { PositionSelectionBox } from '../../common/position_selection_box'
 import { SwitchTransactionToken } from '../../common/switch_transaction_token'
 import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
@@ -62,6 +62,7 @@ const StyledButtonContainer = styled(ButtonContainer)`
 const logger = getLogger('Scalar Market::Sell')
 
 interface Props {
+  currentTab: MarketDetailsTab
   fetchGraphMarketMakerData: () => Promise<void>
   fetchGraphMarketUserTxData: () => Promise<void>
   marketMakerData: MarketMakerData
@@ -69,7 +70,7 @@ interface Props {
 }
 
 export const ScalarMarketSell = (props: Props) => {
-  const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
+  const { currentTab, fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
   const { library: provider } = context
 
@@ -93,6 +94,7 @@ export const ScalarMarketSell = (props: Props) => {
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [amountShares, setAmountShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
+  const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
   const { networkId } = context
   const baseCollateral = getInitialCollateral(networkId, collateral)
@@ -107,6 +109,15 @@ export const ScalarMarketSell = (props: Props) => {
   let displayTotalSymbol = symbol
   if (collateral.address === displayCollateral.address && collateral.address === wrapToken.address) {
     displayTotalSymbol = displayCollateral.symbol
+  }
+
+  let displayBalances = balances
+  if (
+    baseCollateral.address !== collateral.address &&
+    collateral.symbol.toLowerCase() in CompoundTokenType &&
+    compoundService
+  ) {
+    displayBalances = getSharesInBaseToken(balances, compoundService, displayCollateral)
   }
 
   useEffect(() => {
@@ -187,7 +198,6 @@ export const ScalarMarketSell = (props: Props) => {
       parseUnits(newPrediction.toString(), 18),
       scalarLow || new BigNumber(0),
       scalarHigh || new BigNumber(0),
-      18,
     ) / 100
 
   let potentialValueNormalized = potentialValue
@@ -254,13 +264,25 @@ export const ScalarMarketSell = (props: Props) => {
 
   const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
 
+  let displaySelectedOutcomeBalance = selectedOutcomeBalance
+  let displaySelectedOutcomeBalanceValue = balanceItem.shares
+  if (collateralSymbol in CompoundTokenType && compoundService) {
+    displaySelectedOutcomeBalanceValue = compoundService.calculateCTokenToBaseExchange(
+      baseCollateral,
+      balanceItem.shares,
+    )
+    displaySelectedOutcomeBalance = formatNumber(
+      formatBigNumber(displaySelectedOutcomeBalanceValue, baseCollateral.decimals),
+    )
+  }
+
   const amountError =
     balanceItem.shares === null
       ? null
       : balanceItem.shares.isZero() && amountShares?.gt(balanceItem.shares)
       ? `Insufficient balance`
       : amountShares?.gt(balanceItem.shares)
-      ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
+      ? `Value must be less than or equal to ${displaySelectedOutcomeBalance} shares`
       : null
 
   const isSellButtonDisabled =
@@ -302,11 +324,18 @@ export const ScalarMarketSell = (props: Props) => {
     }
   }
 
-  const isShortTabDisabled = isDust(balances[0].shares, collateral.decimals)
-  const isLongTabDisabled = isDust(balances[1].shares, collateral.decimals)
-
   const isNewPrediction =
     formattedNewPrediction !== 0 && formattedNewPrediction !== Number(outcomeTokenMarginalPrices[1].substring(0, 20))
+
+  const setAmountSharesFromInput = (shares: BigNumber) => {
+    if (collateralSymbol in CompoundTokenType && compoundService) {
+      const actualAmountOfShares = compoundService.calculateBaseToCTokenExchange(baseCollateral, shares)
+      setAmountShares(actualAmountOfShares)
+    } else {
+      setAmountShares(shares)
+    }
+    setDisplaySellShares(shares)
+  }
 
   return (
     <>
@@ -314,6 +343,7 @@ export const ScalarMarketSell = (props: Props) => {
         borderTop={true}
         collateral={collateral}
         currentPrediction={isNewPrediction ? String(formattedNewPrediction) : outcomeTokenMarginalPrices[1]}
+        currentTab={currentTab}
         long={positionIndex === 1}
         lowerBound={scalarLow || new BigNumber(0)}
         newPrediction={formattedNewPrediction}
@@ -324,30 +354,13 @@ export const ScalarMarketSell = (props: Props) => {
       />
       <GridTransactionDetails>
         <div>
-          <TabsGrid>
-            <ButtonTab
-              active={(positionIndex === 0 && !isShortTabDisabled) || (isLongTabDisabled && !isShortTabDisabled)}
-              disabled={isShortTabDisabled}
-              onClick={() => {
-                setBalanceItem(balances[0])
-                setPositionIndex(0)
-              }}
-            >
-              Short
-            </ButtonTab>
-            <ButtonTab
-              active={(positionIndex === 1 && !isLongTabDisabled) || (isShortTabDisabled && !isLongTabDisabled)}
-              disabled={isLongTabDisabled}
-              onClick={() => {
-                setBalanceItem(balances[1])
-                setPositionIndex(1)
-              }}
-            >
-              Long
-            </ButtonTab>
-          </TabsGrid>
-          <TokenBalance text="Your Shares" value={formatNumber(selectedOutcomeBalance)} />
-          <ReactTooltip id="walletBalanceTooltip" />
+          <PositionSelectionBox
+            balances={displayBalances}
+            decimals={baseCollateral.decimals}
+            positionIndex={positionIndex}
+            setBalanceItem={setBalanceItem}
+            setPositionIndex={setPositionIndex}
+          />
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput
@@ -355,7 +368,7 @@ export const ScalarMarketSell = (props: Props) => {
                 name="amount"
                 onChange={(e: BigNumberInputReturn) => {
                   setAmountShares(e.value)
-                  setAmountShares(e.value.gt(Zero) ? e.value : Zero)
+                  setAmountSharesFromInput(e.value.gt(Zero) ? e.value : Zero)
                   setAmountSharesToDisplay('')
                 }}
                 style={{ width: 0 }}
@@ -364,8 +377,8 @@ export const ScalarMarketSell = (props: Props) => {
               />
             }
             onClickMaxButton={() => {
-              setAmountShares(balanceItem.shares)
-              setAmountSharesToDisplay(formatBigNumber(balanceItem.shares, collateral.decimals, 5))
+              setAmountSharesFromInput(displaySelectedOutcomeBalanceValue)
+              setAmountSharesToDisplay(formatBigNumber(displaySelectedOutcomeBalanceValue, baseCollateral.decimals, 5))
             }}
             shouldDisplayMaxButton
             symbol={'Shares'}

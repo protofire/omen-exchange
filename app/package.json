@@ -111,7 +111,7 @@
   "husky": {
     "hooks": {
       "pre-commit": "lint-staged --allow-empty",
-      "pre-push": "yarn lint:check && yarn prettier:check"
+      "pre-push": "yarn lint:check && yarn prettier:check && yarn test --coverage --watchAll=false"
     }
   },
   "jest": {
@@ -146,7 +146,7 @@
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-react": "^7.18.3",
     "eslint-plugin-sort-destructure-keys": "^1.3.3",
-    "husky": "^3.0.5",
+    "husky": "^3.1.0",
     "levenary": "^1.1.1",
     "prettier": "^1.18.2",
     "react-app-rewired": "^2.1.6",
