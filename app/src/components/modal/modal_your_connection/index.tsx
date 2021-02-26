@@ -30,7 +30,7 @@ export const ModalYourConnection = (props: Props) => {
       <ContentWrapper>
         <ModalNavigation>
           <ModalTitle>Your Connection</ModalTitle>
-          <IconClose hoverEffect={true} />
+          <IconClose hoverEffect={true} onClick={onClose} />
         </ModalNavigation>
       </ContentWrapper>
     </Modal>
