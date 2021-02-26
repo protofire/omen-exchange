@@ -2,6 +2,8 @@ import React, { HTMLAttributes } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
+import { useConnectedWeb3Context } from '../../../hooks'
+import { truncateStringInTheMiddle } from '../../../util/tools'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconClose } from '../../common/icons'
@@ -73,6 +75,8 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const ModalYourConnection = (props: Props) => {
   const { isOpen, onClose, theme } = props
+  const context = useConnectedWeb3Context()
+  const { account } = context
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
@@ -92,12 +96,12 @@ export const ModalYourConnection = (props: Props) => {
                 <ConnectionIcon scale="1.4" />
               </ConnectionIconWrapper>
               <AccountInfo>
-                {/* TODO: Replace hardcoded address */}
-                <AccountInfoAddress>0xEa6...D7b</AccountInfoAddress>
+                <AccountInfoAddress>{truncateStringInTheMiddle(account || '', 5, 3)}</AccountInfoAddress>
                 {/* TODO: Replace hardcoded wallet */}
                 <AccountInfoWallet>Metamask</AccountInfoWallet>
               </AccountInfo>
             </TopCardHeaderLeft>
+            {/* TODO: Add onClick */}
             <ChangeWalletButton buttonType={ButtonType.secondaryLine}>Change</ChangeWalletButton>
           </TopCardHeader>
         </TopCard>
