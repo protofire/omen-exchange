@@ -1,9 +1,10 @@
+import { BigNumber } from 'ethers/utils'
 import React, { HTMLAttributes } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../hooks'
-import { truncateStringInTheMiddle } from '../../../util/tools'
+import { useConnectedWeb3Context, useTokens } from '../../../hooks'
+import { formatBigNumber, formatNumber, truncateStringInTheMiddle } from '../../../util/tools'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
@@ -159,6 +160,13 @@ export const ModalYourConnection = (props: Props) => {
       <></>
     )
 
+  const { tokens } = useTokens(context, true, true)
+
+  const ethBalance = new BigNumber(tokens.filter(token => token.symbol === 'ETH')[0].balance || '')
+  const formattedEthBalance = formatNumber(formatBigNumber(ethBalance, 18, 18))
+  const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0].balance || '')
+  const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
+
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.connectionModal}>
       <ContentWrapper>
@@ -189,16 +197,14 @@ export const ModalYourConnection = (props: Props) => {
                   <EtherIcon />
                   <WalletItemAsset>Ether</WalletItemAsset>
                 </WalletItemLeft>
-                {/* TODO: Replace hardcoded balance */}
-                <WalletItemBalance>5.00 ETH</WalletItemBalance>
+                <WalletItemBalance>{formattedEthBalance} ETH</WalletItemBalance>
               </WalletItem>
               <WalletItem>
                 <WalletItemLeft>
                   <DaiIcon size="24px" />
                   <WalletItemAsset>Dai</WalletItemAsset>
                 </WalletItemLeft>
-                {/* TODO: Replace hardcoded balance */}
-                <WalletItemBalance>125.00 DAI</WalletItemBalance>
+                <WalletItemBalance>{formattedDaiBalance} DAI</WalletItemBalance>
               </WalletItem>
             </WalletItems>
           </TopCardWallet>
