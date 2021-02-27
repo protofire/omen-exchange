@@ -7,6 +7,7 @@ import { truncateStringInTheMiddle } from '../../../util/tools'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
+import { DaiIcon, EtherIcon } from '../../common/icons/currencies'
 import { ConnectionIcon } from '../../common/network/img/ConnectionIcon'
 import { ContentWrapper, ModalNavigation } from '../common_styled'
 
@@ -21,6 +22,7 @@ const TopCard = styled.div`
   padding: 16px 0;
   width: 100%;
   display: flex;
+  flex-direction: column;
   align-items: center;
   border: ${props => props.theme.borders.borderLineDisabled};
   border-radius: ${props => props.theme.cards.borderRadius};
@@ -81,6 +83,56 @@ const AccountInfoWallet = styled.p`
   margin: 0;
 `
 
+const TopCardWallet = styled.div`
+  padding: 16px 20px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+`
+
+const TopCardWalletHeader = styled.p`
+  font-size: ${props => props.theme.fonts.defaultSize};
+  color: ${props => props.theme.colors.textColorLighter};
+  margin: 0;
+`
+
+const WalletItems = styled.div`
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+`
+
+const WalletItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+
+  &:first-of-type {
+    margin-bottom: 12px;
+  }
+`
+
+const WalletItemLeft = styled.div`
+  display: flex;
+  align-items: center;
+`
+
+const WalletItemAsset = styled.p`
+  font-size: ${props => props.theme.fonts.defaultSize};
+  color: ${props => props.theme.colors.textColorDark};
+  margin: 0;
+  margin-left: 12px;
+`
+
+const WalletItemBalance = styled.p`
+  font-size: ${props => props.theme.fonts.defaultSize};
+  color: ${props => props.theme.colors.textColorLighter};
+  margin: 0;
+`
+
 const ChangeWalletButton = styled(Button)``
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -129,6 +181,27 @@ export const ModalYourConnection = (props: Props) => {
             {/* TODO: Add onClick */}
             <ChangeWalletButton buttonType={ButtonType.secondaryLine}>Change</ChangeWalletButton>
           </TopCardHeader>
+          <TopCardWallet>
+            <TopCardWalletHeader>Wallet</TopCardWalletHeader>
+            <WalletItems>
+              <WalletItem>
+                <WalletItemLeft>
+                  <EtherIcon />
+                  <WalletItemAsset>Ether</WalletItemAsset>
+                </WalletItemLeft>
+                {/* TODO: Replace hardcoded balance */}
+                <WalletItemBalance>5.00 ETH</WalletItemBalance>
+              </WalletItem>
+              <WalletItem>
+                <WalletItemLeft>
+                  <DaiIcon size="24px" />
+                  <WalletItemAsset>Dai</WalletItemAsset>
+                </WalletItemLeft>
+                {/* TODO: Replace hardcoded balance */}
+                <WalletItemBalance>125.00 DAI</WalletItemBalance>
+              </WalletItem>
+            </WalletItems>
+          </TopCardWallet>
         </TopCard>
       </ContentWrapper>
     </Modal>
