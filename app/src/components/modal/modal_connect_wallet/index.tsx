@@ -1,18 +1,16 @@
 import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
 import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
-import styled, { css } from 'styled-components'
+import Modal from 'react-modal'
+import styled, { css, withTheme } from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
-import { XDAI_NETWORKS } from '../../../common/constants'
 import { getLogger } from '../../../util/logger'
-import { networkIds } from '../../../util/networks'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
-import { MadeBy, Spinner } from '../../common'
-import { ModalWrapper } from '../../modal/modal_wrapper'
+import { Spinner } from '../../common'
+import { IconArrowBack, IconArrowRightLong, IconClose, IconOmen } from '../../common/icons'
 
-import AuthereumSVG from './img/authereum.svg'
 import MetaMaskSVG from './img/metamask.svg'
 import WalletConnectSVG from './img/wallet_connect.svg'
 
@@ -22,13 +20,30 @@ const ContentWrapper = styled.div`
   align-items: center;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  min-height: 230px;
-  padding: 15px 0 0;
+  justify-content: flex-start;
+  width: 100%;
+`
+
+const ModalNavigation = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between
+  width: 100%;
+  padding: 5px;
+  margin-bottom: 14px;
+`
+
+const HeaderText = styled.p`
+  font-size: 16px;
+  font-weight: 500;
+  color: ${props => props.theme.colors.textColorDark};
+  margin-top: 10px;
+  margin-bottom: 48px;
 `
 
 const Buttons = styled.div`
   margin-top: auto;
+  width: 100%;
 
   &:last-child {
     margin-top: 0;
@@ -36,17 +51,45 @@ const Buttons = styled.div`
 `
 
 const ButtonStyled = styled(Button)`
-  margin-bottom: 14px;
-  width: 200px;
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+  border-radius: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
   &[disabled] {
     cursor: not-allowed;
     opacity: 0.6;
   }
 
-  &:last-child {
-    margin-bottom: 0;
+  .arrow-path {
+    transition: 0.2s fill;
   }
+
+  &:hover {
+    border-bottom: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+    background: ${props => props.theme.colors.lightBackground};
+
+    .arrow-path {
+      fill: ${props => props.theme.colors.primaryLight};
+    }
+  }
+
+  &:first-child {
+    border-top: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+
+    &:hover {
+      border-top: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+    }
+  }
+`
+
+const ButtonLeft = styled.div`
+  display: flex;
+  align-items: center;
 `
 
 const Icon = css`
@@ -67,11 +110,6 @@ const IconMetaMask = styled.span`
 const IconWalletConnect = styled.span`
   ${Icon}
   background-image: url('${WalletConnectSVG}');
-`
-
-const IconAuthereum = styled.span`
-  ${Icon}
-  background-image: url('${AuthereumSVG}');
 `
 
 const Text = styled.span`
@@ -105,8 +143,11 @@ const ConnectButton = (props: ButtonProps) => {
 
   return (
     <ButtonStyled buttonType={ButtonType.secondaryLine} disabled={disabled} onClick={onClick}>
-      {icon}
-      <Text>{text}</Text>
+      <ButtonLeft>
+        {icon}
+        <Text>{text}</Text>
+      </ButtonLeft>
+      <IconArrowRightLong />
     </ButtonStyled>
   )
 }
@@ -114,6 +155,7 @@ const ConnectButton = (props: ButtonProps) => {
 interface Props extends HTMLAttributes<HTMLDivElement> {
   isOpen: boolean
   onClose: () => void
+  theme?: any
 }
 
 export const ModalConnectWallet = (props: Props) => {
@@ -121,7 +163,7 @@ export const ModalConnectWallet = (props: Props) => {
   const [connectingToWalletConnect, setConnectingToWalletConnect] = useState(false)
   const [connectingToMetamask, setConnectingToMetamask] = useState(false)
   const [connectingToAuthereum, setConnectingToAuthereum] = useState(false)
-  const { isOpen, onClose } = props
+  const { isOpen, onClose, theme } = props
 
   if (context.error) {
     logger.error('Error in web3 context', context.error)
@@ -204,32 +246,37 @@ export const ModalConnectWallet = (props: Props) => {
   const isConnectingToWallet = connectingToMetamask || connectingToWalletConnect || connectingToAuthereum
   let connectingText = `Connecting to wallet`
   if (connectingToMetamask) {
-    connectingText = 'Waiting for Approval on Metamask'
+    connectingText = 'Requesting permission on Metamask'
   }
   if (connectingToWalletConnect) {
     connectingText = 'Opening QR for Wallet Connect'
   }
 
-  const windowObj: any = window
-
   const disableMetamask: boolean = !isMetamaskEnabled || false
   const disableWalletConnect = false
-  const disableAuthereum =
-    XDAI_NETWORKS.includes(windowObj.ethereum && windowObj.ethereum.chainId) ||
-    (networkIds as any)[location.host.split('.')[0].toUpperCase()] === networkIds.XDAI
+
+  React.useEffect(() => {
+    Modal.setAppElement('#root')
+  }, [])
 
   return (
     <>
-      <ModalWrapper
+      <Modal
         isOpen={!context.account && isOpen}
         onRequestClose={onClickCloseButton}
         shouldCloseOnOverlayClick={!isConnectingToWallet}
-        title={connectingToMetamask ? 'Connecting...' : 'Connect a Wallet'}
+        style={theme.connectWalletModal}
       >
         <ContentWrapper>
+          <ModalNavigation>
+            {isConnectingToWallet ? <IconArrowBack hoverEffect={true} onClick={resetEverything} /> : <div></div>}
+            <IconClose hoverEffect={true} onClick={onClickCloseButton} />
+          </ModalNavigation>
+          <IconOmen />
+          <HeaderText>{isConnectingToWallet ? 'Unlock Wallet' : 'Connect a Wallet'}</HeaderText>
           {isConnectingToWallet ? (
             <>
-              <Spinner />
+              <Spinner big={true} />
               <ConnectingText>{connectingText}</ConnectingText>
             </>
           ) : (
@@ -252,20 +299,13 @@ export const ModalConnectWallet = (props: Props) => {
                   }}
                   text="Wallet Connect"
                 />
-                <ConnectButton
-                  disabled={disableAuthereum}
-                  icon={<IconAuthereum />}
-                  onClick={() => {
-                    onClickWallet(Wallet.Authereum)
-                  }}
-                  text="Authereum"
-                />
               </Buttons>
             </>
           )}
         </ContentWrapper>
-        <MadeBy />
-      </ModalWrapper>
+      </Modal>
     </>
   )
 }
+
+export const ModalConnectWalletWrapper = withTheme(ModalConnectWallet)
