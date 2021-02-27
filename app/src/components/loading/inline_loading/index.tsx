@@ -51,7 +51,7 @@ export const InlineLoading: React.FC<Props> = (props: Props) => {
 
   return (
     <Wrapper {...restProps}>
-      <Spinner big={big} />
+      <Spinner size={big ? '42' : undefined} />
       {message ? <Message>{message}</Message> : null}
     </Wrapper>
   )
