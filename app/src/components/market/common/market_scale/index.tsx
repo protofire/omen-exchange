@@ -3,8 +3,8 @@ import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
-import { useCompoundService, useConnectedWeb3Context, useSymbol } from '../../../../hooks'
-import { getNativeAsset, getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { useCompoundService, useConnectedWeb3Context } from '../../../../hooks'
+import { getNativeAsset, getToken } from '../../../../util/networks'
 import {
   calcPrediction,
   calcXValue,
@@ -306,7 +306,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
   const context = useConnectedWeb3Context()
-  const { account, library: provider, networkId } = context
+  const { networkId } = context
 
   const { compoundService: CompoundService } = useCompoundService(collateral ? collateral : null, context)
   const compoundService = CompoundService || null
@@ -544,7 +544,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     collateral.symbol.toLowerCase() in CompoundTokenType &&
     compoundService
   ) {
-    console.log(profitLoss)
     const yourPayoutCollateralValue = roundNumberStringToSignificantDigits(Math.abs(yourPayout).toString(), 4)
     const profitLossCollateralValue = roundNumberStringToSignificantDigits(Math.abs(profitLoss).toString(), 4)
 

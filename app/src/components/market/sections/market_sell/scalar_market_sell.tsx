@@ -33,7 +33,7 @@ import {
   Status,
   Token,
 } from '../../../../util/types'
-import { Button, ButtonContainer, ButtonTab } from '../../../button'
+import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
@@ -44,7 +44,6 @@ import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
 import { PositionSelectionBox } from '../../common/position_selection_box'
 import { SwitchTransactionToken } from '../../common/switch_transaction_token'
-import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
@@ -266,6 +265,7 @@ export const ScalarMarketSell = (props: Props) => {
 
   let displaySelectedOutcomeBalance = selectedOutcomeBalance
   let displaySelectedOutcomeBalanceValue = balanceItem.shares
+  let displayAmountShares = amountShares
   if (collateralSymbol in CompoundTokenType && compoundService) {
     displaySelectedOutcomeBalanceValue = compoundService.calculateCTokenToBaseExchange(
       baseCollateral,
@@ -274,6 +274,9 @@ export const ScalarMarketSell = (props: Props) => {
     displaySelectedOutcomeBalance = formatNumber(
       formatBigNumber(displaySelectedOutcomeBalanceValue, baseCollateral.decimals),
     )
+    if (amountShares && amountShares.gt(0)) {
+      displayAmountShares = compoundService.calculateCTokenToBaseExchange(collateral, amountShares)
+    }
   }
 
   const amountError =
@@ -372,7 +375,7 @@ export const ScalarMarketSell = (props: Props) => {
                   setAmountSharesToDisplay('')
                 }}
                 style={{ width: 0 }}
-                value={amountShares}
+                value={displaySellShares}
                 valueToDisplay={amountSharesToDisplay}
               />
             }
@@ -389,7 +392,7 @@ export const ScalarMarketSell = (props: Props) => {
           <TransactionDetailsCard>
             <TransactionDetailsRow
               title={'Sell Amount'}
-              value={`${formatNumber(formatBigNumber(amountShares || Zero, collateral.decimals))} Shares`}
+              value={`${formatNumber(formatBigNumber(displayAmountShares || Zero, baseCollateral.decimals))} Shares`}
             />
             <TransactionDetailsRow
               emphasizeValue={potentialValue ? potentialValue.gt(0) : false}

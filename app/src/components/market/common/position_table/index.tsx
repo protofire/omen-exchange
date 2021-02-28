@@ -1,10 +1,16 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useSymbol } from '../../../../hooks'
-import { getNativeAsset, getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
-import { formatBigNumber, formatNumber, getBaseTokenForCToken, isDust } from '../../../../util/tools'
+import { useCompoundService, useConnectedWeb3Context, useSymbol } from '../../../../hooks'
+import { getNativeAsset, getToken } from '../../../../util/networks'
+import {
+  formatBigNumber,
+  formatNumber,
+  getBaseTokenForCToken,
+  isDust,
+  roundNumberStringToSignificantDigits,
+} from '../../../../util/tools'
 import { BalanceItem, CompoundTokenType, PositionTableValue, Token } from '../../../../util/types'
 import { TD, THead, TR, Table } from '../../../common'
 import {
@@ -56,8 +62,13 @@ export const PositionTable = (props: Props) => {
   } = props
 
   let symbol = useSymbol(collateral)
+
   const context = useConnectedWeb3Context()
-  const { account, library: provider, networkId } = context
+  const { networkId } = context
+
+  const { compoundService: CompoundService } = useCompoundService(collateral ? collateral : null, context)
+  const compoundService = CompoundService || null
+
   let baseCollateral = collateral
   if (collateral.symbol.toLowerCase() in CompoundTokenType) {
     if (collateral.symbol.toLowerCase() === 'ceth') {
@@ -69,10 +80,99 @@ export const PositionTable = (props: Props) => {
     symbol = baseCollateral.symbol
   }
 
+  let displayLongPayout = longPayout
+  let displayShortPayout = shortPayout
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
-  const shortSharesFormatted = formatNumber(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals))
-  const longSharesFormatted = formatNumber(formatBigNumber(longShares || new BigNumber(0), collateral.decimals))
+  let shortSharesFormatted = formatNumber(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals))
+  let longSharesFormatted = formatNumber(formatBigNumber(longShares || new BigNumber(0), collateral.decimals))
+  let displayLongProfitLoss = longProfitLoss
+  let displayShortProfitLoss = shortProfitLoss
+  if (
+    baseCollateral &&
+    collateral &&
+    baseCollateral.address !== collateral.address &&
+    collateral.symbol.toLowerCase() in CompoundTokenType &&
+    compoundService
+  ) {
+    if (longPayout && longPayout > 0) {
+      const displayLongPayoutCollateralValue = roundNumberStringToSignificantDigits(Math.abs(longPayout).toString(), 4)
+      const displayLongPayoutCollateralBNValue = parseUnits(displayLongPayoutCollateralValue, collateral.decimals)
+      const displayLongPayoutCollateralBN = compoundService.calculateCTokenToBaseExchange(
+        collateral,
+        displayLongPayoutCollateralBNValue,
+      )
+      const displayLongPayoutNum = formatBigNumber(displayLongPayoutCollateralBN, baseCollateral.decimals, 4)
+      displayLongPayout = parseFloat(displayLongPayoutNum)
+    }
+    if (shortPayout && shortPayout > 0) {
+      const displayShortPayoutCollateralValue = roundNumberStringToSignificantDigits(
+        Math.abs(shortPayout).toString(),
+        4,
+      )
+      const displayShortPayoutCollateralBNValue = parseUnits(displayShortPayoutCollateralValue, collateral.decimals)
+      const displayShortPayoutCollateralBN = compoundService.calculateCTokenToBaseExchange(
+        collateral,
+        displayShortPayoutCollateralBNValue,
+      )
+      const displayShortPayoutNum = formatBigNumber(displayShortPayoutCollateralBN, baseCollateral.decimals, 4)
+      displayShortPayout = parseFloat(displayShortPayoutNum)
+    }
+    if (shortShares && shortShares.gt(0)) {
+      const shortSharesBN = compoundService.calculateCTokenToBaseExchange(collateral, shortShares)
+      shortSharesFormatted = formatNumber(formatBigNumber(shortSharesBN || new BigNumber(0), baseCollateral.decimals))
+    }
+    if (longShares && longShares.gt(0)) {
+      const longSharesBN = compoundService.calculateCTokenToBaseExchange(collateral, longShares)
+      longSharesFormatted = formatNumber(formatBigNumber(longSharesBN || new BigNumber(0), baseCollateral.decimals))
+    }
+    if (longProfitLoss) {
+      const displayLongProfitLossCollateralValue = roundNumberStringToSignificantDigits(
+        Math.abs(longProfitLoss).toString(),
+        4,
+      )
+      const displayLongProfitLossCollateralBNValue = parseUnits(
+        displayLongProfitLossCollateralValue,
+        collateral.decimals,
+      )
+      const displayLongProfileLossBaseCollateralBN = compoundService.calculateCTokenToBaseExchange(
+        collateral,
+        displayLongProfitLossCollateralBNValue,
+      )
+      const displayLongProfitLossNum = formatBigNumber(
+        displayLongProfileLossBaseCollateralBN,
+        baseCollateral.decimals,
+        4,
+      )
+      displayLongProfitLoss = parseFloat(displayLongProfitLossNum)
+      if (longProfitLoss < 0) {
+        displayLongProfitLoss = -displayLongProfitLoss
+      }
+    }
+    if (shortProfitLoss) {
+      const displayShortProfitLossCollateralValue = roundNumberStringToSignificantDigits(
+        Math.abs(shortProfitLoss).toString(),
+        4,
+      )
+      const displayShortProfitLossCollateralBNValue = parseUnits(
+        displayShortProfitLossCollateralValue,
+        collateral.decimals,
+      )
+      const displayShortProfileLossBaseCollateralBN = compoundService.calculateCTokenToBaseExchange(
+        collateral,
+        displayShortProfitLossCollateralBNValue,
+      )
+      const displayShortProfitLossNum = formatBigNumber(
+        displayShortProfileLossBaseCollateralBN,
+        baseCollateral.decimals,
+        4,
+      )
+      displayShortProfitLoss = parseFloat(displayShortProfitLossNum)
+      if (shortProfitLoss < 0) {
+        displayShortProfitLoss = -displayShortProfitLoss
+      }
+    }
+  }
 
   const isShortPositive = shortProfitLoss > 0 ? true : shortProfitLoss < 0 ? false : undefined
   const isLongPositive = longProfitLoss > 0 ? true : longProfitLoss < 0 ? false : undefined
@@ -117,12 +217,16 @@ export const PositionTable = (props: Props) => {
           {index === 0 ? shortSharesFormatted : longSharesFormatted}
         </ColoredTDStyled>
         <ColoredTDStyled positive={index === 0 ? isShortPositive : isLongPositive} textAlign={TableCellsAlign[2]}>
-          {index === 0 ? formatNumber(shortPayout.toString()) : formatNumber(longPayout.toString())}
+          {index === 0 ? formatNumber(displayShortPayout.toString()) : formatNumber(displayLongPayout.toString())}
         </ColoredTDStyled>
         <ColoredTDStyled positive={index === 0 ? isShortPositive : isLongPositive} textAlign={TableCellsAlign[3]}>
           {index === 0
-            ? `${formatNumber(shortProfitLoss.toString())} (${formatNumber(shortProfitLossPercentage.toString())}%)`
-            : `${formatNumber(longProfitLoss.toString())} (${formatNumber(longProfitLossPercentage.toString())}%)`}
+            ? `${formatNumber(displayShortProfitLoss.toString())} (${formatNumber(
+                shortProfitLossPercentage.toString(),
+              )}%)`
+            : `${formatNumber(displayLongProfitLoss.toString())} (${formatNumber(
+                longProfitLossPercentage.toString(),
+              )}%)`}
         </ColoredTDStyled>
       </TR>
     )
