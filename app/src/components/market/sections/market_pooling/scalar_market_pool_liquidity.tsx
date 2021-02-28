@@ -509,7 +509,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   // Set display values if the collateral is cToken type
   if (compoundService && collateralSymbol in CompoundTokenType) {
     displayPoolTokens = compoundService.calculateCTokenToBaseExchange(baseCollateral, poolTokens)
-    displayUserEarnings = compoundService.calculateCTokenToBaseExchange(displayCollateral, userEarnings)
+    displayUserEarnings = compoundService.calculateCTokenToBaseExchange(baseCollateral, userEarnings)
     if (displayCollateral.address === baseCollateral.address) {
       sellNoteUserEarnings = displayUserEarnings
       sellNoteDepositedTokens = compoundService.calculateCTokenToBaseExchange(baseCollateral, depositedTokens)

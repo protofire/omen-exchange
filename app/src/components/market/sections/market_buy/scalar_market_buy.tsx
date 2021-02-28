@@ -219,15 +219,15 @@ export const ScalarMarketBuy = (props: Props) => {
   let displayTradedShares = tradedShares
   if (collateralSymbol in CompoundTokenType && compoundService) {
     if (collateralSymbol !== displayCollateral.symbol.toLowerCase()) {
-      displayFeePaid = compoundService.calculateCTokenToBaseExchange(displayCollateral, feePaid)
+      displayFeePaid = compoundService.calculateCTokenToBaseExchange(baseCollateral, feePaid)
       if (baseCost && baseCost.gt(0)) {
-        displayBaseCost = compoundService.calculateCTokenToBaseExchange(displayCollateral, baseCost)
+        displayBaseCost = compoundService.calculateCTokenToBaseExchange(baseCollateral, baseCost)
       }
       if (potentialProfit && potentialProfit.gt(0)) {
-        displayPotentialProfit = compoundService.calculateCTokenToBaseExchange(displayCollateral, potentialProfit)
+        displayPotentialProfit = compoundService.calculateCTokenToBaseExchange(baseCollateral, potentialProfit)
       }
       if (amount && amount.gt(0)) {
-        displayPotentialLoss = compoundService.calculateCTokenToBaseExchange(displayCollateral, amount)
+        displayPotentialLoss = compoundService.calculateCTokenToBaseExchange(baseCollateral, amount)
       }
     }
     displayTradedShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, tradedShares)

@@ -204,17 +204,17 @@ export const ScalarMarketSell = (props: Props) => {
   let normalizedTradedCollateral = tradedCollateral
   if (displayCollateral.address !== collateral.address && compoundService) {
     if (potentialValue && potentialValue.gt(0)) {
-      potentialValueNormalized = compoundService.calculateCTokenToBaseExchange(displayCollateral, potentialValue)
+      potentialValueNormalized = compoundService.calculateCTokenToBaseExchange(baseCollateral, potentialValue)
     } else {
       potentialValueNormalized = new BigNumber('0')
     }
     if (costFee && costFee.gt(0)) {
-      costFeeNormalized = compoundService.calculateCTokenToBaseExchange(displayCollateral, costFee)
+      costFeeNormalized = compoundService.calculateCTokenToBaseExchange(baseCollateral, costFee)
     } else {
       costFeeNormalized = new BigNumber('0')
     }
     if (tradedCollateral && tradedCollateral.gt(0)) {
-      normalizedTradedCollateral = compoundService.calculateCTokenToBaseExchange(displayCollateral, tradedCollateral)
+      normalizedTradedCollateral = compoundService.calculateCTokenToBaseExchange(baseCollateral, tradedCollateral)
     } else {
       normalizedTradedCollateral = new BigNumber('0')
     }
@@ -275,7 +275,7 @@ export const ScalarMarketSell = (props: Props) => {
       formatBigNumber(displaySelectedOutcomeBalanceValue, baseCollateral.decimals),
     )
     if (amountShares && amountShares.gt(0)) {
-      displayAmountShares = compoundService.calculateCTokenToBaseExchange(collateral, amountShares)
+      displayAmountShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, amountShares)
     }
   }
 

@@ -537,6 +537,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   ]
   let displayYourPayout = yourPayout.toString()
   let displayProfitLoss = profitLoss
+  let displayAddtionalShares = additionalShares
   if (
     baseCollateral &&
     collateral &&
@@ -544,8 +545,15 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     collateral.symbol.toLowerCase() in CompoundTokenType &&
     compoundService
   ) {
-    const yourPayoutCollateralValue = roundNumberStringToSignificantDigits(Math.abs(yourPayout).toString(), 4)
-    const profitLossCollateralValue = roundNumberStringToSignificantDigits(Math.abs(profitLoss).toString(), 4)
+    const significantDigits = 6
+    const yourPayoutCollateralValue = roundNumberStringToSignificantDigits(
+      Math.abs(yourPayout).toString(),
+      significantDigits,
+    )
+    const profitLossCollateralValue = roundNumberStringToSignificantDigits(
+      Math.abs(profitLoss).toString(),
+      significantDigits,
+    )
 
     const yourPayoutCollateralBNValue = parseUnits(yourPayoutCollateralValue, collateral.decimals)
     const profitLossCollateralBNValue = parseUnits(profitLossCollateralValue, collateral.decimals)
@@ -562,6 +570,19 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     displayProfitLoss = parseFloat(displayProfitLossString)
     if (profitLoss < 0) {
       displayProfitLoss = -displayProfitLoss
+    }
+    if (additionalShares) {
+      const additionalSharesValue = roundNumberStringToSignificantDigits(
+        Math.abs(additionalShares).toString(),
+        significantDigits,
+      )
+      const additionalSharesBNValue = parseUnits(additionalSharesValue, collateral.decimals)
+      const additionalSharesBaseBN = compoundService.calculateCTokenToBaseExchange(
+        baseCollateral,
+        additionalSharesBNValue,
+      )
+      const displayAddtionalSharesString = formatBigNumber(additionalSharesBaseBN, baseCollateral.decimals, 4)
+      displayAddtionalShares = parseFloat(displayAddtionalSharesString)
     }
   }
 
@@ -597,7 +618,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'Current prediction',
     },
     {
-      title: `+ ${additionalShares?.toFixed(2)} Shares`,
+      title: `+ ${displayAddtionalShares?.toFixed(2)} Shares`,
       subtitle: `${additionalSharesType} position`,
       tooltip: `To keep the market stable, you receive additional shares for depositing and removing liquidity.`,
       ball: true,

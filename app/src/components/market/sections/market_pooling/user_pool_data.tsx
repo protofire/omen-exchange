@@ -73,10 +73,10 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
   if (collateral.symbol.toLowerCase() in CompoundTokenType && compoundService) {
-    displayUserLiquidity = compoundService.calculateCTokenToBaseExchange(collateral, totalUserLiquidity)
-    displayPoolTokens = compoundService.calculateCTokenToBaseExchange(collateral, totalPoolShares)
-    displayUserEarnings = compoundService.calculateCTokenToBaseExchange(collateral, userEarnings)
-    displayTotalEarnings = compoundService.calculateCTokenToBaseExchange(collateral, totalEarnings)
+    displayUserLiquidity = compoundService.calculateCTokenToBaseExchange(baseCollateral, totalUserLiquidity)
+    displayPoolTokens = compoundService.calculateCTokenToBaseExchange(baseCollateral, totalPoolShares)
+    displayUserEarnings = compoundService.calculateCTokenToBaseExchange(baseCollateral, userEarnings)
+    displayTotalEarnings = compoundService.calculateCTokenToBaseExchange(baseCollateral, totalEarnings)
   }
   const userLiquidityFormatted = formatNumber(formatBigNumber(displayUserLiquidity, baseCollateral.decimals))
   const poolTokensFormatted = formatNumber(formatBigNumber(displayPoolTokens, baseCollateral.decimals))
