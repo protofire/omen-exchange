@@ -550,11 +550,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     const yourPayoutCollateralBNValue = parseUnits(yourPayoutCollateralValue, collateral.decimals)
     const profitLossCollateralBNValue = parseUnits(profitLossCollateralValue, collateral.decimals)
     const displayPayoutCollateralBN = compoundService.calculateCTokenToBaseExchange(
-      collateral,
+      baseCollateral,
       yourPayoutCollateralBNValue,
     )
     const displayProfitLossCollateralBN = compoundService.calculateCTokenToBaseExchange(
-      collateral,
+      baseCollateral,
       profitLossCollateralBNValue,
     )
     displayYourPayout = formatBigNumber(displayPayoutCollateralBN, baseCollateral.decimals, 4)

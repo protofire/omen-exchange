@@ -99,7 +99,7 @@ export const PositionTable = (props: Props) => {
       const displayLongPayoutCollateralValue = roundNumberStringToSignificantDigits(Math.abs(longPayout).toString(), 4)
       const displayLongPayoutCollateralBNValue = parseUnits(displayLongPayoutCollateralValue, collateral.decimals)
       const displayLongPayoutCollateralBN = compoundService.calculateCTokenToBaseExchange(
-        collateral,
+        baseCollateral,
         displayLongPayoutCollateralBNValue,
       )
       const displayLongPayoutNum = formatBigNumber(displayLongPayoutCollateralBN, baseCollateral.decimals, 4)
@@ -112,18 +112,18 @@ export const PositionTable = (props: Props) => {
       )
       const displayShortPayoutCollateralBNValue = parseUnits(displayShortPayoutCollateralValue, collateral.decimals)
       const displayShortPayoutCollateralBN = compoundService.calculateCTokenToBaseExchange(
-        collateral,
+        baseCollateral,
         displayShortPayoutCollateralBNValue,
       )
       const displayShortPayoutNum = formatBigNumber(displayShortPayoutCollateralBN, baseCollateral.decimals, 4)
       displayShortPayout = parseFloat(displayShortPayoutNum)
     }
     if (shortShares && shortShares.gt(0)) {
-      const shortSharesBN = compoundService.calculateCTokenToBaseExchange(collateral, shortShares)
+      const shortSharesBN = compoundService.calculateCTokenToBaseExchange(baseCollateral, shortShares)
       shortSharesFormatted = formatNumber(formatBigNumber(shortSharesBN || new BigNumber(0), baseCollateral.decimals))
     }
     if (longShares && longShares.gt(0)) {
-      const longSharesBN = compoundService.calculateCTokenToBaseExchange(collateral, longShares)
+      const longSharesBN = compoundService.calculateCTokenToBaseExchange(baseCollateral, longShares)
       longSharesFormatted = formatNumber(formatBigNumber(longSharesBN || new BigNumber(0), baseCollateral.decimals))
     }
     if (longProfitLoss) {
@@ -136,7 +136,7 @@ export const PositionTable = (props: Props) => {
         collateral.decimals,
       )
       const displayLongProfileLossBaseCollateralBN = compoundService.calculateCTokenToBaseExchange(
-        collateral,
+        baseCollateral,
         displayLongProfitLossCollateralBNValue,
       )
       const displayLongProfitLossNum = formatBigNumber(
@@ -159,7 +159,7 @@ export const PositionTable = (props: Props) => {
         collateral.decimals,
       )
       const displayShortProfileLossBaseCollateralBN = compoundService.calculateCTokenToBaseExchange(
-        collateral,
+        baseCollateral,
         displayShortProfitLossCollateralBNValue,
       )
       const displayShortProfitLossNum = formatBigNumber(
