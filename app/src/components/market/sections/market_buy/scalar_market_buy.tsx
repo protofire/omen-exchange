@@ -313,7 +313,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
       What do you think?`),
       )
-
+      setDisplayAmountToFund(new BigNumber('0'))
       setAmount(new BigNumber(0))
       setStatus(Status.Ready)
       setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)

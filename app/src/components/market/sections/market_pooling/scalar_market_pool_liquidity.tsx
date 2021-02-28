@@ -150,6 +150,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [additionalShares, setAdditionalShares] = useState<number>(0)
   const [additionalSharesType, setAdditionalSharesType] = useState<Maybe<AdditionalSharesType>>()
   const [amountToFundNormalized, setAmountToFundNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
+  const [amountToRemoveNormalized, setAmountToRemoveNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const collateralSymbol = collateral.symbol.toLowerCase()
 
   let baseCollateral = collateral
@@ -282,6 +283,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setStatus(Status.Ready)
       setAmountToFund(null)
       setAmountToFundDisplay('')
+      setAmountToFundNormalized(null)
       setMessage(`Successfully deposited ${fundsAmount} ${displayCollateral.symbol}`)
     } catch (err) {
       setStatus(Status.Error)
@@ -345,6 +347,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setStatus(Status.Ready)
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
+      setAmountToRemoveNormalized(null)
       setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
       setIsModalTransactionResultOpen(true)
     } catch (err) {
@@ -371,16 +374,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : amountToFund?.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
-      : null
-
-  const sharesAmountError =
-    maybeFundingBalance === null
-      ? null
-      : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
-      ? `Insufficient balance`
-      : amountToRemove?.gt(maybeFundingBalance)
-      ? `Value must be less than or equal to ${sharesBalance} pool shares`
+      ? `Value must be less than or equal to ${walletBalance} ${displayCollateral.symbol}`
       : null
 
   const disableDepositButton =
@@ -390,13 +384,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     collateralAmountError !== null ||
     currentDate > resolutionDate ||
     isNegativeAmountToFund
-
-  const disableWithdrawButton =
-    !amountToRemove ||
-    amountToRemove?.isZero() ||
-    amountToRemove?.gt(fundingBalance) ||
-    sharesAmountError !== null ||
-    isNegativeAmountToRemove
 
   let currencyFilters =
     collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress
@@ -465,6 +452,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     setAmountToFundNormalized(value)
   }
 
+  const setWithdrawAmountToRemove = (val: BigNumber) => {
+    let normalizedWithdrawAmount = val
+    if (compoundService && collateral.symbol.toLowerCase() in CompoundTokenType) {
+      normalizedWithdrawAmount = compoundService.calculateBaseToCTokenExchange(baseCollateral, normalizedWithdrawAmount)
+    }
+    setAmountToRemove(normalizedWithdrawAmount)
+    setAmountToRemoveNormalized(val)
+  }
+
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 
   useEffect(() => {
@@ -506,10 +502,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   let sellNoteDepositedTokensTotal = depositedTokensTotal
   let displayUserEarnings = userEarnings
   let displayPoolTokens = poolTokens
+  let displayFundingBalance = fundingBalance
+  let displaySharesBalance = sharesBalance
   // Set display values if the collateral is cToken type
   if (compoundService && collateralSymbol in CompoundTokenType) {
     displayPoolTokens = compoundService.calculateCTokenToBaseExchange(baseCollateral, poolTokens)
     displayUserEarnings = compoundService.calculateCTokenToBaseExchange(baseCollateral, userEarnings)
+    const sharesBalanceBN = compoundService.calculateCTokenToBaseExchange(baseCollateral, fundingBalance)
+    displaySharesBalance = formatBigNumber(sharesBalanceBN, baseCollateral.decimals)
+    displayFundingBalance = compoundService.calculateCTokenToBaseExchange(baseCollateral, fundingBalance)
     if (displayCollateral.address === baseCollateral.address) {
       sellNoteUserEarnings = displayUserEarnings
       sellNoteDepositedTokens = compoundService.calculateCTokenToBaseExchange(baseCollateral, depositedTokens)
@@ -522,6 +523,22 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       displayTotalSymbol = displayCollateral.symbol
     }
   }
+
+  const sharesAmountError =
+    maybeFundingBalance === null
+      ? null
+      : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
+      ? `Insufficient balance`
+      : amountToRemove?.gt(maybeFundingBalance)
+      ? `Value must be less than or equal to ${displaySharesBalance} pool shares`
+      : null
+
+  const disableWithdrawButton =
+    !amountToRemove ||
+    amountToRemove?.isZero() ||
+    amountToRemoveNormalized?.gt(displayFundingBalance) ||
+    sharesAmountError !== null ||
+    isNegativeAmountToRemove
 
   return (
     <>
@@ -610,25 +627,25 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           )}
           {activeTab === Tabs.withdraw && (
             <>
-              <TokenBalance text="Pool Tokens" value={formatNumber(sharesBalance)} />
+              <TokenBalance text="Pool Tokens" value={formatNumber(displaySharesBalance)} />
 
               <TextfieldCustomPlaceholder
                 formField={
                   <BigNumberInput
-                    decimals={collateral.decimals}
+                    decimals={baseCollateral.decimals}
                     name="amountToRemove"
                     onChange={(e: BigNumberInputReturn) => {
-                      setAmountToRemove(e.value)
+                      setWithdrawAmountToRemove(e.value)
                       setAmountToRemoveDisplay('')
                     }}
                     style={{ width: 0 }}
-                    value={amountToRemove}
+                    value={amountToRemoveNormalized}
                     valueToDisplay={amountToRemoveDisplay}
                   />
                 }
                 onClickMaxButton={() => {
                   setAmountToRemove(fundingBalance)
-                  setAmountToRemoveDisplay(formatBigNumber(fundingBalance, collateral.decimals, 5))
+                  setAmountToRemoveDisplay(formatBigNumber(displayFundingBalance, baseCollateral.decimals, 5))
                 }}
                 shouldDisplayMaxButton
                 symbol="Shares"
