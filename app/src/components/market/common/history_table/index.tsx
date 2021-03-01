@@ -5,11 +5,14 @@ import styled from 'styled-components'
 import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
 import { formatBigNumber, formatHistoryDate, formatHistoryUser } from '../../../../util/tools'
 import { ButtonRound } from '../../../button'
-import { ConnectionIcon } from '../../../common/network/img/ConnectionIcon'
+import { IconJazz } from '../../../common/icons/IconJazz'
 import { InlineLoading } from '../../../loading/inline_loading'
 
 const TableWrapper = styled.div`
   text-align: left;
+`
+const Address = styled.div`
+  margin-left: 10px;
 `
 const HistoryColumns = styled.div<{ firstRow?: boolean }>`
   width: 20%;
@@ -21,10 +24,8 @@ const HistoryColumns = styled.div<{ firstRow?: boolean }>`
   padding-right: 10px;
   &:first-child {
     width: 23%;
-    svg {
-      margin-right: 10px;
-      vertical-align: middle;
-    }
+    display: flex;
+    align-items: center;
   }
   &:last-child {
     padding-right: 0px;
@@ -145,8 +146,8 @@ export const HistoryTable: React.FC<Props> = ({
               return (
                 <HistoryRow key={id}>
                   <HistoryColumns>
-                    <ConnectionIcon size={'22'} />
-                    <span>{formatHistoryUser(user.id)}</span>
+                    <IconJazz account={user.id} size={22} />
+                    <Address>{formatHistoryUser(user.id)}</Address>
                   </HistoryColumns>
                   <HistoryColumns>{transactionType}</HistoryColumns>
                   <HistoryColumns>{formatBigNumber(sharesOrPoolTokenAmount, decimals, 3)}</HistoryColumns>
