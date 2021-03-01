@@ -162,21 +162,11 @@ class MarketMakerService {
       )
       const positionIdForCollectionId = await this.conditionalTokens.getPositionId(collateralTokenAddress, collectionId)
 
-      let balance
-
-      try {
-        balance = await this.conditionalTokens.getBalanceOfByBlock(
-          ownerAddress,
-          positionIdForCollectionId,
-          block.blockNumber,
-        )
-      } catch {
-        balance = await this.conditionalTokens.getBalanceOfByBlock(
-          ownerAddress,
-          positionIdForCollectionId,
-          block.blockNumber,
-        )
-      }
+      const balance = await this.conditionalTokens.getBalanceOfByBlock(
+        ownerAddress,
+        positionIdForCollectionId,
+        block.blockNumber,
+      )
 
       logger.debug(`Balance information :: Balance ${balance.toString()}`)
       balances.push(balance)
