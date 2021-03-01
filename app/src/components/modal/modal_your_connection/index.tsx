@@ -19,21 +19,24 @@ const ModalTitle = styled.p`
   margin: 0;
 `
 
-const TopCard = styled.div`
-  padding: 16px 0;
+const Card = styled.div`
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   border: ${props => props.theme.borders.borderLineDisabled};
   border-radius: ${props => props.theme.cards.borderRadius};
+
+  &:nth-child(3) {
+    margin-top: 16px;
+  }
 `
 
 const TopCardHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px 16px;
+  padding: 16px 20px;
   width: 100%;
   border-bottom: ${props => props.theme.borders.borderLineDisabled};
 `
@@ -84,55 +87,57 @@ const AccountInfoWallet = styled.p`
   margin: 0;
 `
 
-const TopCardWallet = styled.div`
-  padding: 16px 20px 0;
+const BalanceSection = styled.div`
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
 `
 
-const TopCardWalletHeader = styled.p`
+const CardHeaderText = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorLighter};
   margin: 0;
 `
 
-const WalletItems = styled.div`
+const BalanceItems = styled.div`
   margin-top: 14px;
   display: flex;
   flex-direction: column;
   width: 100%;
 `
 
-const WalletItem = styled.div`
+const BalanceItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
 
-  &:first-of-type {
-    margin-bottom: 12px;
+  &:nth-of-type(2) {
+    margin-top: 12px;
   }
 `
 
-const WalletItemLeft = styled.div`
+const BalanceItemLeft = styled.div`
   display: flex;
   align-items: center;
 `
 
-const WalletItemAsset = styled.p`
+const BalanceItemAsset = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorDark};
   margin: 0;
   margin-left: 12px;
 `
 
-const WalletItemBalance = styled.p`
+const BalanceItemBalance = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorLighter};
   margin: 0;
 `
+
+const BottomCardHeader = styled.p``
 
 const ChangeWalletButton = styled(Button)``
 
@@ -174,7 +179,7 @@ export const ModalYourConnection = (props: Props) => {
           <ModalTitle>Your Connection</ModalTitle>
           <IconClose hoverEffect={true} onClick={onClose} />
         </ModalNavigation>
-        <TopCard>
+        <Card>
           <TopCardHeader>
             <TopCardHeaderLeft>
               <ConnectionIconWrapper>
@@ -189,26 +194,41 @@ export const ModalYourConnection = (props: Props) => {
             {/* TODO: Add onClick */}
             <ChangeWalletButton buttonType={ButtonType.secondaryLine}>Change</ChangeWalletButton>
           </TopCardHeader>
-          <TopCardWallet>
-            <TopCardWalletHeader>Wallet</TopCardWalletHeader>
-            <WalletItems>
-              <WalletItem>
-                <WalletItemLeft>
+          <BalanceSection>
+            <CardHeaderText>Wallet</CardHeaderText>
+            <BalanceItems>
+              <BalanceItem>
+                <BalanceItemLeft>
                   <EtherIcon />
-                  <WalletItemAsset>Ether</WalletItemAsset>
-                </WalletItemLeft>
-                <WalletItemBalance>{formattedEthBalance} ETH</WalletItemBalance>
-              </WalletItem>
-              <WalletItem>
-                <WalletItemLeft>
+                  <BalanceItemAsset>Ether</BalanceItemAsset>
+                </BalanceItemLeft>
+                <BalanceItemBalance>{formattedEthBalance} ETH</BalanceItemBalance>
+              </BalanceItem>
+              <BalanceItem>
+                <BalanceItemLeft>
                   <DaiIcon size="24px" />
-                  <WalletItemAsset>Dai</WalletItemAsset>
-                </WalletItemLeft>
-                <WalletItemBalance>{formattedDaiBalance} DAI</WalletItemBalance>
-              </WalletItem>
-            </WalletItems>
-          </TopCardWallet>
-        </TopCard>
+                  <BalanceItemAsset>Dai</BalanceItemAsset>
+                </BalanceItemLeft>
+                <BalanceItemBalance>{formattedDaiBalance} DAI</BalanceItemBalance>
+              </BalanceItem>
+            </BalanceItems>
+          </BalanceSection>
+        </Card>
+        <Card>
+          <BalanceSection>
+            <CardHeaderText>Omen Account</CardHeaderText>
+            <BalanceItems>
+              <BalanceItem>
+                <BalanceItemLeft>
+                  <DaiIcon size="24px" />
+                  <BalanceItemAsset>Dai</BalanceItemAsset>
+                </BalanceItemLeft>
+                {/* TODO: Replace hardcoded balance */}
+                <BalanceItemBalance>0.00 DAI</BalanceItemBalance>
+              </BalanceItem>
+            </BalanceItems>
+          </BalanceSection>
+        </Card>
       </ContentWrapper>
     </Modal>
   )
