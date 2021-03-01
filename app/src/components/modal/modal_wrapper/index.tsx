@@ -13,14 +13,14 @@ interface Props extends React.ComponentProps<typeof Modal> {
 
 const ModalContainer: React.FC<Props> = props => {
   const { children, disableCloseButton, onRequestClose, theme, title, ...restProps } = props
-  const { modalStyle } = theme
+  const { wrapperModalStyle } = theme
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
   }, [])
 
   return (
-    <Modal onRequestClose={onRequestClose} shouldCloseOnOverlayClick={true} style={modalStyle} {...restProps}>
+    <Modal onRequestClose={onRequestClose} shouldCloseOnOverlayClick={true} style={wrapperModalStyle} {...restProps}>
       {title ? <ModalTitle disableCloseButton={disableCloseButton} onClick={onRequestClose} title={title} /> : null}
       {children}
     </Modal>

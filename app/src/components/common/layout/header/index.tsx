@@ -13,15 +13,15 @@ import { XdaiService } from '../../../../services'
 import { networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
+import { Network } from '../../../common'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { XdaiBridgeTransfer } from '../../../market/common/xdai_bridge_modal'
-import { ModalConnectWallet } from '../../../modal'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../form/dropdown'
+import { ModalConnectWalletWrapper } from '../../../modal'
 import { IconAdd, IconClose } from '../../icons'
 import { IconArrowRight } from '../../icons/IconArrowRight'
 import { IconSettings } from '../../icons/IconSettings'
 import { DaiIcon } from '../../icons/currencies'
 import { XdaiIcon } from '../../icons/currencies/XdaiIcon'
-import { Network } from '../../network'
 
 export const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -362,7 +362,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             <IconSettings />
           </ButtonSettings>
         </ContentsRight>
-        <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />
+        <ModalConnectWalletWrapper isOpen={isModalOpen} onClose={() => setModalState(false)} />
       </HeaderInner>
     </HeaderWrapper>
   )
