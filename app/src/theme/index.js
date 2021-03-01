@@ -374,7 +374,7 @@ const theme = {
       zIndex: '12345',
     },
   },
-  connectionModal: {
+  connectWalletModal: {
     content: {
       height: '510px',
       width: '382px',
