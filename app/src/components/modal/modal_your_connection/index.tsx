@@ -131,15 +131,26 @@ const BalanceItemAsset = styled.p`
   margin-left: 12px;
 `
 
+const ChangeWalletButton = styled(Button)``
+
 const BalanceItemBalance = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorLighter};
   margin: 0;
 `
 
-const BottomCardHeader = styled.p``
+const DepositWithdrawButtons = styled.div`
+  padding: 16px 20px;
+  border-top: ${props => props.theme.borders.borderLineDisabled};
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`
 
-const ChangeWalletButton = styled(Button)``
+const DepositWithdrawButton = styled(Button)`
+  width: calc(50% - 8px);
+`
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   isOpen: boolean
@@ -228,6 +239,12 @@ export const ModalYourConnection = (props: Props) => {
               </BalanceItem>
             </BalanceItems>
           </BalanceSection>
+          <DepositWithdrawButtons>
+            {/* TODO: Add onClick handler */}
+            <DepositWithdrawButton buttonType={ButtonType.secondaryLine}>Deposit</DepositWithdrawButton>
+            {/* TODO: Add onClick handler */}
+            <DepositWithdrawButton buttonType={ButtonType.secondaryLine}>Withdraw</DepositWithdrawButton>
+          </DepositWithdrawButtons>
         </Card>
       </ContentWrapper>
     </Modal>
