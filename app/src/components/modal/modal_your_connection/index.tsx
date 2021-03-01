@@ -184,7 +184,7 @@ export const ModalYourConnection = (props: Props) => {
   const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
 
   return (
-    <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.connectionModal}>
+    <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.yourConnectionModal}>
       <ContentWrapper>
         <ModalNavigation>
           <ModalTitle>Your Connection</ModalTitle>
