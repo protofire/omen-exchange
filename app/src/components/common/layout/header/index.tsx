@@ -188,7 +188,7 @@ const ClaimText = styled.div`
 `
 
 interface ExtendsHistory extends RouteComponentProps {
-  setClaim: React.Dispatch<React.SetStateAction<boolean>>
+  setClaim?: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
@@ -206,7 +206,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
       content: (
         <ClaimWrapper
           onClick={() => {
-            props.setClaim(true)
+            props.setClaim && props.setClaim(true)
           }}
         >
           <ClaimText>

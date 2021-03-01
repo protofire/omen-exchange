@@ -13,6 +13,7 @@ import {
   ButtonSettings,
   ContentsLeft,
   ContentsRight,
+  Header,
   HeaderInner,
   HeaderWrapper,
   LogoWrapper,
@@ -52,20 +53,7 @@ const App: React.FC = () => {
       <Web3Provider connectors={connectors} libraryName="ethers.js">
         {!status ? (
           <>
-            <HeaderWrapper>
-              <HeaderInner>
-                <ContentsLeft>
-                  <LogoWrapper as="div">
-                    <OmenLogo />
-                  </LogoWrapper>
-                </ContentsLeft>
-                <ContentsRight>
-                  <ButtonSettings>
-                    <IconSettings />
-                  </ButtonSettings>
-                </ContentsRight>
-              </HeaderInner>
-            </HeaderWrapper>
+            <Header />
             <SettingsViewContainer networkId={networkId} />
           </>
         ) : (
