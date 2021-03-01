@@ -11,13 +11,14 @@ import { useConnectedWeb3Context } from './connectedWeb3'
 
 export const useConnectedCPKContext = (): Maybe<CPKService> => {
   const [cpk, setCpk] = useState<Maybe<CPKService>>(null)
-  const { account, library, relay } = useConnectedWeb3Context()
+  const { account, library, networkId, relay } = useConnectedWeb3Context()
+
   useEffect(() => {
     if (account && library) {
       createCPK(library, relay)
         .then(cpk => new CPKService(cpk, library))
         .then(setCpk)
     }
-  }, [account, library, relay])
+  }, [account, library, networkId, relay])
   return cpk
 }

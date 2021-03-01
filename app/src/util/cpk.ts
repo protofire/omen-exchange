@@ -8,10 +8,11 @@ import { ethers } from 'ethers'
 import { Web3Provider } from 'ethers/providers'
 
 import { proxyFactoryAbi } from '../abi/proxy_factory'
+import { MAIN_NETWORKS } from '../common/constants'
 import { BiconomyService } from '../services/biconomy'
 import { SafeService } from '../services/safe'
 
-import { getCPKAddresses, getRelayProxyFactory, networkIds } from './networks'
+import { getCPKAddresses, getInfuraUrl, getRelayProxyFactory, networkIds } from './networks'
 
 type Address = string
 
@@ -301,7 +302,6 @@ export const createCPK = async (provider: Web3Provider, relay: boolean) => {
       networks[network.chainId].proxyFactoryAddress = relayProxyFactoryAddress
     }
   }
-
   const transactionManager = relay ? new BiconomyTransactionManager() : new CpkTransactionManager()
   const cpk = new OCPK({ ethLibAdapter: new EthersAdapter({ ethers, signer }), transactionManager, networks })
   await cpk.init()
@@ -340,4 +340,44 @@ export const verifyProxyAddress = async (owner: string, proxyAddress: string, cp
   }
 }
 
+export const getRelayProvider = (
+  relay: boolean,
+  networkId: number,
+  library: any,
+  account: string | null | undefined,
+) => {
+  const windowObj: any = window
+  const chainId = windowObj.ethereum?.chainId
+  const correctChainId = chainId ? MAIN_NETWORKS.includes(chainId) : true
+
+  // provider override if running as relay
+  if (relay && networkId === networkIds.MAINNET && correctChainId) {
+    const netId = networkIds.XDAI
+    const provider = new ethers.providers.JsonRpcProvider(getInfuraUrl(netId)) as any
+    const address = account ? calcRelayProxyAddress(account, provider) : ''
+    const signer = library.getSigner()
+    const fakeSigner = {
+      provider,
+      getAddress: () => address,
+      _ethersType: 'Signer',
+      // access the connected signer for relay signatures
+      signer: signer,
+    }
+    provider.signer = fakeSigner
+    provider.getSigner = () => fakeSigner
+    provider.relay = true
+    return {
+      address,
+      isRelay: true,
+      netId,
+      provider,
+    }
+  }
+  return {
+    address: account,
+    isRelay: false,
+    netId: networkId,
+    provider: library,
+  }
+}
 export default OCPK

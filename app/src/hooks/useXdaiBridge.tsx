@@ -130,9 +130,11 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
   }
 
   useEffect(() => {
-    fetchBalance()
-    if (networkId === networkIds.MAINNET || relay) {
-      fetchUnclaimedAssets()
+    if (account) {
+      fetchBalance()
+      if (networkId === networkIds.MAINNET || relay) {
+        fetchUnclaimedAssets()
+      }
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

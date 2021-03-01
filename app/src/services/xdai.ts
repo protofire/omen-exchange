@@ -184,6 +184,7 @@ class XdaiService {
       const account = this.provider.relay
         ? await this.provider.signer.signer.getAddress()
         : await this.provider.getSigner().getAddress()
+
       const variables = { address: account }
       const xDaiRequests = await axios.post(XDAI_HOME_BRIDGE, { query, variables })
       const xDaiExecutions = await axios.post(XDAI_FOREIGN_BRIDGE, {

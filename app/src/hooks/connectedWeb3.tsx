@@ -1,11 +1,11 @@
-import { ethers, providers } from 'ethers'
+import { providers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
 import connectors, { handleGsMultiSend } from '../util/connectors'
-import { calcRelayProxyAddress } from '../util/cpk'
+import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
-import { getInfuraUrl, networkIds } from '../util/networks'
+import { networkIds } from '../util/networks'
 
 import { useSafeApp } from './useSafeApp'
 
@@ -45,7 +45,6 @@ export const ConnectedWeb3: React.FC = props => {
   const context = useWeb3Context()
 
   const { account, active, error, library } = context
-
   const [relay, setRelay] = useState(true)
   const toggleRelay = () => setRelay(!relay)
 
@@ -102,29 +101,7 @@ export const ConnectedWeb3: React.FC = props => {
     return null
   }
 
-  let netId = networkId
-  let provider = library
-  let isRelay = false
-  let address = account
-
-  // provider override if running as relay
-  if (relay && networkId === networkIds.MAINNET && account) {
-    isRelay = true
-    netId = networkIds.XDAI
-    provider = new ethers.providers.JsonRpcProvider(getInfuraUrl(netId))
-    address = calcRelayProxyAddress(account, provider)
-    const signer = library.getSigner()
-    const fakeSigner = {
-      provider,
-      getAddress: () => address,
-      _ethersType: 'Signer',
-      // the actual signer for relay sigs
-      signer: signer,
-    }
-    provider.signer = fakeSigner
-    provider.getSigner = () => fakeSigner
-    provider.relay = isRelay
-  }
+  const { address, isRelay, netId, provider } = getRelayProvider(relay, networkId, library, account)
 
   const value = {
     account: address || null,

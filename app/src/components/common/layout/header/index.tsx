@@ -226,7 +226,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
       }
       setClaimState(false)
     }
-    if (networkId === 1 || relay) {
+    if ((networkId === 1 || relay) && account) {
       fetchUnclaimedAssets()
     } else {
       setUnclaimedAmount(Zero)
