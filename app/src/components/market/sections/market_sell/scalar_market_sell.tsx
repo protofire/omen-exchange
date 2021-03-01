@@ -248,9 +248,9 @@ export const ScalarMarketSell = (props: Props) => {
 
       await fetchGraphMarketUserTxData()
       await fetchGraphMarketMakerData()
-
+      setAmountSharesFromInput(new BigNumber('0'))
+      setDisplaySellShares(null)
       setAmountShares(null)
-      setAmountSharesToDisplay('')
       setStatus(Status.Ready)
       setMessage(`Successfully sold ${displaySharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {

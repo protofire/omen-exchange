@@ -286,8 +286,10 @@ export const ScalarMarketBuy = (props: Props) => {
       let inputAmount = amount || Zero
       if (collateralSymbol in CompoundTokenType && compoundService && amount) {
         displayTradedShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, tradedShares)
-        useBaseToken = true
-        inputAmount = compoundService.calculateCTokenToBaseExchange(baseCollateral, amount)
+        if (collateral.symbol !== displayCollateral.symbol) {
+          useBaseToken = true
+          inputAmount = compoundService.calculateCTokenToBaseExchange(baseCollateral, amount)
+        }
       }
       const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals)
       setStatus(Status.Loading)
