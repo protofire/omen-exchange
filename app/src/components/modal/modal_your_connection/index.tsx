@@ -8,8 +8,8 @@ import { formatBigNumber, formatNumber, truncateStringInTheMiddle } from '../../
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
+import { IconJazz } from '../../common/icons/IconJazz'
 import { DaiIcon, EtherIcon } from '../../common/icons/currencies'
-import { ConnectionIcon } from '../../common/network/img/ConnectionIcon'
 import { ContentWrapper, ModalNavigation } from '../common_styled'
 
 const ModalTitle = styled.p`
@@ -179,7 +179,7 @@ export const ModalYourConnection = (props: Props) => {
             <TopCardHeaderLeft>
               <ConnectionIconWrapper>
                 <ConnectorCircle>{connectorIcon}</ConnectorCircle>
-                <ConnectionIcon scale="1.4" />
+                <IconJazz account={account || ''} size={28} />
               </ConnectionIconWrapper>
               <AccountInfo>
                 <AccountInfoAddress>{truncateStringInTheMiddle(account || '', 5, 3)}</AccountInfoAddress>
