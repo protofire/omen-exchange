@@ -554,7 +554,7 @@ class CPKService {
           distributionHint,
         ),
       })
-      if (gelatoData.shouldSubmit && gelato !== null) {
+      if (gelatoData.shouldSubmit && gelato !== null && !useCompoundReserve) {
         const gelatoTransactions = await this.addGelatoSubmitTransaction(
           marketData.funding,
           Zero, // no prior funding, new market

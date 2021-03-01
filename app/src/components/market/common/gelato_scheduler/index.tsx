@@ -92,22 +92,6 @@ const GelatoIconCircle = styled.button<{ active?: boolean }>`
   width: ${props => props.theme.buttonCircle.dimensions};
 `
 
-const Wrapper = styled.div`
-  border-radius: 4px;
-  border: ${({ theme }) => theme.borders.borderLineDisabled};
-  padding: 18px 25px;
-  margin-bottom: 20px;
-`
-
-const Title = styled.h2`
-  color: ${props => props.theme.colors.textColorDark};
-  font-size: 16px;
-  letter-spacing: 0.4px;
-  line-height: 1.2;
-  margin: 0 0 20px;
-  font-weight: 400;
-`
-
 const DescriptionWrapper = styled.div`
   align-items: center;
   display: flex;
@@ -201,7 +185,7 @@ const GelatoServiceDescription = styled.div`
   font-size: ${props => props.theme.textfield.fontSize};
   letter-spacing: 0.2px;
   line-height: 1.4;
-  margin: 0 8px 0 0;
+  margin: 0 0 0 0;
   width: 100%;
 `
 
@@ -372,8 +356,7 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
   }
 
   return (
-    <Wrapper>
-      <Title>Recommended Services</Title>
+    <>
       <DescriptionWrapper>
         <GelatoServiceDescription>
           <ServiceWrapper>
@@ -415,11 +398,7 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
                   )}
                   <ServiceCheckWrapper onClick={belowMinimum ? undefined : toggleActive}>
                     <CheckService disabled={belowMinimum} isActive={active}>
-                      <IconTick
-                        disabled={belowMinimum}
-                        fill={belowMinimum ? '#86909E' : active ? 'white' : '#37474F'}
-                        stroke={belowMinimum ? '#86909E' : active ? 'white' : '#37474F'}
-                      />
+                      <IconTick selected={!belowMinimum && active} />
                     </CheckService>
                   </ServiceCheckWrapper>
                 </>
@@ -520,6 +499,6 @@ export const GelatoScheduler: React.FC<GelatoSchedulerProps> = (props: GelatoSch
           </TextBody>
         </GelatoExtendedWrapper>
       )}
-    </Wrapper>
+    </>
   )
 }

@@ -5,22 +5,6 @@ import { getCTokenForToken } from '../../../../util/tools'
 import { IconTick } from '../../../common/icons'
 import { CompoundIcon } from '../../../common/icons/currencies/CompoundIcon'
 
-const Wrapper = styled.div`
-  border-radius: 4px;
-  border: ${({ theme }) => theme.borders.borderLineDisabled};
-  padding: 18px 25px;
-  margin-bottom: 20px;
-`
-
-const Title = styled.h2`
-  color: ${props => props.theme.colors.textColorDark};
-  font-size: 16px;
-  letter-spacing: 0.4px;
-  line-height: 1.2;
-  margin: 0 0 20px;
-  font-weight: 400;
-`
-
 const DescriptionWrapper = styled.div`
   align-items: center;
   display: flex;
@@ -137,29 +121,26 @@ export const AddCompoundService: React.FC<AddCompoundServiceProps> = (props: Add
   const cTokenDisplay =
     cTokenSymbol.charAt(0).toLowerCase() + cTokenSymbol.charAt(1).toUpperCase() + cTokenSymbol.slice(2).toLowerCase()
   return (
-    <Wrapper>
-      <Title>Recommended Service</Title>
-      <DescriptionWrapper>
-        <CompoundServiceDescription>
-          <ServiceWrapper>
-            <ServiceIconWrapper>
-              <CompoundIcon />
-            </ServiceIconWrapper>
-            <ServiceTokenDetails>
-              <ServiceTextWrapper>
-                <TextHeading>Compound</TextHeading>
-                <TextBody>
-                  Convert {currentTokenDisplay} to {cTokenDisplay} and
-                  <TextBodyMarker> earn {compoundInterestRate}% APY</TextBodyMarker>
-                </TextBody>
-              </ServiceTextWrapper>
-              <ServiceCheckWrapper onClick={toggleServiceCheck}>
-                <CheckService isServiceChecked={isServiceChecked}>{serviceChecked}</CheckService>
-              </ServiceCheckWrapper>
-            </ServiceTokenDetails>
-          </ServiceWrapper>
-        </CompoundServiceDescription>
-      </DescriptionWrapper>
-    </Wrapper>
+    <DescriptionWrapper>
+      <CompoundServiceDescription>
+        <ServiceWrapper>
+          <ServiceIconWrapper>
+            <CompoundIcon />
+          </ServiceIconWrapper>
+          <ServiceTokenDetails>
+            <ServiceTextWrapper>
+              <TextHeading>Compound</TextHeading>
+              <TextBody>
+                Convert {currentTokenDisplay} to {cTokenDisplay} and
+                <TextBodyMarker> earn {compoundInterestRate}% APY</TextBodyMarker>
+              </TextBody>
+            </ServiceTextWrapper>
+            <ServiceCheckWrapper onClick={toggleServiceCheck}>
+              <CheckService isServiceChecked={isServiceChecked}>{serviceChecked}</CheckService>
+            </ServiceCheckWrapper>
+          </ServiceTokenDetails>
+        </ServiceWrapper>
+      </CompoundServiceDescription>
+    </DescriptionWrapper>
   )
 }

@@ -168,6 +168,22 @@ const StyledButtonContainerFullWidth = styled(ButtonContainerFullWidth as any)`
   margin-bottom: -1px;
 `
 
+const ServicesWrapper = styled.div`
+  border-radius: 4px;
+  border: ${({ theme }) => theme.borders.borderLineDisabled};
+  padding: 18px 25px;
+  margin-bottom: 20px;
+`
+
+const Title = styled.h2`
+  color: ${props => props.theme.colors.textColorDark};
+  font-size: 16px;
+  letter-spacing: 0.4px;
+  line-height: 1.2;
+  margin: 0 0 20px;
+  font-weight: 400;
+`
+
 interface Props {
   back: (state: string) => void
   submit: (isScalar: boolean) => void
@@ -210,7 +226,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { gelato } = useContracts(context)
 
   const signer = useMemo(() => provider.getSigner(), [provider])
-  const [isServiceChecked, setServiceCheck] = useState<boolean>(false)
+  const [isCompoundServiceChecked, setCompoundServiceCheck] = useState<boolean>(false)
   const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
   const {
     back,
@@ -324,8 +340,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [exceedsMaxFee, setExceedsMaxFee] = useState<boolean>(false)
 
   const toggleServiceCheck = () => {
-    const newCheckValue = !isServiceChecked
-    setServiceCheck(newCheckValue)
+    const newCheckValue = !isCompoundServiceChecked
+    setCompoundServiceCheck(newCheckValue)
     handleUseCompoundReserveChange(newCheckValue)
   }
   useEffect(() => {
@@ -336,7 +352,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     if (userInputCollateral.symbol.toLowerCase() in CompoundEnabledTokenType && isETHNetwork() && state !== 'SCALAR') {
       getInterestRate(userInputCollateral)
     }
-  }, [isServiceChecked, userInputCollateral, collateral]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isCompoundServiceChecked, userInputCollateral, collateral]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const amountError =
     maybeCollateralBalance === null
@@ -409,7 +425,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
     setAmount(newAmount)
     handleCollateralChange(token, newAmount)
-    setServiceCheck(false)
+    setCompoundServiceCheck(false)
     setAllowanceFinished(false)
   }
 
@@ -592,26 +608,30 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             hyperlinkDescription={''}
           />
         )}
-        {GELATO_ACTIVATED && state !== 'SCALAR' && (
-          <GelatoScheduler
-            belowMinimum={belowGelatoMinimum}
-            collateralSymbol={collateral.symbol}
-            gelatoData={values.gelatoData}
-            handleGelatoDataChange={handleGelatoDataChange}
-            handleGelatoDataInputChange={handleGelatoDataInputChange}
-            isScheduled={false}
-            minimum={gelatoMinimum}
-            resolution={values.resolution !== null ? values.resolution : new Date()}
-          />
-        )}
-        {showAddCompoundService && (
-          <AddCompoundService
-            compoundInterestRate={compoundInterestRate}
-            currentToken={userInputCollateral.symbol}
-            isServiceChecked={isServiceChecked}
-            toggleServiceCheck={toggleServiceCheck}
-          />
-        )}
+        <ServicesWrapper>
+          <Title>Recommended Services</Title>
+          {GELATO_ACTIVATED && state !== 'SCALAR' && !isCompoundServiceChecked && (
+            <GelatoScheduler
+              belowMinimum={belowGelatoMinimum}
+              collateralSymbol={collateral.symbol}
+              gelatoData={values.gelatoData}
+              handleGelatoDataChange={handleGelatoDataChange}
+              handleGelatoDataInputChange={handleGelatoDataInputChange}
+              isScheduled={false}
+              minimum={gelatoMinimum}
+              resolution={values.resolution !== null ? values.resolution : new Date()}
+            />
+          )}
+          <br></br>
+          {showAddCompoundService && !values.gelatoData.shouldSubmit && (
+            <AddCompoundService
+              compoundInterestRate={compoundInterestRate}
+              currentToken={userInputCollateral.symbol}
+              isServiceChecked={isCompoundServiceChecked}
+              toggleServiceCheck={toggleServiceCheck}
+            />
+          )}
+        </ServicesWrapper>
         {showSetAllowance && (
           <SetAllowance
             collateral={userInputCollateral}
@@ -669,7 +689,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       {!MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus) ? (
         <FullLoading
           message={
-            values.gelatoData.shouldSubmit && !belowGelatoMinimum
+            values.gelatoData.shouldSubmit && !belowGelatoMinimum && !isCompoundServiceChecked
               ? `${marketCreationStatus._type} and scheduling auto-withdraw with Gelato...`
               : `${marketCreationStatus._type}...`
           }

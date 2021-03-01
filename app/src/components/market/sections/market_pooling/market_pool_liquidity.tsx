@@ -95,6 +95,22 @@ const SetAllowanceStyled = styled(SetAllowance)`
   margin-bottom: 20px;
 `
 
+const ServicesWrapper = styled.div`
+  border-radius: 4px;
+  border: ${({ theme }) => theme.borders.borderLineDisabled};
+  padding: 18px 25px;
+  margin-bottom: 20px;
+`
+
+const Title = styled.h2`
+  color: ${props => props.theme.colors.textColorDark};
+  font-size: 16px;
+  letter-spacing: 0.4px;
+  line-height: 1.2;
+  margin: 0 0 20px;
+  font-weight: 400;
+`
+
 const logger = getLogger('Market::Fund')
 
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
@@ -275,7 +291,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
 
-  const symbol = collateral.address === pseudoNativeAssetAddress ? wrapToken.symbol : collateral.symbol
   const checkGelatoMinimum = useCallback(async () => {
     if (cpk && amountToFund) {
       const { belowMinimum, minimum } = await cpk.isBelowGelatoMinimum(
@@ -399,7 +414,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         fundsAmount = formatBigNumber(displayDepositedTokensTotal || Zero, displayCollateral.decimals)
       }
       setMessage(`Withdrawing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
-      const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
 
       withGelato
         ? setMessage(`Withdrawing funds: ${fundsAmount} ${symbol}\n
@@ -866,22 +880,25 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       {GELATO_ACTIVATED && (
-        <GelatoScheduler
-          belowMinimum={belowGelatoMinimum}
-          collateralSymbol={collateral.symbol}
-          collateralToWithdraw={`${formatBigNumber(maxCollateralReturnAmount(fundingBalance), collateral.decimals)}`}
-          etherscanLink={etherscanLink ? etherscanLink : undefined}
-          gelatoData={gelatoData}
-          handleGelatoDataChange={setGelatoData}
-          handleGelatoDataInputChange={(newDate: Date | null) => {
-            const gelatoDataCopy = { ...gelatoData, input: newDate }
-            setGelatoData(gelatoDataCopy)
-          }}
-          isScheduled={submittedTaskReceiptWrapper ? true : false}
-          minimum={gelatoMinimum}
-          resolution={resolutionDate !== null ? marketMakerData.question.resolution : new Date()}
-          taskStatus={submittedTaskReceiptWrapper ? submittedTaskReceiptWrapper.status : undefined}
-        />
+        <ServicesWrapper>
+          <Title>Recommended Services</Title>
+          <GelatoScheduler
+            belowMinimum={belowGelatoMinimum}
+            collateralSymbol={collateral.symbol}
+            collateralToWithdraw={`${formatBigNumber(maxCollateralReturnAmount(fundingBalance), collateral.decimals)}`}
+            etherscanLink={etherscanLink ? etherscanLink : undefined}
+            gelatoData={gelatoData}
+            handleGelatoDataChange={setGelatoData}
+            handleGelatoDataInputChange={(newDate: Date | null) => {
+              const gelatoDataCopy = { ...gelatoData, input: newDate }
+              setGelatoData(gelatoDataCopy)
+            }}
+            isScheduled={submittedTaskReceiptWrapper ? true : false}
+            minimum={gelatoMinimum}
+            resolution={resolutionDate !== null ? marketMakerData.question.resolution : new Date()}
+            taskStatus={submittedTaskReceiptWrapper ? submittedTaskReceiptWrapper.status : undefined}
+          />
+        </ServicesWrapper>
       )}
       <BottomButtonWrapper borderTop>
         <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
