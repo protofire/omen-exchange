@@ -87,7 +87,7 @@ export const Main: React.FC = () => {
             <meta content={TWITTER_SITE} name="twitter:site" />
             <link href={`${OG_IMAGE}`} rel="icon" type="image/png" />
           </Helmet>
-          <Header setClaim={setClaimState} />
+          <Header setClaim={setClaimState} web3context={context} />
           <MainScroll>
             {context.error && <WrongNetworkMessage />}
             {!context.error && (

@@ -113,6 +113,5 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
 export const WhenConnected: React.FC<Props> = props => {
   const { account } = useConnectedWeb3Context()
 
-  props.setStatus(true)
   return <>{account && props.children}</>
 }

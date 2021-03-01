@@ -502,6 +502,51 @@ export const formatNumber = (number: string, decimals = 2): string => {
   return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
 }
 
+export const formatHistoryDate = (dateData: number | string): string => {
+  const date = new Date(dateData)
+  const minute = date.getMinutes()
+  const minuteWithZero = (minute < 10 ? '0' : '') + minute
+  const hour = date.getHours()
+  const hourWithZero = (hour < 10 ? '0' : '') + hour
+  return `${date.getDate()}.${date.getMonth() + 1} - ${hourWithZero}:${minuteWithZero}`
+}
+
+export const formatTimestampToDate = (timestamp: number, value: string) => {
+  const ts = moment(timestamp * 1000)
+  if (value === '1D' || value === '1H') return ts.format('HH:mm')
+
+  return ts.format('MMM D')
+}
+
+export const formatHistoryUser = (user: string) => {
+  const firstStringPart = user ? user.substring(0, 5) + '...' : ''
+  const lastPart = user ? user.substring(user.length - 3, user.length) : ''
+
+  return firstStringPart + lastPart
+}
+
+export const calculateSharesBought = (
+  poolShares: BigNumber,
+  balances: BigNumber[],
+  shares: BigNumber[],
+  collateralTokenAmount: BigNumber,
+) => {
+  const sendAmountsAfterAddingFunding = calcAddFundingSendAmounts(collateralTokenAmount, balances, poolShares)
+
+  const sharesAfterAddingFunding = sendAmountsAfterAddingFunding
+    ? shares.map((balance, i) => balance.add(sendAmountsAfterAddingFunding[i]))
+    : shares.map(share => share)
+
+  const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(collateralTokenAmount, balances, poolShares)
+  const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
+    amount.lt(min) ? amount : min,
+  )
+  const sharesAfterRemovingFunding = shares.map((share, i) => {
+    return share.add(sendAmountsAfterRemovingFunding[i]).sub(depositedTokens)
+  })
+
+  return sharesAfterAddingFunding[0].sub(sharesAfterRemovingFunding[0])
+}
 export const formatToShortNumber = (number: string, decimals = 2): string => {
   if (number.length < 1) {
     return '0'

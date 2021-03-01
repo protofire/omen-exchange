@@ -8,17 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import 'sanitize.css'
 
 import { MAINNET_LOCATION, XDAI_LOCATION } from './common/constants'
-import { IconSettings } from './components/common/icons'
-import {
-  ButtonSettings,
-  ContentsLeft,
-  ContentsRight,
-  Header,
-  HeaderInner,
-  HeaderWrapper,
-  LogoWrapper,
-} from './components/common/layout/header'
-import { OmenLogo } from './components/common/logos/omen'
+import { HeaderNoRouter } from './components/common/layout/header'
 import { Main } from './components/main'
 import SettingsViewContainer from './components/settings/settings_view'
 import { ApolloProviderWrapper } from './contexts/Apollo'
@@ -53,7 +43,7 @@ const App: React.FC = () => {
       <Web3Provider connectors={connectors} libraryName="ethers.js">
         {!status ? (
           <>
-            <Header />
+            <HeaderNoRouter />
             <SettingsViewContainer networkId={networkId} />
           </>
         ) : (

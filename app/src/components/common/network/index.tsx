@@ -1,14 +1,15 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../hooks'
 import { networkIds } from '../../../util/networks'
 import { truncateStringInTheMiddle } from '../../../util/tools'
+import { IconJazz } from '../icons/IconJazz'
 import { IconNotification } from '../icons/IconNotification'
 
-import { ConnectionIcon } from './img/ConnectionIcon'
 interface Props {
   claim: boolean
+  account?: any
+  networkId?: any
 }
 
 const Wrapper = styled.div`
@@ -29,14 +30,13 @@ const ConnectionStatusText = styled.span`
   }
 `
 
-const ConnectionStatusDot = styled.div`
-  height: 22px;
-  width: 22px;
-`
-
 export const Network = (props: Props) => {
-  const context = useConnectedWeb3Context()
-  const { account, networkId } = context
+  let account
+  let networkId
+  if (props.account && props.networkId) {
+    account = props.account
+    networkId = props.networkId
+  }
 
   if (!account) {
     return null
@@ -45,9 +45,7 @@ export const Network = (props: Props) => {
     <Wrapper {...props}>
       {props.claim && networkId === networkIds.MAINNET && <IconNotification style={{ marginRight: 12 }} />}
       <ConnectionStatusText>{truncateStringInTheMiddle(account, 6, 4) || 'No account connected'}</ConnectionStatusText>
-      <ConnectionStatusDot>
-        <ConnectionIcon />
-      </ConnectionStatusDot>
+      <IconJazz account={account} size={22} />
     </Wrapper>
   )
 }
