@@ -2,7 +2,7 @@ import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 
 import { MarketMakerData } from '../../../../util/types'
-import { HistoryChartContainer } from '../../common/history_chart'
+import { HistorySelectContainer } from '../../common/history_section'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
@@ -13,6 +13,8 @@ const MarketHistoryWrapper: React.FC<Props> = (props: Props) => {
   const {
     address: marketMakerAddress,
     answerFinalizedTimestamp,
+    collateral,
+    fee,
     oracle,
     question,
     scalarHigh,
@@ -21,8 +23,11 @@ const MarketHistoryWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <HistoryChartContainer
+      <HistorySelectContainer
         answerFinalizedTimestamp={answerFinalizedTimestamp}
+        currency={collateral.symbol}
+        decimals={collateral.decimals}
+        fee={fee}
         hidden={false}
         marketMakerAddress={marketMakerAddress}
         oracle={oracle}

@@ -207,7 +207,7 @@ const networks: { [K in NetworkId]: Network } = {
   },
   [networkIds.XDAI]: {
     label: 'xDai',
-    url: 'https://dai.poa.network/',
+    url: 'https://rpc.xdaichain.com/',
     graphHttpUri: GRAPH_XDAI_HTTP,
     graphWsUri: GRAPH_XDAI_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
