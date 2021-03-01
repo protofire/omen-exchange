@@ -198,8 +198,7 @@ const SettingsViewContainer = (props: Props) => {
     if (sessionStorage.getItem('rpcAddress')) {
       const data = JSON.parse(sessionStorage.getItem('rpcAddress') as string)
       setUrl(data.url)
-
-      if (data.network === networkId) {
+      if (data.network === getNetworkFromChain(networkId)) {
         setCurrent(data.index)
         if (data.index === dropdownItems.length - 1) {
           setInputPlaceholder(data.url)
