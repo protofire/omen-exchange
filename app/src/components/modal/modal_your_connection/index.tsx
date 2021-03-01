@@ -153,13 +153,14 @@ const DepositWithdrawButton = styled(Button)`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
+  changeWallet: () => void
   isOpen: boolean
   onClose: () => void
   theme?: any
 }
 
 export const ModalYourConnection = (props: Props) => {
-  const { isOpen, onClose, theme } = props
+  const { changeWallet, isOpen, onClose, theme } = props
   const context = useConnectedWeb3Context()
   const { account } = context
 
@@ -202,8 +203,9 @@ export const ModalYourConnection = (props: Props) => {
                 <AccountInfoWallet>{context.rawWeb3Context.connectorName}</AccountInfoWallet>
               </AccountInfo>
             </TopCardHeaderLeft>
-            {/* TODO: Add onClick */}
-            <ChangeWalletButton buttonType={ButtonType.secondaryLine}>Change</ChangeWalletButton>
+            <ChangeWalletButton buttonType={ButtonType.secondaryLine} onClick={changeWallet}>
+              Change
+            </ChangeWalletButton>
           </TopCardHeader>
           <BalanceSection>
             <CardHeaderText>Wallet</CardHeaderText>

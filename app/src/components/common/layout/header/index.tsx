@@ -5,6 +5,7 @@ import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps, matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
+import { useWeb3Context } from 'web3-react'
 
 import { Logo } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
@@ -196,13 +197,15 @@ interface ExtendsHistory extends RouteComponentProps {
 }
 
 const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
-  const { account, library: provider, networkId } = useConnectedWeb3Context()
+  const context = useWeb3Context()
+  const { account, active, connectorName, error, library: provider, networkId } = context
 
   const { history, ...restProps } = props
   const [isConnectWalletModalOpen, setConnectWalletModalState] = useState(false)
   const [isYourConnectionModalOpen, setYourConnectionModalState] = useState(false)
   const [claimState, setClaimState] = useState<boolean>(false)
   const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
+  const [isDisconnecting, setIsDisconnecting] = useState(false)
 
   const disableConnectButton = isConnectWalletModalOpen
 
@@ -251,6 +254,14 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, networkId])
+
+  const logout = () => {
+    if (active || (error && connectorName)) {
+      setIsDisconnecting(true)
+      localStorage.removeItem('CONNECTOR')
+      context.setConnector('Infura')
+    }
+  }
 
   const isMarketCreatePage = !!matchPath(history.location.pathname, { path: '/create', exact: true })
 
@@ -366,6 +377,11 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           )}
         </ContentsRight>
         <ModalYourConnectionWrapper
+          changeWallet={() => {
+            setYourConnectionModalState(false)
+            logout()
+            setConnectWalletModalState(true)
+          }}
           isOpen={isYourConnectionModalOpen}
           onClose={() => setYourConnectionModalState(false)}
         />

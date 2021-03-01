@@ -249,7 +249,7 @@ export const ModalConnectWallet = (props: Props) => {
         isOpen={!context.account && isOpen}
         onRequestClose={onClickCloseButton}
         shouldCloseOnOverlayClick={!isConnectingToWallet}
-        style={theme.connectionModal}
+        style={theme.walletConnectionModal}
       >
         <ContentWrapper>
           <ModalNavigation>
