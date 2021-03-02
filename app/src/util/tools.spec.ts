@@ -20,7 +20,6 @@ import {
   clampBigNumber,
   computeBalanceAfterTrade,
   divBN,
-  formatBigNumber,
   formatHistoryDate,
   formatHistoryUser,
   formatNumber,
