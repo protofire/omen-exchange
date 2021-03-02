@@ -152,5 +152,8 @@
     "prettier": "^1.18.2",
     "react-app-rewired": "^2.1.6",
     "rimraf": "^3.0.2"
-  }
+  },
+  "resolutions": {
+    "pull-ws": "3.3.2"
+  }  
 }
