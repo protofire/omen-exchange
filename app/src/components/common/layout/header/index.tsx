@@ -203,6 +203,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   const { history, ...restProps } = props
   const [isConnectWalletModalOpen, setConnectWalletModalState] = useState(false)
   const [isYourConnectionModalOpen, setYourConnectionModalState] = useState(false)
+  const [isDepositWithdrawModalOpen, setDepositWithdrawModalState] = useState(false)
   const [claimState, setClaimState] = useState<boolean>(false)
   const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
   const [isDisconnecting, setIsDisconnecting] = useState(false)
@@ -385,14 +386,26 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           claimState={claimState}
           isOpen={isYourConnectionModalOpen}
           onClose={() => setYourConnectionModalState(false)}
+          // TODO: Include exchange type
+          openDepositWithdrawModal={() => {
+            setYourConnectionModalState(false)
+            setDepositWithdrawModalState(true)
+          }}
           unclaimedAmount={unclaimedAmount}
         />
         <ModalConnectWalletWrapper
           isOpen={isConnectWalletModalOpen}
           onClose={() => setConnectWalletModalState(false)}
         />
-        {/* TODO: Replace hardcoded props */}
-        <DepositWithdrawModalWrapper exchangeType={ExchangeType.deposit} isOpen={true} />
+        <DepositWithdrawModalWrapper
+          exchangeType={ExchangeType.deposit}
+          isOpen={isDepositWithdrawModalOpen}
+          onBack={() => {
+            setDepositWithdrawModalState(false)
+            setYourConnectionModalState(true)
+          }}
+          onClose={() => setDepositWithdrawModalState(false)}
+        />
       </HeaderInner>
     </HeaderWrapper>
   )

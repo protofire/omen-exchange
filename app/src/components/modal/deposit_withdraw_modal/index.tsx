@@ -9,25 +9,27 @@ import { ContentWrapper, ModalNavigation, ModalTitle } from '../common_styled'
 interface Props extends HTMLAttributes<HTMLDivElement> {
   exchangeType: ExchangeType
   isOpen: boolean
+  onBack: () => void
+  onClose: () => void
   theme?: any
 }
 
 export const DepositWithdrawModal = (props: Props) => {
-  const { exchangeType, isOpen, theme } = props
+  const { exchangeType, isOpen, onBack, onClose, theme } = props
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
   }, [])
 
   return (
-    <Modal isOpen={isOpen} style={theme.fluidHeightModal}>
+    <Modal isOpen={isOpen} onRequestClose={onClose} style={theme.fluidHeightModal}>
       <ContentWrapper>
         <ModalNavigation>
           {/* TODO: Add onClick */}
-          <IconArrowBack hoverEffect={true} />
+          <IconArrowBack hoverEffect={true} onClick={onBack} />
           <ModalTitle>{exchangeType} Dai</ModalTitle>
           {/* TODO: Add onClick */}
-          <IconClose hoverEffect={true} />
+          <IconClose hoverEffect={true} onClick={onClose} />
         </ModalNavigation>
       </ContentWrapper>
     </Modal>
