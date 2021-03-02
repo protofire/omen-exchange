@@ -9,6 +9,8 @@ import { Arbitrator, CompoundTokenType, KlerosItemStatus, KlerosSubmission, Toke
 import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
 import { CompoundIconNoBorder } from '../../../common/icons/currencies/CompoundIconNoBorder'
 
+import showMore from './img/showMore.svg'
+
 const AdditionalMarketDataWrapper = styled.div`
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
   display: flex;
@@ -16,6 +18,7 @@ const AdditionalMarketDataWrapper = styled.div`
   justify-content: space-between;
   margin-left: -25px;
   width: ${props => props.theme.mainContainer.maxWidth};
+  overflow-y: hidden;
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     flex-direction: column;
@@ -75,6 +78,7 @@ const AdditionalMarketDataSectionWrapper = styled.a<{
   margin-left: ${props => (props.noMarginLeft ? '0px' : '14px')};
   margin-right: ${props => (props.hasMarginRight ? '14px' : '0px')};
   margin-bottom: 14px;
+  background-color: transparent;
   &:hover {
     p {
       color: ${props => (props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight)};
@@ -105,6 +109,41 @@ const AdditionalMarketDataSectionWrapper = styled.a<{
       margin-left: 0;
     }
   }
+`
+const ShowMore = styled.a`
+  display: flex;
+  align-items: center;
+  margin-bottom: 2.7%;
+  cursor: pointer;
+`
+
+const MiniModal = styled.div`
+  display: flex;
+  justify-content: center;
+  position: absolute;
+  z-index: 1;
+  text-align: center;
+  width: 160px;
+  height: auto;
+  padding: 12px;
+  position: relative;
+  top: 10%;
+  left: 63%;
+  margin: -25px;
+  background-color: #fff;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eceff1;
+  outline: none;
+  overflow: hidden;
+`
+
+const CenteredList = styled.ul`
+  margin: 0 auto;
+  margin-right: 25%;
+  text-align: center;
+  list-style-type: none;
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
@@ -145,6 +184,8 @@ export const AdditionalMarketData: React.FC<Props> = props => {
 
   const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
 
+  const [metaData, showMetaData] = useState(false)
+
   useEffect(() => {
     const getAPY = async () => {
       const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
@@ -155,84 +196,222 @@ export const AdditionalMarketData: React.FC<Props> = props => {
       getAPY()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-  return (
-    <AdditionalMarketDataWrapper>
-      <AdditionalMarketDataLeft>
-        <AdditionalMarketDataSectionWrapper
-          href={`/#/24h-volume/category/${encodeURI(category)}`}
-          noColorChange={true}
-          noMarginLeft={true}
-        >
-          <IconCategory size={'24'} />
-          <AdditionalMarketDataSectionTitle>{category}</AdditionalMarketDataSectionTitle>
-        </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionWrapper
-          data-arrow-color="transparent"
-          data-for="marketData"
-          data-tip={`This market uses the ${oracle} oracle which crowd-sources the correct outcome.`}
-          href={realitioUrl}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <IconOracle size={'24'} />
-          <AdditionalMarketDataSectionTitle>{oracle}</AdditionalMarketDataSectionTitle>
-        </AdditionalMarketDataSectionWrapper>
-        <AdditionalMarketDataSectionWrapper
-          data-arrow-color="transparent"
-          data-for="marketData"
-          data-tip={`This market uses ${arbitrator.name} as the final arbitrator.`}
-          href={arbitrator.url}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <IconArbitrator size={'24'} />
-          <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
-        </AdditionalMarketDataSectionWrapper>
-        {context.networkId !== networkIds.XDAI && (
-          <AdditionalMarketDataSectionWrapper
-            data-arrow-color="transparent"
-            data-for="marketData"
-            data-tip={
-              curatedByDxDaoOrKleros
-                ? 'This Market is verified by DXdao or Kleros and therefore valid.'
-                : 'This Market has not been verified and may be invalid.'
-            }
-            hasMarginRight={true}
-            isError={!curatedByDxDaoOrKleros}
-          >
-            {curatedByDxDaoOrKleros ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
-            <AdditionalMarketDataSectionTitle isError={!curatedByDxDaoOrKleros}>
-              {curatedByDxDaoOrKleros ? 'Verified' : 'Not Verified'}
-            </AdditionalMarketDataSectionTitle>
-          </AdditionalMarketDataSectionWrapper>
-        )}
+
+  if (window.screen.width > 552) {
+    return (
+      <>
+        <AdditionalMarketDataWrapper>
+          <AdditionalMarketDataLeft>
+            <AdditionalMarketDataSectionWrapper
+              href={`/#/24h-volume/category/${encodeURI(category)}`}
+              noColorChange={true}
+              noMarginLeft={true}
+            >
+              <IconCategory size={'24'} />
+
+              <AdditionalMarketDataSectionTitle>{category}</AdditionalMarketDataSectionTitle>
+            </AdditionalMarketDataSectionWrapper>
+            <AdditionalMarketDataSectionWrapper
+              data-arrow-color="transparent"
+              data-for="marketData"
+              data-tip={`This market uses the ${oracle} oracle which crowd-sources the correct outcome.`}
+              href={realitioUrl}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <IconOracle size={'24'} />
+              <AdditionalMarketDataSectionTitle>{oracle}</AdditionalMarketDataSectionTitle>
+            </AdditionalMarketDataSectionWrapper>
+            <AdditionalMarketDataSectionWrapper
+              data-arrow-color="transparent"
+              data-for="marketData"
+              data-tip={`This market uses ${arbitrator.name} as the final arbitrator.`}
+              href={arbitrator.url}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <IconArbitrator size={'24'} />
+              <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
+            </AdditionalMarketDataSectionWrapper>
+            {context.networkId !== networkIds.XDAI && (
+              <AdditionalMarketDataSectionWrapper
+                data-arrow-color="transparent"
+                data-for="marketData"
+                data-tip={
+                  curatedByDxDaoOrKleros
+                    ? 'This Market is verified by DXdao or Kleros and therefore valid.'
+                    : 'This Market has not been verified and may be invalid.'
+                }
+                hasMarginRight={true}
+                isError={!curatedByDxDaoOrKleros}
+              >
+                {curatedByDxDaoOrKleros ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
+                <AdditionalMarketDataSectionTitle isError={!curatedByDxDaoOrKleros}>
+                  {curatedByDxDaoOrKleros ? 'Verified' : 'Not Verified'}
+                </AdditionalMarketDataSectionTitle>
+              </AdditionalMarketDataSectionWrapper>
+            )}
+            {collateral.symbol.toLowerCase() in CompoundTokenType ? (
+              <ShowMore onClick={() => showMetaData(!metaData)}>
+                <img alt="Click to see more" src={showMore} />
+              </ShowMore>
+            ) : (
+              <span />
+            )}
+          </AdditionalMarketDataLeft>
+          <ReactTooltip
+            className="customMarketTooltip"
+            data-multiline={true}
+            effect="solid"
+            id="marketData"
+            offset={{ top: 0 }}
+            place="top"
+            type="light"
+          />
+        </AdditionalMarketDataWrapper>
+
         {collateral.symbol.toLowerCase() in CompoundTokenType ? (
-          <AdditionalMarketDataSectionWrapper
-            customColor={'#00897B'}
-            customColorChange={true}
-            data-arrow-color="transparent"
-            data-for="marketData"
-            data-tip={`This market is earning ${compoundInterestRate}% APY powered by compound.finance`}
-            noMarginLeft={true}
-          >
-            <CompoundIconNoBorder />
-            <AdditionalMarketDataSectionTitle>
+          metaData ? (
+            <MiniModal>
+              <CompoundIconNoBorder />
               <CompoundInterestWrapper customColor={'#00897B'}>{compoundInterestRate}% APY</CompoundInterestWrapper>
-            </AdditionalMarketDataSectionTitle>
-          </AdditionalMarketDataSectionWrapper>
+            </MiniModal>
+          ) : (
+            <span />
+          )
         ) : (
           <span />
         )}
-      </AdditionalMarketDataLeft>
-      <ReactTooltip
-        className="customMarketTooltip"
-        data-multiline={true}
-        effect="solid"
-        id="marketData"
-        offset={{ top: 0 }}
-        place="top"
-        type="light"
-      />
-    </AdditionalMarketDataWrapper>
-  )
+      </>
+    )
+  } else {
+    return (
+      <>
+        <AdditionalMarketDataWrapper>
+          <AdditionalMarketDataLeft>
+            <AdditionalMarketDataSectionWrapper
+              href={`/#/24h-volume/category/${encodeURI(category)}`}
+              noColorChange={true}
+              noMarginLeft={true}
+            >
+              <IconCategory size={'24'} />
+
+              <AdditionalMarketDataSectionTitle>{category}</AdditionalMarketDataSectionTitle>
+            </AdditionalMarketDataSectionWrapper>
+            <AdditionalMarketDataSectionWrapper
+              data-arrow-color="transparent"
+              data-for="marketData"
+              data-tip={`This market uses the ${oracle} oracle which crowd-sources the correct outcome.`}
+              href={realitioUrl}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <IconOracle size={'24'} />
+              <AdditionalMarketDataSectionTitle>{oracle}</AdditionalMarketDataSectionTitle>
+            </AdditionalMarketDataSectionWrapper>
+
+            <ShowMore onClick={() => showMetaData(!metaData)}>
+              <img alt="Click to see more" src={showMore} />
+            </ShowMore>
+          </AdditionalMarketDataLeft>
+          <ReactTooltip
+            className="customMarketTooltip"
+            data-multiline={true}
+            effect="solid"
+            id="marketData"
+            offset={{ top: 0 }}
+            place="top"
+            type="light"
+          />
+        </AdditionalMarketDataWrapper>
+
+        {collateral.symbol.toLowerCase() in CompoundTokenType ? (
+          metaData ? (
+            <MiniModal>
+              <CenteredList>
+                <li>
+                  <CompoundIconNoBorder />
+                  <CompoundInterestWrapper customColor={'#00897B'}>{compoundInterestRate}% APY</CompoundInterestWrapper>
+                  <AdditionalMarketDataSectionWrapper
+                    data-arrow-color="transparent"
+                    data-for="marketData"
+                    data-tip={`This market uses ${arbitrator.name} as the final arbitrator.`}
+                    href={arbitrator.url}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    <IconArbitrator size={'24'} />
+                    <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
+                  </AdditionalMarketDataSectionWrapper>
+                </li>
+
+                {context.networkId !== networkIds.XDAI && (
+                  <li>
+                    <AdditionalMarketDataSectionWrapper
+                      data-arrow-color="transparent"
+                      data-for="marketData"
+                      data-tip={
+                        curatedByDxDaoOrKleros
+                          ? 'This Market is verified by DXdao or Kleros and therefore valid.'
+                          : 'This Market has not been verified and may be invalid.'
+                      }
+                      hasMarginRight={true}
+                      isError={!curatedByDxDaoOrKleros}
+                    >
+                      {curatedByDxDaoOrKleros ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
+                      <AdditionalMarketDataSectionTitle isError={!curatedByDxDaoOrKleros}>
+                        {curatedByDxDaoOrKleros ? 'Verified' : 'Not Verified'}
+                      </AdditionalMarketDataSectionTitle>
+                    </AdditionalMarketDataSectionWrapper>
+                  </li>
+                )}
+              </CenteredList>
+            </MiniModal>
+          ) : (
+            <span />
+          )
+        ) : metaData ? (
+          <MiniModal>
+            <CenteredList>
+              <li>
+                <AdditionalMarketDataSectionWrapper
+                  data-arrow-color="transparent"
+                  data-for="marketData"
+                  data-tip={`This market uses ${arbitrator.name} as the final arbitrator.`}
+                  href={arbitrator.url}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <IconArbitrator size={'24'} />
+                  <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
+                </AdditionalMarketDataSectionWrapper>
+              </li>
+              {context.networkId !== networkIds.XDAI && (
+                <li>
+                  <AdditionalMarketDataSectionWrapper
+                    data-arrow-color="transparent"
+                    data-for="marketData"
+                    data-tip={
+                      curatedByDxDaoOrKleros
+                        ? 'This Market is verified by DXdao or Kleros and therefore valid.'
+                        : 'This Market has not been verified and may be invalid.'
+                    }
+                    hasMarginRight={true}
+                    isError={!curatedByDxDaoOrKleros}
+                  >
+                    {curatedByDxDaoOrKleros ? <IconVerified size={'24'} /> : <IconAlert size={'24'} />}
+                    <AdditionalMarketDataSectionTitle isError={!curatedByDxDaoOrKleros}>
+                      {curatedByDxDaoOrKleros ? 'Verified' : 'Not Verified'}
+                    </AdditionalMarketDataSectionTitle>
+                  </AdditionalMarketDataSectionWrapper>
+                </li>
+              )}
+            </CenteredList>
+          </MiniModal>
+        ) : (
+          <span />
+        )}
+      </>
+    )
+  }
 }
