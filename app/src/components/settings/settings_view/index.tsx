@@ -132,7 +132,7 @@ const SettingsViewContainer = (props: Props) => {
   const [url, setUrl] = useState<string>('')
   const [isValidUrl, setIsValidUrl] = useState<boolean>(false)
   const [onlineStatus, setOnlineStatus] = useState<boolean>(false)
-  const [inputPlaceholder, setInputPlaceholder] = useState<string>('')
+  const [customUrl, setCustomUrl] = useState<string>('')
 
   const urlObject = getChainSpecificAlternativeUrls(network)
   let dropdownItems: any[] = []
@@ -201,7 +201,7 @@ const SettingsViewContainer = (props: Props) => {
       if (data.network === getNetworkFromChain(networkId)) {
         setCurrent(data.index)
         if (data.index === dropdownItems.length - 1) {
-          setInputPlaceholder(data.url)
+          setCustomUrl(data.url)
         }
       }
     }
@@ -231,9 +231,10 @@ const SettingsViewContainer = (props: Props) => {
           <Input
             onChange={event => {
               setUrl(event.target.value)
-              if (current === dropdownItems.length - 1) setInputPlaceholder(event.target.value)
+              if (current === dropdownItems.length - 1) setCustomUrl(event.target.value)
             }}
-            placeholder={inputPlaceholder ? inputPlaceholder : 'Paste your RPC URL'}
+            placeholder={'Paste your RPC URL'}
+            value={customUrl}
           ></Input>
         )}
       </MainContent>
