@@ -38,8 +38,7 @@ const ButtonsWrapper = styled.div`
   align-items: center;
   display: flex;
   flex: 1;
-  justify-content: space-between;
-  margin-left: 80px;
+  justify-content: flex-end;
 `
 
 const SelectWrapper = styled.div`
@@ -65,11 +64,8 @@ type Props = {
 const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
   color: ${props => (props.active ? props.theme.colors.primary : props.theme.colors.clickable)};
   font-weight: 500;
-  margin-left: 5px;
 
-  &:first-child {
-    margin-left: 0;
-  }
+  width: 43px;
 `
 const ButtonSelect = styled(ButtonRound)`
   margin-right: 10px;
