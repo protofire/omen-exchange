@@ -5,6 +5,7 @@ import styled, { withTheme } from 'styled-components'
 
 import { useConnectedWeb3Context, useTokens } from '../../../hooks'
 import { formatBigNumber, formatNumber, truncateStringInTheMiddle } from '../../../util/tools'
+import { WalletState } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
@@ -152,6 +153,25 @@ const DepositWithdrawButton = styled(Button)`
   width: calc(50% - 8px);
 `
 
+const EnableDai = styled.div`
+  width: 100%;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`
+
+const EnableDaiText = styled.p`
+  font-size: ${props => props.theme.fonts.defaultSize};
+  color: ${props => props.theme.colors.textColorLighter};
+  text-align: center;
+  margin: 16px 0;
+`
+
+const EnableDaiButton = styled(Button)`
+  width: 100%;
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   changeWallet: () => void
   isOpen: boolean
@@ -183,6 +203,9 @@ export const ModalYourConnection = (props: Props) => {
   const formattedEthBalance = formatNumber(formatBigNumber(ethBalance, 18, 18))
   const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0].balance || '')
   const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
+
+  // TODO: Replace hardcoded state
+  const walletState = WalletState.ready
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.yourConnectionModal}>
@@ -228,25 +251,35 @@ export const ModalYourConnection = (props: Props) => {
           </BalanceSection>
         </Card>
         <Card>
-          <BalanceSection>
-            <CardHeaderText>Omen Account</CardHeaderText>
-            <BalanceItems>
-              <BalanceItem>
-                <BalanceItemLeft>
-                  <DaiIcon size="24px" />
-                  <BalanceItemAsset>Dai</BalanceItemAsset>
-                </BalanceItemLeft>
-                {/* TODO: Replace hardcoded balance */}
-                <BalanceItemBalance>0.00 DAI</BalanceItemBalance>
-              </BalanceItem>
-            </BalanceItems>
-          </BalanceSection>
-          <DepositWithdrawButtons>
-            {/* TODO: Add onClick handler */}
-            <DepositWithdrawButton buttonType={ButtonType.secondaryLine}>Deposit</DepositWithdrawButton>
-            {/* TODO: Add onClick handler */}
-            <DepositWithdrawButton buttonType={ButtonType.secondaryLine}>Withdraw</DepositWithdrawButton>
-          </DepositWithdrawButtons>
+          {walletState !== WalletState.ready ? (
+            <>
+              <BalanceSection>
+                <CardHeaderText>Omen Account</CardHeaderText>
+                <BalanceItems>
+                  <BalanceItem>
+                    <BalanceItemLeft>
+                      <DaiIcon size="24px" />
+                      <BalanceItemAsset>Dai</BalanceItemAsset>
+                    </BalanceItemLeft>
+                    {/* TODO: Replace hardcoded balance */}
+                    <BalanceItemBalance>0.00 DAI</BalanceItemBalance>
+                  </BalanceItem>
+                </BalanceItems>
+              </BalanceSection>
+              <DepositWithdrawButtons>
+                {/* TODO: Add onClick handler */}
+                <DepositWithdrawButton buttonType={ButtonType.secondaryLine}>Deposit</DepositWithdrawButton>
+                {/* TODO: Add onClick handler */}
+                <DepositWithdrawButton buttonType={ButtonType.secondaryLine}>Withdraw</DepositWithdrawButton>
+              </DepositWithdrawButtons>
+            </>
+          ) : (
+            <EnableDai>
+              <DaiIcon size="38px" />
+              <EnableDaiText>To deposit DAI to your Omen account, you must first enable it.</EnableDaiText>
+              <EnableDaiButton buttonType={ButtonType.primary}>Enable</EnableDaiButton>
+            </EnableDai>
+          )}
         </Card>
       </ContentWrapper>
     </Modal>

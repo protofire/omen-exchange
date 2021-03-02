@@ -508,3 +508,8 @@ export enum AdditionalSharesType {
   long = 'Long',
   short = 'Short',
 }
+
+export enum WalletState {
+  ready,
+  enable,
+}
