@@ -11,14 +11,7 @@ import { ButtonType } from '../../button/button_styling_types'
 import { IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
 import { IconJazz } from '../../common/icons/IconJazz'
 import { DaiIcon, EtherIcon } from '../../common/icons/currencies'
-import { ContentWrapper, ModalNavigation } from '../common_styled'
-
-const ModalTitle = styled.p`
-  font-size: 16px;
-  color: ${props => props.theme.colors.textColorDark};
-  font-weight: 500;
-  margin: 0;
-`
+import { ContentWrapper, ModalNavigation, ModalTitle } from '../common_styled'
 
 const Card = styled.div`
   width: 100%;

@@ -16,3 +16,10 @@ export const ModalNavigation = styled.div`
   padding: 5px;
   margin-bottom: 14px;
 `
+
+export const ModalTitle = styled.p`
+  font-size: 16px;
+  color: ${props => props.theme.colors.textColorDark};
+  font-weight: 500;
+  margin: 0;
+`

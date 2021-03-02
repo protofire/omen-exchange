@@ -513,3 +513,8 @@ export enum WalletState {
   ready,
   enable,
 }
+
+export enum ExchangeType {
+  deposit = 'Deposit',
+  withdraw = 'Withdraw',
+}
