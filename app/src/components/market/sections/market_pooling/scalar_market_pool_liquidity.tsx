@@ -220,9 +220,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     totalPoolShares,
   )
 
-  const totalDepositedTokens = totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) =>
-    amount.lt(min) ? amount : min,
-  )
+  const totalDepositedTokens = totalUserShareAmounts.length
+    ? totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
+    : new BigNumber(0)
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
 
@@ -480,8 +480,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
     const sendBackAmounts = outcomeTokenAmounts.map(amount => {
       const outcomeTokenAmount = new Big(amount)
-      const remaining = liquidityAmount.mul(outcomeTokenAmount).div(poolWeight)
-      return liquidityAmount.sub(remaining)
+      try {
+        const remaining = liquidityAmount.mul(outcomeTokenAmount).div(poolWeight)
+        return liquidityAmount.sub(remaining)
+      } catch {
+        return new Big(0)
+      }
     })
     const extraShares = bigMax(sendBackAmounts).sub(bigMin(sendBackAmounts) || new Big(0))
     setAdditionalShares(Number(extraShares.toFixed(0)) / 10 ** collateral.decimals)
