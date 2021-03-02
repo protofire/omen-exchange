@@ -61,7 +61,7 @@
     "git-revision-webpack-plugin": "^3.0.6",
     "graphql": "^14.6.0",
     "graphql-tag": "^2.10.1",
-    "ipfs-deploy": "^7.10.5",
+    "ipfs-deploy": "^8.0.1",
     "lint-staged": "^10.0.8",
     "lodash.unionby": "^4.8.0",
     "logdown": "^3.2.8",
