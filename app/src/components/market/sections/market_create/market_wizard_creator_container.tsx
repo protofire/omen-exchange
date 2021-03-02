@@ -9,7 +9,7 @@ import { getLogger } from '../../../../util/logger'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { getToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { MarketData } from '../../../../util/types'
-import { ModalConnectWallet } from '../../../modal'
+import { ModalConnectWalletWrapper } from '../../../modal'
 
 import { MarketWizardCreator } from './market_wizard_creator'
 
@@ -117,7 +117,7 @@ const MarketWizardCreatorContainer: FC = () => {
         marketCreationStatus={marketCreationStatus}
         marketMakerAddress={marketMakerAddress}
       />
-      <ModalConnectWallet isOpen={isModalOpen} onClose={() => setModalState(false)} />
+      <ModalConnectWalletWrapper isOpen={isModalOpen} onClose={() => setModalState(false)} />
     </>
   )
 }

@@ -4,9 +4,9 @@ import { useWeb3Context } from 'web3-react/dist'
 
 import { networkIds } from '../../../util/networks'
 import { truncateStringInTheMiddle } from '../../../util/tools'
+import { IconJazz } from '../icons/IconJazz'
 import { IconNotification } from '../icons/IconNotification'
 
-import { ConnectionIcon } from './img/ConnectionIcon'
 interface Props {
   claim: boolean
 }
@@ -29,11 +29,6 @@ const ConnectionStatusText = styled.span`
   }
 `
 
-const ConnectionStatusDot = styled.div`
-  height: 22px;
-  width: 22px;
-`
-
 export const Network = (props: Props) => {
   const context = useWeb3Context()
   const { account, networkId } = context
@@ -45,9 +40,7 @@ export const Network = (props: Props) => {
     <Wrapper {...props}>
       {props.claim && networkId === networkIds.MAINNET && <IconNotification style={{ marginRight: 12 }} />}
       <ConnectionStatusText>{truncateStringInTheMiddle(account, 6, 4) || 'No account connected'}</ConnectionStatusText>
-      <ConnectionStatusDot>
-        <ConnectionIcon />
-      </ConnectionStatusDot>
+      <IconJazz account={account} size={22} />
     </Wrapper>
   )
 }

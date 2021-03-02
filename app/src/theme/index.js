@@ -110,6 +110,7 @@ const theme = {
     red: '#E57373',
     gold: '#f9a606',
     black: '#000',
+    lightBackground: '#FCFDFD',
   },
   message: {
     colors: {
@@ -341,7 +342,7 @@ const theme = {
       },
     ],
   },
-  modalStyle: {
+  wrapperModalStyle: {
     content: {
       backgroundColor: '#fff',
       borderColor: '#ECEFF1',
@@ -366,6 +367,31 @@ const theme = {
     overlay: {
       alignItems: 'unset',
       backgroundColor: 'rgba(0, 0, 0, 0.06)',
+      display: 'flex',
+      justifyContent: 'center',
+      overflow: 'auto',
+      padding: '10px',
+      zIndex: '12345',
+    },
+  },
+  connectWalletModal: {
+    content: {
+      height: '510px',
+      width: '382px',
+      padding: '28px',
+      borderRadius: '8px',
+      border: '1px solid #ECEFF1',
+      boxShadow: '0px 0px 6px rgba(0, 0, 0, 0.12)',
+      margin: 'auto 0',
+      left: 'auto',
+      right: 'auto',
+      top: 'auto',
+      bottom: 'auto',
+      position: 'relative',
+    },
+    overlay: {
+      alignItems: 'unset',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
       display: 'flex',
       justifyContent: 'center',
       overflow: 'auto',
