@@ -94,7 +94,7 @@ export const pseudoNativeAssetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeE
 const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
     label: 'Mainnet',
-    url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+    url: `https://mainnet.infura.io/v3/ssasks${INFURA_PROJECT_ID}`,
     graphHttpUri: GRAPH_MAINNET_HTTP,
     graphWsUri: GRAPH_MAINNET_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_MAINNET_HTTP,
