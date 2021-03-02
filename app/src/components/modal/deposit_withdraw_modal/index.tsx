@@ -1,7 +1,10 @@
+import { BigNumber } from 'ethers/utils'
 import React, { HTMLAttributes } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
+import { useConnectedWeb3Context, useTokens } from '../../../hooks'
+import { formatBigNumber, formatNumber } from '../../../util/tools'
 import { ExchangeType } from '../../../util/types'
 import { IconArrowBack, IconClose } from '../../common/icons'
 import { DaiIcon } from '../../common/icons/currencies'
@@ -28,10 +31,16 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const DepositWithdrawModal = (props: Props) => {
   const { exchangeType, isOpen, onBack, onClose, theme } = props
+  const context = useConnectedWeb3Context()
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
   }, [])
+
+  const { tokens } = useTokens(context, true, true)
+
+  const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0].balance || '')
+  const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} style={theme.fluidHeightModal}>
@@ -50,7 +59,7 @@ export const DepositWithdrawModal = (props: Props) => {
                 </BalanceItemSide>
                 <BalanceItemSide>
                   {/* TODO: Replace hardcoded balance */}
-                  <BalanceItemBalance style={{ marginRight: '12px' }}>125.00 DAI</BalanceItemBalance>
+                  <BalanceItemBalance style={{ marginRight: '12px' }}>{formattedDaiBalance} DAI</BalanceItemBalance>
                   <DaiIcon size="24px" />
                 </BalanceItemSide>
               </BalanceItem>
