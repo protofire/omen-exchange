@@ -226,13 +226,15 @@ export const ScalarMarketSell = (props: Props) => {
       if (!tradedCollateral) {
         return
       }
-
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
-
       let displaySharesAmount = sharesAmount
       if (collateral.symbol.toLowerCase() in CompoundTokenType && amountShares && compoundService) {
         const displaySharesAmountValue = compoundService.calculateCTokenToBaseExchange(baseCollateral, amountShares)
         displaySharesAmount = formatBigNumber(displaySharesAmountValue || Zero, baseCollateral.decimals)
+      }
+      let useBaseToken = false
+      if (collateral.address !== displayCollateral.address) {
+        useBaseToken = true
       }
       setStatus(Status.Loading)
       setMessage(`Selling ${displaySharesAmount} shares...`)
@@ -241,9 +243,11 @@ export const ScalarMarketSell = (props: Props) => {
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,
+        compoundService,
         conditionalTokens,
         marketMaker,
         outcomeIndex,
+        useBaseToken,
       })
 
       await fetchGraphMarketUserTxData()
