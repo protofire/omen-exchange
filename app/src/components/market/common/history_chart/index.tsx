@@ -9,7 +9,7 @@ import { getOutcomeColor } from '../../../../theme/utils'
 import { calcPrediction } from '../../../../util/tools'
 import { Button } from '../../../button/button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { OutcomeItemLittleBallOfJoyAndDifferentColors, commonWrapperCSS } from '../common_styled'
+import { OutcomeItemLittleBallOfJoyAndDifferentColors } from '../common_styled'
 import { CustomInlineLoading } from '../history_table'
 
 const ResponsiveWrapper = styled.div`
@@ -64,7 +64,6 @@ const Legend = styled.li`
   }
 `
 const NoData = styled.div`
-  ${commonWrapperCSS};
   align-items: center;
   color: ${props => props.theme.colors.textColorDarker};
   display: flex;
