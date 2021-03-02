@@ -27,21 +27,6 @@ const DropdownMenu = styled(Dropdown)`
   min-width: 164px;
 `
 
-const NoData = styled.div`
-  ${commonWrapperCSS};
-  align-items: center;
-  color: ${props => props.theme.colors.textColorDarker};
-  display: flex;
-  font-size: 15px;
-  font-weight: 400;
-  height: 340px;
-  justify-content: center;
-  letter-spacing: 0.4px;
-  line-height: 1.3;
-  padding-left: ${props => props.theme.cards.paddingHorizontal};
-  padding-right: ${props => props.theme.cards.paddingHorizontal};
-`
-
 const ChartWrapper = styled.div`
   ${commonWrapperCSS}
 `
@@ -287,14 +272,7 @@ export const History_select: React.FC<Props> = ({
     const newPageIndex = pageIndex - pageSize
     setPageIndex(newPageIndex)
   }
-
-  // if (!data || status === 'Loading' || sharesDataLoader) {
-  //   return <CustomInlineLoading message="Loading Trade History" />
-  // }
-
-  if (holdingSeries && holdingSeries.length <= 1) {
-    return <NoData>There is not enough historical data for this market</NoData>
-  }
+  const notEnoughData = holdingSeries && holdingSeries.length <= 1
 
   return (
     <ChartWrapper>
@@ -336,6 +314,7 @@ export const History_select: React.FC<Props> = ({
       ) : (
         <HistoryChart
           data={data}
+          hasEnoughData={notEnoughData}
           isScalar={isScalar}
           outcomes={outcomeArray}
           scalarHigh={scalarHigh}

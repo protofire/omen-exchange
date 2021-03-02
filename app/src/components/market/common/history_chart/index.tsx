@@ -10,6 +10,7 @@ import { calcPrediction } from '../../../../util/tools'
 import { Button } from '../../../button/button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { OutcomeItemLittleBallOfJoyAndDifferentColors } from '../common_styled'
+import { commonWrapperCSS } from '../history_section/history_select'
 import { CustomInlineLoading } from '../history_table'
 
 const ResponsiveWrapper = styled.div`
@@ -62,6 +63,20 @@ const Legend = styled.li`
     margin-right: 6px;
   }
 `
+const NoData = styled.div`
+  ${commonWrapperCSS};
+  align-items: center;
+  color: ${props => props.theme.colors.textColorDarker};
+  display: flex;
+  font-size: 15px;
+  font-weight: 400;
+  height: 340px;
+  justify-content: center;
+  letter-spacing: 0.4px;
+  line-height: 1.3;
+  padding-left: ${props => props.theme.cards.paddingHorizontal};
+  padding-right: ${props => props.theme.cards.paddingHorizontal};
+`
 
 const AnEvenSmallerLittleBall = styled(OutcomeItemLittleBallOfJoyAndDifferentColors as any)`
   height: 8px;
@@ -99,10 +114,12 @@ type Props = {
   isScalar?: Maybe<boolean>
   sharesDataLoader: boolean
   status: any
+  hasEnoughData: any
 }
 
 export const HistoryChart: React.FC<Props> = ({
   data,
+  hasEnoughData,
   isScalar,
   outcomes,
   scalarHigh,
@@ -142,6 +159,9 @@ export const HistoryChart: React.FC<Props> = ({
 
   if (!data || status === 'Loading' || sharesDataLoader) {
     return <CustomInlineLoading message="Loading Trade History" />
+  }
+  if (hasEnoughData) {
+    return <NoData>There is not enough historical data for this market</NoData>
   }
   return (
     <>
