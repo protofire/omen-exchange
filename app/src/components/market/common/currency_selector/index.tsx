@@ -24,7 +24,7 @@ const CurrencyButtonSelectedCSS = css`
 `
 
 const CurrencyDropdown = styled(Dropdown)<{ selected: boolean }>`
-  ${props => props.selected && CurrencyButtonSelectedCSS}
+  ${props => props.selected && CurrencyButtonSelectedCSS};
   width: 100%;
 `
 
