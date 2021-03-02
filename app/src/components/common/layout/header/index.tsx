@@ -204,6 +204,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   const [isConnectWalletModalOpen, setConnectWalletModalState] = useState(false)
   const [isYourConnectionModalOpen, setYourConnectionModalState] = useState(false)
   const [isDepositWithdrawModalOpen, setDepositWithdrawModalState] = useState(false)
+  const [depositWithdrawType, setDepositWithdrawType] = useState<ExchangeType>(ExchangeType.deposit)
   const [claimState, setClaimState] = useState<boolean>(false)
   const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
   const [isDisconnecting, setIsDisconnecting] = useState(false)
@@ -387,8 +388,14 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           isOpen={isYourConnectionModalOpen}
           onClose={() => setYourConnectionModalState(false)}
           // TODO: Include exchange type
-          openDepositWithdrawModal={() => {
+          openDepositModal={() => {
             setYourConnectionModalState(false)
+            setDepositWithdrawType(ExchangeType.deposit)
+            setDepositWithdrawModalState(true)
+          }}
+          openWithdrawModal={() => {
+            setYourConnectionModalState(false)
+            setDepositWithdrawType(ExchangeType.withdraw)
             setDepositWithdrawModalState(true)
           }}
           unclaimedAmount={unclaimedAmount}
@@ -398,7 +405,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           onClose={() => setConnectWalletModalState(false)}
         />
         <DepositWithdrawModalWrapper
-          exchangeType={ExchangeType.deposit}
+          exchangeType={depositWithdrawType}
           isOpen={isDepositWithdrawModalOpen}
           onBack={() => {
             setDepositWithdrawModalState(false)

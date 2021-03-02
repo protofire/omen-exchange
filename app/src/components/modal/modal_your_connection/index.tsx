@@ -189,13 +189,23 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   claimState: boolean
   isOpen: boolean
   onClose: () => void
-  openDepositWithdrawModal: () => void
+  openDepositModal: () => void
+  openWithdrawModal: () => void
   theme?: any
   unclaimedAmount: BigNumber
 }
 
 export const ModalYourConnection = (props: Props) => {
-  const { changeWallet, claimState, isOpen, onClose, openDepositWithdrawModal, theme, unclaimedAmount } = props
+  const {
+    changeWallet,
+    claimState,
+    isOpen,
+    onClose,
+    openDepositModal,
+    openWithdrawModal,
+    theme,
+    unclaimedAmount,
+  } = props
   const context = useConnectedWeb3Context()
   const { account, networkId } = context
 
@@ -296,10 +306,10 @@ export const ModalYourConnection = (props: Props) => {
                 </BalanceItems>
               </BalanceSection>
               <DepositWithdrawButtons>
-                <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositWithdrawModal}>
+                <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositModal}>
                   Deposit
                 </DepositWithdrawButton>
-                <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositWithdrawModal}>
+                <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openWithdrawModal}>
                   Withdraw
                 </DepositWithdrawButton>
               </DepositWithdrawButtons>
