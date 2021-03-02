@@ -1,163 +1,192 @@
-import { Block } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
-import moment from 'moment'
-import React, { useEffect, useMemo, useState } from 'react'
-import { useWeb3Context } from 'web3-react'
+import React from 'react'
+import { useHistory } from 'react-router'
+import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import styled from 'styled-components'
 
-import { EARLIEST_MAINNET_BLOCK_TO_CHECK } from '../../../../common/constants'
-import { useMultipleQueries } from '../../../../hooks/useMultipleQueries'
-import { isScalarMarket, keys, range } from '../../../../util/tools'
-import { Period } from '../../../../util/types'
+import theme from '../../../../theme'
+import { getOutcomeColor } from '../../../../theme/utils'
+import { calcPrediction } from '../../../../util/tools'
+import { Button } from '../../../button/button'
+import { ButtonType } from '../../../button/button_styling_types'
+import { OutcomeItemLittleBallOfJoyAndDifferentColors } from '../common_styled'
+import { CustomInlineLoading } from '../history_table'
 
-import { HistoryChart } from './chart'
+const ResponsiveWrapper = styled.div`
+  margin: 21px 24.5px;
+  border: 1px solid ${props => props.theme.borders.borderDisabled};
+  padding-bottom: 16px;
+  border-radius: 6px;
+`
+const ChartTooltip = styled.div`
+  background: #fff;
+  border-radius: 2px;
+  border: 1px solid ${props => props.theme.borders.borderDisabled};
+  box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.12);
+  min-width: 160px;
+  padding: 17px;
+`
 
-// This query will return an object where each entry is
-// `fixedProductMarketMaker_X: { outcomeTokenAmounts }`,
-// where X is a block number,
-//  and `outcomeTokenAmounts` is the amount of holdings of the market maker at that block.
-const buildQueriesHistory = (blockNumbers: number[]) => {
-  return blockNumbers.map(
-    blockNumber => `query fixedProductMarketMaker_${blockNumber}($id: ID!) {
-      fixedProductMarketMaker(id: $id, block: { number: ${blockNumber} }) {
-        outcomeTokenAmounts
-      }
-    }
-    `,
-  )
-}
+const TooltipTitle = styled.h4`
+  color: ${props => props.theme.colors.textColorDark};
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.2;
+  margin: 0 0 10px;
+  text-align: left;
+`
+const Legends = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 0;
+`
+const ButtonWrapper = styled.div`
+  border-top: ${props => props.theme.borders.borderLineDisabled};
+  padding-top: 20px;
+  padding-left: 24px;
+`
 
-type HistoricDataPoint = {
-  block: Block
-  holdings: string[]
-}
+const Legend = styled.li`
+  align-items: center;
+  color: ${props => props.theme.colors.textColor};
+  display: flex;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
 
-type HistoricData = HistoricDataPoint[]
-
-const useHoldingsHistory = (marketMakerAddress: string, blocks: Maybe<Block[]>): Maybe<HistoricData> => {
-  const queries = useMemo(
-    () => (blocks && blocks.length ? buildQueriesHistory(blocks.map(block => block.number)) : null),
-    [blocks],
-  )
-  const variables = useMemo(() => {
-    return { id: marketMakerAddress }
-  }, [marketMakerAddress])
-
-  const queriesResult = useMultipleQueries<{ data: { [key: string]: { outcomeTokenAmounts: string[] } } }>(
-    queries,
-    variables,
-  )
-
-  if (queriesResult && blocks) {
-    const result: HistoricData = []
-    queriesResult
-      .filter(d => d.data)
-      .forEach((queryResult, index) => {
-        Object.values(queryResult.data).forEach(value => {
-          if (value && value.outcomeTokenAmounts) {
-            const block = blocks[index]
-            const holdings = value.outcomeTokenAmounts
-            result.push({ block, holdings })
-          }
-        })
-      })
-
-    return result
+  strong {
+    color: ${props => props.theme.colors.textColorDarker};
+    font-weight: 500;
+    margin-right: 6px;
   }
-  return null
-}
+`
 
+const AnEvenSmallerLittleBall = styled(OutcomeItemLittleBallOfJoyAndDifferentColors as any)`
+  height: 8px;
+  margin-right: 12px;
+  width: 8px;
+`
+
+const toPercent = (decimal: number, fixed = 0) => {
+  return `${(decimal * 100).toFixed(fixed)}%`
+}
+const renderTooltipContent = (o: any) => {
+  const { label, payload } = o
+
+  return (
+    <ChartTooltip>
+      <TooltipTitle>{label}</TooltipTitle>
+      <Legends>
+        {payload.reverse().map((entry: any, index: number) => (
+          <Legend key={`item-${index}`}>
+            <AnEvenSmallerLittleBall outcomeIndex={index} />
+            <strong>{`${toPercent(entry.value)}`}</strong>
+            {`- ${entry.name}`}
+          </Legend>
+        ))}
+      </Legends>
+    </ChartTooltip>
+  )
+}
 type Props = {
-  answerFinalizedTimestamp: Maybe<BigNumber>
-  marketMakerAddress: string
-  hidden: boolean
-  oracle: Maybe<string>
+  data: { date: string }[] | null
   outcomes: string[]
-  scalarHigh: Maybe<BigNumber>
-  scalarLow: Maybe<BigNumber>
+  scalarHigh?: Maybe<BigNumber>
+  scalarLow?: Maybe<BigNumber>
   unit: string
+  isScalar?: Maybe<boolean>
+  sharesDataLoader: boolean
+  status: any
 }
 
-const blocksPerAllTimePeriod = 10000
-const blocksPerDay = 5760
-const blocksPerHour = Math.floor(blocksPerDay / 24)
-const blocksPerMinute = Math.floor(blocksPerHour / 60)
-
-const calcOffsetByDate = (nowOrClosedTs: number) => {
-  const now = moment()
-  const offsetInMinutes = moment(nowOrClosedTs)
-    .startOf('day')
-    .diff(now, 'minute')
-
-  return -offsetInMinutes * blocksPerMinute
-}
-
-export const HistoryChartContainer: React.FC<Props> = ({
-  answerFinalizedTimestamp,
-  hidden,
-  marketMakerAddress,
-  oracle,
+export const HistoryChart: React.FC<Props> = ({
+  data,
+  isScalar,
   outcomes,
   scalarHigh,
   scalarLow,
+  sharesDataLoader,
+  status,
   unit,
 }) => {
-  const context = useWeb3Context()
-  const { library } = context
-  const [latestBlockNumber, setLatestBlockNumber] = useState<Maybe<number>>(null)
-  const [blocks, setBlocks] = useState<Maybe<Block[]>>(null)
-  const holdingsSeries = useHoldingsHistory(marketMakerAddress, blocks)
-  const [period, setPeriod] = useState<Period>('1M')
-  const blocksOffset = useMemo(
-    () => (answerFinalizedTimestamp ? calcOffsetByDate(answerFinalizedTimestamp.toNumber() * 1000) : 0),
-    [answerFinalizedTimestamp],
-  )
+  const history = useHistory()
 
-  const blocksSinceInception = latestBlockNumber ? latestBlockNumber - EARLIEST_MAINNET_BLOCK_TO_CHECK : 0
-  const allDataPoints = Math.floor(blocksSinceInception / blocksPerAllTimePeriod)
-
-  const mapPeriod: { [period in Period]: { totalDataPoints: number; blocksPerPeriod: number } } = {
-    All: { totalDataPoints: allDataPoints, blocksPerPeriod: blocksPerAllTimePeriod },
-    '1Y': { totalDataPoints: 365, blocksPerPeriod: blocksPerDay },
-    '1M': { totalDataPoints: 30, blocksPerPeriod: blocksPerDay },
-    '1W': { totalDataPoints: 7, blocksPerPeriod: blocksPerDay },
-    '1D': { totalDataPoints: 24, blocksPerPeriod: blocksPerHour },
-    '1H': { totalDataPoints: 60, blocksPerPeriod: blocksPerMinute },
+  const toScaleValue = (decimal: number, fixed = 0) => {
+    return `${calcPrediction(decimal.toString(), scalarLow || new BigNumber(0), scalarHigh || new BigNumber(0)).toFixed(
+      fixed,
+    )} ${unit}`
   }
 
-  useEffect(() => {
-    library.getBlockNumber().then((latest: number) => setLatestBlockNumber(latest - blocksOffset))
-  }, [blocksOffset, library])
+  const renderScalarTooltipContent = (o: any) => {
+    const { label, payload } = o
+    const prediction = calcPrediction(
+      payload[0]?.value,
+      scalarLow || new BigNumber(0),
+      scalarHigh || new BigNumber(0),
+    ).toFixed(2)
+    return (
+      <ChartTooltip>
+        <TooltipTitle>{label}</TooltipTitle>
+        <Legends>
+          <Legend key={`item-0`}>
+            <AnEvenSmallerLittleBall outcomeIndex={0} />
+            <strong>{`${prediction}`}</strong>
+            {`${unit}`}
+          </Legend>
+        </Legends>
+      </ChartTooltip>
+    )
+  }
 
-  useEffect(() => {
-    const getBlocks = async (latestBlockNumber: number) => {
-      const { blocksPerPeriod, totalDataPoints } = mapPeriod[period]
+  if (!data || status === 'Loading' || sharesDataLoader) {
+    return <CustomInlineLoading message="Loading Trade History" />
+  }
+  return (
+    <>
+      <ResponsiveWrapper>
+        <ResponsiveContainer height={300} width="100%">
+          <AreaChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} stackOffset="expand">
+            <XAxis
+              dataKey="date"
+              stroke={theme.colors.verticalDivider}
+              tick={{ fill: theme.colors.textColor, fontFamily: 'Roboto' }}
+              tickMargin={11}
+            />
+            <YAxis
+              orientation="right"
+              stroke={theme.colors.verticalDivider}
+              tick={{ fill: theme.colors.textColor, fontFamily: 'Roboto' }}
+              tickFormatter={isScalar ? toScaleValue : toPercent}
+              tickMargin={10}
+            />
+            <Tooltip content={isScalar ? renderScalarTooltipContent : renderTooltipContent} />
 
-      if (latestBlockNumber) {
-        const blockNumbers = range(totalDataPoints).map(multiplier => latestBlockNumber - multiplier * blocksPerPeriod)
-        const blocks = await Promise.all(blockNumbers.map(blockNumber => library.getBlock(blockNumber)))
-        setBlocks(blocks.filter(block => block))
-      }
-    }
+            {outcomes
+              .map((outcomeName, index) => {
+                const color = getOutcomeColor(index)
 
-    if (latestBlockNumber) {
-      getBlocks(latestBlockNumber)
-    }
-    // eslint-disable-next-line
-  }, [latestBlockNumber, library, period])
-
-  const isScalar = isScalarMarket(oracle || '', context.networkId || 0)
-
-  return hidden ? null : (
-    <HistoryChart
-      holdingSeries={holdingsSeries}
-      isScalar={isScalar}
-      onChange={setPeriod}
-      options={keys(mapPeriod)}
-      outcomes={outcomes}
-      scalarHigh={scalarHigh}
-      scalarLow={scalarLow}
-      unit={unit}
-      value={period}
-    />
+                return (
+                  <Area
+                    dataKey={outcomeName}
+                    fill={color.medium}
+                    key={`${index}-${outcomeName}`}
+                    stackId="1"
+                    stroke={color.darker}
+                    type="monotone"
+                  />
+                )
+              })
+              .reverse()}
+          </AreaChart>
+        </ResponsiveContainer>
+      </ResponsiveWrapper>
+      <ButtonWrapper>
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
+          Back
+        </Button>
+      </ButtonWrapper>
+    </>
   )
 }

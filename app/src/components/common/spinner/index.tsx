@@ -1,7 +1,7 @@
 import React, { HTMLAttributes } from 'react'
 import styled, { keyframes } from 'styled-components'
 
-import { IconSpinner } from '../icons'
+import { IconSpinner, IconSpinnerBig } from '../icons'
 
 const rotate = keyframes`
   from {
@@ -29,7 +29,7 @@ export const Spinner: React.FC<Props> = (props: Props) => {
 
   return (
     <RotatingSpinner color={color} {...restProps}>
-      <IconSpinner spinnerSize={big ? '42' : size ? size : '40'} />
+      {big ? <IconSpinnerBig /> : <IconSpinner spinnerSize={size ? size : '40'} />}
     </RotatingSpinner>
   )
 }
