@@ -132,6 +132,25 @@ const BalanceItemAsset = styled.p`
   margin-left: 12px;
 `
 
+const BalanceItemInfo = styled.p`
+  font-size: ${props => props.theme.fonts.defaultSize};
+  color: ${props => props.theme.colors.textColorLighter};
+  margin: 0;
+  margin-left: 4px;
+`
+
+const BalanceDivider = styled.div`
+  width: 100%;
+  height: 1px;
+  background: ${props => props.theme.borders.borderDisabled};
+  margin: 16px 0;
+`
+
+const ClaimButton = styled(Button)`
+  width: 100%;
+  margin-top: 16px;
+`
+
 const ChangeWalletButton = styled(Button)``
 
 const BalanceItemBalance = styled.p`
@@ -174,15 +193,17 @@ const EnableDaiButton = styled(Button)`
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   changeWallet: () => void
+  claimState: boolean
   isOpen: boolean
   onClose: () => void
   theme?: any
+  unclaimedAmount: BigNumber
 }
 
 export const ModalYourConnection = (props: Props) => {
-  const { changeWallet, isOpen, onClose, theme } = props
+  const { changeWallet, claimState, isOpen, onClose, theme, unclaimedAmount } = props
   const context = useConnectedWeb3Context()
-  const { account } = context
+  const { account, networkId } = context
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
@@ -247,11 +268,25 @@ export const ModalYourConnection = (props: Props) => {
                 </BalanceItemLeft>
                 <BalanceItemBalance>{formattedDaiBalance} DAI</BalanceItemBalance>
               </BalanceItem>
+              {networkId === 1 && claimState && (
+                <>
+                  <BalanceDivider />
+                  <BalanceItem>
+                    <BalanceItemLeft>
+                      <DaiIcon size="24px" />
+                      <BalanceItemAsset>Dai</BalanceItemAsset>
+                      <BalanceItemInfo>(Claimable)</BalanceItemInfo>
+                    </BalanceItemLeft>
+                    <BalanceItemBalance>{formatBigNumber(unclaimedAmount, 18, 2)} DAI</BalanceItemBalance>
+                  </BalanceItem>
+                  <ClaimButton buttonType={ButtonType.primary}>Claim Now</ClaimButton>
+                </>
+              )}
             </BalanceItems>
           </BalanceSection>
         </Card>
         <Card>
-          {walletState !== WalletState.ready ? (
+          {walletState === WalletState.ready ? (
             <>
               <BalanceSection>
                 <CardHeaderText>Omen Account</CardHeaderText>

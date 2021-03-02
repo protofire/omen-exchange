@@ -382,8 +382,10 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             logout()
             setConnectWalletModalState(true)
           }}
+          claimState={claimState}
           isOpen={isYourConnectionModalOpen}
           onClose={() => setYourConnectionModalState(false)}
+          unclaimedAmount={unclaimedAmount}
         />
         <ModalConnectWalletWrapper
           isOpen={isConnectWalletModalOpen}
