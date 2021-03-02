@@ -498,16 +498,21 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const showSingleValueBox =
     !isAmountInputted && !(additionalShares && additionalShares > 0.000001) && currentTab !== MarketDetailsTab.sell
 
+  const showLiquidityBox =
+    !!liquidityAmount && liquidityAmount.gt(0) && !!additionalShares && additionalShares > 0.000001
+
   const singleValueBoxData = [
     {
       title: `${
-        currentPrediction ? formatNumber(currentPredictionNumber.toString()) : startingPoint && startingPointNumber
+        currentPrediction ? formatNumber(currentPredictionNumber.toString()) : startingPoint ? startingPointNumber : ''
       }
       ${currentPrediction || startingPoint ? ` ${unit}` : 'Unknown'}`,
       subtitle: startingPointTitle,
       xValue: currentPrediction
         ? Number(currentPrediction)
-        : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound) / 100,
+        : startingPoint && lowerBound && upperBound
+        ? calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound) / 100
+        : 0.01,
     },
   ]
 
@@ -636,9 +641,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           {showSingleValueBox && <ValueBoxes valueBoxData={singleValueBoxData} />}
         </Scale>
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
-        {liquidityAmount && liquidityAmount.gt(0) && additionalShares && additionalShares > 0.000001 && (
-          <ValueBoxes valueBoxData={liquidityValueBoxData} />
-        )}
+        {showLiquidityBox && <ValueBoxes valueBoxData={liquidityValueBoxData} />}
       </ScaleWrapper>
       {!isPositionTableDisabled && balances && collateral && trades && (
         <PositionTable
