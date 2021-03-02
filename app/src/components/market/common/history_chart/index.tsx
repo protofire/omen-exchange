@@ -9,8 +9,7 @@ import { getOutcomeColor } from '../../../../theme/utils'
 import { calcPrediction } from '../../../../util/tools'
 import { Button } from '../../../button/button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { OutcomeItemLittleBallOfJoyAndDifferentColors } from '../common_styled'
-import { commonWrapperCSS } from '../history_section/history_select'
+import { OutcomeItemLittleBallOfJoyAndDifferentColors, commonWrapperCSS } from '../common_styled'
 import { CustomInlineLoading } from '../history_table'
 
 const ResponsiveWrapper = styled.div`
@@ -19,6 +18,7 @@ const ResponsiveWrapper = styled.div`
   padding-bottom: 16px;
   border-radius: 6px;
 `
+
 const ChartTooltip = styled.div`
   background: #fff;
   border-radius: 2px;

@@ -1,7 +1,7 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import {
@@ -13,15 +13,10 @@ import { calcPrice, calcSellAmountInCollateral, formatBigNumber, formatTimestamp
 import { HistoricData, Period } from '../../../../util/types'
 import { ButtonRound, ButtonSelectable } from '../../../button'
 import { Dropdown, DropdownPosition } from '../../../common/form/dropdown'
+import { commonWrapperCSS } from '../common_styled'
 import { HistoryChart } from '../history_chart'
 import { HistoryTable } from '../history_table'
 
-export const commonWrapperCSS = css`
-  border-top: 1px solid ${props => props.theme.borders.borderDisabled};
-  margin-left: -${props => props.theme.cards.paddingHorizontal};
-  margin-right: -${props => props.theme.cards.paddingHorizontal};
-  width: auto;
-`
 const DropdownMenu = styled(Dropdown)`
   margin-left: auto;
   min-width: 164px;
