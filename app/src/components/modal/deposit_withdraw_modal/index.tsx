@@ -21,6 +21,11 @@ import {
   ModalTitle,
 } from '../common_styled'
 
+const ModalNavigationLeft = styled.div`
+  display: flex;
+  align-items: center;
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   exchangeType: ExchangeType
   isOpen: boolean
@@ -46,8 +51,10 @@ export const DepositWithdrawModal = (props: Props) => {
     <Modal isOpen={isOpen} onRequestClose={onClose} style={theme.fluidHeightModal}>
       <ContentWrapper>
         <ModalNavigation>
-          <IconArrowBack hoverEffect={true} onClick={onBack} />
-          <ModalTitle>{exchangeType} Dai</ModalTitle>
+          <ModalNavigationLeft>
+            <IconArrowBack hoverEffect={true} onClick={onBack} />
+            <ModalTitle style={{ marginLeft: '16px' }}>{exchangeType} Dai</ModalTitle>
+          </ModalNavigationLeft>
           <IconClose hoverEffect={true} onClick={onClose} />
         </ModalNavigation>
         <ModalCard>
@@ -58,7 +65,6 @@ export const DepositWithdrawModal = (props: Props) => {
                   <BalanceItemTitle>Wallet</BalanceItemTitle>
                 </BalanceItemSide>
                 <BalanceItemSide>
-                  {/* TODO: Replace hardcoded balance */}
                   <BalanceItemBalance style={{ marginRight: '12px' }}>{formattedDaiBalance} DAI</BalanceItemBalance>
                   <DaiIcon size="24px" />
                 </BalanceItemSide>
