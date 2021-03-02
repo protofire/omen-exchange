@@ -374,7 +374,7 @@ const theme = {
       zIndex: '12345',
     },
   },
-  walletConnectionModal: {
+  fixedHeightModal: {
     content: {
       height: '510px',
       width: '382px',
@@ -399,7 +399,7 @@ const theme = {
       zIndex: '12345',
     },
   },
-  yourConnectionModal: {
+  fluidHeightModal: {
     content: {
       height: 'auto',
       width: '382px',

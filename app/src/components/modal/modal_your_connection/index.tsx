@@ -229,7 +229,7 @@ export const ModalYourConnection = (props: Props) => {
   const walletState = WalletState.ready
 
   return (
-    <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.yourConnectionModal}>
+    <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
       <ContentWrapper>
         <ModalNavigation>
           <ModalTitle>Your Connection</ModalTitle>
