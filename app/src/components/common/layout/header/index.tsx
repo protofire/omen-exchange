@@ -21,7 +21,7 @@ import { XdaiBridgeTransfer } from '../../../market/common/xdai_bridge_modal'
 import {
   ModalConnectWalletWrapper,
   ModalDepositWithdrawWrapper,
-  ModalTransaction,
+  ModalTransactionWrapper,
   ModalYourConnectionWrapper,
 } from '../../../modal'
 import { IconAdd, IconClose } from '../../icons'
@@ -419,7 +419,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           onClose={() => setDepositWithdrawModalState(false)}
         />
         {/* TODO: Replace hardcoded props */}
-        <ModalTransaction isOpen={true} txState={TransactionState.waiting} txType={TransactionType.deposit} />
+        <ModalTransactionWrapper isOpen={true} txState={TransactionState.waiting} txType={TransactionType.deposit} />
       </HeaderInner>
     </HeaderWrapper>
   )
