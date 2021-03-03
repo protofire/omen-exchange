@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps, matchPath } from 'react-router-dom'
@@ -11,7 +11,7 @@ import { Logo } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useOutsideAlerter } from '../../../../hooks/useOutsideAlerter'
 import { XdaiService } from '../../../../services'
-import { networkIds } from '../../../../util/networks'
+import { getToken, networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { ExchangeType, TransactionState, TransactionType } from '../../../../util/types'
 import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
@@ -419,7 +419,13 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           onClose={() => setDepositWithdrawModalState(false)}
         />
         {/* TODO: Replace hardcoded props */}
-        <ModalTransactionWrapper isOpen={true} txState={TransactionState.waiting} txType={TransactionType.deposit} />
+        <ModalTransactionWrapper
+          amount={parseUnits('125', 18)}
+          collateral={getToken(1, 'dai')}
+          isOpen={true}
+          txState={TransactionState.waiting}
+          txType={TransactionType.deposit}
+        />
       </HeaderInner>
     </HeaderWrapper>
   )
