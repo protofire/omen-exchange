@@ -518,3 +518,19 @@ export enum ExchangeType {
   deposit = 'Deposit',
   withdraw = 'Withdraw',
 }
+
+export enum TransactionState {
+  waiting,
+  submitted,
+  confirming,
+  confirmed,
+}
+
+export enum TransactionType {
+  deposit = 'Deposit',
+  withdraw = 'Withdraw',
+  buy = 'Buy',
+  sell = 'Sell',
+  redeem = 'Redeem',
+  create = 'Create',
+}

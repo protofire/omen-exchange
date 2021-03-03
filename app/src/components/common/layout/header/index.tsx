@@ -13,7 +13,7 @@ import { useOutsideAlerter } from '../../../../hooks/useOutsideAlerter'
 import { XdaiService } from '../../../../services'
 import { networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
-import { ExchangeType } from '../../../../util/types'
+import { ExchangeType, TransactionState, TransactionType } from '../../../../util/types'
 import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
@@ -419,7 +419,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           onClose={() => setDepositWithdrawModalState(false)}
         />
         {/* TODO: Replace hardcoded props */}
-        <ModalTransaction isOpen={true} />
+        <ModalTransaction isOpen={true} txState={TransactionState.waiting} txType={TransactionType.deposit} />
       </HeaderInner>
     </HeaderWrapper>
   )
