@@ -26,7 +26,7 @@ const App: React.FC = () => {
   const windowObj: any = window
 
   const ethereum = windowObj.ethereum
-  const networkId = ethereum.chainId
+  const networkId = ethereum && ethereum.chainId
   const [status, setStatus] = useState(true)
   const network = getNetworkFromChain(networkId)
 
