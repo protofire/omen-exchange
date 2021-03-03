@@ -195,8 +195,8 @@ const SettingsViewContainer = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url])
   useEffect(() => {
-    if (sessionStorage.getItem('rpcAddress')) {
-      const data = JSON.parse(sessionStorage.getItem('rpcAddress') as string)
+    if (localStorage.getItem('rpcAddress')) {
+      const data = JSON.parse(localStorage.getItem('rpcAddress') as string)
       setUrl(data.url)
       if (data.network === getNetworkFromChain(networkId)) {
         setCurrent(data.index)
@@ -266,7 +266,7 @@ const SettingsViewContainer = (props: Props) => {
             onClick={async () => {
               if (!(await checkRpcStatus(url, setOnlineStatus))) return
 
-              sessionStorage.setItem(
+              localStorage.setItem(
                 'rpcAddress',
                 JSON.stringify({
                   url: url,

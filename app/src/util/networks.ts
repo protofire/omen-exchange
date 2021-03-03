@@ -282,8 +282,8 @@ export const getChainSpecificAlternativeUrls = (networkId: any) => {
   }
   return networks[networkId].alternativeUrls
 }
-if (sessionStorage.getItem('rpcAddress')) {
-  const data = JSON.parse(<string>sessionStorage.getItem('rpcAddress'))
+if (localStorage.getItem('rpcAddress')) {
+  const data = JSON.parse(<string>localStorage.getItem('rpcAddress'))
   const network: NetworkId = data.network
   networks[network].url = data.url
 }

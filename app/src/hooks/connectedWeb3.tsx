@@ -44,7 +44,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   const safeAppInfo = useSafeApp()
   const context = useWeb3Context()
   const { account, active, error, library } = context
-  const rpcAddress: string | null = sessionStorage.getItem('rpcAddress')
+  const rpcAddress: string | null = localStorage.getItem('rpcAddress')
 
   useEffect(() => {
     let isSubscribed = true
