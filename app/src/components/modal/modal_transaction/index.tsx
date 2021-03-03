@@ -3,6 +3,8 @@ import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { TransactionState, TransactionType } from '../../../util/types'
+import { IconClose } from '../../common/icons'
+import { ContentWrapper, ModalNavigation, ModalNavigationLeft } from '../common_styled'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   isOpen: boolean
@@ -18,7 +20,17 @@ export const ModalTransaction = (props: Props) => {
     Modal.setAppElement('#root')
   }, [])
 
-  return <Modal isOpen={isOpen} style={theme.fluidHeightModal}></Modal>
+  return (
+    <Modal isOpen={isOpen} style={theme.fluidHeightModal}>
+      <ContentWrapper>
+        <ModalNavigation>
+          <ModalNavigationLeft></ModalNavigationLeft>
+          {/* TODO: Add onClick */}
+          <IconClose hoverEffect={true} />
+        </ModalNavigation>
+      </ContentWrapper>
+    </Modal>
+  )
 }
 
 export const ModalTransactionWrapper = withTheme(ModalTransaction)

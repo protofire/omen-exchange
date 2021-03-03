@@ -22,13 +22,9 @@ import {
   ContentWrapper,
   ModalCard,
   ModalNavigation,
+  ModalNavigationLeft,
   ModalTitle,
 } from '../common_styled'
-
-const ModalNavigationLeft = styled.div`
-  display: flex;
-  align-items: center;
-`
 
 const InputInfo = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};

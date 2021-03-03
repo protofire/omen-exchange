@@ -17,6 +17,11 @@ export const ModalNavigation = styled.div`
   margin-bottom: 14px;
 `
 
+export const ModalNavigationLeft = styled.div`
+  display: flex;
+  align-items: center;
+`
+
 export const ModalTitle = styled.p`
   font-size: 16px;
   color: ${props => props.theme.colors.textColorDark};
