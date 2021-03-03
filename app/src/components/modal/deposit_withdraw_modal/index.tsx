@@ -6,6 +6,8 @@ import styled, { withTheme } from 'styled-components'
 import { useConnectedWeb3Context, useTokens } from '../../../hooks'
 import { formatBigNumber, formatNumber } from '../../../util/tools'
 import { ExchangeType } from '../../../util/types'
+import { Button } from '../../button'
+import { ButtonType } from '../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInputReturn } from '../../common/form/big_number_input'
 import { IconArrowBack, IconClose } from '../../common/icons'
@@ -36,6 +38,11 @@ const InputInfo = styled.p`
   width: 100%;
 `
 
+const DepositWithdrawButton = styled(Button)`
+  width: 100%;
+  margin-top: 28px;
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   exchangeType: ExchangeType
   isOpen: boolean
@@ -59,6 +66,9 @@ export const DepositWithdrawModal = (props: Props) => {
 
   const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0].balance || '')
   const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
+
+  // TODO: Replace hardcoded value
+  const isDepositWithdrawDisabled = true
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} style={theme.fluidHeightModal}>
@@ -116,6 +126,9 @@ export const DepositWithdrawModal = (props: Props) => {
           symbol={'DAI'}
         ></TextfieldCustomPlaceholder>
         <InputInfo>You need to deposit at least 10 DAI.</InputInfo>
+        <DepositWithdrawButton buttonType={ButtonType.primaryAlternative} disabled={isDepositWithdrawDisabled}>
+          {exchangeType}
+        </DepositWithdrawButton>
       </ContentWrapper>
     </Modal>
   )
