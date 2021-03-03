@@ -51,7 +51,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   theme?: any
 }
 
-export const DepositWithdrawModal = (props: Props) => {
+export const ModalDepositWithdraw = (props: Props) => {
   const { exchangeType, isOpen, onBack, onClose, theme } = props
   const context = useConnectedWeb3Context()
 
@@ -80,7 +80,7 @@ export const DepositWithdrawModal = (props: Props) => {
           </ModalNavigationLeft>
           <IconClose hoverEffect={true} onClick={onClose} />
         </ModalNavigation>
-        <ModalCard style={{ marginBottom: '16px' }}>
+        <ModalCard style={{ marginBottom: '16px', marginTop: '12px' }}>
           <BalanceSection>
             <BalanceItems>
               <BalanceItem>
@@ -134,4 +134,4 @@ export const DepositWithdrawModal = (props: Props) => {
   )
 }
 
-export const DepositWithdrawModalWrapper = withTheme(DepositWithdrawModal)
+export const ModalDepositWithdrawWrapper = withTheme(ModalDepositWithdraw)
