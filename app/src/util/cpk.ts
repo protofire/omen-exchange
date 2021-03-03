@@ -186,7 +186,7 @@ class BiconomyTransactionManager {
   }
 
   // @ts-expect-error ignore
-  async execTransactions({ contracts, ethLibAdapter, isDeployed, safeExecTxParams }) {
+  async execTransactions({ contracts, ethLibAdapter, isDeployed, safeExecTxParams, transactions }) {
     // build params
     const proxyFactoryAddress = contracts.proxyFactory.address
     const proxyAddress = contracts.safeContract.address
@@ -227,6 +227,8 @@ class BiconomyTransactionManager {
     // execute transaction through biconomy
     const biconomy = new BiconomyService()
 
+    const standardizedTxs = transactions.map(standardizeTransaction)
+
     // if proxy is already deployed, exec tx directly, otherwise deploy proxy first
     if (isDeployed) {
       return biconomy.execTransaction({
@@ -242,6 +244,7 @@ class BiconomyTransactionManager {
         safeTxGas,
         signature,
         to,
+        transactions: standardizedTxs,
         value,
       })
     } else {
@@ -255,6 +258,7 @@ class BiconomyTransactionManager {
         proxyFactoryAddress,
         signature,
         to,
+        transactions: standardizedTxs,
         value,
       })
     }

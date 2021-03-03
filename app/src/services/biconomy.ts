@@ -1,5 +1,7 @@
 import axios from 'axios'
 
+import { Transaction } from '../util/cpk'
+
 interface CreateProxyAndExecParams {
   data: string
   fallbackHandlerAddress: string
@@ -9,6 +11,7 @@ interface CreateProxyAndExecParams {
   predeterminedSaltNonce: string
   proxyFactoryAddress: string
   signature: string
+  transactions: Transaction[]
   to: string
   value: string
 }
@@ -25,6 +28,7 @@ interface ExecTransactionParams {
   refundReceiver: string
   safeTxGas: number
   signature: string
+  transactions: Transaction[]
   to: string
   value: string
 }
@@ -34,11 +38,12 @@ class BiconomyService {
 
   request = async (payload: any) => {
     const BICONOMY_API_KEY = 'MPEEl225y.19edc8a0-06f9-444b-b6bc-c1b7ca6bdc31'
-    const url = 'https://api.biconomy.io/api/v2/meta-tx/native'
+    // const url = 'https://api.biconomy.io/api/v2/meta-tx/native'
+    const url = 'http://localhost:8000/'
     const response = await axios(url, {
       method: 'POST',
       headers: {
-        'x-api-key': BICONOMY_API_KEY,
+        // 'x-api-key': BICONOMY_API_KEY,
         'Content-Type': 'application/json;charset=utf-8',
       },
       data: JSON.stringify(payload),
@@ -61,6 +66,7 @@ class BiconomyService {
     proxyFactoryAddress,
     signature,
     to,
+    transactions,
     value,
   }: CreateProxyAndExecParams) => {
     const METHOD_API_ID = '6aa2f830-cc0b-4b4c-a183-e96a046a9800'
@@ -80,6 +86,7 @@ class BiconomyService {
         signature,
       ],
       from,
+      transactions,
     })
   }
 
@@ -96,6 +103,7 @@ class BiconomyService {
     safeTxGas,
     signature,
     to,
+    transactions,
     value,
   }: ExecTransactionParams) => {
     const METHOD_API_ID = 'cfcd8ae2-776b-4bcb-87f6-2bf33930dd4a'
@@ -117,6 +125,7 @@ class BiconomyService {
         signature,
       ],
       from,
+      transactions,
     })
   }
 }
