@@ -113,13 +113,13 @@ type Props = {
   isScalar?: Maybe<boolean>
   sharesDataLoader: boolean
   status: any
-  hasEnoughData: any
+  notEnoughData: boolean
 }
 
 export const HistoryChart: React.FC<Props> = ({
   data,
-  hasEnoughData,
   isScalar,
+  notEnoughData,
   outcomes,
   scalarHigh,
   scalarLow,
@@ -159,7 +159,7 @@ export const HistoryChart: React.FC<Props> = ({
   if (!data || status === 'Loading' || sharesDataLoader) {
     return <CustomInlineLoading message="Loading Trade History" />
   }
-  if (hasEnoughData) {
+  if (notEnoughData) {
     return <NoData>There is not enough historical data for this market</NoData>
   }
   return (

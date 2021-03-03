@@ -263,7 +263,7 @@ export const History_select: React.FC<Props> = ({
     const newPageIndex = pageIndex - pageSize
     setPageIndex(newPageIndex)
   }
-  const notEnoughData = holdingSeries && holdingSeries.length <= 1
+  const notEnoughData = holdingSeries && holdingSeries.length <= 1 ? true : false
 
   return (
     <ChartWrapper>
@@ -305,8 +305,8 @@ export const History_select: React.FC<Props> = ({
       ) : (
         <HistoryChart
           data={data}
-          hasEnoughData={notEnoughData}
           isScalar={isScalar}
+          notEnoughData={notEnoughData}
           outcomes={outcomeArray}
           scalarHigh={scalarHigh}
           scalarLow={scalarLow}
