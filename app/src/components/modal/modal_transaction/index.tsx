@@ -66,8 +66,18 @@ export const ModalTransaction = (props: Props) => {
           {txType} {formatBigNumber(amount || new BigNumber(0), collateral.decimals, 2)} {collateral.symbol}
           <ModalTokenIcon src={collateral.image} />
         </ModalMainText>
-        {/* TODO: Add case for each txState */}
-        <ModalSubText>{txState === TransactionState.waiting ? 'Confirm Transaction' : 'asdfghjkl;'}</ModalSubText>
+        <ModalSubText>
+          {txState === TransactionState.waiting
+            ? 'Confirm Transaction'
+            : TransactionState.submitted
+            ? 'Transaction Submitted'
+            : TransactionState.confirming
+            ? // TODO: Replace with dynamic amounts
+              '1 out of 8 Confirmations'
+            : TransactionState.confirmed
+            ? 'Transaction Confirmed'
+            : ''}
+        </ModalSubText>
         {/* TODO: Add disabled check */}
         <EtherscanButton buttonType={ButtonType.secondaryLine}>View on Etherscan</EtherscanButton>
       </ContentWrapper>
