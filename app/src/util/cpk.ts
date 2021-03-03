@@ -176,8 +176,6 @@ class OCPK extends CPK {
   }
 }
 
-export const zeroAddress = '0x0000000000000000000000000000000000000000'
-
 class BiconomyTransactionManager {
   get config() {
     return {
@@ -197,8 +195,8 @@ class BiconomyTransactionManager {
     const safeTxGas = 0
     const dataGas = 0
     const gasPrice = 0
-    const gasToken = zeroAddress
-    const refundReceiver = zeroAddress
+    const gasToken = ethers.constants.AddressZero
+    const refundReceiver = ethers.constants.AddressZero
     const from = await ethLibAdapter.signer.signer.getAddress()
 
     // get safe transaction nonce
