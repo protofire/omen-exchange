@@ -423,6 +423,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           amount={parseUnits('125', 18)}
           collateral={getToken(1, 'dai')}
           isOpen={true}
+          txHash={'asdf'}
           txState={TransactionState.waiting}
           txType={TransactionType.deposit}
         />

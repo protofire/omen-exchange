@@ -3,7 +3,8 @@ import React, { HTMLAttributes } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { formatBigNumber } from '../../../util/tools'
+import { useConnectedWeb3Context } from '../../../hooks'
+import { formatBigNumber, getBlockExplorerURL } from '../../../util/tools'
 import { Token, TransactionState, TransactionType } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -34,6 +35,10 @@ const ModalSubText = styled.p`
 
 const EtherscanButton = styled(Button)`
   width: 100%;
+`
+
+const EtherscanButtonWrapper = styled.a`
+  width: 100%;
   margin-top: 32px;
 `
 
@@ -42,12 +47,15 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   collateral: Token
   isOpen: boolean
   theme?: any
+  txHash: string
   txState: TransactionState
   txType: TransactionType
 }
 
 export const ModalTransaction = (props: Props) => {
-  const { amount, collateral, isOpen, theme, txState, txType } = props
+  const { amount, collateral, isOpen, theme, txHash, txState, txType } = props
+  const context = useConnectedWeb3Context()
+  const { networkId } = context
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
@@ -78,8 +86,10 @@ export const ModalTransaction = (props: Props) => {
             ? 'Transaction Confirmed'
             : ''}
         </ModalSubText>
-        {/* TODO: Add disabled check */}
-        <EtherscanButton buttonType={ButtonType.secondaryLine}>View on Etherscan</EtherscanButton>
+        <EtherscanButtonWrapper href={getBlockExplorerURL(networkId, txHash)} rel="noopener noreferrer" target="_blank">
+          {/* TODO: Add disabled check */}
+          <EtherscanButton buttonType={ButtonType.secondaryLine}>View on Etherscan</EtherscanButton>
+        </EtherscanButtonWrapper>
       </ContentWrapper>
     </Modal>
   )

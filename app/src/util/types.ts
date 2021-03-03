@@ -534,3 +534,10 @@ export enum TransactionType {
   redeem = 'Redeem',
   create = 'Create',
 }
+
+export enum EtherscanLink {
+  rinkeby = 'https://rinkeby.etherscan.io/tx/',
+  mainnet = 'https://etherscan.io/tx/',
+  xDai = 'https://blockscout.com/poa/xdai/tx/',
+  sokol = 'https://blockscout.com/poa/sokol/tx/',
+}
