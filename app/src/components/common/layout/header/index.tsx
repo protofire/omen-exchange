@@ -18,7 +18,12 @@ import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, Butt
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { XdaiBridgeTransfer } from '../../../market/common/xdai_bridge_modal'
-import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
+import {
+  ModalConnectWalletWrapper,
+  ModalDepositWithdrawWrapper,
+  ModalTransaction,
+  ModalYourConnectionWrapper,
+} from '../../../modal'
 import { IconAdd, IconClose } from '../../icons'
 import { IconArrowRight } from '../../icons/IconArrowRight'
 import { DaiIcon } from '../../icons/currencies'
@@ -413,6 +418,8 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           }}
           onClose={() => setDepositWithdrawModalState(false)}
         />
+        {/* TODO: Replace hardcoded props */}
+        <ModalTransaction isOpen={true} />
       </HeaderInner>
     </HeaderWrapper>
   )
