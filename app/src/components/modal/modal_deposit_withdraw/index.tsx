@@ -133,7 +133,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       </Modal>
       {/* TODO: Replace hardcoded props */}
       <ModalTransactionWrapper
-        amount={parseUnits('125', 18)}
+        amount={displayFundAmount || new BigNumber(0)}
         collateral={getToken(1, 'dai')}
         isOpen={isTransactionModalOpen}
         onClose={() => setIsTransactionModalOpen(false)}

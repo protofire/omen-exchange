@@ -1,9 +1,11 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { HTMLAttributes } from 'react'
+import React, { HTMLAttributes, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { useConnectedWeb3Context, useTokens } from '../../../hooks'
+import { XdaiService } from '../../../services'
 import { formatBigNumber, formatNumber, truncateStringInTheMiddle } from '../../../util/tools'
 import { WalletState } from '../../../util/types'
 import { Button } from '../../button/button'
@@ -140,28 +142,43 @@ const EnableDaiButton = styled(Button)`
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   changeWallet: () => void
-  claimState: boolean
   isOpen: boolean
   onClose: () => void
   openDepositModal: () => void
   openWithdrawModal: () => void
   theme?: any
-  unclaimedAmount: BigNumber
 }
 
 export const ModalYourConnection = (props: Props) => {
-  const {
-    changeWallet,
-    claimState,
-    isOpen,
-    onClose,
-    openDepositModal,
-    openWithdrawModal,
-    theme,
-    unclaimedAmount,
-  } = props
+  const { changeWallet, isOpen, onClose, openDepositModal, openWithdrawModal, theme } = props
   const context = useConnectedWeb3Context()
-  const { account, networkId } = context
+  const { account, library: provider, networkId } = context
+
+  const [claimState, setClaimState] = useState<boolean>(false)
+  const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
+
+  useEffect(() => {
+    const fetchUnclaimedAssets = async () => {
+      const xDaiService = new XdaiService(provider)
+      const transaction = await xDaiService.fetchXdaiTransactionData()
+      if (transaction) {
+        setUnclaimedAmount(transaction.value)
+
+        setClaimState(true)
+
+        return
+      }
+      setClaimState(false)
+    }
+    if (networkId === 1) {
+      fetchUnclaimedAssets()
+    } else {
+      setUnclaimedAmount(Zero)
+      setClaimState(false)
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account, networkId])
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
