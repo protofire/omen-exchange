@@ -5,6 +5,8 @@ import styled, { withTheme } from 'styled-components'
 
 import { formatBigNumber } from '../../../util/tools'
 import { Token, TransactionState, TransactionType } from '../../../util/types'
+import { Button } from '../../button'
+import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
 import { IconClose } from '../../common/icons'
 import { ContentWrapper, ModalNavigation, ModalNavigationLeft } from '../common_styled'
@@ -28,6 +30,11 @@ const ModalSubText = styled.p`
   font-size: ${props => props.theme.fonts.defaultFontSize};
   color: ${props => props.theme.colors.textColorLighter};
   margin: 0;
+`
+
+const EtherscanButton = styled(Button)`
+  width: 100%;
+  margin-top: 32px;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -61,6 +68,8 @@ export const ModalTransaction = (props: Props) => {
         </ModalMainText>
         {/* TODO: Add case for each txState */}
         <ModalSubText>{txState === TransactionState.waiting ? 'Confirm Transaction' : 'asdfghjkl;'}</ModalSubText>
+        {/* TODO: Add disabled check */}
+        <EtherscanButton buttonType={ButtonType.secondaryLine}>View on Etherscan</EtherscanButton>
       </ContentWrapper>
     </Modal>
   )
