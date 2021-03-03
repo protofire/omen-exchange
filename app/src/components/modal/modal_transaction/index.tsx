@@ -46,6 +46,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   amount?: BigNumber
   collateral: Token
   isOpen: boolean
+  onClose: () => void
   theme?: any
   txHash: string
   txState: TransactionState
@@ -53,7 +54,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const ModalTransaction = (props: Props) => {
-  const { amount, collateral, isOpen, theme, txHash, txState, txType } = props
+  const { amount, collateral, isOpen, onClose, theme, txHash, txState, txType } = props
   const context = useConnectedWeb3Context()
   const { networkId } = context
 
@@ -62,7 +63,7 @@ export const ModalTransaction = (props: Props) => {
   }, [])
 
   return (
-    <Modal isOpen={isOpen} style={theme.fluidHeightModal}>
+    <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
       <ContentWrapper>
         <ModalNavigation>
           <ModalNavigationLeft></ModalNavigationLeft>

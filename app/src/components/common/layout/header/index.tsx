@@ -418,15 +418,6 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
           }}
           onClose={() => setDepositWithdrawModalState(false)}
         />
-        {/* TODO: Replace hardcoded props */}
-        <ModalTransactionWrapper
-          amount={parseUnits('125', 18)}
-          collateral={getToken(1, 'dai')}
-          isOpen={true}
-          txHash={'asdf'}
-          txState={TransactionState.waiting}
-          txType={TransactionType.deposit}
-        />
       </HeaderInner>
     </HeaderWrapper>
   )

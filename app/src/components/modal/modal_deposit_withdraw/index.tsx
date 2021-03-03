@@ -1,11 +1,12 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { useConnectedWeb3Context, useTokens } from '../../../hooks'
+import { getToken } from '../../../util/networks'
 import { formatBigNumber, formatNumber } from '../../../util/tools'
-import { ExchangeType } from '../../../util/types'
+import { ExchangeType, TransactionState, TransactionType } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../common'
@@ -25,6 +26,7 @@ import {
   ModalNavigationLeft,
   ModalTitle,
 } from '../common_styled'
+import { ModalTransactionWrapper } from '../modal_transaction'
 
 const InputInfo = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
@@ -53,6 +55,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
@@ -67,66 +70,78 @@ export const ModalDepositWithdraw = (props: Props) => {
   const isDepositWithdrawDisabled = true
 
   return (
-    <Modal isOpen={isOpen} onRequestClose={onClose} style={theme.fluidHeightModal}>
-      <ContentWrapper>
-        <ModalNavigation>
-          <ModalNavigationLeft>
-            <IconArrowBack hoverEffect={true} onClick={onBack} />
-            <ModalTitle style={{ marginLeft: '16px' }}>{exchangeType} Dai</ModalTitle>
-          </ModalNavigationLeft>
-          <IconClose hoverEffect={true} onClick={onClose} />
-        </ModalNavigation>
-        <ModalCard style={{ marginBottom: '16px', marginTop: '12px' }}>
-          <BalanceSection>
-            <BalanceItems>
-              <BalanceItem>
-                <BalanceItemSide>
-                  <BalanceItemTitle>Wallet</BalanceItemTitle>
-                </BalanceItemSide>
-                <BalanceItemSide>
-                  <BalanceItemBalance style={{ marginRight: '12px' }}>{formattedDaiBalance} DAI</BalanceItemBalance>
-                  <DaiIcon size="24px" />
-                </BalanceItemSide>
-              </BalanceItem>
-              <BalanceItem>
-                <BalanceItemSide>
-                  <BalanceItemTitle>Omen Account</BalanceItemTitle>
-                </BalanceItemSide>
-                <BalanceItemSide>
-                  {/* TODO: Replace hardcoded balance */}
-                  <BalanceItemBalance style={{ marginRight: '12px' }}>0.00 DAI</BalanceItemBalance>
-                  <DaiIcon size="24px" />
-                </BalanceItemSide>
-              </BalanceItem>
-            </BalanceItems>
-          </BalanceSection>
-        </ModalCard>
-        <TextfieldCustomPlaceholder
-          formField={
-            <BigNumberInput
-              decimals={18}
-              name="amount"
-              onChange={(e: BigNumberInputReturn) => {
-                setDisplayFundAmount(e.value)
-                setAmountToDisplay('')
-              }}
-              value={displayFundAmount}
-              valueToDisplay={amountToDisplay}
-            ></BigNumberInput>
-          }
-          onClickMaxButton={() => {
-            setDisplayFundAmount(daiBalance)
-            setAmountToDisplay(formatBigNumber(daiBalance, 18, 5))
-          }}
-          shouldDisplayMaxButton={true}
-          symbol={'DAI'}
-        ></TextfieldCustomPlaceholder>
-        <InputInfo>You need to deposit at least 10 DAI.</InputInfo>
-        <DepositWithdrawButton buttonType={ButtonType.primaryAlternative} disabled={isDepositWithdrawDisabled}>
-          {exchangeType}
-        </DepositWithdrawButton>
-      </ContentWrapper>
-    </Modal>
+    <>
+      <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
+        <ContentWrapper>
+          <ModalNavigation>
+            <ModalNavigationLeft>
+              <IconArrowBack hoverEffect={true} onClick={onBack} />
+              <ModalTitle style={{ marginLeft: '16px' }}>{exchangeType} Dai</ModalTitle>
+            </ModalNavigationLeft>
+            <IconClose hoverEffect={true} onClick={onClose} />
+          </ModalNavigation>
+          <ModalCard style={{ marginBottom: '16px', marginTop: '12px' }}>
+            <BalanceSection>
+              <BalanceItems>
+                <BalanceItem>
+                  <BalanceItemSide>
+                    <BalanceItemTitle>Wallet</BalanceItemTitle>
+                  </BalanceItemSide>
+                  <BalanceItemSide>
+                    <BalanceItemBalance style={{ marginRight: '12px' }}>{formattedDaiBalance} DAI</BalanceItemBalance>
+                    <DaiIcon size="24px" />
+                  </BalanceItemSide>
+                </BalanceItem>
+                <BalanceItem>
+                  <BalanceItemSide>
+                    <BalanceItemTitle>Omen Account</BalanceItemTitle>
+                  </BalanceItemSide>
+                  <BalanceItemSide>
+                    {/* TODO: Replace hardcoded balance */}
+                    <BalanceItemBalance style={{ marginRight: '12px' }}>0.00 DAI</BalanceItemBalance>
+                    <DaiIcon size="24px" />
+                  </BalanceItemSide>
+                </BalanceItem>
+              </BalanceItems>
+            </BalanceSection>
+          </ModalCard>
+          <TextfieldCustomPlaceholder
+            formField={
+              <BigNumberInput
+                decimals={18}
+                name="amount"
+                onChange={(e: BigNumberInputReturn) => {
+                  setDisplayFundAmount(e.value)
+                  setAmountToDisplay('')
+                }}
+                value={displayFundAmount}
+                valueToDisplay={amountToDisplay}
+              ></BigNumberInput>
+            }
+            onClickMaxButton={() => {
+              setDisplayFundAmount(daiBalance)
+              setAmountToDisplay(formatBigNumber(daiBalance, 18, 5))
+            }}
+            shouldDisplayMaxButton={true}
+            symbol={'DAI'}
+          ></TextfieldCustomPlaceholder>
+          <InputInfo>You need to deposit at least 10 DAI.</InputInfo>
+          <DepositWithdrawButton buttonType={ButtonType.primaryAlternative} disabled={isDepositWithdrawDisabled}>
+            {exchangeType}
+          </DepositWithdrawButton>
+        </ContentWrapper>
+      </Modal>
+      {/* TODO: Replace hardcoded props */}
+      <ModalTransactionWrapper
+        amount={parseUnits('125', 18)}
+        collateral={getToken(1, 'dai')}
+        isOpen={isTransactionModalOpen}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={'asdf'}
+        txState={TransactionState.waiting}
+        txType={TransactionType.deposit}
+      />
+    </>
   )
 }
 
