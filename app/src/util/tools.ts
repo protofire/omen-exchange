@@ -461,7 +461,7 @@ export const formatNumber = (number: string, decimals = 2): string => {
 }
 
 export const formatHistoryDate = (dateData: number | string): string => {
-  const date = new Date(dateData)
+  const date = new Date(new Date(dateData).toUTCString().substr(0, 25))
   const minute = date.getMinutes()
   const minuteWithZero = (minute < 10 ? '0' : '') + minute
   const hour = date.getHours()
@@ -470,7 +470,8 @@ export const formatHistoryDate = (dateData: number | string): string => {
 }
 
 export const formatTimestampToDate = (timestamp: number, value: string) => {
-  const ts = moment(timestamp * 1000)
+  const date = new Date(new Date(timestamp * 1000).toUTCString().substr(0, 25))
+  const ts = moment(date)
   if (value === '1D' || value === '1H') return ts.format('HH:mm')
 
   return ts.format('MMM D')
