@@ -534,6 +534,7 @@ export enum TransactionType {
   sell = 'Sell',
   redeem = 'Redeem',
   create = 'Create',
+  claim = 'Claim',
 }
 
 export enum EtherscanLink {
