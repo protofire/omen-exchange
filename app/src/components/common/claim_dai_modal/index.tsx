@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
+import { useConnectedWeb3Context } from '../../../hooks'
 import { useXdaiBridge } from '../../../hooks/useXdaiBridge'
 import theme from '../../../theme'
-import { formatBigNumber } from '../../../util/tools'
+import { formatBigNumber, getTxHashBlockExplorerURL } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonRound } from '../../button/button_round'
@@ -50,6 +51,8 @@ const Reversed = styled.div`
 
 export const ClaimDaiModal = (props: any) => {
   const { claimLatestToken, transactionHash, transactionStep } = useXdaiBridge()
+  const context = useConnectedWeb3Context()
+  const { networkId } = context
 
   useEffect(() => {
     if (transactionStep === TransactionStep.error) props.setClaim(false)
@@ -91,7 +94,7 @@ export const ClaimDaiModal = (props: any) => {
         ) : transactionStep === TransactionStep.transactionSubmitted ||
           transactionStep === TransactionStep.transactionConfirmed ? (
           <TransactionLink
-            href={`https://etherscan.io/tx/${transactionHash}`}
+            href={getTxHashBlockExplorerURL(networkId, transactionHash)}
             rel="noopener noreferrer"
             target="_blank"
           >
