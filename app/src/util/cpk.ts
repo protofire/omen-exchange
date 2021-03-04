@@ -9,7 +9,7 @@ import { Web3Provider } from 'ethers/providers'
 
 import { proxyFactoryAbi } from '../abi/proxy_factory'
 import { MAIN_NETWORKS } from '../common/constants'
-import { BiconomyService } from '../services/biconomy'
+import { RelayService } from '../services/relay'
 import { SafeService } from '../services/safe'
 
 import { getCPKAddresses, getInfuraUrl, getRelayProxyFactory, networkIds } from './networks'
@@ -61,7 +61,7 @@ class OCPK extends CPK {
   constructor(opts?: any) {
     super(opts)
     this.transactionManager = opts.transactionManager
-    this.relay = this.transactionManager.config.name === 'BiconomyTransactionManager'
+    this.relay = this.transactionManager.config.name === 'RelayTransactionManager'
   }
 
   async init() {
@@ -176,10 +176,10 @@ class OCPK extends CPK {
   }
 }
 
-class BiconomyTransactionManager {
+class RelayTransactionManager {
   get config() {
     return {
-      name: 'BiconomyTransactionManager',
+      name: 'RelayTransactionManager',
     }
   }
 
@@ -222,14 +222,14 @@ class BiconomyTransactionManager {
     // sign transaction hash
     const signature = await this.signTransactionHash(ethLibAdapter, txHash)
 
-    // execute transaction through biconomy
-    const biconomy = new BiconomyService()
+    // execute transaction through relay
+    const relay = new RelayService()
 
     const standardizedTxs = transactions.map(standardizeTransaction)
 
     // if proxy is already deployed, exec tx directly, otherwise deploy proxy first
     if (isDeployed) {
-      return biconomy.execTransaction({
+      return relay.execTransaction({
         data,
         dataGas,
         from,
@@ -246,7 +246,7 @@ class BiconomyTransactionManager {
         value,
       })
     } else {
-      return biconomy.createProxyAndExecTransaction({
+      return relay.createProxyAndExecTransaction({
         data,
         fallbackHandlerAddress,
         from,
@@ -304,7 +304,7 @@ export const createCPK = async (provider: Web3Provider, relay: boolean) => {
       networks[network.chainId].proxyFactoryAddress = relayProxyFactoryAddress
     }
   }
-  const transactionManager = relay ? new BiconomyTransactionManager() : new CpkTransactionManager()
+  const transactionManager = relay ? new RelayTransactionManager() : new CpkTransactionManager()
   const cpk = new OCPK({ ethLibAdapter: new EthersAdapter({ ethers, signer }), transactionManager, networks })
   await cpk.init()
   return cpk
