@@ -6,7 +6,7 @@ import styled, { withTheme } from 'styled-components'
 import { useConnectedWeb3Context, useTokens } from '../../../hooks'
 import { getToken } from '../../../util/networks'
 import { formatBigNumber, formatNumber } from '../../../util/tools'
-import { ExchangeType, TransactionState, TransactionType } from '../../../util/types'
+import { ExchangeType, TransactionStep, TransactionType } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../common'
@@ -138,7 +138,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         isOpen={isTransactionModalOpen}
         onClose={() => setIsTransactionModalOpen(false)}
         txHash={'asdf'}
-        txState={TransactionState.waiting}
+        txState={TransactionStep.waitingConfirmation}
         txType={TransactionType.deposit}
       />
     </>

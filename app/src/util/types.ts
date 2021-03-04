@@ -519,11 +519,12 @@ export enum ExchangeType {
   withdraw = 'Withdraw',
 }
 
-export enum TransactionState {
-  waiting,
-  submitted,
-  confirming,
-  confirmed,
+export enum TransactionStep {
+  idle,
+  waitingConfirmation,
+  transactionSubmitted,
+  transactionConfirmed,
+  error,
 }
 
 export enum TransactionType {

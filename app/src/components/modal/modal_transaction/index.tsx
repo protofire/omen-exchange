@@ -5,7 +5,7 @@ import styled, { withTheme } from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../hooks'
 import { formatBigNumber, getBlockExplorerURL } from '../../../util/tools'
-import { Token, TransactionState, TransactionType } from '../../../util/types'
+import { Token, TransactionStep, TransactionType } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
@@ -49,7 +49,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   onClose: () => void
   theme?: any
   txHash: string
-  txState: TransactionState
+  txState: TransactionStep
   txType: TransactionType
 }
 
@@ -76,14 +76,15 @@ export const ModalTransaction = (props: Props) => {
           <ModalTokenIcon src={collateral.image} />
         </ModalMainText>
         <ModalSubText>
-          {txState === TransactionState.waiting
+          {txState === TransactionStep.waitingConfirmation
             ? 'Confirm Transaction'
-            : TransactionState.submitted
+            : TransactionStep.transactionSubmitted
             ? 'Transaction Submitted'
-            : TransactionState.confirming
-            ? // TODO: Replace with dynamic amounts
-              '1 out of 8 Confirmations'
-            : TransactionState.confirmed
+            : // TODO: Add confirming step
+            // : TransactionStep.confirming
+            // ? // TODO: Replace with dynamic amounts
+            //   '1 out of 8 Confirmations'
+            TransactionStep.transactionConfirmed
             ? 'Transaction Confirmed'
             : ''}
         </ModalSubText>
