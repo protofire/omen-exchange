@@ -354,6 +354,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
               {/* TODO: Remove hardcoded balance */}
               <DepositedBalance>0.00 DAI</DepositedBalance>
               <HeaderButtonDivider />
+              <Network claim={false} />
             </HeaderButton>
           )}
         </ContentsRight>
