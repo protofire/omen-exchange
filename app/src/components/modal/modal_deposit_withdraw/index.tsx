@@ -63,7 +63,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   const { tokens } = useTokens(context, true, true)
 
-  const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0].balance || '')
+  const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
   const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
 
   // TODO: Replace hardcoded value

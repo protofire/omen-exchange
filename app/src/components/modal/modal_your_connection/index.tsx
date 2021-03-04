@@ -201,9 +201,9 @@ export const ModalYourConnection = (props: Props) => {
 
   const { tokens } = useTokens(context, true, true)
 
-  const ethBalance = new BigNumber(tokens.filter(token => token.symbol === 'ETH')[0].balance || '')
+  const ethBalance = new BigNumber(tokens.filter(token => token.symbol === 'ETH')[0]?.balance || '')
   const formattedEthBalance = formatNumber(formatBigNumber(ethBalance, 18, 18))
-  const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0].balance || '')
+  const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
   const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
 
   // TODO: Replace hardcoded state
