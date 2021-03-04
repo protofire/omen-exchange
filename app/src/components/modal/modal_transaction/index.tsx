@@ -67,8 +67,7 @@ export const ModalTransaction = (props: Props) => {
       <ContentWrapper>
         <ModalNavigation>
           <ModalNavigationLeft></ModalNavigationLeft>
-          {/* TODO: Add onClick */}
-          <IconClose hoverEffect={true} />
+          <IconClose hoverEffect={true} onClick={onClose} />
         </ModalNavigation>
         <Spinner big={true} style={{ marginTop: '10px' }} />
         <ModalMainText>
