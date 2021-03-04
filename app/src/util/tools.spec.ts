@@ -27,7 +27,7 @@ import {
   formatTimestampToDate,
   formatToShortNumber,
   getBaseTokenForCToken,
-  getBlockExplorerURL,
+  getTxHashBlockExplorerURL,
   getCTokenForToken,
   getIndexSets,
   getInitialCollateral,
@@ -744,7 +744,7 @@ describe('tools', () => {
     }
   })
 
-  describe('getBlockExplorerURL', () => {
+  describe('getTxHashBlockExplorerURL', () => {
     const testCases: [[number, string], string][] = [
       [[1, 'asdfghjkl'], 'https://etherscan.io/tx/asdfghjkl'],
       [[4, '12345'], 'https://rinkeby.etherscan.io/tx/12345'],
@@ -752,7 +752,7 @@ describe('tools', () => {
       [[100, 'jkj2kjasdf'], 'https://blockscout.com/poa/xdai/tx/jkj2kjasdf'],
     ]
     for (const [[networkId, txHash], result] of testCases) {
-      const blockExplorerURL = getBlockExplorerURL(networkId, txHash)
+      const blockExplorerURL = getTxHashBlockExplorerURL(networkId, txHash)
       expect(result).toStrictEqual(blockExplorerURL)
     }
   })

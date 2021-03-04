@@ -694,7 +694,7 @@ export const reverseArray = (array: any[]): any[] => {
   return newArray
 }
 
-export const getBlockExplorerURL = (networkId: number, txHash: string): string => {
+export const getTxHashBlockExplorerURL = (networkId: number, txHash: string): string => {
   if (networkId === 1) {
     return `${EtherscanLink.mainnet}${txHash}`
   }

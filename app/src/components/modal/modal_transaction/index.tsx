@@ -4,7 +4,7 @@ import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../hooks'
-import { formatBigNumber, getBlockExplorerURL } from '../../../util/tools'
+import { formatBigNumber, getTxHashBlockExplorerURL } from '../../../util/tools'
 import { Token, TransactionStep, TransactionType } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -87,7 +87,11 @@ export const ModalTransaction = (props: Props) => {
             ? 'Transaction Confirmed'
             : ''}
         </ModalSubText>
-        <EtherscanButtonWrapper href={getBlockExplorerURL(networkId, txHash)} rel="noopener noreferrer" target="_blank">
+        <EtherscanButtonWrapper
+          href={getTxHashBlockExplorerURL(networkId, txHash)}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
           {/* TODO: Add disabled check */}
           <EtherscanButton buttonType={ButtonType.secondaryLine}>View on Etherscan</EtherscanButton>
         </EtherscanButtonWrapper>
