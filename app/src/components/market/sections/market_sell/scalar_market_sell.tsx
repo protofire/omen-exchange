@@ -336,13 +336,18 @@ export const ScalarMarketSell = (props: Props) => {
     formattedNewPrediction !== 0 && formattedNewPrediction !== Number(outcomeTokenMarginalPrices[1].substring(0, 20))
 
   const setAmountSharesFromInput = (shares: BigNumber) => {
-    if (collateralSymbol in CompoundTokenType && compoundService) {
-      const actualAmountOfShares = compoundService.calculateBaseToCTokenExchange(baseCollateral, shares)
-      setAmountShares(actualAmountOfShares)
+    if (shares.eq(displaySelectedOutcomeBalanceValue)) {
+      setAmountShares(balanceItem.shares)
+      setDisplaySellShares(shares)
     } else {
-      setAmountShares(shares)
+      if (collateralSymbol in CompoundTokenType && compoundService) {
+        const actualAmountOfShares = compoundService.calculateBaseToCTokenExchange(baseCollateral, shares)
+        setAmountShares(actualAmountOfShares)
+      } else {
+        setAmountShares(shares)
+      }
+      setDisplaySellShares(shares)
     }
-    setDisplaySellShares(shares)
   }
 
   return (
