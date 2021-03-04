@@ -75,7 +75,14 @@ export const ModalDepositWithdraw = (props: Props) => {
         <ContentWrapper>
           <ModalNavigation>
             <ModalNavigationLeft>
-              <IconArrowBack hoverEffect={true} onClick={onBack} />
+              <IconArrowBack
+                hoverEffect={true}
+                onClick={() => {
+                  onBack()
+                  setDisplayFundAmount(new BigNumber(0))
+                  setAmountToDisplay('')
+                }}
+              />
               <ModalTitle style={{ marginLeft: '16px' }}>{exchangeType} Dai</ModalTitle>
             </ModalNavigationLeft>
             <IconClose hoverEffect={true} onClick={onClose} />
