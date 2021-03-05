@@ -1,7 +1,7 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import {
@@ -13,33 +13,13 @@ import { calcPrice, calcSellAmountInCollateral, formatBigNumber, formatTimestamp
 import { HistoricData, Period } from '../../../../util/types'
 import { ButtonRound, ButtonSelectable } from '../../../button'
 import { Dropdown, DropdownPosition } from '../../../common/form/dropdown'
+import { commonWrapperCSS } from '../common_styled'
 import { HistoryChart } from '../history_chart'
 import { HistoryTable } from '../history_table'
 
-export const commonWrapperCSS = css`
-  border-top: 1px solid ${props => props.theme.borders.borderDisabled};
-  margin-left: -${props => props.theme.cards.paddingHorizontal};
-  margin-right: -${props => props.theme.cards.paddingHorizontal};
-  width: auto;
-`
 const DropdownMenu = styled(Dropdown)`
   margin-left: auto;
   min-width: 164px;
-`
-
-const NoData = styled.div`
-  ${commonWrapperCSS};
-  align-items: center;
-  color: ${props => props.theme.colors.textColorDarker};
-  display: flex;
-  font-size: 15px;
-  font-weight: 400;
-  height: 340px;
-  justify-content: center;
-  letter-spacing: 0.4px;
-  line-height: 1.3;
-  padding-left: ${props => props.theme.cards.paddingHorizontal};
-  padding-right: ${props => props.theme.cards.paddingHorizontal};
 `
 
 const ChartWrapper = styled.div`
@@ -58,8 +38,7 @@ const ButtonsWrapper = styled.div`
   align-items: center;
   display: flex;
   flex: 1;
-  justify-content: space-between;
-  margin-left: 80px;
+  justify-content: flex-end;
 `
 
 const SelectWrapper = styled.div`
@@ -85,11 +64,8 @@ type Props = {
 const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
   color: ${props => (props.active ? props.theme.colors.primary : props.theme.colors.clickable)};
   font-weight: 500;
-  margin-left: 5px;
 
-  &:first-child {
-    margin-left: 0;
-  }
+  width: 43px;
 `
 const ButtonSelect = styled(ButtonRound)`
   margin-right: 10px;
@@ -287,14 +263,7 @@ export const History_select: React.FC<Props> = ({
     const newPageIndex = pageIndex - pageSize
     setPageIndex(newPageIndex)
   }
-
-  // if (!data || status === 'Loading' || sharesDataLoader) {
-  //   return <CustomInlineLoading message="Loading Trade History" />
-  // }
-
-  if (holdingSeries && holdingSeries.length <= 1) {
-    return <NoData>There is not enough historical data for this market</NoData>
-  }
+  const notEnoughData = holdingSeries && holdingSeries.length <= 1 ? true : false
 
   return (
     <ChartWrapper>
@@ -337,6 +306,7 @@ export const History_select: React.FC<Props> = ({
         <HistoryChart
           data={data}
           isScalar={isScalar}
+          notEnoughData={notEnoughData}
           outcomes={outcomeArray}
           scalarHigh={scalarHigh}
           scalarLow={scalarLow}
