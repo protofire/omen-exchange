@@ -155,7 +155,7 @@ const HeaderDropdown = styled(Dropdown)`
 const CloseIconWrapper = styled.div`
   margin-right: 12px;
 `
-const ClaimWrapper = styled.div`
+const DropdownWrapper = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
@@ -164,15 +164,17 @@ const ClaimAmount = styled.div`
   color: ${props => props.theme.colors.textColorDark};
   font-size: ${props => props.theme.fonts.defaultSize};
 `
-const GoldDot = styled.div`
-  height: 6px;
-  width: 6px;
-  background-color: ${props => props.theme.colors.gold};
+
+const Dot = styled.div<{ color: string; size: number }>`
+  height: ${props => props.size}px;
+  width: ${props => props.size}px;
+  background-color: ${props => props.theme.colors[props.color]};
   border-radius: 50%;
   display: inline-block;
   margin-right: 8px;
 `
-const ClaimText = styled.div`
+
+const DropdownText = styled.div`
   display: flex;
   align-items: center;
 `
@@ -182,7 +184,7 @@ interface ExtendsHistory extends RouteComponentProps {
 }
 
 const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
-  const { account, library: provider, networkId, relay } = useConnectedWeb3Context()
+  const { account, library: provider, networkId, relay, toggleRelay } = useConnectedWeb3Context()
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
@@ -193,23 +195,45 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   const headerDropdownItems: Array<DropdownItemProps> = [
     {
       content: (
-        <ClaimWrapper
+        <DropdownWrapper
           onClick={() => {
             props.setClaim(true)
           }}
         >
-          <ClaimText>
-            <GoldDot />
+          <DropdownText>
+            <Dot color="gold" size={6} />
             Claim
-          </ClaimText>
+          </DropdownText>
           <ClaimAmount>{formatBigNumber(unclaimedAmount, 18, 2)} DAI</ClaimAmount>
-        </ClaimWrapper>
+        </DropdownWrapper>
       ),
       visibility: (networkId !== 1 && !relay) || !claimState,
     },
 
     {
       content: <ButtonDisconnectWallet />,
+    },
+  ]
+
+  const networkPlacholder = (
+    <DropdownWrapper>
+      <DropdownText>
+        <Dot color="greenLight" size={8} />
+        {relay ? 'xDai' : 'Mainnet'}
+      </DropdownText>
+    </DropdownWrapper>
+  )
+  const networkDropdownItems: Array<DropdownItemProps> = [
+    {
+      content: (
+        <DropdownWrapper
+          onClick={() => {
+            toggleRelay()
+          }}
+        >
+          <DropdownText>{relay ? 'Mainnet' : 'xDai'}</DropdownText>
+        </DropdownWrapper>
+      ),
     },
   ]
 
@@ -294,6 +318,18 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
               <ButtonCreateMobile {...createButtonProps}>
                 <IconAdd />
               </ButtonCreateMobile>
+            </>
+          )}
+
+          {(networkId === networkIds.MAINNET || networkId == networkIds.XDAI) && (
+            <>
+              <HeaderDropdown
+                currentItem={headerDropdownItems.length + 1}
+                dropdownPosition={DropdownPosition.center}
+                items={networkDropdownItems}
+                omitRightButtonMargin={true}
+                placeholder={networkPlacholder}
+              />
             </>
           )}
 

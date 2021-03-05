@@ -45,8 +45,13 @@ export const ConnectedWeb3: React.FC = props => {
   const context = useWeb3Context()
 
   const { account, active, error, library } = context
-  const [relay, setRelay] = useState(true)
-  const toggleRelay = () => setRelay(!relay)
+
+  const initialRelayState = localStorage.getItem('relay') === 'false' ? false : true
+  const [relay, setRelay] = useState(initialRelayState)
+  const toggleRelay = () => {
+    localStorage.setItem('relay', String(!relay))
+    setRelay(!relay)
+  }
 
   useEffect(() => {
     let isSubscribed = true
