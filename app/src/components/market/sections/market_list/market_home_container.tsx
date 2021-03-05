@@ -40,7 +40,6 @@ const Banner = styled.div`
   padding: 20px;
   height: unset;
   max-width: ${props => props.theme.mainContainer.maxWidth};
-  display: flex;
   margin-bottom: 20px;
   border-color: ${props => props.theme.borders.borderColor}!important;
 `
@@ -51,7 +50,6 @@ const TextWrapper = styled.div`
   flex-direction: row;
   text-align: left;
   flex-wrap: wrap;
-  display: flex;
   margin-left: 20px;
 `
 const TransferIcon = styled.img`
@@ -60,7 +58,7 @@ const TransferIcon = styled.img`
   margin-right: auto;
 `
 const TextTitle = styled.div`
-  font-weight: 500;
+  font-weight: ${props => props.theme.textfield.fontWeight};
   font-size: 16px;
   line-height: 18.75px;
 `

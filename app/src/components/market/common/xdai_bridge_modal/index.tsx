@@ -20,7 +20,7 @@ interface Prop {
   setOpen: any
 }
 
-export const BridgeWrapper = styled.div<{ isOpen: boolean }>`
+const BridgeWrapper = styled.div<{ isOpen: boolean }>`
   align-items: center;
   background-color: ${({ theme }) => theme.colors.mainBodyBackground};
   ${props => (!props.isOpen ? 'display:none' : 'display: flow-root')};
