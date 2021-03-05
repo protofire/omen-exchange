@@ -191,7 +191,7 @@ const SettingsViewContainer = (props: Props) => {
       return
     }
 
-    checkRpcStatus(url, setOnlineStatus, network)
+    checkRpcStatus(urlObject ? urlObject[current].rpcUrl : url, setOnlineStatus, network)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url])
   useEffect(() => {
