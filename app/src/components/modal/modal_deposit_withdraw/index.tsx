@@ -87,7 +87,14 @@ export const ModalDepositWithdraw = (props: Props) => {
               />
               <ModalTitle style={{ marginLeft: '16px' }}>{exchangeType} Dai</ModalTitle>
             </ModalNavigationLeft>
-            <IconClose hoverEffect={true} onClick={onClose} />
+            <IconClose
+              hoverEffect={true}
+              onClick={() => {
+                onClose()
+                setDisplayFundAmount(new BigNumber(0))
+                setAmountToDisplay('')
+              }}
+            />
           </ModalNavigation>
           <ModalCard style={{ marginBottom: '16px', marginTop: '12px' }}>
             <BalanceSection>
@@ -144,7 +151,9 @@ export const ModalDepositWithdraw = (props: Props) => {
       <ModalTransactionWrapper
         icon={DAI.image}
         isOpen={isTransactionModalOpen}
-        message={`Depositing ${formatBigNumber(displayFundAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`}
+        message={`${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), DAI.decimals)} ${
+          DAI.symbol
+        }`}
         onClose={() => setIsTransactionModalOpen(false)}
         txHash={'asdf'}
         txState={TransactionStep.waitingConfirmation}
