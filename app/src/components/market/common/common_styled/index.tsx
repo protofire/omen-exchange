@@ -86,6 +86,12 @@ export const OutcomeItemTextWrapper = styled.div`
   align-items: center;
   display: flex;
 `
+export const commonWrapperCSS = css`
+  border-top: 1px solid ${props => props.theme.borders.borderDisabled};
+  margin-left: -${props => props.theme.cards.paddingHorizontal};
+  margin-right: -${props => props.theme.cards.paddingHorizontal};
+  width: auto;
+`
 
 export const RowWrapper = styled.div`
   align-items: center;
