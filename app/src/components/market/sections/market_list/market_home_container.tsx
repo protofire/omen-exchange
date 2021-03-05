@@ -5,11 +5,14 @@ import { bigNumberify } from 'ethers/utils'
 import React, { useCallback, useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import { useLocation } from 'react-router-dom'
+import styled from 'styled-components'
+import useLocalStorageState from 'use-local-storage-state'
 
 import { MAX_MARKET_FEE } from '../../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../../hooks'
 import { useMarkets } from '../../../../hooks/useMarkets'
 import { queryCategories } from '../../../../queries/markets_home'
+import theme from '../../../../theme'
 import { getLogger } from '../../../../util/logger'
 import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
@@ -23,10 +26,52 @@ import {
   MarketStates,
   MarketsSortCriteria,
 } from '../../../../util/types'
+import { ButtonCSS } from '../../../button/button_styling_types'
+import { IconClose } from '../../../common/icons'
 
+import xDaiIntergation from './img/xDaiIntegration.svg'
 import { MarketHome } from './market_home'
 
 const logger = getLogger('MarketHomeContainer')
+
+const Banner = styled.div`
+  ${ButtonCSS};
+  white-space: unset;
+  padding: 20px;
+  height: unset;
+  max-width: ${props => props.theme.mainContainer.maxWidth};
+  display: flex;
+  margin-bottom: 20px;
+  border-color: ${props => props.theme.borders.borderColor}!important;
+`
+const CloseStyled = styled.div`
+  margin-bottom: auto;
+`
+const TextWrapper = styled.div`
+  flex-direction: row;
+  text-align: left;
+  flex-wrap: wrap;
+  display: flex;
+  margin-left: 20px;
+`
+const TransferIcon = styled.img`
+  width: 52px;
+  height: 52px;
+  margin-right: auto;
+`
+const TextTitle = styled.div`
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 18.75px;
+`
+const TextDescription = styled.div`
+  margin-top: 8px;
+  color: ${props => props.theme.colors.textColorLighter};
+`
+const Link = styled.a`
+  color: ${props => props.theme.colors.clickable};
+  text-decoration: underline;
+`
 
 const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
   return data.map((graphMarketMakerDataItem: GraphMarketMakerDataItem) => {
@@ -65,6 +110,7 @@ const MarketHomeContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
   const history = useHistory()
+  const [hasSeenBanner, setHasSeenBanner] = useLocalStorageState('hasSeenBanner')
 
   const location = useLocation()
 
@@ -361,6 +407,27 @@ const MarketHomeContainer: React.FC = () => {
 
   return (
     <>
+      {hasSeenBanner === undefined && (
+        <Banner>
+          <TransferIcon alt="" src={xDaiIntergation} />
+          <TextWrapper>
+            <TextTitle>Scaling Omen with xDai Chain!</TextTitle>
+            <TextDescription>
+              You now have access to Omen markets on xDai Chain with your Mainnet Ethereum wallet. To use Omen on
+              Mainnet choose &quot;Mainnet&quot; from the network dropdown above!{' '}
+              <Link href={'https://youtube.com'}>learn more</Link>
+            </TextDescription>
+          </TextWrapper>
+          <CloseStyled
+            onClick={() => {
+              setHasSeenBanner('true')
+            }}
+          >
+            <IconClose color={theme.colors.tertiary} size={'24'} />
+          </CloseStyled>
+        </Banner>
+      )}
+
       <MarketHome
         categories={categories}
         context={context}
