@@ -13,7 +13,6 @@ const Wrapper = styled.button<ButtonSelectableProps>`
   padding-right: 8px;
 
   &:hover {
-    background-color: ${props => props.theme.buttonSecondary.backgroundColor};
     color: ${props => props.theme.buttonSecondary.color};
   }
 `
