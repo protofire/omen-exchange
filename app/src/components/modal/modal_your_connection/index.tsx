@@ -312,8 +312,8 @@ export const ModalYourConnection = (props: Props) => {
           </ModalCard>
         </ContentWrapper>
       </Modal>
-      {/* TODO: Replace hardcoded props */}
       <ModalTransactionWrapper
+        icon={DAI.image}
         isOpen={isTransactionModalOpen}
         message={`Claim ${formatBigNumber(unclaimedAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`}
         onClose={() => setIsTransactionModalOpen(false)}

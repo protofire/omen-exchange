@@ -19,6 +19,8 @@ const ModalMainText = styled.p`
   font-weight: 500;
   margin-top: 28px
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
 `
 
 const ModalTokenIcon = styled.img`
