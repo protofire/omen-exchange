@@ -88,9 +88,23 @@ export const ModalTransaction = (props: Props) => {
             ? 'Transaction Confirmed'
             : ''}
         </ModalSubText>
-        <EtherscanButtonWrapper href={getBlockExplorerURL(networkId, txHash)} rel="noopener noreferrer" target="_blank">
-          {/* TODO: Add disabled check */}
-          <EtherscanButton buttonType={ButtonType.secondaryLine}>View on Etherscan</EtherscanButton>
+        <EtherscanButtonWrapper
+          href={
+            txState === TransactionStep.transactionSubmitted || txState === TransactionStep.transactionConfirmed
+              ? getBlockExplorerURL(networkId, txHash)
+              : undefined
+          }
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          <EtherscanButton
+            buttonType={ButtonType.secondaryLine}
+            disabled={
+              txState !== TransactionStep.transactionSubmitted && txState !== TransactionStep.transactionConfirmed
+            }
+          >
+            View on Etherscan
+          </EtherscanButton>
         </EtherscanButtonWrapper>
       </ContentWrapper>
     </Modal>
