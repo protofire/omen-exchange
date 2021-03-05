@@ -66,6 +66,8 @@ export const ModalDepositWithdraw = (props: Props) => {
   const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
   const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
 
+  const DAI = getToken(1, 'dai')
+
   // TODO: Replace hardcoded value
   const isDepositWithdrawDisabled = true
 
@@ -140,13 +142,12 @@ export const ModalDepositWithdraw = (props: Props) => {
       </Modal>
       {/* TODO: Replace hardcoded props */}
       <ModalTransactionWrapper
-        amount={displayFundAmount || new BigNumber(0)}
-        collateral={getToken(1, 'dai')}
+        icon={DAI.image}
         isOpen={isTransactionModalOpen}
+        message={`Depositing ${formatBigNumber(displayFundAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`}
         onClose={() => setIsTransactionModalOpen(false)}
         txHash={'asdf'}
         txState={TransactionStep.waitingConfirmation}
-        txType={TransactionType.deposit}
       />
     </>
   )

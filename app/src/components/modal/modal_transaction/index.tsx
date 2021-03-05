@@ -43,18 +43,17 @@ const EtherscanButtonWrapper = styled.a`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  amount?: BigNumber
-  collateral: Token
+  icon?: string
   isOpen: boolean
+  message: string
   onClose: () => void
   theme?: any
   txHash: string
   txState: TransactionStep
-  txType: TransactionType
 }
 
 export const ModalTransaction = (props: Props) => {
-  const { amount, collateral, isOpen, onClose, theme, txHash, txState, txType } = props
+  const { icon, isOpen, message, onClose, theme, txHash, txState } = props
   const context = useConnectedWeb3Context()
   const { networkId } = context
 
@@ -71,8 +70,8 @@ export const ModalTransaction = (props: Props) => {
         </ModalNavigation>
         <Spinner big={true} style={{ marginTop: '10px' }} />
         <ModalMainText>
-          {txType} {formatBigNumber(amount || new BigNumber(0), collateral.decimals, 2)} {collateral.symbol}
-          <ModalTokenIcon src={collateral.image} />
+          {message}
+          {icon && <ModalTokenIcon src={icon} />}
         </ModalMainText>
         <ModalSubText>
           {txState === TransactionStep.waitingConfirmation

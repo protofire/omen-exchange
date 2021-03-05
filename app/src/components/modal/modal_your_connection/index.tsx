@@ -209,6 +209,8 @@ export const ModalYourConnection = (props: Props) => {
   // TODO: Replace hardcoded state
   const walletState = WalletState.ready
 
+  const DAI = getToken(1, 'dai')
+
   return (
     <>
       <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
@@ -312,13 +314,11 @@ export const ModalYourConnection = (props: Props) => {
       </Modal>
       {/* TODO: Replace hardcoded props */}
       <ModalTransactionWrapper
-        amount={unclaimedAmount}
-        collateral={getToken(1, 'dai')}
         isOpen={isTransactionModalOpen}
+        message={`Claim ${formatBigNumber(unclaimedAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`}
         onClose={() => setIsTransactionModalOpen(false)}
         txHash={transactionHash}
         txState={transactionStep}
-        txType={TransactionType.claim}
       />
     </>
   )
