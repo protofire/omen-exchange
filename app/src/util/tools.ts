@@ -60,15 +60,14 @@ export const formatDate = (date: Date, utcAdd = true): string => {
     .tz('UTC')
     .format(`YYYY-MM-DD - HH:mm${utcAdd ? ' [UTC]' : ''}`)
 }
-export const checkRpcStatus = async (customUrl: string, setStatus: any) => {
+export const checkRpcStatus = async (customUrl: string, setStatus: any, network: any) => {
   try {
     const response = await axios.post(customUrl, {
       id: +new Date(),
       jsonrpc: '2.0',
-      method: 'eth_getBlockByNumber',
-      params: ['latest', true],
+      method: 'net_version',
     })
-    if (response.data.error) {
+    if (response.data.error || +response.data.result !== network) {
       setStatus(false)
       return false
     }

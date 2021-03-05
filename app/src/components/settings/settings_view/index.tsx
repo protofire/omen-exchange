@@ -191,7 +191,7 @@ const SettingsViewContainer = (props: Props) => {
       return
     }
 
-    checkRpcStatus(url, setOnlineStatus)
+    checkRpcStatus(url, setOnlineStatus, network)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url])
   useEffect(() => {
@@ -264,7 +264,7 @@ const SettingsViewContainer = (props: Props) => {
               url.length === 0 || !isValidUrl || (network !== -1 && getInfuraUrl(network) === url) || !onlineStatus
             }
             onClick={async () => {
-              if (!(await checkRpcStatus(url, setOnlineStatus))) return
+              if (!(await checkRpcStatus(url, setOnlineStatus, network))) return
 
               localStorage.setItem(
                 'rpcAddress',

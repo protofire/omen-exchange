@@ -34,7 +34,7 @@ const App: React.FC = () => {
     if (location.host === MAINNET_LOCATION) network === networkIds.MAINNET
     if (location.host === XDAI_LOCATION) network === networkIds.XDAI
 
-    if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus)
+    if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ethereum])
 
