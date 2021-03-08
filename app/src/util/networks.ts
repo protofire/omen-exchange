@@ -231,11 +231,11 @@ const networks: { [K in NetworkId]: Network } = {
     alternativeUrls: [
       {
         rpcUrl: 'https://rpc.xdaichain.com/',
-        name: 'Blockscout',
+        name: 'xDai',
       },
       {
         rpcUrl: 'https://dai.poa.network/',
-        name: 'xDai',
+        name: 'Blockscout',
       },
     ],
     graphHttpUri: GRAPH_XDAI_HTTP,
