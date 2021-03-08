@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../hooks'
 import { networkIds } from '../../../util/networks'
 import { truncateStringInTheMiddle } from '../../../util/tools'
 import { IconJazz } from '../icons/IconJazz'
@@ -9,6 +8,8 @@ import { IconNotification } from '../icons/IconNotification'
 
 interface Props {
   claim: boolean
+  account?: any
+  networkId?: any
 }
 
 const Wrapper = styled.div`
@@ -30,8 +31,12 @@ const ConnectionStatusText = styled.span`
 `
 
 export const Network = (props: Props) => {
-  const context = useConnectedWeb3Context()
-  const { account, networkId } = context
+  let account
+  let networkId
+  if (props.account && props.networkId) {
+    account = props.account
+    networkId = props.networkId
+  }
 
   if (!account) {
     return null
