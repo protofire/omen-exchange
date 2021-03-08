@@ -37,8 +37,9 @@ const logger = getLogger('MarketHomeContainer')
 const Banner = styled.div`
   ${ButtonCSS};
   white-space: unset;
-  padding: 20px;
+  padding: 20px 24px;
   height: unset;
+  cursor: unset;
   max-width: ${props => props.theme.mainContainer.maxWidth};
   margin-bottom: 20px;
   border-color: ${props => props.theme.borders.borderColor}!important;
@@ -65,10 +66,15 @@ const TextTitle = styled.div`
 const TextDescription = styled.div`
   margin-top: 8px;
   color: ${props => props.theme.colors.textColorLighter};
+  line-height: 19px;
 `
 const Link = styled.a`
   color: ${props => props.theme.colors.clickable};
   text-decoration: underline;
+
+  &:hover {
+    color: ${props => props.theme.buttonSecondary.color};
+  }
 `
 
 const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
@@ -421,7 +427,7 @@ const MarketHomeContainer: React.FC = () => {
               setHasSeenBanner('true')
             }}
           >
-            <IconClose color={theme.colors.tertiary} size={'24'} />
+            <IconClose color={theme.colors.tertiary} hoverEffect size={'24'} />
           </CloseStyled>
         </Banner>
       )}
