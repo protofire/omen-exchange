@@ -102,8 +102,6 @@ const networks: { [K in NetworkId]: Network } = {
         name: 'Infura',
       },
       { rpcUrl: 'https://cloudflare-eth.com/', name: 'Cloudflare' },
-      { rpcUrl: 'https://blockscout.com/poa/xdai/api/eth-rpc', name: 'Blockscout' },
-      { rpcUrl: 'https://web3.1inch.exchange/', name: '1inch' },
     ],
     graphHttpUri: GRAPH_MAINNET_HTTP,
     graphWsUri: GRAPH_MAINNET_WS,

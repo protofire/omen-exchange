@@ -7,6 +7,7 @@ import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { TextfieldCSS } from '../../common/form/textfield'
 import { IconBlockscout, IconCloudflare, IconInfura } from '../../common/icons'
+import { IconXdai } from '../../common/icons/IconXdai'
 import { ListCard } from '../../market/common/list_card/index'
 
 const TopContent = styled.div`
@@ -147,6 +148,8 @@ const SettingsViewContainer = (props: Props) => {
             <IconCloudflare />
           ) : item.name === 'Blockscout' ? (
             <IconBlockscout />
+          ) : item.name === 'xDai' ? (
+            <IconXdai />
           ) : (
             undefined
           ),
