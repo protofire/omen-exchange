@@ -327,6 +327,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
                 currentItem={headerDropdownItems.length + 1}
                 dropdownPosition={DropdownPosition.center}
                 items={networkDropdownItems}
+                minWidth={false}
                 omitRightButtonMargin={true}
                 placeholder={networkPlacholder}
               />

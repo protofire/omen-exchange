@@ -209,13 +209,14 @@ const ItemsContainer = styled.div<{
   dropdownPosition?: DropdownPosition
   dropdownDirection?: DropdownDirection
   dropdownVariant?: DropdownVariant
+  minWidth: boolean
 }>`
   background-color: ${props => props.theme.dropdown.dropdownItems.backgroundColor};
   border-radius: ${props => props.theme.dropdown.dropdownItems.borderRadius};
   border: solid 1px ${props => props.theme.dropdown.dropdownItems.borderColor};
   box-shadow: ${props => props.theme.dropdown.dropdownItems.boxShadow};
   display: ${props => (props.isOpen ? 'block' : 'none')};
-  min-width: 164px;
+  min-width: ${props => (props.minWidth ? '164px' : 'none')};
   padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '9px' : '9px')};
   position: absolute;
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardItemsContainerCSS : '')};
@@ -319,6 +320,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   placeholder?: React.ReactNode | string | undefined
   maxHeight?: boolean
   omitRightButtonMargin?: boolean
+  minWidth?: boolean
 }
 
 export const Dropdown: React.FC<Props> = props => {
@@ -333,6 +335,7 @@ export const Dropdown: React.FC<Props> = props => {
     omitRightButtonMargin,
     placeholder,
     maxHeight = false,
+    minWidth = true,
     ...restProps
   } = props
 
@@ -427,6 +430,7 @@ export const Dropdown: React.FC<Props> = props => {
           dropdownPosition={dropdownPosition}
           dropdownVariant={dropdownVariant}
           isOpen={isOpen}
+          minWidth={minWidth}
           ref={dropdownContainerRef}
         >
           <Items
