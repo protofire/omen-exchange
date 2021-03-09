@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent } from 'react'
+import { borderColor } from 'polished'
+import React, { ChangeEvent, useState } from 'react'
 import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES } from '../../../../../../common/constants'
@@ -75,7 +76,18 @@ const NumericalInput = styled(BigNumberInput)`
     -webkit-appearance: none;
   }
 `
+const ErrorMessage = styled.p`
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.2px;
 
+  color: #e57373;
+`
 interface Props {
   context: ConnectedWeb3Context
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
@@ -125,6 +137,35 @@ export const CreateScalarMarket = (props: Props) => {
     upperBound,
   } = props
 
+  const lowerBoundNumber = lowerBound?.abs() !== undefined && Number(lowerBound.abs())
+  const startingPointNumber = startingPoint?.abs() !== undefined && Number(startingPoint.abs())
+  const upperBoundNumber = upperBound?.abs() !== undefined && Number(upperBound.abs())
+
+  let errMessage1
+  let errMessage2
+
+  if (lowerBoundNumber >= startingPointNumber) {
+    errMessage1 = 'Value must be less than Starting Point'
+  }
+
+  if (startingPointNumber >= upperBoundNumber) {
+    errMessage2 = 'Value must be less than Upper Bound'
+  }
+
+  // let errMessage: string
+
+  // const errorMessage = (): string => {
+  //   if (
+  //     lowerBound?.abs() !== undefined &&
+  //     startingPoint?.abs() !== undefined &&
+  //     lowerBound.abs() > startingPoint.abs()
+  //   ) {
+  //     errMessage = 'Lower bound must be less than starting point'
+  //   }
+
+  //   return ''
+  // }
+
   return (
     <>
       <FormRow
@@ -142,9 +183,11 @@ export const CreateScalarMarket = (props: Props) => {
       <RowWrapper>
         <Row>
           <FormRow
+            error={<ErrorMessage>{errMessage1}</ErrorMessage>}
             formField={
               <NumericalInput
                 decimals={18}
+                min={0}
                 name="lowerBound"
                 onChange={handleChange}
                 placeholder={'0'}
@@ -155,6 +198,7 @@ export const CreateScalarMarket = (props: Props) => {
             style={{ marginTop: 0 }}
             title={'Lower Bound'}
           />
+
           <FormRow
             formField={
               <NumericalInput
@@ -172,6 +216,7 @@ export const CreateScalarMarket = (props: Props) => {
         </Row>
         <Row>
           <FormRow
+            error={<ErrorMessage>{errMessage2}</ErrorMessage>}
             formField={
               <NumericalInput
                 decimals={18}
