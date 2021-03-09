@@ -18,6 +18,7 @@ const ResponsiveWrapper = styled.div`
   padding-bottom: 16px;
   border-radius: 6px;
 `
+
 const ChartTooltip = styled.div`
   background: #fff;
   border-radius: 2px;
@@ -62,6 +63,19 @@ const Legend = styled.li`
     margin-right: 6px;
   }
 `
+const NoData = styled.div`
+  align-items: center;
+  color: ${props => props.theme.colors.textColorDarker};
+  display: flex;
+  font-size: 15px;
+  font-weight: 400;
+  height: 340px;
+  justify-content: center;
+  letter-spacing: 0.4px;
+  line-height: 1.3;
+  padding-left: ${props => props.theme.cards.paddingHorizontal};
+  padding-right: ${props => props.theme.cards.paddingHorizontal};
+`
 
 const AnEvenSmallerLittleBall = styled(OutcomeItemLittleBallOfJoyAndDifferentColors as any)`
   height: 8px;
@@ -99,11 +113,13 @@ type Props = {
   isScalar?: Maybe<boolean>
   sharesDataLoader: boolean
   status: any
+  notEnoughData: boolean
 }
 
 export const HistoryChart: React.FC<Props> = ({
   data,
   isScalar,
+  notEnoughData,
   outcomes,
   scalarHigh,
   scalarLow,
@@ -142,6 +158,9 @@ export const HistoryChart: React.FC<Props> = ({
 
   if (!data || status === 'Loading' || sharesDataLoader) {
     return <CustomInlineLoading message="Loading Trade History" />
+  }
+  if (notEnoughData) {
+    return <NoData>There is not enough historical data for this market</NoData>
   }
   return (
     <>

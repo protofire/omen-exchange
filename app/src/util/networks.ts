@@ -51,6 +51,7 @@ type CPKAddresses = {
 interface Network {
   label: string
   url: string
+  alternativeUrls: { [key: string]: string }[]
   graphHttpUri: string
   graphWsUri: string
   klerosCurateGraphHttpUri: string
@@ -95,6 +96,13 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
     label: 'Mainnet',
     url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+    alternativeUrls: [
+      {
+        rpcUrl: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+        name: 'Infura',
+      },
+      { rpcUrl: 'https://cloudflare-eth.com/', name: 'Cloudflare' },
+    ],
     graphHttpUri: GRAPH_MAINNET_HTTP,
     graphWsUri: GRAPH_MAINNET_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_MAINNET_HTTP,
@@ -133,6 +141,12 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
     url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
+    alternativeUrls: [
+      {
+        rpcUrl: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
+        name: 'Infura',
+      },
+    ],
     graphHttpUri: GRAPH_RINKEBY_HTTP,
     graphWsUri: GRAPH_RINKEBY_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
@@ -171,6 +185,12 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.SOKOL]: {
     label: 'Sokol',
     url: 'https://sokol.poa.network',
+    alternativeUrls: [
+      {
+        rpcUrl: 'https://sokol.poa.network',
+        name: 'xDai',
+      },
+    ],
     graphHttpUri: GRAPH_SOKOL_HTTP,
     graphWsUri: GRAPH_SOKOL_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
@@ -208,6 +228,16 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.XDAI]: {
     label: 'xDai',
     url: 'https://rpc.xdaichain.com/',
+    alternativeUrls: [
+      {
+        rpcUrl: 'https://rpc.xdaichain.com/',
+        name: 'xDai',
+      },
+      {
+        rpcUrl: 'https://dai.poa.network/',
+        name: 'Blockscout',
+      },
+    ],
     graphHttpUri: GRAPH_XDAI_HTTP,
     graphWsUri: GRAPH_XDAI_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
@@ -242,6 +272,18 @@ const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
   },
+}
+
+export const getChainSpecificAlternativeUrls = (networkId: any) => {
+  if (!validNetworkId(networkId)) {
+    return false
+  }
+  return networks[networkId].alternativeUrls
+}
+if (localStorage.getItem('rpcAddress')) {
+  const data = JSON.parse(<string>localStorage.getItem('rpcAddress'))
+  const network: NetworkId = data.network
+  networks[network].url = data.url
 }
 
 export const supportedNetworkIds = Object.keys(networks).map(Number) as NetworkId[]
