@@ -1,9 +1,10 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
+import axios from 'axios'
 import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
-import { CONFIRMATION_COUNT } from '../common/constants'
+import { CONFIRMATION_COUNT, MAIN_NETWORKS, RINKEBY_NETWORKS, SOKOL_NETWORKS, XDAI_NETWORKS } from '../common/constants'
 import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
 import { CPKService } from '../services'
 import { CompoundService } from '../services/compound_service'
@@ -58,6 +59,50 @@ export const formatDate = (date: Date, utcAdd = true): string => {
   return moment(date)
     .tz('UTC')
     .format(`YYYY-MM-DD - HH:mm${utcAdd ? ' [UTC]' : ''}`)
+}
+export const checkRpcStatus = async (customUrl: string, setStatus: any, network: any) => {
+  try {
+    const response = await axios.post(customUrl, {
+      id: +new Date(),
+      jsonrpc: '2.0',
+      method: 'net_version',
+    })
+    if (response.data.error || +response.data.result !== network) {
+      setStatus(false)
+      return false
+    }
+
+    setStatus(true)
+    return true
+  } catch (e) {
+    setStatus(false)
+
+    return false
+  }
+}
+export const isValidHttpUrl = (data: string): boolean => {
+  let url
+
+  try {
+    url = new URL(data)
+  } catch (_) {
+    return false
+  }
+
+  return url.protocol === 'http:' || url.protocol === 'https:'
+}
+
+export const getNetworkFromChain = (chain: string) => {
+  const network = RINKEBY_NETWORKS.includes(chain)
+    ? networkIds.RINKEBY
+    : SOKOL_NETWORKS.includes(chain)
+    ? networkIds.SOKOL
+    : MAIN_NETWORKS.includes(chain)
+    ? networkIds.MAINNET
+    : XDAI_NETWORKS.includes(chain)
+    ? networkIds.XDAI
+    : -1
+  return network
 }
 
 export const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {

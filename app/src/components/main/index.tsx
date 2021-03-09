@@ -30,10 +30,11 @@ import { SwitchNetworkModal } from '../common/switch_network_modal'
 import { MarketRoutes } from '../market/routes/market_routes'
 import { MarketWizardCreatorContainer } from '../market/sections/market_create/market_wizard_creator_container'
 import { MarketHomeContainer } from '../market/sections/market_list/market_home_container'
-
+import SettingsViewContainer from '../settings/settings_view'
 const RedirectToHome = () => <Redirect to="/" />
 export const Main: React.FC = () => {
   const context = useWeb3Context()
+
   const windowObj: any = window
   const [claimState, setClaimState] = useState(false)
 
@@ -86,7 +87,7 @@ export const Main: React.FC = () => {
             <meta content={TWITTER_SITE} name="twitter:site" />
             <link href={`${OG_IMAGE}`} rel="icon" type="image/png" />
           </Helmet>
-          <Header setClaim={setClaimState} />
+          <Header setClaim={setClaimState} web3context={context} />
           <MainScroll>
             {context.error && <WrongNetworkMessage />}
             {!context.error && (
@@ -94,6 +95,12 @@ export const Main: React.FC = () => {
                 <Route exact path="/">
                   <Redirect to="/liquidity" />
                 </Route>
+                {/*<Route component={() => <SettingsWithRouter />} exact networkId={networkId} path="/settings" />*/}
+                <Route
+                  exact
+                  path="/settings"
+                  render={props => <SettingsViewContainer networkId={networkId} {...props} />}
+                />
                 <Route component={MarketHomeContainer} path="/24h-volume" />
                 <Route component={MarketHomeContainer} path="/volume" />
                 <Route component={MarketHomeContainer} path="/newest" />

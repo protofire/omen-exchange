@@ -2,12 +2,11 @@ import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import { withRouter } from 'react-router'
-import { NavLink, RouteComponentProps, matchPath } from 'react-router-dom'
+import { matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 
 import { Logo } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks'
 import { useOutsideAlerter } from '../../../../hooks/useOutsideAlerter'
 import { XdaiService } from '../../../../services'
 import { networkIds } from '../../../../util/networks'
@@ -19,10 +18,11 @@ import { XdaiBridgeTransfer } from '../../../market/common/xdai_bridge_modal'
 import { ModalConnectWalletWrapper } from '../../../modal'
 import { IconAdd, IconClose } from '../../icons'
 import { IconArrowRight } from '../../icons/IconArrowRight'
+import { IconSettings } from '../../icons/IconSettings'
 import { DaiIcon } from '../../icons/currencies'
 import { XdaiIcon } from '../../icons/currencies/XdaiIcon'
 
-const HeaderWrapper = styled.div`
+export const HeaderWrapper = styled.div`
   align-items: flex-end;
   background: ${props => props.theme.header.backgroundColor};
   display: flex;
@@ -39,7 +39,7 @@ const HeaderWrapper = styled.div`
   }
 `
 
-const HeaderInner = styled.div`
+export const HeaderInner = styled.div`
   align-items: center;
   display: flex;
   flex-direction: row;
@@ -56,9 +56,10 @@ const HeaderInner = styled.div`
   }
 `
 
-const LogoWrapper = styled(NavLink)`
+export const LogoWrapper = styled.div<{ disabled?: boolean }>`
   max-width: 90px;
   min-width: fit-content;
+  ${props => (props.disabled ? 'pointer-events:none;' : '')};
 `
 
 const ButtonCreateDesktop = styled(ButtonRound)`
@@ -126,7 +127,16 @@ const ButtonWrapper = styled.div`
   ${ButtonCSS}
 `
 
-const ContentsLeft = styled.div`
+export const ButtonSettings = styled(ButtonRound)`
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin-left: 12px;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+  }
+`
+
+export const ContentsLeft = styled.div`
   align-items: center;
   display: flex;
   margin: auto auto auto 0;
@@ -136,7 +146,7 @@ const ContentsLeft = styled.div`
   }
 `
 
-const ContentsRight = styled.div`
+export const ContentsRight = styled.div`
   align-items: center;
   display: flex;
   flex-wrap: wrap;
@@ -177,18 +187,22 @@ const ClaimText = styled.div`
   align-items: center;
 `
 
-interface ExtendsHistory extends RouteComponentProps {
-  setClaim: React.Dispatch<React.SetStateAction<boolean>>
-}
+const HeaderContainer = (props: any) => {
+  let account: any
+  let provider: any
+  let networkId: any
 
-const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
-  const { account, library: provider, networkId } = useConnectedWeb3Context()
+  if (props.web3context) {
+    account = props.web3context.account
+    networkId = props.web3context.networkId
+    provider = props.web3context.library
+  }
 
   const { history, ...restProps } = props
   const [isModalOpen, setModalState] = useState(false)
   const [claimState, setClaimState] = useState<boolean>(false)
   const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
-
+  const hasRouter = props.history !== undefined
   const disableConnectButton = isModalOpen
 
   const headerDropdownItems: Array<DropdownItemProps> = [
@@ -196,7 +210,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
       content: (
         <ClaimWrapper
           onClick={() => {
-            props.setClaim(true)
+            props.setClaim && props.setClaim(true)
           }}
         >
           <ClaimText>
@@ -237,18 +251,18 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, networkId])
 
-  const isMarketCreatePage = !!matchPath(history.location.pathname, { path: '/create', exact: true })
+  const isMarketCreatePage = history ? !!matchPath(history.location.pathname, { path: '/create', exact: true }) : false
 
   const createButtonProps = {
-    disabled: disableConnectButton || isMarketCreatePage,
-    onClick: () => history.push('/create'),
+    disabled: disableConnectButton || isMarketCreatePage || !hasRouter,
+    onClick: () => history && history.push('/create'),
   }
   const [isBridgeOpen, setIsBridgeOpen] = useState<boolean>(false)
   const ref = useRef(null)
   useOutsideAlerter(setIsBridgeOpen, ref)
 
   const exitButtonProps = {
-    onClick: () => history.push('/'),
+    onClick: () => history && history.push('/'),
   }
 
   const currencyReturn = (condition: boolean): JSX.Element => {
@@ -271,7 +285,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
     <HeaderWrapper {...restProps}>
       <HeaderInner>
         <ContentsLeft>
-          <LogoWrapper to="/">
+          <LogoWrapper disabled={!hasRouter} onClick={() => props.history && props.history.push('/')}>
             <Logo />
           </LogoWrapper>
         </ContentsLeft>
@@ -328,7 +342,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
               data-place="left"
             >
               <ButtonConnectWalletStyled
-                disabled={disableConnectButton}
+                disabled={disableConnectButton || !hasRouter}
                 modalState={isModalOpen}
                 onClick={() => {
                   setModalState(true)
@@ -344,10 +358,17 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
                 dropdownPosition={DropdownPosition.center}
                 items={headerDropdownItems}
                 omitRightButtonMargin={true}
-                placeholder={<Network claim={claimState} />}
+                placeholder={<Network account={account} claim={claimState} networkId={networkId} />}
               />
             </>
           )}
+          <ButtonSettings
+            disabled={!hasRouter}
+            {...exitButtonProps}
+            onClick={() => history && history.push('/settings')}
+          >
+            <IconSettings />
+          </ButtonSettings>
         </ContentsRight>
         <ModalConnectWalletWrapper isOpen={isModalOpen} onClose={() => setModalState(false)} />
       </HeaderInner>
@@ -356,3 +377,4 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
 }
 
 export const Header = withRouter(HeaderContainer)
+export const HeaderNoRouter = HeaderContainer
