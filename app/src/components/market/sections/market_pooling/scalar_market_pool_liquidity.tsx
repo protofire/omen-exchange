@@ -174,7 +174,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
   const signer = useMemo(() => provider.getSigner(), [provider])
   const [allowanceFinished, setAllowanceFinished] = useState(false)
-  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
+  const { allowance, unlock } = useCpkAllowance(signer, displayCollateral.address)
 
   const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
     displayCollateral,
@@ -190,7 +190,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
   const showSetAllowance =
-    collateral.address !== pseudoNativeAssetAddress &&
+    displayCollateral.address !== pseudoNativeAssetAddress &&
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
@@ -716,7 +716,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       </GridTransactionDetails>
       {activeTab === Tabs.deposit && showSetAllowance && (
         <SetAllowanceStyled
-          collateral={collateral}
+          collateral={displayCollateral}
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
           onUnlock={unlockCollateral}
