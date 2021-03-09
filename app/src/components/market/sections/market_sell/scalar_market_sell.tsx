@@ -142,6 +142,7 @@ export const ScalarMarketSell = (props: Props) => {
     () => async (
       amountShares: BigNumber,
     ): Promise<[Maybe<BigNumber>, Maybe<number>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
+      console.log(balances.toString())
       const holdings = balances.map(balance => balance.holdings)
       const holdingsOfSoldOutcome = holdings[positionIndex]
       const holdingsOfOtherOutcome = holdings.filter((item, index) => {
@@ -338,10 +339,12 @@ export const ScalarMarketSell = (props: Props) => {
 
   const setAmountSharesFromInput = (shares: BigNumber) => {
     if (shares.eq(displaySelectedOutcomeBalanceValue)) {
+      console.log('HERE')
       setIsMaxAmountSelected(true)
       setAmountShares(balanceItem.shares)
       setDisplaySellShares(shares)
     } else {
+      console.log('THERE')
       setIsMaxAmountSelected(false)
       if (collateralSymbol in CompoundTokenType && compoundService) {
         const actualAmountOfShares = compoundService.calculateBaseToCTokenExchange(baseCollateral, shares)
