@@ -109,6 +109,8 @@ export const XDAI_LOCATION = 'xdai.omen.eth.link'
 
 export const MAIN_NETWORKS = ['1', '0x1', '4', '0x4']
 export const XDAI_NETWORKS = ['100', '0x64', '77', '0x4d']
+export const RINKEBY_NETWORKS = ['4', '0x4']
+export const SOKOL_NETWORKS = ['77', '0x4d']
 
 export const XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS = '0x7301CFA0e1756B71869E93d4e4Dca5c7d0eb0AA6'
 export const DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS = '0x4aa42145Aa6Ebf72e164C9bBC74fbD3788045016'
