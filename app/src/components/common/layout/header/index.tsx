@@ -1,22 +1,29 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import { withRouter } from 'react-router'
 import { NavLink, RouteComponentProps, matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
+import { useWeb3Context } from 'web3-react'
 
 import { Logo } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useOutsideAlerter } from '../../../../hooks/useOutsideAlerter'
 import { XdaiService } from '../../../../services'
-import { networkIds } from '../../../../util/networks'
+import { getToken, networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
-import { ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
+import { ExchangeType } from '../../../../util/types'
+import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { XdaiBridgeTransfer } from '../../../market/common/xdai_bridge_modal'
-import { ModalConnectWalletWrapper } from '../../../modal'
+import {
+  ModalConnectWalletWrapper,
+  ModalDepositWithdrawWrapper,
+  ModalTransactionWrapper,
+  ModalYourConnectionWrapper,
+} from '../../../modal'
 import { IconAdd, IconClose } from '../../icons'
 import { IconArrowRight } from '../../icons/IconArrowRight'
 import { DaiIcon } from '../../icons/currencies'
@@ -109,6 +116,7 @@ const ButtonCreateMobile = styled(ButtonCircle)`
 
 const ButtonCSS = css`
   margin: 0 0 0 5px;
+  padding: 12px 14px;
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-left: 12px;
 
@@ -148,8 +156,20 @@ const ContentsRight = styled.div`
   }
 `
 
-const HeaderDropdown = styled(Dropdown)`
+const HeaderButton = styled(Button)`
   ${ButtonCSS};
+`
+
+const DepositedBalance = styled.p`
+  font-size: ${props => props.theme.fonts.defaultSize};
+  color: ${props => props.theme.colors.textColorLighter};
+`
+
+const HeaderButtonDivider = styled.div`
+  height: 16px;
+  width: 1px;
+  margin: 0 12px;
+  background: ${props => props.theme.borders.borderDisabled};
 `
 
 const CloseIconWrapper = styled.div`
@@ -184,36 +204,18 @@ interface ExtendsHistory extends RouteComponentProps {
 }
 
 const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
-  const { account, library: provider, networkId, relay, toggleRelay } = useConnectedWeb3Context()
+  const context = useWeb3Context()
+  const { relay, toggleRelay } = useConnectedWeb3Context()
+  const { account, active, connectorName, error, library: provider, networkId } = context
 
   const { history, ...restProps } = props
-  const [isModalOpen, setModalState] = useState(false)
-  const [claimState, setClaimState] = useState<boolean>(false)
-  const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
-  const disableConnectButton = isModalOpen
+  const [isConnectWalletModalOpen, setConnectWalletModalState] = useState(false)
+  const [isYourConnectionModalOpen, setYourConnectionModalState] = useState(false)
+  const [isDepositWithdrawModalOpen, setDepositWithdrawModalState] = useState(false)
+  const [depositWithdrawType, setDepositWithdrawType] = useState<ExchangeType>(ExchangeType.deposit)
+  const [isDisconnecting, setIsDisconnecting] = useState(false)
 
-  const headerDropdownItems: Array<DropdownItemProps> = [
-    {
-      content: (
-        <DropdownWrapper
-          onClick={() => {
-            props.setClaim(true)
-          }}
-        >
-          <DropdownText>
-            <Dot color="gold" size={6} />
-            Claim
-          </DropdownText>
-          <ClaimAmount>{formatBigNumber(unclaimedAmount, 18, 2)} DAI</ClaimAmount>
-        </DropdownWrapper>
-      ),
-      visibility: (networkId !== 1 && !relay) || !claimState,
-    },
-
-    {
-      content: <ButtonDisconnectWallet />,
-    },
-  ]
+  const disableConnectButton = isConnectWalletModalOpen
 
   const networkPlacholder = (
     <DropdownWrapper>
@@ -237,28 +239,36 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
     },
   ]
 
-  useEffect(() => {
-    const fetchUnclaimedAssets = async () => {
-      const xDaiService = new XdaiService(provider)
-      const transaction = await xDaiService.fetchXdaiTransactionData()
-      if (transaction) {
-        setUnclaimedAmount(transaction.value)
+  // const headerDropdownItems: Array<DropdownItemProps> = [
+  //   {
+  //     content: (
+  //       <ClaimWrapper
+  //         onClick={() => {
+  //           props.setClaim(true)
+  //         }}
+  //       >
+  //         <ClaimText>
+  //           <GoldDot />
+  //           Claim
+  //         </ClaimText>
+  //         <ClaimAmount>{formatBigNumber(unclaimedAmount, 18, 2)} DAI</ClaimAmount>
+  //       </ClaimWrapper>
+  //     ),
+  //     visibility: networkId !== 1 || !claimState,
+  //   },
 
-        setClaimState(true)
+  //   {
+  //     content: <ButtonDisconnectWallet />,
+  //   },
+  // ]
 
-        return
-      }
-      setClaimState(false)
+  const logout = () => {
+    if (active || (error && connectorName)) {
+      setIsDisconnecting(true)
+      localStorage.removeItem('CONNECTOR')
+      context.setConnector('Infura')
     }
-    if ((networkId === 1 || relay) && account) {
-      fetchUnclaimedAssets()
-    } else {
-      setUnclaimedAmount(Zero)
-      setClaimState(false)
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, networkId])
+  }
 
   const isMarketCreatePage = !!matchPath(history.location.pathname, { path: '/create', exact: true })
 
@@ -321,7 +331,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             </>
           )}
 
-          {(networkId === networkIds.MAINNET || networkId == networkIds.XDAI) && (
+          {/* {(networkId === networkIds.MAINNET || networkId == networkIds.XDAI) && (
             <>
               <HeaderDropdown
                 currentItem={headerDropdownItems.length + 1}
@@ -332,7 +342,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
                 placeholder={networkPlacholder}
               />
             </>
-          )}
+          )} */}
 
           {(networkId === networkIds.MAINNET || networkId == networkIds.XDAI) && account && (
             <>
@@ -365,27 +375,60 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             >
               <ButtonConnectWalletStyled
                 disabled={disableConnectButton}
-                modalState={isModalOpen}
+                modalState={isConnectWalletModalOpen}
                 onClick={() => {
-                  setModalState(true)
+                  setConnectWalletModalState(true)
                 }}
               />
               {disableConnectButton && <ReactTooltip id="connectButtonTooltip" />}
             </ButtonWrapper>
           )}
           {account && (
-            <>
-              <HeaderDropdown
-                currentItem={headerDropdownItems.length + 1}
-                dropdownPosition={DropdownPosition.center}
-                items={headerDropdownItems}
-                omitRightButtonMargin={true}
-                placeholder={<Network claim={claimState} />}
-              />
-            </>
+            <HeaderButton
+              onClick={() => {
+                setYourConnectionModalState(true)
+              }}
+            >
+              {/* TODO: Remove hardcoded balance */}
+              <DepositedBalance>0.00 DAI</DepositedBalance>
+              <HeaderButtonDivider />
+              <Network claim={false} />
+            </HeaderButton>
           )}
         </ContentsRight>
-        <ModalConnectWalletWrapper isOpen={isModalOpen} onClose={() => setModalState(false)} />
+        <ModalYourConnectionWrapper
+          changeWallet={() => {
+            setYourConnectionModalState(false)
+            logout()
+            setConnectWalletModalState(true)
+          }}
+          isOpen={isYourConnectionModalOpen}
+          onClose={() => setYourConnectionModalState(false)}
+          // TODO: Include exchange type
+          openDepositModal={() => {
+            setYourConnectionModalState(false)
+            setDepositWithdrawType(ExchangeType.deposit)
+            setDepositWithdrawModalState(true)
+          }}
+          openWithdrawModal={() => {
+            setYourConnectionModalState(false)
+            setDepositWithdrawType(ExchangeType.withdraw)
+            setDepositWithdrawModalState(true)
+          }}
+        />
+        <ModalConnectWalletWrapper
+          isOpen={isConnectWalletModalOpen}
+          onClose={() => setConnectWalletModalState(false)}
+        />
+        <ModalDepositWithdrawWrapper
+          exchangeType={depositWithdrawType}
+          isOpen={isDepositWithdrawModalOpen}
+          onBack={() => {
+            setDepositWithdrawModalState(false)
+            setYourConnectionModalState(true)
+          }}
+          onClose={() => setDepositWithdrawModalState(false)}
+        />
       </HeaderInner>
     </HeaderWrapper>
   )

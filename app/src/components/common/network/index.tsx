@@ -39,7 +39,7 @@ export const Network = (props: Props) => {
   return (
     <Wrapper {...props}>
       {props.claim && networkId === networkIds.MAINNET && <IconNotification style={{ marginRight: 12 }} />}
-      <ConnectionStatusText>{truncateStringInTheMiddle(account, 6, 4) || 'No account connected'}</ConnectionStatusText>
+      <ConnectionStatusText>{truncateStringInTheMiddle(account, 5, 3) || 'No account connected'}</ConnectionStatusText>
       <IconJazz account={account} size={22} />
     </Wrapper>
   )

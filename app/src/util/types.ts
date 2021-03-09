@@ -508,3 +508,38 @@ export enum AdditionalSharesType {
   long = 'Long',
   short = 'Short',
 }
+
+export enum WalletState {
+  ready,
+  enable,
+}
+
+export enum ExchangeType {
+  deposit = 'Deposit',
+  withdraw = 'Withdraw',
+}
+
+export enum TransactionStep {
+  idle,
+  waitingConfirmation,
+  transactionSubmitted,
+  transactionConfirmed,
+  error,
+}
+
+export enum TransactionType {
+  deposit = 'Deposit',
+  withdraw = 'Withdraw',
+  buy = 'Buy',
+  sell = 'Sell',
+  redeem = 'Redeem',
+  create = 'Create',
+  claim = 'Claim',
+}
+
+export enum EtherscanLink {
+  rinkeby = 'https://rinkeby.etherscan.io/tx/',
+  mainnet = 'https://etherscan.io/tx/',
+  xDai = 'https://blockscout.com/poa/xdai/tx/',
+  sokol = 'https://blockscout.com/poa/sokol/tx/',
+}
