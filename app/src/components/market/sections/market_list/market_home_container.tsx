@@ -36,6 +36,7 @@ const logger = getLogger('MarketHomeContainer')
 
 const Banner = styled.div`
   ${ButtonCSS};
+  user-select: text;
   white-space: unset;
   padding: 20px 24px;
   height: unset;
