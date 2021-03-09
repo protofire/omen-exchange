@@ -4,8 +4,9 @@ import styled, { withTheme } from 'styled-components'
 
 import { CONFIRMATION_COUNT } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../hooks'
-import { getBlockExplorerURL } from '../../../util/tools'
-import { TransactionStep } from '../../../util/types'
+import { getBlockExplorer } from '../../../util/networks'
+import { formatBigNumber, getBlockExplorerURL } from '../../../util/tools'
+import { Token, TransactionStep, TransactionType } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
@@ -83,6 +84,11 @@ export const ModalTransaction = (props: Props) => {
       txState !== TransactionStep.transactionConfirmed &&
       txState !== TransactionStep.confirming)
 
+  const blockExplorer =
+    getBlockExplorer(networkId)
+      .charAt(0)
+      .toUpperCase() + getBlockExplorer(networkId).slice(1)
+
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
       <ContentWrapper>
@@ -112,7 +118,7 @@ export const ModalTransaction = (props: Props) => {
           target="_blank"
         >
           <EtherscanButton buttonType={ButtonType.secondaryLine} disabled={etherscanDisabled}>
-            View on Etherscan
+            View on {blockExplorer}
           </EtherscanButton>
         </EtherscanButtonWrapper>
       </ContentWrapper>
