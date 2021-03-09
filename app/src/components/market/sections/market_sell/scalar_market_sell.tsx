@@ -95,7 +95,6 @@ export const ScalarMarketSell = (props: Props) => {
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
-  const [isMaxAmountSelected, setIsMaxAmountSelected] = useState<boolean>(false)
   const { networkId } = context
   const baseCollateral = getInitialCollateral(networkId, collateral)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
@@ -142,7 +141,6 @@ export const ScalarMarketSell = (props: Props) => {
     () => async (
       amountShares: BigNumber,
     ): Promise<[Maybe<BigNumber>, Maybe<number>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
-      console.log(balances.toString())
       const holdings = balances.map(balance => balance.holdings)
       const holdingsOfSoldOutcome = holdings[positionIndex]
       const holdingsOfOtherOutcome = holdings.filter((item, index) => {
@@ -183,7 +181,7 @@ export const ScalarMarketSell = (props: Props) => {
       logger.log(`Amount to sell ${amountToSell}`)
       return [costFee, newPrediction, amountToSell, potentialValue]
     },
-    [balances, positionIndex, scalarLow, scalarHigh, fee],
+    [balances, positionIndex, scalarLow, scalarHigh, marketFeeWithTwoDecimals],
   )
 
   const [costFee, newPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(
@@ -339,13 +337,9 @@ export const ScalarMarketSell = (props: Props) => {
 
   const setAmountSharesFromInput = (shares: BigNumber) => {
     if (shares.eq(displaySelectedOutcomeBalanceValue)) {
-      console.log('HERE')
-      setIsMaxAmountSelected(true)
       setAmountShares(balanceItem.shares)
       setDisplaySellShares(shares)
     } else {
-      console.log('THERE')
-      setIsMaxAmountSelected(false)
       if (collateralSymbol in CompoundTokenType && compoundService) {
         const actualAmountOfShares = compoundService.calculateBaseToCTokenExchange(baseCollateral, shares)
         setAmountShares(actualAmountOfShares)
