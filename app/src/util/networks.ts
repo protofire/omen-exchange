@@ -76,6 +76,7 @@ interface Network {
   targetSafeImplementation: string
   nativeAsset: Token
   defaultToken?: string
+  blockExplorer: string
 }
 
 type KnownContracts = keyof Network['contracts']
@@ -130,6 +131,7 @@ const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     defaultToken: 'dai',
+    blockExplorer: 'etherscan',
   },
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
@@ -168,6 +170,7 @@ const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     defaultToken: 'dai',
+    blockExplorer: 'etherscan',
   },
   [networkIds.SOKOL]: {
     label: 'Sokol',
@@ -205,6 +208,7 @@ const networks: { [K in NetworkId]: Network } = {
       decimals: 18,
     },
     targetSafeImplementation: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
+    blockExplorer: 'blockscout',
   },
   [networkIds.XDAI]: {
     label: 'xDai',
@@ -243,6 +247,7 @@ const networks: { [K in NetworkId]: Network } = {
       decimals: 18,
     },
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    blockExplorer: 'blockscout',
   },
 }
 
@@ -780,4 +785,11 @@ export const getBySafeTx = async (networkId: number, safeTxHash: string) => {
   const txServiceUrl = `https://safe-transaction.${networkName}.gnosis.io/api/v1`
   const result = await axios.get(`${txServiceUrl}/transactions/${safeTxHash}`)
   return result.data
+}
+
+export const getBlockExplorer = (networkId: number): string => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].blockExplorer
 }
