@@ -95,6 +95,7 @@ export const ScalarMarketSell = (props: Props) => {
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
+  const [isMaxAmountSelected, setIsMaxAmountSelected] = useState<boolean>(false)
   const { networkId } = context
   const baseCollateral = getInitialCollateral(networkId, collateral)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
@@ -136,6 +137,7 @@ export const ScalarMarketSell = (props: Props) => {
     // eslint-disable-next-line
   }, [collateral.address])
 
+  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
   const calcSellAmount = useMemo(
     () => async (
       amountShares: BigNumber,
@@ -145,8 +147,6 @@ export const ScalarMarketSell = (props: Props) => {
       const holdingsOfOtherOutcome = holdings.filter((item, index) => {
         return index !== positionIndex
       })
-      const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
-
       const amountToSell = calcSellAmountInCollateral(
         // If the transaction incur in some precision error, we need to multiply the amount by some factor, for example  amountShares.mul(99999).div(100000) , bigger the factor, less dust
         amountShares,
@@ -201,6 +201,7 @@ export const ScalarMarketSell = (props: Props) => {
 
   let potentialValueNormalized = potentialValue
   let costFeeNormalized = costFee
+
   let normalizedTradedCollateral = tradedCollateral
   if (displayCollateral.address !== collateral.address && compoundService) {
     if (potentialValue && potentialValue.gt(0)) {
@@ -337,9 +338,11 @@ export const ScalarMarketSell = (props: Props) => {
 
   const setAmountSharesFromInput = (shares: BigNumber) => {
     if (shares.eq(displaySelectedOutcomeBalanceValue)) {
+      setIsMaxAmountSelected(true)
       setAmountShares(balanceItem.shares)
       setDisplaySellShares(shares)
     } else {
+      setIsMaxAmountSelected(false)
       if (collateralSymbol in CompoundTokenType && compoundService) {
         const actualAmountOfShares = compoundService.calculateBaseToCTokenExchange(baseCollateral, shares)
         setAmountShares(actualAmountOfShares)
@@ -430,7 +433,7 @@ export const ScalarMarketSell = (props: Props) => {
               }
               state={
                 (tradedCollateral &&
-                  parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0 &&
+                  parseFloat(formatBigNumber(tradedCollateral, displayCollateral.decimals, 2)) > 0 &&
                   ValueStates.important) ||
                 ValueStates.normal
               }

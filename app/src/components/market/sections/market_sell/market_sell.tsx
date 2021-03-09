@@ -257,7 +257,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       return compoundService.calculateCTokenToBaseExchange(baseCollateral, ns)
     })
   }
-  const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
+  const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, baseCollateral.decimals))
   let displaySelectedOutcomeBalance = selectedOutcomeBalance
   let displaySelectedOutcomeBalanceValue = balanceItem.shares
   if (collateralSymbol in CompoundTokenType && compoundService) {

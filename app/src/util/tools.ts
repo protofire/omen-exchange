@@ -188,7 +188,6 @@ export const calcSellAmountInCollateral = (
   fee: number,
 ): Maybe<BigNumber> => {
   Big.DP = 90
-
   const sharesToSellBig = new Big(sharesToSell.toString())
   const holdingsBig = new Big(holdings.toString())
   const otherHoldingsBig = otherHoldings.map(x => new Big(x.toString()))

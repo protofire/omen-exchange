@@ -109,10 +109,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
-  const { allowance, unlock } = useCpkAllowance(signer, displayCollateral.address)
 
-  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
-  const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
   const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
 
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
@@ -120,6 +117,10 @@ export const ScalarMarketBuy = (props: Props) => {
 
   const baseCollateral = getInitialCollateral(networkId, collateral)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
+
+  const { allowance, unlock } = useCpkAllowance(signer, displayCollateral.address)
+  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
+  const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   const collateralSymbol = collateral.symbol.toLowerCase()
   const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
