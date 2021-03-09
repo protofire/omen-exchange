@@ -4,10 +4,10 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { useConnectedWeb3Context, useTokens } from '../../../hooks'
+import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../../../hooks'
 import { useXdaiBridge } from '../../../hooks/useXdaiBridge'
 import { XdaiService } from '../../../services'
-import { getToken } from '../../../util/networks'
+import { getNativeAsset, getToken } from '../../../util/networks'
 import { formatBigNumber, formatNumber, truncateStringInTheMiddle } from '../../../util/tools'
 import { TransactionStep, TransactionType, WalletState } from '../../../util/types'
 import { Button } from '../../button/button'
@@ -154,6 +154,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const ModalYourConnection = (props: Props) => {
   const { changeWallet, isOpen, onClose, openDepositModal, openWithdrawModal, theme } = props
+  // const context = useWeb3Context()
   const context = useConnectedWeb3Context()
   const { account, library: provider, networkId } = context
 
@@ -199,7 +200,7 @@ export const ModalYourConnection = (props: Props) => {
       <></>
     )
 
-  const { tokens } = useTokens(context, true, true)
+  const { tokens } = useTokens(context.rawWeb3Context, true, true)
 
   const ethBalance = new BigNumber(tokens.filter(token => token.symbol === 'ETH')[0]?.balance || '')
   const formattedEthBalance = formatNumber(formatBigNumber(ethBalance, 18, 18))
@@ -211,6 +212,9 @@ export const ModalYourConnection = (props: Props) => {
 
   const DAI = getToken(1, 'dai')
 
+  const nativeAsset = getNativeAsset(context.networkId)
+  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(getNativeAsset(context.networkId), context)
+  const balance = `${formatBigNumber(maybeCollateralBalance || Zero, nativeAsset.decimals, 2)}`
   return (
     <>
       <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
@@ -227,7 +231,9 @@ export const ModalYourConnection = (props: Props) => {
                   <IconJazz account={account || ''} size={28} />
                 </ConnectionIconWrapper>
                 <AccountInfo>
-                  <AccountInfoAddress>{truncateStringInTheMiddle(account || '', 5, 3)}</AccountInfoAddress>
+                  <AccountInfoAddress>
+                    {truncateStringInTheMiddle(context.rawWeb3Context.account || '', 5, 3)}
+                  </AccountInfoAddress>
                   <AccountInfoWallet>{context.rawWeb3Context.connectorName}</AccountInfoWallet>
                 </AccountInfo>
               </TopCardHeaderLeft>
@@ -288,8 +294,7 @@ export const ModalYourConnection = (props: Props) => {
                         <DaiIcon size="24px" />
                         <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
                       </BalanceItemSide>
-                      {/* TODO: Replace hardcoded balance */}
-                      <BalanceItemBalance>0.00 DAI</BalanceItemBalance>
+                      <BalanceItemBalance>{balance} DAI</BalanceItemBalance>
                     </BalanceItem>
                   </BalanceItems>
                 </BalanceSection>

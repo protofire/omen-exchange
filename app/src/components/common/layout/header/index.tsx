@@ -8,10 +8,10 @@ import styled, { css } from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
 import { Logo } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks'
+import { useCollateralBalance, useConnectedWeb3Context } from '../../../../hooks'
 import { useOutsideAlerter } from '../../../../hooks/useOutsideAlerter'
 import { XdaiService } from '../../../../services'
-import { getToken, networkIds } from '../../../../util/networks'
+import { getNativeAsset, getToken, networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { ExchangeType } from '../../../../util/types'
 import { Button, ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
@@ -180,10 +180,6 @@ const DropdownWrapper = styled.div`
   width: 100%;
   justify-content: space-between;
 `
-const ClaimAmount = styled.div`
-  color: ${props => props.theme.colors.textColorDark};
-  font-size: ${props => props.theme.fonts.defaultSize};
-`
 
 const Dot = styled.div<{ color: string; size: number }>`
   height: ${props => props.size}px;
@@ -199,14 +195,19 @@ const DropdownText = styled.div`
   align-items: center;
 `
 
+const HeaderDropdown = styled(Dropdown)`
+  ${ButtonCSS};
+  height: 40px;
+`
+
 interface ExtendsHistory extends RouteComponentProps {
   setClaim: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
-  const context = useWeb3Context()
-  const { relay, toggleRelay } = useConnectedWeb3Context()
-  const { account, active, connectorName, error, library: provider, networkId } = context
+  const context = useConnectedWeb3Context()
+  const { relay, toggleRelay } = context
+  const { account, active, connectorName, error, networkId } = context.rawWeb3Context
 
   const { history, ...restProps } = props
   const [isConnectWalletModalOpen, setConnectWalletModalState] = useState(false)
@@ -266,7 +267,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
     if (active || (error && connectorName)) {
       setIsDisconnecting(true)
       localStorage.removeItem('CONNECTOR')
-      context.setConnector('Infura')
+      context.rawWeb3Context.setConnector('Infura')
     }
   }
 
@@ -299,7 +300,9 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
       </CurrencyWrapper>
     )
   }
-
+  const nativeAsset = getNativeAsset(context.networkId)
+  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(getNativeAsset(context.networkId), context)
+  const balance = `${formatBigNumber(maybeCollateralBalance || Zero, nativeAsset.decimals, 2)}`
   return (
     <HeaderWrapper {...restProps}>
       <HeaderInner>
@@ -331,10 +334,10 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             </>
           )}
 
-          {/* {(networkId === networkIds.MAINNET || networkId == networkIds.XDAI) && (
+          {(networkId === networkIds.MAINNET || networkId == networkIds.XDAI) && (
             <>
               <HeaderDropdown
-                currentItem={headerDropdownItems.length + 1}
+                currentItem={networkDropdownItems.length + 1}
                 dropdownPosition={DropdownPosition.center}
                 items={networkDropdownItems}
                 minWidth={false}
@@ -342,9 +345,9 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
                 placeholder={networkPlacholder}
               />
             </>
-          )} */}
+          )}
 
-          {(networkId === networkIds.MAINNET || networkId == networkIds.XDAI) && account && (
+          {/* {!relay && (networkId === networkIds.MAINNET || networkId == networkIds.XDAI) && account && (
             <>
               <Bridge ref={ref}>
                 <ButtonRound
@@ -362,7 +365,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
                 <XdaiBridgeTransfer open={isBridgeOpen} setOpen={setIsBridgeOpen} />
               </Bridge>
             </>
-          )}
+          )} */}
 
           {!account && (
             <ButtonWrapper
@@ -389,9 +392,12 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
                 setYourConnectionModalState(true)
               }}
             >
-              {/* TODO: Remove hardcoded balance */}
-              <DepositedBalance>0.00 DAI</DepositedBalance>
-              <HeaderButtonDivider />
+              {relay && (
+                <>
+                  <DepositedBalance>{balance} DAI</DepositedBalance>
+                  <HeaderButtonDivider />
+                </>
+              )}
               <Network claim={false} />
             </HeaderButton>
           )}

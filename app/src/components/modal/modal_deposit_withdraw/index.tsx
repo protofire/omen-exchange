@@ -1,10 +1,11 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { useConnectedWeb3Context, useTokens } from '../../../hooks'
-import { getToken } from '../../../util/networks'
+import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../../../hooks'
+import { getNativeAsset, getToken } from '../../../util/networks'
 import { formatBigNumber, formatNumber } from '../../../util/tools'
 import { ExchangeType, TransactionStep, TransactionType } from '../../../util/types'
 import { Button } from '../../button'
@@ -61,7 +62,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     Modal.setAppElement('#root')
   }, [])
 
-  const { tokens } = useTokens(context, true, true)
+  const { tokens } = useTokens(context.rawWeb3Context, true, true)
 
   const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
   const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
@@ -71,6 +72,9 @@ export const ModalDepositWithdraw = (props: Props) => {
   // TODO: Replace hardcoded value
   const isDepositWithdrawDisabled = true
 
+  const nativeAsset = getNativeAsset(context.networkId)
+  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(getNativeAsset(context.networkId), context)
+  const balance = `${formatBigNumber(maybeCollateralBalance || Zero, nativeAsset.decimals, 2)}`
   return (
     <>
       <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
@@ -113,8 +117,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                     <BalanceItemTitle>Omen Account</BalanceItemTitle>
                   </BalanceItemSide>
                   <BalanceItemSide>
-                    {/* TODO: Replace hardcoded balance */}
-                    <BalanceItemBalance style={{ marginRight: '12px' }}>0.00 DAI</BalanceItemBalance>
+                    <BalanceItemBalance style={{ marginRight: '12px' }}>{balance} DAI</BalanceItemBalance>
                     <DaiIcon size="24px" />
                   </BalanceItemSide>
                 </BalanceItem>
@@ -141,7 +144,9 @@ export const ModalDepositWithdraw = (props: Props) => {
             shouldDisplayMaxButton={true}
             symbol={'DAI'}
           ></TextfieldCustomPlaceholder>
-          <InputInfo>You need to deposit at least 10 DAI.</InputInfo>
+          <InputInfo>
+            You need to {exchangeType === ExchangeType.deposit ? 'depoist' : 'withdraw'} at least 10 DAI.
+          </InputInfo>
           <DepositWithdrawButton buttonType={ButtonType.primaryAlternative} disabled={isDepositWithdrawDisabled}>
             {exchangeType}
           </DepositWithdrawButton>
