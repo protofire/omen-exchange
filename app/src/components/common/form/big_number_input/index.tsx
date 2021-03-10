@@ -67,7 +67,8 @@ export const BigNumberInput: React.FC<Props> = props => {
       value &&
       !ethers.utils.parseUnits((currentValue && Number(currentValue).toFixed(decimals)) || '0', decimals).eq(value)
     ) {
-      setCurrentValue(ethers.utils.formatUnits(value, decimals))
+      const formatted = ethers.utils.formatUnits(value, decimals)
+      setCurrentValue(formatted.endsWith('.0') ? formatted.substring(0, formatted.length - 2) : formatted)
     }
   }, [value, decimals, currentValue])
 
