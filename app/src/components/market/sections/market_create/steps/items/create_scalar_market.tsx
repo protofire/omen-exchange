@@ -149,7 +149,6 @@ export const CreateScalarMarket = (props: Props) => {
                 onChange={handleChange}
                 placeholder={'0'}
                 value={lowerBound}
-                valueToDisplay={''}
               />
             }
             style={{ marginTop: 0 }}
@@ -163,7 +162,6 @@ export const CreateScalarMarket = (props: Props) => {
                 onChange={handleChange}
                 placeholder={'1000'}
                 value={upperBound}
-                valueToDisplay={''}
               />
             }
             style={{ marginTop: 0 }}
@@ -179,7 +177,6 @@ export const CreateScalarMarket = (props: Props) => {
                 onChange={handleChange}
                 placeholder={'500'}
                 value={startingPoint}
-                valueToDisplay={''}
               />
             }
             title={'Starting Point'}
