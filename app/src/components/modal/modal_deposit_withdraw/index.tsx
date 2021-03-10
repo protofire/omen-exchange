@@ -1,12 +1,12 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber, parseUnits } from 'ethers/utils'
-import React, { HTMLAttributes, useState } from 'react'
+import { BigNumber, parseEther } from 'ethers/utils'
+import React, { HTMLAttributes, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../../../hooks'
+import { useCollateralBalance, useConnectedCPKContext, useConnectedWeb3Context, useTokens } from '../../../hooks'
 import { getNativeAsset, getToken } from '../../../util/networks'
-import { formatBigNumber, formatNumber } from '../../../util/tools'
+import { formatBigNumber, formatNumber, waitABit } from '../../../util/tools'
 import { ExchangeType, TransactionStep, TransactionType } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -53,10 +53,14 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const ModalDepositWithdraw = (props: Props) => {
   const { exchangeType, isOpen, onBack, onClose, theme } = props
   const context = useConnectedWeb3Context()
+  const cpk = useConnectedCPKContext()
 
-  const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
+  const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txHash, setTxHash] = useState('')
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
+  const [confirmations, setConfirmations] = useState(0)
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
@@ -69,12 +73,46 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   const DAI = getToken(1, 'dai')
 
-  // TODO: Replace hardcoded value
-  const isDepositWithdrawDisabled = true
-
   const nativeAsset = getNativeAsset(context.networkId)
   const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(getNativeAsset(context.networkId), context)
   const balance = `${formatBigNumber(maybeCollateralBalance || Zero, nativeAsset.decimals, 2)}`
+
+  const wallet = exchangeType === ExchangeType.deposit ? daiBalance : maybeCollateralBalance
+  const minDeposit = parseEther('10')
+  const isDepositWithdrawDisabled =
+    displayFundAmount.isZero() || !wallet || displayFundAmount.gt(wallet) || displayFundAmount.lt(minDeposit)
+
+  const deposit = async () => {
+    if (!cpk) {
+      return
+    }
+
+    setTxState(TransactionStep.waitingConfirmation)
+    setConfirmations(0)
+    setIsTransactionModalOpen(true)
+
+    const hash =
+      exchangeType === ExchangeType.deposit
+        ? await cpk.sendDaiToBridge(displayFundAmount)
+        : await cpk.sendXdaiToBridge(displayFundAmount)
+
+    setTxHash(hash)
+    setTxState(TransactionStep.transactionSubmitted)
+    let confs = 0
+    const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
+    while (confs < 8) {
+      const tx = await provider.getTransaction(hash)
+      console.log(tx, tx && tx.confirmations, confirmations)
+      if (tx && tx.confirmations) {
+        setTxState(TransactionStep.confirming)
+        setConfirmations(tx.confirmations)
+        confs = tx.confirmations
+      }
+      await waitABit()
+    }
+    setTxState(TransactionStep.transactionConfirmed)
+  }
+
   return (
     <>
       <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
@@ -138,30 +176,36 @@ export const ModalDepositWithdraw = (props: Props) => {
               ></BigNumberInput>
             }
             onClickMaxButton={() => {
-              setDisplayFundAmount(daiBalance)
-              setAmountToDisplay(formatBigNumber(daiBalance, 18, 5))
+              const maxBalance = exchangeType === ExchangeType.deposit ? daiBalance : maybeCollateralBalance || Zero
+              setDisplayFundAmount(maxBalance)
+              setAmountToDisplay(formatBigNumber(maxBalance, 18, 5))
             }}
             shouldDisplayMaxButton={true}
             symbol={'DAI'}
           ></TextfieldCustomPlaceholder>
           <InputInfo>
-            You need to {exchangeType === ExchangeType.deposit ? 'depoist' : 'withdraw'} at least 10 DAI.
+            You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least 10 DAI.
           </InputInfo>
-          <DepositWithdrawButton buttonType={ButtonType.primaryAlternative} disabled={isDepositWithdrawDisabled}>
+          <DepositWithdrawButton
+            buttonType={ButtonType.primaryAlternative}
+            disabled={isDepositWithdrawDisabled}
+            onClick={deposit}
+          >
             {exchangeType}
           </DepositWithdrawButton>
         </ContentWrapper>
       </Modal>
       {/* TODO: Replace hardcoded props */}
       <ModalTransactionWrapper
+        confirmations={confirmations}
         icon={DAI.image}
         isOpen={isTransactionModalOpen}
         message={`${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), DAI.decimals)} ${
           DAI.symbol
         }`}
         onClose={() => setIsTransactionModalOpen(false)}
-        txHash={'asdf'}
-        txState={TransactionStep.waitingConfirmation}
+        txHash={txHash}
+        txState={txState}
       />
     </>
   )

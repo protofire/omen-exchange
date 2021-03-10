@@ -71,7 +71,7 @@ class XdaiService {
     return erc20.getContract
   }
 
-  generateXdaiBridgeContractInstance = async () => {
+  generateXdaiBridgeContractInstance = () => {
     const signer = this.provider.relay ? this.provider.signer.signer : this.provider.signer
     return new ethers.Contract(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, this.abi, signer)
   }

@@ -154,7 +154,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
 export const ModalYourConnection = (props: Props) => {
   const { changeWallet, isOpen, onClose, openDepositModal, openWithdrawModal, theme } = props
-  // const context = useWeb3Context()
+
   const context = useConnectedWeb3Context()
   const { account, library: provider, networkId } = context
 
@@ -318,6 +318,7 @@ export const ModalYourConnection = (props: Props) => {
         </ContentWrapper>
       </Modal>
       <ModalTransactionWrapper
+        confirmations={0}
         icon={DAI.image}
         isOpen={isTransactionModalOpen}
         message={`Claim ${formatBigNumber(unclaimedAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`}

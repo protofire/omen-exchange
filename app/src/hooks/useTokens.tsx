@@ -4,12 +4,15 @@ import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
 import { ERC20Service } from '../services'
+import { getLogger } from '../util/logger'
 import { getNativeAsset, getOmenTCRListId, getTokensByNetwork, pseudoNativeAssetAddress } from '../util/networks'
 import { getImageUrl } from '../util/token'
 import { isObjectEqual } from '../util/tools'
 import { Token } from '../util/types'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
+
+const logger = getLogger('useTokens')
 
 const query = gql`
   query GetTokenList($listId: String!) {
@@ -108,7 +111,11 @@ export const useTokens = (context: ConnectedWeb3Context, addNativeAsset?: boolea
 
   useEffect(() => {
     const reload = async () => {
-      await refetch()
+      try {
+        await refetch()
+      } catch (e) {
+        logger.log(e.message)
+      }
     }
     reload()
     // eslint-disable-next-line

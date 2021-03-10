@@ -52,10 +52,11 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   theme?: any
   txHash: string
   txState: TransactionStep
+  confirmations: number
 }
 
 export const ModalTransaction = (props: Props) => {
-  const { icon, isOpen, message, onClose, theme, txHash, txState } = props
+  const { confirmations, icon, isOpen, message, onClose, theme, txHash, txState } = props
   const context = useConnectedWeb3Context()
   const { networkId } = context
 
@@ -78,13 +79,11 @@ export const ModalTransaction = (props: Props) => {
         <ModalSubText>
           {txState === TransactionStep.waitingConfirmation
             ? 'Confirm Transaction'
-            : TransactionStep.transactionSubmitted
+            : txState === TransactionStep.transactionSubmitted
             ? 'Transaction Submitted'
-            : // TODO: Add confirming step
-            // : TransactionStep.confirming
-            // ? // TODO: Replace with dynamic amounts
-            //   '1 out of 8 Confirmations'
-            TransactionStep.transactionConfirmed
+            : txState === TransactionStep.confirming
+            ? `${confirmations} out of 8 Confirmations`
+            : txState === TransactionStep.transactionConfirmed
             ? 'Transaction Confirmed'
             : ''}
         </ModalSubText>
