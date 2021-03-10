@@ -8,6 +8,7 @@ interface Props {
   marketMakerData: MarketMakerData
   fetchGraphMarketMakerData: () => Promise<void>
   switchMarketTab: (arg0: MarketDetailsTab) => void
+  isScalar: boolean
 }
 
 const MarketBondContainer: React.FC<Props> = (props: Props) => {

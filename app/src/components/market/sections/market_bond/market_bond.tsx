@@ -34,6 +34,7 @@ interface Props extends RouteComponentProps<any> {
   theme?: any
   switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
+  isScalar: boolean
 }
 
 const BottomButtonWrapper = styled(ButtonContainer)`
@@ -133,6 +134,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
+      {props.isScalar ? <div>Here</div> : <div>Niko</div>}
       <OutcomeTable
         balances={balances}
         bonds={marketMakerData.question.bonds}

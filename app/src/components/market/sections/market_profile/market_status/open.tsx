@@ -39,31 +39,31 @@ export const TopCard = styled(ViewCard)`
 
 export const BottomCard = styled(ViewCard)``
 
-const MessageWrapper = styled.div`
-  border-radius: 4px;
-  border: ${({ theme }) => theme.borders.borderLineDisabled};
-  margin-top: 20px;
-  margin-bottom: 20px;
-  padding: 20px 25px;
-`
-
-const Title = styled.h2`
-  color: ${props => props.theme.colors.textColorDarker};
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.2px;
-  line-height: 1.2;
-  margin: 0 0 8px;
-`
-
-const Text = styled.p`
-  color: ${props => props.theme.colors.textColor};
-  font-size: 14px;
-  font-weight: normal;
-  letter-spacing: 0.2px;
-  line-height: 1.5;
-  margin: 0;
-`
+// const MessageWrapper = styled.div`
+//   border-radius: 4px;
+//   border: ${({ theme }) => theme.borders.borderLineDisabled};
+//   margin-top: 20px;
+//   margin-bottom: 20px;
+//   padding: 20px 25px;
+// `
+//
+// const Title = styled.h2`
+//   color: ${props => props.theme.colors.textColorDarker};
+//   font-size: 14px;
+//   font-weight: 500;
+//   letter-spacing: 0.2px;
+//   line-height: 1.2;
+//   margin: 0 0 8px;
+// `
+//
+// const Text = styled.p`
+//   color: ${props => props.theme.colors.textColor};
+//   font-size: 14px;
+//   font-weight: normal;
+//   letter-spacing: 0.2px;
+//   line-height: 1.5;
+//   margin: 0;
+// `
 
 export const StyledButtonContainer = styled(ButtonContainer)`
   margin: 0 -24px;
@@ -228,12 +228,12 @@ const Wrapper = (props: Props) => {
     )
   }
 
-  const openQuestionMessage = (
-    <MessageWrapper>
-      <Title>The question is being resolved.</Title>
-      <Text>You will be able to redeem your winnings as soon as the market is resolved.</Text>
-    </MessageWrapper>
-  )
+  // const openQuestionMessage = (
+  //   <MessageWrapper>
+  //     <Title>The question is being resolved.</Title>
+  //     <Text>You will be able to redeem your winnings as soon as the market is resolved.</Text>
+  //   </MessageWrapper>
+  // )
 
   const openInRealitioButton = (
     <Button
@@ -375,25 +375,10 @@ const Wrapper = (props: Props) => {
           </>
         )}
         {currentTab === MarketDetailsTab.finalize ? (
-          !isScalar ? (
-            <>
-              {renderFinalizeTableData()}
-              <WhenConnected>
-                <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
-                  <Button
-                    buttonType={ButtonType.secondaryLine}
-                    onClick={() => {
-                      history.goBack()
-                    }}
-                  >
-                    Back
-                  </Button>
-                  {finalizeButtons}
-                </StyledButtonContainer>
-              </WhenConnected>
-            </>
-          ) : (
-            <>
+          <>
+            {!isScalar ? (
+              renderFinalizeTableData()
+            ) : (
               <MarketScale
                 borderTop={true}
                 currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
@@ -402,26 +387,52 @@ const Wrapper = (props: Props) => {
                 unit={getUnit(question.title)}
                 upperBound={scalarHigh || new BigNumber(0)}
               />
-              {openQuestionMessage}
-              <WhenConnected>
-                <StyledButtonContainer className={!hasFunding || isQuestionOpen ? 'border' : ''}>
-                  <Button
-                    buttonType={ButtonType.secondaryLine}
-                    onClick={() => {
-                      history.goBack()
-                    }}
-                  >
-                    Back
-                  </Button>
-                  {isQuestionOpen ? openInRealitioButton : buySellButtons}
-                </StyledButtonContainer>
-              </WhenConnected>
-            </>
-          )
-        ) : null}
+            )}
+            <WhenConnected>
+              <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
+                <Button
+                  buttonType={ButtonType.secondaryLine}
+                  onClick={() => {
+                    history.goBack()
+                  }}
+                >
+                  Back
+                </Button>
+                {finalizeButtons}
+              </StyledButtonContainer>
+            </WhenConnected>
+          </>
+        ) : // ) : (
+        //   <>
+        //     <MarketScale
+        //       borderTop={true}
+        //       currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
+        //       lowerBound={scalarLow || new BigNumber(0)}
+        //       startingPointTitle={'Current prediction'}
+        //       unit={getUnit(question.title)}
+        //       upperBound={scalarHigh || new BigNumber(0)}
+        //     />
+        //     {openQuestionMessage}
+        //     <WhenConnected>
+        //       <StyledButtonContainer className={!hasFunding || isQuestionOpen ? 'border' : ''}>
+        //         <Button
+        //           buttonType={ButtonType.secondaryLine}
+        //           onClick={() => {
+        //             history.goBack()
+        //           }}
+        //         >
+        //           Back
+        //         </Button>
+        //         {isQuestionOpen ? openInRealitioButton : buySellButtons}
+        //       </StyledButtonContainer>
+        //     </WhenConnected>
+        //   </>
+        // )
+        null}
         {currentTab === MarketDetailsTab.setOutcome && (
           <MarketBondContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
           />

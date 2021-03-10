@@ -111,6 +111,7 @@ export const OutcomeTable = (props: Props) => {
   } = props
   const context = useConnectedWeb3Context()
   let winningBondIndex = -1
+  console.log(bonds)
   bonds.forEach((bond, bondIndex) => {
     if ((winningBondIndex === -1 || bonds[winningBondIndex].bondedEth.lt(bond.bondedEth)) && bond.bondedEth.gt(0)) {
       winningBondIndex = bondIndex
