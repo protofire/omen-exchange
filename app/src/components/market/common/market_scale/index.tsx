@@ -391,7 +391,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       newPrediction
         ? newPrediction * 100
         : currentPrediction
-        ? Number(currentPrediction) * 100
+        ? Number(currentPrediction) * 100 > 100
+          ? 100
+          : Number(currentPrediction) * 100
         : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound),
     )
     setScaleValuePrediction(
