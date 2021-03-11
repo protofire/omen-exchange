@@ -315,7 +315,7 @@ const Wrapper = (props: Props) => {
     }
     // eslint-disable-next-line
   }, [isQuestionFinalized, isFinalizing])
-
+  console.log(question)
   return (
     <>
       <TopCard>
@@ -380,8 +380,12 @@ const Wrapper = (props: Props) => {
               renderFinalizeTableData()
             ) : (
               <MarketScale
+                bonded={question.bonds && question.bonds[0].bondedEth}
                 borderTop={true}
+                collateral={collateral}
                 currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
+                currentTab={MarketDetailsTab.finalize}
+                isBonded={true}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Current prediction'}
                 unit={getUnit(question.title)}

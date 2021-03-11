@@ -235,6 +235,8 @@ interface Props {
   additionalShares?: Maybe<number>
   additionalSharesType?: Maybe<AdditionalSharesType>
   currentTab?: MarketDetailsTab
+  isBonded?: boolean
+  bonded?: Maybe<BigNumber>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
@@ -243,11 +245,13 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     additionalSharesType,
     amountShares,
     balances,
+    bonded,
     borderTop,
     collateral,
     currentPrediction,
     currentTab,
     fee,
+    isBonded,
     liquidityAmount,
     liquidityTxs,
     long,
@@ -263,6 +267,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     unit,
     upperBound,
   } = props
+  console.log(props)
 
   const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, 18))
   const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, 18))
@@ -496,7 +501,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       isDust(longShares || new BigNumber(0), collateral.decimals))
 
   const showSingleValueBox =
-    !isAmountInputted && !(additionalShares && additionalShares > 0.000001) && currentTab !== MarketDetailsTab.sell
+    !isAmountInputted &&
+    !(additionalShares && additionalShares > 0.000001) &&
+    currentTab !== MarketDetailsTab.sell &&
+    currentTab !== MarketDetailsTab.finalize &&
+    currentTab !== MarketDetailsTab.setOutcome
 
   const showLiquidityBox =
     !!liquidityAmount && liquidityAmount.gt(0) && !!additionalShares && additionalShares > 0.000001
@@ -513,6 +522,20 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         : startingPoint && lowerBound && upperBound
         ? calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound) / 100
         : 0.01,
+    },
+  ]
+  const bondedValueBoxData = [
+    {
+      title: `${currentPredictionNumber.toFixed(2)} ${unit}`,
+      subtitle: 'Predicted Outcome',
+    },
+    {
+      title: `${bonded && formatBigNumber(bonded, 2)}  ${collateral && collateral.symbol}`,
+      subtitle: 'Bonded',
+    },
+    {
+      title: '-',
+      subtitle: 'Final Outcome',
     },
   ]
 
@@ -640,8 +663,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           )}
           {showSingleValueBox && <ValueBoxes valueBoxData={singleValueBoxData} />}
         </Scale>
+
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
         {showLiquidityBox && <ValueBoxes valueBoxData={liquidityValueBoxData} />}
+        {isBonded && <ValueBoxes valueBoxData={bondedValueBoxData} />}
       </ScaleWrapper>
       {!isPositionTableDisabled && balances && collateral && trades && (
         <PositionTable

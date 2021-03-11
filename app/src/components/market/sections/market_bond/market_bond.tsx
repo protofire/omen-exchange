@@ -7,7 +7,7 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, networkIds } from '../../../../util/networks'
-import { formatBigNumber, formatNumber, numberToByte32 } from '../../../../util/tools'
+import { formatBigNumber, formatNumber, getUnit, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
   MarketDetailsTab,
@@ -24,6 +24,7 @@ import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { AssetBalance } from '../../common/asset_balance'
 import { CurrenciesWrapper } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
+import { MarketScale } from '../../common/market_scale'
 import { OutcomeTable } from '../../common/outcome_table'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
@@ -67,9 +68,11 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const probabilities = balances.map(balance => balance.probability)
   const initialBondAmount =
     networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
+  console.log(formatBigNumber(initialBondAmount, 18))
   const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
     currentAnswerBond ? new BigNumber(currentAnswerBond).mul(2) : initialBondAmount,
   )
+  console.log(formatBigNumber(bondNativeAssetAmount, 18))
   const [nativeAssetBalance, setNativeAssetBalance] = useState<BigNumber>(Zero)
 
   useEffect(() => {
@@ -134,28 +137,48 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      {props.isScalar ? <div>Here</div> : <div>Niko</div>}
-      <OutcomeTable
-        balances={balances}
-        bonds={marketMakerData.question.bonds}
-        collateral={marketMakerData.collateral}
-        disabledColumns={[
-          OutcomeTableValue.OutcomeProbability,
-          OutcomeTableValue.Probability,
-          OutcomeTableValue.CurrentPrice,
-          OutcomeTableValue.Payout,
-        ]}
-        isBond
-        newBonds={marketMakerData.question.bonds?.map((bond, bondIndex) =>
-          bondIndex !== outcomeIndex ? bond : { ...bond, bondedEth: bond.bondedEth.add(bondNativeAssetAmount) },
-        )}
-        outcomeHandleChange={(value: number) => {
-          setOutcomeIndex(value)
-        }}
-        outcomeSelected={outcomeIndex}
-        probabilities={probabilities}
-        showBondChange
-      />
+      {props.isScalar ? (
+        <MarketScale
+          bonded={marketMakerData.question.bonds && marketMakerData.question.bonds[0].bondedEth}
+          borderTop={true}
+          collateral={props.marketMakerData.collateral}
+          currentPrediction={
+            props.marketMakerData.outcomeTokenMarginalPrices
+              ? props.marketMakerData.outcomeTokenMarginalPrices[1]
+              : null
+          }
+          currentTab={MarketDetailsTab.setOutcome}
+          fee={props.marketMakerData.fee}
+          isBonded={true}
+          lowerBound={props.marketMakerData.scalarLow || new BigNumber(0)}
+          startingPointTitle={'Current prediction'}
+          unit={getUnit(props.marketMakerData.question.title)}
+          upperBound={props.marketMakerData.scalarHigh || new BigNumber(0)}
+        />
+      ) : (
+        <OutcomeTable
+          balances={balances}
+          bonds={marketMakerData.question.bonds}
+          collateral={marketMakerData.collateral}
+          disabledColumns={[
+            OutcomeTableValue.OutcomeProbability,
+            OutcomeTableValue.Probability,
+            OutcomeTableValue.CurrentPrice,
+            OutcomeTableValue.Payout,
+          ]}
+          isBond
+          newBonds={marketMakerData.question.bonds?.map((bond, bondIndex) =>
+            bondIndex !== outcomeIndex ? bond : { ...bond, bondedEth: bond.bondedEth.add(bondNativeAssetAmount) },
+          )}
+          outcomeHandleChange={(value: number) => {
+            setOutcomeIndex(value)
+          }}
+          outcomeSelected={outcomeIndex}
+          probabilities={probabilities}
+          showBondChange
+        />
+      )}
+
       <GridTransactionDetails>
         <div>
           <>
