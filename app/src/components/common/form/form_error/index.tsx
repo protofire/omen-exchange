@@ -3,11 +3,14 @@ import styled from 'styled-components'
 
 const FormErrorWrapper = styled.div`
   color: ${props => props.theme.colors.error};
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.2;
-  margin: 0 0 10px;
-  text-align: left;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  letter-spacing: 0.2px;
 
   &:last-child {
     margin-bottom: 0;

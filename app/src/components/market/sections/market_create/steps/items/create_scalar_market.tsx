@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES } from '../../../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../../../hooks'
+import { formatBigNumber } from '../../../../../../util/tools'
 import { Arbitrator } from '../../../../../../util/types'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { DateField, FormRow, Textfield } from '../../../../../common'
@@ -76,18 +77,7 @@ const NumericalInput = styled(BigNumberInput)`
     -webkit-appearance: none;
   }
 `
-const ErrorMessage = styled.p`
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: normal;
-  font-size: 14px;
-  line-height: 16px;
-  display: flex;
-  align-items: center;
-  letter-spacing: 0.2px;
 
-  color: #e57373;
-`
 interface Props {
   context: ConnectedWeb3Context
   handleChange: (event: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement> | BigNumberInputReturn) => any
@@ -137,34 +127,29 @@ export const CreateScalarMarket = (props: Props) => {
     upperBound,
   } = props
 
-  const lowerBoundNumber = lowerBound?.abs() !== undefined && Number(lowerBound.abs())
-  const startingPointNumber = startingPoint?.abs() !== undefined && Number(startingPoint.abs())
-  const upperBoundNumber = upperBound?.abs() !== undefined && Number(upperBound.abs())
+  let lowerBoundError
+  let startingPointError
+  let upperBoundError
 
-  let errMessage1
-  let errMessage2
+  const startingPointNumber = startingPoint !== null ? formatBigNumber(startingPoint, 18, 2) : 0
+  console.log(startingPointNumber)
 
-  if (lowerBoundNumber >= startingPointNumber) {
-    errMessage1 = 'Value must be less than Starting Point'
+  const lowerBoundNumber = lowerBound !== null ? formatBigNumber(lowerBound, 18, 2) : 0
+
+  const upperBoundNumber = upperBound !== null ? formatBigNumber(upperBound, 18, 2) : 0
+  console.log(upperBoundNumber)
+
+  if (lowerBoundNumber > startingPointNumber) {
+    lowerBoundError = 'Value must be less than Starting Point'
   }
 
-  if (startingPointNumber >= upperBoundNumber) {
-    errMessage2 = 'Value must be less than Upper Bound'
+  if (startingPointNumber > upperBoundNumber) {
+    startingPointError = 'Value must be less than Upper Bounds'
   }
 
-  // let errMessage: string
-
-  // const errorMessage = (): string => {
-  //   if (
-  //     lowerBound?.abs() !== undefined &&
-  //     startingPoint?.abs() !== undefined &&
-  //     lowerBound.abs() > startingPoint.abs()
-  //   ) {
-  //     errMessage = 'Lower bound must be less than starting point'
-  //   }
-
-  //   return ''
-  // }
+  lowerBoundNumber < '0' ? (lowerBoundError = 'Value cannot be negative') : null
+  startingPointNumber < '0' ? (startingPointError = 'Value cannot be negative') : null
+  upperBoundNumber < '0' ? (upperBoundError = 'Value cannot be negative') : null
 
   return (
     <>
@@ -183,7 +168,7 @@ export const CreateScalarMarket = (props: Props) => {
       <RowWrapper>
         <Row>
           <FormRow
-            error={<ErrorMessage>{errMessage1}</ErrorMessage>}
+            error={lowerBoundError}
             formField={
               <NumericalInput
                 decimals={18}
@@ -200,6 +185,7 @@ export const CreateScalarMarket = (props: Props) => {
           />
 
           <FormRow
+            error={upperBoundError}
             formField={
               <NumericalInput
                 decimals={18}
@@ -216,7 +202,7 @@ export const CreateScalarMarket = (props: Props) => {
         </Row>
         <Row>
           <FormRow
-            error={<ErrorMessage>{errMessage2}</ErrorMessage>}
+            error={startingPointError}
             formField={
               <NumericalInput
                 decimals={18}
