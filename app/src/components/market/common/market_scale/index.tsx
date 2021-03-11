@@ -389,7 +389,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     setScaleValue(
       newPrediction
-        ? newPrediction * 100
+        ? newPrediction * 100 > 100
+          ? 100
+          : newPrediction * 100
         : currentPrediction
         ? Number(currentPrediction) * 100 > 100
           ? 100
