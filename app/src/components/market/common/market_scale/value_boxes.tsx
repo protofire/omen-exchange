@@ -35,6 +35,7 @@ const ValueBoxPair = styled.div`
 
 interface Props {
   valueBoxData: ValueBoxItem[]
+  straightEdges?: boolean
 }
 
 export const ValueBoxes: React.FC<Props> = (props: Props) => {
@@ -44,6 +45,7 @@ export const ValueBoxes: React.FC<Props> = (props: Props) => {
     return (
       <ValueBox
         ball={valueBox.ball}
+        hasThreeBoxes={valueBoxData.length === 3 ? true : false}
         key={index}
         positive={valueBox.positive}
         subtitle={valueBox.subtitle}

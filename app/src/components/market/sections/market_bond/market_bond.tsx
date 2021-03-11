@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber, parseUnits } from 'ethers/utils'
+import { BigNumber, formatBytes32String, parseUnits } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -7,7 +7,7 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, networkIds } from '../../../../util/networks'
-import { formatBigNumber, formatNumber, getUnit, numberToByte32 } from '../../../../util/tools'
+import { calcPrediction, formatBigNumber, formatNumber, getUnit, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
   MarketDetailsTab,
@@ -39,7 +39,6 @@ interface Props extends RouteComponentProps<any> {
 }
 
 const BottomButtonWrapper = styled(ButtonContainer)`
-  justify-content: space-between;
   margin: 0 -24px;
   padding: 20px 24px 0;
 `
@@ -74,6 +73,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   )
   console.log(formatBigNumber(bondNativeAssetAmount, 18))
   const [nativeAssetBalance, setNativeAssetBalance] = useState<BigNumber>(Zero)
+  console.log(numberToByte32(0))
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -88,15 +88,19 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       fetchBalance()
     }
   }, [account, provider])
-
+  console.log(marketMakerData)
   useEffect(() => {
     if (currentAnswerBond && !new BigNumber(currentAnswerBond).mul(2).eq(bondNativeAssetAmount)) {
       setBondNativeAssetAmount(new BigNumber(currentAnswerBond).mul(2))
     }
     // eslint-disable-next-line
   }, [currentAnswerBond])
-
-  const bondOutcome = async () => {
+  const currentPredictionNumber = calcPrediction(
+    props.marketMakerData.outcomeTokenMarginalPrices[1] || '',
+    props.marketMakerData.scalarLow || Zero,
+    props.marketMakerData.scalarHigh || Zero,
+  )
+  const bondOutcome = async (isInvalid?: boolean) => {
     setModalTitle('Bond Outcome')
 
     try {
@@ -104,17 +108,20 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
-
-      const answer = outcomeIndex >= balances.length ? INVALID_ANSWER_ID : numberToByte32(outcomeIndex)
-
+      console.log(outcomeIndex >= balances.length || isInvalid)
+      const answer =
+        outcomeIndex >= balances.length && isInvalid !== undefined ? INVALID_ANSWER_ID : numberToByte32(outcomeIndex)
+      console.log(answer)
       setMessage(
         `Bonding ${formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals)} ${symbol} on: ${
-          outcomeIndex >= marketMakerData.question.outcomes.length
+          props.isScalar
+            ? `${currentPredictionNumber.toFixed(2)} ${getUnit(props.marketMakerData.question.title)}`
+            : outcomeIndex >= marketMakerData.question.outcomes.length
             ? 'Invalid'
             : marketMakerData.question.outcomes[outcomeIndex]
         }`,
       )
-
+      console.log(numberToByte32(currentPredictionNumber))
       logger.log(`Submit Answer questionId: ${marketMakerData.question.id}, answer: ${answer}`, bondNativeAssetAmount)
       await realitio.submitAnswer(marketMakerData.question.id, answer, bondNativeAssetAmount)
       await fetchGraphMarketMakerData()
@@ -229,10 +236,19 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       </GridTransactionDetails>
 
       <BottomButtonWrapper borderTop>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.finalize)}>
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => switchMarketTab(MarketDetailsTab.finalize)}
+          style={{ marginRight: 'auto' }}
+        >
           Back
         </Button>
-        <Button buttonType={ButtonType.primary} onClick={() => bondOutcome()}>
+        {props.isScalar && (
+          <Button buttonType={ButtonType.secondaryLine} onClick={() => bondOutcome(true)}>
+            Set Invalid
+          </Button>
+        )}
+        <Button buttonType={ButtonType.primary} onClick={() => bondOutcome(false)}>
           Bond {symbol}
         </Button>
       </BottomButtonWrapper>

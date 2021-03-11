@@ -7,7 +7,7 @@ import { useCompoundService, useConnectedCPKContext, useGraphMarketUserTxData } 
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { getNativeAsset, getToken } from '../../../../../util/networks'
-import { getSharesInBaseToken, getUnit, isDust } from '../../../../../util/tools'
+import { getSharesInBaseToken, getUnit, isDust, numberToByte32 } from '../../../../../util/tools'
 import {
   BalanceItem,
   CompoundTokenType,
@@ -315,7 +315,7 @@ const Wrapper = (props: Props) => {
     }
     // eslint-disable-next-line
   }, [isQuestionFinalized, isFinalizing])
-  console.log(question)
+  console.log(numberToByte32(0))
   return (
     <>
       <TopCard>
@@ -376,9 +376,7 @@ const Wrapper = (props: Props) => {
         )}
         {currentTab === MarketDetailsTab.finalize ? (
           <>
-            {!isScalar ? (
-              renderFinalizeTableData()
-            ) : (
+            {isScalar ? (
               <MarketScale
                 bonded={question.bonds && question.bonds[0].bondedEth}
                 borderTop={true}
@@ -391,6 +389,8 @@ const Wrapper = (props: Props) => {
                 unit={getUnit(question.title)}
                 upperBound={scalarHigh || new BigNumber(0)}
               />
+            ) : (
+              renderFinalizeTableData()
             )}
             <WhenConnected>
               <StyledButtonContainer className={!hasFunding ? 'border' : ''}>

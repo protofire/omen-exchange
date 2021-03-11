@@ -531,7 +531,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     },
     {
       title: `${bonded && formatBigNumber(bonded, 2)}  ${collateral && collateral.symbol}`,
-      subtitle: 'Bonded',
+      subtitle: 'Bond Amount',
     },
     {
       title: '-',
@@ -663,10 +663,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           )}
           {showSingleValueBox && <ValueBoxes valueBoxData={singleValueBoxData} />}
         </Scale>
-
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
         {showLiquidityBox && <ValueBoxes valueBoxData={liquidityValueBoxData} />}
-        {isBonded && <ValueBoxes valueBoxData={bondedValueBoxData} />}
+        {isBonded && <ValueBoxes straightEdges={true} valueBoxData={bondedValueBoxData} />}
       </ScaleWrapper>
       {!isPositionTableDisabled && balances && collateral && trades && (
         <PositionTable
