@@ -1214,17 +1214,15 @@ class CPKService {
 
   sendDaiToBridge = async (amount: BigNumber) => {
     try {
-      console.log('cal;ed2')
       if (this.cpk.relay) {
-        console.log('cal;ed')
         const xDaiService = new XdaiService(this.provider)
         const contract = xDaiService.generateXdaiBridgeContractInstance()
         const sender = await this.cpk.ethLibAdapter.signer.signer.getAddress()
         const receiver = this.cpk.address
-        console.log(sender, receiver)
+
         // verify proxy address before deposit
         await verifyProxyAddress(sender, receiver, this.cpk)
-        console.log('here')
+
         const transaction = await contract.relayTokens(sender, receiver, amount)
         return transaction.hash
       } else {

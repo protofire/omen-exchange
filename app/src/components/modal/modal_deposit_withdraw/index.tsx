@@ -6,7 +6,7 @@ import styled, { withTheme } from 'styled-components'
 
 import { useCollateralBalance, useConnectedCPKContext, useConnectedWeb3Context, useTokens } from '../../../hooks'
 import { getNativeAsset, getToken } from '../../../util/networks'
-import { formatBigNumber, formatNumber, waitABit } from '../../../util/tools'
+import { formatBigNumber, formatNumber, waitABit, waitForConfirmations } from '../../../util/tools'
 import { ExchangeType, TransactionStep, TransactionType } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -81,6 +81,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const minDeposit = parseEther('10')
   const isDepositWithdrawDisabled =
     displayFundAmount.isZero() || !wallet || displayFundAmount.gt(wallet) || displayFundAmount.lt(minDeposit)
+  const fee = '1000000000000000'
 
   const deposit = async () => {
     if (!cpk) {
@@ -95,22 +96,9 @@ export const ModalDepositWithdraw = (props: Props) => {
       exchangeType === ExchangeType.deposit
         ? await cpk.sendDaiToBridge(displayFundAmount)
         : await cpk.sendXdaiToBridge(displayFundAmount)
-
     setTxHash(hash)
-    setTxState(TransactionStep.transactionSubmitted)
-    let confs = 0
     const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
-    while (confs < 8) {
-      const tx = await provider.getTransaction(hash)
-      console.log(tx, tx && tx.confirmations, confirmations)
-      if (tx && tx.confirmations) {
-        setTxState(TransactionStep.confirming)
-        setConfirmations(tx.confirmations)
-        confs = tx.confirmations
-      }
-      await waitABit()
-    }
-    setTxState(TransactionStep.transactionConfirmed)
+    await waitForConfirmations(hash, provider, setConfirmations, setTxState)
   }
 
   return (

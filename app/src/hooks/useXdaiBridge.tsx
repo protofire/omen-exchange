@@ -49,7 +49,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
         setTransactionHash(transaction.hash)
         setTransactionStep(TransactionStep.transactionSubmitted)
 
-        await waitForConfirmations(transaction, cpk, setNumberOfConfirmations, networkId)
+        // await waitForConfirmations(transaction, cpk, setNumberOfConfirmations, networkId)
 
         setTransactionStep(TransactionStep.transactionConfirmed)
         setNumberOfConfirmations(0)
@@ -67,7 +67,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
         setTransactionHash(transaction)
         setTransactionStep(TransactionStep.transactionSubmitted)
 
-        await waitForConfirmations(transaction, cpk, setNumberOfConfirmations, networkId)
+        // await waitForConfirmations(transaction, cpk, setNumberOfConfirmations, networkId)
         setNumberOfConfirmations(0)
         setTransactionStep(TransactionStep.transactionConfirmed)
       }
@@ -81,15 +81,8 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
   const claimLatestToken = async () => {
     try {
       if (!cpk) return
-      setIsClaimStateTransaction(true)
-      setTransactionStep(TransactionStep.waitingConfirmation)
       const transaction = await cpk.claimDaiTokens()
-      setTransactionHash(transaction.hash)
-      setTransactionStep(TransactionStep.transactionSubmitted)
-      await waitForConfirmations(transaction, cpk, setNumberOfConfirmations, networkId)
-      setTransactionStep(TransactionStep.transactionConfirmed)
-      setIsClaimStateTransaction(false)
-      await fetchUnclaimedAssets()
+      return transaction.hash
     } catch (e) {
       setIsClaimStateTransaction(false)
       setTransactionStep(TransactionStep.error)

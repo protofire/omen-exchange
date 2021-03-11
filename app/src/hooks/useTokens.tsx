@@ -82,24 +82,27 @@ export const useTokens = (context: ConnectedWeb3Context, addNativeAsset?: boolea
         }
 
         if (addBalances) {
+          const { account, library: provider } = context
           // fetch token balances
           tokenData = await Promise.all(
             tokenData.map(async token => {
-              const { account, library: provider } = context
               let balance = new BigNumber(0)
               if (account) {
                 if (token.address === pseudoNativeAssetAddress) {
                   balance = await provider.getBalance(account)
                 } else {
-                  const collateralService = new ERC20Service(provider, account, token.address)
-                  balance = await collateralService.getCollateral(account)
+                  try {
+                    const collateralService = new ERC20Service(provider, account, token.address)
+                    balance = await collateralService.getCollateral(account)
+                  } catch (e) {
+                    return { ...token, balance: balance.toString() }
+                  }
                 }
               }
               return { ...token, balance: balance.toString() }
             }),
           )
         }
-
         if (!isObjectEqual(tokens, tokenData)) {
           setTokens(tokenData)
         }

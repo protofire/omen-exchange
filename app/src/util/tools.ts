@@ -10,7 +10,14 @@ import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'
 import { getContractAddress, getNativeAsset, getToken, getWrapToken, networkIds } from './networks'
-import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, EtherscanLink, Token } from './types'
+import {
+  BalanceItem,
+  CompoundEnabledTokenType,
+  CompoundTokenType,
+  EtherscanLink,
+  Token,
+  TransactionStep,
+} from './types'
 
 const logger = getLogger('Tools')
 
@@ -229,23 +236,25 @@ export const isAddress = (address: string): boolean => {
 }
 
 export const waitForConfirmations = async (
-  transaction: any,
-  cpk: CPKService,
-  setNumberOfConfirmations: any,
-  network: number,
+  hash: string,
+  provider: any,
+  setConfirmations: (confirmations: number) => void,
+  setTxState: (step: TransactionStep) => void,
+  confirmations?: number,
 ) => {
+  setTxState(TransactionStep.transactionSubmitted)
   let receipt
-
-  if (network === networkIds.XDAI) receipt = await cpk.waitForTransaction(transaction)
-  else receipt = await cpk.waitForTransaction(transaction)
-
-  while (receipt.confirmations && receipt.confirmations <= CONFIRMATION_COUNT) {
-    setNumberOfConfirmations(receipt.confirmations)
+  const requiredConfs = confirmations || CONFIRMATION_COUNT
+  while (!receipt || !receipt.confirmations || (receipt.confirmations && receipt.confirmations <= requiredConfs)) {
+    receipt = await provider.getTransaction(hash)
+    if (receipt && receipt.confirmations) {
+      setTxState(TransactionStep.confirming)
+      const confs = receipt.confirmations > requiredConfs ? requiredConfs : receipt.confirmations
+      setConfirmations(confs)
+    }
     await waitABit(2000)
-    if (network === networkIds.XDAI) receipt = await cpk.waitForTransaction(transaction)
-    else receipt = await cpk.waitForTransaction(transaction)
   }
-  return
+  setTxState(TransactionStep.transactionConfirmed)
 }
 
 export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string =>

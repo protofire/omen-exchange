@@ -334,7 +334,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             </>
           )}
 
-          {(networkId === networkIds.MAINNET || networkId == networkIds.XDAI) && (
+          {(networkId === networkIds.MAINNET || relay) && (
             <>
               <HeaderDropdown
                 currentItem={networkDropdownItems.length + 1}
