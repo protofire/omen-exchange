@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
+import { RELAY_FEE } from '../common/constants'
 import { ERC20Service } from '../services'
 import { pseudoNativeAssetAddress } from '../util/networks'
 import { Token } from '../util/types'
@@ -14,7 +15,7 @@ export const useCollateralBalance = (
   collateralBalance: Maybe<BigNumber>
   fetchCollateralBalance: () => Promise<void>
 } => {
-  const { account, library: provider } = context
+  const { account, library: provider, relay } = context
 
   const [collateralBalance, setCollateralBalance] = useState<Maybe<BigNumber>>(null)
 
@@ -24,6 +25,10 @@ export const useCollateralBalance = (
     if (account) {
       if (collateral.address === pseudoNativeAssetAddress) {
         collateralBalance = await provider.getBalance(account)
+        if (relay) {
+          // subtract the unspendable relay fee
+          collateralBalance = collateralBalance.lt(RELAY_FEE) ? collateralBalance : collateralBalance.sub(RELAY_FEE)
+        }
       } else {
         const collateralService = new ERC20Service(provider, account, collateral.address)
         collateralBalance = await collateralService.getCollateral(account)

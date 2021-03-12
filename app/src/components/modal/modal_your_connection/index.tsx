@@ -150,44 +150,33 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   openDepositModal: () => void
   openWithdrawModal: () => void
   theme?: any
+  claimState: boolean
+  unclaimedAmount: BigNumber
+  fetchUnclaimedAssets: () => void
 }
 
 export const ModalYourConnection = (props: Props) => {
-  const { changeWallet, isOpen, onClose, openDepositModal, openWithdrawModal, theme } = props
+  const {
+    changeWallet,
+    claimState,
+    fetchUnclaimedAssets,
+    isOpen,
+    onClose,
+    openDepositModal,
+    openWithdrawModal,
+    theme,
+    unclaimedAmount,
+  } = props
 
   const context = useConnectedWeb3Context()
-  const { account, library: provider, networkId, relay } = context
+  const { account, networkId, relay } = context
 
-  const [claimState, setClaimState] = useState<boolean>(false)
-  const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txHash, setTxHash] = useState('')
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
   const [confirmations, setConfirmations] = useState(0)
 
   const { claimLatestToken } = useXdaiBridge()
-
-  const fetchUnclaimedAssets = async () => {
-    const xDaiService = new XdaiService(provider)
-    const transaction = await xDaiService.fetchXdaiTransactionData()
-    if (transaction) {
-      setUnclaimedAmount(transaction.value)
-      setClaimState(true)
-      return
-    }
-    setClaimState(false)
-  }
-
-  useEffect(() => {
-    if (relay) {
-      fetchUnclaimedAssets()
-    } else {
-      setUnclaimedAmount(Zero)
-      setClaimState(false)
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, networkId])
 
   const claim = async () => {
     setTxState(TransactionStep.waitingConfirmation)
@@ -200,9 +189,6 @@ export const ModalYourConnection = (props: Props) => {
     const provider = context.rawWeb3Context.library
     await waitForConfirmations(hash, provider, setConfirmations, setTxState, 1)
     fetchUnclaimedAssets()
-
-    setClaimState(false)
-    setUnclaimedAmount(Zero)
   }
 
   React.useEffect(() => {

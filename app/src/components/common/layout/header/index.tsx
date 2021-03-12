@@ -216,6 +216,32 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   const [depositWithdrawType, setDepositWithdrawType] = useState<ExchangeType>(ExchangeType.deposit)
   const [isDisconnecting, setIsDisconnecting] = useState(false)
 
+  const [claimState, setClaimState] = useState<boolean>(false)
+  const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
+
+  const fetchUnclaimedAssets = async () => {
+    const xDaiService = new XdaiService(context.library)
+    const transaction = await xDaiService.fetchXdaiTransactionData()
+    if (transaction) {
+      setUnclaimedAmount(transaction.value)
+      setClaimState(true)
+      return
+    }
+    setUnclaimedAmount(Zero)
+    setClaimState(false)
+  }
+
+  useEffect(() => {
+    if (relay) {
+      fetchUnclaimedAssets()
+    } else {
+      setUnclaimedAmount(Zero)
+      setClaimState(false)
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account, networkId])
+
   const disableConnectButton = isConnectWalletModalOpen
 
   const networkPlacholder = (
@@ -262,7 +288,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
   //     content: <ButtonDisconnectWallet />,
   //   },
   // ]
-
+  //
   const logout = () => {
     if (active || (error && connectorName)) {
       setIsDisconnecting(true)
@@ -408,9 +434,10 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             logout()
             setConnectWalletModalState(true)
           }}
+          claimState={claimState}
+          fetchUnclaimedAssets={fetchUnclaimedAssets}
           isOpen={isYourConnectionModalOpen}
           onClose={() => setYourConnectionModalState(false)}
-          // TODO: Include exchange type
           openDepositModal={() => {
             setYourConnectionModalState(false)
             setDepositWithdrawType(ExchangeType.deposit)
@@ -421,6 +448,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
             setDepositWithdrawType(ExchangeType.withdraw)
             setDepositWithdrawModalState(true)
           }}
+          unclaimedAmount={unclaimedAmount}
         />
         <ModalConnectWalletWrapper
           isOpen={isConnectWalletModalOpen}
@@ -428,6 +456,7 @@ const HeaderContainer: React.FC<ExtendsHistory> = (props: ExtendsHistory) => {
         />
         <ModalDepositWithdrawWrapper
           exchangeType={depositWithdrawType}
+          fetchUnclaimedAssets={fetchUnclaimedAssets}
           isOpen={isDepositWithdrawModalOpen}
           onBack={() => {
             setDepositWithdrawModalState(false)

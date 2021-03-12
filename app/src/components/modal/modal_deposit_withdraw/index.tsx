@@ -48,10 +48,11 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   onBack: () => void
   onClose: () => void
   theme?: any
+  fetchUnclaimedAssets: () => void
 }
 
 export const ModalDepositWithdraw = (props: Props) => {
-  const { exchangeType, isOpen, onBack, onClose, theme } = props
+  const { exchangeType, fetchUnclaimedAssets, isOpen, onBack, onClose, theme } = props
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
 
@@ -81,7 +82,6 @@ export const ModalDepositWithdraw = (props: Props) => {
   const minDeposit = parseEther('10')
   const isDepositWithdrawDisabled =
     displayFundAmount.isZero() || !wallet || displayFundAmount.gt(wallet) || displayFundAmount.lt(minDeposit)
-  const fee = '1000000000000000'
 
   const deposit = async () => {
     if (!cpk) {
@@ -99,6 +99,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     setTxHash(hash)
     const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
     await waitForConfirmations(hash, provider, setConfirmations, setTxState)
+    fetchUnclaimedAssets()
   }
 
   return (

@@ -3,7 +3,7 @@ import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
-import { XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
+import { RELAY_ADDRESS, RELAY_FEE, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
 import { Transaction, verifyProxyAddress } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
@@ -197,11 +197,9 @@ class CPKService {
   execTransactions = async (transactions: Transaction[], txOptions?: TxOptions) => {
     if (this.cpk.relay) {
       // pay tx fee
-      const fee = '1000000000000000'
-      const recipient = '0xa493f3Adf76560092088a61e9e314a08D0B1B2b8'
       transactions.push({
-        to: recipient,
-        value: fee,
+        to: RELAY_ADDRESS,
+        value: RELAY_FEE,
       })
     }
     const txObject = await this.cpk.execTransactions(transactions, txOptions)
