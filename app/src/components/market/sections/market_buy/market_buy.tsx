@@ -518,7 +518,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       <ModalTransactionWrapper
         confirmations={0}
         confirmationsRequired={0}
-        isOpen={isTransactionProcessing && isTransactionModalOpen}
+        isOpen={isTransactionModalOpen}
         message={message}
         onClose={() => setIsTransactionModalOpen(false)}
         txHash={txHash}
