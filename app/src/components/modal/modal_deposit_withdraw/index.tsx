@@ -184,7 +184,6 @@ export const ModalDepositWithdraw = (props: Props) => {
           </DepositWithdrawButton>
         </ContentWrapper>
       </Modal>
-      {/* TODO: Replace hardcoded props */}
       <ModalTransactionWrapper
         confirmations={confirmations}
         icon={DAI.image}

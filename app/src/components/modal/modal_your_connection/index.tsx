@@ -4,9 +4,10 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
+import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS } from '../../../common/constants'
 import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../../../hooks'
 import { useXdaiBridge } from '../../../hooks/useXdaiBridge'
-import { XdaiService } from '../../../services'
+import { ERC20Service, XdaiService } from '../../../services'
 import { getNativeAsset, getToken, networkIds } from '../../../util/networks'
 import { formatBigNumber, formatNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
 import { TransactionStep, TransactionType, WalletState } from '../../../util/types'
@@ -175,10 +176,13 @@ export const ModalYourConnection = (props: Props) => {
   const [txHash, setTxHash] = useState('')
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
   const [confirmations, setConfirmations] = useState(0)
+  const [allowance, setAllowance] = useState<BigNumber>(new BigNumber(0))
+  const [message, setMessage] = useState('')
 
   const { claimLatestToken } = useXdaiBridge()
 
   const claim = async () => {
+    setMessage(`Claim ${formatBigNumber(unclaimedAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`)
     setTxState(TransactionStep.waitingConfirmation)
     setConfirmations(0)
     setIsTransactionModalOpen(true)
@@ -190,6 +194,41 @@ export const ModalYourConnection = (props: Props) => {
     await waitForConfirmations(hash, provider, setConfirmations, setTxState, 1)
     fetchUnclaimedAssets()
   }
+
+  const DAI = getToken(1, 'dai')
+
+  const fetchAllowance = async () => {
+    const owner = context.rawWeb3Context.account
+    if (relay && owner) {
+      const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, DAI.address)
+      const allowance = await collateralService.allowance(owner, DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
+      setAllowance(allowance)
+    }
+  }
+
+  const approve = async () => {
+    if (!relay) {
+      return
+    }
+    setMessage(`Enable ${DAI.symbol}`)
+    setTxState(TransactionStep.waitingConfirmation)
+    setConfirmations(0)
+    setIsTransactionModalOpen(true)
+    const owner = context.rawWeb3Context.account
+    const provider = context.rawWeb3Context.library
+    const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, DAI.address)
+    const { transactionHash } = await collateralService.approveUnlimited(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, true)
+    if (transactionHash) {
+      setTxHash(transactionHash)
+      await waitForConfirmations(transactionHash, provider, setConfirmations, setTxState, 1)
+      await fetchAllowance()
+    }
+  }
+
+  React.useEffect(() => {
+    fetchAllowance()
+    // eslint-disable-next-line
+  }, [relay, account])
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
@@ -213,10 +252,7 @@ export const ModalYourConnection = (props: Props) => {
   const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
   const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
 
-  // TODO: Replace hardcoded state
-  const walletState = WalletState.ready
-
-  const DAI = getToken(1, 'dai')
+  const walletState = allowance.isZero() ? WalletState.enable : WalletState.ready
 
   const nativeAsset = getNativeAsset(context.networkId)
   const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(getNativeAsset(context.networkId), context)
@@ -317,7 +353,9 @@ export const ModalYourConnection = (props: Props) => {
                 <EnableDai>
                   <DaiIcon size="38px" />
                   <EnableDaiText>To deposit DAI to your Omen account, you must first enable it.</EnableDaiText>
-                  <EnableDaiButton buttonType={ButtonType.primary}>Enable</EnableDaiButton>
+                  <EnableDaiButton buttonType={ButtonType.primary} onClick={approve}>
+                    Enable
+                  </EnableDaiButton>
                 </EnableDai>
               )}
             </ModalCard>
@@ -329,7 +367,7 @@ export const ModalYourConnection = (props: Props) => {
         confirmationsRequired={confirmationsRequired}
         icon={DAI.image}
         isOpen={isTransactionModalOpen}
-        message={`Claim ${formatBigNumber(unclaimedAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`}
+        message={message}
         onClose={() => setIsTransactionModalOpen(false)}
         txHash={txHash}
         txState={txState}
