@@ -25,7 +25,7 @@ import {
   signaturesFormatted,
   waitABit,
 } from '../util/tools'
-import { MarketData, Question, Token } from '../util/types'
+import { MarketData, Question, Token, TransactionStep } from '../util/types'
 
 import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
@@ -50,6 +50,9 @@ interface CPKBuyOutcomesParams {
   outcomeIndex: number
   useBaseToken?: boolean
   marketMaker: MarketMakerService
+  // TODO: Possibly remove optionality of params
+  setTxHash?: (arg0: string) => void
+  setTxState?: (step: TransactionStep) => void
 }
 
 interface CPKSellOutcomesParams {
@@ -198,7 +201,12 @@ class CPKService {
     return transactionReceipt
   }
 
-  execTransactions = async (transactions: Transaction[], txOptions?: TxOptions) => {
+  execTransactions = async (
+    transactions: Transaction[],
+    txOptions?: TxOptions,
+    setTxHash?: (arg0: string) => void,
+    setTxState?: (step: TransactionStep) => void,
+  ) => {
     if (this.cpk.relay) {
       // pay tx fee
       transactions.push({
@@ -207,7 +215,11 @@ class CPKService {
       })
     }
     const txObject = await this.cpk.execTransactions(transactions, txOptions)
-    return this.waitForTransaction(txObject)
+    setTxState && setTxState(TransactionStep.transactionSubmitted)
+    setTxHash && setTxHash(txObject.hash)
+    const tx = await this.waitForTransaction(txObject)
+    setTxState && setTxState(TransactionStep.transactionConfirmed)
+    return tx
   }
 
   buyOutcomes = async ({
@@ -216,6 +228,8 @@ class CPKService {
     compoundService,
     marketMaker,
     outcomeIndex,
+    setTxHash,
+    setTxState,
     useBaseToken = false,
   }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
@@ -330,7 +344,7 @@ class CPKService {
         data: MarketMakerService.encodeBuy(minCollateralAmount, outcomeIndex, outcomeTokensToBuy),
       })
 
-      return this.execTransactions(transactions, txOptions)
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error buying '${amount.toString()}' of shares`, err.message)
       throw err
