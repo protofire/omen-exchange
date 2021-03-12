@@ -78,9 +78,10 @@ export const ModalTransaction = (props: Props) => {
   }, [])
 
   const etherscanDisabled =
-    txState !== TransactionStep.transactionSubmitted &&
-    txState !== TransactionStep.transactionConfirmed &&
-    txState !== TransactionStep.confirming
+    (txState !== TransactionStep.transactionSubmitted &&
+      txState !== TransactionStep.transactionConfirmed &&
+      txState !== TransactionStep.confirming) ||
+    !txHash
 
   const blockExplorer =
     getBlockExplorer(networkId)
