@@ -5,11 +5,10 @@ import moment from 'moment-timezone'
 
 import { CONFIRMATION_COUNT } from '../common/constants'
 import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
-import { CPKService } from '../services'
 import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'
-import { getContractAddress, getNativeAsset, getToken, getWrapToken, networkIds } from './networks'
+import { getContractAddress, getNativeAsset, getToken, getWrapToken } from './networks'
 import {
   BalanceItem,
   CompoundEnabledTokenType,

@@ -1,11 +1,10 @@
-import { BigNumber } from 'ethers/utils'
 import React, { HTMLAttributes } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../hooks'
-import { formatBigNumber, getBlockExplorerURL } from '../../../util/tools'
-import { Token, TransactionStep, TransactionType } from '../../../util/types'
+import { getBlockExplorerURL } from '../../../util/tools'
+import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
@@ -54,16 +53,33 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   txState: TransactionStep
   confirmations: number
   confirmationsRequired?: number
+  netId?: number
 }
 
 export const ModalTransaction = (props: Props) => {
-  const { confirmations, confirmationsRequired = 8, icon, isOpen, message, onClose, theme, txHash, txState } = props
+  const {
+    confirmations,
+    confirmationsRequired = 8,
+    icon,
+    isOpen,
+    message,
+    netId,
+    onClose,
+    theme,
+    txHash,
+    txState,
+  } = props
   const context = useConnectedWeb3Context()
-  const { networkId } = context
+  const networkId = netId ? netId : context.networkId
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
   }, [])
+
+  const etherscanDisabled =
+    txState !== TransactionStep.transactionSubmitted &&
+    txState !== TransactionStep.transactionConfirmed &&
+    txState !== TransactionStep.confirming
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
@@ -72,7 +88,7 @@ export const ModalTransaction = (props: Props) => {
           <ModalNavigationLeft></ModalNavigationLeft>
           <IconClose hoverEffect={true} onClick={onClose} />
         </ModalNavigation>
-        <Spinner big={true} style={{ marginTop: '10px' }} />
+        {txState !== TransactionStep.transactionConfirmed && <Spinner big={true} style={{ marginTop: '10px' }} />}
         <ModalMainText>
           {message}
           {icon && <ModalTokenIcon src={icon} />}
@@ -89,20 +105,11 @@ export const ModalTransaction = (props: Props) => {
             : ''}
         </ModalSubText>
         <EtherscanButtonWrapper
-          href={
-            txState === TransactionStep.transactionSubmitted || txState === TransactionStep.transactionConfirmed
-              ? getBlockExplorerURL(networkId, txHash)
-              : undefined
-          }
+          href={etherscanDisabled ? undefined : getBlockExplorerURL(networkId, txHash)}
           rel="noopener noreferrer"
           target="_blank"
         >
-          <EtherscanButton
-            buttonType={ButtonType.secondaryLine}
-            disabled={
-              txState !== TransactionStep.transactionSubmitted && txState !== TransactionStep.transactionConfirmed
-            }
-          >
+          <EtherscanButton buttonType={ButtonType.secondaryLine} disabled={etherscanDisabled}>
             View on Etherscan
           </EtherscanButton>
         </EtherscanButtonWrapper>

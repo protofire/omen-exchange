@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { XdaiService } from '../services'
 import { knownTokens, networkIds } from '../util/networks'
-import { formatBigNumber, waitForConfirmations } from '../util/tools'
+import { formatBigNumber } from '../util/tools'
 import { TransactionStep } from '../util/types'
 
 import { useConnectedCPKContext } from './connectedCpk'

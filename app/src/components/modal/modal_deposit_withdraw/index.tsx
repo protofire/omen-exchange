@@ -1,13 +1,13 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber, parseEther } from 'ethers/utils'
-import React, { HTMLAttributes, useEffect, useState } from 'react'
+import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { useCollateralBalance, useConnectedCPKContext, useConnectedWeb3Context, useTokens } from '../../../hooks'
-import { getNativeAsset, getToken } from '../../../util/networks'
-import { formatBigNumber, formatNumber, waitABit, waitForConfirmations } from '../../../util/tools'
-import { ExchangeType, TransactionStep, TransactionType } from '../../../util/types'
+import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
+import { getToken } from '../../../util/networks'
+import { formatBigNumber, waitForConfirmations } from '../../../util/tools'
+import { ExchangeType, TransactionStep } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../common'
@@ -48,11 +48,26 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   onBack: () => void
   onClose: () => void
   theme?: any
-  fetchUnclaimedAssets: () => void
+  fetchBalances: () => void
+  formattedDaiBalance: string
+  formattedxDaiBalance: string
+  daiBalance: BigNumber
+  xDaiBalance: Maybe<BigNumber>
 }
 
 export const ModalDepositWithdraw = (props: Props) => {
-  const { exchangeType, fetchUnclaimedAssets, isOpen, onBack, onClose, theme } = props
+  const {
+    daiBalance,
+    exchangeType,
+    fetchBalances,
+    formattedDaiBalance,
+    formattedxDaiBalance,
+    isOpen,
+    onBack,
+    onClose,
+    theme,
+    xDaiBalance,
+  } = props
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
 
@@ -61,24 +76,17 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txHash, setTxHash] = useState('')
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
+  const [txNetId, setTxNetId] = useState()
   const [confirmations, setConfirmations] = useState(0)
+  const [message, setMessage] = useState('')
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
   }, [])
 
-  const { tokens } = useTokens(context.rawWeb3Context, true, true)
-
-  const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
-  const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
-
   const DAI = getToken(1, 'dai')
 
-  const nativeAsset = getNativeAsset(context.networkId)
-  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(getNativeAsset(context.networkId), context)
-  const balance = `${formatBigNumber(maybeCollateralBalance || Zero, nativeAsset.decimals, 2)}`
-
-  const wallet = exchangeType === ExchangeType.deposit ? daiBalance : maybeCollateralBalance
+  const wallet = exchangeType === ExchangeType.deposit ? daiBalance : xDaiBalance
   const minDeposit = parseEther('10')
   const isDepositWithdrawDisabled =
     displayFundAmount.isZero() || !wallet || displayFundAmount.gt(wallet) || displayFundAmount.lt(minDeposit)
@@ -87,7 +95,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     if (!cpk) {
       return
     }
-
+    setMessage(`${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`)
     setTxState(TransactionStep.waitingConfirmation)
     setConfirmations(0)
     setIsTransactionModalOpen(true)
@@ -96,10 +104,14 @@ export const ModalDepositWithdraw = (props: Props) => {
       exchangeType === ExchangeType.deposit
         ? await cpk.sendDaiToBridge(displayFundAmount)
         : await cpk.sendXdaiToBridge(displayFundAmount)
-    setTxHash(hash)
+
     const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
+    setTxNetId(provider.network.chainId)
+    setTxHash(hash)
     await waitForConfirmations(hash, provider, setConfirmations, setTxState)
-    fetchUnclaimedAssets()
+    setDisplayFundAmount(new BigNumber(0))
+    setAmountToDisplay('')
+    fetchBalances()
   }
 
   return (
@@ -144,7 +156,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                     <BalanceItemTitle>Omen Account</BalanceItemTitle>
                   </BalanceItemSide>
                   <BalanceItemSide>
-                    <BalanceItemBalance style={{ marginRight: '12px' }}>{balance} DAI</BalanceItemBalance>
+                    <BalanceItemBalance style={{ marginRight: '12px' }}>{formattedxDaiBalance} DAI</BalanceItemBalance>
                     <DaiIcon size="24px" />
                   </BalanceItemSide>
                 </BalanceItem>
@@ -165,7 +177,7 @@ export const ModalDepositWithdraw = (props: Props) => {
               ></BigNumberInput>
             }
             onClickMaxButton={() => {
-              const maxBalance = exchangeType === ExchangeType.deposit ? daiBalance : maybeCollateralBalance || Zero
+              const maxBalance = exchangeType === ExchangeType.deposit ? daiBalance : xDaiBalance || Zero
               setDisplayFundAmount(maxBalance)
               setAmountToDisplay(formatBigNumber(maxBalance, 18, 5))
             }}
@@ -186,11 +198,11 @@ export const ModalDepositWithdraw = (props: Props) => {
       </Modal>
       <ModalTransactionWrapper
         confirmations={confirmations}
+        confirmationsRequired={9}
         icon={DAI.image}
         isOpen={isTransactionModalOpen}
-        message={`${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), DAI.decimals)} ${
-          DAI.symbol
-        }`}
+        message={message}
+        netId={txNetId}
         onClose={() => setIsTransactionModalOpen(false)}
         txHash={txHash}
         txState={txState}

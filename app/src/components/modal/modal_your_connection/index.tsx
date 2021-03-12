@@ -1,16 +1,15 @@
-import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { HTMLAttributes, useEffect, useState } from 'react'
+import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS } from '../../../common/constants'
-import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../../../hooks'
+import { useConnectedWeb3Context } from '../../../hooks'
 import { useXdaiBridge } from '../../../hooks/useXdaiBridge'
-import { ERC20Service, XdaiService } from '../../../services'
-import { getNativeAsset, getToken, networkIds } from '../../../util/networks'
-import { formatBigNumber, formatNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
-import { TransactionStep, TransactionType, WalletState } from '../../../util/types'
+import { ERC20Service } from '../../../services'
+import { getToken, networkIds } from '../../../util/networks'
+import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
+import { TransactionStep, WalletState } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
@@ -153,14 +152,20 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   theme?: any
   claimState: boolean
   unclaimedAmount: BigNumber
-  fetchUnclaimedAssets: () => void
+  fetchBalances: () => void
+  formattedEthBalance: string
+  formattedDaiBalance: string
+  formattedxDaiBalance: string
 }
 
 export const ModalYourConnection = (props: Props) => {
   const {
     changeWallet,
     claimState,
-    fetchUnclaimedAssets,
+    fetchBalances,
+    formattedDaiBalance,
+    formattedEthBalance,
+    formattedxDaiBalance,
     isOpen,
     onClose,
     openDepositModal,
@@ -175,6 +180,7 @@ export const ModalYourConnection = (props: Props) => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txHash, setTxHash] = useState('')
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
+  const [txNetId, setTxNetId] = useState()
   const [confirmations, setConfirmations] = useState(0)
   const [allowance, setAllowance] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState('')
@@ -188,11 +194,13 @@ export const ModalYourConnection = (props: Props) => {
     setIsTransactionModalOpen(true)
 
     const hash = await claimLatestToken()
-    setTxHash(hash)
 
     const provider = context.rawWeb3Context.library
+    setTxNetId(provider.network.chainId)
+    setTxHash(hash)
+
     await waitForConfirmations(hash, provider, setConfirmations, setTxState, 1)
-    fetchUnclaimedAssets()
+    fetchBalances()
   }
 
   const DAI = getToken(1, 'dai')
@@ -219,6 +227,7 @@ export const ModalYourConnection = (props: Props) => {
     const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, DAI.address)
     const { transactionHash } = await collateralService.approveUnlimited(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, true)
     if (transactionHash) {
+      setTxNetId(provider.network.chainId)
       setTxHash(transactionHash)
       await waitForConfirmations(transactionHash, provider, setConfirmations, setTxState, 1)
       await fetchAllowance()
@@ -243,21 +252,8 @@ export const ModalYourConnection = (props: Props) => {
       <></>
     )
 
-  const { tokens } = useTokens(context.rawWeb3Context, true, true)
-
-  const ethBalance = new BigNumber(
-    tokens.filter(token => token.symbol === 'ETH' || token.symbol === 'xDAI')[0]?.balance || '',
-  )
-  const formattedEthBalance = formatNumber(formatBigNumber(ethBalance, 18, 18))
-  const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
-  const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
-
   const walletState = allowance.isZero() ? WalletState.enable : WalletState.ready
 
-  const nativeAsset = getNativeAsset(context.networkId)
-  const { collateralBalance: maybeCollateralBalance } = useCollateralBalance(getNativeAsset(context.networkId), context)
-  const balance = `${formatBigNumber(maybeCollateralBalance || Zero, nativeAsset.decimals, 2)}`
-  const confirmationsRequired = 1
   return (
     <>
       <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
@@ -336,7 +332,7 @@ export const ModalYourConnection = (props: Props) => {
                           <DaiIcon size="24px" />
                           <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
                         </BalanceItemSide>
-                        <BalanceItemBalance>{balance} DAI</BalanceItemBalance>
+                        <BalanceItemBalance>{formattedxDaiBalance} DAI</BalanceItemBalance>
                       </BalanceItem>
                     </BalanceItems>
                   </BalanceSection>
@@ -364,10 +360,11 @@ export const ModalYourConnection = (props: Props) => {
       </Modal>
       <ModalTransactionWrapper
         confirmations={confirmations}
-        confirmationsRequired={confirmationsRequired}
+        confirmationsRequired={1}
         icon={DAI.image}
         isOpen={isTransactionModalOpen}
         message={message}
+        netId={txNetId}
         onClose={() => setIsTransactionModalOpen(false)}
         txHash={txHash}
         txState={txState}

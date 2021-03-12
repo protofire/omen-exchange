@@ -135,9 +135,6 @@ class CPKService {
   constructor(cpk: any, provider: Web3Provider) {
     this.cpk = cpk
     this.provider = provider
-    if (cpk.relay) {
-      logger.log(`CPK address: ${cpk.address}`)
-    }
     this.safe = new SafeService(cpk.address, provider)
   }
 
