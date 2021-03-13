@@ -62,6 +62,9 @@ interface CPKSellOutcomesParams {
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
   useBaseToken?: boolean
+  // TODO: Possibly remove optionality of params
+  setTxHash?: (arg0: string) => void
+  setTxState?: (step: TransactionStep) => void
 }
 
 interface CPKCreateMarketParams {
@@ -755,6 +758,8 @@ class CPKService {
     conditionalTokens,
     marketMaker,
     outcomeIndex,
+    setTxHash,
+    setTxState,
     useBaseToken,
   }: CPKSellOutcomesParams): Promise<TransactionReceipt> => {
     try {
@@ -850,7 +855,7 @@ class CPKService {
         }
       }
 
-      return this.execTransactions(transactions, txOptions)
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error selling '${amount.toString()}' of shares`, err.message)
       throw err

@@ -35,12 +35,14 @@ import {
   OutcomeTableValue,
   Status,
   Token,
+  TransactionStep,
 } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
+import { ModalTransactionWrapper } from '../../../modal'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
@@ -69,6 +71,7 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { networkId } = context
   const cpk = useConnectedCPKContext()
   const { fetchBalances } = useConnectedBalanceContext()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
@@ -85,6 +88,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
+  const baseCollateral = getInitialCollateral(networkId, collateral)
+
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(defaultOutcomeIndex)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
@@ -93,7 +98,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
-  const { networkId } = context
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
+  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
+
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
 
@@ -212,7 +222,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       if (!cpk) {
         return
       }
+      setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
       let displaySharesAmount = sharesAmount
       if (collateral.symbol.toLowerCase() in CompoundTokenType && amountShares && compoundService) {
@@ -233,6 +245,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         marketMaker,
         conditionalTokens,
         useBaseToken,
+        setTxHash,
+        setTxState,
       })
 
       await fetchGraphMarketMakerData()
@@ -249,7 +263,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       logger.error(`${message} - ${err.message}`)
       setIsTransactionProcessing(false)
     }
-    setIsModalTransactionResultOpen(true)
   }
 
   const newShares = balances.map((balance, i) =>
@@ -453,14 +466,23 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           Sell
         </Button>
       </StyledButtonContainer>
-      <ModalTransactionResult
+      {/* <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
         status={status}
         text={message}
         title={status === Status.Error ? 'Transaction Error' : 'Sell Shares'}
       />
-      {status === Status.Loading && <FullLoading message={message} />}
+      {status === Status.Loading && <FullLoading message={message} />} */}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={txHash}
+        txState={txState}
+      />
     </>
   )
 }
