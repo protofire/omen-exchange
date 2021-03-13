@@ -9,7 +9,7 @@ import { Token, TransactionStep, TransactionType } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
-import { IconClose } from '../../common/icons'
+import { IconClose, IconDone } from '../../common/icons'
 import { ContentWrapper, ModalNavigation, ModalNavigationLeft } from '../common_styled'
 
 const ModalMainText = styled.p`
@@ -95,7 +95,11 @@ export const ModalTransaction = (props: Props) => {
           <ModalNavigationLeft></ModalNavigationLeft>
           <IconClose hoverEffect={true} onClick={onClose} />
         </ModalNavigation>
-        {txState !== TransactionStep.transactionConfirmed && <Spinner big={true} style={{ marginTop: '10px' }} />}
+        {txState === TransactionStep.transactionConfirmed ? (
+          <IconDone />
+        ) : (
+          <Spinner big={true} style={{ marginTop: '10px' }} />
+        )}
         <ModalMainText>
           {message}
           {icon && <ModalTokenIcon src={icon} />}
