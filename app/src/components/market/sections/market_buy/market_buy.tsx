@@ -21,7 +21,7 @@ import {
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { getNativeAsset, getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   computeBalanceAfterTrade,
@@ -30,7 +30,6 @@ import {
   getInitialCollateral,
   getSharesInBaseToken,
   mulBN,
-  waitForConfirmations,
 } from '../../../../util/tools'
 import {
   CompoundTokenType,
@@ -41,15 +40,12 @@ import {
   Ternary,
   Token,
   TransactionStep,
-  TransactionType,
 } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { FullLoading } from '../../../loading'
 import { ModalTransactionWrapper } from '../../../modal'
-import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
@@ -125,7 +121,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [tweet, setTweet] = useState('')
   const [newShares, setNewShares] = useState<Maybe<BigNumber[]>>(null)
   const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
@@ -270,7 +265,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       logger.error(`${message} - ${err.message}`)
       setIsTransactionProcessing(false)
     }
-    setIsModalTransactionResultOpen(true)
   }
 
   const showSetAllowance =
@@ -507,16 +501,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           Buy
         </Button>
       </StyledButtonContainer>
-      {/* <ModalTransactionResult
-        isOpen={isModalTransactionResultOpen}
-        onClose={() => setIsModalTransactionResultOpen(false)}
-        shareUrl={`${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`}
-        status={status}
-        text={message}
-        title={status === Status.Error ? 'Transaction Error' : 'Buy Shares'}
-        tweet={tweet}
-      />
-      {status === Status.Loading && <FullLoading message={message} />} */}
       <ModalTransactionWrapper
         confirmations={0}
         confirmationsRequired={0}
