@@ -523,6 +523,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         isOpen={isTransactionModalOpen}
         message={message}
         onClose={() => setIsTransactionModalOpen(false)}
+        shareUrl={`${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`}
+        tweet={tweet}
         txHash={txHash}
         txState={txState}
       />

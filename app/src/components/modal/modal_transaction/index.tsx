@@ -1,5 +1,7 @@
 import React, { HTMLAttributes } from 'react'
 import Modal from 'react-modal'
+import { TwitterIcon } from 'react-share'
+import { TwitterShareButton } from 'react-share'
 import styled, { withTheme } from 'styled-components'
 
 import { CONFIRMATION_COUNT } from '../../../common/constants'
@@ -10,7 +12,7 @@ import { Token, TransactionStep, TransactionType } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
-import { IconClose, IconDone } from '../../common/icons'
+import { IconClose, IconDone, IconTwitter } from '../../common/icons'
 import { ContentWrapper, ModalNavigation, ModalNavigationLeft } from '../common_styled'
 
 const ModalMainText = styled.p`
@@ -36,13 +38,24 @@ const ModalSubText = styled.p`
   margin: 0;
 `
 
-const EtherscanButton = styled(Button)`
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 20px;
+`
+
+const ModalButton = styled(Button)`
   width: 100%;
 `
 
-const EtherscanButtonWrapper = styled.a`
+const ModalButtonWrapper = styled.a`
   width: 100%;
-  margin-top: 32px;
+  margin-top: 12px;
+`
+
+const ModalButtonText = styled.span`
+  margin-left: 12px;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -56,6 +69,8 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   confirmations: number
   confirmationsRequired?: number
   netId?: number
+  tweet?: string
+  shareUrl?: string
 }
 
 export const ModalTransaction = (props: Props) => {
@@ -67,7 +82,9 @@ export const ModalTransaction = (props: Props) => {
     message,
     netId,
     onClose,
+    shareUrl,
     theme,
+    tweet,
     txHash,
     txState,
   } = props
@@ -88,6 +105,8 @@ export const ModalTransaction = (props: Props) => {
     getBlockExplorer(networkId)
       .charAt(0)
       .toUpperCase() + getBlockExplorer(networkId).slice(1)
+
+  const shareOnTwitter = tweet && shareUrl
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
@@ -116,15 +135,25 @@ export const ModalTransaction = (props: Props) => {
             ? 'Transaction Confirmed'
             : ''}
         </ModalSubText>
-        <EtherscanButtonWrapper
-          href={etherscanDisabled ? undefined : getBlockExplorerURL(networkId, txHash)}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <EtherscanButton buttonType={ButtonType.secondaryLine} disabled={etherscanDisabled}>
-            View on {blockExplorer}
-          </EtherscanButton>
-        </EtherscanButtonWrapper>
+        <ButtonContainer>
+          {shareOnTwitter && (
+            <TwitterShareButton style={{ width: '100%', marginTop: '12px' }} title={tweet} url={shareUrl}>
+              <ModalButton buttonType={ButtonType.secondaryLine} disabled={etherscanDisabled}>
+                <IconTwitter />
+                <ModalButtonText>Share on twitter</ModalButtonText>
+              </ModalButton>
+            </TwitterShareButton>
+          )}
+          <ModalButtonWrapper
+            href={etherscanDisabled ? undefined : getBlockExplorerURL(networkId, txHash)}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <ModalButton buttonType={ButtonType.secondaryLine} disabled={etherscanDisabled}>
+              View on {blockExplorer}
+            </ModalButton>
+          </ModalButtonWrapper>
+        </ButtonContainer>
       </ContentWrapper>
     </Modal>
   )
