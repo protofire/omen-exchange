@@ -237,9 +237,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         compoundService,
         marketMaker,
         outcomeIndex,
-        useBaseToken,
         setTxHash,
         setTxState,
+        useBaseToken,
       })
 
       await fetchGraphMarketMakerData()
