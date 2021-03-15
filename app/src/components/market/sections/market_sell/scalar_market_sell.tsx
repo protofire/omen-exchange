@@ -3,6 +3,7 @@ import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts, useSymbol } from '../../../../hooks'
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
@@ -106,7 +107,7 @@ export const ScalarMarketSell = (props: Props) => {
       const holdingsOfOtherOutcome = holdings.filter((item, index) => {
         return index !== positionIndex
       })
-      const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
+      const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
 
       const amountToSell = calcSellAmountInCollateral(
         // If the transaction incur in some precision error, we need to multiply the amount by some factor, for example  amountShares.mul(99999).div(100000) , bigger the factor, less dust
@@ -155,7 +156,7 @@ export const ScalarMarketSell = (props: Props) => {
   const formattedNewPrediction =
     newPrediction &&
     calcXValue(
-      parseUnits(newPrediction.toString(), 18),
+      parseUnits(newPrediction.toString(), STANDARD_DECIMALS),
       scalarLow || new BigNumber(0),
       scalarHigh || new BigNumber(0),
     ) / 100

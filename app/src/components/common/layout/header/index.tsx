@@ -6,7 +6,7 @@ import { matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 
-import { Logo } from '../../../../common/constants'
+import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
 import { useOutsideAlerter } from '../../../../hooks/useOutsideAlerter'
 import { XdaiService } from '../../../../services'
 import { networkIds } from '../../../../util/networks'
@@ -217,7 +217,7 @@ const HeaderContainer = (props: any) => {
             <GoldDot />
             Claim
           </ClaimText>
-          <ClaimAmount>{formatBigNumber(unclaimedAmount, 18, 2)} DAI</ClaimAmount>
+          <ClaimAmount>{formatBigNumber(unclaimedAmount, STANDARD_DECIMALS, 2)} DAI</ClaimAmount>
         </ClaimWrapper>
       ),
       visibility: networkId !== 1 || !claimState,
