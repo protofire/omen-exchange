@@ -30,12 +30,21 @@ import {
   getUnit,
   isDust,
 } from '../../../../util/tools'
-import { AdditionalSharesType, MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
+import {
+  AdditionalSharesType,
+  MarketDetailsTab,
+  MarketMakerData,
+  Status,
+  Ternary,
+  Token,
+  TransactionStep,
+} from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
+import { ModalTransactionWrapper } from '../../../modal'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
@@ -133,6 +142,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
   const [additionalShares, setAdditionalShares] = useState<number>(0)
   const [additionalSharesType, setAdditionalSharesType] = useState<Maybe<AdditionalSharesType>>()
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
     setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
@@ -230,11 +242,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       await cpk.addFunding({
         amount: amountToFund || Zero,
         collateral,
         marketMaker,
+        setTxHash,
+        setTxState,
       })
 
       await fetchGraphMarketUserTxData()
@@ -602,14 +618,23 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           </Button>
         )}
       </BottomButtonWrapper>
-      <ModalTransactionResult
+      {/* <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
         status={status}
         text={message}
         title={modalTitle}
       />
-      {status === Status.Loading && <FullLoading message={message} />}
+      {status === Status.Loading && <FullLoading message={message} />} */}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={txHash}
+        txState={txState}
+      />
     </>
   )
 }
