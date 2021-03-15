@@ -236,7 +236,7 @@ interface Props {
   additionalSharesType?: Maybe<AdditionalSharesType>
   currentTab?: MarketDetailsTab
   isBonded?: boolean
-  bonded?: Maybe<BigNumber>
+  bondNativeAssetAmount?: BigNumber
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
@@ -245,7 +245,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     additionalSharesType,
     amountShares,
     balances,
-    bonded,
+    bondNativeAssetAmount,
     borderTop,
     collateral,
     currentPrediction,
@@ -267,7 +267,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     unit,
     upperBound,
   } = props
-  console.log(props)
 
   const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, 18))
   const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, 18))
@@ -524,13 +523,15 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         : 0.01,
     },
   ]
+  console.log(bondNativeAssetAmount)
   const bondedValueBoxData = [
     {
       title: `${currentPredictionNumber.toFixed(2)} ${unit}`,
       subtitle: 'Predicted Outcome',
     },
     {
-      title: `${bonded && formatBigNumber(bonded, 2)}  ${collateral && collateral.symbol}`,
+      title: `${formatBigNumber(bondNativeAssetAmount ? bondNativeAssetAmount : Zero, 18)}  ${collateral &&
+        collateral.symbol}`,
       subtitle: 'Bond Amount',
     },
     {

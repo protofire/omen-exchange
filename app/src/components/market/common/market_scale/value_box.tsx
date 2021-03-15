@@ -29,7 +29,7 @@ const ValueBoxSegment = styled.div<{ threeBoxes?: boolean }>`
     border-bottom-right-radius: 4px;
     border-top-left-radius: ${props => (props.threeBoxes ? '4' : '0')}px;
     border-bottom-left-radius: ${props => (props.threeBoxes ? '4' : '0')}px;
-    ${props => props.threeBoxes && 'border-left:none'};
+    ${props => !props.threeBoxes && 'border-left:none'};
   }
 `
 

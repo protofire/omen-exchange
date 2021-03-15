@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { useCompoundService, useConnectedCPKContext, useGraphMarketUserTxData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
-import { getNativeAsset, getToken } from '../../../../../util/networks'
+import { getNativeAsset, getToken, networkIds } from '../../../../../util/networks'
 import { getSharesInBaseToken, getUnit, isDust, numberToByte32 } from '../../../../../util/tools'
 import {
   BalanceItem,
@@ -132,6 +132,19 @@ const Wrapper = (props: Props) => {
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
+  const nativeAsset = getNativeAsset(networkId)
+  const initialBondAmount =
+    networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
+
+  const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
+    question.currentAnswerBond ? new BigNumber(question.currentAnswerBond).mul(2) : initialBondAmount,
+  )
+  useEffect(() => {
+    if (question.currentAnswerBond && !new BigNumber(question.currentAnswerBond).mul(2).eq(bondNativeAssetAmount)) {
+      setBondNativeAssetAmount(new BigNumber(question.currentAnswerBond).mul(2))
+    }
+    // eslint-disable-next-line
+  }, [question.currentAnswerBond])
 
   const setCurrentDisplayCollateral = () => {
     // if collateral is a cToken then convert the collateral and balances to underlying token
@@ -315,7 +328,7 @@ const Wrapper = (props: Props) => {
     }
     // eslint-disable-next-line
   }, [isQuestionFinalized, isFinalizing])
-  console.log(numberToByte32(0))
+
   return (
     <>
       <TopCard>
@@ -378,7 +391,7 @@ const Wrapper = (props: Props) => {
           <>
             {isScalar ? (
               <MarketScale
-                bonded={question.bonds && question.bonds[0].bondedEth}
+                bondNativeAssetAmount={bondNativeAssetAmount}
                 borderTop={true}
                 collateral={collateral}
                 currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
@@ -406,35 +419,10 @@ const Wrapper = (props: Props) => {
               </StyledButtonContainer>
             </WhenConnected>
           </>
-        ) : // ) : (
-        //   <>
-        //     <MarketScale
-        //       borderTop={true}
-        //       currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
-        //       lowerBound={scalarLow || new BigNumber(0)}
-        //       startingPointTitle={'Current prediction'}
-        //       unit={getUnit(question.title)}
-        //       upperBound={scalarHigh || new BigNumber(0)}
-        //     />
-        //     {openQuestionMessage}
-        //     <WhenConnected>
-        //       <StyledButtonContainer className={!hasFunding || isQuestionOpen ? 'border' : ''}>
-        //         <Button
-        //           buttonType={ButtonType.secondaryLine}
-        //           onClick={() => {
-        //             history.goBack()
-        //           }}
-        //         >
-        //           Back
-        //         </Button>
-        //         {isQuestionOpen ? openInRealitioButton : buySellButtons}
-        //       </StyledButtonContainer>
-        //     </WhenConnected>
-        //   </>
-        // )
-        null}
+        ) : null}
         {currentTab === MarketDetailsTab.setOutcome && (
           <MarketBondContainer
+            bondNativeAssetAmount={bondNativeAssetAmount}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             isScalar={isScalar}
             marketMakerData={marketMakerData}

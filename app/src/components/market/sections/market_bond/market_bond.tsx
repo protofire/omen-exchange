@@ -36,6 +36,7 @@ interface Props extends RouteComponentProps<any> {
   switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
   isScalar: boolean
+  bondNativeAssetAmount: BigNumber
 }
 
 const BottomButtonWrapper = styled(ButtonContainer)`
@@ -46,7 +47,7 @@ const BottomButtonWrapper = styled(ButtonContainer)`
 const logger = getLogger('Market::Bond')
 
 const MarketBondWrapper: React.FC<Props> = (props: Props) => {
-  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
+  const { bondNativeAssetAmount, fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const {
     balances,
     question: { currentAnswerBond },
@@ -65,15 +66,8 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const probabilities = balances.map(balance => balance.probability)
-  const initialBondAmount =
-    networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
-  console.log(formatBigNumber(initialBondAmount, 18))
-  const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
-    currentAnswerBond ? new BigNumber(currentAnswerBond).mul(2) : initialBondAmount,
-  )
-  console.log(formatBigNumber(bondNativeAssetAmount, 18))
+
   const [nativeAssetBalance, setNativeAssetBalance] = useState<BigNumber>(Zero)
-  console.log(numberToByte32(0))
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -88,13 +82,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       fetchBalance()
     }
   }, [account, provider])
-  console.log(marketMakerData)
-  useEffect(() => {
-    if (currentAnswerBond && !new BigNumber(currentAnswerBond).mul(2).eq(bondNativeAssetAmount)) {
-      setBondNativeAssetAmount(new BigNumber(currentAnswerBond).mul(2))
-    }
-    // eslint-disable-next-line
-  }, [currentAnswerBond])
+
   const currentPredictionNumber = calcPrediction(
     props.marketMakerData.outcomeTokenMarginalPrices[1] || '',
     props.marketMakerData.scalarLow || Zero,
@@ -108,10 +96,13 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
-      console.log(outcomeIndex >= balances.length || isInvalid)
+      console.log(currentPredictionNumber)
       const answer =
-        outcomeIndex >= balances.length && isInvalid !== undefined ? INVALID_ANSWER_ID : numberToByte32(outcomeIndex)
+        outcomeIndex >= balances.length || isInvalid
+          ? INVALID_ANSWER_ID
+          : numberToByte32(props.isScalar ? currentPredictionNumber : outcomeIndex)
       console.log(answer)
+      console.log
       setMessage(
         `Bonding ${formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals)} ${symbol} on: ${
           props.isScalar
@@ -121,7 +112,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             : marketMakerData.question.outcomes[outcomeIndex]
         }`,
       )
-      console.log(numberToByte32(currentPredictionNumber))
+
       logger.log(`Submit Answer questionId: ${marketMakerData.question.id}, answer: ${answer}`, bondNativeAssetAmount)
       await realitio.submitAnswer(marketMakerData.question.id, answer, bondNativeAssetAmount)
       await fetchGraphMarketMakerData()
@@ -146,7 +137,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
     <>
       {props.isScalar ? (
         <MarketScale
-          bonded={marketMakerData.question.bonds && marketMakerData.question.bonds[0].bondedEth}
+          bondNativeAssetAmount={bondNativeAssetAmount}
           borderTop={true}
           collateral={props.marketMakerData.collateral}
           currentPrediction={
