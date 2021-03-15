@@ -10,7 +10,7 @@ const Wrapper = styled.div`
   background-color: rgba(0, 0, 0, 0.06);
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  ketscaleheight: 100vh;
   justify-content: center;
   left: 0;
   position: fixed;

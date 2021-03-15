@@ -1,5 +1,7 @@
+import { toHex } from 'authereum/dist/utils'
+import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
-import { BigNumber, formatBytes32String, parseUnits } from 'ethers/utils'
+import { BigNumber, bigNumberify, formatBytes32String, parseUnits } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -100,9 +102,13 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       const answer =
         outcomeIndex >= balances.length || isInvalid
           ? INVALID_ANSWER_ID
-          : numberToByte32(props.isScalar ? currentPredictionNumber : outcomeIndex)
+          : numberToByte32(props.isScalar ? currentPredictionNumber : outcomeIndex, props.isScalar)
       console.log(answer)
-      console.log
+      console.log(currentPredictionNumber)
+      const number = 20 * 1000000000000000000
+
+      console.log(number.toString(16))
+
       setMessage(
         `Bonding ${formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals)} ${symbol} on: ${
           props.isScalar
