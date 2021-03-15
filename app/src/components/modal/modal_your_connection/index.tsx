@@ -4,8 +4,7 @@ import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS } from '../../../common/constants'
-import { useConnectedWeb3Context } from '../../../hooks'
-import { useXdaiBridge } from '../../../hooks/useXdaiBridge'
+import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service } from '../../../services'
 import { getToken, networkIds } from '../../../util/networks'
 import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
@@ -175,6 +174,8 @@ export const ModalYourConnection = (props: Props) => {
   } = props
 
   const context = useConnectedWeb3Context()
+  const cpk = useConnectedCPKContext()
+
   const { account, networkId, relay } = context
 
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
@@ -185,21 +186,23 @@ export const ModalYourConnection = (props: Props) => {
   const [allowance, setAllowance] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState('')
 
-  const { claimLatestToken } = useXdaiBridge()
-
   const claim = async () => {
+    if (!cpk) {
+      return
+    }
+
     setMessage(`Claim ${formatBigNumber(unclaimedAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`)
     setTxState(TransactionStep.waitingConfirmation)
     setConfirmations(0)
     setIsTransactionModalOpen(true)
 
-    const hash = await claimLatestToken()
+    const transaction = await cpk.claimDaiTokens()
 
     const provider = context.rawWeb3Context.library
     setTxNetId(provider.network.chainId)
-    setTxHash(hash)
+    setTxHash(transaction.hash)
 
-    await waitForConfirmations(hash, provider, setConfirmations, setTxState, 1)
+    await waitForConfirmations(transaction.hash, provider, setConfirmations, setTxState, 1)
     fetchBalances()
   }
 

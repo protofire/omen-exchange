@@ -11,7 +11,7 @@ export const FETCH_EVENTS_CHUNK_SIZE = parseInt('500000', 10)
 
 const MAX_OUTCOMES = parseInt('8', 10)
 export const MAX_OUTCOME_ALLOWED = MAX_OUTCOMES > 256 ? 256 : MAX_OUTCOMES
-export const CONFIRMATION_COUNT = 8
+export const CONFIRMATION_COUNT = 9
 
 export const UINT_TEMPLATE_ID = 1
 export const SINGLE_SELECT_TEMPLATE_ID = 2

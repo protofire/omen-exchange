@@ -2,6 +2,7 @@ import React, { HTMLAttributes } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
+import { CONFIRMATION_COUNT } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../hooks'
 import { getBlockExplorerURL } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
@@ -59,7 +60,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const ModalTransaction = (props: Props) => {
   const {
     confirmations,
-    confirmationsRequired = 8,
+    confirmationsRequired = CONFIRMATION_COUNT,
     icon,
     isOpen,
     message,

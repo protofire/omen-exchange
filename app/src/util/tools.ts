@@ -256,8 +256,11 @@ export const waitForConfirmations = async (
   setTxState(TransactionStep.transactionConfirmed)
 }
 
-export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string =>
-  Number(formatUnits(value, decimals)).toFixed(precision)
+export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string => {
+  const formatted = formatUnits(value, decimals)
+  const parts = formatted.split('.')
+  return `${parts[0]}.${parts[1].slice(0, precision)}`
+}
 
 export const isContract = async (provider: any, address: string): Promise<boolean> => {
   const code = await provider.getCode(address)
