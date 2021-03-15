@@ -635,6 +635,7 @@ describe('tools', () => {
       [[parseUnits('5', 18), parseUnits('0', 18), parseUnits('10', 18)], 50],
       [[parseUnits('40', 18), parseUnits('5', 18), parseUnits('105', 18)], 35],
       [[parseUnits('2', 18), parseUnits('0', 18), parseUnits('10', 18)], 20],
+      [[parseUnits('103', 18), parseUnits('0', 18), parseUnits('100', 18)], 100],
     ]
     for (const [[currentPrediction, lowerBound, upperBound], result] of testCases) {
       const xValue = calcXValue(currentPrediction, lowerBound, upperBound)
