@@ -255,6 +255,8 @@ const Wrapper = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage('Redeeming payout...')
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       await cpk.redeemPositions({
         isConditionResolved,
@@ -265,6 +267,8 @@ const Wrapper = (props: Props) => {
         collateralToken,
         marketMaker,
         conditionalTokens,
+        setTxHash,
+        setTxState,
       })
       await fetchBalances()
 

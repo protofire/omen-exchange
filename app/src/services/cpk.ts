@@ -110,6 +110,9 @@ interface CPKRedeemParams {
   oracle: OracleService
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
+  // TODO: Possibly remove optionality of params
+  setTxHash?: (arg0: string) => void
+  setTxState?: (step: TransactionStep) => void
 }
 
 interface TransactionResult {
@@ -1138,6 +1141,8 @@ class CPKService {
     numOutcomes,
     oracle,
     question,
+    setTxHash,
+    setTxState,
   }: CPKRedeemParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
@@ -1169,7 +1174,7 @@ class CPKService {
         })
       }
 
-      return this.execTransactions(transactions, txOptions)
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`Error trying to resolve condition or redeem for question id '${question.id}'`, err.message)
       throw err
