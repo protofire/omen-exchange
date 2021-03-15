@@ -83,6 +83,9 @@ interface CPKAddFundingParams {
   compoundService?: CompoundService | null
   marketMaker: MarketMakerService
   useBaseToken?: boolean
+  // TODO: Possibly remove optionality of params
+  setTxHash?: (arg0: string) => void
+  setTxState?: (step: TransactionStep) => void
 }
 
 interface CPKRemoveFundingParams {
@@ -885,6 +888,8 @@ class CPKService {
     collateral,
     compoundService,
     marketMaker,
+    setTxHash,
+    setTxState,
     useBaseToken,
   }: CPKAddFundingParams): Promise<TransactionReceipt> => {
     try {
@@ -998,7 +1003,7 @@ class CPKService {
         data: MarketMakerService.encodeAddFunding(minCollateralAmount),
       })
 
-      return this.execTransactions(transactions, txOptions)
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error adding an amount of '${amount.toString()}' for funding`, err.message)
       throw err
