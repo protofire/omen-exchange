@@ -165,7 +165,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <IconStar></IconStar>
         <Outcome>
           {isScalar
-            ? `${currentPrediction && formatNumber(currentPrediction.toString())} ${unit}`
+            ? `${currentPrediction ? formatNumber(currentPrediction.toString()) : 'Unknown'} ${unit}`
             : outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}
         </Outcome>
         <Separator>|</Separator>

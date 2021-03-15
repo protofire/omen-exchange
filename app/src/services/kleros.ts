@@ -6,6 +6,7 @@ import { Contract, ethers } from 'ethers'
 import { Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
+import { STANDARD_DECIMALS } from '../common/constants'
 import { getGraphUris, getKlerosCurateGraphUris, getTokensByNetwork, networkIds } from '../util/networks'
 import { waitABit } from '../util/tools'
 import {
@@ -133,7 +134,7 @@ class KlerosService {
             return {
               symbol: token.ticker,
               address: token.addr,
-              decimals: token.decimals.toNumber() || 18, // Token does not implement the 'decimals()' function, falling back to the default, 18 decimal places.
+              decimals: token.decimals.toNumber() || STANDARD_DECIMALS, // Token does not implement the 'decimals()' function, falling back to the default, 18 decimal places.
             }
           },
         )

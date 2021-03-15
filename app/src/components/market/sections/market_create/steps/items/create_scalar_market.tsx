@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 
-import { DOCUMENT_VALIDITY_RULES } from '../../../../../../common/constants'
+import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../../../hooks'
 import { formatBigNumber } from '../../../../../../util/tools'
 import { Arbitrator } from '../../../../../../util/types'
@@ -180,9 +180,10 @@ export const CreateScalarMarket = (props: Props) => {
           <FormRow
             error={lowerBoundError}
             formField={
+
               <NumericalInputError error={lowerBoundError}>
                 <NumericalInput
-                  decimals={18}
+                  decimals={STANDARD_DECIMALS}
                   error={lowerBoundError}
                   min={0}
                   name="lowerBound"
@@ -192,6 +193,7 @@ export const CreateScalarMarket = (props: Props) => {
                   valueToDisplay={''}
                 />
               </NumericalInputError>
+
             }
             style={{ marginTop: 0 }}
             title={'Lower Bound'}
@@ -201,13 +203,12 @@ export const CreateScalarMarket = (props: Props) => {
             error={upperBoundError}
             formField={
               <NumericalInput
-                decimals={18}
+                decimals={STANDARD_DECIMALS}
                 error={upperBoundError}
                 name="upperBound"
                 onChange={handleChange}
                 placeholder={'1000'}
                 value={upperBound}
-                valueToDisplay={''}
               />
             }
             style={{ marginTop: 0 }}
@@ -218,15 +219,15 @@ export const CreateScalarMarket = (props: Props) => {
           <FormRow
             error={startingPointError}
             formField={
+
               <NumericalInputError error={startingPointError}>
                 <NumericalInput
-                  decimals={18}
+                  decimals={STANDARD_DECIMALS}
                   error={startingPointError}
                   name="startingPoint"
                   onChange={handleChange}
                   placeholder={'500'}
                   value={startingPoint}
-                  valueToDisplay={''}
                 />
               </NumericalInputError>
             }
