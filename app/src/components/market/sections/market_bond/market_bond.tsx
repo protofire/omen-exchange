@@ -15,11 +15,13 @@ import {
   OutcomeTableValue,
   Status,
   TokenEthereum,
+  TransactionStep,
 } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { FullLoading } from '../../../loading'
+import { ModalTransactionWrapper } from '../../../modal'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { AssetBalance } from '../../common/asset_balance'
 import { CurrenciesWrapper } from '../../common/common_styled'
@@ -70,6 +72,9 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
     currentAnswerBond ? new BigNumber(currentAnswerBond).mul(2) : initialBondAmount,
   )
   const [nativeAssetBalance, setNativeAssetBalance] = useState<BigNumber>(Zero)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -110,9 +115,11 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             : marketMakerData.question.outcomes[outcomeIndex]
         }`,
       )
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       logger.log(`Submit Answer questionId: ${marketMakerData.question.id}, answer: ${answer}`, bondNativeAssetAmount)
-      await realitio.submitAnswer(marketMakerData.question.id, answer, bondNativeAssetAmount)
+      await realitio.submitAnswer(marketMakerData.question.id, answer, bondNativeAssetAmount, setTxHash, setTxState)
       await fetchGraphMarketMakerData()
 
       setStatus(Status.Ready)
@@ -211,14 +218,23 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           Bond {symbol}
         </Button>
       </BottomButtonWrapper>
-      <ModalTransactionResult
+      {/* <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
         status={status}
         text={message}
         title={modalTitle}
       />
-      {status === Status.Loading && <FullLoading message={message} />}
+      {status === Status.Loading && <FullLoading message={message} />} */}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={txHash}
+        txState={txState}
+      />
     </>
   )
 }
