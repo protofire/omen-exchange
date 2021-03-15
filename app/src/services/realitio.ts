@@ -217,10 +217,20 @@ class RealitioService {
     }
   }
 
-  submitAnswer = async (questionId: string, answer: string, amount: BigNumber): Promise<void> => {
+  submitAnswer = async (
+    questionId: string,
+    answer: string,
+    amount: BigNumber,
+    setTxHash?: (arg0: string) => void,
+    setTxState?: (step: TransactionStep) => void,
+  ): Promise<void> => {
     try {
       const result = await this.contract.submitAnswer(questionId, answer, 0, { value: amount })
-      return this.provider.waitForTransaction(result.hash)
+      setTxState && setTxState(TransactionStep.transactionSubmitted)
+      setTxHash && setTxHash(result.hash)
+      const tx = await this.provider.waitForTransaction(result.hash)
+      setTxState && setTxState(TransactionStep.transactionConfirmed)
+      return tx
     } catch (error) {
       logger.error(`There was an error submitting answer '${questionId}'`, error.message)
       throw error
