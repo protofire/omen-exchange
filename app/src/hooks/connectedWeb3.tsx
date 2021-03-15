@@ -34,17 +34,21 @@ export const useConnectedWeb3Context = () => {
 
   return context
 }
-
+interface Props {
+  children?: React.ReactNode
+  setStatus?: any
+}
 /**
  * Component used to render components that depend on Web3 being available. These components can then
  * `useConnectedWeb3Context` safely to get web3 stuff without having to null check it.
  */
-export const ConnectedWeb3: React.FC = props => {
+export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   const [networkId, setNetworkId] = useState<number | null>(null)
   const safeAppInfo = useSafeApp()
   const context = useWeb3Context()
 
   const { account, active, error, library } = context
+  const rpcAddress: string | null = localStorage.getItem('rpcAddress')
 
   const initialRelayState = localStorage.getItem('relay') === 'false' ? false : true
   const [relay, setRelay] = useState(initialRelayState)
@@ -100,9 +104,10 @@ export const ConnectedWeb3: React.FC = props => {
     return () => {
       isSubscribed = false
     }
-  }, [context, library, active, error, networkId, safeAppInfo])
+  }, [context, library, active, error, networkId, safeAppInfo, rpcAddress])
 
   if (!networkId || !library) {
+    props.setStatus(true)
     return null
   }
 
@@ -116,11 +121,11 @@ export const ConnectedWeb3: React.FC = props => {
     relay: isRelay,
     toggleRelay,
   }
-
+  props.setStatus(true)
   return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
 }
 
-export const WhenConnected: React.FC = props => {
+export const WhenConnected: React.FC<Props> = props => {
   const { account } = useConnectedWeb3Context()
 
   return <>{account && props.children}</>

@@ -198,7 +198,6 @@ export const ModalDepositWithdraw = (props: Props) => {
       </Modal>
       <ModalTransactionWrapper
         confirmations={confirmations}
-        confirmationsRequired={9}
         icon={DAI.image}
         isOpen={isTransactionModalOpen}
         message={message}

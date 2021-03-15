@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useXdaiBridge } from '../../../hooks/useXdaiBridge'
 import theme from '../../../theme'
 import { formatBigNumber } from '../../../util/tools'
@@ -80,7 +81,7 @@ export const ClaimDaiModal = (props: any) => {
           </Reversed>
         )}
 
-        <ClaimAmount>Claim {formatBigNumber(props.unclaimedAmount, 18, 2)} DAI</ClaimAmount>
+        <ClaimAmount>Claim {formatBigNumber(props.unclaimedAmount, STANDARD_DECIMALS, 2)} DAI</ClaimAmount>
         {transactionStep === TransactionStep.idle && (
           <SecondaryText>
             Transfers from xDai Network <br /> need to be claimed

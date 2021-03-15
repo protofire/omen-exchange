@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 
-import { DOCUMENT_VALIDITY_RULES } from '../../../../../../common/constants'
+import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../../../hooks'
 import { Arbitrator } from '../../../../../../util/types'
 import { ButtonType } from '../../../../../button/button_styling_types'
@@ -144,12 +144,11 @@ export const CreateScalarMarket = (props: Props) => {
           <FormRow
             formField={
               <NumericalInput
-                decimals={18}
+                decimals={STANDARD_DECIMALS}
                 name="lowerBound"
                 onChange={handleChange}
                 placeholder={'0'}
                 value={lowerBound}
-                valueToDisplay={''}
               />
             }
             style={{ marginTop: 0 }}
@@ -158,12 +157,11 @@ export const CreateScalarMarket = (props: Props) => {
           <FormRow
             formField={
               <NumericalInput
-                decimals={18}
+                decimals={STANDARD_DECIMALS}
                 name="upperBound"
                 onChange={handleChange}
                 placeholder={'1000'}
                 value={upperBound}
-                valueToDisplay={''}
               />
             }
             style={{ marginTop: 0 }}
@@ -174,12 +172,11 @@ export const CreateScalarMarket = (props: Props) => {
           <FormRow
             formField={
               <NumericalInput
-                decimals={18}
+                decimals={STANDARD_DECIMALS}
                 name="startingPoint"
                 onChange={handleChange}
                 placeholder={'500'}
                 value={startingPoint}
-                valueToDisplay={''}
               />
             }
             title={'Starting Point'}

@@ -2,6 +2,7 @@ import { Contract, Wallet, ethers, utils } from 'ethers'
 import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
+import { STANDARD_DECIMALS } from '../common/constants'
 import { getLogger } from '../util/logger'
 import { isAddress, isContract } from '../util/tools'
 import { Token } from '../util/types'
@@ -116,7 +117,7 @@ class ERC20Service {
     try {
       ;[decimals, symbol] = await Promise.all([this.contract.decimals(), this.contract.symbol()])
     } catch {
-      decimals = 18
+      decimals = STANDARD_DECIMALS
       symbol = 'MKR'
     }
 

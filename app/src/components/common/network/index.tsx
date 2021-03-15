@@ -9,6 +9,8 @@ import { IconNotification } from '../icons/IconNotification'
 
 interface Props {
   claim: boolean
+  account?: any
+  networkId?: any
 }
 
 const Wrapper = styled.div`

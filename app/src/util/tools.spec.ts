@@ -30,6 +30,7 @@ import {
   getCTokenForToken,
   getIndexSets,
   getInitialCollateral,
+  getNetworkFromChain,
   getScalarTitle,
   getUnit,
   isDust,
@@ -99,6 +100,20 @@ describe('tools', () => {
       it('should strip 0x', () => {
         const stripped = strip0x(address)
         expect(stripped).toBe(testCase)
+      })
+    }
+  })
+  describe('getNetworkFromChain', () => {
+    const testCases: any = [
+      ['0x4', 4],
+      ['4', 4],
+      ['0x1', 1],
+      ['0x3', -1],
+    ]
+    for (const [network, result] of testCases) {
+      it('should give network or -1 if invalid', () => {
+        const getNetwork = getNetworkFromChain(network)
+        expect(result).toBe(getNetwork)
       })
     }
   })
