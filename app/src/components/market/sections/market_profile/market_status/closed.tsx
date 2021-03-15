@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../../common/constants'
 import { useConnectedCPKContext, useContracts, useGraphMarketUserTxData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../../services'
@@ -306,9 +307,9 @@ const Wrapper = (props: Props) => {
     cpk?.address.toLowerCase(),
   )
 
-  const realitioAnswerNumber = Number(formatBigNumber(realitioAnswer || new BigNumber(0), 18))
-  const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), 18))
-  const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), 18))
+  const realitioAnswerNumber = Number(formatBigNumber(realitioAnswer || new BigNumber(0), STANDARD_DECIMALS))
+  const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), STANDARD_DECIMALS))
+  const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), STANDARD_DECIMALS))
 
   const finalAnswerPercentage =
     realitioAnswer && realitioAnswer.eq(MaxUint256)
