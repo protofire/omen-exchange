@@ -17,10 +17,12 @@ import {
   MarketMakerData,
   OutcomeTableValue,
   Status,
+  TransactionStep,
 } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
+import { ModalTransactionWrapper } from '../../../../modal'
 import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
 import { ButtonContainerFullWidth } from '../../../common/common_styled'
 import MarketResolutionMessage from '../../../common/market_resolution_message'
@@ -151,6 +153,9 @@ const Wrapper = (props: Props) => {
   const marketCollateralToken = collateralToken
   const [compoundService, setCompoundService] = useState<Maybe<CompoundService>>(null)
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
 
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
   useMemo(() => {
@@ -186,12 +191,14 @@ const Wrapper = (props: Props) => {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const resolveCondition = async () => {
     setModalTitle('Resolve Condition')
-
+    setTxState(TransactionStep.waitingConfirmation)
+    setIsTransactionModalOpen(true)
     try {
       setStatus(Status.Loading)
       setMessage('Resolving condition...')
+
       if (isScalar && scalarLow && scalarHigh) {
-        await realitio.resolveCondition(question.id, question.raw, scalarLow, scalarHigh)
+        await realitio.resolveCondition(question.id, question.raw, scalarLow, scalarHigh, setTxHash, setTxState)
       } else {
         await oracle.resolveCondition(question, balances.length)
       }
@@ -465,14 +472,23 @@ const Wrapper = (props: Props) => {
           />
         )}
       </BottomCard>
-      <ModalTransactionResult
+      {/* <ModalTransactionResult
         isOpen={isModalTransactionResultOpen}
         onClose={() => setIsModalTransactionResultOpen(false)}
         status={status}
         text={message}
         title={modalTitle}
       />
-      {status === Status.Loading && <FullLoading message={message} />}
+      {status === Status.Loading && <FullLoading message={message} />} */}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={txHash}
+        txState={txState}
+      />
     </>
   )
 }

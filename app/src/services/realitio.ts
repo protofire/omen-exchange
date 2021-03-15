@@ -9,7 +9,7 @@ import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID, UINT_TEMPLATE_ID } from '.
 import { Outcome } from '../components/market/sections/market_create/steps/outcomes'
 import { getLogger } from '../util/logger'
 import { getEarliestBlockToCheck, getRealitioTimeout } from '../util/networks'
-import { Question, QuestionLog } from '../util/types'
+import { Question, QuestionLog, TransactionStep } from '../util/types'
 
 const logger = getLogger('Services::Realitio')
 
@@ -300,10 +300,21 @@ class RealitioService {
     return announceConditionInterface.functions.announceConditionQuestionId.encode(args)
   }
 
-  resolveCondition = async (questionId: string, question: string, scalarLow: BigNumber, scalarHigh: BigNumber) => {
+  resolveCondition = async (
+    questionId: string,
+    question: string,
+    scalarLow: BigNumber,
+    scalarHigh: BigNumber,
+    setTxHash?: (arg0: string) => void,
+    setTxState?: (step: TransactionStep) => void,
+  ) => {
     try {
       const transactionObject = await this.scalarContract.resolve(questionId, question, scalarLow, scalarHigh)
-      return this.provider.waitForTransaction(transactionObject.hash)
+      setTxState && setTxState(TransactionStep.transactionSubmitted)
+      setTxHash && setTxHash(transactionObject.hash)
+      const tx = this.provider.waitForTransaction(transactionObject.hash)
+      setTxState && setTxState(TransactionStep.transactionConfirmed)
+      return tx
     } catch (err) {
       logger.error(`There was an error resolving the condition with question id '${questionId}'`, err.message)
       throw err
