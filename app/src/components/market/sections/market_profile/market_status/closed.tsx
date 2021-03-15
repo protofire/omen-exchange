@@ -200,7 +200,7 @@ const Wrapper = (props: Props) => {
       if (isScalar && scalarLow && scalarHigh) {
         await realitio.resolveCondition(question.id, question.raw, scalarLow, scalarHigh, setTxHash, setTxState)
       } else {
-        await oracle.resolveCondition(question, balances.length)
+        await oracle.resolveCondition(question, balances.length, setTxHash, setTxState)
       }
 
       await fetchGraphMarketMakerData()
