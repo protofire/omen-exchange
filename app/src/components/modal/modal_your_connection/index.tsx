@@ -356,7 +356,9 @@ export const ModalYourConnection = (props: Props) => {
               ) : (
                 <EnableDai>
                   <DaiIcon size="38px" />
-                  <EnableDaiText>To deposit DAI to your Omen account, you must first enable it.</EnableDaiText>
+                  <EnableDaiText>
+                    To Deposit or Withdraw Dai to your Omen Account, you need to enable it first.
+                  </EnableDaiText>
                   <EnableDaiButton buttonType={ButtonType.primary} onClick={approve}>
                     Enable
                   </EnableDaiButton>
