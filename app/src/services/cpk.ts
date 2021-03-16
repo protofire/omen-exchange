@@ -75,6 +75,9 @@ interface CPKCreateMarketParams {
   realitio: RealitioService
   marketMakerFactory: MarketMakerFactoryService
   useCompoundReserve?: boolean
+  // TODO: Possibly remove optionality of params
+  setTxHash?: (arg0: string) => void
+  setTxState?: (step: TransactionStep) => void
 }
 
 interface CPKAddFundingParams {
@@ -570,6 +573,8 @@ class CPKService {
     marketData,
     marketMakerFactory,
     realitio,
+    setTxHash,
+    setTxState,
   }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
       const {
@@ -746,7 +751,7 @@ class CPKService {
         ),
       })
 
-      const transaction = await this.execTransactions(transactions, txOptions)
+      const transaction = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
 
       return {
         transaction,
