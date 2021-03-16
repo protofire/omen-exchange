@@ -1208,6 +1208,8 @@ class CPKService {
     try {
       if (this.cpk.relay) {
         const transactions: Transaction[] = []
+        const txOptions: TxOptions = {}
+        txOptions.gas = defaultGas
 
         // get mainnet relay signer
         const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
@@ -1219,8 +1221,14 @@ class CPKService {
           value: amount.toString(),
         })
 
-        const txObject = await this.execTransactions(transactions)
-        return txObject.transactionHash
+        // pay tx fee
+        transactions.push({
+          to: RELAY_ADDRESS,
+          value: RELAY_FEE,
+        })
+
+        const txObject = await this.cpk.execTransactions(transactions, txOptions)
+        return txObject.hash
       } else {
         const xDaiService = new XdaiService(this.provider)
         const transaction = await xDaiService.sendXdaiToBridge(amount)
