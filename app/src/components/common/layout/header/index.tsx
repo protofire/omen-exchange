@@ -187,7 +187,7 @@ const HeaderContainer: React.FC = (props: any) => {
   const ethBalance = new BigNumber(
     tokens.filter(token => token.symbol === 'ETH' || token.symbol === 'xDAI')[0]?.balance || '',
   )
-  const formattedEthBalance = formatNumber(formatBigNumber(ethBalance, 18, 18))
+  const formattedEthBalance = formatNumber(formatBigNumber(ethBalance, 18, 18), 3)
   const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
   const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
 
@@ -329,12 +329,12 @@ const HeaderContainer: React.FC = (props: any) => {
                 setYourConnectionModalState(true)
               }}
             >
-              {relay && (
-                <>
-                  <DepositedBalance>{formattedxDaiBalance} DAI</DepositedBalance>
-                  <HeaderButtonDivider />
-                </>
-              )}
+              <>
+                <DepositedBalance>
+                  {relay ? `${formattedxDaiBalance} DAI` : `${formattedEthBalance} ETH`}
+                </DepositedBalance>
+                <HeaderButtonDivider />
+              </>
               <Network claim={false} />
             </HeaderButton>
           )}
