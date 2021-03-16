@@ -107,6 +107,8 @@ const MarketWizardCreatorContainer: FC = () => {
             conditionalTokens,
             realitio,
             marketMakerFactory,
+            setTxHash,
+            setTxState,
             useCompoundReserve,
           })
           setMarketMakerAddress(marketMakerAddress)

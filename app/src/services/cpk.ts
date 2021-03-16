@@ -376,6 +376,8 @@ class CPKService {
     marketData,
     marketMakerFactory,
     realitio,
+    setTxHash,
+    setTxState,
     useCompoundReserve,
   }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
@@ -567,7 +569,7 @@ class CPKService {
         ),
       })
 
-      const transaction = await this.execTransactions(transactions, txOptions)
+      const transaction = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       return {
         transaction,
         marketMakerAddress: predictedMarketMakerAddress,
