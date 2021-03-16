@@ -196,19 +196,23 @@ export const ModalYourConnection = (props: Props) => {
       return
     }
 
-    setMessage(`Claim ${formatBigNumber(unclaimedAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`)
-    setTxState(TransactionStep.waitingConfirmation)
-    setConfirmations(0)
-    setIsTransactionModalOpen(true)
+    try {
+      setMessage(`Claim ${formatBigNumber(unclaimedAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`)
+      setTxState(TransactionStep.waitingConfirmation)
+      setConfirmations(0)
+      setIsTransactionModalOpen(true)
 
-    const transaction = await cpk.claimDaiTokens()
+      const transaction = await cpk.claimDaiTokens()
 
-    const provider = context.rawWeb3Context.library
-    setTxNetId(provider.network.chainId)
-    setTxHash(transaction.hash)
+      const provider = context.rawWeb3Context.library
+      setTxNetId(provider.network.chainId)
+      setTxHash(transaction.hash)
 
-    await waitForConfirmations(transaction.hash, provider, setConfirmations, setTxState, 1)
-    fetchBalances()
+      await waitForConfirmations(transaction.hash, provider, setConfirmations, setTxState, 1)
+      fetchBalances()
+    } catch (e) {
+      setIsTransactionModalOpen(false)
+    }
   }
 
   const DAI = getToken(1, 'dai')
