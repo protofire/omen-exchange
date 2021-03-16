@@ -357,7 +357,7 @@ const HeaderContainer: React.FC = (props: any) => {
           formattedDaiBalance={formattedDaiBalance}
           formattedEthBalance={formattedEthBalance}
           formattedxDaiBalance={formattedxDaiBalance}
-          isOpen={isYourConnectionModalOpen}
+          isOpen={isYourConnectionModalOpen && !isDepositWithdrawModalOpen}
           onClose={() => setYourConnectionModalState(false)}
           openDepositModal={() => {
             setYourConnectionModalState(false)
