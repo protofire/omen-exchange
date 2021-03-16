@@ -87,7 +87,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const DAI = getToken(1, 'dai')
 
   const wallet = exchangeType === ExchangeType.deposit ? daiBalance : xDaiBalance
-  const minDeposit = parseEther('10')
+  const minDeposit = exchangeType === ExchangeType.deposit ? parseEther('0.005') : parseEther('10')
   const isDepositWithdrawDisabled =
     displayFundAmount.isZero() || !wallet || displayFundAmount.gt(wallet) || displayFundAmount.lt(minDeposit)
 
@@ -185,7 +185,8 @@ export const ModalDepositWithdraw = (props: Props) => {
             symbol={'DAI'}
           ></TextfieldCustomPlaceholder>
           <InputInfo>
-            You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least 10 DAI.
+            You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least{' '}
+            {formatBigNumber(minDeposit, 18, exchangeType === ExchangeType.deposit ? 3 : 0)} DAI.
           </InputInfo>
           <DepositWithdrawButton
             buttonType={ButtonType.primaryAlternative}
