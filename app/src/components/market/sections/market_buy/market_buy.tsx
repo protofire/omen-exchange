@@ -307,7 +307,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const isBuyDisabled =
     !amount ||
-    Number(sharesTotal) == 0 ||
     (status !== Status.Ready && status !== Status.Error) ||
     amount?.isZero() ||
     (!cpk?.isSafeApp &&
