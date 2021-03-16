@@ -95,28 +95,40 @@ export const ModalDepositWithdraw = (props: Props) => {
     if (!cpk) {
       return
     }
-    setMessage(`${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`)
-    setTxState(TransactionStep.waitingConfirmation)
-    setConfirmations(0)
-    setIsTransactionModalOpen(true)
 
-    const hash =
-      exchangeType === ExchangeType.deposit
-        ? await cpk.sendDaiToBridge(displayFundAmount)
-        : await cpk.sendXdaiToBridge(displayFundAmount)
+    try {
+      setMessage(
+        `${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`,
+      )
+      setTxState(TransactionStep.waitingConfirmation)
+      setConfirmations(0)
+      setIsTransactionModalOpen(true)
 
-    const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
-    setTxNetId(provider.network.chainId)
-    setTxHash(hash)
-    await waitForConfirmations(hash, provider, setConfirmations, setTxState)
-    setDisplayFundAmount(new BigNumber(0))
-    setAmountToDisplay('')
-    fetchBalances()
+      const hash =
+        exchangeType === ExchangeType.deposit
+          ? await cpk.sendDaiToBridge(displayFundAmount)
+          : await cpk.sendXdaiToBridge(displayFundAmount)
+
+      const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
+      setTxNetId(provider.network.chainId)
+      setTxHash(hash)
+      await waitForConfirmations(hash, provider, setConfirmations, setTxState)
+      setDisplayFundAmount(new BigNumber(0))
+      setAmountToDisplay('')
+      fetchBalances()
+    } catch (e) {
+      setIsTransactionModalOpen(false)
+    }
   }
 
   return (
     <>
-      <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
+      <Modal
+        isOpen={isOpen && !isTransactionModalOpen}
+        onRequestClose={onClose}
+        shouldCloseOnOverlayClick={true}
+        style={theme.fluidHeightModal}
+      >
         <ContentWrapper>
           <ModalNavigation>
             <ModalNavigationLeft>

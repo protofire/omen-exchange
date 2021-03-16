@@ -226,19 +226,23 @@ export const ModalYourConnection = (props: Props) => {
     if (!relay) {
       return
     }
-    setMessage(`Enable ${DAI.symbol}`)
-    setTxState(TransactionStep.waitingConfirmation)
-    setConfirmations(0)
-    setIsTransactionModalOpen(true)
-    const owner = context.rawWeb3Context.account
-    const provider = context.rawWeb3Context.library
-    const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, DAI.address)
-    const { transactionHash } = await collateralService.approveUnlimited(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, true)
-    if (transactionHash) {
-      setTxNetId(provider.network.chainId)
-      setTxHash(transactionHash)
-      await waitForConfirmations(transactionHash, provider, setConfirmations, setTxState, 1)
-      await fetchAllowance()
+    try {
+      setMessage(`Enable ${DAI.symbol}`)
+      setTxState(TransactionStep.waitingConfirmation)
+      setConfirmations(0)
+      setIsTransactionModalOpen(true)
+      const owner = context.rawWeb3Context.account
+      const provider = context.rawWeb3Context.library
+      const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, DAI.address)
+      const { transactionHash } = await collateralService.approveUnlimited(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, true)
+      if (transactionHash) {
+        setTxNetId(provider.network.chainId)
+        setTxHash(transactionHash)
+        await waitForConfirmations(transactionHash, provider, setConfirmations, setTxState, 1)
+        await fetchAllowance()
+      }
+    } catch (e) {
+      setIsTransactionModalOpen(false)
     }
   }
 
@@ -264,7 +268,12 @@ export const ModalYourConnection = (props: Props) => {
 
   return (
     <>
-      <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
+      <Modal
+        isOpen={isOpen && !isTransactionModalOpen}
+        onRequestClose={onClose}
+        shouldCloseOnOverlayClick={true}
+        style={theme.fluidHeightModal}
+      >
         <ContentWrapper>
           <ConnectionModalNavigation>
             <ModalTitle>Your Connection</ModalTitle>
