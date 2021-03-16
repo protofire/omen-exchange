@@ -8,8 +8,8 @@ import { CompoundService } from '../../../../services/compound_service'
 import { getLogger } from '../../../../util/logger'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { getToken, pseudoNativeAssetAddress } from '../../../../util/networks'
-import { MarketData } from '../../../../util/types'
-import { ModalConnectWalletWrapper } from '../../../modal'
+import { MarketData, TransactionStep } from '../../../../util/types'
+import { ModalConnectWalletWrapper, ModalTransactionWrapper } from '../../../modal'
 
 import { MarketWizardCreator } from './market_wizard_creator'
 
@@ -26,6 +26,10 @@ const MarketWizardCreatorContainer: FC = () => {
 
   const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(MarketCreationStatus.ready())
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
+  const [message, setMessage] = useState<string>('')
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
 
   const getCompoundInterestRate = async (symbol: string): Promise<number> => {
     const tokenSymbol = symbol.toLowerCase()
@@ -54,6 +58,9 @@ const MarketWizardCreatorContainer: FC = () => {
         }
         setMarketCreationStatus(MarketCreationStatus.creatingAMarket())
 
+        setTxState(TransactionStep.waitingConfirmation)
+        setIsTransactionModalOpen(true)
+
         if (
           !cpk.isSafeApp &&
           marketData.collateral.address !== pseudoNativeAssetAddress &&
@@ -67,17 +74,21 @@ const MarketWizardCreatorContainer: FC = () => {
           }
         }
         if (isScalar) {
+          setMessage('Creating scalar market...')
           const { marketMakerAddress } = await cpk.createScalarMarket({
             marketData,
             conditionalTokens,
             realitio,
             marketMakerFactory,
+            setTxHash,
+            setTxState,
           })
           setMarketMakerAddress(marketMakerAddress)
 
           setMarketCreationStatus(MarketCreationStatus.done())
           history.replace(`/${marketMakerAddress}`)
         } else {
+          setMessage('Creating categorical market...')
           let compoundTokenDetails = marketData.userInputCollateral
           let compoundService = null
           const userInputCollateralSymbol = marketData.userInputCollateral.symbol.toLowerCase()
@@ -118,6 +129,15 @@ const MarketWizardCreatorContainer: FC = () => {
         marketMakerAddress={marketMakerAddress}
       />
       <ModalConnectWalletWrapper isOpen={isModalOpen} onClose={() => setModalState(false)} />
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={txHash}
+        txState={txState}
+      />
     </>
   )
 }
