@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent } from 'react'
 import styled from 'styled-components'
 
-import { DOCUMENT_VALIDITY_RULES } from '../../../../../../common/constants'
+import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../../../hooks'
 import { formatBigNumber } from '../../../../../../util/tools'
 import { Arbitrator } from '../../../../../../util/types'
@@ -26,7 +26,6 @@ const Row = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-
   & > * {
     width: calc(50% - 10px);
     margin-bottom: 0;
@@ -48,27 +47,22 @@ const NumericalInput = styled(BigNumberInput)<{ error?: string }>`
   padding: ${props => props.theme.textfield.paddingVertical + ' ' + props.theme.textfield.paddingHorizontal};
   transition: border-color 0.15s ease-in-out;
   width: 100%;
-
   &:hover {
     border-color: ${props => (props.error ? 'display: none' : props.theme.textfield.borderColorOnHover)};
   }
-
   &:active,
   &:focus {
     border-color: ${props => (props.error ? 'display: none' : props.theme.textfield.borderColorActive)};
   }
-
   &::placeholder {
     color: ${props => props.theme.textfield.placeholderColor};
     font-size: ${props => props.theme.textfield.placeholderFontSize};
     font-size: ${props => props.theme.textfield.placeholderFontWeight};
   }
-
   &:read-only,
   [readonly] {
     cursor: not-allowed;
   }
-
   &::-webkit-inner-spin-button {
     -webkit-appearance: none;
   }
@@ -182,7 +176,7 @@ export const CreateScalarMarket = (props: Props) => {
             formField={
               <NumericalInputError error={lowerBoundError}>
                 <NumericalInput
-                  decimals={18}
+                  decimals={STANDARD_DECIMALS}
                   error={lowerBoundError}
                   min={0}
                   name="lowerBound"
@@ -201,13 +195,12 @@ export const CreateScalarMarket = (props: Props) => {
             error={upperBoundError}
             formField={
               <NumericalInput
-                decimals={18}
+                decimals={STANDARD_DECIMALS}
                 error={upperBoundError}
                 name="upperBound"
                 onChange={handleChange}
                 placeholder={'1000'}
                 value={upperBound}
-                valueToDisplay={''}
               />
             }
             style={{ marginTop: 0 }}
@@ -220,13 +213,12 @@ export const CreateScalarMarket = (props: Props) => {
             formField={
               <NumericalInputError error={startingPointError}>
                 <NumericalInput
-                  decimals={18}
+                  decimals={STANDARD_DECIMALS}
                   error={startingPointError}
                   name="startingPoint"
                   onChange={handleChange}
                   placeholder={'500'}
                   value={startingPoint}
-                  valueToDisplay={''}
                 />
               </NumericalInputError>
             }
