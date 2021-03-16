@@ -125,7 +125,7 @@ const DepositWithdrawButton = styled(Button)`
 
 const EnableDai = styled.div`
   width: 100%;
-  padding: 16px 20px;
+  padding: 24px 20px 20px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
