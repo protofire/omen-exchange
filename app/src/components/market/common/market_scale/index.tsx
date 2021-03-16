@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { calcPrediction, calcXValue, formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import {
   AdditionalSharesType,
@@ -268,9 +269,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     upperBound,
   } = props
 
-  const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, 18))
-  const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, 18))
-  const startingPointNumber = startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), 18))
+  const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, STANDARD_DECIMALS))
+  const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, STANDARD_DECIMALS))
+  const startingPointNumber =
+    startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), STANDARD_DECIMALS))
 
   const currentPredictionNumber = calcPrediction(currentPrediction || '', lowerBound, upperBound)
   const newPredictionNumber = calcPrediction(newPrediction?.toString() || '', lowerBound, upperBound)
@@ -391,9 +393,13 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     setScaleValue(
       newPrediction
-        ? newPrediction * 100
+        ? newPrediction * 100 > 100
+          ? 100
+          : newPrediction * 100
         : currentPrediction
-        ? Number(currentPrediction) * 100
+        ? Number(currentPrediction) * 100 > 100
+          ? 100
+          : Number(currentPrediction) * 100
         : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound),
     )
     setScaleValuePrediction(

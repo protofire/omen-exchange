@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, networkIds } from '../../../../util/networks'
@@ -220,13 +221,15 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Profit"
-              value={`${formatNumber(formatBigNumber(currentAnswerBond || new BigNumber(0), 18))} ${symbol}`}
+              value={`${formatNumber(
+                formatBigNumber(currentAnswerBond || new BigNumber(0), STANDARD_DECIMALS),
+              )} ${symbol}`}
             />
 
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Loss"
-              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, 18))} ${symbol}`}
+              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, STANDARD_DECIMALS))} ${symbol}`}
             />
           </TransactionDetailsCard>
         </div>
