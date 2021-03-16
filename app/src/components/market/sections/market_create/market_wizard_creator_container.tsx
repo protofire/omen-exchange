@@ -109,6 +109,8 @@ const MarketWizardCreatorContainer: FC = () => {
             conditionalTokens,
             realitio,
             marketMakerFactory,
+            setTxHash,
+            setTxState,
             useCompoundReserve,
           })
           await fetchBalances()
