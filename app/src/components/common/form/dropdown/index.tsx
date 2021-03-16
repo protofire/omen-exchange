@@ -316,6 +316,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   disabled?: boolean
   dropdownPosition?: DropdownPosition | undefined
   dropdownDirection?: DropdownDirection | undefined
+  disableDirty?: boolean
   items: any
   placeholder?: React.ReactNode | string | undefined
   maxHeight?: boolean
@@ -331,6 +332,7 @@ export const Dropdown: React.FC<Props> = props => {
     dropdownVariant = DropdownVariant.pill,
     dropdownDirection,
     dropdownPosition,
+    disableDirty = false,
     items,
     omitRightButtonMargin,
     placeholder,
@@ -372,16 +374,21 @@ export const Dropdown: React.FC<Props> = props => {
     }
   }, [isOpen, dropdownItemsRef?.current?.scrollHeight, dropdownContainerRef?.current?.clientHeight])
 
-  const optionClick = useCallback((onClick: (() => void) | undefined, itemIndex: number) => {
-    if (!onClick) {
-      return
-    }
+  const optionClick = useCallback(
+    (onClick: (() => void) | undefined, itemIndex: number) => {
+      if (!onClick) {
+        return
+      }
 
-    setCurrentItemIndex(itemIndex)
-    onClick()
-    setIsDirty(true)
-    setIsOpen(false)
-  }, [])
+      setCurrentItemIndex(itemIndex)
+      onClick()
+      if (!disableDirty) {
+        setIsDirty(true)
+      }
+      setIsOpen(false)
+    },
+    [disableDirty],
+  )
 
   const onWrapperClick = useCallback(() => {
     if (isOpen) {

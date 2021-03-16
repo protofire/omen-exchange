@@ -240,14 +240,12 @@ const HeaderContainer: React.FC = (props: any) => {
       </DropdownText>
     </DropdownWrapper>
   )
+
   const networkDropdownItems: Array<DropdownItemProps> = [
     {
+      onClick: toggleRelay,
       content: (
-        <DropdownWrapper
-          onClick={() => {
-            toggleRelay()
-          }}
-        >
+        <DropdownWrapper>
           <DropdownText>{relay ? 'Mainnet' : 'xDai'}</DropdownText>
         </DropdownWrapper>
       ),
@@ -306,6 +304,7 @@ const HeaderContainer: React.FC = (props: any) => {
           {(networkId === networkIds.MAINNET || relay) && (
             <HeaderDropdown
               currentItem={networkDropdownItems.length + 1}
+              disableDirty
               dropdownPosition={DropdownPosition.center}
               items={networkDropdownItems}
               minWidth={false}
