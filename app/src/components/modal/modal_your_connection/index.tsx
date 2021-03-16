@@ -142,6 +142,11 @@ const EnableDaiButton = styled(Button)`
   width: 100%;
 `
 
+const ConnectionModalNavigation = styled(ModalNavigation as any)`
+  padding: 0;
+  margin-bottom: 16px;
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   changeWallet: () => void
   isOpen: boolean
@@ -261,10 +266,10 @@ export const ModalYourConnection = (props: Props) => {
     <>
       <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
         <ContentWrapper>
-          <ModalNavigation>
+          <ConnectionModalNavigation>
             <ModalTitle>Your Connection</ModalTitle>
             <IconClose hoverEffect={true} onClick={onClose} />
-          </ModalNavigation>
+          </ConnectionModalNavigation>
           <ModalCard>
             <TopCardHeader>
               <TopCardHeaderLeft>
