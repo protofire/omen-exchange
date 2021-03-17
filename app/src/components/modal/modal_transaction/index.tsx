@@ -78,9 +78,10 @@ export const ModalTransaction = (props: Props) => {
   }, [])
 
   const etherscanDisabled =
-    txState !== TransactionStep.transactionSubmitted &&
-    txState !== TransactionStep.transactionConfirmed &&
-    txState !== TransactionStep.confirming
+    !txState ||
+    (txState !== TransactionStep.transactionSubmitted &&
+      txState !== TransactionStep.transactionConfirmed &&
+      txState !== TransactionStep.confirming)
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>

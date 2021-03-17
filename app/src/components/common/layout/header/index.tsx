@@ -6,7 +6,7 @@ import { matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 
-import { Logo } from '../../../../common/constants'
+import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
 import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../../../../hooks'
 import { XdaiService } from '../../../../services'
 import { getNativeAsset, networkIds } from '../../../../util/networks'
@@ -185,17 +185,14 @@ const HeaderContainer: React.FC = (props: any) => {
   const { refetch, tokens } = useTokens(context.rawWeb3Context, true, true)
 
   const ethBalance = new BigNumber(
-    tokens.filter(token => token.symbol === 'ETH' || token.symbol === 'xDAI')[0]?.balance || '',
+    tokens.filter(token => token.symbol === getNativeAsset(context.rawWeb3Context.networkId).symbol)[0]?.balance || '',
   )
-  const formattedEthBalance = formatNumber(formatBigNumber(ethBalance, 18, 18), 3)
+  const formattedEthBalance = formatNumber(formatBigNumber(ethBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 3)
   const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
-  const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
+  const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, STANDARD_DECIMALS, STANDARD_DECIMALS))
 
   const nativeAsset = getNativeAsset(context.networkId)
-  const { collateralBalance: xDaiBalance, fetchCollateralBalance } = useCollateralBalance(
-    getNativeAsset(context.networkId),
-    context,
-  )
+  const { collateralBalance: xDaiBalance, fetchCollateralBalance } = useCollateralBalance(nativeAsset, context)
   const formattedxDaiBalance = `${formatBigNumber(xDaiBalance || Zero, nativeAsset.decimals, 2)}`
 
   const hasRouter = props.history !== undefined
@@ -331,7 +328,9 @@ const HeaderContainer: React.FC = (props: any) => {
             >
               <>
                 <DepositedBalance>
-                  {relay ? `${formattedxDaiBalance} DAI` : `${formattedEthBalance} ETH`}
+                  {relay || context.rawWeb3Context.networkId === networkIds.XDAI
+                    ? `${formattedxDaiBalance} DAI`
+                    : `${formattedEthBalance} ETH`}
                 </DepositedBalance>
                 <HeaderButtonDivider />
               </>

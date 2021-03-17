@@ -4,6 +4,7 @@ import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { getToken } from '../../../util/networks'
 import { formatBigNumber, waitForConfirmations } from '../../../util/tools'
@@ -178,7 +179,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput
-                decimals={18}
+                decimals={STANDARD_DECIMALS}
                 name="amount"
                 onChange={(e: BigNumberInputReturn) => {
                   setDisplayFundAmount(e.value)
@@ -186,19 +187,19 @@ export const ModalDepositWithdraw = (props: Props) => {
                 }}
                 value={displayFundAmount}
                 valueToDisplay={amountToDisplay}
-              ></BigNumberInput>
+              />
             }
             onClickMaxButton={() => {
               const maxBalance = exchangeType === ExchangeType.deposit ? daiBalance : xDaiBalance || Zero
               setDisplayFundAmount(maxBalance)
-              setAmountToDisplay(formatBigNumber(maxBalance, 18, 5))
+              setAmountToDisplay(formatBigNumber(maxBalance, STANDARD_DECIMALS, 5))
             }}
             shouldDisplayMaxButton={true}
             symbol={'DAI'}
-          ></TextfieldCustomPlaceholder>
+          />
           <InputInfo>
             You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least{' '}
-            {formatBigNumber(minDeposit, 18, exchangeType === ExchangeType.deposit ? 3 : 0)} DAI.
+            {formatBigNumber(minDeposit, STANDARD_DECIMALS, exchangeType === ExchangeType.deposit ? 3 : 0)} DAI.
           </InputInfo>
           <DepositWithdrawButton
             buttonType={ButtonType.primaryAlternative}

@@ -311,9 +311,7 @@ export const waitForConfirmations = async (
 }
 
 export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string => {
-  let formatted = formatUnits(value, decimals)
-  formatted = formatted.endsWith('.0') ? formatted.replace('.0', '.00') : formatted
-  return formatNumber(formatted, precision)
+  return Number(formatUnits(value, decimals)).toFixed(precision)
 }
 
 export const isContract = async (provider: any, address: string): Promise<boolean> => {
@@ -514,11 +512,7 @@ export const formatNumber = (number: string, decimals = 2): string => {
     return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
   }
 
-  const parts = number
-    .split(',')
-    .join('')
-    .split('.')
-  const fixedInt = `${parts[0]}.${parts[1] ? parts[1].slice(0, decimals) : '0'.repeat(decimals)}`
+  const fixedInt = parseFloat(number.split(',').join('')).toFixed(decimals)
   const splitFixedInt = fixedInt.split('.')[0]
   const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 

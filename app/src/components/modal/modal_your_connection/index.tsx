@@ -3,7 +3,7 @@ import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS } from '../../../common/constants'
+import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service } from '../../../services'
 import { getToken, networkIds } from '../../../util/networks'
@@ -331,7 +331,9 @@ export const ModalYourConnection = (props: Props) => {
                         <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
                         <BalanceItemInfo>(Claimable)</BalanceItemInfo>
                       </BalanceItemSide>
-                      <BalanceItemBalance>{formatBigNumber(unclaimedAmount, 18, 2)} DAI</BalanceItemBalance>
+                      <BalanceItemBalance>
+                        {formatBigNumber(unclaimedAmount, STANDARD_DECIMALS, 2)} DAI
+                      </BalanceItemBalance>
                     </BalanceItem>
                     <ClaimButton buttonType={ButtonType.primary} onClick={claim}>
                       Claim Now
