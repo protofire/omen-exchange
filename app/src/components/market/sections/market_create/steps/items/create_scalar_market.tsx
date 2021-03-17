@@ -157,7 +157,7 @@ export const CreateScalarMarket = (props: Props) => {
     upperBoundNumber !== undefined &&
     Number(upperBoundNumber) > 0
   ) {
-    startingPointError = `Value must be less than ${upperBoundNumber.slice(0, upperBoundNumber.length - 2)}`
+    startingPointError = `Value must be less than ${upperBoundNumber.slice(0, upperBoundNumber.length - 3)}`
   }
 
   if (
@@ -165,7 +165,7 @@ export const CreateScalarMarket = (props: Props) => {
     startingPointNumber !== undefined &&
     Number(startingPointNumber) > 0
   ) {
-    lowerBoundError = `Value must be less than ${startingPointNumber.slice(0, startingPointNumber.length - 2)}`
+    lowerBoundError = `Value must be less than ${startingPointNumber.slice(0, startingPointNumber.length - 3)}`
   }
 
   if (
@@ -173,7 +173,7 @@ export const CreateScalarMarket = (props: Props) => {
     upperBoundNumber !== undefined &&
     Number(upperBoundNumber) > 0
   ) {
-    lowerBoundError = `Value must be less than ${upperBoundNumber.slice(0, upperBoundNumber.length - 2)}`
+    lowerBoundError = `Value must be less than ${upperBoundNumber.slice(0, upperBoundNumber.length - 3)}`
   }
 
   return (
