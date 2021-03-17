@@ -34,7 +34,7 @@ const Row = styled.div`
 
 const NumericalInput = styled(BigNumberInput)<{ error?: string }>`
   background-color: ${props => props.theme.textfield.backgroundColor};
-  border-color: ${props => props.theme.textfield.borderColor};
+  border-color: ${props => (props.error ? props.theme.colors.error : props.theme.textfield.borderColor)};
   border-style: ${props => props.theme.textfield.borderStyle};
   border-width: ${props => props.theme.textfield.borderWidth};
   border-radius: ${props => props.theme.textfield.borderRadius};
@@ -48,11 +48,11 @@ const NumericalInput = styled(BigNumberInput)<{ error?: string }>`
   transition: border-color 0.15s ease-in-out;
   width: 100%;
   &:hover {
-    border-color: ${props => (props.error ? 'display: none' : props.theme.textfield.borderColorOnHover)};
+    border-color: ${props => (props.error ? `${props.theme.colors.error}` : props.theme.textfield.borderColorOnHover)};
   }
   &:active,
   &:focus {
-    border-color: ${props => (props.error ? 'display: none' : props.theme.textfield.borderColorActive)};
+    border-color: ${props => (props.error ? `${props.theme.colors.error}` : props.theme.textfield.borderColorActive)};
   }
   &::placeholder {
     color: ${props => props.theme.textfield.placeholderColor};
@@ -69,14 +69,6 @@ const NumericalInput = styled(BigNumberInput)<{ error?: string }>`
   &::-webkit-outer-spin-button {
     -webkit-appearance: none;
   }
-`
-
-const NumericalInputError = styled.div<{ error?: string }>`
-  border-color: ${props => (props.error ? props.theme.colors.error : 'display: none')};
-  border-style: ${props => (props.error ? props.theme.textfield.borderStyle : 'display: none')};
-  border-width: ${props => (props.error ? props.theme.textfield.borderWidth : 'display: none')};
-  border-radius: ${props => (props.error ? props.theme.textfield.borderRadius : 'display: none')};
-  border: ${props => (props.error ? 'display: flow-root' : 'display: none')};
 `
 
 interface Props {
@@ -131,28 +123,60 @@ export const CreateScalarMarket = (props: Props) => {
   let lowerBoundError
   let startingPointError
   let upperBoundError
+  let startingPointNumber
+  let lowerBoundNumber
+  let upperBoundNumber
 
-  const startingPointNumber = startingPoint !== null ? formatBigNumber(startingPoint, 18, 2) : '0'
-
-  const lowerBoundNumber = lowerBound !== null ? formatBigNumber(lowerBound, 18, 2) : '0'
-
-  const upperBoundNumber = upperBound !== null ? formatBigNumber(upperBound, 18, 2) : '0'
-
-  if (Number(lowerBoundNumber) > Number(startingPointNumber)) {
-    lowerBoundError = 'Value must be less than Starting Point'
+  console.log(startingPointNumber)
+  // if the input values aren't null the number is cast to BigNumber with 18 decimals and precision value of 2
+  if (startingPoint !== null) {
+    startingPointNumber = formatBigNumber(startingPoint, 18, 2)
   }
 
-  if (Number(lowerBoundNumber) > Number(upperBoundNumber)) {
-    lowerBoundError = 'Value must be less than Upper Bound'
+  if (lowerBound !== null) {
+    lowerBoundNumber = formatBigNumber(lowerBound, 18, 2)
   }
 
-  if (Number(startingPointNumber) > Number(upperBoundNumber)) {
-    startingPointError = 'Value must be less than Upper Bound'
+  if (upperBound !== null) {
+    upperBoundNumber = formatBigNumber(upperBound, 18, 2)
+  }
+  //check for values to be non negative integers
+  if (startingPointNumber !== undefined && startingPointNumber < '0') {
+    startingPointError = 'Value must be greater than 0'
   }
 
-  lowerBoundNumber < '0' ? (lowerBoundError = 'Amount must be greater than 0') : ''
-  startingPointNumber < '0' ? (startingPointError = 'Amount must be greater than 0') : ''
-  upperBoundNumber < '0' ? (upperBoundError = 'Amount must be greater than 0') : ''
+  if (lowerBoundNumber !== undefined && lowerBoundNumber < '0') {
+    lowerBoundError = 'Value must be greater than 0'
+  }
+
+  if (upperBoundNumber !== undefined && upperBoundNumber < '0') {
+    upperBoundError = 'Value must be greater than 0'
+  }
+  //checks if error is appropriate or not. if true, displays error and removes decimals from numbers in error message.
+  //checks for starting point to not be undefined and not equal 0. this prevents unwanted error messages like "lower bound must be less than 0."
+  if (
+    Number(startingPointNumber) > Number(upperBoundNumber) &&
+    upperBoundNumber !== undefined &&
+    Number(upperBoundNumber) > 0
+  ) {
+    startingPointError = `Value must be less than ${upperBoundNumber.slice(0, upperBoundNumber.length - 2)}`
+  }
+
+  if (
+    Number(lowerBoundNumber) > Number(startingPointNumber) &&
+    startingPointNumber !== undefined &&
+    Number(startingPointNumber) > 0
+  ) {
+    lowerBoundError = `Value must be less than ${startingPointNumber.slice(0, startingPointNumber.length - 2)}`
+  }
+
+  if (
+    Number(lowerBoundNumber) > Number(upperBoundNumber) &&
+    upperBoundNumber !== undefined &&
+    Number(upperBoundNumber) > 0
+  ) {
+    lowerBoundError = `Value must be less than ${upperBoundNumber.slice(0, upperBoundNumber.length - 2)}`
+  }
 
   return (
     <>
@@ -174,18 +198,16 @@ export const CreateScalarMarket = (props: Props) => {
           <FormRow
             error={lowerBoundError}
             formField={
-              <NumericalInputError error={lowerBoundError}>
-                <NumericalInput
-                  decimals={STANDARD_DECIMALS}
-                  error={lowerBoundError}
-                  min={0}
-                  name="lowerBound"
-                  onChange={handleChange}
-                  placeholder={'0'}
-                  value={lowerBound}
-                  valueToDisplay={''}
-                />
-              </NumericalInputError>
+              <NumericalInput
+                decimals={STANDARD_DECIMALS}
+                error={lowerBoundError}
+                min={0}
+                name="lowerBound"
+                onChange={handleChange}
+                placeholder={'0'}
+                value={lowerBound}
+                valueToDisplay={''}
+              />
             }
             style={{ marginTop: 0 }}
             title={'Lower Bound'}
@@ -197,6 +219,7 @@ export const CreateScalarMarket = (props: Props) => {
               <NumericalInput
                 decimals={STANDARD_DECIMALS}
                 error={upperBoundError}
+                min={0}
                 name="upperBound"
                 onChange={handleChange}
                 placeholder={'1000'}
@@ -211,16 +234,15 @@ export const CreateScalarMarket = (props: Props) => {
           <FormRow
             error={startingPointError}
             formField={
-              <NumericalInputError error={startingPointError}>
-                <NumericalInput
-                  decimals={STANDARD_DECIMALS}
-                  error={startingPointError}
-                  name="startingPoint"
-                  onChange={handleChange}
-                  placeholder={'500'}
-                  value={startingPoint}
-                />
-              </NumericalInputError>
+              <NumericalInput
+                decimals={STANDARD_DECIMALS}
+                error={startingPointError}
+                min={0}
+                name="startingPoint"
+                onChange={handleChange}
+                placeholder={'500'}
+                value={startingPoint}
+              />
             }
             title={'Starting Point'}
           />

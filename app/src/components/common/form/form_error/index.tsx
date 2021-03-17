@@ -6,11 +6,11 @@ const FormErrorWrapper = styled.div`
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;
-  font-size: 14px;
-  line-height: 16px;
-  display: flex;
+  line-height: 1.5px;
   align-items: center;
   letter-spacing: 0.2px;
+  margin-top: 15px;
+  margin-bottom: -20px;
 
   &:last-child {
     margin-bottom: 0;
