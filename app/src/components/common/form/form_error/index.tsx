@@ -2,7 +2,7 @@ import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
 const FormErrorWrapper = styled.div`
-  color: ${props => props.theme.colors.error};
+  color: ${props => props.theme.colors.alert};
   font-family: Roboto;
   font-style: normal;
   font-weight: normal;

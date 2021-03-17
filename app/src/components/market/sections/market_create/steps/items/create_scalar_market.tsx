@@ -34,7 +34,7 @@ const Row = styled.div`
 
 const NumericalInput = styled(BigNumberInput)<{ error?: string }>`
   background-color: ${props => props.theme.textfield.backgroundColor};
-  border-color: ${props => (props.error ? props.theme.colors.error : props.theme.textfield.borderColor)};
+  border-color: ${props => (props.error ? props.theme.colors.alert : props.theme.textfield.borderColor)};
   border-style: ${props => props.theme.textfield.borderStyle};
   border-width: ${props => props.theme.textfield.borderWidth};
   border-radius: ${props => props.theme.textfield.borderRadius};
@@ -48,11 +48,11 @@ const NumericalInput = styled(BigNumberInput)<{ error?: string }>`
   transition: border-color 0.15s ease-in-out;
   width: 100%;
   &:hover {
-    border-color: ${props => (props.error ? `${props.theme.colors.error}` : props.theme.textfield.borderColorOnHover)};
+    border-color: ${props => (props.error ? `${props.theme.colors.alert}` : props.theme.textfield.borderColorOnHover)};
   }
   &:active,
   &:focus {
-    border-color: ${props => (props.error ? `${props.theme.colors.error}` : props.theme.textfield.borderColorActive)};
+    border-color: ${props => (props.error ? `${props.theme.colors.alert}` : props.theme.textfield.borderColorActive)};
   }
   &::placeholder {
     color: ${props => props.theme.textfield.placeholderColor};

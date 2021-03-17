@@ -88,7 +88,7 @@ const theme = {
     alertHover: '#EF5350',
     borderColorDark: '#9FA8DA',
     darkGray: '#acacac',
-    error: '#e57373',
+    error: '#fa0000',
     gray: '#b7b7b7',
     green: '#4B9E98',
     mainBodyBackground: '#fff',
