@@ -126,8 +126,6 @@ export const CreateScalarMarket = (props: Props) => {
   let startingPointNumber
   let lowerBoundNumber
   let upperBoundNumber
-
-  console.log(startingPointNumber)
   // if the input values aren't null the number is cast to BigNumber with 18 decimals and precision value of 2
   if (startingPoint !== null) {
     startingPointNumber = formatBigNumber(startingPoint, 18, 2)
