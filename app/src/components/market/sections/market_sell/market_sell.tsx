@@ -107,10 +107,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
 
-  const baseCollateral = getInitialCollateral(networkId, collateral)
-  const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
-  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
   const collateralSymbol = collateral.symbol.toLowerCase()
   const symbol = useSymbol(displayCollateral)
