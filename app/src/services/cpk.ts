@@ -614,7 +614,7 @@ class CPKService {
           value: marketData.funding,
         })
       } else if (useCompoundReserve && compoundTokenDetails) {
-        txOptions.gas = await this.getGas(compoundServiceGasNeeded)
+        txOptions.gas = defaultGas
         if (userInputCollateral.address === pseudoNativeAssetAddress) {
           // If user chosen collateral is ETH
           collateral = marketData.collateral
