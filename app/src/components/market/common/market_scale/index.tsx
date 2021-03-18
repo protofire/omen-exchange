@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { useCompoundService, useConnectedWeb3Context } from '../../../../hooks'
-import { getNativeAsset, getToken } from '../../../../util/networks'
+import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../util/networks'
 import {
   calcPrediction,
   calcXValue,
@@ -342,7 +342,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [shortProfitPercentage, setShortProfitPercentage] = useState(0)
   let baseCollateral = collateral
   if (collateral && collateral.symbol.toLowerCase() in CompoundTokenType) {
-    if (collateral.symbol.toLowerCase() === 'ceth') {
+    const nativeCompoundAsset = getNativeCompoundAsset(networkId)
+    if (collateral.symbol.toLowerCase() === nativeCompoundAsset.symbol.toLowerCase()) {
       baseCollateral = getNativeAsset(networkId)
     } else {
       const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken

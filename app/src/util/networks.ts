@@ -775,6 +775,15 @@ export const getNativeAsset = (networkId: number): Token => {
   return networks[networkId].nativeAsset as Token
 }
 
+export const getNativeCompoundAsset = (networkId: number): Token => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  } else {
+    const knownToken = 'ceth' as KnownToken
+    return getToken(networkId, knownToken)
+  }
+}
+
 export const getTargetSafeImplementation = (networkId: number): string => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)

@@ -18,7 +18,13 @@ import {
   useSymbol,
 } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
-import { getNativeAsset, getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import {
+  getNativeAsset,
+  getNativeCompoundAsset,
+  getToken,
+  getWrapToken,
+  pseudoNativeAssetAddress,
+} from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   bigMax,
@@ -155,7 +161,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
   let baseCollateral = collateral
   if (collateralSymbol in CompoundTokenType) {
-    if (collateralSymbol === 'ceth') {
+    const nativeCompoundAsset = getNativeCompoundAsset(networkId)
+    if (collateralSymbol === nativeCompoundAsset.symbol.toLowerCase()) {
       baseCollateral = getNativeAsset(networkId)
     } else {
       const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken

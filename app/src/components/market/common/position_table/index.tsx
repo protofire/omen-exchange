@@ -3,7 +3,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { useCompoundService, useConnectedWeb3Context, useSymbol } from '../../../../hooks'
-import { getNativeAsset, getToken } from '../../../../util/networks'
+import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../util/networks'
 import {
   formatBigNumber,
   formatNumber,
@@ -71,7 +71,8 @@ export const PositionTable = (props: Props) => {
 
   let baseCollateral = collateral
   if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-    if (collateral.symbol.toLowerCase() === 'ceth') {
+    const nativeCompoundAsset = getNativeCompoundAsset(networkId)
+    if (collateral.symbol.toLowerCase() === nativeCompoundAsset.symbol.toLowerCase()) {
       baseCollateral = getNativeAsset(networkId)
     } else {
       const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
