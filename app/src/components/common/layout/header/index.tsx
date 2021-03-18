@@ -201,7 +201,7 @@ const HeaderContainer: React.FC = (props: any) => {
   const toggle = () => {
     toggleRelay()
     if (hasRouter) {
-      history.replace('/liquidity')
+      history.replace('/')
     }
   }
 
