@@ -21,7 +21,6 @@ export const useCollateralBalance = (
 
   const fetchCollateralBalance = async () => {
     let collateralBalance = new BigNumber(0)
-    setCollateralBalance(collateralBalance)
     if (account) {
       if (collateral.address === pseudoNativeAssetAddress) {
         collateralBalance = await provider.getBalance(account)

@@ -154,7 +154,14 @@ class CPKService {
     if (txObject.hash && !this.cpk.isConnectedToSafe) {
       // standard transaction
       logger.log(`Transaction hash: ${txObject.hash}`)
-      transactionReceipt = await this.provider.waitForTransaction(txObject.hash)
+      // @ts-expect-error ignore
+      while (!transactionReceipt) {
+        try {
+          transactionReceipt = await this.provider.waitForTransaction(txObject.hash)
+        } catch (e) {
+          logger.log(e.message)
+        }
+      }
     } else {
       const safeTxHash = txObject.hash || txObject.safeTxHash
       // transaction through the safe app sdk

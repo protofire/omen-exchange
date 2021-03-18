@@ -94,7 +94,7 @@ export const useTokens = (context: ConnectedWeb3Context, addNativeAsset?: boolea
                   balance = await provider.getBalance(account)
                   // @ts-expect-error ignore
                   if (provider.relay) {
-                    balance = balance.sub(RELAY_FEE)
+                    balance = balance.lt(RELAY_FEE) ? balance : balance.sub(RELAY_FEE)
                   }
                 } else {
                   try {

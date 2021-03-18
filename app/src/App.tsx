@@ -12,7 +12,7 @@ import { HeaderNoRouter } from './components/common/layout/header'
 import { Main } from './components/main'
 import SettingsViewContainer from './components/settings/settings_view'
 import { ApolloProviderWrapper } from './contexts/Apollo'
-import { ConnectedWeb3 } from './hooks'
+import { ConnectedBalance, ConnectedWeb3 } from './hooks'
 import balanceReducer from './store/reducer'
 import theme from './theme'
 import { GlobalStyle } from './theme/global_style'
@@ -51,7 +51,9 @@ const App: React.FC = () => {
             <ApolloProviderWrapper>
               <Provider store={store}>
                 <GlobalStyle />
-                <Main />
+                <ConnectedBalance>
+                  <Main />
+                </ConnectedBalance>
               </Provider>
             </ApolloProviderWrapper>
           </ConnectedWeb3>

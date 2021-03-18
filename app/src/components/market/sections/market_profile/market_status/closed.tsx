@@ -6,7 +6,12 @@ import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../../common/constants'
-import { useConnectedCPKContext, useContracts, useGraphMarketUserTxData } from '../../../../../hooks'
+import {
+  useConnectedBalanceContext,
+  useConnectedCPKContext,
+  useContracts,
+  useGraphMarketUserTxData,
+} from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../../services'
 import { CompoundService } from '../../../../../services/compound_service'
@@ -124,6 +129,7 @@ const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: 
 const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
+  const { fetchBalances } = useConnectedBalanceContext()
 
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
@@ -252,6 +258,7 @@ const Wrapper = (props: Props) => {
         marketMaker,
         conditionalTokens,
       })
+      await fetchBalances()
 
       setStatus(Status.Ready)
       setMessage(`Payout successfully redeemed.`)

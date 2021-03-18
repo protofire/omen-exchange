@@ -1,16 +1,12 @@
-import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { withRouter } from 'react-router'
 import { matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 
-import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
-import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../../../../hooks'
-import { XdaiService } from '../../../../services'
-import { getNativeAsset, networkIds } from '../../../../util/networks'
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { Logo } from '../../../../common/constants'
+import { useConnectedBalanceContext, useConnectedWeb3Context } from '../../../../hooks'
+import { networkIds } from '../../../../util/networks'
 import { ExchangeType } from '../../../../util/types'
 import { Button, ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
@@ -179,55 +175,19 @@ const HeaderContainer: React.FC = (props: any) => {
   const [isDepositWithdrawModalOpen, setDepositWithdrawModalState] = useState(false)
   const [depositWithdrawType, setDepositWithdrawType] = useState<ExchangeType>(ExchangeType.deposit)
 
-  const [claimState, setClaimState] = useState<boolean>(false)
-  const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
-
-  const { refetch, tokens } = useTokens(context.rawWeb3Context, true, true)
-
-  const ethBalance = new BigNumber(
-    tokens.filter(token => token.symbol === getNativeAsset(context.rawWeb3Context.networkId).symbol)[0]?.balance || '',
-  )
-  const formattedEthBalance = formatNumber(formatBigNumber(ethBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 3)
-  const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
-  const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, STANDARD_DECIMALS, STANDARD_DECIMALS))
-
-  const nativeAsset = getNativeAsset(context.networkId)
-  const { collateralBalance: xDaiBalance, fetchCollateralBalance } = useCollateralBalance(nativeAsset, context)
-  const formattedxDaiBalance = `${formatBigNumber(xDaiBalance || Zero, nativeAsset.decimals, 2)}`
-
   const hasRouter = props.history !== undefined
   const disableConnectButton = isConnectWalletModalOpen
 
-  const fetchUnclaimedAssets = async () => {
-    if (account) {
-      const xDaiService = new XdaiService(context.library)
-      const transaction = await xDaiService.fetchXdaiTransactionData()
-      if (transaction) {
-        setUnclaimedAmount(transaction.value)
-        setClaimState(true)
-        return
-      }
-      setUnclaimedAmount(Zero)
-      setClaimState(false)
-    }
-  }
-
-  const fetchBalances = () => {
-    fetchUnclaimedAssets()
-    fetchCollateralBalance()
-    refetch()
-  }
-
-  useEffect(() => {
-    if (relay) {
-      fetchBalances()
-    } else {
-      setUnclaimedAmount(Zero)
-      setClaimState(false)
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, networkId])
+  const {
+    claimState,
+    daiBalance,
+    fetchBalances,
+    formattedDaiBalance,
+    formattedEthBalance,
+    formattedxDaiBalance,
+    unclaimedAmount,
+    xDaiBalance,
+  } = useConnectedBalanceContext()
 
   const networkPlacholder = (
     <DropdownWrapper>
@@ -238,9 +198,16 @@ const HeaderContainer: React.FC = (props: any) => {
     </DropdownWrapper>
   )
 
+  const toggle = () => {
+    toggleRelay()
+    if (hasRouter) {
+      history.replace('/liquidity')
+    }
+  }
+
   const networkDropdownItems: Array<DropdownItemProps> = [
     {
-      onClick: toggleRelay,
+      onClick: toggle,
       content: (
         <DropdownWrapper>
           <DropdownText>{relay ? 'Mainnet' : 'xDai'}</DropdownText>
