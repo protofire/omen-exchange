@@ -284,6 +284,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
 
       setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
@@ -296,6 +298,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         earnings: userEarnings,
         marketMaker,
         outcomesCount: balances.length,
+        setTxHash,
+        setTxState,
         sharesToBurn: amountToRemove || Zero,
       })
 
