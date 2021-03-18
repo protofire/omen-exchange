@@ -150,14 +150,15 @@ export const CreateScalarMarket = (props: Props) => {
   if (upperBoundNumber !== undefined && upperBoundNumber < '0') {
     upperBoundError = 'Value must be greater than 0'
   }
-  //checks if error is appropriate or not. if true, displays error and removes decimals from numbers in error message.
-  //checks for starting point to not be undefined and not equal 0. this prevents unwanted error messages like "lower bound must be less than 0."
+  //checks for numbers which don't follow the input rules: lowerBound < startingPoint < upperBound. also errors for numbers equal to each other.
   if (
     Number(startingPointNumber) > Number(upperBoundNumber) &&
     upperBoundNumber !== undefined &&
     Number(upperBoundNumber) > 0
   ) {
-    startingPointError = `Value must be less than ${upperBoundNumber.slice(0, upperBoundNumber.length - 3)}`
+    startingPointError = `Value must be less than ${upperBoundNumber}`
+  } else if (startingPointNumber !== undefined && startingPointNumber === upperBoundNumber) {
+    startingPointError = `Value cannot be equal to ${upperBoundNumber}`
   }
 
   if (
@@ -165,7 +166,9 @@ export const CreateScalarMarket = (props: Props) => {
     startingPointNumber !== undefined &&
     Number(startingPointNumber) > 0
   ) {
-    lowerBoundError = `Value must be less than ${startingPointNumber.slice(0, startingPointNumber.length - 3)}`
+    lowerBoundError = `Value must be less than ${startingPointNumber}`
+  } else if (lowerBoundNumber !== undefined && lowerBoundNumber === startingPointNumber) {
+    lowerBoundError = `Value cannot be equal to ${startingPointNumber}`
   }
 
   if (
@@ -173,7 +176,17 @@ export const CreateScalarMarket = (props: Props) => {
     upperBoundNumber !== undefined &&
     Number(upperBoundNumber) > 0
   ) {
-    lowerBoundError = `Value must be less than ${upperBoundNumber.slice(0, upperBoundNumber.length - 3)}`
+    lowerBoundError = `Value must be less than ${upperBoundNumber}`
+  } else if (lowerBoundNumber !== undefined && lowerBoundNumber === upperBoundNumber) {
+    lowerBoundError = `Value cannot be equal to ${upperBoundNumber}`
+  }
+
+  if (
+    Number(startingPointNumber) > Number(upperBoundNumber) &&
+    upperBoundNumber !== undefined &&
+    Number(upperBoundNumber) > 0
+  ) {
+    startingPointError = `Value must be less than ${upperBoundNumber}`
   }
 
   return (
