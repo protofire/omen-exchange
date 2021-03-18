@@ -31,7 +31,7 @@ const Row = styled.div`
     margin-bottom: 0;
   }
 `
-
+//dynamically change props
 const NumericalInput = styled(BigNumberInput)<{ error?: string }>`
   background-color: ${props => props.theme.textfield.backgroundColor};
   border-color: ${props => (props.error ? props.theme.colors.alert : props.theme.textfield.borderColor)};
