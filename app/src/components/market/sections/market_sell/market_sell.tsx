@@ -5,6 +5,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCompoundService,
@@ -98,7 +99,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
+  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
   const collateralSymbol = collateral.symbol.toLowerCase()
   const symbol = useSymbol(displayCollateral)
 
@@ -298,7 +299,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const isSellButtonDisabled =
     !amountShares ||
-    Number(sellAmountSharesDisplay) == 0 ||
     (status !== Status.Ready && status !== Status.Error) ||
     amountShares?.isZero() ||
     amountError !== null ||

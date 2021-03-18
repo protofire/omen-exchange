@@ -3,6 +3,7 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import {
   FpmmTradeDataType,
@@ -131,7 +132,7 @@ export const History_select: React.FC<Props> = ({
   ]
   const [pageIndex, setPageIndex] = useState(0)
   const [pageSize] = useState(6)
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
+  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
   const { fpmmTransactions, paginationNext, refetch, status } = useGraphFpmmTransactionsFromQuestion(
     marketMakerAddress,
     pageSize,

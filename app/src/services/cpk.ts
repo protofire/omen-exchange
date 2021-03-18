@@ -40,7 +40,7 @@ import { XdaiService } from './xdai'
 
 const logger = getLogger('Services::CPKService')
 
-const compoundServiceGasNeeded = 1500000
+const defaultGas = 1500000
 
 interface CPKBuyOutcomesParams {
   amount: BigNumber
@@ -203,15 +203,6 @@ class CPKService {
     return transactionReceipt
   }
 
-  getGas = async (gas: number): Promise<number> => {
-    const deployed = await this.cpk.isProxyDeployed()
-    if (deployed) {
-      return gas
-    }
-    const addProxyDeploymentGas = 500000
-    return gas + addProxyDeploymentGas
-  }
-
   buyOutcomes = async ({
     amount,
     collateral,
@@ -229,10 +220,7 @@ class CPKService {
       const transactions = []
 
       const txOptions: TxOptions = {}
-
-      if (!this.isSafeApp && collateral.address === pseudoNativeAssetAddress) {
-        txOptions.gas = await this.getGas(500000)
-      }
+      txOptions.gas = defaultGas
 
       let collateralAddress
       let collateralSymbol = ''
@@ -256,8 +244,8 @@ class CPKService {
         // we need to send the funding amount in native ether
         if (!this.isSafeApp) {
           txOptions.value = amount
-          txOptions.gas = 500000
         }
+
         // Step 0: Wrap ether
         transactions.push({
           to: collateralAddress,
@@ -268,7 +256,6 @@ class CPKService {
           // If base token is ETH then we don't need to transfer to cpk
           if (!this.isSafeApp) {
             txOptions.value = amount
-            txOptions.gas = compoundServiceGasNeeded
           }
           const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, amount.toString())
           transactions.push({
@@ -382,10 +369,7 @@ class CPKService {
 
       const transactions = []
       const txOptions: TxOptions = {}
-
-      if (!this.isSafeApp && marketData.collateral.address === pseudoNativeAssetAddress) {
-        txOptions.gas = await this.getGas(1200000)
-      }
+      txOptions.gas = defaultGas
 
       let collateral
 
@@ -404,7 +388,6 @@ class CPKService {
           value: marketData.funding,
         })
       } else if (useCompoundReserve && compoundTokenDetails) {
-        txOptions.gas = await this.getGas(compoundServiceGasNeeded)
         if (userInputCollateral.address === pseudoNativeAssetAddress) {
           // If user chosen collateral is ETH
           collateral = marketData.collateral
@@ -612,10 +595,7 @@ class CPKService {
 
       const transactions = []
       const txOptions: TxOptions = {}
-
-      if (!this.isSafeApp && marketData.collateral.address === pseudoNativeAssetAddress) {
-        txOptions.gas = await this.getGas(1500000)
-      }
+      txOptions.gas = defaultGas
 
       let collateral
 
@@ -819,6 +799,7 @@ class CPKService {
 
       const transactions = []
       const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
 
       const network = await this.provider.getNetwork()
       const networkId = network.chainId
@@ -833,10 +814,6 @@ class CPKService {
           const userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
           userInputCollateral = getToken(networkId, userInputCollateralSymbol)
         }
-      }
-
-      if (this.isSafeApp) {
-        txOptions.gas = await this.getGas(500000)
       }
 
       const isAlreadyApprovedForMarketMaker = await conditionalTokens.isApprovedForAll(
@@ -867,8 +844,6 @@ class CPKService {
             data: encodedWithdrawFunction,
           })
         } else {
-          // cToken to base token conversion flow
-          txOptions.gas = await this.getGas(compoundServiceGasNeeded)
           // Convert cpk token to base token if user wants to redeem in base
           const encodedRedeemFunction = CompoundService.encodeRedeemTokens(collateralSymbol, amount.toString())
           // Approve cToken for the cpk contract
@@ -932,14 +907,11 @@ class CPKService {
       const transactions = []
 
       const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
 
       let collateralSymbol = ''
       let userInputCollateralSymbol: KnownToken
       let userInputCollateral: Token = collateral
-
-      if (!this.isSafeApp && collateral.address === pseudoNativeAssetAddress) {
-        txOptions.gas = await this.getGas(500000)
-      }
 
       let collateralAddress
       if (collateral.address === pseudoNativeAssetAddress) {
@@ -988,7 +960,6 @@ class CPKService {
       if (!this.isSafeApp && collateral.address !== pseudoNativeAssetAddress) {
         // Step 4: Transfer funding from user
         if (useBaseToken) {
-          txOptions.gas = await this.getGas(compoundServiceGasNeeded)
           // If use base token then transfer the base token amount from the user
           if (collateral.address !== pseudoNativeAssetAddress) {
             transactions.push({
@@ -1077,6 +1048,7 @@ class CPKService {
       transactions.push(mergePositionsTx)
 
       const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
 
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
@@ -1197,6 +1169,7 @@ class CPKService {
 
       const transactions = []
       const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
 
       if (!isConditionResolved) {
         transactions.push({
@@ -1246,8 +1219,7 @@ class CPKService {
   upgradeProxyImplementation = async (): Promise<TransactionReceipt> => {
     try {
       const txOptions: TxOptions = {}
-      // add plenty of gas to avoid locked proxy https://github.com/gnosis/contract-proxy-kit/issues/132
-      txOptions.gas = 500000
+      txOptions.gas = defaultGas
       const network = await this.provider.getNetwork()
       const targetGnosisSafeImplementation = getTargetSafeImplementation(network.chainId)
       const transactions = [

@@ -5,7 +5,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { DOCUMENT_FAQ } from '../../../../common/constants'
+import { DOCUMENT_FAQ, STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useCollateralBalance,
   useCompoundService,
@@ -212,7 +212,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     : new BigNumber(0)
   const depositedTokensTotal = depositedTokens.add(userEarnings)
 
-  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
+  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
 
   const totalUserShareAmounts = calcRemoveFundingSendAmounts(
     fundingBalance,

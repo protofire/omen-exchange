@@ -3,6 +3,7 @@ import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
+<<<<<<< HEAD
 import {
   useAsyncDerivedValue,
   useCompoundService,
@@ -10,6 +11,10 @@ import {
   useContracts,
   useSymbol,
 } from '../../../../hooks'
+=======
+import { STANDARD_DECIMALS } from '../../../../common/constants'
+import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts, useSymbol } from '../../../../hooks'
+>>>>>>> a953ae91d01db7cf95a9dfd73502b5234e55761c
 import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken } from '../../../../util/networks'
@@ -146,6 +151,11 @@ export const ScalarMarketSell = (props: Props) => {
       const holdingsOfOtherOutcome = holdings.filter((item, index) => {
         return index !== positionIndex
       })
+<<<<<<< HEAD
+=======
+      const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
+
+>>>>>>> a953ae91d01db7cf95a9dfd73502b5234e55761c
       const amountToSell = calcSellAmountInCollateral(
         // If the transaction incur in some precision error, we need to multiply the amount by some factor, for example  amountShares.mul(99999).div(100000) , bigger the factor, less dust
         amountShares,
@@ -193,7 +203,7 @@ export const ScalarMarketSell = (props: Props) => {
   const formattedNewPrediction =
     newPrediction &&
     calcXValue(
-      parseUnits(newPrediction.toString(), 18),
+      parseUnits(newPrediction.toString(), STANDARD_DECIMALS),
       scalarLow || new BigNumber(0),
       scalarHigh || new BigNumber(0),
     ) / 100

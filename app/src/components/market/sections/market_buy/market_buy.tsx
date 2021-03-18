@@ -6,7 +6,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { DOCUMENT_VALIDITY_RULES } from '../../../../common/constants'
+import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
@@ -264,8 +264,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
-  const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, 18, 4)))
-  const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
+  const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)))
+  const feePercentage = Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)) * 100
 
   const baseCost = debouncedAmount?.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount || Zero)
@@ -308,7 +308,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const isBuyDisabled =
     !amount ||
-    Number(sharesTotal) == 0 ||
     (status !== Status.Ready && status !== Status.Error) ||
     amount?.isZero() ||
     (!cpk?.isSafeApp &&
