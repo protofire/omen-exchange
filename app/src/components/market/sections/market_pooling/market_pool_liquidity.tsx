@@ -297,6 +297,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to deposit funds.`)
       logger.error(`${message} - ${err.message}`)
       setIsTransactionProcessing(false)
@@ -362,6 +363,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to withdraw funds.`)
       logger.error(`${message} - ${err.message}`)
       setIsTransactionProcessing(false)

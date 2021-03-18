@@ -133,6 +133,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       )
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to bond ${symbol}.`)
       logger.error(`${message} - ${err.message}`)
     }

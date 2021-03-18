@@ -265,6 +265,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to deposit funds.`)
       logger.error(`${message} - ${err.message}`)
     }
@@ -311,6 +312,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setIsModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to withdraw funds.`)
       logger.error(`${message} - ${err.message}`)
     }

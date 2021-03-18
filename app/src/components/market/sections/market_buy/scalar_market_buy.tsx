@@ -282,6 +282,7 @@ export const ScalarMarketBuy = (props: Props) => {
       setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
       logger.error(`${message} - ${err.message}`)
     }

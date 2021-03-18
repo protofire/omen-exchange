@@ -120,6 +120,7 @@ const MarketWizardCreatorContainer: FC = () => {
         }
       }
     } catch (err) {
+      setTxState(TransactionStep.error)
       setMarketCreationStatus(MarketCreationStatus.error(err))
       logger.error(err.message)
     }

@@ -256,6 +256,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' shares.`)
       logger.error(`${message} - ${err.message}`)
       setIsTransactionProcessing(false)

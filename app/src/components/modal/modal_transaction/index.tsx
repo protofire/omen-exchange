@@ -132,6 +132,8 @@ export const ModalTransaction = (props: Props) => {
             ? `${confirmations} out of ${confirmationsRequired} Confirmations`
             : txState === TransactionStep.transactionConfirmed
             ? 'Transaction Confirmed'
+            : txState === TransactionStep.error
+            ? 'Transaction Failed'
             : ''}
         </ModalSubText>
         <ButtonContainer>

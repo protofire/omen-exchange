@@ -261,6 +261,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
       logger.error(`${message} - ${err.message}`)
       setIsTransactionProcessing(false)

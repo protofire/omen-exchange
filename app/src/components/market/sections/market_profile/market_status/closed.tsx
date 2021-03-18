@@ -217,6 +217,7 @@ const Wrapper = (props: Props) => {
       setMessage(`Condition successfully resolved.`)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to resolve the condition.`)
       logger.error(`${message} - ${err.message}`)
     }
@@ -276,6 +277,7 @@ const Wrapper = (props: Props) => {
       setMessage(`Payout successfully redeemed.`)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to redeem.`)
       logger.error(`${message} -  ${err.message}`)
     }
