@@ -100,6 +100,9 @@ interface CPKRemoveFundingParams {
   earnings: BigNumber
   marketMaker: MarketMakerService
   outcomesCount: number
+  // TODO: Possibly remove optionality of params
+  setTxHash?: (arg0: string) => void
+  setTxState?: (step: TransactionStep) => void
   sharesToBurn: BigNumber
   useBaseToken?: boolean
 }
@@ -1007,6 +1010,8 @@ class CPKService {
     earnings,
     marketMaker,
     outcomesCount,
+    setTxHash,
+    setTxState,
     sharesToBurn,
     useBaseToken,
   }: CPKRemoveFundingParams): Promise<TransactionReceipt> => {
@@ -1113,7 +1118,7 @@ class CPKService {
         }
       }
 
-      return this.execTransactions(transactions, txOptions)
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error removing amount '${sharesToBurn.toString()}' for funding`, err.message)
       throw err

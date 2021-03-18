@@ -336,7 +336,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           useBaseToken = true
         }
       }
+      setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
         collateralAddress,
@@ -346,6 +348,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         earnings: userEarnings,
         marketMaker,
         outcomesCount: balances.length,
+        setTxHash,
+        setTxState,
         sharesToBurn: amountToRemove || Zero,
         useBaseToken,
       })
@@ -362,6 +366,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setIsModalTransactionResultOpen(true)
       setIsTransactionProcessing(false)
     } catch (err) {
+      console.log('error: ', err)
       setStatus(Status.Error)
       setTxState(TransactionStep.error)
       setMessage(`Error trying to withdraw funds.`)
