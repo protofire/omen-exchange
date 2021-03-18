@@ -237,6 +237,15 @@ class CPKService {
     return tx
   }
 
+  getGas = async (gas: number): Promise<number> => {
+    const deployed = await this.cpk.isProxyDeployed()
+    if (deployed) {
+      return gas
+    }
+    const addProxyDeploymentGas = 500000
+    return gas + addProxyDeploymentGas
+  }
+
   buyOutcomes = async ({
     amount,
     collateral,
