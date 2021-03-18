@@ -1,5 +1,5 @@
 import Big from 'big.js'
-import { MaxUint256 } from 'ethers/constants'
+import { MaxUint256, Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
@@ -329,10 +329,18 @@ const Wrapper = (props: Props) => {
   const hasWinningOutcomes = earnedCollateral && !isDust(earnedCollateral, collateralToken.decimals)
   const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
   const userWinnersOutcomes = payouts
-    ? payouts.filter(
+    ? // If payouts, the market is categorical so check how many outcomes are winners
+      payouts.filter(
         (payout, index) => balances[index] && balances[index].shares && balances[index].shares.gt(0) && payout.gt(0),
       ).length
-    : 0
+    : // Else see if the final answer is at the upper or lower bound and if the user has a corresponding share
+    balances.filter((balance, index) => index === finalAnswerPercentage)
+    ? 1
+    : // Else check how many outcomes the user has shares for as they will all win some amount
+      balances.filter(balance => {
+        balance.shares.gt(Zero)
+      }).length
+
   const userWinnerShares = payouts
     ? balances.reduce((acc, balance, index) => (payouts[index].gt(0) ? acc.add(balance.shares) : acc), new BigNumber(0))
     : new BigNumber(0)
