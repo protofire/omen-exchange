@@ -19,6 +19,7 @@ import { getLogger } from '../../../../../util/logger'
 import { formatBigNumber, getUnit, isDust } from '../../../../../util/tools'
 import {
   CompoundTokenType,
+  INVALID_ANSWER_ID,
   MarketDetailsTab,
   MarketMakerData,
   OutcomeTableValue,
@@ -343,14 +344,25 @@ const Wrapper = (props: Props) => {
     ? balances.reduce((acc, balance, index) => (payouts[index].gt(0) ? acc.add(balance.shares) : acc), new BigNumber(0))
     : new BigNumber(0)
   const EPS = 0.01
-  const allPayoutsEqual = payouts
-    ? payouts.every(payout =>
-        payout
-          .sub(1 / payouts.length)
-          .abs()
-          .lte(EPS),
-      )
-    : false
+
+  let invalid = false
+
+  if (isScalar) {
+    if (question.answers && question.answers[question.answers.length - 1].answer === INVALID_ANSWER_ID) {
+      invalid = true
+    } else {
+      invalid = false
+    }
+  } else {
+    invalid = payouts
+      ? payouts.every(payout =>
+          payout
+            .sub(1 / payouts.length)
+            .abs()
+            .lte(EPS),
+        )
+      : false
+  }
 
   return (
     <>
@@ -396,7 +408,7 @@ const Wrapper = (props: Props) => {
                   arbitrator={arbitrator}
                   collateralToken={collateralToken}
                   earnedCollateral={earnedCollateral}
-                  invalid={allPayoutsEqual}
+                  invalid={invalid}
                   userWinnerShares={userWinnerShares}
                   userWinnersOutcomes={userWinnersOutcomes}
                   winnersOutcomes={winnersOutcomes}
