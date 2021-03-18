@@ -269,7 +269,6 @@ export const ScalarMarketBuy = (props: Props) => {
   const isBuyDisabled =
     (status !== Status.Ready && status !== Status.Error) ||
     amount.isZero() ||
-    Number(sharesTotal) == 0 ||
     (!cpk?.isSafeApp &&
       collateral.address !== pseudoNativeAssetAddress &&
       displayCollateral.address !== pseudoNativeAssetAddress &&
@@ -335,7 +334,7 @@ export const ScalarMarketBuy = (props: Props) => {
       : []
 
   if (collateralSymbol in CompoundTokenType) {
-    if (baseCollateral.symbol.toLowerCase() === 'eth') {
+    if (baseCollateral.address === pseudoNativeAssetAddress) {
       currencyFilters = [collateral.address, pseudoNativeAssetAddress.toLowerCase()]
     } else {
       currencyFilters = [collateral.address, baseCollateral.address]

@@ -89,6 +89,36 @@ export const PositionTable = (props: Props) => {
   let longSharesFormatted = formatNumber(formatBigNumber(longShares || new BigNumber(0), collateral.decimals))
   let displayLongProfitLoss = longProfitLoss
   let displayShortProfitLoss = shortProfitLoss
+
+  const getProfitLossInBase = (positionProfitLoss: number) => {
+    if (compoundService) {
+      const displayPositionProfitLossCollateralValue = roundNumberStringToSignificantDigits(
+        Math.abs(positionProfitLoss).toString(),
+        4,
+      )
+      const displayPositionProfitLossCollateralBNValue = parseUnits(
+        displayPositionProfitLossCollateralValue,
+        collateral.decimals,
+      )
+      const displayPositionProfitLossBaseCollateralBN = compoundService.calculateCTokenToBaseExchange(
+        baseCollateral,
+        displayPositionProfitLossCollateralBNValue,
+      )
+      const displayPositionProfitLossNum = formatBigNumber(
+        displayPositionProfitLossBaseCollateralBN,
+        baseCollateral.decimals,
+        4,
+      )
+      let displayPositionProfitLoss = parseFloat(displayPositionProfitLossNum)
+      if (positionProfitLoss < 0) {
+        displayPositionProfitLoss = -displayPositionProfitLoss
+      }
+      return displayPositionProfitLoss
+    } else {
+      return positionProfitLoss
+    }
+  }
+
   if (
     baseCollateral &&
     collateral &&
@@ -128,50 +158,10 @@ export const PositionTable = (props: Props) => {
       longSharesFormatted = formatNumber(formatBigNumber(longSharesBN || new BigNumber(0), baseCollateral.decimals))
     }
     if (longProfitLoss) {
-      const displayLongProfitLossCollateralValue = roundNumberStringToSignificantDigits(
-        Math.abs(longProfitLoss).toString(),
-        4,
-      )
-      const displayLongProfitLossCollateralBNValue = parseUnits(
-        displayLongProfitLossCollateralValue,
-        collateral.decimals,
-      )
-      const displayLongProfileLossBaseCollateralBN = compoundService.calculateCTokenToBaseExchange(
-        baseCollateral,
-        displayLongProfitLossCollateralBNValue,
-      )
-      const displayLongProfitLossNum = formatBigNumber(
-        displayLongProfileLossBaseCollateralBN,
-        baseCollateral.decimals,
-        4,
-      )
-      displayLongProfitLoss = parseFloat(displayLongProfitLossNum)
-      if (longProfitLoss < 0) {
-        displayLongProfitLoss = -displayLongProfitLoss
-      }
+      displayLongProfitLoss = getProfitLossInBase(longProfitLoss)
     }
     if (shortProfitLoss) {
-      const displayShortProfitLossCollateralValue = roundNumberStringToSignificantDigits(
-        Math.abs(shortProfitLoss).toString(),
-        4,
-      )
-      const displayShortProfitLossCollateralBNValue = parseUnits(
-        displayShortProfitLossCollateralValue,
-        collateral.decimals,
-      )
-      const displayShortProfileLossBaseCollateralBN = compoundService.calculateCTokenToBaseExchange(
-        baseCollateral,
-        displayShortProfitLossCollateralBNValue,
-      )
-      const displayShortProfitLossNum = formatBigNumber(
-        displayShortProfileLossBaseCollateralBN,
-        baseCollateral.decimals,
-        4,
-      )
-      displayShortProfitLoss = parseFloat(displayShortProfitLossNum)
-      if (shortProfitLoss < 0) {
-        displayShortProfitLoss = -displayShortProfitLoss
-      }
+      displayShortProfitLoss = getProfitLossInBase(shortProfitLoss)
     }
   }
 
