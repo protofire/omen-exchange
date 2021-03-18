@@ -291,8 +291,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     longBalances.length &&
     longBalances.map(longBalance => longBalance.shares).reduce((a, b) => a.add(b))
 
-  const shortSharesNumber = collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals))
-  const longSharesNumber = collateral && Number(formatBigNumber(longShares || new BigNumber(0), collateral.decimals))
+  const shortSharesNumber =
+    collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals, 3))
+  const longSharesNumber = collateral && Number(formatBigNumber(longShares || new BigNumber(0), collateral.decimals, 3))
 
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
