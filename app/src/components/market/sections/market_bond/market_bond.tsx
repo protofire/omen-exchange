@@ -66,7 +66,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const probabilities = balances.map(balance => balance.probability)
   const initialBondAmount =
-    networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
+    networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits(' < 0.01', nativeAsset.decimals)
   const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
     currentAnswerBond ? new BigNumber(currentAnswerBond).mul(2) : initialBondAmount,
   )
