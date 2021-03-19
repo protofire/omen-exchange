@@ -123,6 +123,8 @@ interface CPKResolveParams {
   numOutcomes: number
   scalarLow: Maybe<BigNumber>
   scalarHigh: Maybe<BigNumber>
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKSubmitAnswerParams {
@@ -130,6 +132,8 @@ interface CPKSubmitAnswerParams {
   question: Question
   answer: string
   amount: BigNumber
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 interface TransactionResult {
@@ -1221,6 +1225,8 @@ class CPKService {
     realitio,
     scalarHigh,
     scalarLow,
+    setTxHash,
+    setTxState,
   }: CPKResolveParams) => {
     try {
       const transactions: Transaction[] = []
@@ -1238,14 +1244,14 @@ class CPKService {
           data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
         })
       }
-      return this.execTransactions(transactions, txOptions)
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error resolving the condition with question id '${question.id}'`, err.message)
       throw err
     }
   }
 
-  submitAnswer = async ({ amount, answer, question, realitio }: CPKSubmitAnswerParams) => {
+  submitAnswer = async ({ amount, answer, question, realitio, setTxHash, setTxState }: CPKSubmitAnswerParams) => {
     try {
       if (this.cpk.relay || this.isSafeApp) {
         const transactions: Transaction[] = [
@@ -1257,9 +1263,9 @@ class CPKService {
         ]
         const txOptions: TxOptions = {}
         txOptions.gas = defaultGas
-        return this.execTransactions(transactions, txOptions)
+        return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       }
-      return realitio.submitAnswer(question.id, answer, amount)
+      return realitio.submitAnswer(question.id, answer, amount, setTxHash, setTxState)
     } catch (error) {
       logger.error(`There was an error submitting answer '${question.id}'`, error.message)
       throw error

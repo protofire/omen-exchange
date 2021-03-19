@@ -123,6 +123,8 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         question,
         answer,
         amount: bondNativeAssetAmount,
+        setTxHash,
+        setTxState,
       })
 
       await fetchGraphMarketMakerData()

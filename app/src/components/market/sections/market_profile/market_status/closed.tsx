@@ -194,14 +194,14 @@ const Wrapper = (props: Props) => {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const resolveCondition = async () => {
-    setTxState(TransactionStep.waitingConfirmation)
-    setIsTransactionModalOpen(true)
     if (!cpk) {
       return
     }
     try {
       setStatus(Status.Loading)
       setMessage('Resolving condition...')
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       await cpk.resolveCondition({
         oracle,
@@ -211,6 +211,8 @@ const Wrapper = (props: Props) => {
         scalarHigh,
         question,
         numOutcomes: balances.length,
+        setTxHash,
+        setTxState,
       })
 
       await fetchGraphMarketMakerData()
