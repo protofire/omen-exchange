@@ -24,11 +24,11 @@ import {
   MarketMakerData,
   OutcomeTableValue,
   Status,
+  TransactionStep,
 } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
-import { FullLoading } from '../../../../loading'
-import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
+import { ModalTransactionWrapper } from '../../../../modal'
 import { ButtonContainerFullWidth } from '../../../common/common_styled'
 import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { MarketScale } from '../../../common/market_scale'
@@ -153,12 +153,13 @@ const Wrapper = (props: Props) => {
   const history = useHistory()
 
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState('')
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const marketCollateralToken = collateralToken
   const [compoundService, setCompoundService] = useState<Maybe<CompoundService>>(null)
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
 
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
   useMemo(() => {
@@ -196,10 +197,11 @@ const Wrapper = (props: Props) => {
     if (!cpk) {
       return
     }
-    setModalTitle('Resolve Condition')
     try {
       setStatus(Status.Loading)
       setMessage('Resolving condition...')
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       await cpk.resolveCondition({
         oracle,
@@ -209,6 +211,8 @@ const Wrapper = (props: Props) => {
         scalarHigh,
         question,
         numOutcomes: balances.length,
+        setTxHash,
+        setTxState,
       })
 
       await fetchGraphMarketMakerData()
@@ -217,11 +221,10 @@ const Wrapper = (props: Props) => {
       setMessage(`Condition successfully resolved.`)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to resolve the condition.`)
       logger.error(`${message} - ${err.message}`)
     }
-
-    setIsModalTransactionResultOpen(true)
   }
 
   useEffect(() => {
@@ -242,8 +245,6 @@ const Wrapper = (props: Props) => {
   }, [provider, account, marketMakerAddress, marketMaker])
 
   const redeem = async () => {
-    setModalTitle('Redeem Payout')
-
     try {
       if (!earnedCollateral) {
         return
@@ -255,6 +256,8 @@ const Wrapper = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage('Redeeming payout...')
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       await cpk.redeemPositions({
         isConditionResolved,
@@ -265,6 +268,8 @@ const Wrapper = (props: Props) => {
         collateralToken,
         marketMaker,
         conditionalTokens,
+        setTxHash,
+        setTxState,
       })
       await fetchBalances()
 
@@ -272,11 +277,10 @@ const Wrapper = (props: Props) => {
       setMessage(`Payout successfully redeemed.`)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to redeem.`)
       logger.error(`${message} -  ${err.message}`)
     }
-
-    setIsModalTransactionResultOpen(true)
   }
 
   const probabilities = balances.map(balance => balance.probability)
@@ -495,14 +499,15 @@ const Wrapper = (props: Props) => {
           />
         )}
       </BottomCard>
-      <ModalTransactionResult
-        isOpen={isModalTransactionResultOpen}
-        onClose={() => setIsModalTransactionResultOpen(false)}
-        status={status}
-        text={message}
-        title={modalTitle}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={txHash}
+        txState={txState}
       />
-      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

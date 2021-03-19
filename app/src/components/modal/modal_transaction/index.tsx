@@ -1,15 +1,17 @@
 import React, { HTMLAttributes } from 'react'
 import Modal from 'react-modal'
+import { TwitterShareButton } from 'react-share'
 import styled, { withTheme } from 'styled-components'
 
 import { CONFIRMATION_COUNT } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../hooks'
+import { getBlockExplorer } from '../../../util/networks'
 import { getTxHashBlockExplorerURL } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
-import { IconClose } from '../../common/icons'
+import { IconClose, IconDone, IconFail, IconTwitter } from '../../common/icons'
 import { ContentWrapper, ModalNavigation, ModalNavigationLeft } from '../common_styled'
 
 const ModalMainText = styled.p`
@@ -35,13 +37,24 @@ const ModalSubText = styled.p`
   margin: 0;
 `
 
-const EtherscanButton = styled(Button)`
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 20px;
+`
+
+const ModalButton = styled(Button)`
   width: 100%;
 `
 
-const EtherscanButtonWrapper = styled.a`
+const ModalButtonWrapper = styled.a`
   width: 100%;
-  margin-top: 32px;
+  margin-top: 12px;
+`
+
+const ModalButtonText = styled.span`
+  margin-left: 12px;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -55,6 +68,8 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   confirmations: number
   confirmationsRequired?: number
   netId?: number
+  tweet?: string
+  shareUrl?: string
 }
 
 export const ModalTransaction = (props: Props) => {
@@ -66,7 +81,9 @@ export const ModalTransaction = (props: Props) => {
     message,
     netId,
     onClose,
+    shareUrl,
     theme,
+    tweet,
     txHash,
     txState,
   } = props
@@ -78,10 +95,17 @@ export const ModalTransaction = (props: Props) => {
   }, [])
 
   const etherscanDisabled =
-    !txState ||
     (txState !== TransactionStep.transactionSubmitted &&
       txState !== TransactionStep.transactionConfirmed &&
-      txState !== TransactionStep.confirming)
+      txState !== TransactionStep.confirming) ||
+    !txHash
+
+  const blockExplorer =
+    getBlockExplorer(networkId)
+      .charAt(0)
+      .toUpperCase() + getBlockExplorer(networkId).slice(1)
+
+  const shareOnTwitter = tweet && shareUrl
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
@@ -90,7 +114,13 @@ export const ModalTransaction = (props: Props) => {
           <ModalNavigationLeft></ModalNavigationLeft>
           <IconClose hoverEffect={true} onClick={onClose} />
         </ModalNavigation>
-        {txState !== TransactionStep.transactionConfirmed && <Spinner big={true} style={{ marginTop: '10px' }} />}
+        {txState === TransactionStep.transactionConfirmed ? (
+          <IconDone />
+        ) : txState === TransactionStep.error ? (
+          <IconFail />
+        ) : (
+          <Spinner big={true} style={{ marginTop: '10px' }} />
+        )}
         <ModalMainText>
           {message}
           {icon && <ModalTokenIcon src={icon} />}
@@ -104,17 +134,29 @@ export const ModalTransaction = (props: Props) => {
             ? `${confirmations} out of ${confirmationsRequired} Confirmations`
             : txState === TransactionStep.transactionConfirmed
             ? 'Transaction Confirmed'
+            : txState === TransactionStep.error
+            ? 'Transaction Failed'
             : ''}
         </ModalSubText>
-        <EtherscanButtonWrapper
-          href={etherscanDisabled ? undefined : getTxHashBlockExplorerURL(networkId, txHash)}
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          <EtherscanButton buttonType={ButtonType.secondaryLine} disabled={etherscanDisabled}>
-            View on Etherscan
-          </EtherscanButton>
-        </EtherscanButtonWrapper>
+        <ButtonContainer>
+          {shareOnTwitter && (
+            <TwitterShareButton style={{ width: '100%', marginTop: '12px' }} title={tweet} url={shareUrl}>
+              <ModalButton buttonType={ButtonType.secondaryLine} disabled={etherscanDisabled}>
+                <IconTwitter />
+                <ModalButtonText>Share on twitter</ModalButtonText>
+              </ModalButton>
+            </TwitterShareButton>
+          )}
+          <ModalButtonWrapper
+            href={etherscanDisabled ? undefined : getTxHashBlockExplorerURL(networkId, txHash)}
+            rel="noopener noreferrer"
+            target="_blank"
+          >
+            <ModalButton buttonType={ButtonType.secondaryLine} disabled={etherscanDisabled}>
+              View on {blockExplorer}
+            </ModalButton>
+          </ModalButtonWrapper>
+        </ButtonContainer>
       </ContentWrapper>
     </Modal>
   )
