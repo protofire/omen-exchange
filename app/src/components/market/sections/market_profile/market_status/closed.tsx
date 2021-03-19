@@ -193,16 +193,23 @@ const Wrapper = (props: Props) => {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const resolveCondition = async () => {
+    if (!cpk) {
+      return
+    }
     setModalTitle('Resolve Condition')
-
     try {
       setStatus(Status.Loading)
       setMessage('Resolving condition...')
-      if (isScalar && scalarLow && scalarHigh) {
-        await realitio.resolveCondition(question.id, question.raw, scalarLow, scalarHigh)
-      } else {
-        await oracle.resolveCondition(question, balances.length)
-      }
+
+      await cpk.resolveCondition({
+        oracle,
+        realitio,
+        isScalar,
+        scalarLow,
+        scalarHigh,
+        question,
+        numOutcomes: balances.length,
+      })
 
       await fetchGraphMarketMakerData()
 
@@ -341,7 +348,10 @@ const Wrapper = (props: Props) => {
       ).length
     : 0
   const userWinnerShares = payouts
-    ? balances.reduce((acc, balance, index) => (payouts[index].gt(0) ? acc.add(balance.shares) : acc), new BigNumber(0))
+    ? balances.reduce(
+        (acc, balance, index) => (payouts[index].gt(0) && balance.shares ? acc.add(balance.shares) : acc),
+        new BigNumber(0),
+      )
     : new BigNumber(0)
   const EPS = 0.01
 

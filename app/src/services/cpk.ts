@@ -103,6 +103,23 @@ interface CPKRedeemParams {
   conditionalTokens: ConditionalTokenService
 }
 
+interface CPKResolveParams {
+  isScalar: boolean
+  realitio: RealitioService
+  oracle: OracleService
+  question: Question
+  numOutcomes: number
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
+}
+
+interface CPKSubmitAnswerParams {
+  realitio: RealitioService
+  question: Question
+  answer: string
+  amount: BigNumber
+}
+
 interface TransactionResult {
   hash?: string
   safeTxHash?: string
@@ -1149,6 +1166,59 @@ class CPKService {
     } catch (err) {
       logger.error(`Error trying to resolve condition or redeem for question id '${question.id}'`, err.message)
       throw err
+    }
+  }
+
+  resolveCondition = async ({
+    isScalar,
+    numOutcomes,
+    oracle,
+    question,
+    realitio,
+    scalarHigh,
+    scalarLow,
+  }: CPKResolveParams) => {
+    try {
+      const transactions: Transaction[] = []
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
+
+      if (isScalar && scalarLow && scalarHigh) {
+        transactions.push({
+          to: realitio.scalarContract.address,
+          data: RealitioService.encodeResolveCondition(question.id, question.raw, scalarLow, scalarHigh),
+        })
+      } else {
+        transactions.push({
+          to: oracle.address,
+          data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
+        })
+      }
+      return this.execTransactions(transactions, txOptions)
+    } catch (err) {
+      logger.error(`There was an error resolving the condition with question id '${question.id}'`, err.message)
+      throw err
+    }
+  }
+
+  submitAnswer = async ({ amount, answer, question, realitio }: CPKSubmitAnswerParams) => {
+    try {
+      if (this.cpk.relay || this.isSafeApp) {
+        const transactions: Transaction[] = [
+          {
+            to: realitio.address,
+            data: RealitioService.encodeSubmitAnswer(question.id, answer),
+            value: amount.toString(),
+          },
+        ]
+        const txOptions: TxOptions = {}
+        txOptions.gas = defaultGas
+        return this.execTransactions(transactions, txOptions)
+      }
+      return realitio.submitAnswer(question.id, answer, amount)
+    } catch (error) {
+      logger.error(`There was an error submitting answer '${question.id}'`, error.message)
+      throw error
     }
   }
 
