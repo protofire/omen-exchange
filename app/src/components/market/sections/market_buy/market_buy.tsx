@@ -225,7 +225,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals)
 
       setStatus(Status.Loading)
-      setMessage(`Buying ${sharesAmount} shares ...`)
+      Number(sharesAmount) < 0.01
+        ? setMessage(`Buying <${0.01} shares`)
+        : setMessage(`Buying ${sharesAmount} shares ...`)
       setIsTransactionProcessing(true)
       await cpk.buyOutcomes({
         amount: inputAmount,
