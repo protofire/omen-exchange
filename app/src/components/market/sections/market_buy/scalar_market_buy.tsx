@@ -9,6 +9,7 @@ import { STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
+  useConnectedBalanceContext,
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
@@ -67,6 +68,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
+  const { fetchBalances } = useConnectedBalanceContext()
 
   const { library: provider, networkId } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
@@ -257,6 +259,7 @@ export const ScalarMarketBuy = (props: Props) => {
       await fetchGraphMarketUserTxData()
       await fetchGraphMarketMakerData()
       await fetchCollateralBalance()
+      await fetchBalances()
 
       setTweet(
         stripIndents(`${question.title}

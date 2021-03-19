@@ -91,6 +91,7 @@ const theme = {
     error: '#fa0000',
     gray: '#b7b7b7',
     green: '#4B9E98',
+    greenLight: '#60D099',
     mainBodyBackground: '#fff',
     primary: '#3F51B5',
     primaryLight: '#5C6BC0',
@@ -374,9 +375,34 @@ const theme = {
       zIndex: '12345',
     },
   },
-  connectWalletModal: {
+  fixedHeightModal: {
     content: {
       height: '510px',
+      width: '382px',
+      padding: '28px',
+      borderRadius: '8px',
+      border: '1px solid #ECEFF1',
+      boxShadow: '0px 0px 6px rgba(0, 0, 0, 0.12)',
+      margin: 'auto 0',
+      left: 'auto',
+      right: 'auto',
+      top: 'auto',
+      bottom: 'auto',
+      position: 'relative',
+    },
+    overlay: {
+      alignItems: 'unset',
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      display: 'flex',
+      justifyContent: 'center',
+      overflow: 'auto',
+      padding: '10px',
+      zIndex: '12345',
+    },
+  },
+  fluidHeightModal: {
+    content: {
+      height: 'auto',
       width: '382px',
       padding: '28px',
       borderRadius: '8px',
