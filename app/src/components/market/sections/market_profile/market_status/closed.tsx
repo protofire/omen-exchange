@@ -44,7 +44,11 @@ const TopCard = styled(ViewCard)`
 const BottomCard = styled(ViewCard)``
 
 const MarketResolutionMessageStyled = styled(MarketResolutionMessage)`
-  margin: 20px 0;
+  margin: 20px 24px;
+`
+const MarketResolutionFirstBorder = styled.div`
+  margin: 0 -24px;
+  border-bottom: ${({ theme }) => theme.borders.borderLineDisabled};
 `
 
 const StyledButtonContainer = styled(ButtonContainer)`
@@ -405,15 +409,17 @@ const Wrapper = (props: Props) => {
             )}
             <WhenConnected>
               {hasWinningOutcomes && (
-                <MarketResolutionMessageStyled
-                  arbitrator={arbitrator}
-                  collateralToken={collateralToken}
-                  earnedCollateral={earnedCollateral}
-                  invalid={invalid}
-                  userWinnerShares={userWinnerShares}
-                  userWinnersOutcomes={userWinnersOutcomes}
-                  winnersOutcomes={winnersOutcomes}
-                ></MarketResolutionMessageStyled>
+                <MarketResolutionFirstBorder>
+                  <MarketResolutionMessageStyled
+                    arbitrator={arbitrator}
+                    collateralToken={collateralToken}
+                    earnedCollateral={earnedCollateral}
+                    invalid={invalid}
+                    userWinnerShares={userWinnerShares}
+                    userWinnersOutcomes={userWinnersOutcomes}
+                    winnersOutcomes={winnersOutcomes}
+                  ></MarketResolutionMessageStyled>
+                </MarketResolutionFirstBorder>
               )}
               {isConditionResolved && !hasWinningOutcomes ? (
                 <StyledButtonContainer>
