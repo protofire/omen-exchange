@@ -1,10 +1,10 @@
-import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
-import { createCPK } from '../util/cpk'
+import { RELAY_ADDRESS, RELAY_FEE, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
+import { Transaction, verifyProxyAddress } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
   getBySafeTx,
@@ -35,6 +35,7 @@ import { MarketMakerFactoryService } from './market_maker_factory'
 import { OracleService } from './oracle'
 import { OvmService } from './ovm'
 import { RealitioService } from './realitio'
+import { SafeService } from './safe'
 import { UnwrapTokenService } from './unwrap_token'
 import { XdaiService } from './xdai'
 
@@ -102,6 +103,23 @@ interface CPKRedeemParams {
   conditionalTokens: ConditionalTokenService
 }
 
+interface CPKResolveParams {
+  isScalar: boolean
+  realitio: RealitioService
+  oracle: OracleService
+  question: Question
+  numOutcomes: number
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
+}
+
+interface CPKSubmitAnswerParams {
+  realitio: RealitioService
+  question: Question
+  answer: string
+  amount: BigNumber
+}
+
 interface TransactionResult {
   hash?: string
   safeTxHash?: string
@@ -111,14 +129,6 @@ interface TxOptions {
   value?: BigNumber
   gas?: number
 }
-
-const proxyAbi = [
-  'function masterCopy() external view returns (address)',
-  'function changeMasterCopy(address _masterCopy) external',
-  'function swapOwner(address prevOwner, address oldOwner, address newOwner) external',
-  'function getOwners() public view returns (address[] memory)',
-  'function getThreshold() public view returns (uint256)',
-]
 
 const fallbackMultisigTransactionReceipt: TransactionReceipt = {
   byzantium: true,
@@ -137,17 +147,12 @@ interface CreateMarketResult {
 class CPKService {
   cpk: any
   provider: Web3Provider
-  proxy: any
+  safe: SafeService
 
   constructor(cpk: any, provider: Web3Provider) {
     this.cpk = cpk
     this.provider = provider
-    this.proxy = new ethers.Contract(cpk.address, proxyAbi, provider.getSigner())
-  }
-
-  static async create(provider: Web3Provider) {
-    const cpk = await createCPK(provider)
-    return new CPKService(cpk, provider)
+    this.safe = new SafeService(cpk.address, provider)
   }
 
   get address(): string {
@@ -155,7 +160,7 @@ class CPKService {
   }
 
   get isSafeApp(): boolean {
-    if (this.cpk.isConnectedToSafe || this.cpk.isSafeApp()) {
+    if (this.cpk.relay || this.cpk.isConnectedToSafe || this.cpk.isSafeApp()) {
       return true
     }
     return false
@@ -166,11 +171,18 @@ class CPKService {
     if (txObject.hash && !this.cpk.isConnectedToSafe) {
       // standard transaction
       logger.log(`Transaction hash: ${txObject.hash}`)
-      transactionReceipt = await this.provider.waitForTransaction(txObject.hash)
+      // @ts-expect-error ignore
+      while (!transactionReceipt) {
+        try {
+          transactionReceipt = await this.provider.waitForTransaction(txObject.hash)
+        } catch (e) {
+          logger.log(e.message)
+        }
+      }
     } else {
       const safeTxHash = txObject.hash || txObject.safeTxHash
       // transaction through the safe app sdk
-      const threshold = await this.proxy.getThreshold()
+      const threshold = await this.safe.getThreshold()
       if (threshold.toNumber() === 1 && safeTxHash) {
         logger.log(`Safe transaction hash: ${safeTxHash}`)
         let transactionHash
@@ -203,6 +215,18 @@ class CPKService {
     return transactionReceipt
   }
 
+  execTransactions = async (transactions: Transaction[], txOptions?: TxOptions) => {
+    if (this.cpk.relay) {
+      // pay tx fee
+      transactions.push({
+        to: RELAY_ADDRESS,
+        value: RELAY_FEE,
+      })
+    }
+    const txObject = await this.cpk.execTransactions(transactions, txOptions)
+    return this.waitForTransaction(txObject)
+  }
+
   buyOutcomes = async ({
     amount,
     collateral,
@@ -217,7 +241,7 @@ class CPKService {
       const network = await this.provider.getNetwork()
       const networkId = network.chainId
 
-      const transactions = []
+      const transactions: Transaction[] = []
 
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
@@ -249,7 +273,7 @@ class CPKService {
         // Step 0: Wrap ether
         transactions.push({
           to: collateralAddress,
-          value: amount,
+          value: amount.toString(),
         })
       } else if (useBaseToken) {
         if (userInputCollateral.address === pseudoNativeAssetAddress) {
@@ -323,8 +347,7 @@ class CPKService {
         data: MarketMakerService.encodeBuy(minCollateralAmount, outcomeIndex, outcomeTokensToBuy),
       })
 
-      const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      return this.waitForTransaction(txObject)
+      return this.execTransactions(transactions, txOptions)
     } catch (err) {
       logger.error(`There was an error buying '${amount.toString()}' of shares`, err.message)
       throw err
@@ -367,7 +390,7 @@ class CPKService {
 
       const openingDateMoment = moment(resolution)
 
-      const transactions = []
+      const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
 
@@ -385,7 +408,7 @@ class CPKService {
         // Step 0: Wrap ether
         transactions.push({
           to: collateral.address,
-          value: marketData.funding,
+          value: marketData.funding.toString(),
         })
       } else if (useCompoundReserve && compoundTokenDetails) {
         if (userInputCollateral.address === pseudoNativeAssetAddress) {
@@ -401,7 +424,7 @@ class CPKService {
           transactions.push({
             to: collateral.address,
             data: encodedMintFunction,
-            value: marketData.funding,
+            value: marketData.funding.toString(),
           })
         } else {
           collateral = marketData.collateral
@@ -525,8 +548,7 @@ class CPKService {
         ),
       })
 
-      const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      const transaction = await this.waitForTransaction(txObject)
+      const transaction = await this.execTransactions(transactions, txOptions)
       return {
         transaction,
         marketMakerAddress: predictedMarketMakerAddress,
@@ -589,7 +611,7 @@ class CPKService {
 
       const openingDateMoment = moment(resolution)
 
-      const transactions = []
+      const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
 
@@ -607,7 +629,7 @@ class CPKService {
         // Step 0: Wrap ether
         transactions.push({
           to: collateral.address,
-          value: marketData.funding,
+          value: marketData.funding.toString(),
         })
       } else {
         collateral = marketData.collateral
@@ -718,9 +740,7 @@ class CPKService {
         ),
       })
 
-      const txObject = await this.cpk.execTransactions(transactions, txOptions)
-
-      const transaction = await this.waitForTransaction(txObject)
+      const transaction = await this.execTransactions(transactions, txOptions)
 
       return {
         transaction,
@@ -747,7 +767,7 @@ class CPKService {
       const outcomeTokensToSell = await marketMaker.calcSellAmount(amount, outcomeIndex)
       const collateralAddress = await marketMaker.getCollateralToken()
 
-      const transactions = []
+      const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
 
@@ -827,13 +847,13 @@ class CPKService {
           } else {
             transactions.push({
               to: account,
-              value: amount,
+              value: amount.toString(),
             })
           }
         }
       }
-      const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      return this.waitForTransaction(txObject)
+
+      return this.execTransactions(transactions, txOptions)
     } catch (err) {
       logger.error(`There was an error selling '${amount.toString()}' of shares`, err.message)
       throw err
@@ -854,7 +874,7 @@ class CPKService {
       const network = await this.provider.getNetwork()
       const networkId = network.chainId
 
-      const transactions = []
+      const transactions: Transaction[] = []
 
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
@@ -876,7 +896,7 @@ class CPKService {
         // Step 0: Wrap ether
         transactions.push({
           to: collateralAddress,
-          value: amount,
+          value: amount.toString(),
         })
       } else {
         collateralAddress = collateral.address
@@ -934,7 +954,7 @@ class CPKService {
           transactions.push({
             to: collateral.address,
             data: encodedMintFunction,
-            value: amount,
+            value: amount.toString(),
           })
         } else {
           transactions.push({
@@ -954,8 +974,7 @@ class CPKService {
         data: MarketMakerService.encodeAddFunding(minCollateralAmount),
       })
 
-      const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      return this.waitForTransaction(txObject)
+      return this.execTransactions(transactions, txOptions)
     } catch (err) {
       logger.error(`There was an error adding an amount of '${amount.toString()}' for funding`, err.message)
       throw err
@@ -979,7 +998,7 @@ class CPKService {
       const account = await signer.getAddress()
       const network = await this.provider.getNetwork()
       const networkId = network.chainId
-      const transactions = []
+      const transactions: Transaction[] = []
       const removeFundingTx = {
         to: marketMaker.address,
         data: MarketMakerService.encodeRemoveFunding(sharesToBurn),
@@ -1066,7 +1085,7 @@ class CPKService {
             // Transfer unwrapped asset back to user
             transactions.push({
               to: account,
-              value: totalAmountToSend,
+              value: totalAmountToSend.toString(),
             })
           }
         } else {
@@ -1076,8 +1095,8 @@ class CPKService {
           })
         }
       }
-      const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      return this.waitForTransaction(txObject)
+
+      return this.execTransactions(transactions, txOptions)
     } catch (err) {
       logger.error(`There was an error removing amount '${sharesToBurn.toString()}' for funding`, err.message)
       throw err
@@ -1117,7 +1136,7 @@ class CPKService {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
 
-      const transactions = []
+      const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
 
@@ -1143,11 +1162,63 @@ class CPKService {
         })
       }
 
-      const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      return this.waitForTransaction(txObject)
+      return this.execTransactions(transactions, txOptions)
     } catch (err) {
       logger.error(`Error trying to resolve condition or redeem for question id '${question.id}'`, err.message)
       throw err
+    }
+  }
+
+  resolveCondition = async ({
+    isScalar,
+    numOutcomes,
+    oracle,
+    question,
+    realitio,
+    scalarHigh,
+    scalarLow,
+  }: CPKResolveParams) => {
+    try {
+      const transactions: Transaction[] = []
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
+
+      if (isScalar && scalarLow && scalarHigh) {
+        transactions.push({
+          to: realitio.scalarContract.address,
+          data: RealitioService.encodeResolveCondition(question.id, question.raw, scalarLow, scalarHigh),
+        })
+      } else {
+        transactions.push({
+          to: oracle.address,
+          data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
+        })
+      }
+      return this.execTransactions(transactions, txOptions)
+    } catch (err) {
+      logger.error(`There was an error resolving the condition with question id '${question.id}'`, err.message)
+      throw err
+    }
+  }
+
+  submitAnswer = async ({ amount, answer, question, realitio }: CPKSubmitAnswerParams) => {
+    try {
+      if (this.cpk.relay || this.isSafeApp) {
+        const transactions: Transaction[] = [
+          {
+            to: realitio.address,
+            data: RealitioService.encodeSubmitAnswer(question.id, answer),
+            value: amount.toString(),
+          },
+        ]
+        const txOptions: TxOptions = {}
+        txOptions.gas = defaultGas
+        return this.execTransactions(transactions, txOptions)
+      }
+      return realitio.submitAnswer(question.id, answer, amount)
+    } catch (error) {
+      logger.error(`There was an error submitting answer '${question.id}'`, error.message)
+      throw error
     }
   }
 
@@ -1158,7 +1229,7 @@ class CPKService {
     }
     const deployed = await this.cpk.isProxyDeployed()
     if (deployed) {
-      const implementation = await this.proxy.masterCopy()
+      const implementation = await this.safe.getMasterCopy()
       if (implementation.toLowerCase() === getTargetSafeImplementation(network.chainId).toLowerCase()) {
         return true
       }
@@ -1172,14 +1243,13 @@ class CPKService {
       txOptions.gas = defaultGas
       const network = await this.provider.getNetwork()
       const targetGnosisSafeImplementation = getTargetSafeImplementation(network.chainId)
-      const transactions = [
+      const transactions: Transaction[] = [
         {
           to: this.cpk.address,
-          data: this.proxy.interface.functions.changeMasterCopy.encode([targetGnosisSafeImplementation]),
+          data: this.safe.encodeChangeMasterCopy(targetGnosisSafeImplementation),
         },
       ]
-      const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      return this.provider.waitForTransaction(txObject.hash)
+      return this.execTransactions(transactions, txOptions)
     } catch (err) {
       logger.error(`Error trying to update proxy`, err.message)
       throw err
@@ -1188,27 +1258,65 @@ class CPKService {
 
   sendDaiToBridge = async (amount: BigNumber) => {
     try {
-      const xDaiService = new XdaiService(this.provider)
-      const contract = await xDaiService.generateErc20ContractInstance()
-      const transaction = await xDaiService.generateSendTransaction(amount, contract)
+      if (this.cpk.relay) {
+        const xDaiService = new XdaiService(this.provider)
+        const contract = xDaiService.generateXdaiBridgeContractInstance()
+        const sender = await this.cpk.ethLibAdapter.signer.signer.getAddress()
+        const receiver = this.cpk.address
 
-      return transaction
+        // verify proxy address before deposit
+        await verifyProxyAddress(sender, receiver, this.cpk)
+
+        const transaction = await contract.relayTokens(sender, receiver, amount)
+        return transaction.hash
+      } else {
+        const xDaiService = new XdaiService(this.provider)
+        const contract = await xDaiService.generateErc20ContractInstance()
+        const transaction = await xDaiService.generateSendTransaction(amount, contract)
+        return transaction
+      }
     } catch (e) {
       logger.error(`Error trying to send Dai to bridge address`, e.message)
       throw e
     }
   }
+
   sendXdaiToBridge = async (amount: BigNumber) => {
     try {
-      const xDaiService = new XdaiService(this.provider)
-      const transaction = await xDaiService.sendXdaiToBridge(amount)
+      if (this.cpk.relay) {
+        const transactions: Transaction[] = []
+        const txOptions: TxOptions = {}
+        txOptions.gas = defaultGas
 
-      return transaction
+        // get mainnet relay signer
+        const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
+
+        // relay to signer address on mainnet
+        transactions.push({
+          to: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
+          data: XdaiService.encodeRelayTokens(to),
+          value: amount.toString(),
+        })
+
+        // pay tx fee
+        transactions.push({
+          to: RELAY_ADDRESS,
+          value: RELAY_FEE,
+        })
+
+        const txObject = await this.cpk.execTransactions(transactions, txOptions)
+        return txObject.hash
+      } else {
+        const xDaiService = new XdaiService(this.provider)
+        const transaction = await xDaiService.sendXdaiToBridge(amount)
+        return transaction
+      }
     } catch (e) {
       logger.error(`Error trying to send XDai to bridge address`, e.message)
       throw e
     }
   }
+
   fetchLatestUnclaimedTransactions = async () => {
     try {
       const xDaiService = new XdaiService(this.provider)
@@ -1220,13 +1328,18 @@ class CPKService {
       throw e
     }
   }
+
   claimDaiTokens = async () => {
     try {
       const { message } = await this.fetchLatestUnclaimedTransactions()
       const signatures = signaturesFormatted(message.signatures)
       const xDaiService = new XdaiService(this.provider)
-      const contract = await xDaiService.generateXdaiBridgeContractInstance()
-      return await xDaiService.claimDaiTokens({ message: message.content, signatures: signatures }, contract)
+      const contract = xDaiService.generateXdaiBridgeContractInstance()
+      const transaction = await xDaiService.claimDaiTokens(
+        { message: message.content, signatures: signatures },
+        contract,
+      )
+      return transaction
     } catch (e) {
       logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)
       throw e
