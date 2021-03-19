@@ -250,7 +250,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )
       setDisplayAmountToFund(new BigNumber('0'))
       setStatus(Status.Ready)
-      setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      {
+        Number(sharesAmount) < 0.01
+          ? setMessage(`Successfully bought <${0.01} '${balances[outcomeIndex].outcomeName}' shares.`)
+          : setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      }
+
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)

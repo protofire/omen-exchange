@@ -245,7 +245,9 @@ export const ScalarMarketBuy = (props: Props) => {
       const sharesAmount = formatBigNumber(tradedShares, collateral.decimals)
 
       setStatus(Status.Loading)
-      setMessage(`Buying ${sharesAmount} shares ...`)
+      Number(sharesAmount) < 0.01
+        ? setMessage(`Buying <${0.01} shares`)
+        : setMessage(`Buying ${sharesAmount} shares ...`)
 
       await cpk.buyOutcomes({
         amount,

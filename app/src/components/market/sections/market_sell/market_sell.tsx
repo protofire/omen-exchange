@@ -259,6 +259,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     })
   }
   const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
+
   let displaySelectedOutcomeBalance = selectedOutcomeBalance
   let displaySelectedOutcomeBalanceValue = balanceItem.shares
   if (collateralSymbol in CompoundTokenType && compoundService) {
@@ -359,7 +360,15 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       />
       <GridTransactionDetails>
         <div>
-          <TokenBalance text="Your Shares" value={formatNumber(displaySelectedOutcomeBalance)} />
+          <TokenBalance
+            text="Your Shares"
+            //values below 0.01 are recognized as NaN so logic checks for isNaN to be true and if it is displays 0.01, otherwise displays normally.
+            value={
+              isNaN(Number(formatNumber(displaySelectedOutcomeBalance)))
+                ? '<0.01'
+                : formatNumber(displaySelectedOutcomeBalance)
+            }
+          />
           <ReactTooltip id="walletBalanceTooltip" />
           <TextfieldCustomPlaceholder
             formField={
