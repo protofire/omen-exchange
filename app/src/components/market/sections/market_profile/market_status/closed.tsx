@@ -24,7 +24,7 @@ import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
 import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
-import { ButtonContainerFullWidth } from '../../../common/common_styled'
+import { MarginsButton } from '../../../common/common_styled'
 import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { MarketScale } from '../../../common/market_scale'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
@@ -46,10 +46,6 @@ const BottomCard = styled(ViewCard)``
 const MarketResolutionMessageStyled = styled(MarketResolutionMessage)`
   margin: 20px 24px;
 `
-const MarketResolutionFirstBorder = styled.div`
-  margin: 0 -24px;
-  border-bottom: ${({ theme }) => theme.borders.borderLineDisabled};
-`
 
 const StyledButtonContainer = styled(ButtonContainer)`
   margin: 0 -24px;
@@ -65,10 +61,7 @@ const StyledButtonContainer = styled(ButtonContainer)`
 `
 
 const BorderedButtonContainer = styled(ButtonContainer)`
-  margin-right: -24px;
-  margin-left: -24px;
-  padding-right: 24px;
-  padding-left: 24px;
+  ${MarginsButton};
   border-top: 1px solid ${props => props.theme.colors.verticalDivider};
 `
 
@@ -409,17 +402,15 @@ const Wrapper = (props: Props) => {
             )}
             <WhenConnected>
               {hasWinningOutcomes && (
-                <MarketResolutionFirstBorder>
-                  <MarketResolutionMessageStyled
-                    arbitrator={arbitrator}
-                    collateralToken={collateralToken}
-                    earnedCollateral={earnedCollateral}
-                    invalid={invalid}
-                    userWinnerShares={userWinnerShares}
-                    userWinnersOutcomes={userWinnersOutcomes}
-                    winnersOutcomes={winnersOutcomes}
-                  ></MarketResolutionMessageStyled>
-                </MarketResolutionFirstBorder>
+                <MarketResolutionMessageStyled
+                  arbitrator={arbitrator}
+                  collateralToken={collateralToken}
+                  earnedCollateral={earnedCollateral}
+                  invalid={invalid}
+                  userWinnerShares={userWinnerShares}
+                  userWinnersOutcomes={userWinnersOutcomes}
+                  winnersOutcomes={winnersOutcomes}
+                ></MarketResolutionMessageStyled>
               )}
               {isConditionResolved && !hasWinningOutcomes ? (
                 <StyledButtonContainer>
@@ -436,7 +427,7 @@ const Wrapper = (props: Props) => {
               ) : (
                 <>
                   {!isConditionResolved && (
-                    <ButtonContainerFullWidth>
+                    <BorderedButtonContainer>
                       <Button
                         buttonType={ButtonType.primary}
                         disabled={status === Status.Loading}
@@ -444,7 +435,7 @@ const Wrapper = (props: Props) => {
                       >
                         Resolve Condition
                       </Button>
-                    </ButtonContainerFullWidth>
+                    </BorderedButtonContainer>
                   )}
                   {isConditionResolved && hasWinningOutcomes && (
                     <BorderedButtonContainer>
