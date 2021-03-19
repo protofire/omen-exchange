@@ -46,31 +46,32 @@ const getBalances = (
 }
 
 const getScalarBalances = (
-  outcomePrices: string[],
   marketMakerShares: BigNumber[],
   userShares: BigNumber[],
   payouts: Maybe<Big[]>,
 ): BalanceItem[] => {
   const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
 
-  const balances: BalanceItem[] = outcomePrices.length
-    ? outcomePrices.map((price: string, index: number) => {
-        const outcomeName = index === 0 ? 'short' : 'long'
-        const probability = actualPrices[index] * 100
-        const currentPrice = actualPrices[index]
-        const shares = userShares[index]
-        const holdings = marketMakerShares[index]
+  const balances: BalanceItem[] = []
 
-        return {
-          outcomeName,
-          probability,
-          currentPrice,
-          shares,
-          holdings,
-          payout: payouts ? payouts[index] : new Big(0),
-        }
-      })
-    : []
+  for (let i = 0; i < 2; i++) {
+    const outcomeName = i === 0 ? 'short' : 'long'
+    const probability = actualPrices[i] * 100
+    const currentPrice = actualPrices[i]
+    const shares = userShares[i]
+    const holdings = marketMakerShares[i]
+
+    const balance = {
+      outcomeName,
+      probability,
+      currentPrice,
+      shares,
+      holdings,
+      payout: payouts ? payouts[i] : new Big(0),
+    }
+
+    balances.push(balance)
+  }
 
   return balances
 }
@@ -157,12 +158,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
     let balances: BalanceItem[]
     isScalar
-      ? (balances = getScalarBalances(
-          graphMarketMakerData.outcomeTokenMarginalPrices || [],
-          marketMakerShares,
-          userShares,
-          payouts,
-        ))
+      ? (balances = getScalarBalances(marketMakerShares, userShares, payouts))
       : (balances = getBalances(outcomes, marketMakerShares, userShares, payouts))
 
     const newMarketMakerData: MarketMakerData = {
