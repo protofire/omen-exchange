@@ -5,9 +5,10 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { DOCUMENT_FAQ } from '../../../../common/constants'
+import { DOCUMENT_FAQ, STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useCollateralBalance,
+  useConnectedBalanceContext,
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
@@ -98,7 +99,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const history = useHistory()
   const { account, library: provider, networkId } = context
   const cpk = useConnectedCPKContext()
-
+  const { fetchBalances } = useConnectedBalanceContext()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
@@ -182,7 +183,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     : new BigNumber(0)
   const depositedTokensTotal = depositedTokens.add(userEarnings)
 
-  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), 18)}%`, [fee])
+  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
 
   const totalUserShareAmounts = calcRemoveFundingSendAmounts(
     fundingBalance,
@@ -190,9 +191,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     totalPoolShares,
   )
 
-  const totalDepositedTokens = totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) =>
-    amount.lt(min) ? amount : min,
-  )
+  const totalDepositedTokens = totalUserShareAmounts.length
+    ? totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
+    : new BigNumber(0)
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
 
@@ -240,6 +241,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
       await fetchCollateralBalance()
+      await fetchBalances()
 
       setStatus(Status.Ready)
       setAmountToFund(null)
@@ -284,6 +286,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
       await fetchCollateralBalance()
+      await fetchBalances()
 
       setStatus(Status.Ready)
       setAmountToRemove(null)
@@ -365,8 +368,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
     const sendBackAmounts = outcomeTokenAmounts.map(amount => {
       const outcomeTokenAmount = new Big(amount)
-      const remaining = liquidityAmount.mul(outcomeTokenAmount).div(poolWeight)
-      return liquidityAmount.sub(remaining)
+      try {
+        const remaining = liquidityAmount.mul(outcomeTokenAmount).div(poolWeight)
+        return liquidityAmount.sub(remaining)
+      } catch {
+        return new Big(0)
+      }
     })
     const extraShares = bigMax(sendBackAmounts).sub(bigMin(sendBackAmounts) || new Big(0))
     setAdditionalShares(Number(extraShares.toFixed(0)) / 10 ** collateral.decimals)

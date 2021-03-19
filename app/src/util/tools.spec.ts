@@ -20,7 +20,6 @@ import {
   clampBigNumber,
   computeBalanceAfterTrade,
   divBN,
-  formatBigNumber,
   formatHistoryDate,
   formatHistoryUser,
   formatNumber,
@@ -31,6 +30,7 @@ import {
   getCTokenForToken,
   getIndexSets,
   getInitialCollateral,
+  getNetworkFromChain,
   getScalarTitle,
   getUnit,
   isDust,
@@ -100,6 +100,20 @@ describe('tools', () => {
       it('should strip 0x', () => {
         const stripped = strip0x(address)
         expect(stripped).toBe(testCase)
+      })
+    }
+  })
+  describe('getNetworkFromChain', () => {
+    const testCases: any = [
+      ['0x4', 4],
+      ['4', 4],
+      ['0x1', 1],
+      ['0x3', -1],
+    ]
+    for (const [network, result] of testCases) {
+      it('should give network or -1 if invalid', () => {
+        const getNetwork = getNetworkFromChain(network)
+        expect(result).toBe(getNetwork)
       })
     }
   })
@@ -418,21 +432,20 @@ describe('tools', () => {
 
   describe('formatHistoryDate', () => {
     const testCases: [number, string][] = [
-      [1610546486000, '13.1 - 15:01'],
-      [1610460714000, '12.1 - 15:11'],
-      [1609374633000, '31.12 - 01:30'],
+      [1610546486000, '13.1 - 14:01'],
+      [1610460714000, '12.1 - 14:11'],
+      [1609374633000, '31.12 - 00:30'],
     ]
-
     for (const [timestamp, result] of testCases) {
       const unitResult = formatHistoryDate(timestamp)
-
       expect(unitResult).toMatch(result)
     }
   })
+
   describe('formatTimestampToDate', () => {
     const testCases: [[number, string], string][] = [
       [[1607993079, '1M'], 'Dec 15'],
-      [[1608166400, '1D'], '01:53'],
+      [[1608166400, '1D'], '00:53'],
       [[1608513696, '1h'], 'Dec 21'],
     ]
     for (const [[timestamp, value], result] of testCases) {
@@ -622,6 +635,7 @@ describe('tools', () => {
       [[parseUnits('5', 18), parseUnits('0', 18), parseUnits('10', 18)], 50],
       [[parseUnits('40', 18), parseUnits('5', 18), parseUnits('105', 18)], 35],
       [[parseUnits('2', 18), parseUnits('0', 18), parseUnits('10', 18)], 20],
+      [[parseUnits('103', 18), parseUnits('0', 18), parseUnits('100', 18)], 100],
     ]
     for (const [[currentPrediction, lowerBound, upperBound], result] of testCases) {
       const xValue = calcXValue(currentPrediction, lowerBound, upperBound)

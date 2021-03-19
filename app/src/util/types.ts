@@ -524,6 +524,7 @@ export enum TransactionStep {
   waitingConfirmation,
   transactionSubmitted,
   transactionConfirmed,
+  confirming,
   error,
 }
 

@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { calcPrediction, calcXValue, formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import {
   AdditionalSharesType,
@@ -264,9 +265,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     upperBound,
   } = props
 
-  const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, 18))
-  const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, 18))
-  const startingPointNumber = startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), 18))
+  const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, STANDARD_DECIMALS))
+  const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, STANDARD_DECIMALS))
+  const startingPointNumber =
+    startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), STANDARD_DECIMALS))
 
   const currentPredictionNumber = calcPrediction(currentPrediction || '', lowerBound, upperBound)
   const newPredictionNumber = calcPrediction(newPrediction?.toString() || '', lowerBound, upperBound)
@@ -289,8 +291,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     longBalances.length &&
     longBalances.map(longBalance => longBalance.shares).reduce((a, b) => a.add(b))
 
-  const shortSharesNumber = collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals))
-  const longSharesNumber = collateral && Number(formatBigNumber(longShares || new BigNumber(0), collateral.decimals))
+  const shortSharesNumber =
+    collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals, STANDARD_DECIMALS))
+  const longSharesNumber =
+    collateral && Number(formatBigNumber(longShares || new BigNumber(0), collateral.decimals, STANDARD_DECIMALS))
 
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
@@ -387,9 +391,13 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     setScaleValue(
       newPrediction
-        ? newPrediction * 100
+        ? newPrediction * 100 > 100
+          ? 100
+          : newPrediction * 100
         : currentPrediction
-        ? Number(currentPrediction) * 100
+        ? Number(currentPrediction) * 100 > 100
+          ? 100
+          : Number(currentPrediction) * 100
         : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound),
     )
     setScaleValuePrediction(
@@ -431,14 +439,15 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       setProfitLoss(calcProfit(amountSharesNumber || 0, 100 - scaleValue, tradeAmountNumber || 0))
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
-        const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
+        const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, STANDARD_DECIMALS))
         setShortPayout(calcPayout(shortSharesNumber || 0, 100 - scaleValue))
         setShortProfitAmount(calcProfit(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
         setShortProfitPercentage(calcProfitPercentage(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
-        const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
+        const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, STANDARD_DECIMALS))
         setLongPayout(calcPayout(longSharesNumber || 0, scaleValue))
+
         setLongProfitAmount(calcProfit(longSharesNumber || 0, scaleValue, totalLongPriceNumber))
         setLongProfitPercentage(calcProfitPercentage(longSharesNumber || 0, scaleValue, totalLongPriceNumber))
       }
@@ -498,16 +507,21 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const showSingleValueBox =
     !isAmountInputted && !(additionalShares && additionalShares > 0.000001) && currentTab !== MarketDetailsTab.sell
 
+  const showLiquidityBox =
+    !!liquidityAmount && liquidityAmount.gt(0) && !!additionalShares && additionalShares > 0.000001
+
   const singleValueBoxData = [
     {
       title: `${
-        currentPrediction ? formatNumber(currentPredictionNumber.toString()) : startingPoint && startingPointNumber
+        currentPrediction ? formatNumber(currentPredictionNumber.toString()) : startingPoint ? startingPointNumber : ''
       }
       ${currentPrediction || startingPoint ? ` ${unit}` : 'Unknown'}`,
       subtitle: startingPointTitle,
       xValue: currentPrediction
         ? Number(currentPrediction)
-        : calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound) / 100,
+        : startingPoint && lowerBound && upperBound
+        ? calcXValue(startingPoint || new BigNumber(0), lowerBound, upperBound) / 100
+        : 0.01,
     },
   ]
 
@@ -636,9 +650,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
           {showSingleValueBox && <ValueBoxes valueBoxData={singleValueBoxData} />}
         </Scale>
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
-        {liquidityAmount && liquidityAmount.gt(0) && additionalShares && additionalShares > 0.000001 && (
-          <ValueBoxes valueBoxData={liquidityValueBoxData} />
-        )}
+        {showLiquidityBox && <ValueBoxes valueBoxData={liquidityValueBoxData} />}
       </ScaleWrapper>
       {!isPositionTableDisabled && balances && collateral && trades && (
         <PositionTable

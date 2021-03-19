@@ -51,6 +51,7 @@ type CPKAddresses = {
 interface Network {
   label: string
   url: string
+  alternativeUrls: { [key: string]: string }[]
   graphHttpUri: string
   graphWsUri: string
   klerosCurateGraphHttpUri: string
@@ -71,6 +72,7 @@ interface Network {
     omenVerifiedMarkets: string
   }
   cpk?: CPKAddresses
+  relayProxyFactoryAddress?: string
   wrapToken: string
   targetSafeImplementation: string
   nativeAsset: Token
@@ -95,6 +97,13 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
     label: 'Mainnet',
     url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+    alternativeUrls: [
+      {
+        rpcUrl: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
+        name: 'Infura',
+      },
+      { rpcUrl: 'https://cloudflare-eth.com/', name: 'Cloudflare' },
+    ],
     graphHttpUri: GRAPH_MAINNET_HTTP,
     graphWsUri: GRAPH_MAINNET_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_MAINNET_HTTP,
@@ -133,6 +142,12 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
     url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
+    alternativeUrls: [
+      {
+        rpcUrl: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
+        name: 'Infura',
+      },
+    ],
     graphHttpUri: GRAPH_RINKEBY_HTTP,
     graphWsUri: GRAPH_RINKEBY_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
@@ -171,6 +186,12 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.SOKOL]: {
     label: 'Sokol',
     url: 'https://sokol.poa.network',
+    alternativeUrls: [
+      {
+        rpcUrl: 'https://sokol.poa.network',
+        name: 'xDai',
+      },
+    ],
     graphHttpUri: GRAPH_SOKOL_HTTP,
     graphWsUri: GRAPH_SOKOL_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
@@ -208,6 +229,16 @@ const networks: { [K in NetworkId]: Network } = {
   [networkIds.XDAI]: {
     label: 'xDai',
     url: 'https://rpc.xdaichain.com/',
+    alternativeUrls: [
+      {
+        rpcUrl: 'https://rpc.xdaichain.com/',
+        name: 'xDai',
+      },
+      {
+        rpcUrl: 'https://dai.poa.network/',
+        name: 'Blockscout',
+      },
+    ],
     graphHttpUri: GRAPH_XDAI_HTTP,
     graphWsUri: GRAPH_XDAI_WS,
     klerosCurateGraphHttpUri: KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
@@ -233,6 +264,7 @@ const networks: { [K in NetworkId]: Network } = {
       multiSendAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
       fallbackHandlerAddress: '0x602DF5F404f86469459D5e604CDa43A2cdFb7580',
     },
+    relayProxyFactoryAddress: '0x7b9756f8A7f4208fE42FE8DE8a8CC5aA9A03f356',
     wrapToken: 'wxdai',
     nativeAsset: {
       address: pseudoNativeAssetAddress,
@@ -242,6 +274,18 @@ const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
   },
+}
+
+export const getChainSpecificAlternativeUrls = (networkId: any) => {
+  if (!validNetworkId(networkId)) {
+    return false
+  }
+  return networks[networkId].alternativeUrls
+}
+if (localStorage.getItem('rpcAddress')) {
+  const data = JSON.parse(<string>localStorage.getItem('rpcAddress'))
+  const network: NetworkId = data.network
+  networks[network].url = data.url
 }
 
 export const supportedNetworkIds = Object.keys(networks).map(Number) as NetworkId[]
@@ -675,6 +719,15 @@ export const getCPKAddresses = (networkId: number): Maybe<CPKAddresses> => {
 
   const cpkAddresses = networks[networkId].cpk
   return cpkAddresses || null
+}
+
+export const getRelayProxyFactory = (networkId: number): Maybe<string> => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  const proxyFactoryAddress = networks[networkId].relayProxyFactoryAddress
+  return proxyFactoryAddress || null
 }
 
 export const getGraphUris = (networkId: number): { httpUri: string; wsUri: string } => {

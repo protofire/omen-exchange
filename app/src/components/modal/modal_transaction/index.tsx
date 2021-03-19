@@ -1,11 +1,11 @@
-import { BigNumber } from 'ethers/utils'
 import React, { HTMLAttributes } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
+import { CONFIRMATION_COUNT } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../hooks'
-import { formatBigNumber, getTxHashBlockExplorerURL } from '../../../util/tools'
-import { Token, TransactionStep, TransactionType } from '../../../util/types'
+import { getTxHashBlockExplorerURL } from '../../../util/tools'
+import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
@@ -19,6 +19,8 @@ const ModalMainText = styled.p`
   font-weight: 500;
   margin-top: 28px
   margin-bottom: 8px;
+  display: flex;
+  align-items: center;
 `
 
 const ModalTokenIcon = styled.img`
@@ -43,24 +45,43 @@ const EtherscanButtonWrapper = styled.a`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  amount?: BigNumber
-  collateral: Token
+  icon?: string
   isOpen: boolean
+  message: string
   onClose: () => void
   theme?: any
   txHash: string
   txState: TransactionStep
-  txType: TransactionType
+  confirmations: number
+  confirmationsRequired?: number
+  netId?: number
 }
 
 export const ModalTransaction = (props: Props) => {
-  const { amount, collateral, isOpen, onClose, theme, txHash, txState, txType } = props
+  const {
+    confirmations,
+    confirmationsRequired = CONFIRMATION_COUNT,
+    icon,
+    isOpen,
+    message,
+    netId,
+    onClose,
+    theme,
+    txHash,
+    txState,
+  } = props
   const context = useConnectedWeb3Context()
-  const { networkId } = context
+  const networkId = netId ? netId : context.networkId
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
   }, [])
+
+  const etherscanDisabled =
+    !txState ||
+    (txState !== TransactionStep.transactionSubmitted &&
+      txState !== TransactionStep.transactionConfirmed &&
+      txState !== TransactionStep.confirming)
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
@@ -69,31 +90,30 @@ export const ModalTransaction = (props: Props) => {
           <ModalNavigationLeft></ModalNavigationLeft>
           <IconClose hoverEffect={true} onClick={onClose} />
         </ModalNavigation>
-        <Spinner big={true} style={{ marginTop: '10px' }} />
+        {txState !== TransactionStep.transactionConfirmed && <Spinner big={true} style={{ marginTop: '10px' }} />}
         <ModalMainText>
-          {txType} {formatBigNumber(amount || new BigNumber(0), collateral.decimals, 2)} {collateral.symbol}
-          <ModalTokenIcon src={collateral.image} />
+          {message}
+          {icon && <ModalTokenIcon src={icon} />}
         </ModalMainText>
         <ModalSubText>
           {txState === TransactionStep.waitingConfirmation
             ? 'Confirm Transaction'
-            : TransactionStep.transactionSubmitted
+            : txState === TransactionStep.transactionSubmitted
             ? 'Transaction Submitted'
-            : // TODO: Add confirming step
-            // : TransactionStep.confirming
-            // ? // TODO: Replace with dynamic amounts
-            //   '1 out of 8 Confirmations'
-            TransactionStep.transactionConfirmed
+            : txState === TransactionStep.confirming
+            ? `${confirmations} out of ${confirmationsRequired} Confirmations`
+            : txState === TransactionStep.transactionConfirmed
             ? 'Transaction Confirmed'
             : ''}
         </ModalSubText>
         <EtherscanButtonWrapper
-          href={getTxHashBlockExplorerURL(networkId, txHash)}
+          href={etherscanDisabled ? undefined : getTxHashBlockExplorerURL(networkId, txHash)}
           rel="noopener noreferrer"
           target="_blank"
         >
-          {/* TODO: Add disabled check */}
-          <EtherscanButton buttonType={ButtonType.secondaryLine}>View on Etherscan</EtherscanButton>
+          <EtherscanButton buttonType={ButtonType.secondaryLine} disabled={etherscanDisabled}>
+            View on Etherscan
+          </EtherscanButton>
         </EtherscanButtonWrapper>
       </ContentWrapper>
     </Modal>

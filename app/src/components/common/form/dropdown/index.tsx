@@ -209,13 +209,14 @@ const ItemsContainer = styled.div<{
   dropdownPosition?: DropdownPosition
   dropdownDirection?: DropdownDirection
   dropdownVariant?: DropdownVariant
+  minWidth: boolean
 }>`
   background-color: ${props => props.theme.dropdown.dropdownItems.backgroundColor};
   border-radius: ${props => props.theme.dropdown.dropdownItems.borderRadius};
   border: solid 1px ${props => props.theme.dropdown.dropdownItems.borderColor};
   box-shadow: ${props => props.theme.dropdown.dropdownItems.boxShadow};
   display: ${props => (props.isOpen ? 'block' : 'none')};
-  min-width: 164px;
+  min-width: ${props => (props.minWidth ? '164px' : 'none')};
   padding: ${props => (props.dropdownVariant === DropdownVariant.card ? '9px' : '9px')};
   position: absolute;
   ${props => (props.dropdownVariant === DropdownVariant.card ? DropdownVariantCardItemsContainerCSS : '')};
@@ -315,10 +316,12 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   disabled?: boolean
   dropdownPosition?: DropdownPosition | undefined
   dropdownDirection?: DropdownDirection | undefined
+  disableDirty?: boolean
   items: any
   placeholder?: React.ReactNode | string | undefined
   maxHeight?: boolean
   omitRightButtonMargin?: boolean
+  minWidth?: boolean
 }
 
 export const Dropdown: React.FC<Props> = props => {
@@ -329,10 +332,12 @@ export const Dropdown: React.FC<Props> = props => {
     dropdownVariant = DropdownVariant.pill,
     dropdownDirection,
     dropdownPosition,
+    disableDirty = false,
     items,
     omitRightButtonMargin,
     placeholder,
     maxHeight = false,
+    minWidth = true,
     ...restProps
   } = props
 
@@ -369,16 +374,21 @@ export const Dropdown: React.FC<Props> = props => {
     }
   }, [isOpen, dropdownItemsRef?.current?.scrollHeight, dropdownContainerRef?.current?.clientHeight])
 
-  const optionClick = useCallback((onClick: (() => void) | undefined, itemIndex: number) => {
-    if (!onClick) {
-      return
-    }
+  const optionClick = useCallback(
+    (onClick: (() => void) | undefined, itemIndex: number) => {
+      if (!onClick) {
+        return
+      }
 
-    setCurrentItemIndex(itemIndex)
-    onClick()
-    setIsDirty(true)
-    setIsOpen(false)
-  }, [])
+      setCurrentItemIndex(itemIndex)
+      onClick()
+      if (!disableDirty) {
+        setIsDirty(true)
+      }
+      setIsOpen(false)
+    },
+    [disableDirty],
+  )
 
   const onWrapperClick = useCallback(() => {
     if (isOpen) {
@@ -388,7 +398,7 @@ export const Dropdown: React.FC<Props> = props => {
     }
   }, [isOpen])
 
-  const itemIndex = currentItem && currentItem > -1 ? currentItem : currentItemIndex
+  const itemIndex = currentItem > -1 ? currentItem : currentItemIndex
   const activeItem = getItem(itemIndex)
   const extraContent = getItemExtraContent(itemIndex)
 
@@ -427,6 +437,7 @@ export const Dropdown: React.FC<Props> = props => {
           dropdownPosition={dropdownPosition}
           dropdownVariant={dropdownVariant}
           isOpen={isOpen}
+          minWidth={minWidth}
           ref={dropdownContainerRef}
         >
           <Items

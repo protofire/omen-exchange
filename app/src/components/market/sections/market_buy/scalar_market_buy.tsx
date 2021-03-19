@@ -5,9 +5,11 @@ import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
+  useConnectedBalanceContext,
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
@@ -66,6 +68,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
+  const { fetchBalances } = useConnectedBalanceContext()
 
   const { library: provider, networkId } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
@@ -191,13 +194,13 @@ export const ScalarMarketBuy = (props: Props) => {
   const formattedNewPrediction =
     newPrediction &&
     calcXValue(
-      parseUnits(newPrediction.toString(), 18),
+      parseUnits(newPrediction.toString(), STANDARD_DECIMALS),
       scalarLow || new BigNumber(0),
       scalarHigh || new BigNumber(0),
     ) / 100
 
-  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
-  const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
+  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)))
+  const feePercentage = Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)) * 100
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
@@ -256,6 +259,7 @@ export const ScalarMarketBuy = (props: Props) => {
       await fetchGraphMarketUserTxData()
       await fetchGraphMarketMakerData()
       await fetchCollateralBalance()
+      await fetchBalances()
 
       setTweet(
         stripIndents(`${question.title}

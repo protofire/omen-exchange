@@ -5,9 +5,11 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCompoundService,
+  useConnectedBalanceContext,
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
@@ -68,6 +70,7 @@ interface Props extends RouteComponentProps<any> {
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
+  const { fetchBalances } = useConnectedBalanceContext()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
@@ -98,7 +101,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
+  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
   const collateralSymbol = collateral.symbol.toLowerCase()
   const symbol = useSymbol(displayCollateral)
 
@@ -233,6 +236,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       })
 
       await fetchGraphMarketMakerData()
+      await fetchBalances()
       setAmountSharesFromInput(new BigNumber('0'))
       setDisplaySellShares(null)
       setAmountShares(null)
@@ -298,7 +302,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const isSellButtonDisabled =
     !amountShares ||
-    Number(sellAmountSharesDisplay) == 0 ||
     (status !== Status.Ready && status !== Status.Error) ||
     amountShares?.isZero() ||
     amountError !== null ||

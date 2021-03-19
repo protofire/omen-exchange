@@ -1,16 +1,30 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
+import axios from 'axios'
 import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
-import { CONFIRMATION_COUNT } from '../common/constants'
+import {
+  CONFIRMATION_COUNT,
+  MAIN_NETWORKS,
+  RINKEBY_NETWORKS,
+  SOKOL_NETWORKS,
+  STANDARD_DECIMALS,
+  XDAI_NETWORKS,
+} from '../common/constants'
 import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
-import { CPKService } from '../services'
 import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'
 import { getContractAddress, getNativeAsset, getToken, getWrapToken, networkIds } from './networks'
-import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, EtherscanLink, Token } from './types'
+import {
+  BalanceItem,
+  CompoundEnabledTokenType,
+  CompoundTokenType,
+  EtherscanLink,
+  Token,
+  TransactionStep,
+} from './types'
 
 const logger = getLogger('Tools')
 
@@ -58,6 +72,52 @@ export const formatDate = (date: Date, utcAdd = true): string => {
   return moment(date)
     .tz('UTC')
     .format(`YYYY-MM-DD - HH:mm${utcAdd ? ' [UTC]' : ''}`)
+}
+
+export const checkRpcStatus = async (customUrl: string, setStatus: any, network: any) => {
+  try {
+    const response = await axios.post(customUrl, {
+      id: +new Date(),
+      jsonrpc: '2.0',
+      method: 'net_version',
+    })
+    if (response.data.error || +response.data.result !== network) {
+      setStatus(false)
+      return false
+    }
+
+    setStatus(true)
+    return true
+  } catch (e) {
+    setStatus(false)
+
+    return false
+  }
+}
+
+export const isValidHttpUrl = (data: string): boolean => {
+  let url
+
+  try {
+    url = new URL(data)
+  } catch (_) {
+    return false
+  }
+
+  return url.protocol === 'http:' || url.protocol === 'https:'
+}
+
+export const getNetworkFromChain = (chain: string) => {
+  const network = RINKEBY_NETWORKS.includes(chain)
+    ? networkIds.RINKEBY
+    : SOKOL_NETWORKS.includes(chain)
+    ? networkIds.SOKOL
+    : MAIN_NETWORKS.includes(chain)
+    ? networkIds.MAINNET
+    : XDAI_NETWORKS.includes(chain)
+    ? networkIds.XDAI
+    : -1
+  return network
 }
 
 export const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {
@@ -229,27 +289,30 @@ export const isAddress = (address: string): boolean => {
 }
 
 export const waitForConfirmations = async (
-  transaction: any,
-  cpk: CPKService,
-  setNumberOfConfirmations: any,
-  network: number,
+  hash: string,
+  provider: any,
+  setConfirmations: (confirmations: number) => void,
+  setTxState: (step: TransactionStep) => void,
+  confirmations?: number,
 ) => {
+  setTxState(TransactionStep.transactionSubmitted)
   let receipt
-
-  if (network === networkIds.XDAI) receipt = await cpk.waitForTransaction({ hash: transaction })
-  else receipt = await cpk.waitForTransaction(transaction)
-
-  while (receipt.confirmations && receipt.confirmations <= CONFIRMATION_COUNT) {
-    setNumberOfConfirmations(receipt.confirmations)
+  const requiredConfs = confirmations || CONFIRMATION_COUNT
+  while (!receipt || !receipt.confirmations || (receipt.confirmations && receipt.confirmations <= requiredConfs)) {
+    receipt = await provider.getTransaction(hash)
+    if (receipt && receipt.confirmations) {
+      setTxState(TransactionStep.confirming)
+      const confs = receipt.confirmations > requiredConfs ? requiredConfs : receipt.confirmations
+      setConfirmations(confs)
+    }
     await waitABit(2000)
-    if (network === networkIds.XDAI) receipt = await cpk.waitForTransaction({ hash: transaction })
-    else receipt = await cpk.waitForTransaction(transaction)
   }
-  return
+  setTxState(TransactionStep.transactionConfirmed)
 }
 
-export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string =>
-  Number(formatUnits(value, decimals)).toFixed(precision)
+export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string => {
+  return Number(formatUnits(value, decimals)).toFixed(precision)
+}
 
 export const isContract = async (provider: any, address: string): Promise<boolean> => {
   const code = await provider.getCode(address)
@@ -457,7 +520,7 @@ export const formatNumber = (number: string, decimals = 2): string => {
 }
 
 export const formatHistoryDate = (dateData: number | string): string => {
-  const date = new Date(dateData)
+  const date = new Date(new Date(dateData).toUTCString().substr(0, 25))
   const minute = date.getMinutes()
   const minuteWithZero = (minute < 10 ? '0' : '') + minute
   const hour = date.getHours()
@@ -466,7 +529,8 @@ export const formatHistoryDate = (dateData: number | string): string => {
 }
 
 export const formatTimestampToDate = (timestamp: number, value: string) => {
-  const ts = moment(timestamp * 1000)
+  const date = new Date(new Date(timestamp * 1000).toUTCString().substr(0, 25))
+  const ts = moment(date)
   if (value === '1D' || value === '1H') return ts.format('HH:mm')
 
   return ts.format('MMM D')
@@ -628,17 +692,17 @@ export const onChangeMarketCurrency = (
 }
 
 export const calcXValue = (currentPrediction: BigNumber, lowerBound: BigNumber, upperBound: BigNumber) => {
-  const currentPredictionNumber = Number(formatBigNumber(currentPrediction, 18))
-  const lowerBoundNumber = Number(formatBigNumber(lowerBound, 18))
-  const upperBoundNumber = Number(formatBigNumber(upperBound, 18))
+  const currentPredictionNumber = Number(formatBigNumber(currentPrediction, STANDARD_DECIMALS))
+  const lowerBoundNumber = Number(formatBigNumber(lowerBound, STANDARD_DECIMALS))
+  const upperBoundNumber = Number(formatBigNumber(upperBound, STANDARD_DECIMALS))
   const xValue = ((currentPredictionNumber - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100
-  return xValue
+  return xValue > 100 ? 100 : xValue
 }
 
 export const calcPrediction = (probability: string, lowerBound: BigNumber, upperBound: BigNumber) => {
   const probabilityNumber = Number(probability)
-  const lowerBoundNumber = Number(formatBigNumber(lowerBound, 18, 18))
-  const upperBoundNumber = Number(formatBigNumber(upperBound, 18, 18))
+  const lowerBoundNumber = Number(formatBigNumber(lowerBound, STANDARD_DECIMALS, STANDARD_DECIMALS))
+  const upperBoundNumber = Number(formatBigNumber(upperBound, STANDARD_DECIMALS, STANDARD_DECIMALS))
   const prediction = probabilityNumber * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
   return prediction
 }

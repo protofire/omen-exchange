@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { STANDARD_DECIMALS } from '../../../../common/constants'
+import { useConnectedCPKContext, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, networkIds } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, numberToByte32 } from '../../../../util/tools'
@@ -54,6 +55,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account, library: provider, networkId } = context
 
+  const cpk = useConnectedCPKContext()
   const nativeAsset = getNativeAsset(networkId)
   const symbol = nativeAsset.symbol
   const { realitio } = useContracts(context)
@@ -93,6 +95,9 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   }, [currentAnswerBond])
 
   const bondOutcome = async () => {
+    if (!cpk) {
+      return
+    }
     setModalTitle('Bond Outcome')
 
     try {
@@ -111,8 +116,16 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         }`,
       )
 
-      logger.log(`Submit Answer questionId: ${marketMakerData.question.id}, answer: ${answer}`, bondNativeAssetAmount)
-      await realitio.submitAnswer(marketMakerData.question.id, answer, bondNativeAssetAmount)
+      const question = marketMakerData.question
+      logger.log(`Submit Answer questionId: ${question.id}, answer: ${answer}`, bondNativeAssetAmount)
+
+      await cpk.submitAnswer({
+        realitio,
+        question,
+        answer,
+        amount: bondNativeAssetAmount,
+      })
+
       await fetchGraphMarketMakerData()
 
       setStatus(Status.Ready)
@@ -191,13 +204,15 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Profit"
-              value={`${formatNumber(formatBigNumber(currentAnswerBond || new BigNumber(0), 18))} ${symbol}`}
+              value={`${formatNumber(
+                formatBigNumber(currentAnswerBond || new BigNumber(0), STANDARD_DECIMALS),
+              )} ${symbol}`}
             />
 
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Loss"
-              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, 18))} ${symbol}`}
+              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, STANDARD_DECIMALS))} ${symbol}`}
             />
           </TransactionDetailsCard>
         </div>

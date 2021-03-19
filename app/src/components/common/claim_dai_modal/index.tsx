@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../hooks'
+import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useXdaiBridge } from '../../../hooks/useXdaiBridge'
 import theme from '../../../theme'
 import { formatBigNumber, getTxHashBlockExplorerURL } from '../../../util/tools'
@@ -14,6 +14,7 @@ import { IconArrowUp } from '../icons/IconArrowUp'
 import { DaiIcon } from '../icons/currencies'
 import { Spinner } from '../spinner'
 import { Modal, ModalBackground } from '../switch_network_modal'
+import { useConnectedWeb3Context } from '../../../hooks'
 
 const ClaimAmount = styled.div`
   margin-top: 32px;
@@ -83,7 +84,7 @@ export const ClaimDaiModal = (props: any) => {
           </Reversed>
         )}
 
-        <ClaimAmount>Claim {formatBigNumber(props.unclaimedAmount, 18, 2)} DAI</ClaimAmount>
+        <ClaimAmount>Claim {formatBigNumber(props.unclaimedAmount, STANDARD_DECIMALS, 2)} DAI</ClaimAmount>
         {transactionStep === TransactionStep.idle && (
           <SecondaryText>
             Transfers from xDai Network <br /> need to be claimed

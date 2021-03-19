@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
-import { CONFIRMATION_COUNT } from '../../../../common/constants'
+import { CONFIRMATION_COUNT, STANDARD_DECIMALS } from '../../../../common/constants'
 import theme from '../../../../theme'
 import { networkIds } from '../../../../util/networks'
 import { formatBigNumber, getTxHashBlockExplorerURL } from '../../../../util/tools'
@@ -81,7 +81,8 @@ export const TransactionState = ({
       </SvgWrapper>
 
       <BoldedText>
-        Transfer {formatBigNumber(amountToTransfer, 18)} {network === networkIds.MAINNET ? 'DAI' : 'XDAI'}
+        Transfer {formatBigNumber(amountToTransfer, STANDARD_DECIMALS)}{' '}
+        {network === networkIds.MAINNET ? 'DAI' : 'XDAI'}
       </BoldedText>
       <ChainText>to {network === networkIds.MAINNET ? 'xDai Chain' : 'Mainnet'}</ChainText>
 

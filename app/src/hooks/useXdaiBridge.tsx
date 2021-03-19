@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { XdaiService } from '../services'
 import { knownTokens, networkIds } from '../util/networks'
-import { formatBigNumber, waitForConfirmations } from '../util/tools'
+import { formatBigNumber } from '../util/tools'
 import { TransactionStep } from '../util/types'
 
 import { useConnectedCPKContext } from './connectedCpk'
@@ -27,7 +27,7 @@ interface Prop {
 
 export const useXdaiBridge = (amount?: BigNumber): Prop => {
   const [transactionStep, setTransactionStep] = useState<TransactionStep>(TransactionStep.idle)
-  const { account, library: provider, networkId } = useConnectedWeb3Context()
+  const { account, library: provider, networkId, relay } = useConnectedWeb3Context()
   const [xDaiBalance, setXdaiBalance] = useState<BigNumber>(Zero)
   const [daiBalance, setDaiBalance] = useState<BigNumber>(Zero)
   const [numberOfConfirmations, setNumberOfConfirmations] = useState<any>(0)
@@ -49,7 +49,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
         setTransactionHash(transaction.hash)
         setTransactionStep(TransactionStep.transactionSubmitted)
 
-        await waitForConfirmations(transaction, cpk, setNumberOfConfirmations, networkId)
+        // await waitForConfirmations(transaction, cpk, setNumberOfConfirmations, networkId)
 
         setTransactionStep(TransactionStep.transactionConfirmed)
         setNumberOfConfirmations(0)
@@ -67,7 +67,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
         setTransactionHash(transaction)
         setTransactionStep(TransactionStep.transactionSubmitted)
 
-        await waitForConfirmations(transaction, cpk, setNumberOfConfirmations, networkId)
+        // await waitForConfirmations(transaction, cpk, setNumberOfConfirmations, networkId)
         setNumberOfConfirmations(0)
         setTransactionStep(TransactionStep.transactionConfirmed)
       }
@@ -77,18 +77,12 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
       console.error(`Error while transferring! ${err}`)
     }
   }
+
   const claimLatestToken = async () => {
     try {
       if (!cpk) return
-      setIsClaimStateTransaction(true)
-      setTransactionStep(TransactionStep.waitingConfirmation)
       const transaction = await cpk.claimDaiTokens()
-      setTransactionHash(transaction.hash)
-      setTransactionStep(TransactionStep.transactionSubmitted)
-      await waitForConfirmations(transaction, cpk, setNumberOfConfirmations, networkId)
-      setTransactionStep(TransactionStep.transactionConfirmed)
-      setIsClaimStateTransaction(false)
-      await fetchUnclaimedAssets()
+      return transaction.hash
     } catch (e) {
       setIsClaimStateTransaction(false)
       setTransactionStep(TransactionStep.error)
@@ -99,11 +93,9 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
   const fetchBalance = async () => {
     try {
       const xDaiService = new XdaiService(provider)
-
       const responseXdai = await xDaiService.fetchCrossChainBalance(100)
 
       setXdaiBalance(bigNumberify(responseXdai))
-
       const responseDai = await xDaiService.fetchCrossChainBalance(1)
 
       setDaiBalance(bigNumberify(responseDai))
@@ -125,9 +117,11 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
   }
 
   useEffect(() => {
-    fetchBalance()
-    if (networkId === networkIds.MAINNET) {
-      fetchUnclaimedAssets()
+    if (account) {
+      fetchBalance()
+      if (networkId === networkIds.MAINNET || relay) {
+        fetchUnclaimedAssets()
+      }
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

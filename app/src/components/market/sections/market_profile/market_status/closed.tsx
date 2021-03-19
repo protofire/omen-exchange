@@ -5,7 +5,13 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedCPKContext, useContracts, useGraphMarketUserTxData } from '../../../../../hooks'
+import { STANDARD_DECIMALS } from '../../../../../common/constants'
+import {
+  useConnectedBalanceContext,
+  useConnectedCPKContext,
+  useContracts,
+  useGraphMarketUserTxData,
+} from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../../services'
 import { CompoundService } from '../../../../../services/compound_service'
@@ -13,6 +19,7 @@ import { getLogger } from '../../../../../util/logger'
 import { formatBigNumber, getUnit, isDust } from '../../../../../util/tools'
 import {
   CompoundTokenType,
+  INVALID_ANSWER_ID,
   MarketDetailsTab,
   MarketMakerData,
   OutcomeTableValue,
@@ -98,7 +105,13 @@ const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): 
 }
 
 const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: BigNumber[]): Maybe<BigNumber> => {
-  if (!balances[0] || (balances[0].isZero() && !balances[1]) || balances[1].isZero()) return null
+  if (
+    (!balances[0] && !balances[1]) ||
+    (balances[0].isZero() && !balances[1]) ||
+    (!balances[0] && balances[1].isZero()) ||
+    (balances[0].isZero() && balances[1].isZero())
+  )
+    return null
 
   // use floor as rounding method
   Big.RM = 0
@@ -117,6 +130,7 @@ const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: 
 const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
+  const { fetchBalances } = useConnectedBalanceContext()
 
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
@@ -179,16 +193,23 @@ const Wrapper = (props: Props) => {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const resolveCondition = async () => {
+    if (!cpk) {
+      return
+    }
     setModalTitle('Resolve Condition')
-
     try {
       setStatus(Status.Loading)
       setMessage('Resolving condition...')
-      if (isScalar && scalarLow && scalarHigh) {
-        await realitio.resolveCondition(question.id, question.raw, scalarLow, scalarHigh)
-      } else {
-        await oracle.resolveCondition(question, balances.length)
-      }
+
+      await cpk.resolveCondition({
+        oracle,
+        realitio,
+        isScalar,
+        scalarLow,
+        scalarHigh,
+        question,
+        numOutcomes: balances.length,
+      })
 
       await fetchGraphMarketMakerData()
 
@@ -245,6 +266,7 @@ const Wrapper = (props: Props) => {
         marketMaker,
         conditionalTokens,
       })
+      await fetchBalances()
 
       setStatus(Status.Ready)
       setMessage(`Payout successfully redeemed.`)
@@ -299,9 +321,9 @@ const Wrapper = (props: Props) => {
     cpk?.address.toLowerCase(),
   )
 
-  const realitioAnswerNumber = Number(formatBigNumber(realitioAnswer || new BigNumber(0), 18))
-  const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), 18))
-  const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), 18))
+  const realitioAnswerNumber = Number(formatBigNumber(realitioAnswer || new BigNumber(0), STANDARD_DECIMALS))
+  const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), STANDARD_DECIMALS))
+  const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), STANDARD_DECIMALS))
 
   const finalAnswerPercentage =
     realitioAnswer && realitioAnswer.eq(MaxUint256)
@@ -326,17 +348,31 @@ const Wrapper = (props: Props) => {
       ).length
     : 0
   const userWinnerShares = payouts
-    ? balances.reduce((acc, balance, index) => (payouts[index].gt(0) ? acc.add(balance.shares) : acc), new BigNumber(0))
+    ? balances.reduce(
+        (acc, balance, index) => (payouts[index].gt(0) && balance.shares ? acc.add(balance.shares) : acc),
+        new BigNumber(0),
+      )
     : new BigNumber(0)
   const EPS = 0.01
-  const allPayoutsEqual = payouts
-    ? payouts.every(payout =>
-        payout
-          .sub(1 / payouts.length)
-          .abs()
-          .lte(EPS),
-      )
-    : false
+
+  let invalid = false
+
+  if (isScalar) {
+    if (question.answers && question.answers[question.answers.length - 1].answer === INVALID_ANSWER_ID) {
+      invalid = true
+    } else {
+      invalid = false
+    }
+  } else {
+    invalid = payouts
+      ? payouts.every(payout =>
+          payout
+            .sub(1 / payouts.length)
+            .abs()
+            .lte(EPS),
+        )
+      : false
+  }
 
   return (
     <>
@@ -382,7 +418,7 @@ const Wrapper = (props: Props) => {
                   arbitrator={arbitrator}
                   collateralToken={collateralToken}
                   earnedCollateral={earnedCollateral}
-                  invalid={allPayoutsEqual}
+                  invalid={invalid}
                   userWinnerShares={userWinnerShares}
                   userWinnersOutcomes={userWinnersOutcomes}
                   winnersOutcomes={winnersOutcomes}

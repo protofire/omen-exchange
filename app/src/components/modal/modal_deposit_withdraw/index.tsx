@@ -1,12 +1,14 @@
-import { BigNumber, parseUnits } from 'ethers/utils'
+import { Zero } from 'ethers/constants'
+import { BigNumber, parseEther } from 'ethers/utils'
 import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { useConnectedWeb3Context, useTokens } from '../../../hooks'
+import { STANDARD_DECIMALS } from '../../../common/constants'
+import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { getToken } from '../../../util/networks'
-import { formatBigNumber, formatNumber } from '../../../util/tools'
-import { ExchangeType, TransactionStep, TransactionType } from '../../../util/types'
+import { formatBigNumber, waitForConfirmations } from '../../../util/tools'
+import { ExchangeType, TransactionStep } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../common'
@@ -47,31 +49,87 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   onBack: () => void
   onClose: () => void
   theme?: any
+  fetchBalances: () => void
+  formattedDaiBalance: string
+  formattedxDaiBalance: string
+  daiBalance: BigNumber
+  xDaiBalance: Maybe<BigNumber>
 }
 
 export const ModalDepositWithdraw = (props: Props) => {
-  const { exchangeType, isOpen, onBack, onClose, theme } = props
+  const {
+    daiBalance,
+    exchangeType,
+    fetchBalances,
+    formattedDaiBalance,
+    formattedxDaiBalance,
+    isOpen,
+    onBack,
+    onClose,
+    theme,
+    xDaiBalance,
+  } = props
   const context = useConnectedWeb3Context()
+  const cpk = useConnectedCPKContext()
 
-  const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
+  const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txHash, setTxHash] = useState('')
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
+  const [txNetId, setTxNetId] = useState()
+  const [confirmations, setConfirmations] = useState(0)
+  const [message, setMessage] = useState('')
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
   }, [])
 
-  const { tokens } = useTokens(context, true, true)
+  const DAI = getToken(1, 'dai')
 
-  const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
-  const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, 18, 18))
+  const wallet = exchangeType === ExchangeType.deposit ? daiBalance : xDaiBalance
+  const minDeposit = exchangeType === ExchangeType.deposit ? parseEther('0.005') : parseEther('10')
+  const isDepositWithdrawDisabled =
+    displayFundAmount.isZero() || !wallet || displayFundAmount.gt(wallet) || displayFundAmount.lt(minDeposit)
 
-  // TODO: Replace hardcoded value
-  const isDepositWithdrawDisabled = true
+  const deposit = async () => {
+    if (!cpk) {
+      return
+    }
+
+    try {
+      setMessage(
+        `${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`,
+      )
+      setTxState(TransactionStep.waitingConfirmation)
+      setConfirmations(0)
+      setIsTransactionModalOpen(true)
+
+      const hash =
+        exchangeType === ExchangeType.deposit
+          ? await cpk.sendDaiToBridge(displayFundAmount)
+          : await cpk.sendXdaiToBridge(displayFundAmount)
+
+      const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
+      setTxNetId(provider.network.chainId)
+      setTxHash(hash)
+      await waitForConfirmations(hash, provider, setConfirmations, setTxState)
+      setDisplayFundAmount(new BigNumber(0))
+      setAmountToDisplay('')
+      fetchBalances()
+    } catch (e) {
+      setIsTransactionModalOpen(false)
+    }
+  }
 
   return (
     <>
-      <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
+      <Modal
+        isOpen={isOpen && !isTransactionModalOpen}
+        onRequestClose={onClose}
+        shouldCloseOnOverlayClick={true}
+        style={theme.fluidHeightModal}
+      >
         <ContentWrapper>
           <ModalNavigation>
             <ModalNavigationLeft>
@@ -85,7 +143,14 @@ export const ModalDepositWithdraw = (props: Props) => {
               />
               <ModalTitle style={{ marginLeft: '16px' }}>{exchangeType} Dai</ModalTitle>
             </ModalNavigationLeft>
-            <IconClose hoverEffect={true} onClick={onClose} />
+            <IconClose
+              hoverEffect={true}
+              onClick={() => {
+                onClose()
+                setDisplayFundAmount(new BigNumber(0))
+                setAmountToDisplay('')
+              }}
+            />
           </ModalNavigation>
           <ModalCard style={{ marginBottom: '16px', marginTop: '12px' }}>
             <BalanceSection>
@@ -104,8 +169,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                     <BalanceItemTitle>Omen Account</BalanceItemTitle>
                   </BalanceItemSide>
                   <BalanceItemSide>
-                    {/* TODO: Replace hardcoded balance */}
-                    <BalanceItemBalance style={{ marginRight: '12px' }}>0.00 DAI</BalanceItemBalance>
+                    <BalanceItemBalance style={{ marginRight: '12px' }}>{formattedxDaiBalance} DAI</BalanceItemBalance>
                     <DaiIcon size="24px" />
                   </BalanceItemSide>
                 </BalanceItem>
@@ -115,7 +179,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput
-                decimals={18}
+                decimals={STANDARD_DECIMALS}
                 name="amount"
                 onChange={(e: BigNumberInputReturn) => {
                   setDisplayFundAmount(e.value)
@@ -123,30 +187,38 @@ export const ModalDepositWithdraw = (props: Props) => {
                 }}
                 value={displayFundAmount}
                 valueToDisplay={amountToDisplay}
-              ></BigNumberInput>
+              />
             }
             onClickMaxButton={() => {
-              setDisplayFundAmount(daiBalance)
-              setAmountToDisplay(formatBigNumber(daiBalance, 18, 5))
+              const maxBalance = exchangeType === ExchangeType.deposit ? daiBalance : xDaiBalance || Zero
+              setDisplayFundAmount(maxBalance)
+              setAmountToDisplay(formatBigNumber(maxBalance, STANDARD_DECIMALS, 5))
             }}
             shouldDisplayMaxButton={true}
             symbol={'DAI'}
-          ></TextfieldCustomPlaceholder>
-          <InputInfo>You need to deposit at least 10 DAI.</InputInfo>
-          <DepositWithdrawButton buttonType={ButtonType.primaryAlternative} disabled={isDepositWithdrawDisabled}>
+          />
+          <InputInfo>
+            You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least{' '}
+            {formatBigNumber(minDeposit, STANDARD_DECIMALS, exchangeType === ExchangeType.deposit ? 3 : 0)} DAI.
+          </InputInfo>
+          <DepositWithdrawButton
+            buttonType={ButtonType.primaryAlternative}
+            disabled={isDepositWithdrawDisabled}
+            onClick={deposit}
+          >
             {exchangeType}
           </DepositWithdrawButton>
         </ContentWrapper>
       </Modal>
-      {/* TODO: Replace hardcoded props */}
       <ModalTransactionWrapper
-        amount={displayFundAmount || new BigNumber(0)}
-        collateral={getToken(1, 'dai')}
+        confirmations={confirmations}
+        icon={DAI.image}
         isOpen={isTransactionModalOpen}
+        message={message}
+        netId={txNetId}
         onClose={() => setIsTransactionModalOpen(false)}
-        txHash={'asdf'}
-        txState={TransactionStep.waitingConfirmation}
-        txType={TransactionType.deposit}
+        txHash={txHash}
+        txState={txState}
       />
     </>
   )

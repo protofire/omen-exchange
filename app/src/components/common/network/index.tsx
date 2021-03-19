@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
+import { useWeb3Context } from 'web3-react/dist'
 
-import { useConnectedWeb3Context } from '../../../hooks'
 import { networkIds } from '../../../util/networks'
 import { truncateStringInTheMiddle } from '../../../util/tools'
 import { IconJazz } from '../icons/IconJazz'
@@ -9,6 +9,8 @@ import { IconNotification } from '../icons/IconNotification'
 
 interface Props {
   claim: boolean
+  account?: any
+  networkId?: any
 }
 
 const Wrapper = styled.div`
@@ -22,7 +24,7 @@ const ConnectionStatusText = styled.span`
   font-size: 12px;
   font-weight: 400;
   line-height: 1.2;
-  margin-right: 8px;
+  margin-right: 12px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     font-size: 14px;
@@ -30,7 +32,7 @@ const ConnectionStatusText = styled.span`
 `
 
 export const Network = (props: Props) => {
-  const context = useConnectedWeb3Context()
+  const context = useWeb3Context()
   const { account, networkId } = context
 
   if (!account) {
