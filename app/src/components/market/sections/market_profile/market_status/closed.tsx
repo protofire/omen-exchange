@@ -44,7 +44,7 @@ const TopCard = styled(ViewCard)`
 const BottomCard = styled(ViewCard)``
 
 const MarketResolutionMessageStyled = styled(MarketResolutionMessage)`
-  margin: 20px 24px;
+  margin: 20px 0;
 `
 
 const StyledButtonContainer = styled(ButtonContainer)`
