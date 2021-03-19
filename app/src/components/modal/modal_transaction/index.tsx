@@ -11,7 +11,7 @@ import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
-import { IconClose, IconDone, IconTwitter } from '../../common/icons'
+import { IconClose, IconDone, IconFail, IconTwitter } from '../../common/icons'
 import { ContentWrapper, ModalNavigation, ModalNavigationLeft } from '../common_styled'
 
 const ModalMainText = styled.p`
@@ -116,6 +116,8 @@ export const ModalTransaction = (props: Props) => {
         </ModalNavigation>
         {txState === TransactionStep.transactionConfirmed ? (
           <IconDone />
+        ) : txState === TransactionStep.error ? (
+          <IconFail />
         ) : (
           <Spinner big={true} style={{ marginTop: '10px' }} />
         )}
