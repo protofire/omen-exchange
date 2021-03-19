@@ -34,7 +34,6 @@ import {
   AdditionalSharesType,
   MarketDetailsTab,
   MarketMakerData,
-  Status,
   Ternary,
   Token,
   TransactionStep,
@@ -43,9 +42,7 @@ import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { FullLoading } from '../../../loading'
 import { ModalTransactionWrapper } from '../../../modal'
-import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
@@ -134,10 +131,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
   const [amountToRemove, setAmountToRemove] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToRemoveDisplay, setAmountToRemoveDisplay] = useState<string>('')
-  const [status, setStatus] = useState<Status>(Status.Ready)
-  const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
   const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
   const [additionalShares, setAdditionalShares] = useState<number>(0)
@@ -223,8 +217,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   }
 
   const addFunding = async () => {
-    setModalTitle('Deposit Funds')
-
     try {
       if (!cpk) {
         return
@@ -240,7 +232,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
 
-      setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
@@ -259,27 +250,21 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       await fetchCollateralBalance()
       await fetchBalances()
 
-      setStatus(Status.Ready)
       setAmountToFund(null)
       setAmountToFundDisplay('')
       setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
     } catch (err) {
-      setStatus(Status.Error)
       setTxState(TransactionStep.error)
       setMessage(`Error trying to deposit funds.`)
       logger.error(`${message} - ${err.message}`)
     }
-    setIsModalTransactionResultOpen(true)
   }
 
   const removeFunding = async () => {
-    setModalTitle('Withdraw Funds')
     try {
       if (!cpk) {
         return
       }
-
-      setStatus(Status.Loading)
 
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
 
@@ -309,18 +294,14 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       await fetchCollateralBalance()
       await fetchBalances()
 
-      setStatus(Status.Ready)
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
       setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
-      setIsModalTransactionResultOpen(true)
     } catch (err) {
-      setStatus(Status.Error)
       setTxState(TransactionStep.error)
       setMessage(`Error trying to withdraw funds.`)
       logger.error(`${message} - ${err.message}`)
     }
-    setIsModalTransactionResultOpen(true)
   }
 
   const unlockCollateral = async () => {
@@ -624,14 +605,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           </Button>
         )}
       </BottomButtonWrapper>
-      {/* <ModalTransactionResult
-        isOpen={isModalTransactionResultOpen}
-        onClose={() => setIsModalTransactionResultOpen(false)}
-        status={status}
-        text={message}
-        title={modalTitle}
-      />
-      {status === Status.Loading && <FullLoading message={message} />} */}
       <ModalTransactionWrapper
         confirmations={0}
         confirmationsRequired={0}

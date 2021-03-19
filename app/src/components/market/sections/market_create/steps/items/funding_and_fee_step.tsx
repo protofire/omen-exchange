@@ -30,7 +30,6 @@ import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
 import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
 import { TitleValue } from '../../../../../common/text/title_value'
-import { FullLoading } from '../../../../../loading'
 import { AddCompoundService } from '../../../../common/add_compound_service'
 import {
   ButtonContainerFullWidth,

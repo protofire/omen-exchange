@@ -50,9 +50,8 @@ interface CPKBuyOutcomesParams {
   outcomeIndex: number
   useBaseToken?: boolean
   marketMaker: MarketMakerService
-  // TODO: Possibly remove optionality of params
-  setTxHash?: (arg0: string) => void
-  setTxState?: (step: TransactionStep) => void
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKSellOutcomesParams {
@@ -62,9 +61,8 @@ interface CPKSellOutcomesParams {
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
   useBaseToken?: boolean
-  // TODO: Possibly remove optionality of params
-  setTxHash?: (arg0: string) => void
-  setTxState?: (step: TransactionStep) => void
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKCreateMarketParams {
@@ -75,9 +73,8 @@ interface CPKCreateMarketParams {
   realitio: RealitioService
   marketMakerFactory: MarketMakerFactoryService
   useCompoundReserve?: boolean
-  // TODO: Possibly remove optionality of params
-  setTxHash?: (arg0: string) => void
-  setTxState?: (step: TransactionStep) => void
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKAddFundingParams {
@@ -86,9 +83,8 @@ interface CPKAddFundingParams {
   compoundService?: CompoundService | null
   marketMaker: MarketMakerService
   useBaseToken?: boolean
-  // TODO: Possibly remove optionality of params
-  setTxHash?: (arg0: string) => void
-  setTxState?: (step: TransactionStep) => void
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKRemoveFundingParams {
@@ -100,9 +96,8 @@ interface CPKRemoveFundingParams {
   earnings: BigNumber
   marketMaker: MarketMakerService
   outcomesCount: number
-  // TODO: Possibly remove optionality of params
-  setTxHash?: (arg0: string) => void
-  setTxState?: (step: TransactionStep) => void
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
   sharesToBurn: BigNumber
   useBaseToken?: boolean
 }
@@ -116,9 +111,8 @@ interface CPKRedeemParams {
   oracle: OracleService
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
-  // TODO: Possibly remove optionality of params
-  setTxHash?: (arg0: string) => void
-  setTxState?: (step: TransactionStep) => void
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 interface TransactionResult {

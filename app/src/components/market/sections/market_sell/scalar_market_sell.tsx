@@ -29,9 +29,7 @@ import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { FullLoading } from '../../../loading'
 import { ModalTransactionWrapper } from '../../../modal'
-import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
@@ -83,7 +81,6 @@ export const ScalarMarketSell = (props: Props) => {
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[positionIndex])
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState<string>('')
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [amountShares, setAmountShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
@@ -214,7 +211,6 @@ export const ScalarMarketSell = (props: Props) => {
       setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' Shares.`)
       logger.error(`${message} - ${err.message}`)
     }
-    setIsModalTransactionResultOpen(true)
   }
 
   const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
@@ -343,14 +339,6 @@ export const ScalarMarketSell = (props: Props) => {
           Sell Position
         </Button>
       </StyledButtonContainer>
-      {/* <ModalTransactionResult
-        isOpen={isModalTransactionResultOpen}
-        onClose={() => setIsModalTransactionResultOpen(false)}
-        status={status}
-        text={message}
-        title={status === Status.Error ? 'Transaction Error' : 'Sell Shares'}
-      />
-      {status === Status.Loading && <FullLoading message={message} />} */}
       <ModalTransactionWrapper
         confirmations={0}
         confirmationsRequired={0}

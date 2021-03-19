@@ -35,7 +35,6 @@ import {
   MarketDetailsTab,
   MarketMakerData,
   OutcomeTableValue,
-  Status,
   Ternary,
   Token,
   TransactionStep,
@@ -119,14 +118,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [amountToRemove, setAmountToRemove] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToRemoveDisplay, setAmountToRemoveDisplay] = useState<string>('')
   const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
-  const [status, setStatus] = useState<Status>(Status.Ready)
-  const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [displayCollateral, setDisplayCollateral] = useState<Token>(getInitialCollateral(context.networkId, collateral))
   const { allowance, unlock } = useCpkAllowance(signer, displayCollateral.address)
   let symbol = useSymbol(collateral)
   const collateralSymbol = collateral.symbol.toLowerCase()
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const [amountToFundNormalized, setAmountToFundNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToRemoveNormalized, setAmountToRemoveNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
@@ -243,8 +239,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
 
   const addFunding = async () => {
-    setModalTitle('Deposit Funds')
-
     try {
       if (!cpk) {
         return
@@ -268,7 +262,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       if (collateralSymbol in CompoundTokenType && displayCollateral.symbol === baseCollateral.symbol) {
         fundsAmount = formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)
       }
-      setStatus(Status.Loading)
       setMessage(`Depositing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
 
       setTxState(TransactionStep.waitingConfirmation)
@@ -292,11 +285,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setAmountToFund(null)
       setAmountToFundDisplay('')
       setAmountToFundNormalized(null)
-      setStatus(Status.Ready)
       setMessage(`Successfully deposited ${fundsAmount} ${displayCollateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
-      setStatus(Status.Error)
       setTxState(TransactionStep.error)
       setMessage(`Error trying to deposit funds.`)
       logger.error(`${message} - ${err.message}`)
@@ -305,12 +296,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const removeFunding = async () => {
-    setModalTitle('Withdraw Funds')
     try {
       if (!cpk) {
         return
       }
-      setStatus(Status.Loading)
 
       let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
       if (
@@ -361,19 +350,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
       setAmountToRemoveNormalized(null)
-      setStatus(Status.Ready)
       setMessage(`Successfully withdrew ${fundsAmount} ${displayCollateral.symbol}`)
-      setIsModalTransactionResultOpen(true)
       setIsTransactionProcessing(false)
     } catch (err) {
-      console.log('error: ', err)
-      setStatus(Status.Error)
       setTxState(TransactionStep.error)
       setMessage(`Error trying to withdraw funds.`)
       logger.error(`${message} - ${err.message}`)
       setIsTransactionProcessing(false)
     }
-    setIsModalTransactionResultOpen(true)
   }
 
   const unlockCollateral = async () => {
