@@ -3,13 +3,17 @@ import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
+import { RELAY_FEE } from '../common/constants'
 import { ERC20Service } from '../services'
+import { getLogger } from '../util/logger'
 import { getNativeAsset, getOmenTCRListId, getTokensByNetwork, pseudoNativeAssetAddress } from '../util/networks'
 import { getImageUrl } from '../util/token'
 import { isObjectEqual } from '../util/tools'
 import { Token } from '../util/types'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
+
+const logger = getLogger('useTokens')
 
 const query = gql`
   query GetTokenList($listId: String!) {
@@ -79,24 +83,32 @@ export const useTokens = (context: ConnectedWeb3Context, addNativeAsset?: boolea
         }
 
         if (addBalances) {
+          const { account, library: provider } = context
+
           // fetch token balances
           tokenData = await Promise.all(
             tokenData.map(async token => {
-              const { account, library: provider } = context
               let balance = new BigNumber(0)
               if (account) {
                 if (token.address === pseudoNativeAssetAddress) {
                   balance = await provider.getBalance(account)
+                  // @ts-expect-error ignore
+                  if (provider.relay) {
+                    balance = balance.lt(RELAY_FEE) ? balance : balance.sub(RELAY_FEE)
+                  }
                 } else {
-                  const collateralService = new ERC20Service(provider, account, token.address)
-                  balance = await collateralService.getCollateral(account)
+                  try {
+                    const collateralService = new ERC20Service(provider, account, token.address)
+                    balance = await collateralService.getCollateral(account)
+                  } catch (e) {
+                    return { ...token, balance: balance.toString() }
+                  }
                 }
               }
               return { ...token, balance: balance.toString() }
             }),
           )
         }
-
         if (!isObjectEqual(tokens, tokenData)) {
           setTokens(tokenData)
         }
@@ -108,7 +120,11 @@ export const useTokens = (context: ConnectedWeb3Context, addNativeAsset?: boolea
 
   useEffect(() => {
     const reload = async () => {
-      await refetch()
+      try {
+        await refetch()
+      } catch (e) {
+        logger.log(e.message)
+      }
     }
     reload()
     // eslint-disable-next-line

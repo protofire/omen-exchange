@@ -2,9 +2,10 @@ import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import { State, useXdaiBridge } from '../../../hooks/useXdaiBridge'
+import { useXdaiBridge } from '../../../hooks/useXdaiBridge'
 import theme from '../../../theme'
 import { formatBigNumber } from '../../../util/tools'
+import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonRound } from '../../button/button_round'
 import { ButtonType } from '../../button/button_styling_types'
@@ -52,7 +53,7 @@ export const ClaimDaiModal = (props: any) => {
   const { claimLatestToken, transactionHash, transactionStep } = useXdaiBridge()
 
   useEffect(() => {
-    if (transactionStep === State.error) props.setClaim(false)
+    if (transactionStep === TransactionStep.error) props.setClaim(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [transactionStep])
 
@@ -67,39 +68,42 @@ export const ClaimDaiModal = (props: any) => {
           <IconClose color={theme.colors.tertiary} size={'24'} />
         </CloseStyled>
 
-        {transactionStep === State.idle && <DaiIcon size={'64'} />}
-        {transactionStep === State.waitingConfirmation && <Spinner big />}
-        {transactionStep === State.transactionSubmitted && (
+        {transactionStep === TransactionStep.idle && <DaiIcon size={'64'} />}
+        {transactionStep === TransactionStep.waitingConfirmation && <Spinner big />}
+        {transactionStep === TransactionStep.transactionSubmitted && (
           <Reversed>
             <IconArrowUp size={'64'} />
           </Reversed>
         )}
-        {transactionStep === State.transactionConfirmed && (
+        {transactionStep === TransactionStep.transactionConfirmed && (
           <Reversed>
             <IconArrowUp color={theme.colors.green} size={'64'} />
           </Reversed>
         )}
 
         <ClaimAmount>Claim {formatBigNumber(props.unclaimedAmount, STANDARD_DECIMALS, 2)} DAI</ClaimAmount>
-        {transactionStep === State.idle && (
+        {transactionStep === TransactionStep.idle && (
           <SecondaryText>
             Transfers from xDai Network <br /> need to be claimed
           </SecondaryText>
         )}
-        {transactionStep === State.waitingConfirmation ? (
+        {transactionStep === TransactionStep.waitingConfirmation ? (
           <SecondaryText>Waiting Confirmation</SecondaryText>
-        ) : transactionStep === State.transactionSubmitted || transactionStep === State.transactionConfirmed ? (
+        ) : transactionStep === TransactionStep.transactionSubmitted ||
+          transactionStep === TransactionStep.transactionConfirmed ? (
           <TransactionLink
             href={`https://etherscan.io/tx/${transactionHash}`}
             rel="noopener noreferrer"
             target="_blank"
           >
-            {transactionStep === State.transactionSubmitted ? 'Transaction submitted' : 'Transaction Confirmed'}
+            {transactionStep === TransactionStep.transactionSubmitted
+              ? 'Transaction submitted'
+              : 'Transaction Confirmed'}
           </TransactionLink>
         ) : (
           ''
         )}
-        {transactionStep === State.idle ? (
+        {transactionStep === TransactionStep.idle ? (
           <ClaimButton
             buttonType={ButtonType.primary}
             onClick={() => {

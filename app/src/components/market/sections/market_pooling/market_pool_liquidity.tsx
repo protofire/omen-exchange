@@ -8,6 +8,7 @@ import { DOCUMENT_FAQ, STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useCollateralBalance,
   useCompoundService,
+  useConnectedBalanceContext,
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
@@ -93,6 +94,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { account, library: provider, networkId } = context
   const cpk = useConnectedCPKContext()
+  const { fetchBalances } = useConnectedBalanceContext()
 
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
@@ -278,6 +280,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
       await fetchCollateralBalance()
+      await fetchBalances()
 
       setAmountToFund(null)
       setAmountToFundDisplay('')
@@ -342,6 +345,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
       await fetchCollateralBalance()
+      await fetchBalances()
 
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')

@@ -6,7 +6,12 @@ import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../../common/constants'
-import { useConnectedCPKContext, useContracts, useGraphMarketUserTxData } from '../../../../../hooks'
+import {
+  useConnectedBalanceContext,
+  useConnectedCPKContext,
+  useContracts,
+  useGraphMarketUserTxData,
+} from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../../services'
 import { CompoundService } from '../../../../../services/compound_service'
@@ -122,6 +127,7 @@ const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: 
 const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
+  const { fetchBalances } = useConnectedBalanceContext()
 
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
@@ -184,16 +190,23 @@ const Wrapper = (props: Props) => {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const resolveCondition = async () => {
+    if (!cpk) {
+      return
+    }
     setModalTitle('Resolve Condition')
-
     try {
       setStatus(Status.Loading)
       setMessage('Resolving condition...')
-      if (isScalar && scalarLow && scalarHigh) {
-        await realitio.resolveCondition(question.id, question.raw, scalarLow, scalarHigh)
-      } else {
-        await oracle.resolveCondition(question, balances.length)
-      }
+
+      await cpk.resolveCondition({
+        oracle,
+        realitio,
+        isScalar,
+        scalarLow,
+        scalarHigh,
+        question,
+        numOutcomes: balances.length,
+      })
 
       await fetchGraphMarketMakerData()
 
@@ -250,6 +263,7 @@ const Wrapper = (props: Props) => {
         marketMaker,
         conditionalTokens,
       })
+      await fetchBalances()
 
       setStatus(Status.Ready)
       setMessage(`Payout successfully redeemed.`)
@@ -339,7 +353,10 @@ const Wrapper = (props: Props) => {
       }).length
 
   const userWinnerShares = payouts
-    ? balances.reduce((acc, balance, index) => (payouts[index].gt(0) ? acc.add(balance.shares) : acc), new BigNumber(0))
+    ? balances.reduce(
+        (acc, balance, index) => (payouts[index].gt(0) && balance.shares ? acc.add(balance.shares) : acc),
+        new BigNumber(0),
+      )
     : new BigNumber(0)
   const EPS = 0.01
 
