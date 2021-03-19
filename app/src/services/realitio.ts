@@ -227,6 +227,11 @@ class RealitioService {
     }
   }
 
+  static encodeSubmitAnswer = (questionId: string, answer: string): string => {
+    const submitAnswerInterface = new utils.Interface(realitioAbi)
+    return submitAnswerInterface.functions.submitAnswer.encode([questionId, answer, 0])
+  }
+
   static encodeAskQuestion = (
     question: string,
     outcomes: Outcome[],
@@ -310,7 +315,7 @@ class RealitioService {
     }
   }
 
-  encodeResolveCondition = async (
+  static encodeResolveCondition = (
     questionId: string,
     question: string,
     scalarLow: BigNumber,

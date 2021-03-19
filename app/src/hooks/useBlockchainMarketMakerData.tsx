@@ -206,7 +206,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       setStatus(Status.Loading)
       await doFetchData()
     } catch (e) {
-      logger.error(e.message)
+      logger.error(e)
       setStatus(Status.Error)
     }
   }, [doFetchData])

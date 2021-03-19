@@ -1,5 +1,6 @@
 export * from './connectedCpk'
 export * from './connectedWeb3'
+export * from './connectedBalance'
 export { use24hsVolume } from './use24hsVolume'
 export { useAsyncDerivedValue } from './useAsyncDerivedValue'
 export { useBlockchainMarketMakerData } from './useBlockchainMarketMakerData'
