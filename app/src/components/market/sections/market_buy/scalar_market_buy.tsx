@@ -273,7 +273,12 @@ export const ScalarMarketBuy = (props: Props) => {
 
       setAmount(new BigNumber(0))
       setStatus(Status.Ready)
-      setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+
+      {
+        Number(sharesAmount) < 0.01
+          ? setMessage(`Successfully bought <${0.01} '${balances[outcomeIndex].outcomeName}' shares.`)
+          : setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      }
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)

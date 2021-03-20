@@ -220,8 +220,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         displaySharesAmount = formatBigNumber(displaySharesAmountValue || Zero, baseCollateral.decimals)
       }
       setStatus(Status.Loading)
-      setMessage(`Selling ${displaySharesAmount} shares...`)
-
+      {
+        Number(displaySharesAmount) < 0.01
+          ? setMessage(`Selling <${0.01} shares...`)
+          : setMessage(`Selling ${displaySharesAmount} shares...`)
+      }
       let useBaseToken = false
       if (collateral.address !== displayCollateral.address) {
         useBaseToken = true
@@ -241,7 +244,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setDisplaySellShares(null)
       setAmountShares(null)
       setStatus(Status.Ready)
-      setMessage(`Successfully sold ${displaySharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      {
+        Number(displaySharesAmount) < 0.01
+          ? setMessage(`Successfully sold <${0.01} '${balances[outcomeIndex].outcomeName}' shares.`)
+          : setMessage(`Successfully sold ${displaySharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      }
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)

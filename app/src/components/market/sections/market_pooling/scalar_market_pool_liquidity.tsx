@@ -229,7 +229,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
-      setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
+      {
+        Number(fundsAmount) < 0.01
+          ? setMessage(`Depositing funds: <${0.01} ${collateral.symbol}...`)
+          : setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
+      }
 
       await cpk.addFunding({
         amount: amountToFund || Zero,
@@ -246,7 +250,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setStatus(Status.Ready)
       setAmountToFund(null)
       setAmountToFundDisplay('')
-      setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
+      {
+        Number(fundsAmount) < 0.01
+          ? setMessage(`Successfully deposited <${0.01} ${collateral.symbol}`)
+          : setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
+      }
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to deposit funds.`)
@@ -265,8 +273,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setStatus(Status.Loading)
 
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
-
-      setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
+      {
+        Number(fundsAmount) < 0.01
+          ? setMessage(`Withdrawing funds: <${0.01} ${collateral.symbol}...`)
+          : setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
+      }
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
@@ -291,7 +302,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setStatus(Status.Ready)
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
-      setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
+      {
+        Number(fundsAmount) < 0.01
+          ? setMessage(`Successfully withdrew <${0.01} ${collateral.symbol}`)
+          : setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
+      }
+
       setIsModalTransactionResultOpen(true)
     } catch (err) {
       setStatus(Status.Error)

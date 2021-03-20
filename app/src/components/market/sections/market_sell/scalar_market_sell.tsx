@@ -183,7 +183,10 @@ export const ScalarMarketSell = (props: Props) => {
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
-      setMessage(`Selling ${sharesAmount} shares ...`)
+
+      Number(sharesAmount) < 0.01
+        ? setMessage(`Selling <${0.01} shares ...`)
+        : setMessage(`Selling ${sharesAmount} shares ...`)
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,
@@ -199,7 +202,12 @@ export const ScalarMarketSell = (props: Props) => {
       setAmountShares(null)
       setAmountSharesToDisplay('')
       setStatus(Status.Ready)
-      setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+
+      {
+        Number(sharesAmount) < 0.01
+          ? setMessage(`Successfully sold <${0.01} '${balances[outcomeIndex].outcomeName}' shares.`)
+          : setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      }
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' Shares.`)

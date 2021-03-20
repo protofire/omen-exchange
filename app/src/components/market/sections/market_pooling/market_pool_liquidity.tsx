@@ -266,8 +266,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         fundsAmount = formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)
       }
       setStatus(Status.Loading)
-      setMessage(`Depositing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
 
+      {
+        Number(fundsAmount) < 0.01
+          ? setMessage(`Depositing funds: <${0.01} ${displayCollateral.symbol}...`)
+          : setMessage(`Depositing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
+      }
       setIsTransactionProcessing(true)
       await cpk.addFunding({
         amount: amountToFundNormalized || Zero,
@@ -286,7 +290,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setAmountToFundDisplay('')
       setAmountToFundNormalized(null)
       setStatus(Status.Ready)
-      setMessage(`Successfully deposited ${fundsAmount} ${displayCollateral.symbol}`)
+      {
+        Number(fundsAmount) < 0.01
+          ? setMessage(`Successfully deposited <${0.01} ${displayCollateral.symbol}`)
+          : setMessage(`Successfully deposited ${fundsAmount} ${displayCollateral.symbol}`)
+      }
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
@@ -317,8 +325,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         )
         fundsAmount = formatBigNumber(displayDepositedTokensTotal || Zero, displayCollateral.decimals)
       }
-      setMessage(`Withdrawing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
-
+      {
+        Number(fundsAmount) < 0.01
+          ? setMessage(`Withdrawing funds: <${0.01} ${displayCollateral.symbol}...`)
+          : setMessage(`Withdrawing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
+      }
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
       let useBaseToken = false
@@ -351,7 +362,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setAmountToRemoveDisplay('')
       setAmountToRemoveNormalized(null)
       setStatus(Status.Ready)
-      setMessage(`Successfully withdrew ${fundsAmount} ${displayCollateral.symbol}`)
+      {
+        Number(fundsAmount) < 0.01
+          ? setMessage(`Successfully withdrew <${0.01} ${displayCollateral.symbol}`)
+          : setMessage(`Successfully withdrew ${fundsAmount} ${displayCollateral.symbol}`)
+      }
       setIsModalTransactionResultOpen(true)
       setIsTransactionProcessing(false)
     } catch (err) {
