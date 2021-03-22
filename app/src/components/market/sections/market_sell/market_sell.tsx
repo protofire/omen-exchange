@@ -26,7 +26,7 @@ import {
   getInitialCollateral,
   getSharesInBaseToken,
   mulBN,
-  roundNumberStringToSignificantDigits,  
+  roundNumberStringToSignificantDigits,
 } from '../../../../util/tools'
 import {
   BalanceItem,
