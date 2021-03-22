@@ -1,5 +1,5 @@
 import Big from 'big.js'
-import { MaxUint256 } from 'ethers/constants'
+import { MaxUint256, Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
@@ -29,7 +29,7 @@ import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { FullLoading } from '../../../../loading'
 import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
-import { ButtonContainerFullWidth } from '../../../common/common_styled'
+import { MarginsButton } from '../../../common/common_styled'
 import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { MarketScale } from '../../../common/market_scale'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
@@ -66,10 +66,7 @@ const StyledButtonContainer = styled(ButtonContainer)`
 `
 
 const BorderedButtonContainer = styled(ButtonContainer)`
-  margin-right: -24px;
-  margin-left: -24px;
-  padding-right: 24px;
-  padding-left: 24px;
+  ${MarginsButton};
   border-top: 1px solid ${props => props.theme.colors.verticalDivider};
 `
 
@@ -343,10 +340,18 @@ const Wrapper = (props: Props) => {
   const hasWinningOutcomes = earnedCollateral && !isDust(earnedCollateral, collateralToken.decimals)
   const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
   const userWinnersOutcomes = payouts
-    ? payouts.filter(
+    ? // If payouts, the market is categorical so check how many outcomes are winners
+      payouts.filter(
         (payout, index) => balances[index] && balances[index].shares && balances[index].shares.gt(0) && payout.gt(0),
       ).length
-    : 0
+    : // Else see if the final answer is at the upper or lower bound and if the user has a corresponding share
+    balances.filter((balance, index) => index === finalAnswerPercentage)
+    ? 1
+    : // Else check how many outcomes the user has shares for as they will all win some amount
+      balances.filter(balance => {
+        balance.shares.gt(Zero)
+      }).length
+
   const userWinnerShares = payouts
     ? balances.reduce(
         (acc, balance, index) => (payouts[index].gt(0) && balance.shares ? acc.add(balance.shares) : acc),
@@ -439,7 +444,7 @@ const Wrapper = (props: Props) => {
               ) : (
                 <>
                   {!isConditionResolved && (
-                    <ButtonContainerFullWidth>
+                    <BorderedButtonContainer>
                       <Button
                         buttonType={ButtonType.primary}
                         disabled={status === Status.Loading}
@@ -447,7 +452,7 @@ const Wrapper = (props: Props) => {
                       >
                         Resolve Condition
                       </Button>
-                    </ButtonContainerFullWidth>
+                    </BorderedButtonContainer>
                   )}
                   {isConditionResolved && hasWinningOutcomes && (
                     <BorderedButtonContainer>

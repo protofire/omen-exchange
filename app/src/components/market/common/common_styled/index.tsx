@@ -1,7 +1,6 @@
 import styled, { css } from 'styled-components'
 
 import { getOutcomeColor } from '../../../../theme/utils'
-import { ButtonContainer } from '../../../button'
 import { TD, TH } from '../../../common'
 
 interface StatefulRadioButton {
@@ -9,7 +8,7 @@ interface StatefulRadioButton {
   disabled?: boolean
 }
 
-export const ButtonContainerFullWidth = styled(ButtonContainer)`
+export const MarginsButton = css`
   margin-left: -${props => props.theme.cards.paddingHorizontal};
   margin-right: -${props => props.theme.cards.paddingHorizontal};
   padding-left: ${props => props.theme.cards.paddingHorizontal};
