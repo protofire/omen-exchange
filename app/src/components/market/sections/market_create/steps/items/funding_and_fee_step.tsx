@@ -25,7 +25,7 @@ import { getNativeAsset, networkIds, pseudoNativeAssetAddress } from '../../../.
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, CompoundEnabledTokenType, Ternary, Token } from '../../../../../../util/types'
-import { Button } from '../../../../../button'
+import { Button, ButtonContainer } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
 import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
@@ -33,9 +33,9 @@ import { TitleValue } from '../../../../../common/text/title_value'
 import { FullLoading } from '../../../../../loading'
 import { AddCompoundService } from '../../../../common/add_compound_service'
 import {
-  ButtonContainerFullWidth,
   CurrenciesWrapper,
   GenericError,
+  MarginsButton,
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,
   OutcomeItemTextWrapper,
@@ -158,10 +158,9 @@ const FlexRowWrapper = styled.div`
   }
 `
 
-const StyledButtonContainerFullWidth = styled(ButtonContainerFullWidth as any)`
-  padding: 24px;
-  padding-bottom: 0;
-  margin: 0 -24px;
+const StyledButtonContainerFullWidth = styled(ButtonContainer)`
+  ${MarginsButton};
+  padding-top: 24px;
   margin-bottom: -1px;
 `
 
