@@ -628,9 +628,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           </Button>
         </StyledButtonContainerFullWidth>
       </CreateCardBottom>
-      {/* {!MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus) ? (
-        <FullLoading message={`${marketCreationStatus._type}...`} />
-      ) : null} */}
     </>
   )
 }
