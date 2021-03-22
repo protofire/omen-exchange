@@ -532,7 +532,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         : 0.01,
     },
   ]
-  console.log(bondNativeAssetAmount)
+
   const bondedValueBoxData = [
     {
       title: `${currentPredictionNumber.toFixed(2)} ${unit}`,

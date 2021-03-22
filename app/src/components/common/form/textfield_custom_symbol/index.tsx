@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { CSSProperties } from 'react'
 import styled from 'styled-components'
 
 import { CommonDisabledCSS } from '../common_styled'
@@ -9,6 +9,7 @@ interface Props {
   symbol: any
   shouldDisplayMaxButton?: boolean
   onClickMaxButton?: () => void
+  style?: CSSProperties | undefined
 }
 
 const FieldWrapper = styled.div`
@@ -127,7 +128,7 @@ export const TextfieldCustomSymbol = (props: Props) => {
   // eslint-disable-next-line no-warning-comments
   //TODO: use a input[text] instead of passing a <Textfield />
   return (
-    <FieldWrapper className={disabled ? 'disabled' : ''} {...restProps}>
+    <FieldWrapper className={disabled ? 'disabled' : ''} style={props.style} {...restProps}>
       {React.cloneElement(formField, { disabled: disabled })}
       <Symbol marginRight={shouldDisplayMaxButton}>{symbol}</Symbol>
       {shouldDisplayMaxButton && (

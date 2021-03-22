@@ -7,7 +7,7 @@ import { useCompoundService, useConnectedCPKContext, useGraphMarketUserTxData } 
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { getNativeAsset, getToken, networkIds } from '../../../../../util/networks'
-import { getSharesInBaseToken, getUnit, isDust, numberToByte32 } from '../../../../../util/tools'
+import { getSharesInBaseToken, getUnit, isDust } from '../../../../../util/tools'
 import {
   BalanceItem,
   CompoundTokenType,
@@ -38,32 +38,6 @@ export const TopCard = styled(ViewCard)`
 `
 
 export const BottomCard = styled(ViewCard)``
-
-// const MessageWrapper = styled.div`
-//   border-radius: 4px;
-//   border: ${({ theme }) => theme.borders.borderLineDisabled};
-//   margin-top: 20px;
-//   margin-bottom: 20px;
-//   padding: 20px 25px;
-// `
-//
-// const Title = styled.h2`
-//   color: ${props => props.theme.colors.textColorDarker};
-//   font-size: 14px;
-//   font-weight: 500;
-//   letter-spacing: 0.2px;
-//   line-height: 1.2;
-//   margin: 0 0 8px;
-// `
-//
-// const Text = styled.p`
-//   color: ${props => props.theme.colors.textColor};
-//   font-size: 14px;
-//   font-weight: normal;
-//   letter-spacing: 0.2px;
-//   line-height: 1.5;
-//   margin: 0;
-// `
 
 export const StyledButtonContainer = styled(ButtonContainer)`
   margin: 0 -24px;

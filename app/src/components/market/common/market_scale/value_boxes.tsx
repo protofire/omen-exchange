@@ -6,7 +6,7 @@ import { VALUE_BOXES_MARGIN } from '../common_styled'
 
 import { ValueBox } from './value_box'
 
-const ValueBoxWrapper = styled.div`
+const ValueBoxWrapper = styled.div<{ hasThreeBoxes?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -14,7 +14,7 @@ const ValueBoxWrapper = styled.div`
   width: 100%;
 
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
-    flex-direction: column;
+    flex-direction: ${props => (props.hasThreeBoxes ? 'row' : 'column')};
     justify-content: center;
   }
 `
@@ -57,7 +57,7 @@ export const ValueBoxes: React.FC<Props> = (props: Props) => {
   })
 
   return (
-    <ValueBoxWrapper>
+    <ValueBoxWrapper hasThreeBoxes={valueBoxData.length === 3 ? true : false}>
       {mappedValueBoxes.length === 4 ? (
         <>
           <ValueBoxPair>

@@ -1,7 +1,5 @@
-import { toHex } from 'authereum/dist/utils'
-import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
-import { BigNumber, bigNumberify, formatBytes32String, parseUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -9,7 +7,7 @@ import styled from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
-import { getNativeAsset, networkIds } from '../../../../util/networks'
+import { getNativeAsset } from '../../../../util/networks'
 import { calcPrediction, formatBigNumber, formatNumber, getUnit, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
@@ -22,6 +20,7 @@ import {
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
+import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { FullLoading } from '../../../loading'
 import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
 import { AssetBalance } from '../../common/asset_balance'
@@ -70,8 +69,15 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const probabilities = balances.map(balance => balance.probability)
+  const [bondOutcomeSelected, setBondOutcomeSelected] = useState<BigNumber>(Zero)
+  const [bondOutcomeDisplay, setBondOutcomeDisplay] = useState<string>('')
 
   const [nativeAssetBalance, setNativeAssetBalance] = useState<BigNumber>(Zero)
+  const currentPredictionNumber = calcPrediction(
+    props.marketMakerData.outcomeTokenMarginalPrices[1] || '',
+    props.marketMakerData.scalarLow || Zero,
+    props.marketMakerData.scalarHigh || Zero,
+  )
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -87,11 +93,6 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
     }
   }, [account, provider])
 
-  const currentPredictionNumber = calcPrediction(
-    props.marketMakerData.outcomeTokenMarginalPrices[1] || '',
-    props.marketMakerData.scalarLow || Zero,
-    props.marketMakerData.scalarHigh || Zero,
-  )
   const bondOutcome = async (isInvalid?: boolean) => {
     if (!cpk) {
       return
@@ -103,16 +104,11 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
-      console.log(currentPredictionNumber)
+
       const answer =
         outcomeIndex >= balances.length || isInvalid
           ? INVALID_ANSWER_ID
-          : numberToByte32(props.isScalar ? currentPredictionNumber : outcomeIndex, props.isScalar)
-      console.log(answer)
-      console.log(currentPredictionNumber)
-      const number = 20 * 1000000000000000000
-
-      console.log(number.toString(16))
+          : numberToByte32(props.isScalar ? bondOutcomeSelected.toHexString() : outcomeIndex, props.isScalar)
 
       setMessage(
         `Bonding ${formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals)} ${symbol} on: ${
@@ -220,6 +216,26 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
               }
               symbol={symbol}
             />
+            {props.isScalar && (
+              <TextfieldCustomPlaceholder
+                formField={
+                  <BigNumberInput
+                    decimals={TokenEthereum.decimals}
+                    name="bondAmount"
+                    onChange={(e: BigNumberInputReturn) => {
+                      setBondOutcomeSelected(e.value.gt(Zero) ? e.value : Zero)
+
+                      setBondOutcomeDisplay('')
+                    }}
+                    style={{ width: 0 }}
+                    value={bondOutcomeSelected}
+                    valueToDisplay={bondOutcomeDisplay}
+                  />
+                }
+                style={{ marginTop: 20 }}
+                symbol={getUnit(props.marketMakerData.question.title)}
+              />
+            )}
           </>
         </div>
         <div>

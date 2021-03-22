@@ -68,7 +68,7 @@ TRExtended.defaultProps = {
 }
 
 const TDRadio = styled(TD as any)`
-  ${PaddingCSS}
+  ${PaddingCSS};
   width: 20px;
 `
 

@@ -625,11 +625,10 @@ export const clampBigNumber = (x: BigNumber, min: BigNumber, max: BigNumber): Bi
   return x
 }
 
-export const numberToByte32 = (num: number, isScalar: boolean): string => {
-  let hex
-  if (isScalar) {
-    hex = `0x${(num * 1000000000000000000).toString(16)}`
-  } else hex = new BigNumber(num).toHexString()
+export const numberToByte32 = (num: string | number, isScalar: boolean): string => {
+  let hex: any
+  if (isScalar) hex = num
+  else hex = new BigNumber(num).toHexString()
 
   const frontZeros = '0'.repeat(66 - hex.length)
 
