@@ -295,8 +295,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     longBalances.length &&
     longBalances.map(longBalance => longBalance.shares).reduce((a, b) => a.add(b))
 
-  const shortSharesNumber = collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals))
-  const longSharesNumber = collateral && Number(formatBigNumber(longShares || new BigNumber(0), collateral.decimals))
+  const shortSharesNumber =
+    collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals, STANDARD_DECIMALS))
+  const longSharesNumber =
+    collateral && Number(formatBigNumber(longShares || new BigNumber(0), collateral.decimals, STANDARD_DECIMALS))
 
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
@@ -441,14 +443,15 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       setProfitLoss(calcProfit(amountSharesNumber || 0, 100 - scaleValue, tradeAmountNumber || 0))
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
-        const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
+        const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, STANDARD_DECIMALS))
         setShortPayout(calcPayout(shortSharesNumber || 0, 100 - scaleValue))
         setShortProfitAmount(calcProfit(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
         setShortProfitPercentage(calcProfitPercentage(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
-        const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
+        const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, STANDARD_DECIMALS))
         setLongPayout(calcPayout(longSharesNumber || 0, scaleValue))
+
         setLongProfitAmount(calcProfit(longSharesNumber || 0, scaleValue, totalLongPriceNumber))
         setLongProfitPercentage(calcProfitPercentage(longSharesNumber || 0, scaleValue, totalLongPriceNumber))
       }

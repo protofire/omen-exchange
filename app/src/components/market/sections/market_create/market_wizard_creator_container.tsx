@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react'
 import { useHistory } from 'react-router'
 
-import { useConnectedCPKContext, useContracts } from '../../../../hooks'
+import { useConnectedBalanceContext, useConnectedCPKContext, useContracts } from '../../../../hooks'
 import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../services'
 import { CompoundService } from '../../../../services/compound_service'
@@ -18,6 +18,7 @@ const logger = getLogger('Market::MarketWizardCreatorContainer')
 const MarketWizardCreatorContainer: FC = () => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
+  const { fetchBalances } = useConnectedBalanceContext()
   const { account, library: provider } = context
   const history = useHistory()
 
@@ -73,6 +74,7 @@ const MarketWizardCreatorContainer: FC = () => {
             realitio,
             marketMakerFactory,
           })
+          await fetchBalances()
           setMarketMakerAddress(marketMakerAddress)
 
           setMarketCreationStatus(MarketCreationStatus.done())
@@ -98,6 +100,7 @@ const MarketWizardCreatorContainer: FC = () => {
             marketMakerFactory,
             useCompoundReserve,
           })
+          await fetchBalances()
           setMarketMakerAddress(marketMakerAddress)
           setMarketCreationStatus(MarketCreationStatus.done())
           history.replace(`/${marketMakerAddress}`)

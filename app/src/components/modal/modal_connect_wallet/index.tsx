@@ -10,28 +10,12 @@ import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
 import { IconArrowBack, IconArrowRightLong, IconClose, IconOmen } from '../../common/icons'
+import { ContentWrapper, ModalNavigation } from '../common_styled'
 
 import MetaMaskSVG from './img/metamask.svg'
 import WalletConnectSVG from './img/wallet_connect.svg'
 
 const logger = getLogger('ModalConnectWallet::Index')
-
-const ContentWrapper = styled.div`
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  width: 100%;
-`
-
-const ModalNavigation = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between
-  width: 100%;
-  padding: 5px;
-  margin-bottom: 14px;
-`
 
 const HeaderText = styled.p`
   font-size: 16px;
@@ -265,7 +249,7 @@ export const ModalConnectWallet = (props: Props) => {
         isOpen={!context.account && isOpen}
         onRequestClose={onClickCloseButton}
         shouldCloseOnOverlayClick={!isConnectingToWallet}
-        style={theme.connectWalletModal}
+        style={theme.fixedHeightModal}
       >
         <ContentWrapper>
           <ModalNavigation>
