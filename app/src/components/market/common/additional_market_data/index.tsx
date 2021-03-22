@@ -125,10 +125,10 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   const { address, arbitrator, category, collateral, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
 
   const context = useConnectedWeb3Context()
+  const { account, library: provider, relay } = context
 
-  const realitioBaseUrl = useRealityLink()
+  const realitioBaseUrl = useRealityLink(!!relay)
   const realitioUrl = id ? `${realitioBaseUrl}/#!/question/${id}` : `${realitioBaseUrl}/`
-  const { account, library: provider } = context
   submissionIDs.sort((s1, s2) => {
     if (s1.status === KlerosItemStatus.Registered) return -1
     if (s2.status === KlerosItemStatus.Registered) return 1
