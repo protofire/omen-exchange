@@ -700,7 +700,7 @@ export const calcXValue = (currentPrediction: BigNumber, lowerBound: BigNumber, 
   const lowerBoundNumber = Number(formatBigNumber(lowerBound, STANDARD_DECIMALS))
   const upperBoundNumber = Number(formatBigNumber(upperBound, STANDARD_DECIMALS))
   const xValue = ((currentPredictionNumber - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100
-  return xValue > 100 ? 100 : xValue
+  return xValue > 100 ? 100 : xValue < 0 ? 0 : xValue
 }
 
 export const calcPrediction = (probability: string, lowerBound: BigNumber, upperBound: BigNumber) => {
