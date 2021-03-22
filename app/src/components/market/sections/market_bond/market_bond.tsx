@@ -8,7 +8,7 @@ import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset } from '../../../../util/networks'
-import { calcPrediction, formatBigNumber, formatNumber, getUnit, numberToByte32 } from '../../../../util/tools'
+import { formatBigNumber, formatNumber, getUnit, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
   MarketDetailsTab,
@@ -73,11 +73,6 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const [bondOutcomeDisplay, setBondOutcomeDisplay] = useState<string>('')
 
   const [nativeAssetBalance, setNativeAssetBalance] = useState<BigNumber>(Zero)
-  const currentPredictionNumber = calcPrediction(
-    props.marketMakerData.outcomeTokenMarginalPrices[1] || '',
-    props.marketMakerData.scalarLow || Zero,
-    props.marketMakerData.scalarHigh || Zero,
-  )
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -112,10 +107,13 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
 
       setMessage(
         `Bonding ${formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals)} ${symbol} on: ${
-          props.isScalar
-            ? `${currentPredictionNumber.toFixed(2)} ${getUnit(props.marketMakerData.question.title)}`
-            : outcomeIndex >= marketMakerData.question.outcomes.length
+          outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
+            : // : outcomeIndex >= marketMakerData.question.outcomes.length
+            props.isScalar
+            ? `${formatBigNumber(bondOutcomeSelected, TokenEthereum.decimals)} ${getUnit(
+                props.marketMakerData.question.title,
+              )}`
             : marketMakerData.question.outcomes[outcomeIndex]
         }`,
       )
