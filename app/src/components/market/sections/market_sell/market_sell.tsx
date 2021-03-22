@@ -26,6 +26,7 @@ import {
   getInitialCollateral,
   getSharesInBaseToken,
   mulBN,
+  roundNumberStringToSignificantDigits,  
 } from '../../../../util/tools'
 import {
   BalanceItem,
@@ -144,10 +145,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
         return index !== outcomeIndex
       })
-
+      const roundingFactor = STANDARD_DECIMALS - 4
+      const amountSharesString = roundNumberStringToSignificantDigits(amountShares.toString(), roundingFactor)
+      const amountSharesValue = new BigNumber(amountSharesString)
       const amountToSell = calcSellAmountInCollateral(
         // If the transaction incur in some precision error, we need to multiply the amount by some factor, for example  amountShares.mul(99999).div(100000) , bigger the factor, less dust
-        amountShares,
+        amountSharesValue,
         holdingsOfSoldOutcome,
         holdingsOfOtherOutcomes,
         marketFeeWithTwoDecimals,
