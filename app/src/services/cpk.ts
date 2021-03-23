@@ -3,7 +3,12 @@ import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
-import { RELAY_ADDRESS, RELAY_FEE, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
+import {
+  DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
+  RELAY_ADDRESS,
+  RELAY_FEE,
+  XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
+} from '../common/constants'
 import { Transaction, verifyProxyAddress } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
@@ -1371,7 +1376,6 @@ class CPKService {
     try {
       const xDaiService = new XdaiService(this.provider)
       const data = await xDaiService.fetchXdaiTransactionData()
-
       return data
     } catch (e) {
       logger.error('Error fetching xDai subgraph data', e.message)
@@ -1381,15 +1385,22 @@ class CPKService {
 
   claimDaiTokens = async () => {
     try {
-      const { message } = await this.fetchLatestUnclaimedTransactions()
-      const signatures = signaturesFormatted(message.signatures)
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
       const xDaiService = new XdaiService(this.provider)
-      const contract = xDaiService.generateXdaiBridgeContractInstance()
-      const transaction = await xDaiService.claimDaiTokens(
-        { message: message.content, signatures: signatures },
-        contract,
-      )
-      return transaction
+
+      const transactions = await this.fetchLatestUnclaimedTransactions()
+      const allTransaction = Array.from(transactions, ({ message }) => {
+        const signatures = signaturesFormatted(message.signatures)
+
+        return {
+          to: DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
+          data: xDaiService.encodeClaimDaiTokens(message.content, signatures),
+        }
+      })
+
+      const txObject = await this.cpk.execTransactions(allTransaction, txOptions)
+      return txObject
     } catch (e) {
       logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)
       throw e

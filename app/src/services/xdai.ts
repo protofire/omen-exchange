@@ -109,14 +109,9 @@ class XdaiService {
     return transferFromInterface.functions.relayTokens.encode([receiver])
   }
 
-  claimDaiTokens = async (functionData: any, contract: any) => {
-    try {
-      const transaction = await contract.executeSignatures(functionData.message, functionData.signatures)
-
-      return transaction
-    } catch (e) {
-      throw new Error('Failed at generating transaction!')
-    }
+  encodeClaimDaiTokens = (message: string, signatures: string): string => {
+    const transferFromInterface = new utils.Interface(abi)
+    return transferFromInterface.functions.executeSignatures.encode([message, signatures])
   }
 
   fetchCrossChainBalance = async (chain: number) => {
@@ -159,7 +154,7 @@ class XdaiService {
     try {
       const query = `
       query Requests($address: String) {
-          requests(first:100,orderBy:timestamp,orderDirection:desc,where:{recipient: $address}) {
+          requests(first:1000,orderBy:timestamp,orderDirection:desc,where:{recipient: $address}) {
               transactionHash
               recipient
               timestamp
@@ -174,7 +169,7 @@ class XdaiService {
 
       const queryForeign = `
         query GetTransactions($address: String!) {
-          executions(first:100,orderBy:timestamp,orderDirection:desc,where:{recipient: $address}) {
+          executions(first:1000,orderBy:timestamp,orderDirection:desc,where:{recipient: $address}) {
             transactionHash
             value
           }
@@ -199,7 +194,7 @@ class XdaiService {
         ({ transactionHash: id1 }: any) => !executions.some(({ transactionHash: id2 }: any) => id2 === id1),
       )
 
-      return results[0]
+      return results
     } catch (e) {
       console.error(e)
     }
