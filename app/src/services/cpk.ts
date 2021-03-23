@@ -282,11 +282,13 @@ class CPKService {
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
 
+      const buyAmount = this.cpk.relay ? amount.sub(RELAY_FEE) : amount
+
       let collateralAddress
       let collateralSymbol = ''
       let userInputCollateralSymbol: KnownToken
       let userInputCollateral: Token = collateral
-      let minCollateralAmount = amount
+      let minCollateralAmount = buyAmount
       if (useBaseToken && compoundService != null) {
         collateralSymbol = collateral.symbol.toLowerCase()
         if (collateralSymbol === 'ceth') {
@@ -295,7 +297,7 @@ class CPKService {
           userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
           userInputCollateral = getToken(networkId, userInputCollateralSymbol)
         }
-        minCollateralAmount = compoundService.calculateBaseToCTokenExchange(userInputCollateral, amount)
+        minCollateralAmount = compoundService.calculateBaseToCTokenExchange(userInputCollateral, buyAmount)
       }
       if (collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
@@ -303,34 +305,34 @@ class CPKService {
 
         // we need to send the funding amount in native ether
         if (!this.isSafeApp) {
-          txOptions.value = amount
+          txOptions.value = buyAmount
         }
 
         // Step 0: Wrap ether
         transactions.push({
           to: collateralAddress,
-          value: amount.toString(),
+          value: buyAmount.toString(),
         })
       } else if (useBaseToken) {
         if (userInputCollateral.address === pseudoNativeAssetAddress) {
           // If base token is ETH then we don't need to transfer to cpk
           if (!this.isSafeApp) {
-            txOptions.value = amount
+            txOptions.value = buyAmount
           }
-          const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, amount.toString())
+          const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, buyAmount.toString())
           transactions.push({
             to: collateral.address,
             data: encodedMintFunction,
-            value: amount.toString(),
+            value: buyAmount.toString(),
           })
         } else {
           // Transfer the base token to cpk
           // Mint cTokens in the cpk
           transactions.push({
             to: userInputCollateral.address,
-            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
+            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, buyAmount),
           })
-          const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, amount.toString())
+          const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, buyAmount.toString())
           // Approve cToken for the cpk contract
           transactions.push({
             to: userInputCollateral.address,
@@ -374,7 +376,7 @@ class CPKService {
         // Step 2: Transfer the amount of collateral being spent from the user to the CPK
         transactions.push({
           to: collateralAddress,
-          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, buyAmount),
         })
       }
       // Step 3: Buy outcome tokens with the CPK
@@ -657,19 +659,21 @@ class CPKService {
 
       let collateral
 
+      const fundingAmount = this.cpk.relay ? marketData.funding.sub(RELAY_FEE) : marketData.funding
+
       if (marketData.collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateral = getWrapToken(networkId)
 
         // we need to send the funding amount in native ether
         if (!this.isSafeApp) {
-          txOptions.value = marketData.funding
+          txOptions.value = fundingAmount
         }
 
         // Step 0: Wrap ether
         transactions.push({
           to: collateral.address,
-          value: marketData.funding.toString(),
+          value: fundingAmount.toString(),
         })
       } else {
         collateral = marketData.collateral
@@ -745,7 +749,7 @@ class CPKService {
       if (!this.isSafeApp && marketData.collateral.address !== pseudoNativeAssetAddress) {
         transactions.push({
           to: collateral.address,
-          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, fundingAmount),
         })
       }
 
@@ -775,7 +779,7 @@ class CPKService {
           collateral.address,
           conditionId,
           spread,
-          marketData.funding,
+          fundingAmount,
           distributionHint,
         ),
       })
@@ -845,7 +849,7 @@ class CPKService {
         data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
       })
 
-      if (useBaseToken) {
+      if (useBaseToken || this.cpk.relay) {
         if (!compoundService) {
           // Pseudonative to base token conversion flow
           const collateralToken = getTokenFromAddress(networkId, collateralAddress)
@@ -928,19 +932,22 @@ class CPKService {
       let userInputCollateral: Token = collateral
 
       let collateralAddress
+
+      const fundingAmount = this.cpk.relay ? amount.sub(RELAY_FEE) : amount
+
       if (collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateralAddress = getWrapToken(networkId).address
 
         // we need to send the funding amount in native ether
         if (!this.isSafeApp) {
-          txOptions.value = amount
+          txOptions.value = fundingAmount
         }
 
         // Step 0: Wrap ether
         transactions.push({
           to: collateralAddress,
-          value: amount.toString(),
+          value: fundingAmount.toString(),
         })
       } else {
         collateralAddress = collateral.address
@@ -950,7 +957,7 @@ class CPKService {
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
         marketMaker.address,
-        amount,
+        fundingAmount,
       )
       if (!hasCPKEnoughAlowance) {
         // Step 1:  Approve unlimited amount to be transferred to the market maker
@@ -959,7 +966,7 @@ class CPKService {
           data: ERC20Service.encodeApproveUnlimited(marketMaker.address),
         })
       }
-      let minCollateralAmount = amount
+      let minCollateralAmount = fundingAmount
       if (useBaseToken && compoundService != null) {
         collateralSymbol = collateral.symbol.toLowerCase()
         if (collateralSymbol === 'ceth') {
@@ -968,7 +975,7 @@ class CPKService {
           userInputCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length) as KnownToken
           userInputCollateral = getToken(networkId, userInputCollateralSymbol)
         }
-        minCollateralAmount = compoundService.calculateBaseToCTokenExchange(userInputCollateral, amount)
+        minCollateralAmount = compoundService.calculateBaseToCTokenExchange(userInputCollateral, fundingAmount)
       }
       // If we are signed in as a safe we don't need to transfer
       if (!this.isSafeApp && collateral.address !== pseudoNativeAssetAddress) {
@@ -978,7 +985,7 @@ class CPKService {
           if (collateral.address !== pseudoNativeAssetAddress) {
             transactions.push({
               to: userInputCollateral.address,
-              data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
+              data: ERC20Service.encodeTransferFrom(account, this.cpk.address, fundingAmount),
             })
           }
         } else {
@@ -991,14 +998,16 @@ class CPKService {
       }
       if (useBaseToken) {
         // get base token
-        const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, amount.toString())
+        const encodedMintFunction = CompoundService.encodeMintTokens(collateralSymbol, fundingAmount.toString())
         // Approve cToken for the cpk contract
         if (userInputCollateral.address === pseudoNativeAssetAddress) {
-          txOptions.value = amount
+          if (!this.isSafeApp) {
+            txOptions.value = fundingAmount
+          }
           transactions.push({
             to: collateral.address,
             data: encodedMintFunction,
-            value: amount.toString(),
+            value: fundingAmount.toString(),
           })
         } else {
           transactions.push({
@@ -1070,7 +1079,7 @@ class CPKService {
       let userInputCollateral = collateralToken
       const totalAmountToSend = amountToMerge.add(earnings)
       // transfer to the user the merged collateral plus the earned fees
-      if (useBaseToken) {
+      if (useBaseToken || this.cpk.relay) {
         if (compoundService != null) {
           // cToken to base token flow
           if (collateralSymbol === 'ceth') {
@@ -1201,6 +1210,16 @@ class CPKService {
         to: conditionalTokens.address,
         data: ConditionalTokenService.encodeRedeemPositions(collateralToken.address, conditionId, numOutcomes),
       })
+
+      if (this.cpk.relay && earnedCollateral) {
+        // Pseudonative asset to base asset flow
+        const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, earnedCollateral)
+        // If use prefers to get paid in the base native asset then unwrap the asset
+        transactions.push({
+          to: collateralToken.address,
+          data: encodedWithdrawFunction,
+        })
+      }
 
       // If we are signed in as a safe we don't need to transfer
       if (!this.isSafeApp && earnedCollateral) {
