@@ -14,14 +14,13 @@ import {
   MarketDetailsTab,
   MarketMakerData,
   OutcomeTableValue,
-  Status,
   TokenEthereum,
+  TransactionStep,
 } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
-import { FullLoading } from '../../../loading'
-import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
+import { ModalTransactionWrapper } from '../../../modal'
 import { AssetBalance } from '../../common/asset_balance'
 import { CurrenciesWrapper } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
@@ -60,10 +59,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const symbol = nativeAsset.symbol
   const { realitio } = useContracts(context)
 
-  const [status, setStatus] = useState<Status>(Status.Ready)
-  const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const probabilities = balances.map(balance => balance.probability)
   const initialBondAmount =
@@ -72,6 +68,9 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
     currentAnswerBond ? new BigNumber(currentAnswerBond).mul(2) : initialBondAmount,
   )
   const [nativeAssetBalance, setNativeAssetBalance] = useState<BigNumber>(Zero)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
     const fetchBalance = async () => {
@@ -98,10 +97,8 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
     if (!cpk) {
       return
     }
-    setModalTitle('Bond Outcome')
 
     try {
-      setStatus(Status.Loading)
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
@@ -115,6 +112,8 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             : marketMakerData.question.outcomes[outcomeIndex]
         }`,
       )
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       const question = marketMakerData.question
       logger.log(`Submit Answer questionId: ${question.id}, answer: ${answer}`, bondNativeAssetAmount)
@@ -124,11 +123,12 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         question,
         answer,
         amount: bondNativeAssetAmount,
+        setTxHash,
+        setTxState,
       })
 
       await fetchGraphMarketMakerData()
 
-      setStatus(Status.Ready)
       setMessage(
         `Successfully bonded ${formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals)} ${symbol} on ${
           outcomeIndex < marketMakerData.question.outcomes.length
@@ -137,11 +137,10 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         }`,
       )
     } catch (err) {
-      setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to bond ${symbol}.`)
       logger.error(`${message} - ${err.message}`)
     }
-    setIsModalTransactionResultOpen(true)
   }
 
   return (
@@ -226,14 +225,15 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           Bond {symbol}
         </Button>
       </BottomButtonWrapper>
-      <ModalTransactionResult
-        isOpen={isModalTransactionResultOpen}
-        onClose={() => setIsModalTransactionResultOpen(false)}
-        status={status}
-        text={message}
-        title={modalTitle}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={txHash}
+        txState={txState}
       />
-      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

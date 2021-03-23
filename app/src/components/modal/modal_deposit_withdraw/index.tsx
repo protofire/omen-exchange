@@ -216,7 +216,10 @@ export const ModalDepositWithdraw = (props: Props) => {
         isOpen={isTransactionModalOpen}
         message={message}
         netId={txNetId}
-        onClose={() => setIsTransactionModalOpen(false)}
+        onClose={() => {
+          setIsTransactionModalOpen(false)
+          onClose()
+        }}
         txHash={txHash}
         txState={txState}
       />
