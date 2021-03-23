@@ -4,7 +4,7 @@ import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
-import { INVALID_ANSWER_ID, Question } from '../util/types'
+import { INVALID_ANSWER_ID, Question, TransactionStep } from '../util/types'
 
 const logger = getLogger('Services::Oracle')
 
@@ -33,10 +33,19 @@ export class OracleService {
   /**
    * Resolve the condition with the given questionId
    */
-  resolveCondition = async (question: Question, numOutcomes: number): Promise<TransactionReceipt> => {
+  resolveCondition = async (
+    question: Question,
+    numOutcomes: number,
+    setTxHash?: (arg0: string) => void,
+    setTxState?: (step: TransactionStep) => void,
+  ): Promise<TransactionReceipt> => {
     try {
       const transactionObject = await this.contract.resolve(question.id, question.templateId, question.raw, numOutcomes)
-      return this.provider.waitForTransaction(transactionObject.hash)
+      setTxState && setTxState(TransactionStep.transactionSubmitted)
+      setTxHash && setTxHash(transactionObject.hash)
+      const tx = this.provider.waitForTransaction(transactionObject.hash)
+      setTxState && setTxState(TransactionStep.transactionConfirmed)
+      return tx
     } catch (err) {
       logger.error(`There was an error resolving the condition with question id '${question.id}'`, err.message)
       throw err
