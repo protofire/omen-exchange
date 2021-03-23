@@ -109,7 +109,6 @@ const Wrapper = (props: Props) => {
   const nativeAsset = getNativeAsset(networkId)
   const initialBondAmount =
     networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
-
   const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
     question.currentAnswerBond ? new BigNumber(question.currentAnswerBond).mul(2) : initialBondAmount,
   )
@@ -214,13 +213,6 @@ const Wrapper = (props: Props) => {
       />
     )
   }
-
-  // const openQuestionMessage = (
-  //   <MessageWrapper>
-  //     <Title>The question is being resolved.</Title>
-  //     <Text>You will be able to redeem your winnings as soon as the market is resolved.</Text>
-  //   </MessageWrapper>
-  // )
 
   const openInRealitioButton = (
     <Button
@@ -365,9 +357,9 @@ const Wrapper = (props: Props) => {
           <>
             {isScalar ? (
               <MarketScale
-                bondNativeAssetAmount={bondNativeAssetAmount}
                 borderTop={true}
                 collateral={collateral}
+                currentAnswerBond={question.currentAnswerBond}
                 currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
                 currentTab={MarketDetailsTab.finalize}
                 isBonded={true}

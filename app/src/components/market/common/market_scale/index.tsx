@@ -237,7 +237,7 @@ interface Props {
   additionalSharesType?: Maybe<AdditionalSharesType>
   currentTab?: MarketDetailsTab
   isBonded?: boolean
-  bondNativeAssetAmount?: BigNumber
+  currentAnswerBond?: Maybe<BigNumber>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
@@ -246,9 +246,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     additionalSharesType,
     amountShares,
     balances,
-    bondNativeAssetAmount,
     borderTop,
     collateral,
+    currentAnswerBond,
     currentPrediction,
     currentTab,
     fee,
@@ -543,9 +543,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'Predicted Outcome',
     },
     {
-      title: `${formatBigNumber(bondNativeAssetAmount ? bondNativeAssetAmount : Zero, 18)}  ${collateral &&
-        collateral.symbol}`,
-      subtitle: 'Bond Amount',
+      title: `${formatBigNumber(currentAnswerBond ? currentAnswerBond : Zero, 18)}  ${collateral && collateral.symbol}`,
+      subtitle: 'Bonded',
     },
     {
       title: '-',
