@@ -39,13 +39,13 @@ import {
   Status,
   Ternary,
   Token,
+  TransactionStep,
 } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { FullLoading } from '../../../loading'
-import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
+import { ModalTransactionWrapper } from '../../../modal'
 import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
@@ -121,7 +121,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [tweet, setTweet] = useState('')
   const [newShares, setNewShares] = useState<Maybe<BigNumber[]>>(null)
   const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
@@ -135,6 +134,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals).includes('-'))
@@ -227,16 +229,21 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals)
 
       setStatus(Status.Loading)
+
       Number(sharesAmount) < 0.01
         ? setMessage(`Buying <${0.01} shares`)
         : setMessage(`Buying ${sharesAmount} shares ...`)
+
       setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
       await cpk.buyOutcomes({
         amount: inputAmount,
         collateral,
         compoundService,
         marketMaker,
         outcomeIndex,
+        setTxHash,
+        setTxState,
         useBaseToken,
       })
 
@@ -262,11 +269,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
       logger.error(`${message} - ${err.message}`)
       setIsTransactionProcessing(false)
     }
-    setIsModalTransactionResultOpen(true)
   }
 
   const showSetAllowance =
@@ -503,16 +510,17 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           Buy
         </Button>
       </StyledButtonContainer>
-      <ModalTransactionResult
-        isOpen={isModalTransactionResultOpen}
-        onClose={() => setIsModalTransactionResultOpen(false)}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
         shareUrl={`${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`}
-        status={status}
-        text={message}
-        title={status === Status.Error ? 'Transaction Error' : 'Buy Shares'}
         tweet={tweet}
+        txHash={txHash}
+        txState={txState}
       />
-      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

@@ -133,6 +133,7 @@ class OCPK extends CPK {
       transactions,
       contracts: cpkContracts,
       ethLibAdapter: this.ethLibAdapter,
+      saltNonce: this.saltNonce,
       isDeployed,
       isConnectedToSafe: this.isConnectedToSafe,
       sendOptions,
