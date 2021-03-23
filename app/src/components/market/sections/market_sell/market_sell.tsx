@@ -25,6 +25,7 @@ import {
   formatNumber,
   getInitialCollateral,
   getSharesInBaseToken,
+  handleSmallShares,
   mulBN,
 } from '../../../../util/tools'
 import {
@@ -220,11 +221,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         displaySharesAmount = formatBigNumber(displaySharesAmountValue || Zero, baseCollateral.decimals)
       }
       setStatus(Status.Loading)
-      {
-        Number(displaySharesAmount) < 0.01
-          ? setMessage(`Selling <${0.01} shares...`)
-          : setMessage(`Selling ${displaySharesAmount} shares...`)
-      }
+      handleSmallShares(displaySharesAmount, 'selling', setMessage, balances, outcomeIndex)
+
       let useBaseToken = false
       if (collateral.address !== displayCollateral.address) {
         useBaseToken = true
@@ -244,11 +242,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setDisplaySellShares(null)
       setAmountShares(null)
       setStatus(Status.Ready)
-      {
-        Number(displaySharesAmount) < 0.01
-          ? setMessage(`Successfully sold <${0.01} '${balances[outcomeIndex].outcomeName}' shares.`)
-          : setMessage(`Successfully sold ${displaySharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
-      }
+      handleSmallShares(displaySharesAmount, 'sell', setMessage, balances, outcomeIndex)
+
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)

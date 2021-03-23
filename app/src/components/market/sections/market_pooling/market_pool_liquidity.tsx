@@ -29,6 +29,7 @@ import {
   getBaseTokenForCToken,
   getInitialCollateral,
   getSharesInBaseToken,
+  handleSmallDepositsAndWithdrawals,
 } from '../../../../util/tools'
 import {
   CompoundTokenType,
@@ -266,12 +267,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         fundsAmount = formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)
       }
       setStatus(Status.Loading)
+      handleSmallDepositsAndWithdrawals(fundsAmount, 'depositing', setMessage, displayCollateral)
 
-      {
-        Number(fundsAmount) < 0.01
-          ? setMessage(`Depositing funds: <${0.01} ${displayCollateral.symbol}...`)
-          : setMessage(`Depositing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
-      }
       setIsTransactionProcessing(true)
       await cpk.addFunding({
         amount: amountToFundNormalized || Zero,
@@ -290,11 +287,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setAmountToFundDisplay('')
       setAmountToFundNormalized(null)
       setStatus(Status.Ready)
-      {
-        Number(fundsAmount) < 0.01
-          ? setMessage(`Successfully deposited <${0.01} ${displayCollateral.symbol}`)
-          : setMessage(`Successfully deposited ${fundsAmount} ${displayCollateral.symbol}`)
-      }
+      handleSmallDepositsAndWithdrawals(fundsAmount, 'hasDeposited', setMessage, displayCollateral)
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
@@ -312,8 +305,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         return
       }
       setStatus(Status.Loading)
-
       let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
+      handleSmallDepositsAndWithdrawals(fundsAmount, 'withdrawing', setMessage, displayCollateral)
+
       if (
         compoundService &&
         collateralSymbol in CompoundTokenType &&
@@ -325,11 +319,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         )
         fundsAmount = formatBigNumber(displayDepositedTokensTotal || Zero, displayCollateral.decimals)
       }
-      {
-        Number(fundsAmount) < 0.01
-          ? setMessage(`Withdrawing funds: <${0.01} ${displayCollateral.symbol}...`)
-          : setMessage(`Withdrawing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
-      }
+
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
       let useBaseToken = false
@@ -341,6 +331,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         }
       }
       setIsTransactionProcessing(true)
+
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
         collateralAddress,
@@ -362,11 +353,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setAmountToRemoveDisplay('')
       setAmountToRemoveNormalized(null)
       setStatus(Status.Ready)
-      {
-        Number(fundsAmount) < 0.01
-          ? setMessage(`Successfully withdrew <${0.01} ${displayCollateral.symbol}`)
-          : setMessage(`Successfully withdrew ${fundsAmount} ${displayCollateral.symbol}`)
-      }
+      handleSmallDepositsAndWithdrawals(fundsAmount, 'hasWithdrawn', setMessage, displayCollateral)
+
       setIsModalTransactionResultOpen(true)
       setIsTransactionProcessing(false)
     } catch (err) {

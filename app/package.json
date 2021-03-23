@@ -98,7 +98,7 @@
     "ipfs-deploy": "ipfs-deploy build --pinner pinata --no-open --no-clipboard",
     "lint:check": "eslint \"./src/**/*.{js,ts,tsx}\"",
     "lint:fix": "yarn lint:check --fix",
-    "prettier": "prettier './src/**/*.{js,ts,tsx}'",
+    "prettier": "prettier \"./src/**/*.{js,ts,tsx}\"",
     "prettier:check": "yarn prettier --check",
     "prettier:fix": "yarn prettier --write"
   },

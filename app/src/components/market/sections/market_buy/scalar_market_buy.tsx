@@ -27,6 +27,7 @@ import {
   formatBigNumber,
   formatNumber,
   getUnit,
+  handleSmallShares,
   mulBN,
 } from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
@@ -247,9 +248,7 @@ export const ScalarMarketBuy = (props: Props) => {
       const sharesAmount = formatBigNumber(tradedShares, collateral.decimals)
 
       setStatus(Status.Loading)
-      Number(sharesAmount) < 0.01
-        ? setMessage(`Buying <${0.01} shares`)
-        : setMessage(`Buying ${sharesAmount} shares ...`)
+      handleSmallShares(sharesAmount, 'buying', setMessage, balances, outcomeIndex)
 
       await cpk.buyOutcomes({
         amount,
@@ -273,12 +272,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
       setAmount(new BigNumber(0))
       setStatus(Status.Ready)
-
-      {
-        Number(sharesAmount) < 0.01
-          ? setMessage(`Successfully bought <${0.01} '${balances[outcomeIndex].outcomeName}' shares.`)
-          : setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
-      }
+      handleSmallShares(sharesAmount, 'bought', setMessage, balances, outcomeIndex)
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)

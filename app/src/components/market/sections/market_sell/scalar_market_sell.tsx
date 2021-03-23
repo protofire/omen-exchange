@@ -22,6 +22,7 @@ import {
   formatBigNumber,
   formatNumber,
   getUnit,
+  handleSmallShares,
   mulBN,
 } from '../../../../util/tools'
 import { BalanceItem, MarketDetailsTab, MarketMakerData, Status } from '../../../../util/types'
@@ -183,10 +184,7 @@ export const ScalarMarketSell = (props: Props) => {
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
-
-      Number(sharesAmount) < 0.01
-        ? setMessage(`Selling <${0.01} shares ...`)
-        : setMessage(`Selling ${sharesAmount} shares ...`)
+      handleSmallShares(sharesAmount, 'selling', setMessage, balances, outcomeIndex)
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,
@@ -202,12 +200,7 @@ export const ScalarMarketSell = (props: Props) => {
       setAmountShares(null)
       setAmountSharesToDisplay('')
       setStatus(Status.Ready)
-
-      {
-        Number(sharesAmount) < 0.01
-          ? setMessage(`Successfully sold <${0.01} '${balances[outcomeIndex].outcomeName}' shares.`)
-          : setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
-      }
+      handleSmallShares(sharesAmount, 'sell', setMessage, balances, outcomeIndex)
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' Shares.`)

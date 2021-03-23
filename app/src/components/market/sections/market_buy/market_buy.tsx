@@ -29,6 +29,7 @@ import {
   formatNumber,
   getInitialCollateral,
   getSharesInBaseToken,
+  handleSmallShares,
   mulBN,
 } from '../../../../util/tools'
 import {
@@ -227,9 +228,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals)
 
       setStatus(Status.Loading)
-      Number(sharesAmount) < 0.01
-        ? setMessage(`Buying <${0.01} shares`)
-        : setMessage(`Buying ${sharesAmount} shares ...`)
+      handleSmallShares(sharesAmount, 'buying', setMessage, balances, outcomeIndex)
+
       setIsTransactionProcessing(true)
       await cpk.buyOutcomes({
         amount: inputAmount,
@@ -253,11 +253,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )
       setDisplayAmountToFund(new BigNumber('0'))
       setStatus(Status.Ready)
-      {
-        Number(sharesAmount) < 0.01
-          ? setMessage(`Successfully bought <${0.01} '${balances[outcomeIndex].outcomeName}' shares.`)
-          : setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
-      }
+
+      handleSmallShares(sharesAmount, 'bought', setMessage, balances, outcomeIndex)
 
       setIsTransactionProcessing(false)
     } catch (err) {

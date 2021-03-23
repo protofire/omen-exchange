@@ -28,6 +28,7 @@ import {
   formatBigNumber,
   formatNumber,
   getUnit,
+  handleSmallDepositsAndWithdrawals,
   isDust,
 } from '../../../../util/tools'
 import { AdditionalSharesType, MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
@@ -229,11 +230,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
-      {
-        Number(fundsAmount) < 0.01
-          ? setMessage(`Depositing funds: <${0.01} ${collateral.symbol}...`)
-          : setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
-      }
+      handleSmallDepositsAndWithdrawals(fundsAmount, 'depositing', setMessage, collateral)
 
       await cpk.addFunding({
         amount: amountToFund || Zero,
@@ -250,11 +247,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setStatus(Status.Ready)
       setAmountToFund(null)
       setAmountToFundDisplay('')
-      {
-        Number(fundsAmount) < 0.01
-          ? setMessage(`Successfully deposited <${0.01} ${collateral.symbol}`)
-          : setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
-      }
+      handleSmallDepositsAndWithdrawals(fundsAmount, 'hasDeposited', setMessage, collateral)
     } catch (err) {
       setStatus(Status.Error)
       setMessage(`Error trying to deposit funds.`)
@@ -273,11 +266,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setStatus(Status.Loading)
 
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
-      {
-        Number(fundsAmount) < 0.01
-          ? setMessage(`Withdrawing funds: <${0.01} ${collateral.symbol}...`)
-          : setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
-      }
+      handleSmallDepositsAndWithdrawals(fundsAmount, 'withdrawing', setMessage, collateral)
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
@@ -302,11 +291,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setStatus(Status.Ready)
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
-      {
-        Number(fundsAmount) < 0.01
-          ? setMessage(`Successfully withdrew <${0.01} ${collateral.symbol}`)
-          : setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
-      }
+      handleSmallDepositsAndWithdrawals(fundsAmount, 'hasWithdrawn', setMessage, collateral)
 
       setIsModalTransactionResultOpen(true)
     } catch (err) {

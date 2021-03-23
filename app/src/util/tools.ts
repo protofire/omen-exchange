@@ -512,7 +512,7 @@ export const formatNumber = (number: string, decimals = 2): string => {
     return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
   }
 
-  if (number && Number(number) < 0.01) {
+  if (Number(number) < 0.01) {
     return `<${0.01}`
   }
 
@@ -521,6 +521,93 @@ export const formatNumber = (number: string, decimals = 2): string => {
   const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
 
   return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
+}
+
+export const handleSmallShares = (
+  sharesAmount: string,
+  buyOrSell: string,
+  message: any,
+  balances: BalanceItem[],
+  outcomeIndex: number,
+) => {
+  if (Number(sharesAmount) < 0.01 && buyOrSell === 'buying') {
+    message(`Buying <${0.01} shares...`)
+  }
+
+  if (Number(sharesAmount) > 0.01 && buyOrSell === 'buying') {
+    message(`Buying ${sharesAmount} shares...`)
+  }
+
+  if (Number(sharesAmount) < 0.01 && buyOrSell === 'bought') {
+    message(`Successfully bought <${0.01} ${balances[outcomeIndex].outcomeName} shares`)
+  }
+
+  if (Number(sharesAmount) > 0.01 && buyOrSell === 'bought') {
+    message(`Successfully bought ${sharesAmount} ${balances[outcomeIndex].outcomeName} shares`)
+  }
+
+  if (Number(sharesAmount) < 0.01 && buyOrSell === 'sell') {
+    message(`Successfully sold <${0.01} ${balances[outcomeIndex].outcomeName} shares`)
+  }
+
+  if (Number(sharesAmount) > 0.01 && buyOrSell === 'sell') {
+    message(`Successfully sold ${sharesAmount} ${balances[outcomeIndex].outcomeName} shares`)
+  }
+
+  if (Number(sharesAmount) < 0.01 && buyOrSell === 'selling') {
+    message(`Selling <${0.01} shares...`)
+  }
+
+  if (Number(sharesAmount) > 0.01 && buyOrSell === 'selling') {
+    message(`Selling ${sharesAmount} shares...`)
+  }
+
+  if (Number(sharesAmount) < 0.01 && buyOrSell === 'sold') {
+    message(`Successfully sold <${0.01} shares`)
+  }
+
+  if (Number(sharesAmount) > 0.01 && buyOrSell === 'sold') {
+    message(`Successfully sold ${sharesAmount} shares`)
+  }
+}
+
+export const handleSmallDepositsAndWithdrawals = (
+  sharesAmount: string,
+  depositOrWithdraw: string,
+  message: any,
+  displayCollateral: Token,
+) => {
+  if (Number(sharesAmount) < 0.01 && depositOrWithdraw === 'depositing') {
+    message(`Depositing funds: <${0.01} ${displayCollateral.symbol}...`)
+  }
+
+  if (Number(sharesAmount) > 0.01 && depositOrWithdraw === 'depositing') {
+    message(`Depositing funds: ${sharesAmount} ${displayCollateral.symbol}...`)
+  }
+
+  if (Number(sharesAmount) < 0.01 && depositOrWithdraw === 'withdrawing') {
+    message(`Withdrawing funds: <${0.01} ${displayCollateral.symbol}...`)
+  }
+
+  if (Number(sharesAmount) > 0.01 && depositOrWithdraw === 'withdrawing') {
+    message(`Withdrawing funds: ${sharesAmount} ${displayCollateral.symbol}...`)
+  }
+
+  if (Number(sharesAmount) < 0.01 && depositOrWithdraw === 'hasDeposited') {
+    message(`Successfully deposited <${0.01} ${displayCollateral.symbol}`)
+  }
+
+  if (Number(sharesAmount) > 0.01 && depositOrWithdraw === 'hasDeposited') {
+    message(`Successfully deposited ${sharesAmount} ${displayCollateral.symbol}`)
+  }
+
+  if (Number(sharesAmount) < 0.01 && depositOrWithdraw === 'hasWithdrawn') {
+    message(`Successfully withdrew <${0.01} ${displayCollateral.symbol}`)
+  }
+
+  if (Number(sharesAmount) > 0.01 && depositOrWithdraw === 'hasWithdrawn') {
+    message(`Successfully withdrew ${sharesAmount} ${displayCollateral.symbol}`)
+  }
 }
 
 export const formatHistoryDate = (dateData: number | string): string => {
