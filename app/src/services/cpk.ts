@@ -435,48 +435,48 @@ class CPKService {
       txOptions.gas = defaultGas
 
       let collateral
-
+      const fundingAmount = this.cpk.relay ? marketData.funding.sub(RELAY_FEE) : marketData.funding
       if (marketData.collateral.address === pseudoNativeAssetAddress && !useCompoundReserve) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateral = getWrapToken(networkId)
 
         // we need to send the funding amount in native ether
         if (!this.isSafeApp) {
-          txOptions.value = marketData.funding
+          txOptions.value = fundingAmount
         }
 
         // Step 0: Wrap ether
         transactions.push({
           to: collateral.address,
-          value: marketData.funding.toString(),
+          value: fundingAmount.toString(),
         })
       } else if (useCompoundReserve && compoundTokenDetails) {
         if (userInputCollateral.address === pseudoNativeAssetAddress) {
           // If user chosen collateral is ETH
           collateral = marketData.collateral
           if (!this.isSafeApp) {
-            txOptions.value = marketData.funding
+            txOptions.value = fundingAmount
           }
           const encodedMintFunction = CompoundService.encodeMintTokens(
             compoundTokenDetails.symbol,
-            marketData.funding.toString(),
+            fundingAmount.toString(),
           )
           transactions.push({
             to: collateral.address,
             data: encodedMintFunction,
-            value: marketData.funding.toString(),
+            value: fundingAmount.toString(),
           })
         } else {
           collateral = marketData.collateral
           // For any other compound pair that is not ETH
           const encodedMintFunction = CompoundService.encodeMintTokens(
             compoundTokenDetails.symbol,
-            marketData.funding.toString(),
+            fundingAmount.toString(),
           )
           // Transfer user input collateral to cpk
           transactions.push({
             to: userInputCollateral.address,
-            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
+            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, fundingAmount),
           })
           // Approve cToken for the cpk contract
           transactions.push({
@@ -546,9 +546,9 @@ class CPKService {
         to: collateral.address,
         data: ERC20Service.encodeApproveUnlimited(marketMakerFactory.address),
       })
-      let minCollateralAmount = marketData.funding
+      let minCollateralAmount = fundingAmount
       if (useCompoundReserve && compoundService) {
-        minCollateralAmount = compoundService.calculateBaseToCTokenExchange(userInputCollateral, marketData.funding)
+        minCollateralAmount = compoundService.calculateBaseToCTokenExchange(userInputCollateral, fundingAmount)
       }
       // Step 4: Transfer funding from user
       // If we are funding with native ether we can skip this step
@@ -559,7 +559,7 @@ class CPKService {
         if (!useCompoundReserve) {
           transactions.push({
             to: collateral.address,
-            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
+            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, fundingAmount),
           })
         }
       }
