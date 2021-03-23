@@ -270,6 +270,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
       handleSmallDepositsAndWithdrawals(fundsAmount, 'withdrawing', setMessage, collateral)
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()

@@ -230,8 +230,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals)
 
       setStatus(Status.Loading)
+      setTxState(TransactionStep.waitingConfirmation)
       handleSmallShares(sharesAmount, 'buying', setMessage, balances, outcomeIndex)
-
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
       await cpk.buyOutcomes({
@@ -258,7 +258,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )
       setDisplayAmountToFund(new BigNumber('0'))
       setStatus(Status.Ready)
-
+      setTxState(TransactionStep.transactionConfirmed)
       handleSmallShares(sharesAmount, 'bought', setMessage, balances, outcomeIndex)
 
       setIsTransactionProcessing(false)

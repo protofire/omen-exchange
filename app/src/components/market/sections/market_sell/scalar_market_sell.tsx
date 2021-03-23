@@ -185,8 +185,9 @@ export const ScalarMarketSell = (props: Props) => {
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
+      setTxState(TransactionStep.waitingConfirmation)
       handleSmallShares(sharesAmount, 'selling', setMessage, balances, outcomeIndex)
-
+      setIsTransactionModalOpen(true)
       await cpk.sellOutcomes({
         amount: tradedCollateral,
         conditionalTokens,
@@ -203,6 +204,7 @@ export const ScalarMarketSell = (props: Props) => {
       setAmountShares(null)
       setAmountSharesToDisplay('')
       setStatus(Status.Ready)
+      setTxState(TransactionStep.transactionConfirmed)
       handleSmallShares(sharesAmount, 'sell', setMessage, balances, outcomeIndex)
     } catch (err) {
       setStatus(Status.Error)

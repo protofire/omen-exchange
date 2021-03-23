@@ -227,6 +227,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         displaySharesAmount = formatBigNumber(displaySharesAmountValue || Zero, baseCollateral.decimals)
       }
       setStatus(Status.Loading)
+      setTxState(TransactionStep.waitingConfirmation)
       handleSmallShares(displaySharesAmount, 'selling', setMessage, balances, outcomeIndex)
 
       let useBaseToken = false
@@ -250,6 +251,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setDisplaySellShares(null)
       setAmountShares(null)
       setStatus(Status.Ready)
+      setTxState(TransactionStep.transactionConfirmed)
       handleSmallShares(displaySharesAmount, 'sell', setMessage, balances, outcomeIndex)
 
       setIsTransactionProcessing(false)

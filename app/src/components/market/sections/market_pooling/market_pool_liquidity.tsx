@@ -265,9 +265,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       if (collateralSymbol in CompoundTokenType && displayCollateral.symbol === baseCollateral.symbol) {
         fundsAmount = formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)
       }
-      setStatus(Status.Loading)
-      handleSmallDepositsAndWithdrawals(fundsAmount, 'depositing', setMessage, displayCollateral)
 
+      handleSmallDepositsAndWithdrawals(fundsAmount, 'depositing', setMessage, displayCollateral)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
@@ -290,6 +289,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setAmountToFundDisplay('')
       setAmountToFundNormalized(null)
       setStatus(Status.Ready)
+      setTxState(TransactionStep.transactionConfirmed)
       handleSmallDepositsAndWithdrawals(fundsAmount, 'hasDeposited', setMessage, displayCollateral)
       setIsTransactionProcessing(false)
     } catch (err) {
