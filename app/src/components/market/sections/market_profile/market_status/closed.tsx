@@ -1,5 +1,5 @@
 import Big from 'big.js'
-import { MaxUint256 } from 'ethers/constants'
+import { MaxUint256, Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
@@ -24,12 +24,12 @@ import {
   MarketMakerData,
   OutcomeTableValue,
   Status,
+  TransactionStep,
 } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
-import { FullLoading } from '../../../../loading'
-import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
-import { ButtonContainerFullWidth } from '../../../common/common_styled'
+import { ModalTransactionWrapper } from '../../../../modal'
+import { MarginsButton } from '../../../common/common_styled'
 import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { MarketScale } from '../../../common/market_scale'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
@@ -66,10 +66,7 @@ const StyledButtonContainer = styled(ButtonContainer)`
 `
 
 const BorderedButtonContainer = styled(ButtonContainer)`
-  margin-right: -24px;
-  margin-left: -24px;
-  padding-right: 24px;
-  padding-left: 24px;
+  ${MarginsButton};
   border-top: 1px solid ${props => props.theme.colors.verticalDivider};
 `
 
@@ -153,12 +150,13 @@ const Wrapper = (props: Props) => {
   const history = useHistory()
 
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState('')
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const marketCollateralToken = collateralToken
   const [compoundService, setCompoundService] = useState<Maybe<CompoundService>>(null)
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
 
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
   useMemo(() => {
@@ -196,10 +194,11 @@ const Wrapper = (props: Props) => {
     if (!cpk) {
       return
     }
-    setModalTitle('Resolve Condition')
     try {
       setStatus(Status.Loading)
       setMessage('Resolving condition...')
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       await cpk.resolveCondition({
         oracle,
@@ -209,6 +208,8 @@ const Wrapper = (props: Props) => {
         scalarHigh,
         question,
         numOutcomes: balances.length,
+        setTxHash,
+        setTxState,
       })
 
       await fetchGraphMarketMakerData()
@@ -217,11 +218,10 @@ const Wrapper = (props: Props) => {
       setMessage(`Condition successfully resolved.`)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to resolve the condition.`)
       logger.error(`${message} - ${err.message}`)
     }
-
-    setIsModalTransactionResultOpen(true)
   }
 
   useEffect(() => {
@@ -242,8 +242,6 @@ const Wrapper = (props: Props) => {
   }, [provider, account, marketMakerAddress, marketMaker])
 
   const redeem = async () => {
-    setModalTitle('Redeem Payout')
-
     try {
       if (!earnedCollateral) {
         return
@@ -255,6 +253,8 @@ const Wrapper = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage('Redeeming payout...')
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       await cpk.redeemPositions({
         isConditionResolved,
@@ -265,6 +265,8 @@ const Wrapper = (props: Props) => {
         collateralToken,
         marketMaker,
         conditionalTokens,
+        setTxHash,
+        setTxState,
       })
       await fetchBalances()
 
@@ -272,11 +274,10 @@ const Wrapper = (props: Props) => {
       setMessage(`Payout successfully redeemed.`)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to redeem.`)
       logger.error(`${message} -  ${err.message}`)
     }
-
-    setIsModalTransactionResultOpen(true)
   }
 
   const probabilities = balances.map(balance => balance.probability)
@@ -343,10 +344,18 @@ const Wrapper = (props: Props) => {
   const hasWinningOutcomes = earnedCollateral && !isDust(earnedCollateral, collateralToken.decimals)
   const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
   const userWinnersOutcomes = payouts
-    ? payouts.filter(
+    ? // If payouts, the market is categorical so check how many outcomes are winners
+      payouts.filter(
         (payout, index) => balances[index] && balances[index].shares && balances[index].shares.gt(0) && payout.gt(0),
       ).length
-    : 0
+    : // Else see if the final answer is at the upper or lower bound and if the user has a corresponding share
+    balances.filter((balance, index) => index === finalAnswerPercentage)
+    ? 1
+    : // Else check how many outcomes the user has shares for as they will all win some amount
+      balances.filter(balance => {
+        balance.shares.gt(Zero)
+      }).length
+
   const userWinnerShares = payouts
     ? balances.reduce(
         (acc, balance, index) => (payouts[index].gt(0) && balance.shares ? acc.add(balance.shares) : acc),
@@ -439,7 +448,7 @@ const Wrapper = (props: Props) => {
               ) : (
                 <>
                   {!isConditionResolved && (
-                    <ButtonContainerFullWidth>
+                    <BorderedButtonContainer>
                       <Button
                         buttonType={ButtonType.primary}
                         disabled={status === Status.Loading}
@@ -447,7 +456,7 @@ const Wrapper = (props: Props) => {
                       >
                         Resolve Condition
                       </Button>
-                    </ButtonContainerFullWidth>
+                    </BorderedButtonContainer>
                   )}
                   {isConditionResolved && hasWinningOutcomes && (
                     <BorderedButtonContainer>
@@ -495,14 +504,15 @@ const Wrapper = (props: Props) => {
           />
         )}
       </BottomCard>
-      <ModalTransactionResult
-        isOpen={isModalTransactionResultOpen}
-        onClose={() => setIsModalTransactionResultOpen(false)}
-        status={status}
-        text={message}
-        title={modalTitle}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={txHash}
+        txState={txState}
       />
-      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

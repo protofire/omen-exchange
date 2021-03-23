@@ -7,7 +7,7 @@ import styled, { css } from 'styled-components'
 import { DOCUMENT_VALIDITY_RULES, MAX_OUTCOME_ALLOWED } from '../../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
 import { Arbitrator, FormState, Question } from '../../../../../../util/types'
-import { Button } from '../../../../../button'
+import { Button, ButtonContainer } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { DateField, FormRow, FormStateButton } from '../../../../../common'
 import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
@@ -15,7 +15,7 @@ import { CommonDisabledCSS } from '../../../../../common/form/common_styled'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { Arbitrators } from '../../../../common/arbitrators'
 import { Categories } from '../../../../common/categories'
-import { ButtonContainerFullWidth } from '../../../../common/common_styled'
+import { MarginsButton } from '../../../../common/common_styled'
 import { CreateCard } from '../../../../common/create_card'
 import { WarningMessage } from '../../../../common/warning_message'
 import { Outcome, Outcomes } from '../outcomes'
@@ -102,10 +102,9 @@ const LeftButton = styled(Button as any)`
   margin-right: auto;
 `
 
-const StyledButtonContainerFullWidth = styled(ButtonContainerFullWidth as any)`
-  padding: 20px 24px;
-  padding-bottom: 0;
-  margin: 0 -24px;
+const StyledButtonContainerFullWidth = styled(ButtonContainer)`
+  ${MarginsButton};
+  padding-top: 24px;
 `
 
 interface Props {

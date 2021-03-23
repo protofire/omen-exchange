@@ -9,7 +9,7 @@ import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID, UINT_TEMPLATE_ID } from '.
 import { Outcome } from '../components/market/sections/market_create/steps/outcomes'
 import { getLogger } from '../util/logger'
 import { getEarliestBlockToCheck, getRealitioTimeout } from '../util/networks'
-import { Question, QuestionLog } from '../util/types'
+import { Question, QuestionLog, TransactionStep } from '../util/types'
 
 const logger = getLogger('Services::Realitio')
 
@@ -217,10 +217,20 @@ class RealitioService {
     }
   }
 
-  submitAnswer = async (questionId: string, answer: string, amount: BigNumber): Promise<void> => {
+  submitAnswer = async (
+    questionId: string,
+    answer: string,
+    amount: BigNumber,
+    setTxHash?: (arg0: string) => void,
+    setTxState?: (step: TransactionStep) => void,
+  ): Promise<void> => {
     try {
       const result = await this.contract.submitAnswer(questionId, answer, 0, { value: amount })
-      return this.provider.waitForTransaction(result.hash)
+      setTxState && setTxState(TransactionStep.transactionSubmitted)
+      setTxHash && setTxHash(result.hash)
+      const tx = await this.provider.waitForTransaction(result.hash)
+      setTxState && setTxState(TransactionStep.transactionConfirmed)
+      return tx
     } catch (error) {
       logger.error(`There was an error submitting answer '${questionId}'`, error.message)
       throw error
@@ -305,10 +315,21 @@ class RealitioService {
     return announceConditionInterface.functions.announceConditionQuestionId.encode(args)
   }
 
-  resolveCondition = async (questionId: string, question: string, scalarLow: BigNumber, scalarHigh: BigNumber) => {
+  resolveCondition = async (
+    questionId: string,
+    question: string,
+    scalarLow: BigNumber,
+    scalarHigh: BigNumber,
+    setTxHash?: (arg0: string) => void,
+    setTxState?: (step: TransactionStep) => void,
+  ) => {
     try {
       const transactionObject = await this.scalarContract.resolve(questionId, question, scalarLow, scalarHigh)
-      return this.provider.waitForTransaction(transactionObject.hash)
+      setTxState && setTxState(TransactionStep.transactionSubmitted)
+      setTxHash && setTxHash(transactionObject.hash)
+      const tx = this.provider.waitForTransaction(transactionObject.hash)
+      setTxState && setTxState(TransactionStep.transactionConfirmed)
+      return tx
     } catch (err) {
       logger.error(`There was an error resolving the condition with question id '${questionId}'`, err.message)
       throw err

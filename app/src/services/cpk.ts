@@ -25,7 +25,7 @@ import {
   signaturesFormatted,
   waitABit,
 } from '../util/tools'
-import { MarketData, Question, Token } from '../util/types'
+import { MarketData, Question, Token, TransactionStep } from '../util/types'
 
 import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
@@ -50,6 +50,8 @@ interface CPKBuyOutcomesParams {
   outcomeIndex: number
   useBaseToken?: boolean
   marketMaker: MarketMakerService
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKSellOutcomesParams {
@@ -59,6 +61,8 @@ interface CPKSellOutcomesParams {
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
   useBaseToken?: boolean
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKCreateMarketParams {
@@ -69,6 +73,8 @@ interface CPKCreateMarketParams {
   realitio: RealitioService
   marketMakerFactory: MarketMakerFactoryService
   useCompoundReserve?: boolean
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKAddFundingParams {
@@ -77,6 +83,8 @@ interface CPKAddFundingParams {
   compoundService?: CompoundService | null
   marketMaker: MarketMakerService
   useBaseToken?: boolean
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKRemoveFundingParams {
@@ -88,6 +96,8 @@ interface CPKRemoveFundingParams {
   earnings: BigNumber
   marketMaker: MarketMakerService
   outcomesCount: number
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
   sharesToBurn: BigNumber
   useBaseToken?: boolean
 }
@@ -101,6 +111,8 @@ interface CPKRedeemParams {
   oracle: OracleService
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKResolveParams {
@@ -111,6 +123,8 @@ interface CPKResolveParams {
   numOutcomes: number
   scalarLow: Maybe<BigNumber>
   scalarHigh: Maybe<BigNumber>
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 interface CPKSubmitAnswerParams {
@@ -118,6 +132,8 @@ interface CPKSubmitAnswerParams {
   question: Question
   answer: string
   amount: BigNumber
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 interface TransactionResult {
@@ -215,7 +231,12 @@ class CPKService {
     return transactionReceipt
   }
 
-  execTransactions = async (transactions: Transaction[], txOptions?: TxOptions) => {
+  execTransactions = async (
+    transactions: Transaction[],
+    txOptions?: TxOptions,
+    setTxHash?: (arg0: string) => void,
+    setTxState?: (step: TransactionStep) => void,
+  ) => {
     if (this.cpk.relay) {
       // pay tx fee
       transactions.push({
@@ -224,7 +245,20 @@ class CPKService {
       })
     }
     const txObject = await this.cpk.execTransactions(transactions, txOptions)
-    return this.waitForTransaction(txObject)
+    setTxState && setTxState(TransactionStep.transactionSubmitted)
+    setTxHash && setTxHash(txObject.hash)
+    const tx = await this.waitForTransaction(txObject)
+    setTxState && setTxState(TransactionStep.transactionConfirmed)
+    return tx
+  }
+
+  getGas = async (gas: number): Promise<number> => {
+    const deployed = await this.cpk.isProxyDeployed()
+    if (deployed) {
+      return gas
+    }
+    const addProxyDeploymentGas = 500000
+    return gas + addProxyDeploymentGas
   }
 
   buyOutcomes = async ({
@@ -233,6 +267,8 @@ class CPKService {
     compoundService,
     marketMaker,
     outcomeIndex,
+    setTxHash,
+    setTxState,
     useBaseToken = false,
   }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
@@ -347,7 +383,7 @@ class CPKService {
         data: MarketMakerService.encodeBuy(minCollateralAmount, outcomeIndex, outcomeTokensToBuy),
       })
 
-      return this.execTransactions(transactions, txOptions)
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error buying '${amount.toString()}' of shares`, err.message)
       throw err
@@ -361,6 +397,8 @@ class CPKService {
     marketData,
     marketMakerFactory,
     realitio,
+    setTxHash,
+    setTxState,
     useCompoundReserve,
   }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
@@ -548,7 +586,7 @@ class CPKService {
         ),
       })
 
-      const transaction = await this.execTransactions(transactions, txOptions)
+      const transaction = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       return {
         transaction,
         marketMakerAddress: predictedMarketMakerAddress,
@@ -564,6 +602,8 @@ class CPKService {
     marketData,
     marketMakerFactory,
     realitio,
+    setTxHash,
+    setTxState,
   }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
       const {
@@ -740,7 +780,7 @@ class CPKService {
         ),
       })
 
-      const transaction = await this.execTransactions(transactions, txOptions)
+      const transaction = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
 
       return {
         transaction,
@@ -758,6 +798,8 @@ class CPKService {
     conditionalTokens,
     marketMaker,
     outcomeIndex,
+    setTxHash,
+    setTxState,
     useBaseToken,
   }: CPKSellOutcomesParams): Promise<TransactionReceipt> => {
     try {
@@ -853,7 +895,7 @@ class CPKService {
         }
       }
 
-      return this.execTransactions(transactions, txOptions)
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error selling '${amount.toString()}' of shares`, err.message)
       throw err
@@ -865,6 +907,8 @@ class CPKService {
     collateral,
     compoundService,
     marketMaker,
+    setTxHash,
+    setTxState,
     useBaseToken,
   }: CPKAddFundingParams): Promise<TransactionReceipt> => {
     try {
@@ -974,7 +1018,7 @@ class CPKService {
         data: MarketMakerService.encodeAddFunding(minCollateralAmount),
       })
 
-      return this.execTransactions(transactions, txOptions)
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error adding an amount of '${amount.toString()}' for funding`, err.message)
       throw err
@@ -990,6 +1034,8 @@ class CPKService {
     earnings,
     marketMaker,
     outcomesCount,
+    setTxHash,
+    setTxState,
     sharesToBurn,
     useBaseToken,
   }: CPKRemoveFundingParams): Promise<TransactionReceipt> => {
@@ -1096,7 +1142,7 @@ class CPKService {
         }
       }
 
-      return this.execTransactions(transactions, txOptions)
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error removing amount '${sharesToBurn.toString()}' for funding`, err.message)
       throw err
@@ -1131,6 +1177,8 @@ class CPKService {
     numOutcomes,
     oracle,
     question,
+    setTxHash,
+    setTxState,
   }: CPKRedeemParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
@@ -1162,7 +1210,7 @@ class CPKService {
         })
       }
 
-      return this.execTransactions(transactions, txOptions)
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`Error trying to resolve condition or redeem for question id '${question.id}'`, err.message)
       throw err
@@ -1177,6 +1225,8 @@ class CPKService {
     realitio,
     scalarHigh,
     scalarLow,
+    setTxHash,
+    setTxState,
   }: CPKResolveParams) => {
     try {
       const transactions: Transaction[] = []
@@ -1194,14 +1244,14 @@ class CPKService {
           data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
         })
       }
-      return this.execTransactions(transactions, txOptions)
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error resolving the condition with question id '${question.id}'`, err.message)
       throw err
     }
   }
 
-  submitAnswer = async ({ amount, answer, question, realitio }: CPKSubmitAnswerParams) => {
+  submitAnswer = async ({ amount, answer, question, realitio, setTxHash, setTxState }: CPKSubmitAnswerParams) => {
     try {
       if (this.cpk.relay || this.isSafeApp) {
         const transactions: Transaction[] = [
@@ -1213,9 +1263,9 @@ class CPKService {
         ]
         const txOptions: TxOptions = {}
         txOptions.gas = defaultGas
-        return this.execTransactions(transactions, txOptions)
+        return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       }
-      return realitio.submitAnswer(question.id, answer, amount)
+      return realitio.submitAnswer(question.id, answer, amount, setTxHash, setTxState)
     } catch (error) {
       logger.error(`There was an error submitting answer '${question.id}'`, error.message)
       throw error
