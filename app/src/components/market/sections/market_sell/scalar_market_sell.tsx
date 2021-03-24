@@ -23,7 +23,6 @@ import {
   formatNumber,
   getUnit,
   mulBN,
-  roundNumberStringToSignificantDigits,
 } from '../../../../util/tools'
 import { BalanceItem, MarketDetailsTab, MarketMakerData, Status, TransactionStep } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
@@ -118,12 +117,9 @@ export const ScalarMarketSell = (props: Props) => {
         return index !== positionIndex
       })
       const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
-      const roundingFactor = STANDARD_DECIMALS - 4
-      const amountSharesString = roundNumberStringToSignificantDigits(amountShares.toString(), roundingFactor)
-      const amountSharesValue = new BigNumber(amountSharesString)
       const amountToSell = calcSellAmountInCollateral(
         // If the transaction incur in some precision error, we need to multiply the amount by some factor, for example  amountShares.mul(99999).div(100000) , bigger the factor, less dust
-        amountSharesValue,
+        amountShares.mul(99999).div(100000),
         holdingsOfSoldOutcome,
         holdingsOfOtherOutcome,
         marketFeeWithTwoDecimals,
