@@ -5,8 +5,7 @@ import styled, { withTheme } from 'styled-components'
 
 import { CONFIRMATION_COUNT } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../hooks'
-import { getBlockExplorer } from '../../../util/networks'
-import { getBlockExplorerURL } from '../../../util/tools'
+import { getBlockExplorer, getTxHashBlockExplorerURL } from '../../../util/networks'
 import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -148,7 +147,7 @@ export const ModalTransaction = (props: Props) => {
             </TwitterShareButton>
           )}
           <ModalButtonWrapper
-            href={etherscanDisabled ? undefined : getBlockExplorerURL(networkId, txHash)}
+            href={etherscanDisabled ? undefined : getTxHashBlockExplorerURL(networkId, txHash)}
             rel="noopener noreferrer"
             target="_blank"
           >
