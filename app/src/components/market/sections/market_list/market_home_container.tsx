@@ -412,7 +412,7 @@ const MarketHomeContainer: React.FC = () => {
 
   return (
     <>
-      {hasSeenBanner === undefined && context.networkId == networkIds.MAINNET && (
+      {hasSeenBanner === undefined && (context.relay || context.networkId === networkIds.MAINNET) && (
         <Banner>
           <TransferIcon alt="" src={xDaiIntergation} />
           <TextWrapper>
