@@ -35,7 +35,6 @@ import {
   AdditionalSharesType,
   MarketDetailsTab,
   MarketMakerData,
-  Status,
   Ternary,
   Token,
   TransactionStep,
@@ -139,7 +138,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [additionalShares, setAdditionalShares] = useState<number>(0)
   const [additionalSharesType, setAdditionalSharesType] = useState<Maybe<AdditionalSharesType>>()
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [status, setStatus] = useState<Status>(Status.Ready)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
 
@@ -235,8 +233,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
 
-      setStatus(Status.Loading)
       handleSmallDepositsAndWithdrawals(fundsAmount, 'depositing', setMessage, collateral)
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       await cpk.addFunding({
         amount: amountToFund || Zero,
@@ -269,6 +268,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       }
 
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
+
       handleSmallDepositsAndWithdrawals(fundsAmount, 'withdrawing', setMessage, collateral)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)

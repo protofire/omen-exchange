@@ -251,6 +251,7 @@ export const ScalarMarketBuy = (props: Props) => {
       setStatus(Status.Loading)
       setTxState(TransactionStep.waitingConfirmation)
       handleSmallShares(sharesAmount, 'buying', setMessage, balances, outcomeIndex)
+      setIsTransactionModalOpen(true)
 
       await cpk.buyOutcomes({
         amount,
