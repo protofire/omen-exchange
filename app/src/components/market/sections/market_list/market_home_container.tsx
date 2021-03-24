@@ -14,7 +14,7 @@ import { useMarkets } from '../../../../hooks/useMarkets'
 import { queryCategories } from '../../../../queries/markets_home'
 import theme from '../../../../theme'
 import { getLogger } from '../../../../util/logger'
-import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
+import { getArbitratorsByNetwork, getOutcomes, networkIds } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   CategoryDataItem,
@@ -412,7 +412,7 @@ const MarketHomeContainer: React.FC = () => {
 
   return (
     <>
-      {hasSeenBanner === undefined && (
+      {hasSeenBanner === undefined && context.networkId == networkIds.MAINNET && (
         <Banner>
           <TransferIcon alt="" src={xDaiIntergation} />
           <TextWrapper>
