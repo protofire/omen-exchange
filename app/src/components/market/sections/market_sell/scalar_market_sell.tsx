@@ -117,10 +117,9 @@ export const ScalarMarketSell = (props: Props) => {
         return index !== positionIndex
       })
       const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
-
       const amountToSell = calcSellAmountInCollateral(
         // If the transaction incur in some precision error, we need to multiply the amount by some factor, for example  amountShares.mul(99999).div(100000) , bigger the factor, less dust
-        amountShares,
+        amountShares.mul(99999).div(100000),
         holdingsOfSoldOutcome,
         holdingsOfOtherOutcome,
         marketFeeWithTwoDecimals,
