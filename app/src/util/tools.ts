@@ -17,14 +17,7 @@ import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'
 import { getContractAddress, getNativeAsset, getToken, getWrapToken, networkIds } from './networks'
-import {
-  BalanceItem,
-  CompoundEnabledTokenType,
-  CompoundTokenType,
-  EtherscanLink,
-  Token,
-  TransactionStep,
-} from './types'
+import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token, TransactionStep } from './types'
 
 const logger = getLogger('Tools')
 
