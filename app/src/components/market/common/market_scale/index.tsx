@@ -329,6 +329,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     let totalShortTradesCost = new BigNumber(0)
     let totalLongTradesCost = new BigNumber(0)
+
     if (trades && trades.length && collateral) {
       const shortTrades = trades.filter(trade => trade.outcomeIndex === '0')
       totalShortTradesCost = shortTrades.length
