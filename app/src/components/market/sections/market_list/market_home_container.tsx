@@ -420,7 +420,13 @@ const MarketHomeContainer: React.FC = () => {
             <TextDescription>
               You now have access to Omen markets on xDai Chain with your Mainnet Ethereum wallet. To use Omen on
               Mainnet choose &quot;Mainnet&quot; from the network dropdown above!{' '}
-              <Link href={'https://medium.com/omen-eth/omen-goes-xdai-native-9423ee2e0e63'}>learn more</Link>
+              <Link
+                href={'https://medium.com/omen-eth/omen-goes-xdai-native-9423ee2e0e63'}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                learn more
+              </Link>
             </TextDescription>
           </TextWrapper>
           <CloseStyled
