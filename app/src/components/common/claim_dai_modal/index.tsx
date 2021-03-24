@@ -14,6 +14,8 @@ import { IconArrowUp } from '../icons/IconArrowUp'
 import { DaiIcon } from '../icons/currencies'
 import { Spinner } from '../spinner'
 import { Modal, ModalBackground } from '../switch_network_modal'
+import { useConnectedWeb3Context } from '../../../hooks'
+import { getTxHashBlockExplorerURL } from '../../../util/networks'
 
 const ClaimAmount = styled.div`
   margin-top: 32px;
@@ -51,6 +53,8 @@ const Reversed = styled.div`
 
 export const ClaimDaiModal = (props: any) => {
   const { claimLatestToken, transactionHash, transactionStep } = useXdaiBridge()
+  const context = useConnectedWeb3Context()
+  const { networkId } = context
 
   useEffect(() => {
     if (transactionStep === TransactionStep.error) props.setClaim(false)
@@ -92,7 +96,7 @@ export const ClaimDaiModal = (props: any) => {
         ) : transactionStep === TransactionStep.transactionSubmitted ||
           transactionStep === TransactionStep.transactionConfirmed ? (
           <TransactionLink
-            href={`https://etherscan.io/tx/${transactionHash}`}
+            href={getTxHashBlockExplorerURL(networkId, transactionHash)}
             rel="noopener noreferrer"
             target="_blank"
           >

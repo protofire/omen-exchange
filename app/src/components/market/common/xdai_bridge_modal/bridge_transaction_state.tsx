@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 import { CONFIRMATION_COUNT, STANDARD_DECIMALS } from '../../../../common/constants'
 import theme from '../../../../theme'
-import { networkIds } from '../../../../util/networks'
+import { getTxHashBlockExplorerURL, networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { TransactionStep } from '../../../../util/types'
 import { ButtonRound } from '../../../button/button_round'
@@ -91,11 +91,7 @@ export const TransactionState = ({
       ) : (state === TransactionStep.transactionSubmitted || state === TransactionStep.transactionConfirmed) &&
         numberOfConfirmations === 0 ? (
         <TransactionLink
-          href={
-            network === networkIds.MAINNET
-              ? `https://etherscan.io/tx/${transactionHash}`
-              : `https://blockscout.com/poa/xdai/tx/${transactionHash}`
-          }
+          href={getTxHashBlockExplorerURL(network, transactionHash)}
           rel="noopener noreferrer"
           target="_blank"
         >
