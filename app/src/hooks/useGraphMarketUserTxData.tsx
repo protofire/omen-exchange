@@ -138,8 +138,7 @@ export const useGraphMarketUserTxData = (
       const wrangledValue = wrangleTradeResponse(tradeData.fpmmTrades)
       setTrades(wrangledValue)
     }
-    // eslint-disable-next-line
-  }, [tradeLoading])
+  }, [tradeData, tradeLoading])
 
   useEffect(() => {
     if (!liquidityLoading && !marketLiquidityLoading && liquidityData && liquidityData.fpmmLiquidities) {
@@ -158,8 +157,7 @@ export const useGraphMarketUserTxData = (
       }
       setLiquidity(wrangledValue)
     }
-    // eslint-disable-next-line
-  }, [liquidityLoading, marketLiquidityLoading])
+  }, [liquidityLoading, marketLiquidityLoading, liquidityData, marketLiquidityData])
 
   useEffect(() => {
     if (!marketAddress || !cpkAddress) {
