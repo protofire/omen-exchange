@@ -757,19 +757,3 @@ export const reverseArray = (array: any[]): any[] => {
   const newArray = array.map((e, i, a) => a[a.length - 1 - i])
   return newArray
 }
-
-export const getTxHashBlockExplorerURL = (networkId: number, txHash: string): string => {
-  if (networkId === 1) {
-    return `${EtherscanLink.mainnet}${txHash}`
-  }
-  if (networkId === 4) {
-    return `${EtherscanLink.rinkeby}${txHash}`
-  }
-  if (networkId === 77) {
-    return `${EtherscanLink.sokol}${txHash}`
-  }
-  if (networkId === 100) {
-    return `${EtherscanLink.xDai}${txHash}`
-  }
-  return ''
-}

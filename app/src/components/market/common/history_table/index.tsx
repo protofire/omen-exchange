@@ -4,12 +4,8 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
-import {
-  formatBigNumber,
-  formatHistoryDate,
-  formatHistoryUser,
-  getTxHashBlockExplorerURL,
-} from '../../../../util/tools'
+import { getTxHashBlockExplorerURL } from '../../../../util/networks'
+import { formatBigNumber, formatHistoryDate, formatHistoryUser } from '../../../../util/tools'
 import { ButtonRound } from '../../../button'
 import { IconJazz } from '../../../common/icons/IconJazz'
 import { InlineLoading } from '../../../loading/inline_loading'

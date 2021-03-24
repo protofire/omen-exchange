@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useXdaiBridge } from '../../../hooks/useXdaiBridge'
 import theme from '../../../theme'
-import { formatBigNumber, getTxHashBlockExplorerURL } from '../../../util/tools'
+import { formatBigNumber } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonRound } from '../../button/button_round'
@@ -15,6 +15,7 @@ import { DaiIcon } from '../icons/currencies'
 import { Spinner } from '../spinner'
 import { Modal, ModalBackground } from '../switch_network_modal'
 import { useConnectedWeb3Context } from '../../../hooks'
+import { getTxHashBlockExplorerURL } from '../../../util/networks'
 
 const ClaimAmount = styled.div`
   margin-top: 32px;
