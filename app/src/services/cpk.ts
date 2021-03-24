@@ -3,12 +3,7 @@ import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
-import {
-  DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
-  RELAY_ADDRESS,
-  RELAY_FEE,
-  XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
-} from '../common/constants'
+import { RELAY_ADDRESS, RELAY_FEE, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
 import { Transaction, verifyProxyAddress } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
@@ -1390,16 +1385,18 @@ class CPKService {
       const xDaiService = new XdaiService(this.provider)
 
       const transactions = await this.fetchLatestUnclaimedTransactions()
-      const allTransaction = Array.from(transactions, ({ message }) => {
-        const signatures = signaturesFormatted(message.signatures)
+      const messages = []
+      const signatures = []
 
-        return {
-          to: DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
-          data: xDaiService.encodeClaimDaiTokens(message.content, signatures),
-        }
-      })
+      for (let i = 0; i < transactions.length; i++) {
+        const message = transactions[i].message
+        messages.push(message.content)
 
-      const txObject = await this.cpk.execTransactions(allTransaction, txOptions)
+        const signature = signaturesFormatted(message.signatures)
+        signatures.push(signature)
+      }
+
+      const txObject = await xDaiService.claim(messages, signatures)
       return txObject
     } catch (e) {
       logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)

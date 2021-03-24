@@ -39,6 +39,15 @@ const abi = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
+  {
+    constant: true,
+    inputs: [{ name: '_txHash', type: 'bytes32' }],
+    name: 'relayedMessages',
+    outputs: [{ name: '', type: 'bool' }],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
 ]
 
 const xdaiBridgeAbi = [
@@ -50,6 +59,27 @@ const xdaiBridgeAbi = [
     name: 'relayTokens',
     inputs: [{ type: 'address', name: '_receiver' }],
     constant: false,
+  },
+]
+
+const multiClaimAbi = [
+  {
+    inputs: [
+      {
+        internalType: 'bytes[]',
+        name: 'messages',
+        type: 'bytes[]',
+      },
+      {
+        internalType: 'bytes[]',
+        name: 'signatures',
+        type: 'bytes[]',
+      },
+    ],
+    name: 'claim',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
 ]
 
@@ -102,6 +132,12 @@ class XdaiService {
     } catch (e) {
       throw new Error('Failed at generating transaction!')
     }
+  }
+
+  claim = async (messages: string[], signatures: string[]) => {
+    const MULTI_CLAIM_ADDRESS = '0xE0A392a61357F86f0da2d1586b91cA54e9097022'
+    const multiclaim = new ethers.Contract(MULTI_CLAIM_ADDRESS, multiClaimAbi, this.provider.signer.signer)
+    return multiclaim.claim(messages, signatures)
   }
 
   static encodeRelayTokens = (receiver: string): string => {
@@ -189,10 +225,17 @@ class XdaiService {
 
       const { requests } = xDaiRequests.data.data
       const { executions } = xDaiExecutions.data.data
-
-      const results = requests.filter(
+      let results = requests.filter(
         ({ transactionHash: id1 }: any) => !executions.some(({ transactionHash: id2 }: any) => id2 === id1),
       )
+
+      // double check if txs have been executed
+      const bridge = new ethers.Contract(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, this.abi, this.provider.signer.signer)
+      const relayed = await Promise.all(
+        results.map(async ({ transactionHash }: any) => await bridge.relayedMessages(transactionHash)),
+      )
+      // filter out executed claims
+      results = results.filter((_: any, index: number) => !relayed[index])
 
       return results
     } catch (e) {
