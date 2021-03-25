@@ -113,11 +113,8 @@ const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: 
   // use floor as rounding method
   Big.RM = 0
 
-  const clampedFinalAnswer = new Big(
-    finalAnswerPercentage > 1 ? 1 : finalAnswerPercentage < 0 ? 0 : finalAnswerPercentage,
-  )
-  const shortEarnedCollateral = new Big(balances[0].toString()).mul(new Big(1).sub(clampedFinalAnswer))
-  const longEarnedCollateral = new Big(balances[1].toString()).mul(clampedFinalAnswer)
+  const shortEarnedCollateral = new Big(balances[0].toString()).mul(new Big(1).sub(finalAnswerPercentage))
+  const longEarnedCollateral = new Big(balances[1].toString()).mul(finalAnswerPercentage)
   const collaterals = [shortEarnedCollateral, longEarnedCollateral]
   const earnedCollateral = collaterals.reduce((a, b) => a.add(b.toFixed(0)), bigNumberify(0))
 
@@ -330,6 +327,10 @@ const Wrapper = (props: Props) => {
   const finalAnswerPercentage =
     realitioAnswer && realitioAnswer.eq(MaxUint256)
       ? 0.5
+      : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber) > 1
+      ? 1
+      : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber) < 0
+      ? 0
       : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
 
   const earnedCollateral = isScalar
