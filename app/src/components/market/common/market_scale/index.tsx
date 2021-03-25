@@ -679,7 +679,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         </Scale>
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
         {showLiquidityBox && <ValueBoxes valueBoxData={liquidityValueBoxData} />}
-        {isBonded && <ValueBoxes straightEdges={true} valueBoxData={bondedValueBoxData} />}
+        {isBonded && <ValueBoxes valueBoxData={bondedValueBoxData} />}
       </ScaleWrapper>
       {!isPositionTableDisabled && balances && collateral && trades && (
         <PositionTable

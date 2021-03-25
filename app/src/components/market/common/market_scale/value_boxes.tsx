@@ -35,7 +35,6 @@ const ValueBoxPair = styled.div`
 
 interface Props {
   valueBoxData: ValueBoxItem[]
-  straightEdges?: boolean
 }
 
 export const ValueBoxes: React.FC<Props> = (props: Props) => {

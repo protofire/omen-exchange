@@ -14,7 +14,6 @@ import {
   MarketDetailsTab,
   MarketMakerData,
   OutcomeTableValue,
-  TokenEthereum,
   TransactionStep,
 } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
@@ -108,11 +107,11 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
             : props.isScalar
-            ? `${formatBigNumber(bondOutcomeSelected, TokenEthereum.decimals)} ${getUnit(
+            ? `${formatBigNumber(bondOutcomeSelected, nativeAsset.decimals)} ${getUnit(
                 props.marketMakerData.question.title,
               )}`
             : marketMakerData.question.outcomes[outcomeIndex]
-        } with ${formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals)} ${symbol}`,
+        } with ${formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals)} ${symbol}`,
       )
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
@@ -132,11 +131,11 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       await fetchGraphMarketMakerData()
 
       setMessage(
-        `Successfully bonded ${formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals)} ${symbol} on ${
+        `Successfully bonded ${formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals)} ${symbol} on ${
           outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
             : props.isScalar
-            ? `${formatBigNumber(bondOutcomeSelected, TokenEthereum.decimals)} ${getUnit(
+            ? `${formatBigNumber(bondOutcomeSelected, nativeAsset.decimals)} ${getUnit(
                 props.marketMakerData.question.title,
               )}`
             : marketMakerData.question.outcomes[outcomeIndex]
@@ -199,7 +198,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <CurrenciesWrapper>
               <AssetBalance
                 asset={nativeAsset}
-                value={`${formatNumber(formatBigNumber(nativeAssetBalance, TokenEthereum.decimals, 3), 3)}`}
+                value={`${formatNumber(formatBigNumber(nativeAssetBalance, nativeAsset.decimals, 3), 3)}`}
               />
             </CurrenciesWrapper>
 
@@ -207,7 +206,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
               disabled
               formField={
                 <BigNumberInput
-                  decimals={TokenEthereum.decimals}
+                  decimals={nativeAsset.decimals}
                   name="bondAmount"
                   // eslint-disable-next-line @typescript-eslint/no-empty-function
                   onChange={() => {}}
@@ -221,7 +220,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
               <TextfieldCustomPlaceholder
                 formField={
                   <BigNumberInput
-                    decimals={TokenEthereum.decimals}
+                    decimals={nativeAsset.decimals}
                     name="bondAmount"
                     onChange={(e: BigNumberInputReturn) => {
                       setBondOutcomeSelected(e.value.gt(Zero) ? e.value : Zero)
@@ -244,7 +243,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Bond Amount"
-              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals))} ${symbol}`}
+              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals))} ${symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
