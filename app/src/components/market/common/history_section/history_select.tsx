@@ -10,6 +10,7 @@ import {
   HistoryType,
   useGraphFpmmTransactionsFromQuestion,
 } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
+import { SafeService } from '../../../../services/safe'
 import { calcPrice, calcSellAmountInCollateral, formatBigNumber, formatTimestampToDate } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { ButtonRound, ButtonSelectable } from '../../../button'
@@ -147,6 +148,8 @@ export const History_select: React.FC<Props> = ({
       if (fpmmTransactions) {
         const response: any[] = await Promise.all(
           fpmmTransactions.map(async item => {
+            const safe = new SafeService(item.user.id, context.library)
+            const owners = await safe.getOwners()
             if (item.fpmmType === 'Liquidity') {
               const block: any = await marketMaker.getTransaction(item.transactionHash)
 
@@ -162,19 +165,24 @@ export const History_select: React.FC<Props> = ({
                 ),
                 additionalShares: item.additionalSharesCost,
                 collateralTokenAmount: new BigNumber(item.collateralTokenAmount),
+                user: owners[0],
               }
             }
-            return {}
+            return {
+              user: owners[0],
+              id: item.id,
+            }
           }),
         )
+
         const newFpmmTradeArray: any[] = []
         fpmmTransactions.forEach(item => {
+          const findInResponse = response.find(element => element.id === item.id)
           if (item.fpmmType === 'Liquidity') {
             let sharesValue
 
-            const findInResponse = response.find(element => element.id === item.id)
             if (findInResponse) {
-              const { balances } = findInResponse
+              const { balances, user } = findInResponse
               let firstItem = balances[0]
               let outcomeIndex = 0
 
@@ -208,7 +216,7 @@ export const History_select: React.FC<Props> = ({
                   id: item.id + 1,
                   transactionHash: item.transactionHash,
                   transactionType: 'Buy',
-                  user: item.user,
+                  user: { id: user },
                 })
               }
             }
@@ -226,10 +234,10 @@ export const History_select: React.FC<Props> = ({
                   : collateralBigNumber,
               transactionHash: item.transactionHash,
               transactionType: item.transactionType,
-              user: item.user,
+              user: { id: findInResponse.user },
             })
           } else {
-            newFpmmTradeArray.push(item)
+            newFpmmTradeArray.push({ ...item, user: { id: findInResponse.user } })
           }
         })
 
