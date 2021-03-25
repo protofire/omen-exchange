@@ -319,7 +319,9 @@ export const ModalYourConnection = (props: Props) => {
                     <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
                   </BalanceItemSide>
                   <BalanceItemBalance>
-                    {networkId === networkIds.XDAI && !relay ? formattedEthBalance : formattedDaiBalance} DAI
+                    {networkId === networkIds.XDAI && !relay
+                      ? `${formattedEthBalance} xDAI`
+                      : `${formattedDaiBalance} DAI`}
                   </BalanceItemBalance>
                 </BalanceItem>
                 {relay && claimState && (
