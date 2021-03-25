@@ -219,7 +219,7 @@ export const ModalYourConnection = (props: Props) => {
 
   const fetchAllowance = async () => {
     const owner = context.rawWeb3Context.account
-    if (relay && owner) {
+    if (relay && owner && context.rawWeb3Context.networkId === networkIds.MAINNET) {
       const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, DAI.address)
       const allowance = await collateralService.allowance(owner, DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
       setAllowance(allowance)
