@@ -228,7 +228,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         }
       }
       const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals)
-
+      setTweet('')
       setStatus(Status.Loading)
       setMessage(`Buying ${handleSmallShares(sharesAmount)} shares...`)
       setTxState(TransactionStep.waitingConfirmation)

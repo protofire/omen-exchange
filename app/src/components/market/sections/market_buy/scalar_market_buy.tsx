@@ -251,7 +251,7 @@ export const ScalarMarketBuy = (props: Props) => {
       }
 
       const sharesAmount = formatBigNumber(tradedShares, collateral.decimals)
-
+      setTweet('')
       setStatus(Status.Loading)
       setMessage(`Buying ${handleSmallShares(sharesAmount)} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
