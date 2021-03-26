@@ -225,11 +225,11 @@ export const OutcomeTable = (props: Props) => {
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
     const currentCollateral = displayCollateral ? displayCollateral : collateral
     let baseCollateral = collateral
-    const { networkId } = context
+    const { networkId, relay } = context
     const collateralSymbol = collateral.symbol.toLowerCase()
     if (collateralSymbol in CompoundTokenType) {
       if (collateralSymbol === 'ceth') {
-        baseCollateral = getNativeAsset(networkId)
+        baseCollateral = getNativeAsset(networkId, relay)
       } else {
         const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
         baseCollateral = getToken(networkId, baseCollateralSymbol)

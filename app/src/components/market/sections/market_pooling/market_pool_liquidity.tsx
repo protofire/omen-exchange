@@ -91,7 +91,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
   const history = useHistory()
   const context = useConnectedWeb3Context()
-  const { account, library: provider, networkId } = context
+  const { account, library: provider, networkId, relay } = context
   const cpk = useConnectedCPKContext()
   const { fetchBalances } = useConnectedBalanceContext()
 
@@ -102,7 +102,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [allowanceFinished, setAllowanceFinished] = useState(false)
 
   const wrapToken = getWrapToken(networkId)
-  const nativeAsset = getNativeAsset(networkId)
+  const nativeAsset = getNativeAsset(networkId, relay)
   const initialCollateral =
     marketMakerData.collateral.address.toLowerCase() === wrapToken.address.toLowerCase()
       ? nativeAsset
@@ -137,7 +137,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   let baseCollateral = collateral
   if (collateralSymbol in CompoundTokenType) {
     if (collateralSymbol === 'ceth') {
-      baseCollateral = getNativeAsset(networkId)
+      baseCollateral = getNativeAsset(networkId, relay)
     } else {
       const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
       baseCollateral = getToken(networkId, baseCollateralSymbol)
@@ -502,9 +502,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   } else {
     if (collateral.address === nativeAsset.address || collateral.address === wrapToken.address) {
       if (displayCollateral.address === wrapToken.address) {
-        toggleCollateral = getNativeAsset(context.networkId)
+        toggleCollateral = getNativeAsset(networkId, relay)
       } else {
-        toggleCollateral = getWrapToken(context.networkId)
+        toggleCollateral = getWrapToken(networkId)
       }
     }
   }
@@ -517,9 +517,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       }
     } else {
       if (displayCollateral.address === wrapToken.address) {
-        setDisplayCollateral(getNativeAsset(context.networkId))
+        setDisplayCollateral(getNativeAsset(networkId, relay))
       } else {
-        setDisplayCollateral(getWrapToken(context.networkId))
+        setDisplayCollateral(getWrapToken(networkId))
       }
     }
   }
@@ -543,6 +543,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     setWithdrawAmountToRemove(new BigNumber('0'))
     setActiveTab(tab)
   }
+
+  const currencySelectorIsDisabled = relay ? true : currencyFilters.length ? false : true
 
   return (
     <>
@@ -591,7 +593,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   balance={walletBalance}
                   context={context}
                   currency={displayCollateral.address}
-                  disabled={currencyFilters.length ? false : true}
+                  disabled={currencySelectorIsDisabled}
                   filters={currencyFilters}
                   onSelect={(token: Token | null) => {
                     if (token) {
@@ -701,7 +703,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   formatBigNumber(sellNoteDepositedTokensTotal, displayCollateral.decimals),
                 )} ${displayTotalSymbol}`}
               />
-              {collateral.address === pseudoNativeAssetAddress ? (
+              {!relay && collateral.address === pseudoNativeAssetAddress ? (
                 <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollateral} />
               ) : collateralSymbol in CompoundTokenType ? (
                 <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollateral} />
@@ -722,7 +724,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       )}
       {activeTab === Tabs.deposit && showUpgrade && (
         <SetAllowanceStyled
-          collateral={getNativeAsset(context.networkId)}
+          collateral={getNativeAsset(networkId, relay)}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}

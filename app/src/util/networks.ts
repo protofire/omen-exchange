@@ -789,11 +789,16 @@ export const getWrapToken = (networkId: number): Token => {
   return getToken(networkId, tokenId)
 }
 
-export const getNativeAsset = (networkId: number): Token => {
+export const getNativeAsset = (networkId: number, relay = false): Token => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
-  return networks[networkId].nativeAsset as Token
+  const asset = networks[networkId].nativeAsset as Token
+  if (relay) {
+    const symbol = asset.symbol.replace('x', '')
+    return { ...asset, symbol }
+  }
+  return asset
 }
 
 export const getTargetSafeImplementation = (networkId: number): string => {
