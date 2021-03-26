@@ -28,7 +28,7 @@ import {
   formatBigNumber,
   formatNumber,
   getUnit,
-  handleSmallDepositsAndWithdrawals,
+  handleSmallShares,
   isDust,
 } from '../../../../util/tools'
 import {
@@ -233,7 +233,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
 
-      handleSmallDepositsAndWithdrawals(fundsAmount, 'depositing', setMessage, collateral)
+      setMessage(`Depositing funds: ${handleSmallShares(fundsAmount)} ${collateral.symbol}...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
@@ -253,7 +253,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       setAmountToFund(null)
       setAmountToFundDisplay('')
-      handleSmallDepositsAndWithdrawals(fundsAmount, 'hasDeposited', setMessage, collateral)
+      setMessage(`Successfully deposited ${handleSmallShares(fundsAmount)} ${collateral.symbol}`)
     } catch (err) {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to deposit funds.`)
@@ -269,7 +269,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
 
-      handleSmallDepositsAndWithdrawals(fundsAmount, 'withdrawing', setMessage, collateral)
+      setMessage(`Withdrawing funds: ${handleSmallShares(fundsAmount)} ${collateral.symbol}...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
@@ -297,7 +297,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
-      handleSmallDepositsAndWithdrawals(fundsAmount, 'hasWithdrawn', setMessage, collateral)
+      setMessage(`Successfully withdrew ${handleSmallShares(fundsAmount)} ${collateral.symbol}`)
     } catch (err) {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to withdraw funds.`)

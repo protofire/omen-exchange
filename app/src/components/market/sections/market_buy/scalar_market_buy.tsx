@@ -249,8 +249,8 @@ export const ScalarMarketBuy = (props: Props) => {
       const sharesAmount = formatBigNumber(tradedShares, collateral.decimals)
 
       setStatus(Status.Loading)
+      setMessage(`Buying ${handleSmallShares(sharesAmount)} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
-      handleSmallShares(sharesAmount, 'buying', setMessage, balances, outcomeIndex)
       setIsTransactionModalOpen(true)
 
       await cpk.buyOutcomes({
@@ -277,8 +277,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
       setAmount(new BigNumber(0))
       setStatus(Status.Ready)
-      setTxState(TransactionStep.transactionConfirmed)
-      handleSmallShares(sharesAmount, 'bought', setMessage, balances, outcomeIndex)
+      setMessage(`Successfully bought ${handleSmallShares(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
     } catch (err) {
       setStatus(Status.Error)
       setTxState(TransactionStep.error)

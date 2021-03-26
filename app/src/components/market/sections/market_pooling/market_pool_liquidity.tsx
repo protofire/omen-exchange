@@ -29,7 +29,7 @@ import {
   getBaseTokenForCToken,
   getInitialCollateral,
   getSharesInBaseToken,
-  handleSmallDepositsAndWithdrawals,
+  handleSmallShares,
 } from '../../../../util/tools'
 import {
   CompoundTokenType,
@@ -263,7 +263,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       if (collateralSymbol in CompoundTokenType && displayCollateral.symbol === baseCollateral.symbol) {
         fundsAmount = formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)
       }
-      handleSmallDepositsAndWithdrawals(fundsAmount, 'depositing', setMessage, displayCollateral)
+      setMessage(`Depositing funds: ${handleSmallShares(fundsAmount)} ${displayCollateral.symbol}...`)
 
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
@@ -286,7 +286,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setAmountToFund(null)
       setAmountToFundDisplay('')
       setAmountToFundNormalized(null)
-      handleSmallDepositsAndWithdrawals(fundsAmount, 'hasDeposited', setMessage, displayCollateral)
+      setMessage(`Successfully deposited ${handleSmallShares(fundsAmount)} ${displayCollateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
@@ -314,7 +314,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         )
         fundsAmount = formatBigNumber(displayDepositedTokensTotal || Zero, displayCollateral.decimals)
       }
-      handleSmallDepositsAndWithdrawals(fundsAmount, 'withdrawing', setMessage, displayCollateral)
+      setMessage(`Withdrawing funds: ${handleSmallShares(fundsAmount)} ${displayCollateral.symbol}...`)
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
@@ -351,7 +351,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
       setAmountToRemoveNormalized(null)
-      handleSmallDepositsAndWithdrawals(fundsAmount, 'hasWithdrawn', setMessage, displayCollateral)
+      setMessage(`Successfully withdrew ${handleSmallShares(fundsAmount)} ${displayCollateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)

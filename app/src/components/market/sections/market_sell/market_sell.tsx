@@ -226,8 +226,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         displaySharesAmount = formatBigNumber(displaySharesAmountValue || Zero, baseCollateral.decimals)
       }
       setStatus(Status.Loading)
-      setTxState(TransactionStep.waitingConfirmation)
-      handleSmallShares(displaySharesAmount, 'selling', setMessage, balances, outcomeIndex)
+      setMessage(`Selling ${handleSmallShares(displaySharesAmount)} shares...`)
 
       let useBaseToken = false
       if (collateral.address !== displayCollateral.address) {
@@ -250,9 +249,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setDisplaySellShares(null)
       setAmountShares(null)
       setStatus(Status.Ready)
-      setTxState(TransactionStep.transactionConfirmed)
-      handleSmallShares(displaySharesAmount, 'sell', setMessage, balances, outcomeIndex)
-
+      setMessage(
+        `Successfully sold ${handleSmallShares(displaySharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`,
+      )
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
@@ -273,7 +272,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     })
   }
   const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
-
   let displaySelectedOutcomeBalance = selectedOutcomeBalance
   let displaySelectedOutcomeBalanceValue = balanceItem.shares
   if (collateralSymbol in CompoundTokenType && compoundService) {
@@ -374,15 +372,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       />
       <GridTransactionDetails>
         <div>
-          <TokenBalance
-            text="Your Shares"
-            //values below 0.01 are recognized as NaN so logic checks for isNaN to be true and if it is displays 0.01, otherwise displays normally.
-            value={
-              isNaN(Number(formatNumber(displaySelectedOutcomeBalance)))
-                ? '<0.01'
-                : formatNumber(displaySelectedOutcomeBalance)
-            }
-          />
+          <TokenBalance text="Your Shares" value={formatNumber(displaySelectedOutcomeBalance)} />
           <ReactTooltip id="walletBalanceTooltip" />
           <TextfieldCustomPlaceholder
             formField={
