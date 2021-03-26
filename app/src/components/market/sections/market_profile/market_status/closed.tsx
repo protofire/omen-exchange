@@ -1,6 +1,6 @@
 import Big from 'big.js'
 import { MaxUint256, Zero } from 'ethers/constants'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -119,6 +119,27 @@ const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: 
   const earnedCollateral = collaterals.reduce((a, b) => a.add(b.toFixed(0)), bigNumberify(0))
 
   return earnedCollateral
+}
+
+const calcUserWinnerShares = (
+  isScalar: boolean,
+  shares: BigNumber[],
+  payouts: Maybe<Big[]>,
+  finalAnswerPercentage: number,
+): BigNumber => {
+  let userWinnerShares
+  if (isScalar) {
+    const outcomeWinnings = shares.map((share, i) => {
+      const finalAnswerMultiple = i === 0 ? 1 - finalAnswerPercentage : finalAnswerPercentage
+      return share.mul(new BigNumber(finalAnswerMultiple * 100000)).div(new BigNumber(100000))
+    })
+    userWinnerShares = outcomeWinnings.reduce((acc, outcome) => acc.add(outcome))
+  } else {
+    userWinnerShares =
+      payouts &&
+      shares.reduce((acc, shares, index) => (payouts[index].gt(0) && shares ? acc.add(shares) : acc), new BigNumber(0))
+  }
+  return userWinnerShares || new BigNumber(0)
 }
 
 const Wrapper = (props: Props) => {
@@ -358,12 +379,13 @@ const Wrapper = (props: Props) => {
         balance.shares.gt(Zero)
       }).length
 
-  const userWinnerShares = payouts
-    ? balances.reduce(
-        (acc, balance, index) => (payouts[index].gt(0) && balance.shares ? acc.add(balance.shares) : acc),
-        new BigNumber(0),
-      )
-    : new BigNumber(0)
+  const userWinnerShares = calcUserWinnerShares(
+    isScalar,
+    balances.map(balance => balance.shares),
+    payouts,
+    finalAnswerPercentage,
+  )
+
   const EPS = 0.01
 
   let invalid = false
