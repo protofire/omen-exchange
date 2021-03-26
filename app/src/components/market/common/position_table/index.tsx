@@ -108,8 +108,12 @@ export const PositionTable = (props: Props) => {
         </ColoredTDStyled>
         <ColoredTDStyled positive={index === 0 ? isShortPositive : isLongPositive} textAlign={TableCellsAlign[3]}>
           {index === 0
-            ? `${formatNumber(shortProfitLoss.toString())} (${formatNumber(shortProfitLossPercentage.toString())}%)`
-            : `${formatNumber(longProfitLoss.toString())} (${formatNumber(longProfitLossPercentage.toString())}%)`}
+            ? `${shortProfitLoss >= shortPayout ? '--' : formatNumber(shortProfitLoss.toString())} (${
+                shortProfitLossPercentage === Infinity ? '--' : formatNumber(shortProfitLossPercentage.toString())
+              }%)`
+            : `${longProfitLoss >= longPayout ? '--' : formatNumber(longProfitLoss.toString())} (${
+                longProfitLossPercentage === Infinity ? '--' : formatNumber(longProfitLossPercentage.toString())
+              }%)`}
         </ColoredTDStyled>
       </TR>
     )

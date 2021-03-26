@@ -295,8 +295,10 @@ const HeaderContainer: React.FC = (props: any) => {
             >
               <>
                 <DepositedBalance>
-                  {relay || context.rawWeb3Context.networkId === networkIds.XDAI
+                  {relay
                     ? `${formattedxDaiBalance} DAI`
+                    : context.rawWeb3Context.networkId === networkIds.XDAI
+                    ? `${formattedxDaiBalance} xDAI`
                     : `${formattedEthBalance} ETH`}
                 </DepositedBalance>
                 <HeaderButtonDivider />
