@@ -213,7 +213,9 @@ export const ScalarMarketSell = (props: Props) => {
     }
   }
 
-  const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
+  const selectedOutcomeBalance = formatNumber(
+    formatBigNumber(balanceItem.shares, collateral.decimals, STANDARD_DECIMALS),
+  )
 
   const amountError =
     balanceItem.shares === null
@@ -286,7 +288,9 @@ export const ScalarMarketSell = (props: Props) => {
           <TransactionDetailsCard>
             <TransactionDetailsRow
               title={'Sell Amount'}
-              value={`${formatNumber(formatBigNumber(amountShares || Zero, collateral.decimals))} Shares`}
+              value={`${formatNumber(
+                formatBigNumber(amountShares || Zero, collateral.decimals, STANDARD_DECIMALS),
+              )} Shares`}
             />
             <TransactionDetailsRow
               emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
@@ -294,13 +298,17 @@ export const ScalarMarketSell = (props: Props) => {
               title={'Revenue'}
               value={
                 potentialValue
-                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${symbol}`
+                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, STANDARD_DECIMALS))} ${symbol}`
                   : '0.00'
               }
             />
             <TransactionDetailsRow
               title={'Fee'}
-              value={`${costFee ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, 2)) : '0.00'}
+              value={`${
+                costFee
+                  ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, STANDARD_DECIMALS))
+                  : '0.00'
+              }
                 ${symbol}`}
             />
             <TransactionDetailsLine />
@@ -316,7 +324,9 @@ export const ScalarMarketSell = (props: Props) => {
               }
               title={'Total'}
               value={`${
-                tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
+                tradedCollateral
+                  ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, STANDARD_DECIMALS))
+                  : '0.00'
               } ${symbol}`}
             />
           </TransactionDetailsCard>

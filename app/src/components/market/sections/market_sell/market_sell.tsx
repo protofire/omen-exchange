@@ -271,7 +271,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       return compoundService.calculateCTokenToBaseExchange(baseCollateral, ns)
     })
   }
-  const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
+  const selectedOutcomeBalance = formatNumber(
+    formatBigNumber(balanceItem.shares, collateral.decimals, STANDARD_DECIMALS),
+  )
   let displaySelectedOutcomeBalance = selectedOutcomeBalance
   let displaySelectedOutcomeBalanceValue = balanceItem.shares
   if (collateralSymbol in CompoundTokenType && compoundService) {
@@ -406,7 +408,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               title={'Profit'}
               value={
                 potentialValueNormalized
-                  ? `${formatNumber(formatBigNumber(potentialValueNormalized, displayCollateral.decimals, 2))} 
+                  ? `${formatNumber(
+                      formatBigNumber(potentialValueNormalized, displayCollateral.decimals, STANDARD_DECIMALS),
+                    )} 
                   ${symbol}`
                   : '0.00'
               }
@@ -415,7 +419,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               title={'Trading Fee'}
               value={`${
                 costFeeNormalized
-                  ? formatNumber(formatBigNumber(costFeeNormalized.mul(-1), displayCollateral.decimals, 2))
+                  ? formatNumber(
+                      formatBigNumber(costFeeNormalized.mul(-1), displayCollateral.decimals, STANDARD_DECIMALS),
+                    )
                   : '0.00'
               } ${symbol}`}
             />
@@ -433,7 +439,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               title={'Total'}
               value={`${
                 normalizedTradedCollateral
-                  ? formatNumber(formatBigNumber(normalizedTradedCollateral, displayCollateral.decimals, 2))
+                  ? formatNumber(
+                      formatBigNumber(normalizedTradedCollateral, displayCollateral.decimals, STANDARD_DECIMALS),
+                    )
                   : '0.00'
               } ${displayTotalSymbol}`}
             />

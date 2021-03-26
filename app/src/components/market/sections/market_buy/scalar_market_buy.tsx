@@ -122,7 +122,7 @@ export const ScalarMarketBuy = (props: Props) => {
     context,
   )
   const collateralBalance = maybeCollateralBalance || Zero
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
+  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, STANDARD_DECIMALS), 5)
 
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount, collateral.decimals).includes('-'))
@@ -208,12 +208,16 @@ export const ScalarMarketBuy = (props: Props) => {
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
-  const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals))} ${collateral.symbol}`
-  const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals))} ${collateral.symbol}`
+  const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals, STANDARD_DECIMALS))} ${
+    collateral.symbol
+  }`
+  const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals, STANDARD_DECIMALS))} ${
+    collateral.symbol
+  }`
   const potentialProfitFormatted = potentialProfit.gt(Zero)
     ? `${formatNumber(Number(formatBigNumber(potentialProfit, collateral.decimals)).toString())} ${collateral.symbol}`
     : `0.00 ${collateral.symbol}`
-  const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
+  const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals, STANDARD_DECIMALS))
   const total = `${sharesTotal} Shares`
 
   const showSetAllowance =
@@ -370,9 +374,9 @@ export const ScalarMarketBuy = (props: Props) => {
             <TransactionDetailsLine />
             <TransactionDetailsRow
               title={'Max. Loss'}
-              value={`${!amount.isZero() ? '-' : ''}${formatNumber(formatBigNumber(amount, collateral.decimals))} ${
-                collateral.symbol
-              }`}
+              value={`${!amount.isZero() ? '-' : ''}${formatNumber(
+                formatBigNumber(amount, collateral.decimals, STANDARD_DECIMALS),
+              )} ${collateral.symbol}`}
             />
             <TransactionDetailsRow
               emphasizeValue={potentialProfit.gt(0)}

@@ -2,6 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { formatBigNumber, formatNumber } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
 import { TitleValue } from '../../../common'
@@ -67,11 +68,11 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
     <UserData>
       <UserDataTitleValue
         title="Your Liquidity"
-        value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${symbol}`}
+        value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals, STANDARD_DECIMALS))} ${symbol}`}
       />
       <UserDataTitleValue
         title="Total Pool Tokens"
-        value={`${formatNumber(formatBigNumber(totalPoolShares, collateral.decimals))}`}
+        value={`${formatNumber(formatBigNumber(totalPoolShares, collateral.decimals, STANDARD_DECIMALS))}`}
       />
       <UserDataTitleValue
         state={userEarnings.gt(0) ? ValueStates.success : undefined}

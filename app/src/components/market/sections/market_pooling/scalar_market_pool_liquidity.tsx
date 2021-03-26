@@ -161,7 +161,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const { fetchFundingBalance, fundingBalance: maybeFundingBalance } = useFundingBalance(marketMakerAddress, context)
   const fundingBalance = maybeFundingBalance || Zero
 
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
+  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, STANDARD_DECIMALS), 5)
   const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
@@ -522,7 +522,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 emphasizeValue={poolTokens.gt(0)}
                 state={(poolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Pool Tokens"
-                value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals))}`}
+                value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals, STANDARD_DECIMALS))}`}
               />
             </TransactionDetailsCard>
           )}
@@ -532,19 +532,23 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 emphasizeValue={userEarnings.gt(0)}
                 state={ValueStates.success}
                 title="Earned"
-                value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals))} ${symbol}`}
+                value={`${formatNumber(
+                  formatBigNumber(userEarnings, collateral.decimals, STANDARD_DECIMALS),
+                )} ${symbol}`}
               />
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"
-                value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals))} ${symbol}`}
+                value={`${formatNumber(
+                  formatBigNumber(depositedTokens, collateral.decimals, STANDARD_DECIMALS),
+                )} ${symbol}`}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={depositedTokensTotal.gt(0)}
                 state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Total"
-                value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals))}
+                value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals, STANDARD_DECIMALS))}
                 ${symbol}`}
               />
             </TransactionDetailsCard>
