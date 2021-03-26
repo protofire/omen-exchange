@@ -331,7 +331,7 @@ const Wrapper = (props: Props) => {
     realitioAnswer && realitioAnswer.eq(MaxUint256)
       ? 0.5
       : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
-
+  console.log(props.marketMakerData.question)
   const earnedCollateral = isScalar
     ? scalarComputeEarnedCollateral(
         finalAnswerPercentage,
@@ -405,7 +405,10 @@ const Wrapper = (props: Props) => {
             {isScalar ? (
               <MarketScale
                 borderTop={true}
+                collateral={props.marketMakerData.collateral}
+                currentAnswerBond={props.marketMakerData.question.currentAnswerBond}
                 currentPrediction={finalAnswerPercentage.toString()}
+                isClosed={true}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Final answer'}
                 unit={getUnit(question.title)}

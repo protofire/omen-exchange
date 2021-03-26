@@ -56,7 +56,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
 
   const context = useConnectedWeb3Context()
   const { account, library: provider, networkId } = context
-
+  console.log(marketMakerData)
   const cpk = useConnectedCPKContext()
   const nativeAsset = getNativeAsset(networkId)
   const symbol = nativeAsset.symbol
@@ -147,7 +147,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       logger.error(`${message} - ${err.message}`)
     }
   }
-
+  console.log(props.marketMakerData.outcomeTokenMarginalPrices)
   return (
     <>
       {props.isScalar ? (

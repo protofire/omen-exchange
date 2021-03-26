@@ -238,6 +238,7 @@ interface Props {
   currentTab?: MarketDetailsTab
   isBonded?: boolean
   currentAnswerBond?: Maybe<BigNumber>
+  isClosed?: boolean
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
@@ -253,6 +254,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     currentTab,
     fee,
     isBonded,
+    isClosed,
     liquidityAmount,
     liquidityTxs,
     long,
@@ -276,6 +278,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const currentPredictionNumber = calcPrediction(currentPrediction || '', lowerBound, upperBound)
   const newPredictionNumber = calcPrediction(newPrediction?.toString() || '', lowerBound, upperBound)
+  console.log(newPrediction)
+  console.log(currentPredictionNumber)
 
   const amountSharesNumber =
     collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals))
@@ -329,7 +333,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [longProfitAmount, setLongProfitAmount] = useState(0)
   const [longProfitPercentage, setLongProfitPercentage] = useState(0)
   const [shortProfitPercentage, setShortProfitPercentage] = useState(0)
-
+  console.log(scaleValue)
   useEffect(() => {
     let totalShortTradesCost = new BigNumber(0)
     let totalLongTradesCost = new BigNumber(0)
@@ -548,8 +552,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'Bonded',
     },
     {
-      title: '-',
-      subtitle: 'Final Outcome',
+      title: `${currentPredictionNumber.toFixed(2)} ${unit}`,
+      subtitle: isBonded ? 'Pending Outcome' : 'Final Outcome',
     },
   ]
 
@@ -675,11 +679,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
             </>
           )}
-          {showSingleValueBox && <ValueBoxes valueBoxData={singleValueBoxData} />}
+          {showSingleValueBox && !isClosed && <ValueBoxes valueBoxData={singleValueBoxData} />}
         </Scale>
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
         {showLiquidityBox && <ValueBoxes valueBoxData={liquidityValueBoxData} />}
-        {isBonded && <ValueBoxes valueBoxData={bondedValueBoxData} />}
+        {(isBonded || isClosed) && <ValueBoxes valueBoxData={bondedValueBoxData} />}
       </ScaleWrapper>
       {!isPositionTableDisabled && balances && collateral && trades && (
         <PositionTable
