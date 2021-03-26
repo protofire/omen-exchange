@@ -135,15 +135,12 @@ const calcUserWinningsData = (
       const finalAnswerMultiple = i === 0 ? 1 - finalAnswerPercentage : finalAnswerPercentage
       return share.mul(new BigNumber(finalAnswerMultiple * 100000)).div(new BigNumber(100000))
     })
-    userWinningShares = outcomeWinnings.reduce((acc, outcome) => acc.add(outcome)) || Zero
+    userWinningShares = shares.reduce((acc, outcome) => acc.add(outcome)) || Zero
     winningOutcomes = finalAnswerPercentage === (0 || 1) ? 1 : 2
     userWinningOutcomes = outcomeWinnings.filter(outcome => outcome.gt(Zero)).length
   } else {
     userWinningShares = payouts
-      ? shares.reduce(
-          (acc, shares, index) => (payouts[index].gt(0) && shares ? acc.add(shares) : acc),
-          new BigNumber(0),
-        )
+      ? shares.reduce((acc, shares, index) => (payouts[index].gt(0) && shares ? acc.add(shares) : acc), Zero)
       : Zero
     winningOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
     userWinningOutcomes = payouts

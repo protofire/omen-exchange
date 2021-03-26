@@ -91,7 +91,7 @@ const MarketResolutionMessage = (props: Props) => {
     infoText = `${arbitrator.name} declared this market invalid. You own ${shares} Shares of ${
       userWinningOutcomes === 1 ? `an outcome` : `${userWinningOutcomes} outcomes`
     }
-      which can be redeem for `
+      which can be redeemed for `
   }
 
   if (lost) {
