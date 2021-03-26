@@ -1,6 +1,6 @@
 import Big from 'big.js'
 import { MaxUint256, Zero } from 'ethers/constants'
-import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
