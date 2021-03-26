@@ -353,14 +353,13 @@ const Wrapper = (props: Props) => {
   const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), STANDARD_DECIMALS))
   const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), STANDARD_DECIMALS))
 
-  const finalAnswerPercentage =
+  const unclampedFinalAnswerPercentage =
     realitioAnswer && realitioAnswer.eq(MaxUint256)
       ? 0.5
-      : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber) > 1
-      ? 1
-      : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber) < 0
-      ? 0
       : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
+
+  const finalAnswerPercentage =
+    unclampedFinalAnswerPercentage > 1 ? 1 : unclampedFinalAnswerPercentage < 0 ? 0 : unclampedFinalAnswerPercentage
 
   const earnedCollateral = isScalar
     ? scalarComputeEarnedCollateral(
@@ -423,7 +422,7 @@ const Wrapper = (props: Props) => {
             {isScalar ? (
               <MarketScale
                 borderTop={true}
-                currentPrediction={finalAnswerPercentage.toString()}
+                currentPrediction={unclampedFinalAnswerPercentage.toString()}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Final answer'}
                 unit={getUnit(question.title)}
