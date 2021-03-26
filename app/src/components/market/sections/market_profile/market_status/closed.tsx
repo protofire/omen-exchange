@@ -121,25 +121,31 @@ const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: 
   return earnedCollateral
 }
 
-const calcUserWinnerShares = (
+const calcUserWinningsData = (
   isScalar: boolean,
   shares: BigNumber[],
   payouts: Maybe<Big[]>,
   finalAnswerPercentage: number,
-): BigNumber => {
+): { userWinnerShares: BigNumber; winnersOutcomes: number } => {
   let userWinnerShares
+  let winnersOutcomes
   if (isScalar) {
     const outcomeWinnings = shares.map((share, i) => {
       const finalAnswerMultiple = i === 0 ? 1 - finalAnswerPercentage : finalAnswerPercentage
       return share.mul(new BigNumber(finalAnswerMultiple * 100000)).div(new BigNumber(100000))
     })
-    userWinnerShares = outcomeWinnings.reduce((acc, outcome) => acc.add(outcome))
+    userWinnerShares = outcomeWinnings.reduce((acc, outcome) => acc.add(outcome)) || Zero
+    winnersOutcomes = outcomeWinnings.filter(outcome => outcome.gt(Zero)).length
   } else {
-    userWinnerShares =
-      payouts &&
-      shares.reduce((acc, shares, index) => (payouts[index].gt(0) && shares ? acc.add(shares) : acc), new BigNumber(0))
+    userWinnerShares = payouts
+      ? shares.reduce(
+          (acc, shares, index) => (payouts[index].gt(0) && shares ? acc.add(shares) : acc),
+          new BigNumber(0),
+        )
+      : Zero
+    winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
   }
-  return userWinnerShares || new BigNumber(0)
+  return { userWinnerShares, winnersOutcomes }
 }
 
 const Wrapper = (props: Props) => {
@@ -365,7 +371,7 @@ const Wrapper = (props: Props) => {
       )
 
   const hasWinningOutcomes = earnedCollateral && !isDust(earnedCollateral, collateralToken.decimals)
-  const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
+  // const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
   const userWinnersOutcomes = payouts
     ? // If payouts, the market is categorical so check how many outcomes are winners
       payouts.filter(
@@ -379,7 +385,7 @@ const Wrapper = (props: Props) => {
         balance.shares.gt(Zero)
       }).length
 
-  const userWinnerShares = calcUserWinnerShares(
+  const { userWinnerShares, winnersOutcomes } = calcUserWinningsData(
     isScalar,
     balances.map(balance => balance.shares),
     payouts,
