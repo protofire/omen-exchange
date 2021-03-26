@@ -3,7 +3,6 @@ import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
-import { RELAY_FEE } from '../common/constants'
 import { ERC20Service } from '../services'
 import { getLogger } from '../util/logger'
 import { getNativeAsset, getOmenTCRListId, getTokensByNetwork, pseudoNativeAssetAddress } from '../util/networks'
@@ -92,10 +91,6 @@ export const useTokens = (context: ConnectedWeb3Context, addNativeAsset?: boolea
               if (account) {
                 if (token.address === pseudoNativeAssetAddress) {
                   balance = await provider.getBalance(account)
-                  // @ts-expect-error ignore
-                  if (provider.relay) {
-                    balance = balance.lt(RELAY_FEE) ? balance : balance.sub(RELAY_FEE)
-                  }
                 } else {
                   try {
                     const collateralService = new ERC20Service(provider, account, token.address)

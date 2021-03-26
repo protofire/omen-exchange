@@ -17,14 +17,7 @@ import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'
 import { getContractAddress, getNativeAsset, getToken, getWrapToken, networkIds } from './networks'
-import {
-  BalanceItem,
-  CompoundEnabledTokenType,
-  CompoundTokenType,
-  EtherscanLink,
-  Token,
-  TransactionStep,
-} from './types'
+import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token, TransactionStep } from './types'
 
 const logger = getLogger('Tools')
 
@@ -847,20 +840,4 @@ export const getInitialCollateral = (networkId: number, collateral: Token): Toke
 export const reverseArray = (array: any[]): any[] => {
   const newArray = array.map((e, i, a) => a[a.length - 1 - i])
   return newArray
-}
-
-export const getBlockExplorerURL = (networkId: number, txHash: string): string => {
-  if (networkId === 1) {
-    return `${EtherscanLink.mainnet}${txHash}`
-  }
-  if (networkId === 4) {
-    return `${EtherscanLink.rinkeby}${txHash}`
-  }
-  if (networkId === 77) {
-    return `${EtherscanLink.sokol}${txHash}`
-  }
-  if (networkId === 100) {
-    return `${EtherscanLink.xDai}${txHash}`
-  }
-  return ''
 }

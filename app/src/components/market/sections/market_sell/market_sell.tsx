@@ -149,10 +149,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
         return index !== outcomeIndex
       })
-
       const amountToSell = calcSellAmountInCollateral(
         // If the transaction incur in some precision error, we need to multiply the amount by some factor, for example  amountShares.mul(99999).div(100000) , bigger the factor, less dust
-        amountShares,
+        amountShares.mul(99999).div(100000),
         holdingsOfSoldOutcome,
         holdingsOfOtherOutcomes,
         marketFeeWithTwoDecimals,
