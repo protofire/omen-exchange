@@ -626,7 +626,7 @@ export const numberToByte32 = (num: number): string => {
 }
 
 export const isDust = (amount: BigNumber, decimals: number): boolean => {
-  return amount.lt(parseUnits('0.00001', decimals))
+  return amount.lt(parseUnits('0.0001', decimals))
 }
 
 export const isScalarMarket = (oracle: string, networkId: number): boolean => {
