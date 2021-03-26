@@ -33,7 +33,7 @@ class SafeService {
     return this.safe.nonce()
   }
 
-  getOwners = async (): Promise<number> => {
+  getOwners = async (): Promise<ArrayLike<number>> => {
     return this.safe.getOwners()
   }
 }
