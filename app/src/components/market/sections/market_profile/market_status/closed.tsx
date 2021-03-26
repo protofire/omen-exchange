@@ -385,7 +385,7 @@ const Wrapper = (props: Props) => {
   let invalid = false
 
   if (isScalar) {
-    if (question.answers && question.answers[question.answers.length - 1].answer === INVALID_ANSWER_ID) {
+    if (realitioAnswer?.eq(new BigNumber(INVALID_ANSWER_ID))) {
       invalid = true
     } else {
       invalid = false

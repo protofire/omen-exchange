@@ -1369,12 +1369,6 @@ class CPKService {
           value: withdrawAmount.toString(),
         })
 
-        // pay tx fee
-        transactions.push({
-          to: RELAY_ADDRESS,
-          value: RELAY_FEE,
-        })
-
         const txObject = await this.cpk.execTransactions(transactions, txOptions)
         return txObject.hash
       } else {
