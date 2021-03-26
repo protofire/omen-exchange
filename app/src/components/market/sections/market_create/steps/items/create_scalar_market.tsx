@@ -138,55 +138,81 @@ export const CreateScalarMarket = (props: Props) => {
   if (upperBound !== null) {
     upperBoundNumber = formatBigNumber(upperBound, 18, 2)
   }
-  //check for values to be non negative integers
-  if (startingPointNumber !== undefined && startingPointNumber < '0') {
-    startingPointError = 'Value must be greater than 0'
+  // //check for values to be non negative integers
+  // if (startingPointNumber !== undefined && startingPointNumber < '0') {
+  //   startingPointError = 'Value must be greater than 0'
+  // }
+
+  // if (lowerBoundNumber !== undefined && lowerBoundNumber < '0') {
+  //   lowerBoundError = 'Value must be greater than 0'
+  // }
+
+  // if (upperBoundNumber !== undefined && upperBoundNumber < '0') {
+  //   upperBoundError = 'Value must be greater than 0'
+  // }
+  // //checks for numbers which don't follow the input rules: lowerBound < startingPoint < upperBound. also errors for numbers equal to each other.
+  // if (
+  //   Number(startingPointNumber) > Number(upperBoundNumber) &&
+  //   upperBoundNumber !== undefined &&
+  //   Number(upperBoundNumber) > 0
+  // ) {
+  //   startingPointError = `Value must be less than ${upperBoundNumber}`
+  // } else if (startingPointNumber !== undefined && startingPointNumber === upperBoundNumber) {
+  //   startingPointError = `Value cannot be equal to ${upperBoundNumber}`
+  // }
+
+  // if (
+  //   Number(lowerBoundNumber) > Number(startingPointNumber) &&
+  //   startingPointNumber !== undefined &&
+  //   Number(startingPointNumber) > 0
+  // ) {
+  //   lowerBoundError = `Value must be less than ${startingPointNumber}`
+  // } else if (lowerBoundNumber !== undefined && lowerBoundNumber === startingPointNumber) {
+  //   lowerBoundError = `Value cannot be equal to ${startingPointNumber}`
+  // }
+
+  // if (
+  //   Number(lowerBoundNumber) > Number(upperBoundNumber) &&
+  //   upperBoundNumber !== undefined &&
+  //   Number(upperBoundNumber) > 0
+  // ) {
+  //   lowerBoundError = `Value must be less than ${upperBoundNumber}`
+  // } else if (lowerBoundNumber !== undefined && lowerBoundNumber === upperBoundNumber) {
+  //   lowerBoundError = `Value cannot be equal to ${upperBoundNumber}`
+  // }
+
+  // if (
+  //   Number(startingPointNumber) > Number(upperBoundNumber) &&
+  //   upperBoundNumber !== undefined &&
+  //   Number(upperBoundNumber) > 0
+  // ) {
+  //   startingPointError = `Value must be less than ${upperBoundNumber}`
+  // }
+
+  if (upperBoundNumber) {
+    Number(upperBoundNumber) <= 0
+      ? (upperBoundError = 'Value must be greater than 0')
+      : Number(upperBoundNumber) < Number(lowerBoundNumber)
+      ? (upperBoundError = `Value must be greater than ${lowerBoundNumber}`)
+      : Number(upperBoundNumber) < Number(startingPointNumber)
+      ? (upperBoundError = `Value must be greater than ${startingPointNumber}`)
+      : ''
   }
 
-  if (lowerBoundNumber !== undefined && lowerBoundNumber < '0') {
-    lowerBoundError = 'Value must be greater than 0'
+  if (startingPointNumber) {
+    Number(startingPointNumber) <= 0
+      ? (startingPointError = 'Value must be greater than 0')
+      : Number(startingPointNumber) < Number(lowerBoundNumber)
+      ? (startingPointError = `Value must be greater than ${lowerBoundNumber}`)
+      : ''
   }
 
-  if (upperBoundNumber !== undefined && upperBoundNumber < '0') {
-    upperBoundError = 'Value must be greater than 0'
-  }
-  //checks for numbers which don't follow the input rules: lowerBound < startingPoint < upperBound. also errors for numbers equal to each other.
-  if (
-    Number(startingPointNumber) > Number(upperBoundNumber) &&
-    upperBoundNumber !== undefined &&
-    Number(upperBoundNumber) > 0
-  ) {
-    startingPointError = `Value must be less than ${upperBoundNumber}`
-  } else if (startingPointNumber !== undefined && startingPointNumber === upperBoundNumber) {
-    startingPointError = `Value cannot be equal to ${upperBoundNumber}`
-  }
-
-  if (
-    Number(lowerBoundNumber) > Number(startingPointNumber) &&
-    startingPointNumber !== undefined &&
-    Number(startingPointNumber) > 0
-  ) {
-    lowerBoundError = `Value must be less than ${startingPointNumber}`
-  } else if (lowerBoundNumber !== undefined && lowerBoundNumber === startingPointNumber) {
-    lowerBoundError = `Value cannot be equal to ${startingPointNumber}`
-  }
-
-  if (
-    Number(lowerBoundNumber) > Number(upperBoundNumber) &&
-    upperBoundNumber !== undefined &&
-    Number(upperBoundNumber) > 0
-  ) {
-    lowerBoundError = `Value must be less than ${upperBoundNumber}`
-  } else if (lowerBoundNumber !== undefined && lowerBoundNumber === upperBoundNumber) {
-    lowerBoundError = `Value cannot be equal to ${upperBoundNumber}`
-  }
-
-  if (
-    Number(startingPointNumber) > Number(upperBoundNumber) &&
-    upperBoundNumber !== undefined &&
-    Number(upperBoundNumber) > 0
-  ) {
-    startingPointError = `Value must be less than ${upperBoundNumber}`
+  if (lowerBoundNumber) {
+    Number(lowerBoundNumber) <= 0
+      ? (lowerBoundError = 'Value must be greater than 0')
+      : Number(lowerBoundNumber) > Number(upperBoundNumber)
+      ? (lowerBoundError = `Value must be less than ${upperBoundNumber}`)
+      : ''
   }
 
   return (
