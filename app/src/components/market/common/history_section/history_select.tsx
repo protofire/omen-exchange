@@ -149,7 +149,13 @@ export const History_select: React.FC<Props> = ({
         const response: any[] = await Promise.all(
           fpmmTransactions.map(async item => {
             const safe = new SafeService(item.user.id, context.library)
-            const owners = await safe.getOwners()
+            let owners: string
+            try {
+              const result = await safe.getOwners()
+              owners = result[0].toString()
+            } catch {
+              owners = item.user.id
+            }
             if (item.fpmmType === 'Liquidity') {
               const block: any = await marketMaker.getTransaction(item.transactionHash)
 
@@ -165,11 +171,11 @@ export const History_select: React.FC<Props> = ({
                 ),
                 additionalShares: item.additionalSharesCost,
                 collateralTokenAmount: new BigNumber(item.collateralTokenAmount),
-                user: owners[0],
+                user: owners,
               }
             }
             return {
-              user: owners[0],
+              user: owners,
               id: item.id,
             }
           }),
