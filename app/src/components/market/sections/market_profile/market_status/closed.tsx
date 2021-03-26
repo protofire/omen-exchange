@@ -126,26 +126,31 @@ const calcUserWinningsData = (
   shares: BigNumber[],
   payouts: Maybe<Big[]>,
   finalAnswerPercentage: number,
-): { userWinnerShares: BigNumber; winnersOutcomes: number } => {
-  let userWinnerShares
-  let winnersOutcomes
+): { userWinningShares: BigNumber; winningOutcomes: number; userWinningOutcomes: number } => {
+  let userWinningShares
+  let winningOutcomes
+  let userWinningOutcomes
   if (isScalar) {
     const outcomeWinnings = shares.map((share, i) => {
       const finalAnswerMultiple = i === 0 ? 1 - finalAnswerPercentage : finalAnswerPercentage
       return share.mul(new BigNumber(finalAnswerMultiple * 100000)).div(new BigNumber(100000))
     })
-    userWinnerShares = outcomeWinnings.reduce((acc, outcome) => acc.add(outcome)) || Zero
-    winnersOutcomes = outcomeWinnings.filter(outcome => outcome.gt(Zero)).length
+    userWinningShares = outcomeWinnings.reduce((acc, outcome) => acc.add(outcome)) || Zero
+    winningOutcomes = finalAnswerPercentage === (0 || 1) ? 1 : 2
+    userWinningOutcomes = outcomeWinnings.filter(outcome => outcome.gt(Zero)).length
   } else {
-    userWinnerShares = payouts
+    userWinningShares = payouts
       ? shares.reduce(
           (acc, shares, index) => (payouts[index].gt(0) && shares ? acc.add(shares) : acc),
           new BigNumber(0),
         )
       : Zero
-    winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
+    winningOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
+    userWinningOutcomes = payouts
+      ? payouts.filter((payout, index) => shares[index] && shares[index].gt(0) && payout.gt(0)).length
+      : 0
   }
-  return { userWinnerShares, winnersOutcomes }
+  return { userWinningShares, winningOutcomes, userWinningOutcomes }
 }
 
 const Wrapper = (props: Props) => {
@@ -371,21 +376,8 @@ const Wrapper = (props: Props) => {
       )
 
   const hasWinningOutcomes = earnedCollateral && !isDust(earnedCollateral, collateralToken.decimals)
-  // const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
-  const userWinnersOutcomes = payouts
-    ? // If payouts, the market is categorical so check how many outcomes are winners
-      payouts.filter(
-        (payout, index) => balances[index] && balances[index].shares && balances[index].shares.gt(0) && payout.gt(0),
-      ).length
-    : // Else see if the final answer is at the upper or lower bound and if the user has a corresponding share
-    balances.filter((balance, index) => index === finalAnswerPercentage)
-    ? 1
-    : // Else check how many outcomes the user has shares for as they will all win some amount
-      balances.filter(balance => {
-        balance.shares.gt(Zero)
-      }).length
 
-  const { userWinnerShares, winnersOutcomes } = calcUserWinningsData(
+  const { userWinningOutcomes, userWinningShares, winningOutcomes } = calcUserWinningsData(
     isScalar,
     balances.map(balance => balance.shares),
     payouts,
@@ -458,9 +450,9 @@ const Wrapper = (props: Props) => {
                   collateralToken={collateralToken}
                   earnedCollateral={earnedCollateral}
                   invalid={invalid}
-                  userWinnerShares={userWinnerShares}
-                  userWinnersOutcomes={userWinnersOutcomes}
-                  winnersOutcomes={winnersOutcomes}
+                  userWinningOutcomes={userWinningOutcomes}
+                  userWinningShares={userWinningShares}
+                  winningOutcomes={winningOutcomes}
                 ></MarketResolutionMessageStyled>
               )}
               {isConditionResolved && !hasWinningOutcomes ? (
