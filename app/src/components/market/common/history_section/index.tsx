@@ -2,11 +2,10 @@ import { Block } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useWeb3Context } from 'web3-react'
 
 import { EARLIEST_MAINNET_BLOCK_TO_CHECK, EARLIEST_RINKEBY_BLOCK_TO_CHECK } from '../../../../common/constants'
-import { useMultipleQueries } from '../../../../hooks/useMultipleQueries'
-import { isScalarMarket, keys, range } from '../../../../util/tools'
+import { useConnectedWeb3Context, useMultipleQueries } from '../../../../hooks'
+import { isScalarMarket, keys, range, waitABit } from '../../../../util/tools'
 import { Period } from '../../../../util/types'
 
 import { History_select } from './history_select'
@@ -104,8 +103,7 @@ export const HistorySelectContainer: React.FC<Props> = ({
   scalarLow,
   unit,
 }) => {
-  const context = useWeb3Context()
-  const { library, networkId } = context
+  const { library, networkId } = useConnectedWeb3Context()
   const [latestBlockNumber, setLatestBlockNumber] = useState<Maybe<number>>(null)
 
   const [blocks, setBlocks] = useState<Maybe<Block[]>>(null)
@@ -137,11 +135,21 @@ export const HistorySelectContainer: React.FC<Props> = ({
   useEffect(() => {
     const getBlocks = async (latestBlockNumber: number) => {
       const { blocksPerPeriod, totalDataPoints } = mapPeriod[period]
-
       if (latestBlockNumber) {
         const blockNumbers = range(totalDataPoints).map(multiplier => latestBlockNumber - multiplier * blocksPerPeriod)
-        const blocks = await Promise.all(blockNumbers.map(blockNumber => library.getBlock(blockNumber)))
-
+        const blocks = await Promise.all(
+          blockNumbers.map(async blockNumber => {
+            let block
+            while (!block) {
+              try {
+                block = await library.getBlock(blockNumber)
+              } catch (e) {
+                await waitABit()
+              }
+            }
+            return block
+          }),
+        )
         setBlocks(blocks.filter(block => block))
       }
     }
@@ -152,7 +160,7 @@ export const HistorySelectContainer: React.FC<Props> = ({
     // eslint-disable-next-line
   }, [latestBlockNumber, library, period])
 
-  const isScalar = isScalarMarket(oracle || '', context.networkId || 0)
+  const isScalar = isScalarMarket(oracle || '', networkId || 0)
 
   return hidden ? null : (
     <History_select
