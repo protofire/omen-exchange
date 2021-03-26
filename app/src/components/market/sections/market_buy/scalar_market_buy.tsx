@@ -374,7 +374,7 @@ export const ScalarMarketBuy = (props: Props) => {
             <TransactionDetailsLine />
             <TransactionDetailsRow
               title={'Max. Loss'}
-              value={`${!amount.isZero() && Number(amount) < 0.01 ? '-' : ''}${formatNumber(
+              value={`${!amount.isZero() ? '-' : ''}${formatNumber(
                 formatBigNumber(amount, collateral.decimals, STANDARD_DECIMALS),
               )} ${collateral.symbol}`}
             />
