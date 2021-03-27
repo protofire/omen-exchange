@@ -324,6 +324,7 @@ const Wrapper = (props: Props) => {
   )
 
   const realitioAnswerNumber = Number(formatBigNumber(realitioAnswer || new BigNumber(0), STANDARD_DECIMALS))
+  console.log(realitioAnswerNumber)
   const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), STANDARD_DECIMALS))
   const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), STANDARD_DECIMALS))
 
@@ -331,7 +332,7 @@ const Wrapper = (props: Props) => {
     realitioAnswer && realitioAnswer.eq(MaxUint256)
       ? 0.5
       : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
-  console.log(props.marketMakerData.question)
+  console.log(props.marketMakerData)
   const earnedCollateral = isScalar
     ? scalarComputeEarnedCollateral(
         finalAnswerPercentage,

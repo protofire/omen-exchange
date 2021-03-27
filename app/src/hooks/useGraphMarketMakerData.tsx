@@ -51,6 +51,7 @@ const query = gql`
       question {
         id
         data
+        currentAnswer
         answers {
           answer
           bondAggregate
@@ -100,6 +101,7 @@ type GraphResponseFixedProductMarketMaker = {
   question: {
     id: string
     data: string
+    currentAnswer: string
     answers: {
       answer: string
       bondAggregate: BigNumber

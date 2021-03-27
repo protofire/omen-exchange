@@ -148,6 +148,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
     }
   }
   console.log(props.marketMakerData.outcomeTokenMarginalPrices)
+  console.log(props.marketMakerData)
   return (
     <>
       {props.isScalar ? (
