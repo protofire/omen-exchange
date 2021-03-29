@@ -1360,13 +1360,11 @@ class CPKService {
         // get mainnet relay signer
         const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
 
-        const withdrawAmount = amount.sub(RELAY_FEE)
-
         // relay to signer address on mainnet
         transactions.push({
           to: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
           data: XdaiService.encodeRelayTokens(to),
-          value: withdrawAmount.toString(),
+          value: amount.toString(),
         })
 
         const txObject = await this.cpk.execTransactions(transactions, txOptions)
