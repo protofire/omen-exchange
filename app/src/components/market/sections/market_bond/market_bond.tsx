@@ -55,7 +55,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
 
   const cpk = useConnectedCPKContext()
   const nativeAsset = getNativeAsset(networkId)
-  const symbol = nativeAsset
+  const { symbol } = nativeAsset
   const { realitio } = useContracts(context)
 
   const [message, setMessage] = useState<string>('')
