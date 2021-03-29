@@ -217,6 +217,7 @@ interface Props {
   lowerBound: BigNumber
   startingPoint?: Maybe<BigNumber>
   unit: string
+  currentAnswer?: string
   upperBound: BigNumber
   startingPointTitle: string
   currentPrediction?: Maybe<string>
@@ -249,6 +250,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     balances,
     borderTop,
     collateral,
+    currentAnswer,
     currentAnswerBond,
     currentPrediction,
     currentTab,
@@ -278,8 +280,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const currentPredictionNumber = calcPrediction(currentPrediction || '', lowerBound, upperBound)
   const newPredictionNumber = calcPrediction(newPrediction?.toString() || '', lowerBound, upperBound)
-  console.log(newPrediction)
-  console.log(currentPredictionNumber)
 
   const amountSharesNumber =
     collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals))
@@ -333,7 +333,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [longProfitAmount, setLongProfitAmount] = useState(0)
   const [longProfitPercentage, setLongProfitPercentage] = useState(0)
   const [shortProfitPercentage, setShortProfitPercentage] = useState(0)
-  console.log(scaleValue)
+
   useEffect(() => {
     let totalShortTradesCost = new BigNumber(0)
     let totalLongTradesCost = new BigNumber(0)
@@ -396,7 +396,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     setScaleValue(Number(scaleBall?.value))
     setScaleValuePrediction(calcPrediction((Number(scaleBall?.value) / 100).toString(), lowerBound, upperBound))
   }
-
   useEffect(() => {
     setScaleValue(
       newPrediction
@@ -552,7 +551,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'Bonded',
     },
     {
-      title: `${currentPredictionNumber.toFixed(2)} ${unit}`,
+      title:
+        currentAnswer && collateral
+          ? `${formatBigNumber(new BigNumber(currentAnswer), collateral.decimals)} ${unit}`
+          : '-',
       subtitle: isBonded ? 'Pending Outcome' : 'Final Outcome',
     },
   ]

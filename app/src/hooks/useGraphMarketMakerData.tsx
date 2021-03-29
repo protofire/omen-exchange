@@ -218,6 +218,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
       arbitrationOccurred: data.arbitrationOccurred,
       currentAnswerTimestamp: data.currentAnswerTimestamp ? bigNumberify(data.currentAnswerTimestamp) : null,
       currentAnswerBond: data.currentAnswerBond,
+      currentAnswer: data.currentAnswer,
       answers: data.question.answers,
       bonds: getBondedItems(outcomes, data.question.answers),
     },
