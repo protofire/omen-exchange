@@ -285,7 +285,7 @@ const Wrapper = (props: Props) => {
       await cpk.redeemPositions({
         isConditionResolved,
         // Round down in case of precision error
-        earnedCollateral: earnedCollateral.mul(99999).div(100000),
+        earnedCollateral: earnedCollateral.mul(99999999).div(100000000),
         question,
         numOutcomes: balances.length,
         oracle,
