@@ -131,13 +131,12 @@ const calcUserWinningsData = (
   let winningOutcomes
   let userWinningOutcomes
   if (isScalar) {
-    const outcomeWinnings = shares.map((share, i) => {
-      const finalAnswerMultiple = i === 0 ? 1 - finalAnswerPercentage : finalAnswerPercentage
-      return share.mul(new BigNumber(finalAnswerMultiple * 100000)).div(new BigNumber(100000))
-    })
-    userWinningShares = shares.reduce((acc, outcome) => acc.add(outcome)) || Zero
+    userWinningShares = shares.reduce((acc, outcome) => (acc && outcome ? acc.add(outcome) : Zero)) || Zero
     winningOutcomes = finalAnswerPercentage === (0 || 1) ? 1 : 2
-    userWinningOutcomes = outcomeWinnings.filter(outcome => outcome.gt(Zero)).length
+    userWinningOutcomes = shares.filter((share, i) => {
+      const finalAnswerMultiple = i === 0 ? 1 - finalAnswerPercentage : finalAnswerPercentage
+      return share && share.gt(Zero) && finalAnswerMultiple > 0
+    }).length
   } else {
     userWinningShares = payouts
       ? shares.reduce((acc, shares, index) => (payouts[index].gt(0) && shares ? acc.add(shares) : acc), Zero)
