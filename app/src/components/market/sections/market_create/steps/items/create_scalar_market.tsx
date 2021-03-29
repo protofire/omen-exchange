@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../../../common/constants'
@@ -119,29 +119,41 @@ export const CreateScalarMarket = (props: Props) => {
     unit,
     upperBound,
   } = props
+  const [upperBoundError, setUpperBoundError] = useState('')
+  const [err, setErr] = useState(false)
+  // try using err, setErr state object and setting it to "upperBound" then on
+  //the actual prop for error say err === "upperBound" ? Value must be less than ${upperBound < startingPoint ? 'starting Point' }
+  useEffect(() => {
+    let upperBoundNumber
+    if (upperBoundNumber) {
+      Number(upperBoundNumber) <= 0 ? setUpperBoundError('Value Must be greater than 0') : setUpperBoundError('')
+      // ? setUpperBoundError(`Value must be greater than ${lowerBoundNumber}`)
+      // : Number(upperBoundNumber) < Number(startingPointNumber)
+      // ? setUpperBoundError(`Value must be greater than ${startingPointNumber}`)
+      // : setUpperBoundError('')
+    }
+  })
 
   let lowerBoundError
   let startingPointError
-  let upperBoundError
+  // let upperBoundError
   let startingPointNumber
   let lowerBoundNumber
-  let upperBoundNumber
+
   // if the input values aren't null the number is cast to BigNumber with 18 decimals and precision value of 2.
   if (startingPoint !== null) {
     startingPointNumber = formatBigNumber(startingPoint, 18, 2)
+    setErr(!err)
   }
 
   if (lowerBound !== null) {
     lowerBoundNumber = formatBigNumber(lowerBound, 18, 2)
   }
 
-  if (upperBound !== null) {
-    upperBoundNumber = formatBigNumber(upperBound, 18, 2)
-  }
-  // //check for values to be non negative integers
-  // if (startingPointNumber !== undefined && startingPointNumber < '0') {
-  //   startingPointError = 'Value must be greater than 0'
-  // }
+  // // //check for values to be non negative integers
+  // // if (startingPointNumber !== undefined && startingPointNumber < '0') {
+  // //   startingPointError = 'Value must be greater than 0'
+  // // }
 
   // if (lowerBoundNumber !== undefined && lowerBoundNumber < '0') {
   //   lowerBoundError = 'Value must be greater than 0'
@@ -189,31 +201,21 @@ export const CreateScalarMarket = (props: Props) => {
   //   startingPointError = `Value must be less than ${upperBoundNumber}`
   // }
 
-  if (upperBoundNumber) {
-    Number(upperBoundNumber) <= 0
-      ? (upperBoundError = 'Value must be greater than 0')
-      : Number(upperBoundNumber) < Number(lowerBoundNumber)
-      ? (upperBoundError = `Value must be greater than ${lowerBoundNumber}`)
-      : Number(upperBoundNumber) < Number(startingPointNumber)
-      ? (upperBoundError = `Value must be greater than ${startingPointNumber}`)
-      : ''
-  }
+  // if (startingPointNumber) {
+  //   Number(startingPointNumber) <= 0
+  //     ? (startingPointError = 'Value must be greater than 0')
+  //     : Number(startingPointNumber) < Number(lowerBoundNumber)
+  //     ? (startingPointError = `Value must be greater than ${lowerBoundNumber}`)
+  //     : ''
+  // }
 
-  if (startingPointNumber) {
-    Number(startingPointNumber) <= 0
-      ? (startingPointError = 'Value must be greater than 0')
-      : Number(startingPointNumber) < Number(lowerBoundNumber)
-      ? (startingPointError = `Value must be greater than ${lowerBoundNumber}`)
-      : ''
-  }
-
-  if (lowerBoundNumber) {
-    Number(lowerBoundNumber) <= 0
-      ? (lowerBoundError = 'Value must be greater than 0')
-      : Number(lowerBoundNumber) > Number(upperBoundNumber)
-      ? (lowerBoundError = `Value must be less than ${upperBoundNumber}`)
-      : ''
-  }
+  // if (lowerBoundNumber) {
+  //   Number(lowerBoundNumber) <= 0
+  //     ? (lowerBoundError = 'Value must be greater than 0')
+  //     : Number(lowerBoundNumber) > Number(upperBoundNumber)
+  //     ? (lowerBoundError = `Value must be less than ${upperBoundNumber}`)
+  //     : ''
+  // }
 
   return (
     <>
