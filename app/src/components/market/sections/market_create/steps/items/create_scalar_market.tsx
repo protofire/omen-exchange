@@ -119,103 +119,51 @@ export const CreateScalarMarket = (props: Props) => {
     unit,
     upperBound,
   } = props
-  const [upperBoundError, setUpperBoundError] = useState('')
-  const [err, setErr] = useState(false)
-  // try using err, setErr state object and setting it to "upperBound" then on
-  //the actual prop for error say err === "upperBound" ? Value must be less than ${upperBound < startingPoint ? 'starting Point' }
-  useEffect(() => {
-    let upperBoundNumber
-    if (upperBoundNumber) {
-      Number(upperBoundNumber) <= 0 ? setUpperBoundError('Value Must be greater than 0') : setUpperBoundError('')
-      // ? setUpperBoundError(`Value must be greater than ${lowerBoundNumber}`)
-      // : Number(upperBoundNumber) < Number(startingPointNumber)
-      // ? setUpperBoundError(`Value must be greater than ${startingPointNumber}`)
-      // : setUpperBoundError('')
-    }
-  })
 
-  let lowerBoundError
-  let startingPointError
-  // let upperBoundError
-  let startingPointNumber
-  let lowerBoundNumber
+  let lowerBoundNumber: string
+  let startingPointNumber: string
+  let upperBoundNumber: string
 
-  // if the input values aren't null the number is cast to BigNumber with 18 decimals and precision value of 2.
   if (startingPoint !== null) {
     startingPointNumber = formatBigNumber(startingPoint, 18, 2)
-    setErr(!err)
   }
 
   if (lowerBound !== null) {
     lowerBoundNumber = formatBigNumber(lowerBound, 18, 2)
   }
 
-  // // //check for values to be non negative integers
-  // // if (startingPointNumber !== undefined && startingPointNumber < '0') {
-  // //   startingPointError = 'Value must be greater than 0'
-  // // }
+  if (upperBound !== null) {
+    upperBoundNumber = formatBigNumber(upperBound, 18, 2)
+  }
+  const [lowerBoundError, setLowerBoundError] = useState('')
+  const [startingPointError, setStartingPointError] = useState('')
+  const [upperBoundError, setUpperBoundError] = useState('')
 
-  // if (lowerBoundNumber !== undefined && lowerBoundNumber < '0') {
-  //   lowerBoundError = 'Value must be greater than 0'
-  // }
+  const handleLowerBoundError = (value: BigNumberInputReturn) => {
+    Number(value.formattedValue) <= 0
+      ? setLowerBoundError('Value must be greater than 0')
+      : Number(value.formattedValue) > Number(upperBoundNumber) && Number(upperBoundNumber) !== 0
+      ? setLowerBoundError(`Value must be less than ${upperBoundNumber}`)
+      : setLowerBoundError('')
+  }
 
-  // if (upperBoundNumber !== undefined && upperBoundNumber < '0') {
-  //   upperBoundError = 'Value must be greater than 0'
-  // }
-  // //checks for numbers which don't follow the input rules: lowerBound < startingPoint < upperBound. also errors for numbers equal to each other.
-  // if (
-  //   Number(startingPointNumber) > Number(upperBoundNumber) &&
-  //   upperBoundNumber !== undefined &&
-  //   Number(upperBoundNumber) > 0
-  // ) {
-  //   startingPointError = `Value must be less than ${upperBoundNumber}`
-  // } else if (startingPointNumber !== undefined && startingPointNumber === upperBoundNumber) {
-  //   startingPointError = `Value cannot be equal to ${upperBoundNumber}`
-  // }
+  const handleStartingPointError = (value: BigNumberInputReturn) => {
+    Number(value.formattedValue) <= 0
+      ? setStartingPointError('Value must be greater than 0')
+      : Number(value.formattedValue) < Number(lowerBoundNumber)
+      ? setStartingPointError(`Value must be greater than ${lowerBoundNumber}`)
+      : setStartingPointError('')
+  }
 
-  // if (
-  //   Number(lowerBoundNumber) > Number(startingPointNumber) &&
-  //   startingPointNumber !== undefined &&
-  //   Number(startingPointNumber) > 0
-  // ) {
-  //   lowerBoundError = `Value must be less than ${startingPointNumber}`
-  // } else if (lowerBoundNumber !== undefined && lowerBoundNumber === startingPointNumber) {
-  //   lowerBoundError = `Value cannot be equal to ${startingPointNumber}`
-  // }
-
-  // if (
-  //   Number(lowerBoundNumber) > Number(upperBoundNumber) &&
-  //   upperBoundNumber !== undefined &&
-  //   Number(upperBoundNumber) > 0
-  // ) {
-  //   lowerBoundError = `Value must be less than ${upperBoundNumber}`
-  // } else if (lowerBoundNumber !== undefined && lowerBoundNumber === upperBoundNumber) {
-  //   lowerBoundError = `Value cannot be equal to ${upperBoundNumber}`
-  // }
-
-  // if (
-  //   Number(startingPointNumber) > Number(upperBoundNumber) &&
-  //   upperBoundNumber !== undefined &&
-  //   Number(upperBoundNumber) > 0
-  // ) {
-  //   startingPointError = `Value must be less than ${upperBoundNumber}`
-  // }
-
-  // if (startingPointNumber) {
-  //   Number(startingPointNumber) <= 0
-  //     ? (startingPointError = 'Value must be greater than 0')
-  //     : Number(startingPointNumber) < Number(lowerBoundNumber)
-  //     ? (startingPointError = `Value must be greater than ${lowerBoundNumber}`)
-  //     : ''
-  // }
-
-  // if (lowerBoundNumber) {
-  //   Number(lowerBoundNumber) <= 0
-  //     ? (lowerBoundError = 'Value must be greater than 0')
-  //     : Number(lowerBoundNumber) > Number(upperBoundNumber)
-  //     ? (lowerBoundError = `Value must be less than ${upperBoundNumber}`)
-  //     : ''
-  // }
+  const handleUpperBoundError = (value: BigNumberInputReturn) => {
+    Number(value.formattedValue) <= 0
+      ? setUpperBoundError('Value must be greater than 0')
+      : Number(value.formattedValue) < Number(lowerBoundNumber)
+      ? setUpperBoundError(`Value must be greater than ${lowerBoundNumber}`)
+      : Number(value.formattedValue) < Number(startingPointNumber)
+      ? setUpperBoundError(`Value must be greater than ${startingPointNumber}`)
+      : setUpperBoundError('')
+  }
 
   return (
     <>
@@ -242,7 +190,10 @@ export const CreateScalarMarket = (props: Props) => {
                 error={lowerBoundError}
                 min={0}
                 name="lowerBound"
-                onChange={handleChange}
+                onChange={value => {
+                  handleChange(value)
+                  handleLowerBoundError(value)
+                }}
                 placeholder={'0'}
                 value={lowerBound}
                 valueToDisplay={''}
@@ -260,7 +211,10 @@ export const CreateScalarMarket = (props: Props) => {
                 error={upperBoundError}
                 min={0}
                 name="upperBound"
-                onChange={handleChange}
+                onChange={value => {
+                  handleChange(value)
+                  handleUpperBoundError(value)
+                }}
                 placeholder={'1000'}
                 value={upperBound}
               />
@@ -278,7 +232,11 @@ export const CreateScalarMarket = (props: Props) => {
                 error={startingPointError}
                 min={0}
                 name="startingPoint"
-                onChange={handleChange}
+                onChange={value => {
+                  handleChange(value)
+                  handleStartingPointError(value)
+                  console.log(value)
+                }}
                 placeholder={'500'}
                 value={startingPoint}
               />
