@@ -54,9 +54,9 @@ interface Props {
   collateralToken: Token
   earnedCollateral: Maybe<BigNumber>
   invalid: boolean
-  userWinnerShares: BigNumber
-  userWinnersOutcomes: number
-  winnersOutcomes: number
+  userWinningShares: BigNumber
+  userWinningOutcomes: number
+  winningOutcomes: number
 }
 
 const MarketResolutionMessage = (props: Props) => {
@@ -65,20 +65,20 @@ const MarketResolutionMessage = (props: Props) => {
     collateralToken,
     earnedCollateral,
     invalid,
-    userWinnerShares,
-    userWinnersOutcomes,
-    winnersOutcomes,
+    userWinningOutcomes,
+    userWinningShares,
+    winningOutcomes,
     ...restProps
   } = props
 
-  const shares = formatBigNumber(userWinnerShares, collateralToken.decimals)
+  const shares = formatBigNumber(userWinningShares, collateralToken.decimals)
   const redeemString = earnedCollateral
     ? `${formatBigNumber(earnedCollateral, collateralToken.decimals)} ${collateralToken.symbol}`
     : 'NaN'
 
-  const lost = !invalid && userWinnersOutcomes === 0 && parseFloat(shares) > 0
-  const wonSingle = !invalid && userWinnersOutcomes === 1
-  const wonMultiple = !invalid && userWinnersOutcomes > 1
+  const lost = !invalid && userWinningOutcomes === 0 && parseFloat(shares) > 0
+  const wonSingle = !invalid && userWinningOutcomes === 1
+  const wonMultiple = !invalid && userWinningOutcomes > 1
   const participated = invalid || lost || wonSingle || wonMultiple
 
   let infoText = ''
@@ -89,9 +89,9 @@ const MarketResolutionMessage = (props: Props) => {
     infoTitle = 'Market is invalid!'
     icon = <Invalid />
     infoText = `${arbitrator.name} declared this market invalid. You own ${shares} Shares of ${
-      userWinnersOutcomes === 1 ? `an outcome` : `${userWinnersOutcomes} outcomes`
+      userWinningOutcomes === 1 ? `an outcome` : `${userWinningOutcomes} outcomes`
     }
-      which can be redeem for `
+      which can be redeemed for `
   }
 
   if (lost) {
@@ -109,7 +109,7 @@ const MarketResolutionMessage = (props: Props) => {
   if (wonMultiple) {
     infoTitle = 'Congratulations!'
     icon = <Won />
-    infoText = `${arbitrator.name} declared ${winnersOutcomes} outcomes as valid. You have bought ${shares} Shares of ${userWinnersOutcomes} of the
+    infoText = `${arbitrator.name} declared ${winningOutcomes} outcomes as valid. You have bought ${shares} Shares of ${userWinningOutcomes} of the
   winning outcomes which can be redeemed for `
   }
 
