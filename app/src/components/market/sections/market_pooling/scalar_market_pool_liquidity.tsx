@@ -161,7 +161,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const { fetchFundingBalance, fundingBalance: maybeFundingBalance } = useFundingBalance(marketMakerAddress, context)
   const fundingBalance = maybeFundingBalance || Zero
 
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, STANDARD_DECIMALS), 5)
+  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals), 5)
   const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))

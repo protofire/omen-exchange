@@ -63,7 +63,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const probabilities = balances.map(balance => balance.probability)
   const initialBondAmount =
-    networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits(' < 0.01', nativeAsset.decimals)
+    networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
   const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
     currentAnswerBond ? new BigNumber(currentAnswerBond).mul(2) : initialBondAmount,
   )
@@ -172,10 +172,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <CurrenciesWrapper>
               <AssetBalance
                 asset={nativeAsset}
-                value={`${formatNumber(
-                  formatBigNumber(nativeAssetBalance, TokenEthereum.decimals, STANDARD_DECIMALS),
-                  3,
-                )}`}
+                value={`${formatNumber(formatBigNumber(nativeAssetBalance, TokenEthereum.decimals), 3)}`}
               />
             </CurrenciesWrapper>
 
@@ -200,9 +197,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Bond Amount"
-              value={`${formatNumber(
-                formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals, STANDARD_DECIMALS),
-              )} ${symbol}`}
+              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals))} ${symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
@@ -216,9 +211,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Loss"
-              value={`${formatNumber(
-                formatBigNumber(bondNativeAssetAmount, STANDARD_DECIMALS, STANDARD_DECIMALS),
-              )} ${symbol}`}
+              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, STANDARD_DECIMALS))} ${symbol}`}
             />
           </TransactionDetailsCard>
         </div>

@@ -122,7 +122,7 @@ export const ScalarMarketBuy = (props: Props) => {
     context,
   )
   const collateralBalance = maybeCollateralBalance || Zero
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, STANDARD_DECIMALS), 5)
+  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals), 5)
 
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount, collateral.decimals).includes('-'))
