@@ -102,7 +102,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
 
-  const baseCollateral = getInitialCollateral(networkId, collateral)
+  const baseCollateral = getInitialCollateral(networkId, collateral, relay)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
   let displayBalances = balances
   if (

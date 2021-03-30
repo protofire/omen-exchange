@@ -129,9 +129,7 @@ export const OutcomeTable = (props: Props) => {
   ]
 
   const TableCellsAlign = ['left', 'left', 'right', 'right', 'right', 'right', 'right']
-
   const symbol = useSymbol(displayCollateral)
-
   const renderTableHeader = () => {
     return (
       <THead>

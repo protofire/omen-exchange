@@ -86,7 +86,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
-  const baseCollateral = getInitialCollateral(networkId, collateral)
+  const baseCollateral = getInitialCollateral(networkId, collateral, relay)
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(defaultOutcomeIndex)
@@ -108,7 +108,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
   const collateralSymbol = collateral.symbol.toLowerCase()
   const symbol = useSymbol(displayCollateral)
-
   const wrapToken = getWrapToken(context.networkId)
   let displayTotalSymbol = symbol
   if (collateral.address === displayCollateral.address && collateral.address === wrapToken.address) {

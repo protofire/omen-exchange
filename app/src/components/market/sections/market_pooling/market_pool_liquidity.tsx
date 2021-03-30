@@ -119,7 +119,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [amountToRemoveDisplay, setAmountToRemoveDisplay] = useState<string>('')
   const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
-  const [displayCollateral, setDisplayCollateral] = useState<Token>(getInitialCollateral(context.networkId, collateral))
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(
+    getInitialCollateral(context.networkId, collateral, relay),
+  )
   const { allowance, unlock } = useCpkAllowance(signer, displayCollateral.address)
   let symbol = useSymbol(collateral)
   const collateralSymbol = collateral.symbol.toLowerCase()
