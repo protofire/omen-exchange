@@ -22,7 +22,7 @@ import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { ModalTransactionWrapper } from '../../../modal'
 import { AssetBalance } from '../../common/asset_balance'
-import { CurrenciesWrapper } from '../../common/common_styled'
+import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -72,6 +72,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
 
+  const amountError = props.isScalar ? 'erroro' : 'denor'
   useEffect(() => {
     const fetchBalance = async () => {
       try {
@@ -236,6 +237,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
                 symbol={getUnit(props.marketMakerData.question.title)}
               />
             )}
+            {amountError && <GenericError>{amountError}</GenericError>}
           </>
         </div>
         <div>
