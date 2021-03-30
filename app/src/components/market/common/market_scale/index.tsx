@@ -547,11 +547,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'Predicted Outcome',
     },
     {
-      title: `${
-        currentAnswerBond && currentAnswerBond.gt(Zero)
-          ? `${formatBigNumber(currentAnswerBond, 18)}  ${collateral && collateral.symbol}`
-          : '-'
-      }`,
+      title:
+        currentAnswerBond && collateral
+          ? `${formatBigNumber(currentAnswerBond, collateral.decimals)}  ${collateral && collateral.symbol}`
+          : '-',
       subtitle: 'Bonded',
     },
     {
