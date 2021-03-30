@@ -115,7 +115,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const symbol = useSymbol(displayCollateral)
-  console.log(nativeAsset, marketMakerData.collateral)
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [amount, setAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
@@ -304,7 +303,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   )} ${symbol}`
   const sharesTotal = formatNumber(formatBigNumber(displayTradedShares, baseCollateral.decimals))
   const total = `${sharesTotal} Shares`
-  console.log(formatBigNumber(maybeCollateralBalance || Zero, displayCollateral.decimals, 5))
+
   const amountError = isTransactionProcessing
     ? null
     : maybeCollateralBalance === null
