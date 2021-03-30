@@ -1,7 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { formatBigNumber, formatNumber, isDust, reverseArray } from '../../../../util/tools'
 import { BalanceItem } from '../../../../util/types'
 import { RadioInput } from '../../../common'
