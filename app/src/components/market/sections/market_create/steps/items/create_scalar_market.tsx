@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent, useEffect, useState } from 'react'
+import React, { ChangeEvent, useState } from 'react'
 import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../../../common/constants'
@@ -135,6 +135,7 @@ export const CreateScalarMarket = (props: Props) => {
   if (upperBound !== null) {
     upperBoundNumber = formatBigNumber(upperBound, 18, 2)
   }
+
   const [lowerBoundError, setLowerBoundError] = useState('')
   const [startingPointError, setStartingPointError] = useState('')
   const [upperBoundError, setUpperBoundError] = useState('')
@@ -235,7 +236,6 @@ export const CreateScalarMarket = (props: Props) => {
                 onChange={value => {
                   handleChange(value)
                   handleStartingPointError(value)
-                  console.log(value)
                 }}
                 placeholder={'500'}
                 value={startingPoint}
