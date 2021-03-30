@@ -113,15 +113,40 @@ const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: 
   // use floor as rounding method
   Big.RM = 0
 
-  const clampedFinalAnswer = new Big(
-    finalAnswerPercentage > 1 ? 1 : finalAnswerPercentage < 0 ? 0 : finalAnswerPercentage,
-  )
-  const shortEarnedCollateral = new Big(balances[0].toString()).mul(new Big(1).sub(clampedFinalAnswer))
-  const longEarnedCollateral = new Big(balances[1].toString()).mul(clampedFinalAnswer)
+  const shortEarnedCollateral = new Big(balances[0].toString()).mul(new Big(1).sub(finalAnswerPercentage))
+  const longEarnedCollateral = new Big(balances[1].toString()).mul(finalAnswerPercentage)
   const collaterals = [shortEarnedCollateral, longEarnedCollateral]
   const earnedCollateral = collaterals.reduce((a, b) => a.add(b.toFixed(0)), bigNumberify(0))
 
   return earnedCollateral
+}
+
+const calcUserWinningsData = (
+  isScalar: boolean,
+  shares: BigNumber[],
+  payouts: Maybe<Big[]>,
+  finalAnswerPercentage: number,
+): { userWinningShares: BigNumber; winningOutcomes: number; userWinningOutcomes: number } => {
+  let userWinningShares
+  let winningOutcomes
+  let userWinningOutcomes
+  if (isScalar) {
+    userWinningShares = shares.reduce((acc, outcome) => (acc && outcome ? acc.add(outcome) : Zero)) || Zero
+    winningOutcomes = finalAnswerPercentage === (0 || 1) ? 1 : 2
+    userWinningOutcomes = shares.filter((share, i) => {
+      const finalAnswerMultiple = i === 0 ? 1 - finalAnswerPercentage : finalAnswerPercentage
+      return share && share.gt(Zero) && finalAnswerMultiple > 0
+    }).length
+  } else {
+    userWinningShares = payouts
+      ? shares.reduce((acc, shares, index) => (payouts[index].gt(0) && shares ? acc.add(shares) : acc), Zero)
+      : Zero
+    winningOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
+    userWinningOutcomes = payouts
+      ? payouts.filter((payout, index) => shares[index] && shares[index].gt(0) && payout.gt(0)).length
+      : 0
+  }
+  return { userWinningShares, winningOutcomes, userWinningOutcomes }
 }
 
 const Wrapper = (props: Props) => {
@@ -327,10 +352,13 @@ const Wrapper = (props: Props) => {
   const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), STANDARD_DECIMALS))
   const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), STANDARD_DECIMALS))
 
-  const finalAnswerPercentage =
+  const unclampedFinalAnswerPercentage =
     realitioAnswer && realitioAnswer.eq(MaxUint256)
       ? 0.5
       : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
+
+  const finalAnswerPercentage =
+    unclampedFinalAnswerPercentage > 1 ? 1 : unclampedFinalAnswerPercentage < 0 ? 0 : unclampedFinalAnswerPercentage
 
   const earnedCollateral = isScalar
     ? scalarComputeEarnedCollateral(
@@ -343,32 +371,20 @@ const Wrapper = (props: Props) => {
       )
 
   const hasWinningOutcomes = earnedCollateral && !isDust(earnedCollateral, collateralToken.decimals)
-  const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
-  const userWinnersOutcomes = payouts
-    ? // If payouts, the market is categorical so check how many outcomes are winners
-      payouts.filter(
-        (payout, index) => balances[index] && balances[index].shares && balances[index].shares.gt(0) && payout.gt(0),
-      ).length
-    : // Else see if the final answer is at the upper or lower bound and if the user has a corresponding share
-    balances.filter((balance, index) => index === finalAnswerPercentage)
-    ? 1
-    : // Else check how many outcomes the user has shares for as they will all win some amount
-      balances.filter(balance => {
-        balance.shares.gt(Zero)
-      }).length
 
-  const userWinnerShares = payouts
-    ? balances.reduce(
-        (acc, balance, index) => (payouts[index].gt(0) && balance.shares ? acc.add(balance.shares) : acc),
-        new BigNumber(0),
-      )
-    : new BigNumber(0)
+  const { userWinningOutcomes, userWinningShares, winningOutcomes } = calcUserWinningsData(
+    isScalar,
+    balances.map(balance => balance.shares),
+    payouts,
+    finalAnswerPercentage,
+  )
+
   const EPS = 0.01
 
   let invalid = false
 
   if (isScalar) {
-    if (question.answers && question.answers[question.answers.length - 1].answer === INVALID_ANSWER_ID) {
+    if (realitioAnswer?.eq(new BigNumber(INVALID_ANSWER_ID))) {
       invalid = true
     } else {
       invalid = false
@@ -405,7 +421,7 @@ const Wrapper = (props: Props) => {
             {isScalar ? (
               <MarketScale
                 borderTop={true}
-                currentPrediction={finalAnswerPercentage.toString()}
+                currentPrediction={unclampedFinalAnswerPercentage.toString()}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Final answer'}
                 unit={getUnit(question.title)}
@@ -429,9 +445,9 @@ const Wrapper = (props: Props) => {
                   collateralToken={collateralToken}
                   earnedCollateral={earnedCollateral}
                   invalid={invalid}
-                  userWinnerShares={userWinnerShares}
-                  userWinnersOutcomes={userWinnersOutcomes}
-                  winnersOutcomes={winnersOutcomes}
+                  userWinningOutcomes={userWinningOutcomes}
+                  userWinningShares={userWinningShares}
+                  winningOutcomes={winningOutcomes}
                 ></MarketResolutionMessageStyled>
               )}
               {isConditionResolved && !hasWinningOutcomes ? (
