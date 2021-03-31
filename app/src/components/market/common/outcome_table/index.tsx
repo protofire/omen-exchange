@@ -7,14 +7,7 @@ import { useConnectedWeb3Context, useSymbol } from '../../../../hooks'
 import { getOutcomeColor } from '../../../../theme/utils'
 import { getNativeAsset, getToken } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, getBaseTokenForCToken, mulBN } from '../../../../util/tools'
-import {
-  BalanceItem,
-  BondItem,
-  CompoundTokenType,
-  OutcomeTableValue,
-  Token,
-  TokenEthereum,
-} from '../../../../util/types'
+import { BalanceItem, BondItem, CompoundTokenType, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, THead, TR, Table } from '../../../common'
 import { BarDiagram } from '../bar_diagram_probabilities'
 import {
@@ -110,6 +103,8 @@ export const OutcomeTable = (props: Props) => {
     newBonds,
   } = props
   const context = useConnectedWeb3Context()
+  const { networkId, relay } = context
+  const nativeAsset = getNativeAsset(networkId, relay)
   let winningBondIndex = -1
   bonds.forEach((bond, bondIndex) => {
     if ((winningBondIndex === -1 || bonds[winningBondIndex].bondedEth.lt(bond.bondedEth)) && bond.bondedEth.gt(0)) {
@@ -164,11 +159,11 @@ export const OutcomeTable = (props: Props) => {
     const showBondBadge = isBond && withWinningOutcome && outcomeIndex === winningBondIndex
     const formattedBondedEth =
       bonds && bonds[outcomeIndex] && bonds[outcomeIndex].bondedEth
-        ? formatBigNumber(bonds[outcomeIndex].bondedEth, TokenEthereum.decimals)
+        ? formatBigNumber(bonds[outcomeIndex].bondedEth, nativeAsset.decimals)
         : ''
     const formattedNewBondedEth =
       newBonds && newBonds[outcomeIndex].bondedEth
-        ? formatBigNumber(newBonds[outcomeIndex].bondedEth, TokenEthereum.decimals)
+        ? formatBigNumber(newBonds[outcomeIndex].bondedEth, nativeAsset.decimals)
         : ''
     return (
       <TRExtended
@@ -223,11 +218,10 @@ export const OutcomeTable = (props: Props) => {
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
     const currentCollateral = displayCollateral ? displayCollateral : collateral
     let baseCollateral = collateral
-    const { networkId, relay } = context
     const collateralSymbol = collateral.symbol.toLowerCase()
     if (collateralSymbol in CompoundTokenType) {
       if (collateralSymbol === 'ceth') {
-        baseCollateral = getNativeAsset(networkId, relay)
+        baseCollateral = nativeAsset
       } else {
         const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
         baseCollateral = getToken(networkId, baseCollateralSymbol)
@@ -252,11 +246,11 @@ export const OutcomeTable = (props: Props) => {
     const showBondBadge = isBond && withWinningOutcome && outcomeIndex === winningBondIndex
     const formattedBondedEth =
       bonds && bonds[outcomeIndex] && bonds[outcomeIndex].bondedEth
-        ? formatBigNumber(bonds[outcomeIndex].bondedEth, TokenEthereum.decimals)
+        ? formatBigNumber(bonds[outcomeIndex].bondedEth, nativeAsset.decimals)
         : ''
     const formattedNewBondedEth =
       newBonds && newBonds[outcomeIndex].bondedEth
-        ? formatBigNumber(newBonds[outcomeIndex].bondedEth, TokenEthereum.decimals)
+        ? formatBigNumber(newBonds[outcomeIndex].bondedEth, nativeAsset.decimals)
         : ''
 
     return (
