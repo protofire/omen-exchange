@@ -136,11 +136,6 @@ export interface Token {
   balance?: string
 }
 
-export const TokenEthereum = {
-  decimals: 18,
-  symbol: 'ETH',
-}
-
 export interface QuestionLog {
   category: string
   lang: string

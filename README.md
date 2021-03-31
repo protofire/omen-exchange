@@ -50,6 +50,7 @@ The `build` directory in the `app` directory will now contain the build to be se
 | Uniswap V2 Factory                                                                     | [0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f](https://rinkeby.etherscan.io/address/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f#code) |
 | WETH9                                                                                  | [0xc778417E063141139Fce010982780140Aa0cD5Ab](https://rinkeby.etherscan.io/address/0xc778417E063141139Fce010982780140Aa0cD5Ab#code) |
 | GelatoCore                                                                             | [0x733aDEf4f8346FD96107d8d6605eA9ab5645d632](https://rinkeby.etherscan.io/address/0x733aDEf4f8346FD96107d8d6605eA9ab5645d632#code) |
+| LiquidityMiningFactory                                                                 | [0x781942B59CA2576a1eB199424F32998ad450ECA5](https://rinkeby.etherscan.io/address/0x781942B59CA2576a1eB199424F32998ad450ECA5#code) |
 
 ## xDai Network
 
