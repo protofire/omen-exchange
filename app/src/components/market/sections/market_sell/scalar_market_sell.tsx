@@ -22,7 +22,6 @@ import {
   formatBigNumber,
   formatNumber,
   getUnit,
-  handleSmallShares,
   mulBN,
 } from '../../../../util/tools'
 import { BalanceItem, MarketDetailsTab, MarketMakerData, Status, TransactionStep } from '../../../../util/types'
@@ -181,10 +180,10 @@ export const ScalarMarketSell = (props: Props) => {
         return
       }
 
-      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
+      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals, collateral.decimals)
 
       setStatus(Status.Loading)
-      setMessage(`Selling ${handleSmallShares(sharesAmount)} shares...`)
+      setMessage(`Selling ${formatNumber(sharesAmount)} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
@@ -204,7 +203,7 @@ export const ScalarMarketSell = (props: Props) => {
       setAmountShares(null)
       setAmountSharesToDisplay('')
       setStatus(Status.Ready)
-      setMessage(`Successfully sold ${handleSmallShares(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
+      setMessage(`Successfully sold ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
     } catch (err) {
       setStatus(Status.Error)
       setTxState(TransactionStep.error)

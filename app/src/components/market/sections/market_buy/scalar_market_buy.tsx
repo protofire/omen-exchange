@@ -27,7 +27,6 @@ import {
   formatBigNumber,
   formatNumber,
   getUnit,
-  handleSmallShares,
   mulBN,
 } from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token, TransactionStep } from '../../../../util/types'
@@ -250,10 +249,10 @@ export const ScalarMarketBuy = (props: Props) => {
         return
       }
 
-      const sharesAmount = formatBigNumber(tradedShares, collateral.decimals)
+      const sharesAmount = formatBigNumber(tradedShares, collateral.decimals, collateral.decimals)
       setTweet('')
       setStatus(Status.Loading)
-      setMessage(`Buying ${handleSmallShares(sharesAmount)} shares...`)
+      setMessage(`Buying ${formatNumber(sharesAmount)} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
@@ -281,7 +280,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
       setAmount(new BigNumber(0))
       setStatus(Status.Ready)
-      setMessage(`Successfully bought ${handleSmallShares(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
+      setMessage(`Successfully bought ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
     } catch (err) {
       setStatus(Status.Error)
       setTxState(TransactionStep.error)

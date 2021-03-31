@@ -25,7 +25,6 @@ import {
   formatNumber,
   getInitialCollateral,
   getSharesInBaseToken,
-  handleSmallShares,
   mulBN,
 } from '../../../../util/tools'
 import {
@@ -219,14 +218,18 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
-      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
+      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals, collateral.decimals)
       let displaySharesAmount = sharesAmount
       if (collateral.symbol.toLowerCase() in CompoundTokenType && amountShares && compoundService) {
         const displaySharesAmountValue = compoundService.calculateCTokenToBaseExchange(baseCollateral, amountShares)
-        displaySharesAmount = formatBigNumber(displaySharesAmountValue || Zero, baseCollateral.decimals)
+        displaySharesAmount = formatBigNumber(
+          displaySharesAmountValue || Zero,
+          baseCollateral.decimals,
+          baseCollateral.decimals,
+        )
       }
       setStatus(Status.Loading)
-      setMessage(`Selling ${handleSmallShares(displaySharesAmount)} shares...`)
+      setMessage(`Selling ${formatNumber(displaySharesAmount)} shares...`)
 
       let useBaseToken = false
       if (collateral.address !== displayCollateral.address) {
@@ -249,9 +252,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setDisplaySellShares(null)
       setAmountShares(null)
       setStatus(Status.Ready)
-      setMessage(
-        `Successfully sold ${handleSmallShares(displaySharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`,
-      )
+      setMessage(`Successfully sold ${formatNumber(displaySharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)

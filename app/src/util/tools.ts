@@ -515,10 +515,6 @@ export const formatNumber = (number: string, decimals = 2): string => {
   return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
 }
 
-export const handleSmallShares = (amount: string) => {
-  return Number(amount) < 0.01 ? '<0.01' : `${amount}`
-}
-
 export const formatHistoryDate = (dateData: number | string): string => {
   const date = new Date(new Date(dateData).toUTCString().substr(0, 25))
   const minute = date.getMinutes()

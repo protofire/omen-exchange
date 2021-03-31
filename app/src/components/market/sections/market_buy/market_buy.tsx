@@ -29,7 +29,6 @@ import {
   formatNumber,
   getInitialCollateral,
   getSharesInBaseToken,
-  handleSmallShares,
   mulBN,
 } from '../../../../util/tools'
 import {
@@ -227,10 +226,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           useBaseToken = true
         }
       }
-      const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals)
+      const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals)
       setTweet('')
       setStatus(Status.Loading)
-      setMessage(`Buying ${handleSmallShares(sharesAmount)} shares...`)
+      setMessage(`Buying ${formatNumber(sharesAmount)} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
@@ -258,7 +257,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )
       setDisplayAmountToFund(new BigNumber('0'))
       setStatus(Status.Ready)
-      setMessage(`Successfully bought ${handleSmallShares(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
+      setMessage(`Successfully bought ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)

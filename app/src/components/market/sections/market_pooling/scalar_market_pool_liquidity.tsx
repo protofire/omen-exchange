@@ -28,7 +28,6 @@ import {
   formatBigNumber,
   formatNumber,
   getUnit,
-  handleSmallShares,
   isDust,
 } from '../../../../util/tools'
 import {
@@ -231,9 +230,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
       }
 
-      const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
+      const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals, collateral.decimals)
 
-      setMessage(`Depositing funds: ${handleSmallShares(fundsAmount)} ${collateral.symbol}...`)
+      setMessage(`Depositing funds: ${formatNumber(fundsAmount)} ${collateral.symbol}...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
@@ -253,7 +252,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       setAmountToFund(null)
       setAmountToFundDisplay('')
-      setMessage(`Successfully deposited ${handleSmallShares(fundsAmount)} ${collateral.symbol}`)
+      setMessage(`Successfully deposited ${formatNumber(fundsAmount)} ${collateral.symbol}`)
     } catch (err) {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to deposit funds.`)
@@ -267,9 +266,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         return
       }
 
-      const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
+      const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
 
-      setMessage(`Withdrawing funds: ${handleSmallShares(fundsAmount)} ${collateral.symbol}...`)
+      setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${collateral.symbol}...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
@@ -297,7 +296,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
-      setMessage(`Successfully withdrew ${handleSmallShares(fundsAmount)} ${collateral.symbol}`)
+      setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${collateral.symbol}`)
     } catch (err) {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to withdraw funds.`)
