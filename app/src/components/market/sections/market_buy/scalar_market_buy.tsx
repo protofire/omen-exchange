@@ -207,16 +207,16 @@ export const ScalarMarketBuy = (props: Props) => {
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
-  const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals, STANDARD_DECIMALS))} ${
+  const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals, collateral.decimals))} ${
     collateral.symbol
   }`
-  const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals, STANDARD_DECIMALS))} ${
+  const baseCostFormatted = `${formatNumber(formatBigNumber(baseCost, collateral.decimals, collateral.decimals))} ${
     collateral.symbol
   }`
   const potentialProfitFormatted = potentialProfit.gt(Zero)
     ? `${formatNumber(Number(formatBigNumber(potentialProfit, collateral.decimals)).toString())} ${collateral.symbol}`
     : `0.00 ${collateral.symbol}`
-  const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals, STANDARD_DECIMALS))
+  const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals, collateral.decimals))
   const total = `${sharesTotal} Shares`
 
   const showSetAllowance =

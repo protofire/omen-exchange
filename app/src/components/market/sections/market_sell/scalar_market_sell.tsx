@@ -213,7 +213,7 @@ export const ScalarMarketSell = (props: Props) => {
   }
 
   const selectedOutcomeBalance = formatNumber(
-    formatBigNumber(balanceItem.shares, collateral.decimals, STANDARD_DECIMALS),
+    formatBigNumber(balanceItem.shares, collateral.decimals, collateral.decimals),
   )
 
   const amountError =
@@ -288,7 +288,7 @@ export const ScalarMarketSell = (props: Props) => {
             <TransactionDetailsRow
               title={'Sell Amount'}
               value={`${formatNumber(
-                formatBigNumber(amountShares || Zero, collateral.decimals, STANDARD_DECIMALS),
+                formatBigNumber(amountShares || Zero, collateral.decimals, collateral.decimals),
               )} Shares`}
             />
             <TransactionDetailsRow
@@ -297,7 +297,9 @@ export const ScalarMarketSell = (props: Props) => {
               title={'Revenue'}
               value={
                 potentialValue
-                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, STANDARD_DECIMALS))} ${symbol}`
+                  ? `${formatNumber(
+                      formatBigNumber(potentialValue, collateral.decimals, collateral.decimals),
+                    )} ${symbol}`
                   : '0.00'
               }
             />
@@ -305,7 +307,7 @@ export const ScalarMarketSell = (props: Props) => {
               title={'Fee'}
               value={`${
                 costFee
-                  ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, STANDARD_DECIMALS))
+                  ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, collateral.decimals))
                   : '0.00'
               }
                 ${symbol}`}
@@ -324,7 +326,7 @@ export const ScalarMarketSell = (props: Props) => {
               title={'Total'}
               value={`${
                 tradedCollateral
-                  ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, STANDARD_DECIMALS))
+                  ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, collateral.decimals))
                   : '0.00'
               } ${symbol}`}
             />

@@ -273,7 +273,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     })
   }
   const selectedOutcomeBalance = formatNumber(
-    formatBigNumber(balanceItem.shares, collateral.decimals, STANDARD_DECIMALS),
+    formatBigNumber(balanceItem.shares, collateral.decimals, collateral.decimals),
   )
   let displaySelectedOutcomeBalance = selectedOutcomeBalance
   let displaySelectedOutcomeBalanceValue = balanceItem.shares
@@ -410,7 +410,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               value={
                 potentialValueNormalized
                   ? `${formatNumber(
-                      formatBigNumber(potentialValueNormalized, displayCollateral.decimals, STANDARD_DECIMALS),
+                      formatBigNumber(potentialValueNormalized, displayCollateral.decimals, displayCollateral.decimals),
                     )} 
                   ${symbol}`
                   : '0.00'
@@ -421,7 +421,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               value={`${
                 costFeeNormalized
                   ? formatNumber(
-                      formatBigNumber(costFeeNormalized.mul(-1), displayCollateral.decimals, STANDARD_DECIMALS),
+                      formatBigNumber(
+                        costFeeNormalized.mul(-1),
+                        displayCollateral.decimals,
+                        displayCollateral.decimals,
+                      ),
                     )
                   : '0.00'
               } ${symbol}`}
@@ -441,7 +445,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               value={`${
                 normalizedTradedCollateral
                   ? formatNumber(
-                      formatBigNumber(normalizedTradedCollateral, displayCollateral.decimals, STANDARD_DECIMALS),
+                      formatBigNumber(
+                        normalizedTradedCollateral,
+                        displayCollateral.decimals,
+                        displayCollateral.decimals,
+                      ),
                     )
                   : '0.00'
               } ${displayTotalSymbol}`}

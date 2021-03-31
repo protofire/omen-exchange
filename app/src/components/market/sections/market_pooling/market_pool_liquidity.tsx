@@ -680,7 +680,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 state={(displayPoolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Pool Tokens"
                 value={`${formatNumber(
-                  formatBigNumber(displayPoolTokens, baseCollateral.decimals, STANDARD_DECIMALS),
+                  formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals),
                 )}`}
               />
             </TransactionDetailsCard>

@@ -521,7 +521,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 emphasizeValue={poolTokens.gt(0)}
                 state={(poolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Pool Tokens"
-                value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals, STANDARD_DECIMALS))}`}
+                value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals, collateral.decimals))}`}
               />
             </TransactionDetailsCard>
           )}
@@ -532,14 +532,14 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 state={ValueStates.success}
                 title="Earned"
                 value={`${formatNumber(
-                  formatBigNumber(userEarnings, collateral.decimals, STANDARD_DECIMALS),
+                  formatBigNumber(userEarnings, collateral.decimals, collateral.decimals),
                 )} ${symbol}`}
               />
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"
                 value={`${formatNumber(
-                  formatBigNumber(depositedTokens, collateral.decimals, STANDARD_DECIMALS),
+                  formatBigNumber(depositedTokens, collateral.decimals, collateral.decimals),
                 )} ${symbol}`}
               />
               <TransactionDetailsLine />
