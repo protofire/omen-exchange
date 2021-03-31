@@ -96,6 +96,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     marketMakerData.collateral.address.toLowerCase() === wrapToken.address.toLowerCase()
       ? nativeAsset
       : marketMakerData.collateral
+
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
   const collateralSymbol = collateral.symbol.toLowerCase()
 
@@ -114,7 +115,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const symbol = useSymbol(displayCollateral)
-
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [amount, setAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))

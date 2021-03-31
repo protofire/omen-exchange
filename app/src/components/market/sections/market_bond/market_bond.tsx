@@ -22,7 +22,7 @@ import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { ModalTransactionWrapper } from '../../../modal'
 import { AssetBalance } from '../../common/asset_balance'
-import { CurrenciesWrapper } from '../../common/common_styled'
+import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -66,6 +66,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const probabilities = balances.map(balance => balance.probability)
   const [bondOutcomeSelected, setBondOutcomeSelected] = useState<BigNumber>(Zero)
   const [bondOutcomeDisplay, setBondOutcomeDisplay] = useState<string>('')
+  const [amountError, setAmountError] = useState<boolean>(false)
 
   const [nativeAssetBalance, setNativeAssetBalance] = useState<BigNumber>(Zero)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
@@ -76,6 +77,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
     const fetchBalance = async () => {
       try {
         const balance = await provider.getBalance(account || '')
+        setAmountError(balance.lte(bondNativeAssetAmount))
         setNativeAssetBalance(balance)
       } catch (error) {
         setNativeAssetBalance(Zero)
@@ -84,7 +86,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
     if (account) {
       fetchBalance()
     }
-  }, [account, provider])
+  }, [account, provider, bondNativeAssetAmount])
 
   const bondOutcome = async (isInvalid?: boolean) => {
     if (!cpk) {
@@ -236,6 +238,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
                 symbol={getUnit(props.marketMakerData.question.title)}
               />
             )}
+            {amountError && <GenericError>Insufficient funds to Bond</GenericError>}
           </>
         </div>
         <div>
@@ -272,11 +275,11 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           Back
         </Button>
         {props.isScalar && (
-          <Button buttonType={ButtonType.secondaryLine} onClick={() => bondOutcome(true)}>
+          <Button buttonType={ButtonType.secondaryLine} disabled={amountError} onClick={() => bondOutcome(true)}>
             Set Invalid
           </Button>
         )}
-        <Button buttonType={ButtonType.primary} onClick={() => bondOutcome(false)}>
+        <Button buttonType={ButtonType.primary} disabled={amountError} onClick={() => bondOutcome(false)}>
           Bond {symbol}
         </Button>
       </BottomButtonWrapper>
