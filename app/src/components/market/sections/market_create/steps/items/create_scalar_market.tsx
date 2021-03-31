@@ -1,10 +1,10 @@
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../../../hooks'
-import { formatBigNumber } from '../../../../../../util/tools'
+import { formatBigNumber, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator } from '../../../../../../util/types'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { DateField, FormRow, Textfield } from '../../../../../common'
@@ -120,49 +120,39 @@ export const CreateScalarMarket = (props: Props) => {
     upperBound,
   } = props
 
-  let lowerBoundNumber: string
-  let startingPointNumber: string
-  let upperBoundNumber: string
-
-  if (startingPoint !== null) {
-    startingPointNumber = formatBigNumber(startingPoint, 18, 2)
-  }
-
-  if (lowerBound !== null) {
-    lowerBoundNumber = formatBigNumber(lowerBound, 18, 2)
-  }
-
-  if (upperBound !== null) {
-    upperBoundNumber = formatBigNumber(upperBound, 18, 2)
-  }
-
   const [lowerBoundError, setLowerBoundError] = useState('')
   const [startingPointError, setStartingPointError] = useState('')
   const [upperBoundError, setUpperBoundError] = useState('')
 
-  const handleLowerBoundError = (value: BigNumberInputReturn) => {
-    Number(value.formattedValue) <= 0
-      ? setLowerBoundError('Value must be greater than 0')
-      : Number(value.formattedValue) > Number(upperBoundNumber) && Number(upperBoundNumber) !== 0
-      ? setLowerBoundError(`Value must be less than ${upperBoundNumber}`)
-      : setLowerBoundError('')
+  const handleLowerBoundError = (value: BigNumberInputReturn, upperBound: Maybe<BigNumber>) => {
+    if (value) {
+      Number(value.formattedValue) <= 0
+        ? setLowerBoundError('Value must be greater than 0')
+        : Number(value.formattedValue) > Number(upperBound) && Number(upperBound) !== 0
+        ? setLowerBoundError(`Value must be less than ${upperBound}`)
+        : setLowerBoundError('')
+    }
   }
 
   const handleStartingPointError = (value: BigNumberInputReturn) => {
     Number(value.formattedValue) <= 0
       ? setStartingPointError('Value must be greater than 0')
-      : Number(value.formattedValue) < Number(lowerBoundNumber)
-      ? setStartingPointError(`Value must be greater than ${lowerBoundNumber}`)
+      : Number(value.formattedValue) < Number(lowerBound)
+      ? setStartingPointError(`Value must be greater than ${lowerBound}`)
       : setStartingPointError('')
   }
 
-  const handleUpperBoundError = (value: BigNumberInputReturn) => {
+  const handleUpperBoundError = (
+    value: BigNumberInputReturn,
+    lowerBound: Maybe<BigNumber>,
+    startingPoint: Maybe<BigNumber>,
+  ) => {
     Number(value.formattedValue) <= 0
       ? setUpperBoundError('Value must be greater than 0')
-      : Number(value.formattedValue) < Number(lowerBoundNumber)
-      ? setUpperBoundError(`Value must be greater than ${lowerBoundNumber}`)
-      : Number(value.formattedValue) < Number(startingPointNumber)
-      ? setUpperBoundError(`Value must be greater than ${startingPointNumber}`)
+      : Number(value.formattedValue) < Number(lowerBound)
+      ? setUpperBoundError(`Value must be greater than ${lowerBound}`)
+      : startingPoint && Number(value.formattedValue) < Number(startingPoint)
+      ? setUpperBoundError(`Amount must be greater than ${startingPoint}!`)
       : setUpperBoundError('')
   }
 
@@ -193,7 +183,7 @@ export const CreateScalarMarket = (props: Props) => {
                 name="lowerBound"
                 onChange={value => {
                   handleChange(value)
-                  handleLowerBoundError(value)
+                  handleLowerBoundError(value, upperBound)
                 }}
                 placeholder={'0'}
                 value={lowerBound}
@@ -214,7 +204,7 @@ export const CreateScalarMarket = (props: Props) => {
                 name="upperBound"
                 onChange={value => {
                   handleChange(value)
-                  handleUpperBoundError(value)
+                  handleUpperBoundError(value, lowerBound, startingPoint)
                 }}
                 placeholder={'1000'}
                 value={upperBound}
