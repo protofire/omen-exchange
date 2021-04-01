@@ -43,10 +43,15 @@ type GraphResponse = {
   ]
 }
 
-export const useTokens = (context: ConnectedWeb3Context, addNativeAsset?: boolean, addBalances?: boolean) => {
+export const useTokens = (
+  context: ConnectedWeb3Context,
+  addNativeAsset?: boolean,
+  addBalances?: boolean,
+  relay?: boolean,
+) => {
   const defaultTokens = getTokensByNetwork(context.networkId)
   if (addNativeAsset) {
-    defaultTokens.unshift(getNativeAsset(context.networkId))
+    defaultTokens.unshift(getNativeAsset(context.networkId, relay))
   }
   const [tokens, setTokens] = useState<Token[]>(defaultTokens)
 

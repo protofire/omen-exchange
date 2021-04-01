@@ -58,7 +58,7 @@ export const CurrencySelector: React.FC<Props> = props => {
     ...restProps
   } = props
 
-  const { refetch, tokens } = useTokens(context, addNativeAsset, addBalances)
+  const { refetch, tokens } = useTokens(context, addNativeAsset, addBalances, context.relay)
 
   useEffect(() => {
     refetch()

@@ -42,6 +42,7 @@ interface Props {
 
 const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { networkId, relay } = context
   const { compoundService, marketMakerData } = props
   const history = useHistory()
 
@@ -64,7 +65,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     submissionIDs,
   } = marketMakerData
   const { title } = question
-  const ovmAddress = getContractAddress(context.networkId, 'omenVerifiedMarkets')
+  const ovmAddress = getContractAddress(networkId, 'omenVerifiedMarkets')
 
   const [showingProgressBar, setShowingProgressBar] = useState(false)
 
@@ -81,9 +82,9 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     setShowingProgressBar(!showingProgressBar)
   }
 
-  const nativeAssetAddress = getNativeAsset(context.networkId).address.toLowerCase()
-  const wrapTokenAddress = getWrapToken(context.networkId).address.toLowerCase()
-  const filter = getMarketRelatedQuestionFilter(marketsRelatedQuestion, context.networkId)
+  const nativeAssetAddress = getNativeAsset(networkId, relay).address.toLowerCase()
+  const wrapTokenAddress = getWrapToken(networkId).address.toLowerCase()
+  const filter = getMarketRelatedQuestionFilter(marketsRelatedQuestion, networkId)
 
   return (
     <>
@@ -97,7 +98,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
               disabled={false}
               filters={filter}
               onSelect={(currency: Token | null) =>
-                onChangeMarketCurrency(marketsRelatedQuestion, currency, collateral, context.networkId, history)
+                onChangeMarketCurrency(marketsRelatedQuestion, currency, collateral, networkId, history)
               }
               placeholder=""
             />

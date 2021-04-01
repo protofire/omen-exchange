@@ -82,7 +82,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const cpk = useConnectedCPKContext()
   const { fetchBalances } = useConnectedBalanceContext()
 
-  const { library: provider, networkId } = context
+  const { library: provider, networkId, relay } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
@@ -91,7 +91,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const wrapToken = getWrapToken(networkId)
-  const nativeAsset = getNativeAsset(networkId)
+  const nativeAsset = getNativeAsset(networkId, relay)
   const initialCollateral =
     marketMakerData.collateral.address.toLowerCase() === wrapToken.address.toLowerCase()
       ? nativeAsset
@@ -102,7 +102,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
 
-  const baseCollateral = getInitialCollateral(networkId, collateral)
+  const baseCollateral = getInitialCollateral(networkId, collateral, relay)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
   let displayBalances = balances
   if (
@@ -370,6 +370,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setDisplayFundAmount(value)
   }
 
+  const currencySelectorIsDisabled = relay ? true : currencyFilters.length ? false : true
+
   return (
     <>
       <OutcomeTable
@@ -407,7 +409,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               balance={formatBigNumber(maybeCollateralBalance || Zero, displayCollateral.decimals, 5)}
               context={context}
               currency={displayCollateral.address}
-              disabled={currencyFilters.length ? false : true}
+              disabled={currencySelectorIsDisabled}
               filters={currencyFilters}
               onSelect={(token: Token | null) => {
                 if (token) {
