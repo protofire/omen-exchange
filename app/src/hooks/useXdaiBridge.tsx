@@ -78,7 +78,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
     }
   }
 
-  const claimLatestToken = async () => {
+  const claimAllTokens = async () => {
     try {
       if (!cpk) return
       const transaction = await cpk.claimDaiTokens()
@@ -105,10 +105,16 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
   }
   const fetchUnclaimedAssets = async () => {
     const xDaiService = new XdaiService(provider)
-    const transaction = await xDaiService.fetchXdaiTransactionData()
-    if (transaction) {
+    const transactions = await xDaiService.fetchXdaiTransactionData()
+
+    if (transactions) {
+      let aggregator: BigNumber = Zero
+      for (const { value } of transactions) {
+        aggregator = aggregator.add(value)
+      }
       setClaimState(true)
-      setUnclaimedAmount(transaction.value)
+
+      setUnclaimedAmount(aggregator)
       return
     }
 
@@ -128,7 +134,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
   }, [networkId, account, provider])
 
   return {
-    claimLatestToken,
+    claimLatestToken: claimAllTokens,
     transferFunction,
     fetchUnclaimedAssets,
     isClaimStateTransaction,
