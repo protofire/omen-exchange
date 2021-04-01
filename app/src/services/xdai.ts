@@ -5,6 +5,7 @@ import { BigNumber } from 'ethers/utils'
 import {
   DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   DEFAULT_TOKEN_ADDRESS,
+  MULTI_CLAIM_ADDRESS,
   XDAI_FOREIGN_BRIDGE,
   XDAI_HOME_BRIDGE,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
@@ -135,7 +136,6 @@ class XdaiService {
   }
 
   claim = async (messages: string[], signatures: string[]) => {
-    const MULTI_CLAIM_ADDRESS = '0xE0A392a61357F86f0da2d1586b91cA54e9097022'
     const multiclaim = new ethers.Contract(MULTI_CLAIM_ADDRESS, multiClaimAbi, this.provider.signer.signer)
     return multiclaim.claim(messages, signatures)
   }
