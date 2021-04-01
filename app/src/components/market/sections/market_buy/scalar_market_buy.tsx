@@ -69,7 +69,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const cpk = useConnectedCPKContext()
   const { fetchBalances } = useConnectedBalanceContext()
 
-  const { library: provider, networkId } = context
+  const { library: provider, networkId, relay } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const {
@@ -93,7 +93,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const [amountDisplay, setAmountDisplay] = useState<string>('')
 
   const wrapToken = getWrapToken(networkId)
-  const nativeAsset = getNativeAsset(networkId)
+  const nativeAsset = getNativeAsset(networkId, relay)
   const initialCollateral =
     marketMakerData.collateral.address.toLowerCase() === wrapToken.address.toLowerCase()
       ? nativeAsset
@@ -296,6 +296,8 @@ export const ScalarMarketBuy = (props: Props) => {
       ? [wrapToken.address.toLowerCase(), pseudoNativeAssetAddress.toLowerCase()]
       : []
 
+  const currencySelectorIsDisabled = relay ? true : currencyFilters.length ? false : true
+
   return (
     <>
       <MarketScale
@@ -330,7 +332,7 @@ export const ScalarMarketBuy = (props: Props) => {
               balance={walletBalance}
               context={context}
               currency={collateral.address}
-              disabled={currencyFilters.length ? false : true}
+              disabled={currencySelectorIsDisabled}
               filters={currencyFilters}
               onSelect={(token: Token | null) => {
                 if (token) {

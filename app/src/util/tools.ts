@@ -730,7 +730,7 @@ export const bigMin = (array: Big[]) => {
  * If collateral is cToken type then display is the base collateral
  * Else display is the collateral
  */
-export const getInitialCollateral = (networkId: number, collateral: Token): Token => {
+export const getInitialCollateral = (networkId: number, collateral: Token, relay = false): Token => {
   const collateralSymbol = collateral.symbol.toLowerCase()
   if (collateralSymbol in CompoundTokenType) {
     if (collateralSymbol === 'ceth') {
@@ -742,7 +742,7 @@ export const getInitialCollateral = (networkId: number, collateral: Token): Toke
     }
   } else {
     if (collateral.address === getWrapToken(networkId).address) {
-      return getNativeAsset(networkId)
+      return getNativeAsset(networkId, relay)
     } else {
       return collateral
     }
