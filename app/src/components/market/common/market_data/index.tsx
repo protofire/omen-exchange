@@ -91,6 +91,7 @@ export const MarketData: React.FC<Props> = props => {
   } = props
 
   const context = useConnectedWeb3Context()
+  const { networkId, relay } = context
   const { tokens } = useTokens(context)
   const [currencyIcon, setCurrencyIcon] = useState<string | undefined>('')
   const [showUTC, setShowUTC] = useState<boolean>(true)
@@ -120,7 +121,7 @@ export const MarketData: React.FC<Props> = props => {
   const currencySymbol = currency.symbol.toLowerCase()
   if (compoundService && currencySymbol in CompoundTokenType) {
     if (currencySymbol === 'ceth') {
-      baseCurrency = getNativeAsset(context.networkId)
+      baseCurrency = getNativeAsset(networkId, relay)
     } else {
       const baseCurrencySymbol = getBaseTokenForCToken(currency.symbol) as KnownToken
       baseCurrency = getToken(context.networkId, baseCurrencySymbol)
