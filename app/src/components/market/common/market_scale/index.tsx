@@ -240,6 +240,7 @@ interface Props {
   isBonded?: boolean
   currentAnswerBond?: Maybe<BigNumber>
   isClosed?: boolean
+  outcomePredictedByMarket?: Maybe<string>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
@@ -262,6 +263,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     long,
     lowerBound,
     newPrediction,
+    outcomePredictedByMarket,
     positionTable,
     short,
     startingPoint,
@@ -280,6 +282,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const currentPredictionNumber = calcPrediction(currentPrediction || '', lowerBound, upperBound)
   const newPredictionNumber = calcPrediction(newPrediction?.toString() || '', lowerBound, upperBound)
+  const marketPredictionNumber = calcPrediction(outcomePredictedByMarket || '', lowerBound, upperBound)
 
   const amountSharesNumber =
     collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals))
@@ -543,7 +546,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const bondedValueBoxData = [
     {
-      title: `${currentPredictionNumber.toFixed(2)} ${unit}`,
+      title: `${marketPredictionNumber.toFixed(2)} ${unit}`,
       subtitle: 'Predicted Outcome',
     },
     {

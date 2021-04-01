@@ -425,13 +425,14 @@ const Wrapper = (props: Props) => {
                 collateral={props.marketMakerData.collateral}
                 currentAnswer={props.marketMakerData.question.currentAnswer}
                 currentAnswerBond={props.marketMakerData.question.currentAnswerBond}
-                currentPrediction={
+                currentPrediction={unclampedFinalAnswerPercentage.toString()}
+                isClosed={true}
+                lowerBound={scalarLow || new BigNumber(0)}
+                outcomePredictedByMarket={
                   props.marketMakerData.outcomeTokenMarginalPrices
                     ? props.marketMakerData.outcomeTokenMarginalPrices[1]
                     : null
                 }
-                isClosed={true}
-                lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Final answer'}
                 unit={getUnit(question.title)}
                 upperBound={scalarHigh || new BigNumber(0)}
