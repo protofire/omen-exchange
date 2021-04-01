@@ -102,7 +102,7 @@ const Wrapper = (props: Props) => {
     totalPoolShares,
   } = marketMakerData
   const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
-  const { networkId } = context
+  const { networkId, relay } = context
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
@@ -126,7 +126,7 @@ const Wrapper = (props: Props) => {
       const baseCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length)
       let baseCollateralToken = collateral
       if (baseCollateralSymbol === 'eth') {
-        baseCollateralToken = getNativeAsset(networkId)
+        baseCollateralToken = getNativeAsset(networkId, relay)
       } else {
         baseCollateralToken = getToken(networkId, baseCollateralSymbol as KnownToken)
       }

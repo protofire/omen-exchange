@@ -55,9 +55,11 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   } = marketMakerData
 
   const context = useConnectedWeb3Context()
-  const { account, library: provider, networkId } = context
+  const { account, library: provider, networkId, relay } = context
+
   const cpk = useConnectedCPKContext()
-  const nativeAsset = getNativeAsset(networkId)
+
+  const nativeAsset = getNativeAsset(networkId, relay)
   const { symbol } = nativeAsset
   const { realitio } = useContracts(context)
 

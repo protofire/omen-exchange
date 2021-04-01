@@ -535,7 +535,7 @@ export const getContractAddressName = (networkId: number) => {
   return networkNameCase
 }
 
-export const getDefaultToken = (networkId: number) => {
+export const getDefaultToken = (networkId: number, relay = false) => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
@@ -545,7 +545,7 @@ export const getDefaultToken = (networkId: number) => {
     return getToken(networkId, defaultToken)
   }
 
-  return networks[networkId].nativeAsset
+  return getNativeAsset(networkId, relay)
 }
 
 export const getTokensByNetwork = (networkId: number): Token[] => {
@@ -789,11 +789,16 @@ export const getWrapToken = (networkId: number): Token => {
   return getToken(networkId, tokenId)
 }
 
-export const getNativeAsset = (networkId: number): Token => {
+export const getNativeAsset = (networkId: number, relay = false): Token => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
-  return networks[networkId].nativeAsset as Token
+  const asset = networks[networkId].nativeAsset as Token
+  if (relay) {
+    const symbol = asset.symbol.replace('x', '')
+    return { ...asset, symbol }
+  }
+  return asset
 }
 
 export const getTargetSafeImplementation = (networkId: number): string => {
