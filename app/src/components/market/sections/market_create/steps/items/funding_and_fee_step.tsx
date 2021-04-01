@@ -10,7 +10,6 @@ import {
   DEFAULT_TOKEN_ADDRESS_RINKEBY,
   DOCUMENT_FAQ,
   MAX_MARKET_FEE,
-  STANDARD_DECIMALS,
 } from '../../../../../../common/constants'
 import {
   useCollateralBalance,
@@ -542,7 +541,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 title={'Pool Tokens'}
-                value={formatNumber(formatBigNumber(funding, userInputCollateral.decimals, STANDARD_DECIMALS))}
+                value={formatNumber(
+                  formatBigNumber(funding, userInputCollateral.decimals, userInputCollateral.decimals),
+                )}
               />
             </TransactionDetailsCard>
           </div>

@@ -121,10 +121,10 @@ export const ScalarMarketBuy = (props: Props) => {
     context,
   )
   const collateralBalance = maybeCollateralBalance || Zero
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals), 5)
+  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
 
   useEffect(() => {
-    setIsNegativeAmount(formatBigNumber(amount, collateral.decimals).includes('-'))
+    setIsNegativeAmount(formatBigNumber(amount, collateral.decimals, collateral.decimals).includes('-'))
   }, [amount, collateral.decimals])
 
   useEffect(() => {
@@ -214,7 +214,9 @@ export const ScalarMarketBuy = (props: Props) => {
     collateral.symbol
   }`
   const potentialProfitFormatted = potentialProfit.gt(Zero)
-    ? `${formatNumber(Number(formatBigNumber(potentialProfit, collateral.decimals)).toString())} ${collateral.symbol}`
+    ? `${formatNumber(Number(formatBigNumber(potentialProfit, collateral.decimals, collateral.decimals)).toString())} ${
+        collateral.symbol
+      }`
     : `0.00 ${collateral.symbol}`
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals, collateral.decimals))
   const total = `${sharesTotal} Shares`
@@ -373,7 +375,7 @@ export const ScalarMarketBuy = (props: Props) => {
             <TransactionDetailsLine />
             <TransactionDetailsRow
               title={'Max. Loss'}
-              value={`${formatNumber(formatBigNumber(amount, collateral.decimals, STANDARD_DECIMALS))} ${
+              value={`${formatNumber(formatBigNumber(amount, collateral.decimals, collateral.decimals))} ${
                 collateral.symbol
               }`}
             />

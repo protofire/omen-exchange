@@ -139,7 +139,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
-    setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals).includes('-'))
+    setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals, collateral.decimals).includes('-'))
   }, [amount, collateral.decimals])
 
   useEffect(() => {
@@ -296,16 +296,18 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
   const feeFormatted = `${formatNumber(
-    formatBigNumber(displayFeePaid.mul(-1), displayCollateral.decimals, STANDARD_DECIMALS),
+    formatBigNumber(displayFeePaid.mul(-1), displayCollateral.decimals, displayCollateral.decimals),
   )} ${symbol}`
   const baseCostFormatted = `${formatNumber(
-    formatBigNumber(displayBaseCost || Zero, displayCollateral.decimals, STANDARD_DECIMALS),
+    formatBigNumber(displayBaseCost || Zero, displayCollateral.decimals, displayCollateral.decimals),
   )}
     ${symbol}`
   const potentialProfitFormatted = `${formatNumber(
-    formatBigNumber(displayPotentialProfit, displayCollateral.decimals),
+    formatBigNumber(displayPotentialProfit, displayCollateral.decimals, displayCollateral.decimals),
   )} ${symbol}`
-  const sharesTotal = formatNumber(formatBigNumber(displayTradedShares, baseCollateral.decimals, STANDARD_DECIMALS))
+  const sharesTotal = formatNumber(
+    formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals),
+  )
   const total = `${sharesTotal} Shares`
 
   const amountError = isTransactionProcessing
