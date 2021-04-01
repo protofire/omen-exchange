@@ -102,12 +102,13 @@ export const HistoryTable: React.FC<Props> = ({
 }) => {
   const history = useHistory()
   const context = useConnectedWeb3Context()
-  const { networkId } = context
+  const { networkId, relay } = context
 
   if (!fpmmTrade || status === 'Loading' || sharesDataLoader) {
     return <CustomInlineLoading message="Loading Trade History" />
   }
-  const formattedCurrency = currency === 'WETH' ? 'ETH' : currency === 'WXDAI' ? 'XDAI' : currency
+  const formattedCurrency =
+    currency === 'WETH' ? 'ETH' : relay && currency === 'WXDAI' ? 'DAI' : currency === 'WXDAI' ? 'XDAI' : currency
   return (
     <React.Fragment>
       <TableWrapper>
