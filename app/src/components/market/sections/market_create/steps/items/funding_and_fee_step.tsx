@@ -198,7 +198,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const cpk = useConnectedCPKContext()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
-  const { account, library: provider } = context
+  const { account, library: provider, networkId, relay } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
   const [isServiceChecked, setServiceCheck] = useState<boolean>(false)
   const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
@@ -239,7 +239,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   let showAddCompoundService = false
   const currentTokenSymbol = currentToken.symbol.toLowerCase()
   const isETHNetwork = () => {
-    return context.networkId === networkIds.MAINNET || context.networkId === networkIds.RINKEBY
+    return networkId === networkIds.MAINNET || networkId === networkIds.RINKEBY
   }
   if (currentTokenSymbol in CompoundEnabledTokenType && isETHNetwork() && state !== 'SCALAR') {
     showAddCompoundService = true
@@ -500,7 +500,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 balance={formatNumber(collateralBalanceFormatted, 5)}
                 context={context}
                 currency={userInputCollateral.address}
-                disabled={false}
+                disabled={relay}
                 onSelect={onCollateralChange}
               />
             </CurrenciesWrapper>
@@ -585,7 +585,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         )}
         {showUpgrade && (
           <SetAllowance
-            collateral={getNativeAsset(context.networkId)}
+            collateral={getNativeAsset(networkId, relay)}
             finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
             loading={RemoteData.is.asking(proxyIsUpToDate)}
             onUnlock={upgradeProxy}

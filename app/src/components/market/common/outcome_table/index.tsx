@@ -103,8 +103,8 @@ export const OutcomeTable = (props: Props) => {
     newBonds,
   } = props
   const context = useConnectedWeb3Context()
-  const { networkId } = context
-  const nativeAsset = getNativeAsset(networkId)
+  const { networkId, relay } = context
+  const nativeAsset = getNativeAsset(networkId, relay)
   let winningBondIndex = -1
   bonds.forEach((bond, bondIndex) => {
     if ((winningBondIndex === -1 || bonds[winningBondIndex].bondedEth.lt(bond.bondedEth)) && bond.bondedEth.gt(0)) {
@@ -124,9 +124,7 @@ export const OutcomeTable = (props: Props) => {
   ]
 
   const TableCellsAlign = ['left', 'left', 'right', 'right', 'right', 'right', 'right']
-
   const symbol = useSymbol(displayCollateral)
-
   const renderTableHeader = () => {
     return (
       <THead>
@@ -220,7 +218,6 @@ export const OutcomeTable = (props: Props) => {
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
     const currentCollateral = displayCollateral ? displayCollateral : collateral
     let baseCollateral = collateral
-
     const collateralSymbol = collateral.symbol.toLowerCase()
     if (collateralSymbol in CompoundTokenType) {
       if (collateralSymbol === 'ceth') {
