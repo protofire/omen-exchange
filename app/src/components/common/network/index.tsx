@@ -1,6 +1,5 @@
 import React from 'react'
 import styled from 'styled-components'
-import { useWeb3Context } from 'web3-react/dist'
 
 import { useConnectedWeb3Context } from '../../../hooks'
 import { networkIds } from '../../../util/networks'
