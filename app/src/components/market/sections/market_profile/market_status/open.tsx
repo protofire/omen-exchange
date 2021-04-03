@@ -379,7 +379,7 @@ const Wrapper = (props: Props) => {
             <>
               {renderFinalizeTableData()}
               <WhenConnected>
-                <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
+                <StyledButtonContainer>
                   <Button
                     buttonType={ButtonType.secondaryLine}
                     onClick={() => {
