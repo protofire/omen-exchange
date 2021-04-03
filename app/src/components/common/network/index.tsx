@@ -2,8 +2,10 @@ import React from 'react'
 import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react/dist'
 
+import { useConnectedWeb3Context } from '../../../hooks'
 import { networkIds } from '../../../util/networks'
 import { truncateStringInTheMiddle } from '../../../util/tools'
+import { IconMetaMask, IconWalletConnect } from '../../common/icons'
 import { IconJazz } from '../icons/IconJazz'
 import { IconNotification } from '../icons/IconNotification'
 
@@ -17,6 +19,26 @@ const Wrapper = styled.div`
   align-items: center;
   display: flex;
   justify-content: center;
+`
+const ConnectorCircle = styled.div`
+  height: 17px;
+  width: 17px;
+  border-radius: 50%;
+  border: ${props => props.theme.borders.borderLineDisabled};
+  background: #fff;
+  z-index: 2;
+  position: absolute;
+  top: 5px;
+  bottom: 0;
+  right: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+const ConnectionIconWrapper = styled.div`
+  height: 28px;
+  width: 28px;
+  position: relative;
 `
 
 const ConnectionStatusText = styled.span`
@@ -32,9 +54,16 @@ const ConnectionStatusText = styled.span`
 `
 
 export const Network = (props: Props) => {
-  const context = useWeb3Context()
+  const context = useConnectedWeb3Context()
   const { account, networkId } = context
-
+  const connectorIcon =
+    context.rawWeb3Context.connectorName === 'MetaMask' ? (
+      <IconMetaMask />
+    ) : context.rawWeb3Context.connectorName === 'WalletConnect' ? (
+      <IconWalletConnect />
+    ) : (
+      <></>
+    )
   if (!account) {
     return null
   }
@@ -42,7 +71,10 @@ export const Network = (props: Props) => {
     <Wrapper {...props}>
       {props.claim && networkId === networkIds.MAINNET && <IconNotification style={{ marginRight: 12 }} />}
       <ConnectionStatusText>{truncateStringInTheMiddle(account, 5, 3) || 'No account connected'}</ConnectionStatusText>
-      <IconJazz account={account} size={22} />
+      <ConnectionIconWrapper>
+        <ConnectorCircle>{connectorIcon}</ConnectorCircle>
+        <IconJazz account={account} size={22} />
+      </ConnectionIconWrapper>
     </Wrapper>
   )
 }
