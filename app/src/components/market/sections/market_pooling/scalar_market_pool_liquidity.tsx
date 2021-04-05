@@ -47,6 +47,7 @@ import {
   Status,
   Ternary,
   Token,
+  TransactionStep,
 } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -308,7 +309,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       }
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
-      setStatus(Status.Loading)
       let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
       if (
         compoundService &&

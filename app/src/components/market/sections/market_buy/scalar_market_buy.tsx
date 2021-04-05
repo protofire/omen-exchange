@@ -9,8 +9,8 @@ import { STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
-  useConnectedBalanceContext,
   useCompoundService,
+  useConnectedBalanceContext,
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
@@ -31,7 +31,7 @@ import {
   getUnit,
   mulBN,
 } from '../../../../util/tools'
-import { 
+import {
   CompoundTokenType,
   MarketDetailsTab,
   MarketMakerData,
@@ -304,7 +304,7 @@ export const ScalarMarketBuy = (props: Props) => {
         }
       }
       const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals)
-      setTweet('')      
+      setTweet('')
       setStatus(Status.Loading)
       setMessage(`Buying ${sharesAmount} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
