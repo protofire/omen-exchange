@@ -6,14 +6,16 @@ import styled from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
+  useCompoundService,
   useConnectedBalanceContext,
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
   useSymbol,
 } from '../../../../hooks'
-import { MarketMakerService } from '../../../../services'
+import { CPKService, MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
+import { getNativeAsset, getWrapToken } from '../../../../util/networks'
 import {
   calcPrediction,
   calcSellAmountInCollateral,
@@ -21,10 +23,20 @@ import {
   computeBalanceAfterTrade,
   formatBigNumber,
   formatNumber,
+  getInitialCollateral,
+  getSharesInBaseToken,
   getUnit,
   mulBN,
 } from '../../../../util/tools'
-import { BalanceItem, MarketDetailsTab, MarketMakerData, Status, TransactionStep } from '../../../../util/types'
+import {
+  BalanceItem,
+  CompoundTokenType,
+  MarketDetailsTab,
+  MarketMakerData,
+  Status,
+  Token,
+  TransactionStep,
+} from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -34,6 +46,7 @@ import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
 import { PositionSelectionBox } from '../../common/position_selection_box'
+import { SwitchTransactionToken } from '../../common/switch_transaction_token'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
@@ -83,12 +96,34 @@ export const ScalarMarketSell = (props: Props) => {
   const [message, setMessage] = useState<string>('')
   const [amountShares, setAmountShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
+  const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
+  const { networkId } = context
+  const baseCollateral = getInitialCollateral(networkId, collateral)
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
+  const collateralSymbol = collateral.symbol.toLowerCase()
+  const symbol = useSymbol(displayCollateral)
+
+  const { compoundService: CompoundService } = useCompoundService(collateral, context)
+  const compoundService = CompoundService || null
+
+  const wrapToken = getWrapToken(context.networkId)
+  let displayTotalSymbol = symbol
+  if (collateral.address === displayCollateral.address && collateral.address === wrapToken.address) {
+    displayTotalSymbol = displayCollateral.symbol
+  }
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
 
-  const symbol = useSymbol(collateral)
+  let displayBalances = balances
+  if (
+    baseCollateral.address !== collateral.address &&
+    collateral.symbol.toLowerCase() in CompoundTokenType &&
+    compoundService
+  ) {
+    displayBalances = getSharesInBaseToken(balances, compoundService, displayCollateral)
+  }
 
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
@@ -107,6 +142,7 @@ export const ScalarMarketSell = (props: Props) => {
     // eslint-disable-next-line
   }, [collateral.address])
 
+  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
   const calcSellAmount = useMemo(
     () => async (
       amountShares: BigNumber,
@@ -152,7 +188,7 @@ export const ScalarMarketSell = (props: Props) => {
       logger.log(`Amount to sell ${amountToSell}`)
       return [costFee, newPrediction, amountToSell, potentialValue]
     },
-    [balances, positionIndex, scalarLow, scalarHigh, fee],
+    [balances, positionIndex, scalarLow, scalarHigh, marketFeeWithTwoDecimals],
   )
 
   const [costFee, newPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(
@@ -169,6 +205,28 @@ export const ScalarMarketSell = (props: Props) => {
       scalarHigh || new BigNumber(0),
     ) / 100
 
+  let potentialValueNormalized = potentialValue
+  let costFeeNormalized = costFee
+
+  let normalizedTradedCollateral = tradedCollateral
+  if (displayCollateral.address !== collateral.address && compoundService) {
+    if (potentialValue && potentialValue.gt(0)) {
+      potentialValueNormalized = compoundService.calculateCTokenToBaseExchange(baseCollateral, potentialValue)
+    } else {
+      potentialValueNormalized = new BigNumber('0')
+    }
+    if (costFee && costFee.gt(0)) {
+      costFeeNormalized = compoundService.calculateCTokenToBaseExchange(baseCollateral, costFee)
+    } else {
+      costFeeNormalized = new BigNumber('0')
+    }
+    if (tradedCollateral && tradedCollateral.gt(0)) {
+      normalizedTradedCollateral = compoundService.calculateCTokenToBaseExchange(baseCollateral, tradedCollateral)
+    } else {
+      normalizedTradedCollateral = new BigNumber('0')
+    }
+  }
+
   const finish = async () => {
     const outcomeIndex = positionIndex
     try {
@@ -176,34 +234,42 @@ export const ScalarMarketSell = (props: Props) => {
         return
       }
 
-      if (!cpk) {
-        return
-      }
-
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
-
+      let displaySharesAmount = sharesAmount
+      if (collateral.symbol.toLowerCase() in CompoundTokenType && amountShares && compoundService) {
+        const displaySharesAmountValue = compoundService.calculateCTokenToBaseExchange(baseCollateral, amountShares)
+        displaySharesAmount = formatBigNumber(displaySharesAmountValue || Zero, baseCollateral.decimals)
+      }
+      let useBaseToken = false
+      if (collateral.address !== displayCollateral.address) {
+        useBaseToken = true
+      }
       setStatus(Status.Loading)
-      setMessage(`Selling ${sharesAmount} shares...`)
-      setTxState(TransactionStep.waitingConfirmation)
-      setIsTransactionModalOpen(true)
+      setMessage(`Selling ${displaySharesAmount} shares...`)
+
+      const cpk = await CPKService.create(provider)
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,
+        compoundService,
         conditionalTokens,
         marketMaker,
         outcomeIndex,
+        useBaseToken,
         setTxHash,
         setTxState,
       })
 
       await fetchGraphMarketUserTxData()
       await fetchGraphMarketMakerData()
+      setAmountSharesFromInput(new BigNumber('0'))
+      setDisplaySellShares(null)
       await fetchBalances()
 
       setAmountShares(null)
       setAmountSharesToDisplay('')
       setStatus(Status.Ready)
-      setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      setMessage(`Successfully sold ${displaySharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
       setStatus(Status.Error)
       setTxState(TransactionStep.error)
@@ -214,13 +280,29 @@ export const ScalarMarketSell = (props: Props) => {
 
   const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
 
+  let displaySelectedOutcomeBalance = selectedOutcomeBalance
+  let displaySelectedOutcomeBalanceValue = balanceItem.shares
+  let displayAmountShares = amountShares
+  if (collateralSymbol in CompoundTokenType && compoundService) {
+    displaySelectedOutcomeBalanceValue = compoundService.calculateCTokenToBaseExchange(
+      baseCollateral,
+      balanceItem.shares,
+    )
+    displaySelectedOutcomeBalance = formatNumber(
+      formatBigNumber(displaySelectedOutcomeBalanceValue, baseCollateral.decimals),
+    )
+    if (amountShares && amountShares.gt(0)) {
+      displayAmountShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, amountShares)
+    }
+  }
+
   const amountError =
     balanceItem.shares === null
       ? null
       : balanceItem.shares.isZero() && amountShares?.gt(balanceItem.shares)
       ? `Insufficient balance`
       : amountShares?.gt(balanceItem.shares)
-      ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
+      ? `Value must be less than or equal to ${displaySelectedOutcomeBalance} shares`
       : null
 
   const isSellButtonDisabled =
@@ -230,8 +312,50 @@ export const ScalarMarketSell = (props: Props) => {
     amountError !== null ||
     isNegativeAmountShares
 
+  let toggleCollateral = collateral
+  if (collateralSymbol in CompoundTokenType) {
+    if (collateral.address === displayCollateral.address) {
+      toggleCollateral = baseCollateral
+    } else {
+      toggleCollateral = collateral
+    }
+  } else {
+    if (collateral.address === wrapToken.address) {
+      if (displayCollateral.address === wrapToken.address) {
+        toggleCollateral = getNativeAsset(context.networkId)
+      } else {
+        toggleCollateral = getWrapToken(context.networkId)
+      }
+    }
+  }
+  const setToggleCollateral = () => {
+    if (collateralSymbol in CompoundTokenType) {
+      if (displayCollateral.address === baseCollateral.address) {
+        setDisplayCollateral(collateral)
+      } else {
+        setDisplayCollateral(baseCollateral)
+      }
+    } else {
+      if (displayCollateral.address === wrapToken.address) {
+        setDisplayCollateral(getNativeAsset(context.networkId))
+      } else {
+        setDisplayCollateral(getWrapToken(context.networkId))
+      }
+    }
+  }
+
   const isNewPrediction =
     formattedNewPrediction !== 0 && formattedNewPrediction !== Number(outcomeTokenMarginalPrices[1].substring(0, 20))
+
+  const setAmountSharesFromInput = (shares: BigNumber) => {
+    if (collateralSymbol in CompoundTokenType && compoundService) {
+      const actualAmountOfShares = compoundService.calculateBaseToCTokenExchange(baseCollateral, shares)
+      setAmountShares(actualAmountOfShares)
+    } else {
+      setAmountShares(shares)
+    }
+    setDisplaySellShares(shares)
+  }
 
   return (
     <>
@@ -251,8 +375,8 @@ export const ScalarMarketSell = (props: Props) => {
       <GridTransactionDetails>
         <div>
           <PositionSelectionBox
-            balances={balances}
-            decimals={collateral.decimals}
+            balances={displayBalances}
+            decimals={baseCollateral.decimals}
             positionIndex={positionIndex}
             setBalanceItem={setBalanceItem}
             setPositionIndex={setPositionIndex}
@@ -260,21 +384,21 @@ export const ScalarMarketSell = (props: Props) => {
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput
-                decimals={collateral.decimals}
+                decimals={baseCollateral.decimals}
                 name="amount"
                 onChange={(e: BigNumberInputReturn) => {
                   setAmountShares(e.value)
-                  setAmountShares(e.value.gt(Zero) ? e.value : Zero)
+                  setAmountSharesFromInput(e.value.gt(Zero) ? e.value : Zero)
                   setAmountSharesToDisplay('')
                 }}
                 style={{ width: 0 }}
-                value={amountShares}
+                value={displaySellShares}
                 valueToDisplay={amountSharesToDisplay}
               />
             }
             onClickMaxButton={() => {
-              setAmountShares(balanceItem.shares)
-              setAmountSharesToDisplay(formatBigNumber(balanceItem.shares, collateral.decimals, 5))
+              setAmountSharesFromInput(displaySelectedOutcomeBalanceValue)
+              setAmountSharesToDisplay(formatBigNumber(displaySelectedOutcomeBalanceValue, baseCollateral.decimals, 5))
             }}
             shouldDisplayMaxButton
             symbol={'Shares'}
@@ -285,22 +409,26 @@ export const ScalarMarketSell = (props: Props) => {
           <TransactionDetailsCard>
             <TransactionDetailsRow
               title={'Sell Amount'}
-              value={`${formatNumber(formatBigNumber(amountShares || Zero, collateral.decimals))} Shares`}
+              value={`${formatNumber(formatBigNumber(displayAmountShares || Zero, baseCollateral.decimals))} Shares`}
             />
             <TransactionDetailsRow
               emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
               state={ValueStates.success}
               title={'Revenue'}
               value={
-                potentialValue
-                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${symbol}`
+                potentialValueNormalized
+                  ? `${formatNumber(formatBigNumber(potentialValueNormalized, displayCollateral.decimals, 2))} 
+                  ${symbol}`
                   : '0.00'
               }
             />
             <TransactionDetailsRow
               title={'Fee'}
-              value={`${costFee ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, 2)) : '0.00'}
-                ${symbol}`}
+              value={`${
+                costFeeNormalized
+                  ? formatNumber(formatBigNumber(costFeeNormalized.mul(-1), displayCollateral.decimals, 2))
+                  : '0.00'
+              } ${symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
@@ -309,15 +437,22 @@ export const ScalarMarketSell = (props: Props) => {
               }
               state={
                 (tradedCollateral &&
-                  parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0 &&
+                  parseFloat(formatBigNumber(tradedCollateral, displayCollateral.decimals, 2)) > 0 &&
                   ValueStates.important) ||
                 ValueStates.normal
               }
               title={'Total'}
               value={`${
-                tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
-              } ${symbol}`}
+                normalizedTradedCollateral
+                  ? formatNumber(formatBigNumber(normalizedTradedCollateral, displayCollateral.decimals, 2))
+                  : '0.00'
+              } ${displayTotalSymbol}`}
             />
+            {collateral.address === wrapToken.address || collateralSymbol in CompoundTokenType ? (
+              <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollateral} />
+            ) : (
+              <span />
+            )}
           </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>

@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useSymbol } from '../../../../hooks'
 import { getOutcomeColor } from '../../../../theme/utils'
-import { getNativeAsset, getToken } from '../../../../util/networks'
+import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, getBaseTokenForCToken, mulBN } from '../../../../util/tools'
 import { BalanceItem, BondItem, CompoundTokenType, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, THead, TR, Table } from '../../../common'
@@ -220,8 +220,9 @@ export const OutcomeTable = (props: Props) => {
     let baseCollateral = collateral
     const collateralSymbol = collateral.symbol.toLowerCase()
     if (collateralSymbol in CompoundTokenType) {
-      if (collateralSymbol === 'ceth') {
-        baseCollateral = nativeAsset
+      const nativeCompoundAsset = getNativeCompoundAsset(networkId)
+      if (collateralSymbol === nativeCompoundAsset.symbol.toLowerCase()) {
+        baseCollateral = getNativeAsset(networkId)
       } else {
         const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
         baseCollateral = getToken(networkId, baseCollateralSymbol)

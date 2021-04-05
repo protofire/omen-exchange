@@ -282,6 +282,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   let displayBaseCost = baseCost
   let displayPotentialProfit = potentialProfit
   let displayTradedShares = tradedShares
+
   if (collateralSymbol in CompoundTokenType && compoundService) {
     if (collateralSymbol !== displayCollateral.symbol.toLowerCase()) {
       displayFeePaid = compoundService.calculateCTokenToBaseExchange(displayCollateral, feePaid)
