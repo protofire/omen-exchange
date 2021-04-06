@@ -546,7 +546,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const bondedValueBoxData = [
     {
-      title: `${outcomePredictedByMarket ? marketPredictionNumber.toFixed(2) : currentPredictionNumber} ${unit}`,
+      title: `${
+        outcomePredictedByMarket ? marketPredictionNumber.toFixed(2) : currentPredictionNumber.toFixed(2)
+      } ${unit}`,
       subtitle: 'Predicted Outcome',
     },
     {
