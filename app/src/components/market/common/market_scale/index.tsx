@@ -4,6 +4,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
+import { useConnectedWeb3Context } from '../../../../hooks'
+import { getNativeAsset } from '../../../../util/networks'
 import { calcPrediction, calcXValue, formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
 import {
   AdditionalSharesType,
@@ -274,6 +276,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     unit,
     upperBound,
   } = props
+  const { networkId, relay } = useConnectedWeb3Context()
+  const { decimals: NativeDecimals, symbol: NativeSymbol } = getNativeAsset(networkId, relay)
 
   const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, STANDARD_DECIMALS))
   const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, STANDARD_DECIMALS))
@@ -446,10 +450,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   }
 
   useEffect(() => {
-    if (collateral?.symbol === 'cDAI') {
-      collateral.symbol = 'DAI'
-      collateral.decimals = 18
-    }
     if (long) {
       setYourPayout(calcPayout(amountSharesNumber || 0, scaleValue))
       setProfitLoss(calcProfit(amountSharesNumber || 0, scaleValue, tradeAmountNumber || 0))
@@ -556,10 +556,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'Predicted Outcome',
     },
     {
-      title:
-        currentAnswerBond && collateral
-          ? `${formatBigNumber(currentAnswerBond, collateral.decimals)}  ${collateral && collateral.symbol}`
-          : '-',
+      title: currentAnswerBond ? `${formatBigNumber(currentAnswerBond, NativeDecimals)}  ${NativeSymbol}` : '-',
       subtitle: 'Bonded',
     },
     {
