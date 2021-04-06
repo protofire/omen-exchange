@@ -251,6 +251,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         }}
         onClose={() => {
           setIsClaimModalOpen(false)
+          onClose()
         }}
       />
       <ModalTransactionWrapper
