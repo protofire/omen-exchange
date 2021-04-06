@@ -79,7 +79,7 @@ interface Props {
 
 export const AdvancedFilters = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { networkId } = context
+  const { networkId, relay } = context
 
   const arbitrators = getArbitratorsByNetwork(networkId)
 
@@ -173,38 +173,40 @@ export const AdvancedFilters = (props: Props) => {
 
   const activeArbitratorIndex = arbitrators.findIndex(t => t.address === arbitrator) + 1
 
-  const nativeAssetAddress = getNativeAsset(context.networkId).address.toLowerCase()
+  const nativeAssetAddress = getNativeAsset(context.networkId, context.relay).address.toLowerCase()
   const wrapTokenAddress = getWrapToken(context.networkId).address.toLowerCase()
   const filter = [wrapTokenAddress]
 
   return (
     <Wrapper>
-      <Column>
-        <TitleWrapper>
-          <Title>Currency</Title>
-          {currency && <ClearLabel onClick={() => onChangeCurrency(null)}>Clear</ClearLabel>}
-        </TitleWrapper>
+      {!relay && (
+        <Column>
+          <TitleWrapper>
+            <Title>Currency</Title>
+            {currency && <ClearLabel onClick={() => onChangeCurrency(null)}>Clear</ClearLabel>}
+          </TitleWrapper>
 
-        <CurrencySelector
-          addAll
-          addNativeAsset
-          context={context}
-          currency={currency}
-          disabled={false}
-          filters={filter}
-          negativeFilter
-          onSelect={currency =>
-            onChangeCurrency(
-              currency
-                ? currency.address.toLowerCase() === nativeAssetAddress
-                  ? wrapTokenAddress
-                  : currency.address
-                : null,
-            )
-          }
-          placeholder={currency ? '' : 'All'}
-        />
-      </Column>
+          <CurrencySelector
+            addAll
+            addNativeAsset
+            context={context}
+            currency={currency}
+            disabled={false}
+            filters={filter}
+            negativeFilter
+            onSelect={currency =>
+              onChangeCurrency(
+                currency
+                  ? currency.address.toLowerCase() === nativeAssetAddress
+                    ? wrapTokenAddress
+                    : currency.address
+                  : null,
+              )
+            }
+            placeholder={currency ? '' : 'All'}
+          />
+        </Column>
+      )}
       {showQuestionType && (
         <Column>
           <TitleWrapper>

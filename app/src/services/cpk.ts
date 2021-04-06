@@ -1384,7 +1384,6 @@ class CPKService {
     try {
       const xDaiService = new XdaiService(this.provider)
       const data = await xDaiService.fetchXdaiTransactionData()
-
       return data
     } catch (e) {
       logger.error('Error fetching xDai subgraph data', e.message)
@@ -1394,15 +1393,24 @@ class CPKService {
 
   claimDaiTokens = async () => {
     try {
-      const { message } = await this.fetchLatestUnclaimedTransactions()
-      const signatures = signaturesFormatted(message.signatures)
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
       const xDaiService = new XdaiService(this.provider)
-      const contract = xDaiService.generateXdaiBridgeContractInstance()
-      const transaction = await xDaiService.claimDaiTokens(
-        { message: message.content, signatures: signatures },
-        contract,
-      )
-      return transaction
+
+      const transactions = await this.fetchLatestUnclaimedTransactions()
+      const messages = []
+      const signatures = []
+
+      for (let i = 0; i < transactions.length; i++) {
+        const message = transactions[i].message
+        messages.push(message.content)
+
+        const signature = signaturesFormatted(message.signatures)
+        signatures.push(signature)
+      }
+
+      const txObject = await xDaiService.claim(messages, signatures)
+      return txObject
     } catch (e) {
       logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)
       throw e
