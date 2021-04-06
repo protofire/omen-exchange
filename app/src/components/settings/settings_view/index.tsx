@@ -111,10 +111,8 @@ const Input = styled.input`
 
   ${TextfieldCSS};
 `
-const SettingsWrapper = styled(ListCard)`
-  margin-top: 116px;
-  min-height: initial;
-`
+const SettingsWrapper = styled(ListCard)``
+
 const ImageWrap = styled.div`
   margin-right: 10px;
 `
