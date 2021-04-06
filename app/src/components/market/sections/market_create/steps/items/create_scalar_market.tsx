@@ -145,6 +145,7 @@ export const CreateScalarMarket = (props: Props) => {
             formField={
               <NumericalInput
                 decimals={STANDARD_DECIMALS}
+                formatOnMount
                 name="lowerBound"
                 onChange={handleChange}
                 placeholder={'0'}
