@@ -446,6 +446,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   }
 
   useEffect(() => {
+    if (collateral?.symbol === 'cDAI') {
+      collateral.symbol = 'DAI'
+      collateral.decimals = 18
+    }
     if (long) {
       setYourPayout(calcPayout(amountSharesNumber || 0, scaleValue))
       setProfitLoss(calcProfit(amountSharesNumber || 0, scaleValue, tradeAmountNumber || 0))
@@ -561,7 +565,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     {
       title:
         currentAnswer && collateral
-          ? `${formatBigNumber(new BigNumber(currentAnswer), collateral.decimals)} ${unit}`
+          ? `${formatBigNumber(new BigNumber(currentAnswer), STANDARD_DECIMALS)} ${unit}`
           : '-',
       subtitle: isBonded ? 'Pending Outcome' : 'Final Outcome',
     },
