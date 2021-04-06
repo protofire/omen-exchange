@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react'
 import { STANDARD_DECIMALS } from '../common/constants'
 import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../hooks'
 import { XdaiService } from '../services'
-import { getNativeAsset } from '../util/networks'
+import { getNativeAsset, networkIds } from '../util/networks'
 import { formatBigNumber, formatNumber } from '../util/tools'
 
 export interface ConnectedBalanceContext {
@@ -64,7 +64,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const formattedxDaiBalance = `${formatBigNumber(xDaiBalance, nativeAsset.decimals, 2)}`
 
   const fetchUnclaimedAssets = async () => {
-    if (account) {
+    if (account && networkId === networkIds.MAINNET) {
       const xDaiService = new XdaiService(context.library)
       const transactions = await xDaiService.fetchXdaiTransactionData()
 
