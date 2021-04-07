@@ -92,7 +92,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const DAI = getToken(1, 'dai')
 
   const wallet = exchangeType === ExchangeType.deposit ? daiBalance : xDaiBalance
-  const minDeposit = exchangeType === ExchangeType.deposit ? parseEther('0.005') : parseEther('10')
+  const minDeposit = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
   const isDepositWithdrawDisabled =
     displayFundAmount.isZero() || !wallet || displayFundAmount.gt(wallet) || displayFundAmount.lt(minDeposit)
 
