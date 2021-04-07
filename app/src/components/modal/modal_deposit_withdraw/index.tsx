@@ -232,7 +232,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           />
           <InputInfo>
             You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least{' '}
-            {formatBigNumber(minDeposit, STANDARD_DECIMALS, exchangeType === ExchangeType.deposit ? 3 : 0)} DAI.
+            {formatBigNumber(minDeposit, STANDARD_DECIMALS, 0)} DAI.
           </InputInfo>
           <DepositWithdrawButton
             buttonType={ButtonType.primaryAlternative}
