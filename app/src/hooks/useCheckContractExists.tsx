@@ -11,6 +11,11 @@ export const useCheckContractExists = (marketMakerAddress: string, context: Conn
     let isSubscribed = true
     const provider = context.library
     const fetchIsContract = async () => {
+      if (context.relay) {
+        if (await isContract(context.rawWeb3Context.library, marketMakerAddress)) {
+          return context.toggleRelay()
+        }
+      }
       if (isSubscribed) setContractExists(await isContract(provider, marketMakerAddress))
     }
 
