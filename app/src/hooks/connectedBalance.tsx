@@ -86,7 +86,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     try {
       await Promise.all([fetchUnclaimedAssets(), fetchCollateralBalance(), refetch()])
     } catch (e) {
-      logger.log(e)
+      logger.log(e.message)
     }
   }
 
