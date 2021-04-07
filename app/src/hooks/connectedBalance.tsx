@@ -5,8 +5,11 @@ import React, { useEffect, useState } from 'react'
 import { STANDARD_DECIMALS } from '../common/constants'
 import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../hooks'
 import { XdaiService } from '../services'
+import { getLogger } from '../util/logger'
 import { getNativeAsset, networkIds } from '../util/networks'
 import { formatBigNumber, formatNumber } from '../util/tools'
+
+const logger = getLogger('Hooks::ConnectedBalance')
 
 export interface ConnectedBalanceContext {
   claimState: boolean
@@ -80,7 +83,11 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   }
 
   const fetchBalances = async () => {
-    await Promise.all([fetchUnclaimedAssets(), fetchCollateralBalance(), refetch()])
+    try {
+      await Promise.all([fetchUnclaimedAssets(), fetchCollateralBalance(), refetch()])
+    } catch (e) {
+      logger.log(e)
+    }
   }
 
   useEffect(() => {
