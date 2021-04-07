@@ -103,6 +103,7 @@ export interface Question {
   arbitrationOccurred: boolean
   currentAnswerTimestamp: Maybe<BigNumber>
   currentAnswerBond: Maybe<BigNumber>
+  currentAnswer: string
   answers?: {
     answer: string
     bondAggregate: BigNumber
