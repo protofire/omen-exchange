@@ -52,6 +52,11 @@ The `build` directory in the `app` directory will now contain the build to be se
 | Uniswap V2 Factory | [0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f](https://rinkeby.etherscan.io/address/0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f#code) |
 | WETH9 | [0xc778417E063141139Fce010982780140Aa0cD5Ab](https://rinkeby.etherscan.io/address/0xc778417E063141139Fce010982780140Aa0cD5Ab#code) |
 | GelatoCore | [0x733aDEf4f8346FD96107d8d6605eA9ab5645d632](https://rinkeby.etherscan.io/address/0x733aDEf4f8346FD96107d8d6605eA9ab5645d632#code) |
+| LiquidityMiningFactory | [0x781942B59CA2576a1eB199424F32998ad450ECA5](https://rinkeby.etherscan.io/address/0x781942B59CA2576a1eB199424F32998ad450ECA5#code) |
+| [Omen Token](https://github.com/AugustoL/dxdao-contracts) | [0xCa8B6Cb2834b9Aaba57FD74c1Ed8E5F2bCBa47cB](https://rinkeby.etherscan.io/address/0xca8b6cb2834b9aaba57fd74c1ed8e5f2bcba47cb#code) |
+| Omen Token Proxy | [0x0A08ECa47C56C305F4FeB4fa062AEcd5807BeBb8](https://rinkeby.etherscan.io/address/0x0A08ECa47C56C305F4FeB4fa062AEcd5807BeBb8#code) |
+| [Omen Guild](https://github.com/AugustoL/dxdao-contracts) | [0x8E172c814147d6321Dec2ccc10F4220670030DD3](https://rinkeby.etherscan.io/address/0x8e172c814147d6321dec2ccc10f4220670030dd3#code) |
+| Omen Guild Proxy | [0xa327ea1b9986d81750E9A6FdeAb1305589BFC260](https://rinkeby.etherscan.io/address/0xa327ea1b9986d81750E9A6FdeAb1305589BFC260#code) |
 
 
 ## xDai Network
