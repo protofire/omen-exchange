@@ -505,7 +505,7 @@ export const formatNumber = (number: string, decimals = 2): string => {
   const splitFixedInt = fixedInt.split('.')[0]
   const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
   if (number.length < 1) {
-    return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : '0'}`
+    return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
   }
 
   if (Number(number) < 0.01 && Number(number) > 0) {

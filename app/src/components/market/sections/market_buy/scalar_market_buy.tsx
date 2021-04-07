@@ -214,9 +214,7 @@ export const ScalarMarketBuy = (props: Props) => {
     collateral.symbol
   }`
   const potentialProfitFormatted = potentialProfit.gt(Zero)
-    ? `${formatNumber(Number(formatBigNumber(potentialProfit, collateral.decimals, collateral.decimals)).toString())} ${
-        collateral.symbol
-      }`
+    ? `${formatNumber(formatBigNumber(potentialProfit, collateral.decimals, collateral.decimals))} ${collateral.symbol}`
     : `0.00 ${collateral.symbol}`
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals, collateral.decimals))
   const total = `${sharesTotal} Shares`
