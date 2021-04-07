@@ -177,6 +177,7 @@ export const CreateScalarMarket = (props: Props) => {
               <NumericalInput
                 decimals={STANDARD_DECIMALS}
                 error={lowerBoundError}
+                formatOnMount
                 min={0}
                 name="lowerBound"
                 onChange={value => {

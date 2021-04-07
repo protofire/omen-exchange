@@ -37,6 +37,7 @@ type Props = OverrideProperties<
     step?: BigNumber
     value: Maybe<BigNumber>
     valueToDisplay?: string
+    formatOnMount?: boolean
   }
 >
 
@@ -47,6 +48,7 @@ export const BigNumberInput: React.FC<Props> = props => {
     autoFocus = false,
     decimals,
     disabled = false,
+    formatOnMount = false,
     name,
     onChange,
     placeholder = '0.00',
@@ -59,18 +61,23 @@ export const BigNumberInput: React.FC<Props> = props => {
   const [currentValue, setCurrentValue] = useState('')
 
   const inputRef = useRef<HTMLInputElement>(null)
+  const mounted = useRef(false)
 
   useEffect(() => {
     if (!value) {
       setCurrentValue('')
     } else if (
-      value &&
-      !ethers.utils.parseUnits((currentValue && Number(currentValue).toFixed(decimals)) || '0', decimals).eq(value)
+      (!mounted.current && formatOnMount) ||
+      (value &&
+        !ethers.utils.parseUnits((currentValue && Number(currentValue).toFixed(decimals)) || '0', decimals).eq(value))
     ) {
+      if (!mounted.current) {
+        mounted.current = true
+      }
       const formatted = ethers.utils.formatUnits(value, decimals)
       setCurrentValue(formatted.endsWith('.0') ? formatted.substring(0, formatted.length - 2) : formatted)
     }
-  }, [value, decimals, currentValue])
+  }, [value, decimals, currentValue, formatOnMount])
 
   useEffect(() => {
     if (autoFocus && inputRef && inputRef.current) {
