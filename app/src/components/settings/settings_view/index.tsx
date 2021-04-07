@@ -111,7 +111,9 @@ const Input = styled.input`
 
   ${TextfieldCSS};
 `
-const SettingsWrapper = styled(ListCard)``
+const SettingsWrapper = styled(ListCard)`
+  min-height: initial;
+`
 
 const ImageWrap = styled.div`
   margin-right: 10px;
