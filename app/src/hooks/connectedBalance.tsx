@@ -68,7 +68,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
       const xDaiService = new XdaiService(context.library)
       const transactions = await xDaiService.fetchXdaiTransactionData()
 
-      if (transactions.length) {
+      if (transactions && transactions.length) {
         const aggregator = transactions.reduce((prev: BigNumber, { value }: any) => prev.add(value), Zero)
         setUnclaimedAmount(aggregator)
         setClaimState(true)
