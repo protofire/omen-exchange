@@ -232,7 +232,9 @@ const MarketHomeContainer: React.FC = () => {
 
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
   const [categories, setCategories] = useState<RemoteData<CategoryDataItem[]>>(RemoteData.notAsked())
-  const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
+
+  const defaultCpkAddress = context.relay ? context.account : null
+  const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(defaultCpkAddress)
 
   const [pageSize, setPageSize] = useState(4)
   const [pageIndex, setPageIndex] = useState(0)
