@@ -67,7 +67,6 @@ const StyledButtonContainer = styled(ButtonContainer)`
 
 const BorderedButtonContainer = styled(ButtonContainer)`
   ${MarginsButton};
-  border-top: 1px solid ${props => props.theme.colors.verticalDivider};
 `
 
 const SellBuyWrapper = styled.div`
