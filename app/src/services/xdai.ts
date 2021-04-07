@@ -1,15 +1,16 @@
 import axios from 'axios'
-import { Contract, ethers } from 'ethers'
+import { Contract, ethers, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import {
   DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   DEFAULT_TOKEN_ADDRESS,
+  MULTI_CLAIM_ADDRESS,
   XDAI_FOREIGN_BRIDGE,
   XDAI_HOME_BRIDGE,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
 } from '../common/constants'
-import { getInfuraUrl } from '../util/networks'
+import { getInfuraUrl, networkIds } from '../util/networks'
 
 import { ERC20Service } from './erc20'
 
@@ -23,6 +24,61 @@ const abi = [
     name: 'executeSignatures',
     outputs: [],
     payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: false,
+    inputs: [
+      { name: '_sender', type: 'address' },
+      { name: '_receiver', type: 'address' },
+      { name: '_amount', type: 'uint256' },
+    ],
+    name: 'relayTokens',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    constant: true,
+    inputs: [{ name: '_txHash', type: 'bytes32' }],
+    name: 'relayedMessages',
+    outputs: [{ name: '', type: 'bool' }],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
+]
+
+const xdaiBridgeAbi = [
+  {
+    type: 'function',
+    stateMutability: 'payable',
+    payable: true,
+    outputs: [],
+    name: 'relayTokens',
+    inputs: [{ type: 'address', name: '_receiver' }],
+    constant: false,
+  },
+]
+
+const multiClaimAbi = [
+  {
+    inputs: [
+      {
+        internalType: 'bytes[]',
+        name: 'messages',
+        type: 'bytes[]',
+      },
+      {
+        internalType: 'bytes[]',
+        name: 'signatures',
+        type: 'bytes[]',
+      },
+    ],
+    name: 'claim',
+    outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
   },
@@ -46,10 +102,11 @@ class XdaiService {
     return erc20.getContract
   }
 
-  generateXdaiBridgeContractInstance = async () => {
-    const signer = this.provider.getSigner()
+  generateXdaiBridgeContractInstance = () => {
+    const signer = this.provider.relay ? this.provider.signer.signer : this.provider.signer
     return new ethers.Contract(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, this.abi, signer)
   }
+
   generateSendTransaction = async (amount: BigNumber, contract: Contract) => {
     try {
       const transaction = await contract.transfer(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, amount)
@@ -58,6 +115,7 @@ class XdaiService {
       throw new Error('Failed at generating transaction!')
     }
   }
+
   sendXdaiToBridge = async (amount: BigNumber) => {
     try {
       const signer = this.provider.getSigner()
@@ -76,19 +134,30 @@ class XdaiService {
       throw new Error('Failed at generating transaction!')
     }
   }
-  claimDaiTokens = async (functionData: any, contract: any) => {
-    try {
-      const transaction = await contract.executeSignatures(functionData.message, functionData.signatures)
 
-      return transaction
-    } catch (e) {
-      throw new Error('Failed at generating transaction!')
-    }
+  claim = async (messages: string[], signatures: string[]) => {
+    const multiclaim = new ethers.Contract(MULTI_CLAIM_ADDRESS, multiClaimAbi, this.provider.signer.signer)
+    return multiclaim.claim(messages, signatures)
   }
+
+  static encodeRelayTokens = (receiver: string): string => {
+    const transferFromInterface = new utils.Interface(xdaiBridgeAbi)
+    return transferFromInterface.functions.relayTokens.encode([receiver])
+  }
+
+  encodeClaimDaiTokens = (message: string, signatures: string): string => {
+    const transferFromInterface = new utils.Interface(abi)
+    return transferFromInterface.functions.executeSignatures.encode([message, signatures])
+  }
+
   fetchCrossChainBalance = async (chain: number) => {
     try {
-      const userAddress = await this.provider.getSigner().getAddress()
-
+      let userAddress
+      if (this.provider.relay && chain === networkIds.MAINNET) {
+        userAddress = await this.provider.signer.signer.getAddress()
+      } else {
+        userAddress = await this.provider.getSigner().getAddress()
+      }
       const response = await axios.post(
         getInfuraUrl(chain),
         {
@@ -116,46 +185,59 @@ class XdaiService {
       throw new Error(`Error while fetching cross chain balance ${e}`)
     }
   }
+
   fetchXdaiTransactionData = async () => {
     try {
+      const query = `
+      query Requests($address: String) {
+          requests(first:1000,orderBy:timestamp,orderDirection:desc,where:{recipient: $address}) {
+              transactionHash
+              recipient
+              timestamp
+              value
+              message{
+                id
+                content
+                signatures
+              }
+          }
+      }`
+
       const queryForeign = `
         query GetTransactions($address: String!) {
-          executions(first:100,orderBy:timestamp,orderDirection:desc,where:{recipient: $address}) {
+          executions(first:1000,orderBy:timestamp,orderDirection:desc,where:{recipient: $address}) {
             transactionHash
             value
           }
         }
         `
-      const signer = this.provider.getSigner()
-      const account = await signer.getAddress()
 
-      const query = `
-          query Requests($address: String) {
-              requests(first:100,orderBy:timestamp,orderDirection:desc,where:{sender: $address}) {
-                  transactionHash
-                  recipient
-                  timestamp
-                  value
-                  message{
-                    id
-                    content
-                    signatures
-                  }
-              }
-          }`
+      const account = this.provider.relay
+        ? await this.provider.signer.signer.getAddress()
+        : await this.provider.getSigner().getAddress()
+
       const variables = { address: account }
-
       const xDaiRequests = await axios.post(XDAI_HOME_BRIDGE, { query, variables })
-      const xDaiExecutions = await axios.post(XDAI_FOREIGN_BRIDGE, { query: queryForeign, variables })
+      const xDaiExecutions = await axios.post(XDAI_FOREIGN_BRIDGE, {
+        query: queryForeign,
+        variables,
+      })
 
       const { requests } = xDaiRequests.data.data
       const { executions } = xDaiExecutions.data.data
-
-      const results = requests.filter(
+      let results = requests.filter(
         ({ transactionHash: id1 }: any) => !executions.some(({ transactionHash: id2 }: any) => id2 === id1),
       )
 
-      return results[0]
+      // double check if txs have been executed
+      const bridge = new ethers.Contract(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, this.abi, this.provider.signer.signer)
+      const relayed = await Promise.all(
+        results.map(async ({ transactionHash }: any) => await bridge.relayedMessages(transactionHash)),
+      )
+      // filter out executed claims
+      results = results.filter((_: any, index: number) => !relayed[index])
+
+      return results
     } catch (e) {
       console.error(e)
     }

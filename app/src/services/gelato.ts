@@ -129,17 +129,17 @@ class GelatoService {
   weth: any
   addresses: NetworkContracts
 
-  constructor(provider: any, signerAddress: Maybe<string>, networkId: number) {
+  constructor(provider: any, signerAddress: Maybe<string>, networkId: number, relay: boolean) {
     this.provider = provider
     this.networkId = networkId
     this.usdc = getToken(this.networkId, 'usdc')
     this.weth = getToken(this.networkId, 'weth')
-    if (networkId == 1) {
+    if (networkId == 1 || relay) {
       this.addresses = gelatoContracts.addresses.mainnet
     } else if (networkId == 4) {
       this.addresses = gelatoContracts.addresses.rinkeby
     } else {
-      throw Error(`Unknown networkId: ${networkId}`)
+      console.error(`Unknown networkId: ${networkId}`)
     }
     this.signer = null
     if (signerAddress) {

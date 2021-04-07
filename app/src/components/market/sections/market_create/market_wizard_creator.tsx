@@ -29,11 +29,11 @@ interface Props {
 
 export const MarketWizardCreator = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { networkId } = context
+  const { networkId, relay } = context
 
   const { callback, getCompoundInterestRate, marketCreationStatus } = props
 
-  const defaultCollateral = getDefaultToken(networkId)
+  const defaultCollateral = getDefaultToken(networkId, relay)
   const defaultArbitrator = getDefaultArbitrator(networkId)
   const defaultGelatoData = getDefaultGelatoData(networkId)
 
@@ -88,7 +88,7 @@ export const MarketWizardCreator = (props: Props) => {
     let isSubscribed = true
 
     const updateMarketData = async () => {
-      const collateral = getDefaultToken(networkId)
+      const collateral = getDefaultToken(networkId, relay)
       const arbitrator = getArbitrator(networkId, marketData.arbitrator.id)
 
       const newMarketData = {

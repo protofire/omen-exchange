@@ -3573,13 +3573,6 @@
   resolved "https://registry.yarnpkg.com/@types/common-tags/-/common-tags-1.8.0.tgz#79d55e748d730b997be5b7fce4b74488d8b26a6b"
   integrity sha512-htRqZr5qn8EzMelhX/Xmx142z218lLyGaeZ3YR8jlze4TATRU9huKKvuBmAJEW4LCC4pnY1N6JAm6p85fMHjhg==
 
-"@types/contract-proxy-kit@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/@types/contract-proxy-kit/-/contract-proxy-kit-1.0.1.tgz#2426fffb2ca89a98414cb0efb45002c286006f47"
-  integrity sha512-Ty1mlhmlL04GM7KowufxDxlEeCbv7eHMB9yuEFOQdfKppI8qgo2IfdayR98zdMahZsIYXj+eM4X6MFW5ZHTzFg==
-  dependencies:
-    ethers "^4.0.43"
-
 "@types/d3-path@*":
   version "1.0.8"
   resolved "https://registry.yarnpkg.com/@types/d3-path/-/d3-path-1.0.8.tgz#48e6945a8ff43ee0a1ce85c8cfa2337de85c7c79"
@@ -4113,6 +4106,14 @@
   dependencies:
     "@typescript-eslint/types" "4.2.0"
     eslint-visitor-keys "^2.0.0"
+
+"@ukstv/jazzicon-react@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@ukstv/jazzicon-react/-/jazzicon-react-1.0.0.tgz#f319ebf3b6a165bfc5feaea7ee4c1eb81c5d9b85"
+  integrity sha512-V0klHdrO8Mk+faTGhQRd4t2vR+1IUHJa9sLaP/vhed0klPrOblhEU/Mc+Utgxep6oUuyhcGigjvkEJUOVE1/sg==
+  dependencies:
+    color "^3.1.2"
+    mersenne-twister "^1.1.0"
 
 "@walletconnect/browser@^1.0.0-beta.47":
   version "1.0.0-beta.47"
@@ -7354,6 +7355,14 @@ color-string@^1.5.2:
     color-name "^1.0.0"
     simple-swizzle "^0.2.2"
 
+color-string@^1.5.4:
+  version "1.5.5"
+  resolved "https://registry.yarnpkg.com/color-string/-/color-string-1.5.5.tgz#65474a8f0e7439625f3d27a6a19d89fc45223014"
+  integrity sha512-jgIoum0OfQfq9Whcfc2z/VhCNcmQjWbey6qBX0vqt7YICflUmBCh9E9CiQD5GSJ+Uehixm3NUwHVhqUAWRivZg==
+  dependencies:
+    color-name "^1.0.0"
+    simple-swizzle "^0.2.2"
+
 color@^3.0.0:
   version "3.1.2"
   resolved "https://registry.yarnpkg.com/color/-/color-3.1.2.tgz#68148e7f85d41ad7649c5fa8c8106f098d229e10"
@@ -7361,6 +7370,14 @@ color@^3.0.0:
   dependencies:
     color-convert "^1.9.1"
     color-string "^1.5.2"
+
+color@^3.1.2:
+  version "3.1.3"
+  resolved "https://registry.yarnpkg.com/color/-/color-3.1.3.tgz#ca67fb4e7b97d611dcde39eceed422067d91596e"
+  integrity sha512-xgXAcTHa2HeFCGLE9Xs/R82hujGtu9Jd9x4NW3T34+OMs7VoPsjwzRczKHvTAHeJwWFwX5j15+MgAppE8ztObQ==
+  dependencies:
+    color-convert "^1.9.1"
+    color-string "^1.5.4"
 
 colorette@^1.2.1:
   version "1.2.1"
@@ -10292,7 +10309,7 @@ ethers@^4.0.0-beta.1, ethers@^4.0.32:
     uuid "2.0.1"
     xmlhttprequest "1.8.0"
 
-ethers@^4.0.20, ethers@^4.0.36, ethers@^4.0.43, ethers@~4.0.4:
+ethers@^4.0.20, ethers@^4.0.36, ethers@~4.0.4:
   version "4.0.46"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-4.0.46.tgz#13cd3ed099487f43ece00194b89a8a8781f71507"
   integrity sha512-/dPMzzpInhtiip4hKFvsDiJKeRk64IhyA+Po7CtNXneQFSOCYXg8eBFt+jXbxUQyApgWnWOtYxWdfn9+CvvxDA==
@@ -13731,7 +13748,7 @@ iso-stream-http@^0.1.2, iso-stream-http@~0.1.2:
     inherits "^2.0.1"
     readable-stream "^3.1.1"
 
-iso-url@^0.4.4, iso-url@~0.4.4, iso-url@~0.4.6:
+iso-url@~0.4.4, iso-url@~0.4.6:
   version "0.4.6"
   resolved "https://registry.yarnpkg.com/iso-url/-/iso-url-0.4.6.tgz#45005c4af4984cad4f8753da411b41b74cf0a8a6"
   integrity sha512-YQO7+aIe6l1aSJUKOx+Vrv08DlhZeLFIVfehG2L29KLSEb9RszqPXilxJRVpp57px36BddKR5ZsebacO5qG0tg==
@@ -16320,6 +16337,11 @@ merkle-patricia-tree@^3.0.0:
     readable-stream "^3.0.6"
     rlp "^2.0.0"
     semaphore ">=1.0.1"
+
+mersenne-twister@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/mersenne-twister/-/mersenne-twister-1.1.0.tgz#f916618ee43d7179efcf641bec4531eb9670978a"
+  integrity sha1-+RZhjuQ9cXnvz2Qb7EUx65Zwl4o=
 
 methods@~1.1.2:
   version "1.1.2"
@@ -19775,11 +19797,11 @@ pull-window@^2.1.4:
   dependencies:
     looper "^2.0.0"
 
-pull-ws@hugomrdias/pull-ws#fix/bundle-size:
-  version "3.3.1"
-  resolved "https://codeload.github.com/hugomrdias/pull-ws/tar.gz/8e2ce0bb3b1cd6804828316e937fff8e0bef6225"
+pull-ws@3.3.2, pull-ws@hugomrdias/pull-ws#fix/bundle-size:
+  version "3.3.2"
+  resolved "https://registry.yarnpkg.com/pull-ws/-/pull-ws-3.3.2.tgz#abac497a4800e74ab9a6d749c81a44d12d4e77b3"
+  integrity sha512-Bn4bcJsSzJGOQl4RBulDhG1FkcbDHSCXteI8Jg5k4X6X5TxVzZzKilWJ1WV2v4OnRXl2eYbtHFGsPl8Cr1xJzw==
   dependencies:
-    iso-url "^0.4.4"
     relative-url "^1.0.2"
     safe-buffer "^5.1.1"
     ws "^1.1.0"
@@ -25705,9 +25727,9 @@ xtend@~3.0.0:
   integrity sha1-XM50B7r2Qsunvs2laBEcST9ZZlo=
 
 y18n@^3.2.1:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/y18n/-/y18n-3.2.1.tgz#6d15fba884c08679c0d77e88e7759e811e07fa41"
-  integrity sha1-bRX7qITAhnnA136I53WegR4H+kE=
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/y18n/-/y18n-3.2.2.tgz#85c901bd6470ce71fc4bb723ad209b70f7f28696"
+  integrity sha512-uGZHXkHnhF0XeeAPgnKfPv1bgKAYyVvmNL1xlKsPYZPaIHxGti2hHqvOCQv71XMsLxu1QjergkqogUnms5D3YQ==
 
 y18n@^4.0.0:
   version "4.0.0"

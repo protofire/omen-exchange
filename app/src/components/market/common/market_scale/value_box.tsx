@@ -6,7 +6,7 @@ import { IconInfo } from '../../../common/tooltip/img/IconInfo'
 import { Circle } from '../../common/common_styled'
 import { SCALE_HEIGHT, VALUE_BOXES_MARGIN } from '../common_styled'
 
-const ValueBoxSegment = styled.div`
+const ValueBoxSegment = styled.div<{ threeBoxes?: boolean }>`
   font-size: ${props => props.theme.fonts.defaultSize};
   padding: 12px;
   border: 1px solid ${props => props.theme.scale.box};
@@ -17,17 +17,19 @@ const ValueBoxSegment = styled.div`
   background: ${props => props.theme.colors.mainBodyBackground};
 
   &:nth-of-type(odd) {
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
+    border-top-right-radius: ${props => (props.threeBoxes ? '4' : '0')}px;
+    border-bottom-right-radius: ${props => (props.threeBoxes ? '4' : '0')}px;
+
     border-top-left-radius: 4px;
     border-bottom-left-radius: 4px;
   }
   &:nth-of-type(even) {
+    ${props => props.threeBoxes && 'margin-left:12px;margin-right:12px;'};
     border-top-right-radius: 4px;
     border-bottom-right-radius: 4px;
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-    border-left: none;
+    border-top-left-radius: ${props => (props.threeBoxes ? '4' : '0')}px;
+    border-bottom-left-radius: ${props => (props.threeBoxes ? '4' : '0')}px;
+    ${props => !props.threeBoxes && 'border-left:none'};
   }
 `
 
@@ -48,7 +50,7 @@ const ValueBoxSingle = styled.div<{ xValue?: number }>`
               : ``
           }`
         : `right: 0;`
-      : ''}
+      : ''};
   background: ${props => props.theme.colors.mainBodyBackground};
   position: absolute;
   top: calc(${SCALE_HEIGHT} + ${VALUE_BOXES_MARGIN});
@@ -87,6 +89,7 @@ interface Props {
   positive?: boolean | undefined
   xValue?: number
   ball?: boolean | undefined
+  hasThreeBoxes?: boolean
 }
 
 export const ValueBox: React.FC<Props> = (props: Props) => {
@@ -102,7 +105,7 @@ export const ValueBox: React.FC<Props> = (props: Props) => {
   }
 
   return (
-    <ValueBoxSegment>
+    <ValueBoxSegment threeBoxes={props.hasThreeBoxes}>
       <ValueBoxTitle positive={positive}>{title}</ValueBoxTitle>
       {tooltip && <ReactTooltip id="payoutTooltip" />}
       <ValueBoxSubtitle>

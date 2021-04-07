@@ -103,6 +103,7 @@ export interface Question {
   arbitrationOccurred: boolean
   currentAnswerTimestamp: Maybe<BigNumber>
   currentAnswerBond: Maybe<BigNumber>
+  currentAnswer: string
   answers?: {
     answer: string
     bondAggregate: BigNumber
@@ -134,11 +135,6 @@ export interface Token {
   image?: string
   volume?: string
   balance?: string
-}
-
-export const TokenEthereum = {
-  decimals: 18,
-  symbol: 'ETH',
 }
 
 export interface QuestionLog {
@@ -514,4 +510,33 @@ export type ValueBoxItem = {
 export enum AdditionalSharesType {
   long = 'Long',
   short = 'Short',
+}
+
+export enum WalletState {
+  ready,
+  enable,
+}
+
+export enum ExchangeType {
+  deposit = 'Deposit',
+  withdraw = 'Withdraw',
+}
+
+export enum TransactionStep {
+  idle,
+  waitingConfirmation,
+  transactionSubmitted,
+  transactionConfirmed,
+  confirming,
+  error,
+}
+
+export enum TransactionType {
+  deposit = 'Deposit',
+  withdraw = 'Withdraw',
+  buy = 'Buy',
+  sell = 'Sell',
+  redeem = 'Redeem',
+  create = 'Create',
+  claim = 'Claim',
 }

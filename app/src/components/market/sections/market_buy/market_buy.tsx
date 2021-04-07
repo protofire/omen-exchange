@@ -6,11 +6,12 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { DOCUMENT_VALIDITY_RULES } from '../../../../common/constants'
+import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
   useCompoundService,
+  useConnectedBalanceContext,
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
@@ -38,13 +39,13 @@ import {
   Status,
   Ternary,
   Token,
+  TransactionStep,
 } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { FullLoading } from '../../../loading'
-import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
+import { ModalTransactionWrapper } from '../../../modal'
 import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
@@ -79,8 +80,9 @@ interface Props extends RouteComponentProps<any> {
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
+  const { fetchBalances } = useConnectedBalanceContext()
 
-  const { library: provider, networkId } = context
+  const { library: provider, networkId, relay } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
@@ -89,18 +91,19 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const wrapToken = getWrapToken(networkId)
-  const nativeAsset = getNativeAsset(networkId)
+  const nativeAsset = getNativeAsset(networkId, relay)
   const initialCollateral =
     marketMakerData.collateral.address.toLowerCase() === wrapToken.address.toLowerCase()
       ? nativeAsset
       : marketMakerData.collateral
+
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
   const collateralSymbol = collateral.symbol.toLowerCase()
 
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
 
-  const baseCollateral = getInitialCollateral(networkId, collateral)
+  const baseCollateral = getInitialCollateral(networkId, collateral, relay)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
   let displayBalances = balances
   if (
@@ -112,14 +115,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const symbol = useSymbol(displayCollateral)
-
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [amount, setAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [tweet, setTweet] = useState('')
   const [newShares, setNewShares] = useState<Maybe<BigNumber[]>>(null)
   const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
@@ -133,6 +134,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals).includes('-'))
@@ -223,21 +227,26 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         }
       }
       const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals)
-
+      setTweet('')
       setStatus(Status.Loading)
-      setMessage(`Buying ${sharesAmount} shares ...`)
+      setMessage(`Buying ${sharesAmount} shares...`)
+      setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
       await cpk.buyOutcomes({
         amount: inputAmount,
         collateral,
         compoundService,
         marketMaker,
         outcomeIndex,
+        setTxHash,
+        setTxState,
         useBaseToken,
       })
 
       await fetchGraphMarketMakerData()
       await fetchCollateralBalance()
+      await fetchBalances()
 
       setTweet(
         stripIndents(`${question.title}
@@ -252,11 +261,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
       logger.error(`${message} - ${err.message}`)
       setIsTransactionProcessing(false)
     }
-    setIsModalTransactionResultOpen(true)
   }
 
   const showSetAllowance =
@@ -264,8 +273,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
-  const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, 18, 4)))
-  const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
+  const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)))
+  const feePercentage = Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)) * 100
 
   const baseCost = debouncedAmount?.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount || Zero)
@@ -307,7 +316,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const isBuyDisabled =
     !amount ||
-    Number(sharesTotal) == 0 ||
     (status !== Status.Ready && status !== Status.Error) ||
     amount?.isZero() ||
     (!cpk?.isSafeApp &&
@@ -362,6 +370,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setDisplayFundAmount(value)
   }
 
+  const currencySelectorIsDisabled = relay ? true : currencyFilters.length ? false : true
+
   return (
     <>
       <OutcomeTable
@@ -399,7 +409,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
               balance={formatBigNumber(maybeCollateralBalance || Zero, displayCollateral.decimals, 5)}
               context={context}
               currency={displayCollateral.address}
-              disabled={currencyFilters.length ? false : true}
+              disabled={currencySelectorIsDisabled}
               filters={currencyFilters}
               onSelect={(token: Token | null) => {
                 if (token) {
@@ -494,16 +504,17 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           Buy
         </Button>
       </StyledButtonContainer>
-      <ModalTransactionResult
-        isOpen={isModalTransactionResultOpen}
-        onClose={() => setIsModalTransactionResultOpen(false)}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
         shareUrl={`${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`}
-        status={status}
-        text={message}
-        title={status === Status.Error ? 'Transaction Error' : 'Buy Shares'}
         tweet={tweet}
+        txHash={txHash}
+        txState={txState}
       />
-      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

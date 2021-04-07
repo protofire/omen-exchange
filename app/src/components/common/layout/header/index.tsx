@@ -1,26 +1,19 @@
-import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
 import { withRouter } from 'react-router'
 import { matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 
 import { Logo } from '../../../../common/constants'
-import { useOutsideAlerter } from '../../../../hooks/useOutsideAlerter'
-import { XdaiService } from '../../../../services'
+import { useConnectedBalanceContext, useConnectedWeb3Context } from '../../../../hooks'
 import { networkIds } from '../../../../util/networks'
-import { formatBigNumber } from '../../../../util/tools'
-import { ButtonCircle, ButtonConnectWallet, ButtonDisconnectWallet, ButtonRound } from '../../../button'
+import { ExchangeType } from '../../../../util/types'
+import { Button, ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
-import { XdaiBridgeTransfer } from '../../../market/common/xdai_bridge_modal'
-import { ModalConnectWalletWrapper } from '../../../modal'
+import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
 import { IconAdd, IconClose } from '../../icons'
-import { IconArrowRight } from '../../icons/IconArrowRight'
 import { IconSettings } from '../../icons/IconSettings'
-import { DaiIcon } from '../../icons/currencies'
-import { XdaiIcon } from '../../icons/currencies/XdaiIcon'
 
 export const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -69,35 +62,6 @@ const ButtonCreateDesktop = styled(ButtonRound)`
     display: flex;
   }
 `
-const ArrowWrapper = styled.div`
-  margin-left: 20px;
-  margin-right: 20px;
-`
-const CurrencyWrapper = styled.div`
-  display: flex;
-  text-align: center;
-`
-const CurrencyText = styled.div`
-  padding-left: 12px;
-  font-size: ${props => props.theme.fonts.defaultSize};
-  font-family: ${props => props.theme.fonts.fontFamily};
-  line-height: 22.41px;
-`
-const Bridge = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
-    width: calc(100% - 20px);
-    order: 3;
-    margin-top: 100px;
-    position: absolute;
-    left: 10px;
-  }
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin-left: 12px;
-  }
-`
 
 const ButtonCreateMobile = styled(ButtonCircle)`
   display: flex;
@@ -110,6 +74,7 @@ const ButtonCreateMobile = styled(ButtonCircle)`
 
 const ButtonCSS = css`
   margin: 0 0 0 5px;
+  padding: 12px 14px;
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin-left: 12px;
 
@@ -120,10 +85,6 @@ const ButtonCSS = css`
 `
 
 const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
-  ${ButtonCSS}
-`
-
-const ButtonWrapper = styled.div`
   ${ButtonCSS}
 `
 
@@ -158,98 +119,109 @@ export const ContentsRight = styled.div`
   }
 `
 
-const HeaderDropdown = styled(Dropdown)`
+const HeaderButton = styled(Button)`
   ${ButtonCSS};
+`
+
+const DepositedBalance = styled.p`
+  font-size: ${props => props.theme.fonts.defaultSize};
+  color: ${props => props.theme.colors.textColorLighter};
+`
+
+const HeaderButtonDivider = styled.div`
+  height: 16px;
+  width: 1px;
+  margin: 0 12px;
+  background: ${props => props.theme.borders.borderDisabled};
 `
 
 const CloseIconWrapper = styled.div`
   margin-right: 12px;
 `
-const ClaimWrapper = styled.div`
+
+const DropdownWrapper = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
 `
-const ClaimAmount = styled.div`
-  color: ${props => props.theme.colors.textColorDark};
-  font-size: ${props => props.theme.fonts.defaultSize};
-`
-const GoldDot = styled.div`
-  height: 6px;
-  width: 6px;
-  background-color: ${props => props.theme.colors.gold};
+
+const Dot = styled.div<{ color: string; size: number }>`
+  height: ${props => props.size}px;
+  width: ${props => props.size}px;
+  background-color: ${props => props.theme.colors[props.color]};
   border-radius: 50%;
   display: inline-block;
   margin-right: 8px;
 `
-const ClaimText = styled.div`
+
+const DropdownText = styled.div`
   display: flex;
   align-items: center;
 `
 
-const HeaderContainer = (props: any) => {
-  let account: any
-  let provider: any
-  let networkId: any
+const HeaderDropdown = styled(Dropdown)`
+  ${ButtonCSS};
+  height: 40px;
+`
 
-  if (props.web3context) {
-    account = props.web3context.account
-    networkId = props.web3context.networkId
-    provider = props.web3context.library
-  }
+const HeaderContainer: React.FC = (props: any) => {
+  const context = useConnectedWeb3Context()
+  const { relay, toggleRelay } = context
+  const { account, active, connectorName, error, networkId } = context.rawWeb3Context
 
   const { history, ...restProps } = props
-  const [isModalOpen, setModalState] = useState(false)
-  const [claimState, setClaimState] = useState<boolean>(false)
-  const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
+  const [isConnectWalletModalOpen, setConnectWalletModalState] = useState(false)
+  const [isYourConnectionModalOpen, setYourConnectionModalState] = useState(false)
+  const [isDepositWithdrawModalOpen, setDepositWithdrawModalState] = useState(false)
+  const [depositWithdrawType, setDepositWithdrawType] = useState<ExchangeType>(ExchangeType.deposit)
+
   const hasRouter = props.history !== undefined
-  const disableConnectButton = isModalOpen
+  const disableConnectButton = isConnectWalletModalOpen
 
-  const headerDropdownItems: Array<DropdownItemProps> = [
+  const {
+    claimState,
+    daiBalance,
+    fetchBalances,
+    formattedDaiBalance,
+    formattedEthBalance,
+    formattedxDaiBalance,
+    unclaimedAmount,
+    xDaiBalance,
+  } = useConnectedBalanceContext()
+
+  const networkPlacholder = (
+    <DropdownWrapper>
+      <DropdownText>
+        <Dot color="greenLight" size={8} />
+        {relay ? 'xDai' : 'Mainnet'}
+      </DropdownText>
+    </DropdownWrapper>
+  )
+
+  const toggle = () => {
+    toggleRelay()
+    if (hasRouter) {
+      history.replace('/')
+    }
+  }
+
+  const networkDropdownItems: Array<DropdownItemProps> = [
     {
+      onClick: toggle,
       content: (
-        <ClaimWrapper
-          onClick={() => {
-            props.setClaim && props.setClaim(true)
-          }}
-        >
-          <ClaimText>
-            <GoldDot />
-            Claim
-          </ClaimText>
-          <ClaimAmount>{formatBigNumber(unclaimedAmount, 18, 2)} DAI</ClaimAmount>
-        </ClaimWrapper>
+        <DropdownWrapper>
+          <DropdownText>{relay ? 'Mainnet' : 'xDai'}</DropdownText>
+        </DropdownWrapper>
       ),
-      visibility: networkId !== 1 || !claimState,
-    },
-
-    {
-      content: <ButtonDisconnectWallet />,
     },
   ]
 
-  useEffect(() => {
-    const fetchUnclaimedAssets = async () => {
-      const xDaiService = new XdaiService(provider)
-      const transaction = await xDaiService.fetchXdaiTransactionData()
-      if (transaction) {
-        setUnclaimedAmount(transaction.value)
-
-        setClaimState(true)
-
-        return
-      }
-      setClaimState(false)
+  const logout = () => {
+    if (active || (error && connectorName)) {
+      localStorage.removeItem('CONNECTOR')
+      context.rawWeb3Context.setConnector('Infura')
     }
-    if (networkId === 1) {
-      fetchUnclaimedAssets()
-    } else {
-      setUnclaimedAmount(Zero)
-      setClaimState(false)
-    }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, networkId])
+  }
 
   const isMarketCreatePage = history ? !!matchPath(history.location.pathname, { path: '/create', exact: true }) : false
 
@@ -257,28 +229,9 @@ const HeaderContainer = (props: any) => {
     disabled: disableConnectButton || isMarketCreatePage || !hasRouter,
     onClick: () => history && history.push('/create'),
   }
-  const [isBridgeOpen, setIsBridgeOpen] = useState<boolean>(false)
-  const ref = useRef(null)
-  useOutsideAlerter(setIsBridgeOpen, ref)
 
   const exitButtonProps = {
     onClick: () => history && history.push('/'),
-  }
-
-  const currencyReturn = (condition: boolean): JSX.Element => {
-    return (
-      <CurrencyWrapper>
-        {condition ? (
-          <>
-            <DaiIcon size="22" /> <CurrencyText>Dai</CurrencyText>
-          </>
-        ) : (
-          <>
-            <XdaiIcon /> <CurrencyText>xDai</CurrencyText>
-          </>
-        )}
-      </CurrencyWrapper>
-    )
   }
 
   return (
@@ -312,55 +265,46 @@ const HeaderContainer = (props: any) => {
             </>
           )}
 
-          {(networkId === networkIds.MAINNET || networkId == networkIds.XDAI) && account && (
-            <>
-              <Bridge ref={ref}>
-                <ButtonRound
-                  active={isBridgeOpen}
-                  onClick={() => {
-                    setIsBridgeOpen(!isBridgeOpen)
-                  }}
-                >
-                  {currencyReturn(networkId === 1)}
-                  <ArrowWrapper>
-                    <IconArrowRight />
-                  </ArrowWrapper>
-                  {currencyReturn(networkId !== 1)}
-                </ButtonRound>
-                <XdaiBridgeTransfer open={isBridgeOpen} setOpen={setIsBridgeOpen} />
-              </Bridge>
-            </>
+          {(networkId === networkIds.MAINNET || relay) && (
+            <HeaderDropdown
+              currentItem={networkDropdownItems.length + 1}
+              disableDirty
+              dropdownPosition={DropdownPosition.center}
+              items={networkDropdownItems}
+              minWidth={false}
+              placeholder={networkPlacholder}
+            />
           )}
 
           {!account && (
-            <ButtonWrapper
-              data-class="customTooltip"
-              data-delay-hide="500"
-              data-effect="solid"
-              data-for="connectButtonTooltip"
-              data-multiline={true}
-              data-place="left"
-            >
-              <ButtonConnectWalletStyled
-                disabled={disableConnectButton || !hasRouter}
-                modalState={isModalOpen}
-                onClick={() => {
-                  setModalState(true)
-                }}
-              />
-              {disableConnectButton && <ReactTooltip id="connectButtonTooltip" />}
-            </ButtonWrapper>
+            <ButtonConnectWalletStyled
+              disabled={disableConnectButton || !hasRouter}
+              modalState={isConnectWalletModalOpen}
+              onClick={() => {
+                setConnectWalletModalState(true)
+              }}
+            />
           )}
+          {disableConnectButton && <ReactTooltip id="connectButtonTooltip" />}
+
           {account && (
-            <>
-              <HeaderDropdown
-                currentItem={headerDropdownItems.length + 1}
-                dropdownPosition={DropdownPosition.center}
-                items={headerDropdownItems}
-                omitRightButtonMargin={true}
-                placeholder={<Network account={account} claim={claimState} networkId={networkId} />}
-              />
-            </>
+            <HeaderButton
+              onClick={() => {
+                setYourConnectionModalState(true)
+              }}
+            >
+              <>
+                <DepositedBalance>
+                  {relay
+                    ? `${formattedxDaiBalance} DAI`
+                    : context.rawWeb3Context.networkId === networkIds.XDAI
+                    ? `${formattedxDaiBalance} xDAI`
+                    : `${formattedEthBalance} ETH`}
+                </DepositedBalance>
+                <HeaderButtonDivider />
+              </>
+              <Network claim={false} />
+            </HeaderButton>
           )}
           <ButtonSettings
             disabled={!hasRouter}
@@ -370,7 +314,50 @@ const HeaderContainer = (props: any) => {
             <IconSettings />
           </ButtonSettings>
         </ContentsRight>
-        <ModalConnectWalletWrapper isOpen={isModalOpen} onClose={() => setModalState(false)} />
+        <ModalYourConnectionWrapper
+          changeWallet={() => {
+            setYourConnectionModalState(false)
+            logout()
+            setConnectWalletModalState(true)
+          }}
+          claimState={claimState}
+          fetchBalances={fetchBalances}
+          formattedDaiBalance={formattedDaiBalance}
+          formattedEthBalance={formattedEthBalance}
+          formattedxDaiBalance={formattedxDaiBalance}
+          isOpen={isYourConnectionModalOpen && !isDepositWithdrawModalOpen}
+          onClose={() => setYourConnectionModalState(false)}
+          openDepositModal={() => {
+            setYourConnectionModalState(false)
+            setDepositWithdrawType(ExchangeType.deposit)
+            setDepositWithdrawModalState(true)
+          }}
+          openWithdrawModal={() => {
+            setYourConnectionModalState(false)
+            setDepositWithdrawType(ExchangeType.withdraw)
+            setDepositWithdrawModalState(true)
+          }}
+          unclaimedAmount={unclaimedAmount}
+        />
+        <ModalConnectWalletWrapper
+          isOpen={isConnectWalletModalOpen}
+          onClose={() => setConnectWalletModalState(false)}
+        />
+        <ModalDepositWithdrawWrapper
+          daiBalance={daiBalance}
+          exchangeType={depositWithdrawType}
+          fetchBalances={fetchBalances}
+          formattedDaiBalance={formattedDaiBalance}
+          formattedxDaiBalance={formattedxDaiBalance}
+          isOpen={isDepositWithdrawModalOpen}
+          onBack={() => {
+            setDepositWithdrawModalState(false)
+            setYourConnectionModalState(true)
+          }}
+          onClose={() => setDepositWithdrawModalState(false)}
+          unclaimedAmount={unclaimedAmount}
+          xDaiBalance={xDaiBalance}
+        />
       </HeaderInner>
     </HeaderWrapper>
   )

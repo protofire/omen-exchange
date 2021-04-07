@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export const useRealityLink = (): string => {
+export const useRealityLink = (relay?: boolean): string => {
   const [connected, setConnected] = useState<boolean>()
   const [chainId, setChainId] = useState<Maybe<string>>(null)
   const windowObj: any = window
@@ -25,7 +25,7 @@ export const useRealityLink = (): string => {
   }, [windowObj.ethereum, chainId])
 
   let realityLink
-  if (chainId === '0x64' || chainId === '0x4d') {
+  if (chainId === '0x64' || chainId === '0x4d' || relay) {
     realityLink = 'https://realitio.github.io'
   } else if (connected) {
     realityLink = 'https://reality.eth/app'

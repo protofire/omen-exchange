@@ -2,7 +2,9 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { useConnectedWeb3Context } from '../../../../hooks'
 import { FpmmTradeDataType } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
+import { getTxHashBlockExplorerURL } from '../../../../util/networks'
 import { formatBigNumber, formatHistoryDate, formatHistoryUser } from '../../../../util/tools'
 import { ButtonRound } from '../../../button'
 import { IconJazz } from '../../../common/icons/IconJazz'
@@ -88,12 +90,6 @@ type Props = {
   sharesDataLoader: boolean
 }
 
-enum EtherscanLink {
-  rinkeby = 'https://rinkeby.etherscan.io/tx/',
-  mainnet = 'https://etherscan.io/tx/',
-  xDai = 'https://blockscout.com/poa/xdai/tx/',
-}
-
 export const HistoryTable: React.FC<Props> = ({
   currency,
   fpmmTrade,
@@ -105,13 +101,14 @@ export const HistoryTable: React.FC<Props> = ({
   status,
 }) => {
   const history = useHistory()
-
-  const windowObj: any = window
+  const context = useConnectedWeb3Context()
+  const { networkId, relay } = context
 
   if (!fpmmTrade || status === 'Loading' || sharesDataLoader) {
     return <CustomInlineLoading message="Loading Trade History" />
   }
-  const formattedCurrency = currency === 'WETH' ? 'ETH' : currency === 'WXDAI' ? 'XDAI' : currency
+  const formattedCurrency =
+    currency === 'WETH' ? 'ETH' : relay && currency === 'WXDAI' ? 'DAI' : currency === 'WXDAI' ? 'XDAI' : currency
   return (
     <React.Fragment>
       <TableWrapper>
@@ -135,14 +132,6 @@ export const HistoryTable: React.FC<Props> = ({
               transactionType,
               user,
             }) => {
-              const chainID = windowObj.ethereum.chainId
-
-              const mainnetOrRinkebyUrl =
-                chainID === '0x4'
-                  ? EtherscanLink.rinkeby
-                  : chainID === '0x1'
-                  ? EtherscanLink.mainnet
-                  : EtherscanLink.xDai
               return (
                 <HistoryRow key={id}>
                   <HistoryColumns>
@@ -155,7 +144,7 @@ export const HistoryTable: React.FC<Props> = ({
                     {formatBigNumber(collateralTokenAmount, decimals, 3)}
                     {` ${formattedCurrency}`}
                   </HistoryColumns>
-                  <HistoryColumns as="a" href={mainnetOrRinkebyUrl + transactionHash} target="_blank">
+                  <HistoryColumns as="a" href={getTxHashBlockExplorerURL(networkId, transactionHash)} target="_blank">
                     {formatHistoryDate(creationTimestamp)}
                   </HistoryColumns>
                 </HistoryRow>

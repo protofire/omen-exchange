@@ -16,8 +16,7 @@ import { getContractAddress } from '../util/networks'
 import { ConnectedWeb3Context } from './connectedWeb3'
 
 export const useContracts = (context: ConnectedWeb3Context) => {
-  const { account, library: provider, networkId } = context
-
+  const { account, library: provider, networkId, relay } = context
   const conditionalTokensAddress = getContractAddress(networkId, 'conditionalTokens')
   const conditionalTokens = useMemo(() => new ConditionalTokenService(conditionalTokensAddress, provider, account), [
     conditionalTokensAddress,
@@ -67,7 +66,12 @@ export const useContracts = (context: ConnectedWeb3Context) => {
   const dxTCRAddress = getContractAddress(networkId, 'dxTCR')
   const dxTCR = useMemo(() => new DxTCRService(dxTCRAddress, provider), [provider, dxTCRAddress])
 
-  const gelato = useMemo(() => new GelatoService(provider, account, networkId), [provider, account, networkId])
+  const gelato = useMemo(() => new GelatoService(provider, account, networkId, relay), [
+    provider,
+    account,
+    networkId,
+    relay,
+  ])
 
   return useMemo(
     () => ({

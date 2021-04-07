@@ -14,7 +14,7 @@ import { useMarkets } from '../../../../hooks/useMarkets'
 import { queryCategories } from '../../../../queries/markets_home'
 import theme from '../../../../theme'
 import { getLogger } from '../../../../util/logger'
-import { getArbitratorsByNetwork, getOutcomes } from '../../../../util/networks'
+import { getArbitratorsByNetwork, getOutcomes, getWrapToken, networkIds } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   CategoryDataItem,
@@ -232,7 +232,9 @@ const MarketHomeContainer: React.FC = () => {
 
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
   const [categories, setCategories] = useState<RemoteData<CategoryDataItem[]>>(RemoteData.notAsked())
-  const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(null)
+
+  const defaultCpkAddress = context.relay ? context.account : null
+  const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(defaultCpkAddress)
 
   const [pageSize, setPageSize] = useState(4)
   const [pageIndex, setPageIndex] = useState(0)
@@ -255,6 +257,10 @@ const MarketHomeContainer: React.FC = () => {
     now: +now,
     knownArbitrators,
     ...filter,
+  }
+
+  if (context.relay) {
+    marketsQueryVariables.currency = getWrapToken(context.networkId).address
   }
 
   const { error, loading, markets: fetchedMarkets, moreMarkets } = useMarkets(marketsQueryVariables)
@@ -412,7 +418,7 @@ const MarketHomeContainer: React.FC = () => {
 
   return (
     <>
-      {hasSeenBanner === undefined && (
+      {hasSeenBanner === undefined && (context.relay || context.networkId === networkIds.MAINNET) && (
         <Banner>
           <TransferIcon alt="" src={xDaiIntergation} />
           <TextWrapper>
@@ -420,7 +426,13 @@ const MarketHomeContainer: React.FC = () => {
             <TextDescription>
               You now have access to Omen markets on xDai Chain with your Mainnet Ethereum wallet. To use Omen on
               Mainnet choose &quot;Mainnet&quot; from the network dropdown above!{' '}
-              <Link href={'https://youtube.com'}>learn more</Link>
+              <Link
+                href={'https://medium.com/omen-eth/omen-goes-xdai-native-9423ee2e0e63'}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                learn more
+              </Link>
             </TextDescription>
           </TextWrapper>
           <CloseStyled

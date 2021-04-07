@@ -5,9 +5,11 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCompoundService,
+  useConnectedBalanceContext,
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
@@ -33,13 +35,13 @@ import {
   OutcomeTableValue,
   Status,
   Token,
+  TransactionStep,
 } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { FullLoading } from '../../../loading'
-import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
+import { ModalTransactionWrapper } from '../../../modal'
 import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
@@ -67,7 +69,9 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { networkId, relay } = context
   const cpk = useConnectedCPKContext()
+  const { fetchBalances } = useConnectedBalanceContext()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
@@ -82,6 +86,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
+  const baseCollateral = getInitialCollateral(networkId, collateral, relay)
+
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(defaultOutcomeIndex)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
@@ -90,18 +96,18 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
-  const { networkId } = context
+  const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
+  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
+
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
 
-  const baseCollateral = getInitialCollateral(networkId, collateral)
-  const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
-  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
+  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
   const collateralSymbol = collateral.symbol.toLowerCase()
   const symbol = useSymbol(displayCollateral)
-
   const wrapToken = getWrapToken(context.networkId)
   let displayTotalSymbol = symbol
   if (collateral.address === displayCollateral.address && collateral.address === wrapToken.address) {
@@ -141,10 +147,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
         return index !== outcomeIndex
       })
-
       const amountToSell = calcSellAmountInCollateral(
-        // If the transaction incur in some precision error, we need to multiply the amount by some factor, for example  amountShares.mul(99999).div(100000) , bigger the factor, less dust
-        amountShares,
+        // Round down in case of precision error
+        amountShares.mul(99999999).div(100000000),
         holdingsOfSoldOutcome,
         holdingsOfOtherOutcomes,
         marketFeeWithTwoDecimals,
@@ -209,7 +214,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       if (!cpk) {
         return
       }
+      setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
       let displaySharesAmount = sharesAmount
       if (collateral.symbol.toLowerCase() in CompoundTokenType && amountShares && compoundService) {
@@ -229,10 +236,13 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         outcomeIndex,
         marketMaker,
         conditionalTokens,
+        setTxHash,
+        setTxState,
         useBaseToken,
       })
 
       await fetchGraphMarketMakerData()
+      await fetchBalances()
       setAmountSharesFromInput(new BigNumber('0'))
       setDisplaySellShares(null)
       setAmountShares(null)
@@ -241,11 +251,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' shares.`)
       logger.error(`${message} - ${err.message}`)
       setIsTransactionProcessing(false)
     }
-    setIsModalTransactionResultOpen(true)
   }
 
   const newShares = balances.map((balance, i) =>
@@ -298,7 +308,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const isSellButtonDisabled =
     !amountShares ||
-    Number(sellAmountSharesDisplay) == 0 ||
     (status !== Status.Ready && status !== Status.Error) ||
     amountShares?.isZero() ||
     amountError !== null ||
@@ -313,9 +322,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   } else {
     if (collateral.address === wrapToken.address) {
       if (displayCollateral.address === wrapToken.address) {
-        toggleCollateral = getNativeAsset(context.networkId)
+        toggleCollateral = getNativeAsset(networkId, relay)
       } else {
-        toggleCollateral = getWrapToken(context.networkId)
+        toggleCollateral = getWrapToken(networkId)
       }
     }
   }
@@ -328,9 +337,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       }
     } else {
       if (displayCollateral.address === wrapToken.address) {
-        setDisplayCollateral(getNativeAsset(context.networkId))
+        setDisplayCollateral(getNativeAsset(networkId, relay))
       } else {
-        setDisplayCollateral(getWrapToken(context.networkId))
+        setDisplayCollateral(getWrapToken(networkId))
       }
     }
   }
@@ -424,7 +433,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
                   : '0.00'
               } ${displayTotalSymbol}`}
             />
-            {collateral.address === wrapToken.address || collateralSymbol in CompoundTokenType ? (
+            {(!relay && collateral.address === wrapToken.address) || collateralSymbol in CompoundTokenType ? (
               <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollateral} />
             ) : (
               <span />
@@ -450,14 +459,15 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           Sell
         </Button>
       </StyledButtonContainer>
-      <ModalTransactionResult
-        isOpen={isModalTransactionResultOpen}
-        onClose={() => setIsModalTransactionResultOpen(false)}
-        status={status}
-        text={message}
-        title={status === Status.Error ? 'Transaction Error' : 'Sell Shares'}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={txHash}
+        txState={txState}
       />
-      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

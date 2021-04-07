@@ -1,29 +1,30 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber, parseUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { STANDARD_DECIMALS } from '../../../../common/constants'
+import { useConnectedCPKContext, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
-import { getNativeAsset, networkIds } from '../../../../util/networks'
-import { formatBigNumber, formatNumber, numberToByte32 } from '../../../../util/tools'
+import { getNativeAsset } from '../../../../util/networks'
+import { formatBigNumber, formatNumber, getUnit, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
   MarketDetailsTab,
   MarketMakerData,
   OutcomeTableValue,
-  Status,
-  TokenEthereum,
+  TransactionStep,
 } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
-import { FullLoading } from '../../../loading'
-import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
+import { BigNumberInputReturn } from '../../../common/form/big_number_input'
+import { ModalTransactionWrapper } from '../../../modal'
 import { AssetBalance } from '../../common/asset_balance'
-import { CurrenciesWrapper } from '../../common/common_styled'
+import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
+import { MarketScale } from '../../common/market_scale'
 import { OutcomeTable } from '../../common/outcome_table'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
@@ -34,10 +35,11 @@ interface Props extends RouteComponentProps<any> {
   theme?: any
   switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
+  isScalar: boolean
+  bondNativeAssetAmount: BigNumber
 }
 
 const BottomButtonWrapper = styled(ButtonContainer)`
-  justify-content: space-between;
   margin: 0 -24px;
   padding: 20px 24px 0;
 `
@@ -45,36 +47,39 @@ const BottomButtonWrapper = styled(ButtonContainer)`
 const logger = getLogger('Market::Bond')
 
 const MarketBondWrapper: React.FC<Props> = (props: Props) => {
-  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
+  const { bondNativeAssetAmount, fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
+
   const {
     balances,
     question: { currentAnswerBond },
   } = marketMakerData
 
   const context = useConnectedWeb3Context()
-  const { account, library: provider, networkId } = context
+  const { account, library: provider, networkId, relay } = context
 
-  const nativeAsset = getNativeAsset(networkId)
-  const symbol = nativeAsset.symbol
+  const cpk = useConnectedCPKContext()
+
+  const nativeAsset = getNativeAsset(networkId, relay)
+  const { symbol } = nativeAsset
   const { realitio } = useContracts(context)
 
-  const [status, setStatus] = useState<Status>(Status.Ready)
-  const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState<string>('')
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const probabilities = balances.map(balance => balance.probability)
-  const initialBondAmount =
-    networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
-  const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
-    currentAnswerBond ? new BigNumber(currentAnswerBond).mul(2) : initialBondAmount,
-  )
+  const [bondOutcomeSelected, setBondOutcomeSelected] = useState<BigNumber>(Zero)
+  const [bondOutcomeDisplay, setBondOutcomeDisplay] = useState<string>('')
+  const [amountError, setAmountError] = useState<boolean>(false)
+
   const [nativeAssetBalance, setNativeAssetBalance] = useState<BigNumber>(Zero)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
     const fetchBalance = async () => {
       try {
         const balance = await provider.getBalance(account || '')
+        setAmountError(balance.lte(bondNativeAssetAmount))
         setNativeAssetBalance(balance)
       } catch (error) {
         setNativeAssetBalance(Zero)
@@ -83,84 +88,121 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
     if (account) {
       fetchBalance()
     }
-  }, [account, provider])
+  }, [account, provider, bondNativeAssetAmount])
 
-  useEffect(() => {
-    if (currentAnswerBond && !new BigNumber(currentAnswerBond).mul(2).eq(bondNativeAssetAmount)) {
-      setBondNativeAssetAmount(new BigNumber(currentAnswerBond).mul(2))
+  const bondOutcome = async (isInvalid?: boolean) => {
+    if (!cpk) {
+      return
     }
-    // eslint-disable-next-line
-  }, [currentAnswerBond])
-
-  const bondOutcome = async () => {
-    setModalTitle('Bond Outcome')
 
     try {
-      setStatus(Status.Loading)
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
 
-      const answer = outcomeIndex >= balances.length ? INVALID_ANSWER_ID : numberToByte32(outcomeIndex)
+      const answer =
+        outcomeIndex >= balances.length || isInvalid
+          ? INVALID_ANSWER_ID
+          : numberToByte32(props.isScalar ? bondOutcomeSelected.toHexString() : outcomeIndex, props.isScalar)
 
       setMessage(
-        `Bonding ${formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals)} ${symbol} on: ${
-          outcomeIndex >= marketMakerData.question.outcomes.length
+        `Bonding on ${
+          outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
+            : props.isScalar
+            ? `${formatBigNumber(bondOutcomeSelected, nativeAsset.decimals)} ${getUnit(
+                props.marketMakerData.question.title,
+              )}`
+            : marketMakerData.question.outcomes[outcomeIndex]
+        } with ${formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals)} ${symbol}`,
+      )
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
+
+      const question = marketMakerData.question
+      logger.log(`Submit Answer questionId: ${question.id}, answer: ${answer}`, bondNativeAssetAmount)
+
+      await cpk.submitAnswer({
+        realitio,
+        question,
+        answer,
+        amount: bondNativeAssetAmount,
+        setTxHash,
+        setTxState,
+      })
+
+      await fetchGraphMarketMakerData()
+
+      setMessage(
+        `Successfully bonded ${formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals)} ${symbol} on ${
+          outcomeIndex >= balances.length || isInvalid
+            ? 'Invalid'
+            : props.isScalar
+            ? `${formatBigNumber(bondOutcomeSelected, nativeAsset.decimals)} ${getUnit(
+                props.marketMakerData.question.title,
+              )}`
             : marketMakerData.question.outcomes[outcomeIndex]
         }`,
       )
-
-      logger.log(`Submit Answer questionId: ${marketMakerData.question.id}, answer: ${answer}`, bondNativeAssetAmount)
-      await realitio.submitAnswer(marketMakerData.question.id, answer, bondNativeAssetAmount)
-      await fetchGraphMarketMakerData()
-
-      setStatus(Status.Ready)
-      setMessage(
-        `Successfully bonded ${formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals)} ${symbol} on ${
-          outcomeIndex < marketMakerData.question.outcomes.length
-            ? marketMakerData.question.outcomes[outcomeIndex]
-            : 'Invalid'
-        }`,
-      )
     } catch (err) {
-      setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to bond ${symbol}.`)
       logger.error(`${message} - ${err.message}`)
     }
-    setIsModalTransactionResultOpen(true)
   }
 
   return (
     <>
-      <OutcomeTable
-        balances={balances}
-        bonds={marketMakerData.question.bonds}
-        collateral={marketMakerData.collateral}
-        disabledColumns={[
-          OutcomeTableValue.OutcomeProbability,
-          OutcomeTableValue.Probability,
-          OutcomeTableValue.CurrentPrice,
-          OutcomeTableValue.Payout,
-        ]}
-        isBond
-        newBonds={marketMakerData.question.bonds?.map((bond, bondIndex) =>
-          bondIndex !== outcomeIndex ? bond : { ...bond, bondedEth: bond.bondedEth.add(bondNativeAssetAmount) },
-        )}
-        outcomeHandleChange={(value: number) => {
-          setOutcomeIndex(value)
-        }}
-        outcomeSelected={outcomeIndex}
-        probabilities={probabilities}
-        showBondChange
-      />
+      {props.isScalar ? (
+        <MarketScale
+          borderTop={true}
+          collateral={props.marketMakerData.collateral}
+          currentAnswer={props.marketMakerData.question.currentAnswer}
+          currentAnswerBond={props.marketMakerData.question.currentAnswerBond}
+          currentPrediction={
+            props.marketMakerData.outcomeTokenMarginalPrices
+              ? props.marketMakerData.outcomeTokenMarginalPrices[1]
+              : null
+          }
+          currentTab={MarketDetailsTab.setOutcome}
+          fee={props.marketMakerData.fee}
+          isBonded={true}
+          lowerBound={props.marketMakerData.scalarLow || new BigNumber(0)}
+          startingPointTitle={'Current prediction'}
+          unit={getUnit(props.marketMakerData.question.title)}
+          upperBound={props.marketMakerData.scalarHigh || new BigNumber(0)}
+        />
+      ) : (
+        <OutcomeTable
+          balances={balances}
+          bonds={marketMakerData.question.bonds}
+          collateral={marketMakerData.collateral}
+          disabledColumns={[
+            OutcomeTableValue.OutcomeProbability,
+            OutcomeTableValue.Probability,
+            OutcomeTableValue.CurrentPrice,
+            OutcomeTableValue.Payout,
+          ]}
+          isBond
+          newBonds={marketMakerData.question.bonds?.map((bond, bondIndex) =>
+            bondIndex !== outcomeIndex ? bond : { ...bond, bondedEth: bond.bondedEth.add(bondNativeAssetAmount) },
+          )}
+          outcomeHandleChange={(value: number) => {
+            setOutcomeIndex(value)
+          }}
+          outcomeSelected={outcomeIndex}
+          probabilities={probabilities}
+          showBondChange
+        />
+      )}
+
       <GridTransactionDetails>
         <div>
           <>
             <CurrenciesWrapper>
               <AssetBalance
                 asset={nativeAsset}
-                value={`${formatNumber(formatBigNumber(nativeAssetBalance, TokenEthereum.decimals, 3), 3)}`}
+                value={`${formatNumber(formatBigNumber(nativeAssetBalance, nativeAsset.decimals, 3), 3)}`}
               />
             </CurrenciesWrapper>
 
@@ -168,7 +210,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
               disabled
               formField={
                 <BigNumberInput
-                  decimals={TokenEthereum.decimals}
+                  decimals={nativeAsset.decimals}
                   name="bondAmount"
                   // eslint-disable-next-line @typescript-eslint/no-empty-function
                   onChange={() => {}}
@@ -178,6 +220,27 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
               }
               symbol={symbol}
             />
+            {props.isScalar && (
+              <TextfieldCustomPlaceholder
+                formField={
+                  <BigNumberInput
+                    decimals={nativeAsset.decimals}
+                    name="bondAmount"
+                    onChange={(e: BigNumberInputReturn) => {
+                      setBondOutcomeSelected(e.value.gt(Zero) ? e.value : Zero)
+
+                      setBondOutcomeDisplay('')
+                    }}
+                    style={{ width: 0 }}
+                    value={bondOutcomeSelected}
+                    valueToDisplay={bondOutcomeDisplay}
+                  />
+                }
+                style={{ marginTop: 20 }}
+                symbol={getUnit(props.marketMakerData.question.title)}
+              />
+            )}
+            {amountError && <GenericError>Insufficient funds to Bond</GenericError>}
           </>
         </div>
         <div>
@@ -185,40 +248,52 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Bond Amount"
-              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, TokenEthereum.decimals))} ${symbol}`}
+              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals))} ${symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Profit"
-              value={`${formatNumber(formatBigNumber(currentAnswerBond || new BigNumber(0), 18))} ${symbol}`}
+              value={`${formatNumber(
+                formatBigNumber(currentAnswerBond || new BigNumber(0), STANDARD_DECIMALS),
+              )} ${symbol}`}
             />
 
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Loss"
-              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, 18))} ${symbol}`}
+              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, STANDARD_DECIMALS))} ${symbol}`}
             />
           </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>
 
       <BottomButtonWrapper borderTop>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.finalize)}>
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => switchMarketTab(MarketDetailsTab.finalize)}
+          style={{ marginRight: 'auto' }}
+        >
           Back
         </Button>
-        <Button buttonType={ButtonType.primary} onClick={() => bondOutcome()}>
+        {props.isScalar && (
+          <Button buttonType={ButtonType.secondaryLine} disabled={amountError} onClick={() => bondOutcome(true)}>
+            Set Invalid
+          </Button>
+        )}
+        <Button buttonType={ButtonType.primary} disabled={amountError} onClick={() => bondOutcome(false)}>
           Bond {symbol}
         </Button>
       </BottomButtonWrapper>
-      <ModalTransactionResult
-        isOpen={isModalTransactionResultOpen}
-        onClose={() => setIsModalTransactionResultOpen(false)}
-        status={status}
-        text={message}
-        title={modalTitle}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={txHash}
+        txState={txState}
       />
-      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

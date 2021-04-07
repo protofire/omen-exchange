@@ -3,8 +3,16 @@ import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
-import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts, useSymbol } from '../../../../hooks'
-import { CPKService, MarketMakerService } from '../../../../services'
+import { STANDARD_DECIMALS } from '../../../../common/constants'
+import {
+  useAsyncDerivedValue,
+  useConnectedBalanceContext,
+  useConnectedCPKContext,
+  useConnectedWeb3Context,
+  useContracts,
+  useSymbol,
+} from '../../../../hooks'
+import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import {
   calcPrediction,
@@ -16,13 +24,12 @@ import {
   getUnit,
   mulBN,
 } from '../../../../util/tools'
-import { BalanceItem, MarketDetailsTab, MarketMakerData, Status } from '../../../../util/types'
+import { BalanceItem, MarketDetailsTab, MarketMakerData, Status, TransactionStep } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { FullLoading } from '../../../loading'
-import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
+import { ModalTransactionWrapper } from '../../../modal'
 import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
@@ -54,7 +61,8 @@ interface Props {
 export const ScalarMarketSell = (props: Props) => {
   const { currentTab, fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
-  const { library: provider } = context
+  const cpk = useConnectedCPKContext()
+  const { fetchBalances } = useConnectedBalanceContext()
 
   const {
     address: marketMakerAddress,
@@ -73,10 +81,12 @@ export const ScalarMarketSell = (props: Props) => {
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[positionIndex])
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState<string>('')
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [amountShares, setAmountShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
 
   const symbol = useSymbol(collateral)
 
@@ -106,11 +116,10 @@ export const ScalarMarketSell = (props: Props) => {
       const holdingsOfOtherOutcome = holdings.filter((item, index) => {
         return index !== positionIndex
       })
-      const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
-
+      const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
       const amountToSell = calcSellAmountInCollateral(
-        // If the transaction incur in some precision error, we need to multiply the amount by some factor, for example  amountShares.mul(99999).div(100000) , bigger the factor, less dust
-        amountShares,
+        // Round down in case of precision error
+        amountShares.mul(99999999).div(100000000),
         holdingsOfSoldOutcome,
         holdingsOfOtherOutcome,
         marketFeeWithTwoDecimals,
@@ -155,7 +164,7 @@ export const ScalarMarketSell = (props: Props) => {
   const formattedNewPrediction =
     newPrediction &&
     calcXValue(
-      parseUnits(newPrediction.toString(), 18),
+      parseUnits(newPrediction.toString(), STANDARD_DECIMALS),
       scalarLow || new BigNumber(0),
       scalarHigh || new BigNumber(0),
     ) / 100
@@ -167,22 +176,29 @@ export const ScalarMarketSell = (props: Props) => {
         return
       }
 
+      if (!cpk) {
+        return
+      }
+
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
-      setMessage(`Selling ${sharesAmount} shares ...`)
-
-      const cpk = await CPKService.create(provider)
+      setMessage(`Selling ${sharesAmount} shares...`)
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,
         conditionalTokens,
         marketMaker,
         outcomeIndex,
+        setTxHash,
+        setTxState,
       })
 
       await fetchGraphMarketUserTxData()
       await fetchGraphMarketMakerData()
+      await fetchBalances()
 
       setAmountShares(null)
       setAmountSharesToDisplay('')
@@ -190,10 +206,10 @@ export const ScalarMarketSell = (props: Props) => {
       setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' Shares.`)
       logger.error(`${message} - ${err.message}`)
     }
-    setIsModalTransactionResultOpen(true)
   }
 
   const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
@@ -322,14 +338,15 @@ export const ScalarMarketSell = (props: Props) => {
           Sell Position
         </Button>
       </StyledButtonContainer>
-      <ModalTransactionResult
-        isOpen={isModalTransactionResultOpen}
-        onClose={() => setIsModalTransactionResultOpen(false)}
-        status={status}
-        text={message}
-        title={status === Status.Error ? 'Transaction Error' : 'Sell Shares'}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={txHash}
+        txState={txState}
       />
-      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

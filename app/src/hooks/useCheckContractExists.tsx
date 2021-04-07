@@ -1,5 +1,7 @@
+import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 
+import { getInfuraUrl, networkIds } from '../util/networks'
 import { isContract } from '../util/tools'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
@@ -11,6 +13,14 @@ export const useCheckContractExists = (marketMakerAddress: string, context: Conn
     let isSubscribed = true
     const provider = context.library
     const fetchIsContract = async () => {
+      const switchToMainnet = context.relay && (await isContract(context.rawWeb3Context.library, marketMakerAddress))
+      const switchToxDai =
+        context.networkId === networkIds.MAINNET &&
+        !context.relay &&
+        (await isContract(new ethers.providers.JsonRpcProvider(getInfuraUrl(networkIds.XDAI)), marketMakerAddress))
+      if (switchToMainnet || switchToxDai) {
+        return context.toggleRelay()
+      }
       if (isSubscribed) setContractExists(await isContract(provider, marketMakerAddress))
     }
 

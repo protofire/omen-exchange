@@ -73,10 +73,13 @@ interface Network {
     omenVerifiedMarkets: string
   }
   cpk?: CPKAddresses
+  relayProxyFactoryAddress?: string
   wrapToken: string
   targetSafeImplementation: string
   nativeAsset: Token
   defaultToken?: string
+  blockExplorer: string
+  blockExplorerURL: string
 }
 
 type KnownContracts = keyof Network['contracts']
@@ -138,6 +141,8 @@ const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     defaultToken: 'dai',
+    blockExplorer: 'etherscan',
+    blockExplorerURL: 'https://etherscan.io/tx/',
   },
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
@@ -182,6 +187,8 @@ const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     defaultToken: 'dai',
+    blockExplorer: 'etherscan',
+    blockExplorerURL: 'https://rinkeby.etherscan.io/tx/',
   },
   [networkIds.SOKOL]: {
     label: 'Sokol',
@@ -225,6 +232,8 @@ const networks: { [K in NetworkId]: Network } = {
       decimals: 18,
     },
     targetSafeImplementation: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
+    blockExplorer: 'blockscout',
+    blockExplorerURL: 'https://blockscout.com/poa/sokol/tx/',
   },
   [networkIds.XDAI]: {
     label: 'xDai',
@@ -264,6 +273,7 @@ const networks: { [K in NetworkId]: Network } = {
       multiSendAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
       fallbackHandlerAddress: '0x602DF5F404f86469459D5e604CDa43A2cdFb7580',
     },
+    relayProxyFactoryAddress: '0x7b9756f8A7f4208fE42FE8DE8a8CC5aA9A03f356',
     wrapToken: 'wxdai',
     nativeAsset: {
       address: pseudoNativeAssetAddress,
@@ -272,6 +282,8 @@ const networks: { [K in NetworkId]: Network } = {
       decimals: 18,
     },
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    blockExplorer: 'blockscout',
+    blockExplorerURL: 'https://blockscout.com/poa/xdai/tx/',
   },
 }
 
@@ -524,7 +536,7 @@ export const getContractAddressName = (networkId: number) => {
   return networkNameCase
 }
 
-export const getDefaultToken = (networkId: number) => {
+export const getDefaultToken = (networkId: number, relay = false) => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
@@ -534,7 +546,7 @@ export const getDefaultToken = (networkId: number) => {
     return getToken(networkId, defaultToken)
   }
 
-  return networks[networkId].nativeAsset
+  return getNativeAsset(networkId, relay)
 }
 
 export const getTokensByNetwork = (networkId: number): Token[] => {
@@ -771,6 +783,15 @@ export const getCPKAddresses = (networkId: number): Maybe<CPKAddresses> => {
   return cpkAddresses || null
 }
 
+export const getRelayProxyFactory = (networkId: number): Maybe<string> => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+
+  const proxyFactoryAddress = networks[networkId].relayProxyFactoryAddress
+  return proxyFactoryAddress || null
+}
+
 export const getGraphUris = (networkId: number): { httpUri: string; wsUri: string } => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
@@ -820,11 +841,16 @@ export const getWrapToken = (networkId: number): Token => {
   return getToken(networkId, tokenId)
 }
 
-export const getNativeAsset = (networkId: number): Token => {
+export const getNativeAsset = (networkId: number, relay = false): Token => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
-  return networks[networkId].nativeAsset as Token
+  const asset = networks[networkId].nativeAsset as Token
+  if (relay) {
+    const symbol = asset.symbol.replace('x', '')
+    return { ...asset, symbol }
+  }
+  return asset
 }
 
 export const getTargetSafeImplementation = (networkId: number): string => {
@@ -863,4 +889,18 @@ export const getBySafeTx = async (networkId: number, safeTxHash: string) => {
   const txServiceUrl = `https://safe-transaction.${networkName}.gnosis.io/api/v1`
   const result = await axios.get(`${txServiceUrl}/transactions/${safeTxHash}`)
   return result.data
+}
+
+export const getBlockExplorer = (networkId: number): string => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].blockExplorer
+}
+
+export const getTxHashBlockExplorerURL = (networkId: number, txHash: string): string => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return `${networks[networkId].blockExplorerURL}${txHash}`
 }

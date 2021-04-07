@@ -1,11 +1,17 @@
 import Big from 'big.js'
-import { MaxUint256 } from 'ethers/constants'
+import { MaxUint256, Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedCPKContext, useContracts, useGraphMarketUserTxData } from '../../../../../hooks'
+import { STANDARD_DECIMALS } from '../../../../../common/constants'
+import {
+  useConnectedBalanceContext,
+  useConnectedCPKContext,
+  useContracts,
+  useGraphMarketUserTxData,
+} from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../../services'
 import { CompoundService } from '../../../../../services/compound_service'
@@ -13,16 +19,17 @@ import { getLogger } from '../../../../../util/logger'
 import { formatBigNumber, getUnit, isDust } from '../../../../../util/tools'
 import {
   CompoundTokenType,
+  INVALID_ANSWER_ID,
   MarketDetailsTab,
   MarketMakerData,
   OutcomeTableValue,
   Status,
+  TransactionStep,
 } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
-import { FullLoading } from '../../../../loading'
-import { ModalTransactionResult } from '../../../../modal/modal_transaction_result'
-import { ButtonContainerFullWidth } from '../../../common/common_styled'
+import { ModalTransactionWrapper } from '../../../../modal'
+import { MarginsButton } from '../../../common/common_styled'
 import MarketResolutionMessage from '../../../common/market_resolution_message'
 import { MarketScale } from '../../../common/market_scale'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
@@ -59,10 +66,7 @@ const StyledButtonContainer = styled(ButtonContainer)`
 `
 
 const BorderedButtonContainer = styled(ButtonContainer)`
-  margin-right: -24px;
-  margin-left: -24px;
-  padding-right: 24px;
-  padding-left: 24px;
+  ${MarginsButton};
   border-top: 1px solid ${props => props.theme.colors.verticalDivider};
 `
 
@@ -109,20 +113,46 @@ const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: 
   // use floor as rounding method
   Big.RM = 0
 
-  const clampedFinalAnswer = new Big(
-    finalAnswerPercentage > 1 ? 1 : finalAnswerPercentage < 0 ? 0 : finalAnswerPercentage,
-  )
-  const shortEarnedCollateral = new Big(balances[0].toString()).mul(new Big(1).sub(clampedFinalAnswer))
-  const longEarnedCollateral = new Big(balances[1].toString()).mul(clampedFinalAnswer)
+  const shortEarnedCollateral = new Big(balances[0].toString()).mul(new Big(1).sub(finalAnswerPercentage))
+  const longEarnedCollateral = new Big(balances[1].toString()).mul(finalAnswerPercentage)
   const collaterals = [shortEarnedCollateral, longEarnedCollateral]
   const earnedCollateral = collaterals.reduce((a, b) => a.add(b.toFixed(0)), bigNumberify(0))
 
   return earnedCollateral
 }
 
+const calcUserWinningsData = (
+  isScalar: boolean,
+  shares: BigNumber[],
+  payouts: Maybe<Big[]>,
+  finalAnswerPercentage: number,
+): { userWinningShares: BigNumber; winningOutcomes: number; userWinningOutcomes: number } => {
+  let userWinningShares
+  let winningOutcomes
+  let userWinningOutcomes
+  if (isScalar) {
+    userWinningShares = shares.reduce((acc, outcome) => (acc && outcome ? acc.add(outcome) : Zero)) || Zero
+    winningOutcomes = finalAnswerPercentage === (0 || 1) ? 1 : 2
+    userWinningOutcomes = shares.filter((share, i) => {
+      const finalAnswerMultiple = i === 0 ? 1 - finalAnswerPercentage : finalAnswerPercentage
+      return share && share.gt(Zero) && finalAnswerMultiple > 0
+    }).length
+  } else {
+    userWinningShares = payouts
+      ? shares.reduce((acc, shares, index) => (payouts[index].gt(0) && shares ? acc.add(shares) : acc), Zero)
+      : Zero
+    winningOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
+    userWinningOutcomes = payouts
+      ? payouts.filter((payout, index) => shares[index] && shares[index].gt(0) && payout.gt(0)).length
+      : 0
+  }
+  return { userWinningShares, winningOutcomes, userWinningOutcomes }
+}
+
 const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
+  const { fetchBalances } = useConnectedBalanceContext()
 
   const { account, library: provider } = context
   const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
@@ -145,12 +175,13 @@ const Wrapper = (props: Props) => {
   const history = useHistory()
 
   const [status, setStatus] = useState<Status>(Status.Ready)
-  const [modalTitle, setModalTitle] = useState<string>('')
   const [message, setMessage] = useState('')
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const marketCollateralToken = collateralToken
   const [compoundService, setCompoundService] = useState<Maybe<CompoundService>>(null)
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
 
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
   useMemo(() => {
@@ -185,16 +216,26 @@ const Wrapper = (props: Props) => {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
   const resolveCondition = async () => {
-    setModalTitle('Resolve Condition')
-
+    if (!cpk) {
+      return
+    }
     try {
       setStatus(Status.Loading)
       setMessage('Resolving condition...')
-      if (isScalar && scalarLow && scalarHigh) {
-        await realitio.resolveCondition(question.id, question.raw, scalarLow, scalarHigh)
-      } else {
-        await oracle.resolveCondition(question, balances.length)
-      }
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
+
+      await cpk.resolveCondition({
+        oracle,
+        realitio,
+        isScalar,
+        scalarLow,
+        scalarHigh,
+        question,
+        numOutcomes: balances.length,
+        setTxHash,
+        setTxState,
+      })
 
       await fetchGraphMarketMakerData()
 
@@ -202,11 +243,10 @@ const Wrapper = (props: Props) => {
       setMessage(`Condition successfully resolved.`)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to resolve the condition.`)
       logger.error(`${message} - ${err.message}`)
     }
-
-    setIsModalTransactionResultOpen(true)
   }
 
   useEffect(() => {
@@ -227,8 +267,6 @@ const Wrapper = (props: Props) => {
   }, [provider, account, marketMakerAddress, marketMaker])
 
   const redeem = async () => {
-    setModalTitle('Redeem Payout')
-
     try {
       if (!earnedCollateral) {
         return
@@ -240,27 +278,32 @@ const Wrapper = (props: Props) => {
 
       setStatus(Status.Loading)
       setMessage('Redeeming payout...')
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       await cpk.redeemPositions({
         isConditionResolved,
-        earnedCollateral,
+        // Round down in case of precision error
+        earnedCollateral: earnedCollateral.mul(99999999).div(100000000),
         question,
         numOutcomes: balances.length,
         oracle,
         collateralToken,
         marketMaker,
         conditionalTokens,
+        setTxHash,
+        setTxState,
       })
+      await fetchBalances()
 
       setStatus(Status.Ready)
       setMessage(`Payout successfully redeemed.`)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to redeem.`)
       logger.error(`${message} -  ${err.message}`)
     }
-
-    setIsModalTransactionResultOpen(true)
   }
 
   const probabilities = balances.map(balance => balance.probability)
@@ -305,14 +348,18 @@ const Wrapper = (props: Props) => {
     cpk?.address.toLowerCase(),
   )
 
-  const realitioAnswerNumber = Number(formatBigNumber(realitioAnswer || new BigNumber(0), 18))
-  const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), 18))
-  const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), 18))
+  const realitioAnswerNumber = Number(formatBigNumber(realitioAnswer || new BigNumber(0), STANDARD_DECIMALS))
 
-  const finalAnswerPercentage =
+  const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), STANDARD_DECIMALS))
+  const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), STANDARD_DECIMALS))
+
+  const unclampedFinalAnswerPercentage =
     realitioAnswer && realitioAnswer.eq(MaxUint256)
       ? 0.5
       : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
+
+  const finalAnswerPercentage =
+    unclampedFinalAnswerPercentage > 1 ? 1 : unclampedFinalAnswerPercentage < 0 ? 0 : unclampedFinalAnswerPercentage
 
   const earnedCollateral = isScalar
     ? scalarComputeEarnedCollateral(
@@ -325,24 +372,34 @@ const Wrapper = (props: Props) => {
       )
 
   const hasWinningOutcomes = earnedCollateral && !isDust(earnedCollateral, collateralToken.decimals)
-  const winnersOutcomes = payouts ? payouts.filter(payout => payout.gt(0)).length : 0
-  const userWinnersOutcomes = payouts
-    ? payouts.filter(
-        (payout, index) => balances[index] && balances[index].shares && balances[index].shares.gt(0) && payout.gt(0),
-      ).length
-    : 0
-  const userWinnerShares = payouts
-    ? balances.reduce((acc, balance, index) => (payouts[index].gt(0) ? acc.add(balance.shares) : acc), new BigNumber(0))
-    : new BigNumber(0)
+
+  const { userWinningOutcomes, userWinningShares, winningOutcomes } = calcUserWinningsData(
+    isScalar,
+    balances.map(balance => balance.shares),
+    payouts,
+    finalAnswerPercentage,
+  )
+
   const EPS = 0.01
-  const allPayoutsEqual = payouts
-    ? payouts.every(payout =>
-        payout
-          .sub(1 / payouts.length)
-          .abs()
-          .lte(EPS),
-      )
-    : false
+
+  let invalid = false
+
+  if (isScalar) {
+    if (realitioAnswer?.eq(new BigNumber(INVALID_ANSWER_ID))) {
+      invalid = true
+    } else {
+      invalid = false
+    }
+  } else {
+    invalid = payouts
+      ? payouts.every(payout =>
+          payout
+            .sub(1 / payouts.length)
+            .abs()
+            .lte(EPS),
+        )
+      : false
+  }
 
   return (
     <>
@@ -365,8 +422,17 @@ const Wrapper = (props: Props) => {
             {isScalar ? (
               <MarketScale
                 borderTop={true}
-                currentPrediction={finalAnswerPercentage.toString()}
+                collateral={props.marketMakerData.collateral}
+                currentAnswer={props.marketMakerData.question.currentAnswer}
+                currentAnswerBond={props.marketMakerData.question.currentAnswerBond}
+                currentPrediction={unclampedFinalAnswerPercentage.toString()}
+                isClosed={true}
                 lowerBound={scalarLow || new BigNumber(0)}
+                outcomePredictedByMarket={
+                  props.marketMakerData.outcomeTokenMarginalPrices
+                    ? props.marketMakerData.outcomeTokenMarginalPrices[1]
+                    : null
+                }
                 startingPointTitle={'Final answer'}
                 unit={getUnit(question.title)}
                 upperBound={scalarHigh || new BigNumber(0)}
@@ -388,10 +454,10 @@ const Wrapper = (props: Props) => {
                   arbitrator={arbitrator}
                   collateralToken={collateralToken}
                   earnedCollateral={earnedCollateral}
-                  invalid={allPayoutsEqual}
-                  userWinnerShares={userWinnerShares}
-                  userWinnersOutcomes={userWinnersOutcomes}
-                  winnersOutcomes={winnersOutcomes}
+                  invalid={invalid}
+                  userWinningOutcomes={userWinningOutcomes}
+                  userWinningShares={userWinningShares}
+                  winningOutcomes={winningOutcomes}
                 ></MarketResolutionMessageStyled>
               )}
               {isConditionResolved && !hasWinningOutcomes ? (
@@ -409,7 +475,7 @@ const Wrapper = (props: Props) => {
               ) : (
                 <>
                   {!isConditionResolved && (
-                    <ButtonContainerFullWidth>
+                    <BorderedButtonContainer>
                       <Button
                         buttonType={ButtonType.primary}
                         disabled={status === Status.Loading}
@@ -417,7 +483,7 @@ const Wrapper = (props: Props) => {
                       >
                         Resolve Condition
                       </Button>
-                    </ButtonContainerFullWidth>
+                    </BorderedButtonContainer>
                   )}
                   {isConditionResolved && hasWinningOutcomes && (
                     <BorderedButtonContainer>
@@ -465,14 +531,15 @@ const Wrapper = (props: Props) => {
           />
         )}
       </BottomCard>
-      <ModalTransactionResult
-        isOpen={isModalTransactionResultOpen}
-        onClose={() => setIsModalTransactionResultOpen(false)}
-        status={status}
-        text={message}
-        title={modalTitle}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={txHash}
+        txState={txState}
       />
-      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

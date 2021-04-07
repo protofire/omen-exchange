@@ -20,6 +20,9 @@
     "jsx": "react",
     "noFallthroughCasesInSwitch": true
   },
+  "typeRoots": [
+    "../../node_modules/@types"
+  ],
   "include": [
     "src"
   ]

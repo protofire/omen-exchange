@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { useCompoundService, useConnectedCPKContext, useGraphMarketUserTxData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
-import { getNativeAsset, getToken } from '../../../../../util/networks'
+import { getNativeAsset, getToken, networkIds } from '../../../../../util/networks'
 import { getSharesInBaseToken, getUnit, isDust } from '../../../../../util/tools'
 import {
   BalanceItem,
@@ -38,32 +38,6 @@ export const TopCard = styled(ViewCard)`
 `
 
 export const BottomCard = styled(ViewCard)``
-
-const MessageWrapper = styled.div`
-  border-radius: 4px;
-  border: ${({ theme }) => theme.borders.borderLineDisabled};
-  margin-top: 20px;
-  margin-bottom: 20px;
-  padding: 20px 25px;
-`
-
-const Title = styled.h2`
-  color: ${props => props.theme.colors.textColorDarker};
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.2px;
-  line-height: 1.2;
-  margin: 0 0 8px;
-`
-
-const Text = styled.p`
-  color: ${props => props.theme.colors.textColor};
-  font-size: 14px;
-  font-weight: normal;
-  letter-spacing: 0.2px;
-  line-height: 1.5;
-  margin: 0;
-`
 
 export const StyledButtonContainer = styled(ButtonContainer)`
   margin: 0 -24px;
@@ -128,10 +102,22 @@ const Wrapper = (props: Props) => {
     totalPoolShares,
   } = marketMakerData
   const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
-  const { networkId } = context
+  const { networkId, relay } = context
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
+  const nativeAsset = getNativeAsset(networkId)
+  const initialBondAmount =
+    networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
+  const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
+    question.currentAnswerBond ? new BigNumber(question.currentAnswerBond).mul(2) : initialBondAmount,
+  )
+  useEffect(() => {
+    if (question.currentAnswerBond && !new BigNumber(question.currentAnswerBond).mul(2).eq(bondNativeAssetAmount)) {
+      setBondNativeAssetAmount(new BigNumber(question.currentAnswerBond).mul(2))
+    }
+    // eslint-disable-next-line
+  }, [question.currentAnswerBond])
 
   const setCurrentDisplayCollateral = () => {
     // if collateral is a cToken then convert the collateral and balances to underlying token
@@ -140,7 +126,7 @@ const Wrapper = (props: Props) => {
       const baseCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length)
       let baseCollateralToken = collateral
       if (baseCollateralSymbol === 'eth') {
-        baseCollateralToken = getNativeAsset(networkId)
+        baseCollateralToken = getNativeAsset(networkId, relay)
       } else {
         baseCollateralToken = getToken(networkId, baseCollateralSymbol as KnownToken)
       }
@@ -227,13 +213,6 @@ const Wrapper = (props: Props) => {
       />
     )
   }
-
-  const openQuestionMessage = (
-    <MessageWrapper>
-      <Title>The question is being resolved.</Title>
-      <Text>You will be able to redeem your winnings as soon as the market is resolved.</Text>
-    </MessageWrapper>
-  )
 
   const openInRealitioButton = (
     <Button
@@ -375,53 +354,44 @@ const Wrapper = (props: Props) => {
           </>
         )}
         {currentTab === MarketDetailsTab.finalize ? (
-          !isScalar ? (
-            <>
-              {renderFinalizeTableData()}
-              <WhenConnected>
-                <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
-                  <Button
-                    buttonType={ButtonType.secondaryLine}
-                    onClick={() => {
-                      history.goBack()
-                    }}
-                  >
-                    Back
-                  </Button>
-                  {finalizeButtons}
-                </StyledButtonContainer>
-              </WhenConnected>
-            </>
-          ) : (
-            <>
+          <>
+            {isScalar ? (
               <MarketScale
                 borderTop={true}
+                collateral={collateral}
+                currentAnswer={question.currentAnswer}
+                currentAnswerBond={question.currentAnswerBond}
                 currentPrediction={outcomeTokenMarginalPrices ? outcomeTokenMarginalPrices[1] : null}
+                currentTab={MarketDetailsTab.finalize}
+                isBonded={true}
                 lowerBound={scalarLow || new BigNumber(0)}
                 startingPointTitle={'Current prediction'}
                 unit={getUnit(question.title)}
                 upperBound={scalarHigh || new BigNumber(0)}
               />
-              {openQuestionMessage}
-              <WhenConnected>
-                <StyledButtonContainer className={!hasFunding || isQuestionOpen ? 'border' : ''}>
-                  <Button
-                    buttonType={ButtonType.secondaryLine}
-                    onClick={() => {
-                      history.goBack()
-                    }}
-                  >
-                    Back
-                  </Button>
-                  {isQuestionOpen ? openInRealitioButton : buySellButtons}
-                </StyledButtonContainer>
-              </WhenConnected>
-            </>
-          )
+            ) : (
+              renderFinalizeTableData()
+            )}
+            <WhenConnected>
+              <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
+                <Button
+                  buttonType={ButtonType.secondaryLine}
+                  onClick={() => {
+                    history.goBack()
+                  }}
+                >
+                  Back
+                </Button>
+                {finalizeButtons}
+              </StyledButtonContainer>
+            </WhenConnected>
+          </>
         ) : null}
         {currentTab === MarketDetailsTab.setOutcome && (
           <MarketBondContainer
+            bondNativeAssetAmount={bondNativeAssetAmount}
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
+            isScalar={isScalar}
             marketMakerData={marketMakerData}
             switchMarketTab={switchMarketTab}
           />

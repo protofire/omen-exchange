@@ -4,14 +4,20 @@ import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
-import { CONFIRMATION_COUNT, MAIN_NETWORKS, RINKEBY_NETWORKS, SOKOL_NETWORKS, XDAI_NETWORKS } from '../common/constants'
+import {
+  CONFIRMATION_COUNT,
+  MAIN_NETWORKS,
+  RINKEBY_NETWORKS,
+  SOKOL_NETWORKS,
+  STANDARD_DECIMALS,
+  XDAI_NETWORKS,
+} from '../common/constants'
 import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
-import { CPKService } from '../services'
 import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'
 import { getContractAddress, getNativeAsset, getToken, getWrapToken, networkIds } from './networks'
-import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token } from './types'
+import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token, TransactionStep } from './types'
 
 const logger = getLogger('Tools')
 
@@ -60,6 +66,7 @@ export const formatDate = (date: Date, utcAdd = true): string => {
     .tz('UTC')
     .format(`YYYY-MM-DD - HH:mm${utcAdd ? ' [UTC]' : ''}`)
 }
+
 export const checkRpcStatus = async (customUrl: string, setStatus: any, network: any) => {
   try {
     const response = await axios.post(customUrl, {
@@ -80,6 +87,7 @@ export const checkRpcStatus = async (customUrl: string, setStatus: any, network:
     return false
   }
 }
+
 export const isValidHttpUrl = (data: string): boolean => {
   let url
 
@@ -274,27 +282,30 @@ export const isAddress = (address: string): boolean => {
 }
 
 export const waitForConfirmations = async (
-  transaction: any,
-  cpk: CPKService,
-  setNumberOfConfirmations: any,
-  network: number,
+  hash: string,
+  provider: any,
+  setConfirmations: (confirmations: number) => void,
+  setTxState: (step: TransactionStep) => void,
+  confirmations?: number,
 ) => {
+  setTxState(TransactionStep.transactionSubmitted)
   let receipt
-
-  if (network === networkIds.XDAI) receipt = await cpk.waitForTransaction({ hash: transaction })
-  else receipt = await cpk.waitForTransaction(transaction)
-
-  while (receipt.confirmations && receipt.confirmations <= CONFIRMATION_COUNT) {
-    setNumberOfConfirmations(receipt.confirmations)
+  const requiredConfs = confirmations || CONFIRMATION_COUNT
+  while (!receipt || !receipt.confirmations || (receipt.confirmations && receipt.confirmations <= requiredConfs)) {
+    receipt = await provider.getTransaction(hash)
+    if (receipt && receipt.confirmations) {
+      setTxState(TransactionStep.confirming)
+      const confs = receipt.confirmations > requiredConfs ? requiredConfs : receipt.confirmations
+      setConfirmations(confs)
+    }
     await waitABit(2000)
-    if (network === networkIds.XDAI) receipt = await cpk.waitForTransaction({ hash: transaction })
-    else receipt = await cpk.waitForTransaction(transaction)
   }
-  return
+  setTxState(TransactionStep.transactionConfirmed)
 }
 
-export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string =>
-  Number(formatUnits(value, decimals)).toFixed(precision)
+export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string => {
+  return Number(formatUnits(value, decimals)).toFixed(precision)
+}
 
 export const isContract = async (provider: any, address: string): Promise<boolean> => {
   const code = await provider.getCode(address)
@@ -607,8 +618,11 @@ export const clampBigNumber = (x: BigNumber, min: BigNumber, max: BigNumber): Bi
   return x
 }
 
-export const numberToByte32 = (num: number): string => {
-  const hex = new BigNumber(num).toHexString()
+export const numberToByte32 = (num: string | number, isScalar: boolean): string => {
+  let hex: any
+  if (isScalar) hex = num
+  else hex = new BigNumber(num).toHexString()
+
   const frontZeros = '0'.repeat(66 - hex.length)
 
   return `0x${frontZeros}${hex.split('0x')[1]}`
@@ -674,17 +688,17 @@ export const onChangeMarketCurrency = (
 }
 
 export const calcXValue = (currentPrediction: BigNumber, lowerBound: BigNumber, upperBound: BigNumber) => {
-  const currentPredictionNumber = Number(formatBigNumber(currentPrediction, 18))
-  const lowerBoundNumber = Number(formatBigNumber(lowerBound, 18))
-  const upperBoundNumber = Number(formatBigNumber(upperBound, 18))
+  const currentPredictionNumber = Number(formatBigNumber(currentPrediction, STANDARD_DECIMALS))
+  const lowerBoundNumber = Number(formatBigNumber(lowerBound, STANDARD_DECIMALS))
+  const upperBoundNumber = Number(formatBigNumber(upperBound, STANDARD_DECIMALS))
   const xValue = ((currentPredictionNumber - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100
-  return xValue
+  return xValue > 100 ? 100 : xValue < 0 ? 0 : xValue
 }
 
 export const calcPrediction = (probability: string, lowerBound: BigNumber, upperBound: BigNumber) => {
   const probabilityNumber = Number(probability)
-  const lowerBoundNumber = Number(formatBigNumber(lowerBound, 18, 18))
-  const upperBoundNumber = Number(formatBigNumber(upperBound, 18, 18))
+  const lowerBoundNumber = Number(formatBigNumber(lowerBound, STANDARD_DECIMALS, STANDARD_DECIMALS))
+  const upperBoundNumber = Number(formatBigNumber(upperBound, STANDARD_DECIMALS, STANDARD_DECIMALS))
   const prediction = probabilityNumber * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
   return prediction
 }
@@ -716,7 +730,7 @@ export const bigMin = (array: Big[]) => {
  * If collateral is cToken type then display is the base collateral
  * Else display is the collateral
  */
-export const getInitialCollateral = (networkId: number, collateral: Token): Token => {
+export const getInitialCollateral = (networkId: number, collateral: Token, relay = false): Token => {
   const collateralSymbol = collateral.symbol.toLowerCase()
   if (collateralSymbol in CompoundTokenType) {
     if (collateralSymbol === 'ceth') {
@@ -728,7 +742,7 @@ export const getInitialCollateral = (networkId: number, collateral: Token): Toke
     }
   } else {
     if (collateral.address === getWrapToken(networkId).address) {
-      return getNativeAsset(networkId)
+      return getNativeAsset(networkId, relay)
     } else {
       return collateral
     }

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
 import connectors, { handleGsMultiSend } from '../util/connectors'
+import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
 
@@ -15,6 +16,8 @@ export interface ConnectedWeb3Context {
   library: providers.Web3Provider
   networkId: number
   rawWeb3Context: any
+  relay: boolean
+  toggleRelay: () => void
 }
 
 const ConnectedWeb3Context = React.createContext<Maybe<ConnectedWeb3Context>>(null)
@@ -43,8 +46,16 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   const [networkId, setNetworkId] = useState<number | null>(null)
   const safeAppInfo = useSafeApp()
   const context = useWeb3Context()
+
   const { account, active, error, library } = context
   const rpcAddress: string | null = localStorage.getItem('rpcAddress')
+
+  const initialRelayState = localStorage.getItem('relay') === 'false' ? false : true
+  const [relay, setRelay] = useState(initialRelayState)
+  const toggleRelay = () => {
+    localStorage.setItem('relay', String(!relay))
+    setRelay(!relay)
+  }
 
   useEffect(() => {
     let isSubscribed = true
@@ -100,11 +111,15 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     return null
   }
 
+  const { address, isRelay, netId, provider } = getRelayProvider(relay, networkId, library, account)
+
   const value = {
-    account: account || null,
-    library,
-    networkId,
+    account: address || null,
+    library: provider,
+    networkId: netId,
     rawWeb3Context: context,
+    relay: isRelay,
+    toggleRelay,
   }
   props.setStatus(true)
   return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>

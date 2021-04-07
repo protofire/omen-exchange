@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
+import { useWeb3Context } from 'web3-react/dist'
 
 import { networkIds } from '../../../util/networks'
 import { truncateStringInTheMiddle } from '../../../util/tools'
@@ -23,7 +24,7 @@ const ConnectionStatusText = styled.span`
   font-size: 12px;
   font-weight: 400;
   line-height: 1.2;
-  margin-right: 8px;
+  margin-right: 12px;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     font-size: 14px;
@@ -31,12 +32,8 @@ const ConnectionStatusText = styled.span`
 `
 
 export const Network = (props: Props) => {
-  let account
-  let networkId
-  if (props.account && props.networkId) {
-    account = props.account
-    networkId = props.networkId
-  }
+  const context = useWeb3Context()
+  const { account, networkId } = context
 
   if (!account) {
     return null
@@ -44,7 +41,7 @@ export const Network = (props: Props) => {
   return (
     <Wrapper {...props}>
       {props.claim && networkId === networkIds.MAINNET && <IconNotification style={{ marginRight: 12 }} />}
-      <ConnectionStatusText>{truncateStringInTheMiddle(account, 6, 4) || 'No account connected'}</ConnectionStatusText>
+      <ConnectionStatusText>{truncateStringInTheMiddle(account, 5, 3) || 'No account connected'}</ConnectionStatusText>
       <IconJazz account={account} size={22} />
     </Wrapper>
   )

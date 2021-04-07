@@ -2,18 +2,18 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
-import { CONFIRMATION_COUNT } from '../../../../common/constants'
-import { State } from '../../../../hooks/useXdaiBridge'
+import { CONFIRMATION_COUNT, STANDARD_DECIMALS } from '../../../../common/constants'
 import theme from '../../../../theme'
-import { networkIds } from '../../../../util/networks'
+import { getTxHashBlockExplorerURL, networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
+import { TransactionStep } from '../../../../util/types'
 import { ButtonRound } from '../../../button/button_round'
 import { IconArrowUp } from '../../../common/icons/IconArrowUp'
 import { InlineLoading } from '../../../loading/inline_loading'
 
 interface Prop {
   transactionModalVisibility: any
-  state: State
+  state: TransactionStep
   amountToTransfer: BigNumber
   network: number
   transactionHash: string
@@ -63,7 +63,7 @@ export const TransactionState = ({
   transactionModalVisibility,
 }: Prop) => {
   useEffect(() => {
-    if (state === State.error) {
+    if (state === TransactionStep.error) {
       transactionModalVisibility(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -71,9 +71,9 @@ export const TransactionState = ({
   return (
     <MainWrapper>
       <SvgWrapper>
-        {state === State.waitingConfirmation ? (
+        {state === TransactionStep.waitingConfirmation ? (
           <InlineLoading message="" />
-        ) : state === State.transactionSubmitted ? (
+        ) : state === TransactionStep.transactionSubmitted ? (
           <IconArrowUp />
         ) : (
           <IconArrowUp color={theme.colors.green} />
@@ -81,26 +81,23 @@ export const TransactionState = ({
       </SvgWrapper>
 
       <BoldedText>
-        Transfer {formatBigNumber(amountToTransfer, 18)} {network === networkIds.MAINNET ? 'DAI' : 'XDAI'}
+        Transfer {formatBigNumber(amountToTransfer, STANDARD_DECIMALS)}{' '}
+        {network === networkIds.MAINNET ? 'DAI' : 'XDAI'}
       </BoldedText>
       <ChainText>to {network === networkIds.MAINNET ? 'xDai Chain' : 'Mainnet'}</ChainText>
 
-      {state === State.waitingConfirmation ? (
+      {state === TransactionStep.waitingConfirmation ? (
         <TransactionText>Waiting confirmation</TransactionText>
-      ) : (state === State.transactionSubmitted || state === State.transactionConfirmed) &&
+      ) : (state === TransactionStep.transactionSubmitted || state === TransactionStep.transactionConfirmed) &&
         numberOfConfirmations === 0 ? (
         <TransactionLink
-          href={
-            network === networkIds.MAINNET
-              ? `https://etherscan.io/tx/${transactionHash}`
-              : `https://blockscout.com/poa/xdai/tx/${transactionHash}`
-          }
+          href={getTxHashBlockExplorerURL(network, transactionHash)}
           rel="noopener noreferrer"
           target="_blank"
         >
-          {state === State.transactionConfirmed ? 'Transaction Confirmed' : 'Transaction submitted'}
+          {state === TransactionStep.transactionConfirmed ? 'Transaction Confirmed' : 'Transaction submitted'}
         </TransactionLink>
-      ) : state === State.transactionSubmitted && numberOfConfirmations > 0 ? (
+      ) : state === TransactionStep.transactionSubmitted && numberOfConfirmations > 0 ? (
         <TransactionText>
           {numberOfConfirmations}/{CONFIRMATION_COUNT} confirmations
         </TransactionText>
@@ -111,10 +108,10 @@ export const TransactionState = ({
         onClick={() => {
           fetchBalance()
           transactionModalVisibility(false)
-          if (state !== State.transactionConfirmed) setBridgeOpen(false)
+          if (state !== TransactionStep.transactionConfirmed) setBridgeOpen(false)
         }}
       >
-        {state === State.transactionConfirmed ? 'Transfer Again' : 'Close'}
+        {state === TransactionStep.transactionConfirmed ? 'Transfer Again' : 'Close'}
       </CloseButton>
     </MainWrapper>
   )

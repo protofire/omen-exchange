@@ -5,9 +5,11 @@ import React, { useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
+  useConnectedBalanceContext,
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
@@ -27,13 +29,12 @@ import {
   getUnit,
   mulBN,
 } from '../../../../util/tools'
-import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token, TransactionStep } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
-import { FullLoading } from '../../../loading'
-import { ModalTransactionResult } from '../../../modal/modal_transaction_result'
+import { ModalTransactionWrapper } from '../../../modal'
 import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
@@ -66,8 +67,9 @@ export const ScalarMarketBuy = (props: Props) => {
   const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
+  const { fetchBalances } = useConnectedBalanceContext()
 
-  const { library: provider, networkId } = context
+  const { library: provider, networkId, relay } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const {
@@ -91,7 +93,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const [amountDisplay, setAmountDisplay] = useState<string>('')
 
   const wrapToken = getWrapToken(networkId)
-  const nativeAsset = getNativeAsset(networkId)
+  const nativeAsset = getNativeAsset(networkId, relay)
   const initialCollateral =
     marketMakerData.collateral.address.toLowerCase() === wrapToken.address.toLowerCase()
       ? nativeAsset
@@ -104,7 +106,9 @@ export const ScalarMarketBuy = (props: Props) => {
   const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
   const [tweet, setTweet] = useState('')
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
@@ -191,13 +195,13 @@ export const ScalarMarketBuy = (props: Props) => {
   const formattedNewPrediction =
     newPrediction &&
     calcXValue(
-      parseUnits(newPrediction.toString(), 18),
+      parseUnits(newPrediction.toString(), STANDARD_DECIMALS),
       scalarLow || new BigNumber(0),
       scalarHigh || new BigNumber(0),
     ) / 100
 
-  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, 18, 4)))
-  const feePercentage = Number(formatBigNumber(fee, 18, 4)) * 100
+  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)))
+  const feePercentage = Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)) * 100
 
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
@@ -242,20 +246,25 @@ export const ScalarMarketBuy = (props: Props) => {
       }
 
       const sharesAmount = formatBigNumber(tradedShares, collateral.decimals)
-
+      setTweet('')
       setStatus(Status.Loading)
-      setMessage(`Buying ${sharesAmount} shares ...`)
+      setMessage(`Buying ${sharesAmount} shares...`)
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       await cpk.buyOutcomes({
         amount,
         collateral,
         outcomeIndex,
         marketMaker,
+        setTxHash,
+        setTxState,
       })
 
       await fetchGraphMarketUserTxData()
       await fetchGraphMarketMakerData()
       await fetchCollateralBalance()
+      await fetchBalances()
 
       setTweet(
         stripIndents(`${question.title}
@@ -270,16 +279,18 @@ export const ScalarMarketBuy = (props: Props) => {
       setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
       setStatus(Status.Error)
+      setTxState(TransactionStep.error)
       setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
       logger.error(`${message} - ${err.message}`)
     }
-    setIsModalTransactionResultOpen(true)
   }
 
   const currencyFilters =
     collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress
       ? [wrapToken.address.toLowerCase(), pseudoNativeAssetAddress.toLowerCase()]
       : []
+
+  const currencySelectorIsDisabled = relay ? true : currencyFilters.length ? false : true
 
   return (
     <>
@@ -315,7 +326,7 @@ export const ScalarMarketBuy = (props: Props) => {
               balance={walletBalance}
               context={context}
               currency={collateral.address}
-              disabled={currencyFilters.length ? false : true}
+              disabled={currencySelectorIsDisabled}
               filters={currencyFilters}
               onSelect={(token: Token | null) => {
                 if (token) {
@@ -409,16 +420,17 @@ export const ScalarMarketBuy = (props: Props) => {
           Buy Position
         </Button>
       </StyledButtonContainer>
-      <ModalTransactionResult
-        isOpen={isModalTransactionResultOpen}
-        onClose={() => setIsModalTransactionResultOpen(false)}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
         shareUrl={`${window.location.protocol}//${window.location.hostname}/#/${marketMakerAddress}`}
-        status={status}
-        text={message}
-        title={status === Status.Error ? 'Transaction Error' : 'Buy Shares'}
         tweet={tweet}
+        txHash={txHash}
+        txState={txState}
       />
-      {status === Status.Loading && <FullLoading message={message} />}
     </>
   )
 }

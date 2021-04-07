@@ -43,6 +43,7 @@ interface Props {
 
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const { networkId, relay } = context
   const { width } = useWindowDimensions()
   const isMobile = width <= parseInt(theme.themeBreakPoints.sm)
 
@@ -66,7 +67,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     submissionIDs,
   } = marketMakerData
 
-  const ovmAddress = getContractAddress(context.networkId, 'omenVerifiedMarkets')
+  const ovmAddress = getContractAddress(networkId, 'omenVerifiedMarkets')
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
   const currentTimestamp = new Date().getTime()
@@ -114,15 +115,15 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     },
   ]
 
-  const nativeAssetAddress = getNativeAsset(context.networkId).address.toLowerCase()
-  const wrapTokenAddress = getWrapToken(context.networkId).address.toLowerCase()
-  const filter = getMarketRelatedQuestionFilter(marketsRelatedQuestion, context.networkId)
+  const nativeAssetAddress = getNativeAsset(networkId, relay).address.toLowerCase()
+  const wrapTokenAddress = getWrapToken(networkId).address.toLowerCase()
+  const filter = getMarketRelatedQuestionFilter(marketsRelatedQuestion, networkId)
 
   return (
     <>
       <SubsectionTitleWrapper>
         <SubsectionTitleLeftWrapper>
-          {marketsRelatedQuestion.length > 1 && (
+          {!relay && marketsRelatedQuestion.length > 1 && (
             <MarketCurrencySelector
               addNativeAsset
               context={context}
@@ -130,7 +131,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
               disabled={false}
               filters={filter}
               onSelect={(currency: Token | null) =>
-                onChangeMarketCurrency(marketsRelatedQuestion, currency, collateral, context.networkId, history)
+                onChangeMarketCurrency(marketsRelatedQuestion, currency, collateral, networkId, history)
               }
               placeholder=""
             />

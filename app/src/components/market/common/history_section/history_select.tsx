@@ -3,12 +3,14 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import {
   FpmmTradeDataType,
   HistoryType,
   useGraphFpmmTransactionsFromQuestion,
 } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
+import { SafeService } from '../../../../services/safe'
 import { calcPrice, calcSellAmountInCollateral, formatBigNumber, formatTimestampToDate } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { ButtonRound, ButtonSelectable } from '../../../button'
@@ -131,7 +133,7 @@ export const History_select: React.FC<Props> = ({
   ]
   const [pageIndex, setPageIndex] = useState(0)
   const [pageSize] = useState(6)
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
+  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
   const { fpmmTransactions, paginationNext, refetch, status } = useGraphFpmmTransactionsFromQuestion(
     marketMakerAddress,
     pageSize,
@@ -146,6 +148,14 @@ export const History_select: React.FC<Props> = ({
       if (fpmmTransactions) {
         const response: any[] = await Promise.all(
           fpmmTransactions.map(async item => {
+            const safe = new SafeService(item.user.id, context.library)
+            let owner: string
+            try {
+              const result = await safe.getOwners()
+              owner = result[0].toString()
+            } catch {
+              owner = item.user.id
+            }
             if (item.fpmmType === 'Liquidity') {
               const block: any = await marketMaker.getTransaction(item.transactionHash)
 
@@ -161,19 +171,24 @@ export const History_select: React.FC<Props> = ({
                 ),
                 additionalShares: item.additionalSharesCost,
                 collateralTokenAmount: new BigNumber(item.collateralTokenAmount),
+                user: owner,
               }
             }
-            return {}
+            return {
+              user: owner,
+              id: item.id,
+            }
           }),
         )
+
         const newFpmmTradeArray: any[] = []
         fpmmTransactions.forEach(item => {
+          const findInResponse = response.find(element => element.id === item.id)
           if (item.fpmmType === 'Liquidity') {
             let sharesValue
 
-            const findInResponse = response.find(element => element.id === item.id)
             if (findInResponse) {
-              const { balances } = findInResponse
+              const { balances, user } = findInResponse
               let firstItem = balances[0]
               let outcomeIndex = 0
 
@@ -207,7 +222,7 @@ export const History_select: React.FC<Props> = ({
                   id: item.id + 1,
                   transactionHash: item.transactionHash,
                   transactionType: 'Buy',
-                  user: item.user,
+                  user: { id: user },
                 })
               }
             }
@@ -225,10 +240,10 @@ export const History_select: React.FC<Props> = ({
                   : collateralBigNumber,
               transactionHash: item.transactionHash,
               transactionType: item.transactionType,
-              user: item.user,
+              user: { id: findInResponse.user },
             })
           } else {
-            newFpmmTradeArray.push(item)
+            newFpmmTradeArray.push({ ...item, user: { id: findInResponse.user } })
           }
         })
 

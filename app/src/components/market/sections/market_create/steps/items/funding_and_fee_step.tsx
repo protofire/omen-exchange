@@ -27,17 +27,16 @@ import { getNativeAsset, networkIds, pseudoNativeAssetAddress } from '../../../.
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, CompoundEnabledTokenType, GelatoData, Ternary, Token } from '../../../../../../util/types'
-import { Button } from '../../../../../button'
+import { Button, ButtonContainer } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
 import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
 import { TitleValue } from '../../../../../common/text/title_value'
-import { FullLoading } from '../../../../../loading'
 import { AddCompoundService } from '../../../../common/add_compound_service'
 import {
-  ButtonContainerFullWidth,
   CurrenciesWrapper,
   GenericError,
+  MarginsButton,
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,
   OutcomeItemTextWrapper,
@@ -161,10 +160,9 @@ const FlexRowWrapper = styled.div`
   }
 `
 
-const StyledButtonContainerFullWidth = styled(ButtonContainerFullWidth as any)`
-  padding: 24px;
-  padding-bottom: 0;
-  margin: 0 -24px;
+const StyledButtonContainerFullWidth = styled(ButtonContainer)`
+  ${MarginsButton};
+  padding-top: 24px;
   margin-bottom: -1px;
 `
 
@@ -222,9 +220,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const cpk = useConnectedCPKContext()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
-  const { account, library: provider } = context
+  const { account, library: provider, networkId, relay } = context
   const { gelato } = useContracts(context)
-
   const signer = useMemo(() => provider.getSigner(), [provider])
   const [isCompoundServiceChecked, setCompoundServiceCheck] = useState<boolean>(false)
   const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
@@ -267,7 +264,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   let showAddCompoundService = false
   const currentTokenSymbol = currentToken.symbol.toLowerCase()
   const isETHNetwork = () => {
-    return context.networkId === networkIds.MAINNET || context.networkId === networkIds.RINKEBY
+    return networkId === networkIds.MAINNET || networkId === networkIds.RINKEBY
   }
   if (currentTokenSymbol in CompoundEnabledTokenType && isETHNetwork() && state !== 'SCALAR') {
     showAddCompoundService = true
@@ -543,7 +540,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 balance={formatNumber(collateralBalanceFormatted, 5)}
                 context={context}
                 currency={userInputCollateral.address}
-                disabled={false}
+                disabled={relay}
                 onSelect={onCollateralChange}
               />
             </CurrenciesWrapper>
@@ -644,7 +641,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         )}
         {showUpgrade && (
           <SetAllowance
-            collateral={getNativeAsset(context.networkId)}
+            collateral={getNativeAsset(networkId, relay)}
             finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
             loading={RemoteData.is.asking(proxyIsUpToDate)}
             onUnlock={upgradeProxy}
@@ -686,15 +683,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
           </Button>
         </StyledButtonContainerFullWidth>
       </CreateCardBottom>
-      {!MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus) ? (
-        <FullLoading
-          message={
-            values.gelatoData.shouldSubmit && !belowGelatoMinimum && !isCompoundServiceChecked
-              ? `${marketCreationStatus._type} and scheduling auto-withdraw with Gelato...`
-              : `${marketCreationStatus._type}...`
-          }
-        />
-      ) : null}
+      {/*{!MarketCreationStatus.is.ready(marketCreationStatus) && !MarketCreationStatus.is.error(marketCreationStatus) ? (*/}
+      {/*  <FullLoading*/}
+      {/*    message={*/}
+      {/*      values.gelatoData.shouldSubmit && !belowGelatoMinimum && !isCompoundServiceChecked*/}
+      {/*        ? `${marketCreationStatus._type} and scheduling auto-withdraw with Gelato...`*/}
+      {/*        : `${marketCreationStatus._type}...`*/}
+      {/*    }*/}
+      {/*  />*/}
+      {/*) : null}*/}
     </>
   )
 }
