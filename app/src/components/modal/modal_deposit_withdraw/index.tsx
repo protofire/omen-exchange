@@ -7,13 +7,13 @@ import styled, { withTheme } from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { getToken } from '../../../util/networks'
-import { formatBigNumber, waitForConfirmations } from '../../../util/tools'
+import { formatBigNumber, isDust, waitForConfirmations } from '../../../util/tools'
 import { ExchangeType, TransactionStep } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
-import { BigNumberInput, TextfieldCustomPlaceholder } from '../../common'
+import { BigNumberInput, RadioInput, TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInputReturn } from '../../common/form/big_number_input'
-import { IconArrowBack, IconClose } from '../../common/icons'
+import { IconArrowBack, IconClose, IconOmen } from '../../common/icons'
 import { DaiIcon } from '../../common/icons/currencies'
 import {
   BalanceItem,
@@ -43,6 +43,11 @@ const DepositWithdrawButton = styled(Button)`
   width: 100%;
   margin-top: 28px;
 `
+
+enum Currency {
+  Dai,
+  Omen,
+}
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   exchangeType: ExchangeType
@@ -84,6 +89,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [txNetId, setTxNetId] = useState()
   const [confirmations, setConfirmations] = useState(0)
   const [message, setMessage] = useState('')
+  const [currencySelected, setCurrencySelected] = useState<Currency>(Currency.Dai)
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
@@ -187,23 +193,34 @@ export const ModalDepositWithdraw = (props: Props) => {
           </ModalNavigation>
           <ModalCard style={{ marginBottom: '16px', marginTop: '12px' }}>
             <BalanceSection>
+              <div>Wallet</div>
               <BalanceItems>
-                <BalanceItem>
+                <BalanceItem
+                  onClick={() => {
+                    setCurrencySelected(Currency.Dai)
+                  }}
+                >
                   <BalanceItemSide>
-                    <BalanceItemTitle>Wallet</BalanceItemTitle>
+                    <RadioInput checked={currencySelected === Currency.Dai} name={'Dai'} outcomeIndex={-1} />
+                    <DaiIcon size="24px" style={{ marginLeft: '12px', marginRight: '12px' }} />
+                    <BalanceItemTitle>Dai</BalanceItemTitle>
                   </BalanceItemSide>
                   <BalanceItemSide>
-                    <BalanceItemBalance style={{ marginRight: '12px' }}>{formattedDaiBalance} DAI</BalanceItemBalance>
-                    <DaiIcon size="24px" />
+                    <BalanceItemBalance>{formattedDaiBalance} DAI</BalanceItemBalance>
                   </BalanceItemSide>
                 </BalanceItem>
-                <BalanceItem>
+                <BalanceItem
+                  onClick={() => {
+                    setCurrencySelected(Currency.Omen)
+                  }}
+                >
                   <BalanceItemSide>
-                    <BalanceItemTitle>Omen Account</BalanceItemTitle>
+                    <RadioInput checked={currencySelected === Currency.Omen} name={'Dai'} outcomeIndex={-1} />
+                    <IconOmen size="24" style={{ marginLeft: '12px', marginRight: '12px' }} />
+                    <BalanceItemTitle>Omen</BalanceItemTitle>
                   </BalanceItemSide>
                   <BalanceItemSide>
-                    <BalanceItemBalance style={{ marginRight: '12px' }}>{formattedxDaiBalance} DAI</BalanceItemBalance>
-                    <DaiIcon size="24px" />
+                    <BalanceItemBalance>{formattedxDaiBalance} OMN</BalanceItemBalance>
                   </BalanceItemSide>
                 </BalanceItem>
               </BalanceItems>
