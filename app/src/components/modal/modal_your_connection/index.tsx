@@ -96,13 +96,6 @@ const BalanceItemInfo = styled.p`
   margin-left: 4px;
 `
 
-const BalanceDivider = styled.div`
-  width: 100%;
-  height: 1px;
-  background: ${props => props.theme.borders.borderDisabled};
-  margin: 16px 0;
-`
-
 const ClaimButton = styled(Button)`
   width: 100%;
   margin-top: 16px;
@@ -304,15 +297,6 @@ export const ModalYourConnection = (props: Props) => {
             <BalanceSection>
               <CardHeaderText>Wallet</CardHeaderText>
               <BalanceItems style={{ marginTop: '14px' }}>
-                {(networkId === networkIds.MAINNET || relay) && (
-                  <BalanceItem>
-                    <BalanceItemSide>
-                      <EtherIcon />
-                      <BalanceItemTitle style={{ marginLeft: '12px' }}>Ether</BalanceItemTitle>
-                    </BalanceItemSide>
-                    <BalanceItemBalance>{formattedEthBalance} ETH</BalanceItemBalance>
-                  </BalanceItem>
-                )}
                 <BalanceItem>
                   <BalanceItemSide>
                     <DaiIcon size="24px" />
@@ -324,27 +308,35 @@ export const ModalYourConnection = (props: Props) => {
                       : `${formattedDaiBalance} DAI`}
                   </BalanceItemBalance>
                 </BalanceItem>
-                {relay && claimState && (
-                  <>
-                    <BalanceDivider />
-                    <BalanceItem>
-                      <BalanceItemSide>
-                        <DaiIcon size="24px" />
-                        <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
-                        <BalanceItemInfo>(Claimable)</BalanceItemInfo>
-                      </BalanceItemSide>
-                      <BalanceItemBalance>
-                        {formatBigNumber(unclaimedAmount, STANDARD_DECIMALS, 2)} DAI
-                      </BalanceItemBalance>
-                    </BalanceItem>
-                    <ClaimButton buttonType={ButtonType.primary} onClick={claim}>
-                      Claim Now
-                    </ClaimButton>
-                  </>
+                {(networkId === networkIds.MAINNET || relay) && (
+                  <BalanceItem>
+                    <BalanceItemSide>
+                      <EtherIcon />
+                      <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
+                    </BalanceItemSide>
+                    <BalanceItemBalance>{formattedEthBalance} OMN</BalanceItemBalance>
+                  </BalanceItem>
                 )}
               </BalanceItems>
             </BalanceSection>
           </ModalCard>
+          {relay && claimState && (
+            <ModalCard>
+              <BalanceSection>
+                <BalanceItem>
+                  <BalanceItemSide>
+                    <DaiIcon size="24px" />
+                    <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
+                    <BalanceItemInfo>(Claimable)</BalanceItemInfo>
+                  </BalanceItemSide>
+                  <BalanceItemBalance>{formatBigNumber(unclaimedAmount, STANDARD_DECIMALS, 2)} DAI</BalanceItemBalance>
+                </BalanceItem>
+                <ClaimButton buttonType={ButtonType.primary} onClick={claim}>
+                  Claim Now
+                </ClaimButton>
+              </BalanceSection>
+            </ModalCard>
+          )}
           {relay && (
             <ModalCard>
               {walletState === WalletState.ready ? (
@@ -358,6 +350,13 @@ export const ModalYourConnection = (props: Props) => {
                           <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
                         </BalanceItemSide>
                         <BalanceItemBalance>{formattedxDaiBalance} DAI</BalanceItemBalance>
+                      </BalanceItem>
+                      <BalanceItem>
+                        <BalanceItemSide>
+                          <DaiIcon size="24px" />
+                          <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
+                        </BalanceItemSide>
+                        <BalanceItemBalance>{formattedxDaiBalance} OMN</BalanceItemBalance>
                       </BalanceItem>
                     </BalanceItems>
                   </BalanceSection>

@@ -37,7 +37,8 @@ export const ModalCard = styled.div`
   border: ${props => props.theme.borders.borderLineDisabled};
   border-radius: ${props => props.theme.cards.borderRadius};
 
-  &:nth-child(3) {
+  &:nth-child(3),
+  &:nth-child(4) {
     margin-top: 16px;
   }
 `
