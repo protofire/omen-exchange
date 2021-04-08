@@ -206,7 +206,9 @@ export const ModalDepositWithdraw = (props: Props) => {
                     <BalanceItemTitle>Dai</BalanceItemTitle>
                   </BalanceItemSide>
                   <BalanceItemSide>
-                    <BalanceItemBalance>{formattedDaiBalance} DAI</BalanceItemBalance>
+                    <BalanceItemBalance>
+                      {exchangeType === ExchangeType.deposit ? formattedDaiBalance : formattedxDaiBalance} DAI
+                    </BalanceItemBalance>
                   </BalanceItemSide>
                 </BalanceItem>
                 <BalanceItem
@@ -245,7 +247,7 @@ export const ModalDepositWithdraw = (props: Props) => {
               setAmountToDisplay(formatBigNumber(maxBalance, STANDARD_DECIMALS, 5))
             }}
             shouldDisplayMaxButton={true}
-            symbol={'DAI'}
+            symbol={currencySelected === Currency.Dai ? 'DAI' : 'OMN'}
           />
           <InputInfo>
             You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least{' '}
