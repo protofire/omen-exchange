@@ -11,9 +11,10 @@ import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from
 import { TransactionStep, WalletState } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
-import { IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
+import { IconClose, IconMetaMask, IconOmen, IconWalletConnect } from '../../common/icons'
 import { IconJazz } from '../../common/icons/IconJazz'
 import { DaiIcon, EtherIcon } from '../../common/icons/currencies'
+import { OmenLogo } from '../../common/logos/omen'
 import {
   BalanceItem,
   BalanceItemBalance,
@@ -311,7 +312,7 @@ export const ModalYourConnection = (props: Props) => {
                 {(networkId === networkIds.MAINNET || relay) && (
                   <BalanceItem>
                     <BalanceItemSide>
-                      <EtherIcon />
+                      <IconOmen size={'24'} />
                       <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
                     </BalanceItemSide>
                     <BalanceItemBalance>{formattedEthBalance} OMN</BalanceItemBalance>
@@ -353,7 +354,7 @@ export const ModalYourConnection = (props: Props) => {
                       </BalanceItem>
                       <BalanceItem>
                         <BalanceItemSide>
-                          <DaiIcon size="24px" />
+                          <IconOmen size={'24'} />
                           <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
                         </BalanceItemSide>
                         <BalanceItemBalance>{formattedxDaiBalance} OMN</BalanceItemBalance>
