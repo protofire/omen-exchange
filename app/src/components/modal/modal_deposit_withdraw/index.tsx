@@ -92,9 +92,9 @@ export const ModalDepositWithdraw = (props: Props) => {
   const DAI = getToken(1, 'dai')
 
   const wallet = exchangeType === ExchangeType.deposit ? daiBalance : xDaiBalance
-  const minDeposit = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
+  const minExchangeAmount = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
   const isDepositWithdrawDisabled =
-    displayFundAmount.isZero() || !wallet || displayFundAmount.gt(wallet) || displayFundAmount.lt(minDeposit)
+    displayFundAmount.isZero() || !wallet || displayFundAmount.gt(wallet) || displayFundAmount.lt(minExchangeAmount)
 
   const deposit = async () => {
     if (!cpk) {
@@ -232,7 +232,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           />
           <InputInfo>
             You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least{' '}
-            {formatBigNumber(minDeposit, STANDARD_DECIMALS, 0)} DAI.
+            {formatBigNumber(minExchangeAmount, STANDARD_DECIMALS, 0)} DAI.
           </InputInfo>
           <DepositWithdrawButton
             buttonType={ButtonType.primaryAlternative}
