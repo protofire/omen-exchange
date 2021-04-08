@@ -60,6 +60,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
+
     if (safeAppInfo) {
       if (context.connectorName !== 'Safe') {
         localStorage.removeItem('CONNECTOR')
@@ -77,6 +78,15 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
       context.setConnector('Infura')
     } else {
       context.setConnector('Infura')
+    }
+
+    // debug particular address and network id
+    const url = new URL(window.location.href.replace('#', ''))
+    const debugAddress = url.searchParams.get('debugAddress')
+    const debugNetworkId = url.searchParams.get('debugNetworkId')
+    if (debugAddress) {
+      connectors.Safe.init(debugAddress, debugNetworkId ? Number(debugNetworkId) : 1)
+      context.setConnector('Safe')
     }
 
     handleGsMultiSend()
