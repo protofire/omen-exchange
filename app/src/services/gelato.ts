@@ -10,7 +10,7 @@ import { Contract, Wallet, constants, ethers, utils } from 'ethers'
 
 import { GELATO_MIN_USD_THRESH } from '../common/constants'
 import { getLogger } from '../util/logger'
-import { getToken, pseudoNativeAssetAddress } from '../util/networks'
+import { getToken, networkIds, pseudoNativeAssetAddress } from '../util/networks'
 import { GelatoData } from '../util/types'
 
 const logger = getLogger('Services::GelatoService')
@@ -127,16 +127,19 @@ class GelatoService {
   networkId: number
   usdc: any
   weth: any
+  // @ts-expect-error ignore
   addresses: NetworkContracts
 
   constructor(provider: any, signerAddress: Maybe<string>, networkId: number, relay: boolean) {
     this.provider = provider
     this.networkId = networkId
-    this.usdc = getToken(this.networkId, 'usdc')
-    this.weth = getToken(this.networkId, 'weth')
-    if (networkId == 1 && !relay) {
+    if ((networkId == networkIds.MAINNET && !relay) || networkId == networkIds.RINKEBY) {
+      this.usdc = getToken(this.networkId, 'usdc')
+      this.weth = getToken(this.networkId, 'weth')
+    }
+    if (networkId == networkIds.MAINNET && !relay) {
       this.addresses = gelatoContracts.addresses.mainnet
-    } else if (networkId == 4) {
+    } else if (networkId == networkIds.RINKEBY) {
       this.addresses = gelatoContracts.addresses.rinkeby
     } else {
       console.error(`Unknown networkId: ${networkId}`)
