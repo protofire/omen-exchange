@@ -153,6 +153,7 @@ class RealitioService {
     const event = iface.parseLog(logs[0])
 
     const { arbitrator, opening_ts: openingTs, question } = event.values
+
     const templateId = event.values.template_id.toNumber()
 
     const isNuancedBinary = templateId === 5 || templateId === 6
@@ -184,6 +185,7 @@ class RealitioService {
       outcomes: outcomes,
       templateId,
       raw: question,
+      currentAnswer: question.currentAnswer,
       isPendingArbitration: question.isPendingArbitration,
       arbitrationOccurred: question.arbitrationOccurred,
       currentAnswerTimestamp: question.currentAnswerTimestamp,
