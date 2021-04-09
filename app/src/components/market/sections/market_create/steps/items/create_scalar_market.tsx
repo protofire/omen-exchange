@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../../../common/constants'
@@ -31,7 +31,7 @@ const Row = styled.div`
     margin-bottom: 0;
   }
 `
-//dynamically change props
+
 const NumericalInput = styled(BigNumberInput)<{ error?: string }>`
   background-color: ${props => props.theme.textfield.backgroundColor};
   border-color: ${props => (props.error ? props.theme.colors.alert : props.theme.textfield.borderColor)};
@@ -124,35 +124,25 @@ export const CreateScalarMarket = (props: Props) => {
   const [startingPointError, setStartingPointError] = useState('')
   const [upperBoundError, setUpperBoundError] = useState('')
 
-  const handleLowerBoundError = (value: BigNumberInputReturn) => {
-    Number(value.formattedValue) < 0
+  useEffect(() => {
+    Number(lowerBound) < 0
       ? setLowerBoundError('Value cannot be negative')
-      : upperBound !== null &&
-        Number(upperBound) !== 0 &&
-        Number(value.formattedValue) > Number(formatBigNumber(upperBound, STANDARD_DECIMALS, STANDARD_DECIMALS))
+      : upperBound && Number(upperBound) !== 0 && Number(lowerBound) > Number(upperBound)
       ? setLowerBoundError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
       : setLowerBoundError('')
-  }
 
-  const handleStartingPointError = (value: BigNumberInputReturn) => {
-    lowerBound !== null &&
-    Number(value.formattedValue) < Number(formatBigNumber(lowerBound, STANDARD_DECIMALS, STANDARD_DECIMALS))
+    lowerBound && startingPoint && Number(startingPoint) !== 0 && Number(startingPoint) < Number(lowerBound)
       ? setStartingPointError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
-      : upperBound !== null &&
-        Number(value.formattedValue) > Number(formatBigNumber(upperBound, STANDARD_DECIMALS, STANDARD_DECIMALS))
+      : upperBound && Number(upperBound) !== 0 && Number(startingPoint) > Number(upperBound)
       ? setStartingPointError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
       : setStartingPointError('')
-  }
 
-  const handleUpperBoundError = (value: BigNumberInputReturn) => {
-    lowerBound !== null &&
-    Number(value.formattedValue) < Number(formatBigNumber(lowerBound, STANDARD_DECIMALS, STANDARD_DECIMALS))
+    lowerBound && upperBound && Number(upperBound) !== 0 && Number(upperBound) < Number(lowerBound)
       ? setUpperBoundError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
-      : startingPoint &&
-        Number(value.formattedValue) < Number(formatBigNumber(startingPoint, STANDARD_DECIMALS, STANDARD_DECIMALS))
+      : startingPoint && Number(upperBound) !== 0 && Number(upperBound) < Number(startingPoint)
       ? setUpperBoundError(`Amount must be greater than ${formatBigNumber(startingPoint, STANDARD_DECIMALS, 2)}`)
       : setUpperBoundError('')
-  }
+  }, [lowerBound, upperBound, startingPoint])
 
   return (
     <>
@@ -182,7 +172,6 @@ export const CreateScalarMarket = (props: Props) => {
                 name="lowerBound"
                 onChange={value => {
                   handleChange(value)
-                  handleLowerBoundError(value)
                 }}
                 placeholder={'0'}
                 value={lowerBound}
@@ -203,7 +192,7 @@ export const CreateScalarMarket = (props: Props) => {
                 name="upperBound"
                 onChange={value => {
                   handleChange(value)
-                  handleUpperBoundError(value)
+                  // handleUpperBoundError(value2)
                 }}
                 placeholder={'1000'}
                 value={upperBound}
@@ -224,7 +213,7 @@ export const CreateScalarMarket = (props: Props) => {
                 name="startingPoint"
                 onChange={value => {
                   handleChange(value)
-                  handleStartingPointError(value)
+                  // handleStartingPointError(value3)
                 }}
                 placeholder={'500'}
                 value={startingPoint}
