@@ -5,6 +5,7 @@ import { BigNumber } from 'ethers/utils'
 import {
   DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   DEFAULT_TOKEN_ADDRESS,
+  GEN_TOKEN_ADDDRESS_TESTING,
   MULTI_CLAIM_ADDRESS,
   OMNI_BRIDGE_MAINNET_ADDRESS,
   XDAI_FOREIGN_BRIDGE,
@@ -95,11 +96,15 @@ class XdaiService {
     this.abi = abi
   }
 
-  generateErc20ContractInstance = async () => {
+  generateErc20ContractInstance = async (currency?: ExchangeCurrency) => {
     const signer = this.provider.getSigner()
     const account = await signer.getAddress()
 
-    const erc20 = new ERC20Service(this.provider, account, DEFAULT_TOKEN_ADDRESS)
+    const erc20 = new ERC20Service(
+      this.provider,
+      account,
+      currency === ExchangeCurrency.Omen ? GEN_TOKEN_ADDDRESS_TESTING : DEFAULT_TOKEN_ADDRESS,
+    )
 
     return erc20.getContract
   }

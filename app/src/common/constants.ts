@@ -103,6 +103,7 @@ export const IMPORT_QUESTION_ID_KEY = 'importQuestionId'
 
 export const DEFAULT_TOKEN_ADDRESS_RINKEBY = '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea'
 export const DEFAULT_TOKEN_ADDRESS = '0x6b175474e89094c44da98b954eedeac495271d0f'
+export const GEN_TOKEN_ADDDRESS_TESTING = '0x543ff227f64aa17ea132bf9886cab5db55dcaddf'
 
 export const MAINNET_LOCATION = 'omen.eth.link'
 export const XDAI_LOCATION = 'xdai.omen.eth.link'

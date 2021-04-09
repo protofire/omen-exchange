@@ -1340,7 +1340,7 @@ class CPKService {
         return transaction.hash
       } else {
         const xDaiService = new XdaiService(this.provider)
-        const contract = await xDaiService.generateErc20ContractInstance()
+        const contract = await xDaiService.generateErc20ContractInstance(currency)
         const transaction = await xDaiService.generateSendTransaction(amount, contract)
         return transaction
       }
