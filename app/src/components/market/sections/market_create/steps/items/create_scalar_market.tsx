@@ -127,19 +127,19 @@ export const CreateScalarMarket = (props: Props) => {
   useEffect(() => {
     Number(lowerBound) < 0
       ? setLowerBoundError('Value cannot be negative')
-      : upperBound && Number(upperBound) !== 0 && Number(lowerBound) > Number(upperBound)
+      : upperBound && !upperBound.eq(0) && lowerBound?.gt(upperBound)
       ? setLowerBoundError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
       : setLowerBoundError('')
 
-    lowerBound && startingPoint && Number(startingPoint) !== 0 && Number(startingPoint) < Number(lowerBound)
+    lowerBound && startingPoint && !startingPoint.eq(0) && startingPoint.lt(lowerBound)
       ? setStartingPointError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
-      : upperBound && Number(upperBound) !== 0 && Number(startingPoint) > Number(upperBound)
+      : upperBound && !upperBound.eq(0) && startingPoint && startingPoint.gt(upperBound)
       ? setStartingPointError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
       : setStartingPointError('')
 
-    lowerBound && upperBound && Number(upperBound) !== 0 && Number(upperBound) < Number(lowerBound)
+    lowerBound && upperBound && !upperBound.eq(0) && upperBound.lt(lowerBound)
       ? setUpperBoundError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
-      : startingPoint && Number(upperBound) !== 0 && Number(upperBound) < Number(startingPoint)
+      : startingPoint && upperBound && !upperBound.eq(0) && upperBound.lt(startingPoint)
       ? setUpperBoundError(`Amount must be greater than ${formatBigNumber(startingPoint, STANDARD_DECIMALS, 2)}`)
       : setUpperBoundError('')
   }, [lowerBound, upperBound, startingPoint])
@@ -192,7 +192,6 @@ export const CreateScalarMarket = (props: Props) => {
                 name="upperBound"
                 onChange={value => {
                   handleChange(value)
-                  // handleUpperBoundError(value2)
                 }}
                 placeholder={'1000'}
                 value={upperBound}
@@ -213,7 +212,6 @@ export const CreateScalarMarket = (props: Props) => {
                 name="startingPoint"
                 onChange={value => {
                   handleChange(value)
-                  // handleStartingPointError(value3)
                 }}
                 placeholder={'500'}
                 value={startingPoint}
