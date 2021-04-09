@@ -25,7 +25,7 @@ import {
   signaturesFormatted,
   waitABit,
 } from '../util/tools'
-import { MarketData, Question, Token, TransactionStep } from '../util/types'
+import { ExchangeCurrency, MarketData, Question, Token, TransactionStep } from '../util/types'
 
 import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
@@ -1325,11 +1325,11 @@ class CPKService {
     }
   }
 
-  sendDaiToBridge = async (amount: BigNumber) => {
+  sendDaiToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
     try {
       if (this.cpk.relay) {
         const xDaiService = new XdaiService(this.provider)
-        const contract = xDaiService.generateXdaiBridgeContractInstance()
+        const contract = xDaiService.generateXdaiBridgeContractInstance(currency)
         const sender = await this.cpk.ethLibAdapter.signer.signer.getAddress()
         const receiver = this.cpk.address
 
@@ -1350,7 +1350,7 @@ class CPKService {
     }
   }
 
-  sendXdaiToBridge = async (amount: BigNumber) => {
+  sendXdaiToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
     try {
       if (this.cpk.relay) {
         const transactions: Transaction[] = []

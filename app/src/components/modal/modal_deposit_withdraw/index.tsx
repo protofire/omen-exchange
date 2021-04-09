@@ -8,7 +8,7 @@ import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { getToken } from '../../../util/networks'
 import { formatBigNumber, isDust, waitForConfirmations } from '../../../util/tools'
-import { ExchangeType, TransactionStep } from '../../../util/types'
+import { ExchangeCurrency, ExchangeType, TransactionStep } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { BigNumberInput, RadioInput, TextfieldCustomPlaceholder } from '../../common'
@@ -43,11 +43,6 @@ const DepositWithdrawButton = styled(Button)`
   width: 100%;
   margin-top: 28px;
 `
-
-enum Currency {
-  Dai,
-  Omen,
-}
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   exchangeType: ExchangeType
@@ -89,7 +84,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [txNetId, setTxNetId] = useState()
   const [confirmations, setConfirmations] = useState(0)
   const [message, setMessage] = useState('')
-  const [currencySelected, setCurrencySelected] = useState<Currency>(Currency.Dai)
+  const [currencySelected, setCurrencySelected] = useState<ExchangeCurrency>(ExchangeCurrency.Dai)
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
@@ -117,8 +112,8 @@ export const ModalDepositWithdraw = (props: Props) => {
 
       const hash =
         exchangeType === ExchangeType.deposit
-          ? await cpk.sendDaiToBridge(displayFundAmount)
-          : await cpk.sendXdaiToBridge(displayFundAmount)
+          ? await cpk.sendDaiToBridge(displayFundAmount, currencySelected)
+          : await cpk.sendXdaiToBridge(displayFundAmount, currencySelected)
 
       const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
       setTxNetId(provider.network.chainId)
@@ -197,11 +192,11 @@ export const ModalDepositWithdraw = (props: Props) => {
               <BalanceItems>
                 <BalanceItem
                   onClick={() => {
-                    setCurrencySelected(Currency.Dai)
+                    setCurrencySelected(ExchangeCurrency.Dai)
                   }}
                 >
                   <BalanceItemSide>
-                    <RadioInput checked={currencySelected === Currency.Dai} name={'Dai'} outcomeIndex={-1} />
+                    <RadioInput checked={currencySelected === ExchangeCurrency.Dai} name={'Dai'} outcomeIndex={-1} />
                     <DaiIcon size="24px" style={{ marginLeft: '12px', marginRight: '12px' }} />
                     <BalanceItemTitle>Dai</BalanceItemTitle>
                   </BalanceItemSide>
@@ -213,11 +208,11 @@ export const ModalDepositWithdraw = (props: Props) => {
                 </BalanceItem>
                 <BalanceItem
                   onClick={() => {
-                    setCurrencySelected(Currency.Omen)
+                    setCurrencySelected(ExchangeCurrency.Omen)
                   }}
                 >
                   <BalanceItemSide>
-                    <RadioInput checked={currencySelected === Currency.Omen} name={'Dai'} outcomeIndex={-1} />
+                    <RadioInput checked={currencySelected === ExchangeCurrency.Omen} name={'Dai'} outcomeIndex={-1} />
                     <IconOmen size="24" style={{ marginLeft: '12px', marginRight: '12px' }} />
                     <BalanceItemTitle>Omen</BalanceItemTitle>
                   </BalanceItemSide>
@@ -247,7 +242,7 @@ export const ModalDepositWithdraw = (props: Props) => {
               setAmountToDisplay(formatBigNumber(maxBalance, STANDARD_DECIMALS, 5))
             }}
             shouldDisplayMaxButton={true}
-            symbol={currencySelected === Currency.Dai ? 'DAI' : 'OMN'}
+            symbol={currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}
           />
           <InputInfo>
             You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least{' '}

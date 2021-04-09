@@ -6,11 +6,13 @@ import {
   DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   DEFAULT_TOKEN_ADDRESS,
   MULTI_CLAIM_ADDRESS,
+  OMNI_BRIDGE_MAINNET_ADDRESS,
   XDAI_FOREIGN_BRIDGE,
   XDAI_HOME_BRIDGE,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
 } from '../common/constants'
 import { getInfuraUrl, networkIds } from '../util/networks'
+import { ExchangeCurrency } from '../util/types'
 
 import { ERC20Service } from './erc20'
 
@@ -102,14 +104,21 @@ class XdaiService {
     return erc20.getContract
   }
 
-  generateXdaiBridgeContractInstance = () => {
+  generateXdaiBridgeContractInstance = (currency?: ExchangeCurrency) => {
     const signer = this.provider.relay ? this.provider.signer.signer : this.provider.signer
-    return new ethers.Contract(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, this.abi, signer)
+    return new ethers.Contract(
+      currency === ExchangeCurrency.Omen ? OMNI_BRIDGE_MAINNET_ADDRESS : DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
+      this.abi,
+      signer,
+    )
   }
 
-  generateSendTransaction = async (amount: BigNumber, contract: Contract) => {
+  generateSendTransaction = async (amount: BigNumber, contract: Contract, currency?: ExchangeCurrency) => {
     try {
-      const transaction = await contract.transfer(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, amount)
+      const transaction = await contract.transfer(
+        currency === ExchangeCurrency.Omen ? OMNI_BRIDGE_MAINNET_ADDRESS : DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
+        amount,
+      )
       return transaction
     } catch (e) {
       throw new Error('Failed at generating transaction!')
