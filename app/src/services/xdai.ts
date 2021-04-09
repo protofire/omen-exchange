@@ -53,7 +53,21 @@ const abi = [
     type: 'function',
   },
 ]
-
+const omni_abi = [
+  {
+    constant: false,
+    inputs: [
+      { name: 'token', type: 'address' },
+      { name: '_receiver', type: 'address' },
+      { name: '_value', type: 'uint256' },
+    ],
+    name: 'relayTokens',
+    outputs: [],
+    payable: false,
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+]
 const xdaiBridgeAbi = [
   {
     type: 'function',
@@ -90,10 +104,12 @@ const multiClaimAbi = [
 class XdaiService {
   provider: any
   abi: any
+  omniAbi: any
 
   constructor(provider: any) {
     this.provider = provider
     this.abi = abi
+    this.omniAbi = omni_abi
   }
 
   generateErc20ContractInstance = async (currency?: ExchangeCurrency) => {
@@ -111,9 +127,11 @@ class XdaiService {
 
   generateXdaiBridgeContractInstance = (currency?: ExchangeCurrency) => {
     const signer = this.provider.relay ? this.provider.signer.signer : this.provider.signer
+    console.log(currency)
+    console.log(currency === ExchangeCurrency.Omen ? OMNI_BRIDGE_MAINNET_ADDRESS : DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
     return new ethers.Contract(
       currency === ExchangeCurrency.Omen ? OMNI_BRIDGE_MAINNET_ADDRESS : DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
-      this.abi,
+      currency === ExchangeCurrency.Omen ? this.omniAbi : this.abi,
       signer,
     )
   }

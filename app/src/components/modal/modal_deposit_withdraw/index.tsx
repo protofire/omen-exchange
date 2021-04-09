@@ -7,7 +7,7 @@ import styled, { withTheme } from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { getToken } from '../../../util/networks'
-import { formatBigNumber, isDust, waitForConfirmations } from '../../../util/tools'
+import { formatBigNumber, waitForConfirmations } from '../../../util/tools'
 import { ExchangeCurrency, ExchangeType, TransactionStep } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -93,9 +93,14 @@ export const ModalDepositWithdraw = (props: Props) => {
   const DAI = getToken(1, 'dai')
 
   const wallet = exchangeType === ExchangeType.deposit ? daiBalance : xDaiBalance
-  const minDeposit = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
+
+  const minDaiExchange = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
+  const minOmenExchange = exchangeType === ExchangeType.deposit ? parseEther('1') : parseEther('1')
   const isDepositWithdrawDisabled =
-    displayFundAmount.isZero() || !wallet || displayFundAmount.gt(wallet) || displayFundAmount.lt(minDeposit)
+    displayFundAmount.isZero() ||
+    !wallet ||
+    displayFundAmount.gt(wallet) ||
+    displayFundAmount.lt(currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange)
 
   const deposit = async () => {
     if (!cpk) {
@@ -246,7 +251,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           />
           <InputInfo>
             You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least{' '}
-            {formatBigNumber(minDeposit, STANDARD_DECIMALS, exchangeType === ExchangeType.deposit ? 3 : 0)} DAI.
+            {formatBigNumber(minDaiExchange, STANDARD_DECIMALS, exchangeType === ExchangeType.deposit ? 3 : 0)} DAI.
           </InputInfo>
           <DepositWithdrawButton
             buttonType={ButtonType.primaryAlternative}

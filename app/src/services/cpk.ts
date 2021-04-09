@@ -1328,24 +1328,30 @@ class CPKService {
   sendDaiToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
     try {
       if (this.cpk.relay) {
+        console.log(currency)
         const xDaiService = new XdaiService(this.provider)
         const contract = xDaiService.generateXdaiBridgeContractInstance(currency)
+        console.log('here')
         const sender = await this.cpk.ethLibAdapter.signer.signer.getAddress()
+        console.log(sender, 'matters')
+        console.log('here')
         const receiver = this.cpk.address
-
+        console.log(receiver)
+        console.log('jere')
         // verify proxy address before deposit
         await verifyProxyAddress(sender, receiver, this.cpk)
-
+        console.log('jere')
         const transaction = await contract.relayTokens(sender, receiver, amount)
         return transaction.hash
       } else {
+        console.log(currency)
         const xDaiService = new XdaiService(this.provider)
         const contract = await xDaiService.generateErc20ContractInstance(currency)
-        const transaction = await xDaiService.generateSendTransaction(amount, contract)
+        const transaction = await xDaiService.generateSendTransaction(amount, contract, currency)
         return transaction
       }
     } catch (e) {
-      logger.error(`Error trying to send Dai to bridge address`, e.message)
+      logger.error(`Error trying to send Dai to bridge address: `, e.message)
       throw e
     }
   }
