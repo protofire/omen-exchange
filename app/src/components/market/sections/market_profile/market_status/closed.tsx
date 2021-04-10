@@ -348,6 +348,7 @@ const Wrapper = (props: Props) => {
   )
 
   const realitioAnswerNumber = Number(formatBigNumber(realitioAnswer || new BigNumber(0), STANDARD_DECIMALS))
+
   const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), STANDARD_DECIMALS))
   const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), STANDARD_DECIMALS))
 
@@ -420,8 +421,17 @@ const Wrapper = (props: Props) => {
             {isScalar ? (
               <MarketScale
                 borderTop={true}
+                collateral={props.marketMakerData.collateral}
+                currentAnswer={props.marketMakerData.question.currentAnswer}
+                currentAnswerBond={props.marketMakerData.question.currentAnswerBond}
                 currentPrediction={unclampedFinalAnswerPercentage.toString()}
+                isClosed={true}
                 lowerBound={scalarLow || new BigNumber(0)}
+                outcomePredictedByMarket={
+                  props.marketMakerData.outcomeTokenMarginalPrices
+                    ? props.marketMakerData.outcomeTokenMarginalPrices[1]
+                    : null
+                }
                 startingPointTitle={'Final answer'}
                 unit={getUnit(question.title)}
                 upperBound={scalarHigh || new BigNumber(0)}
