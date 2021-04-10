@@ -236,7 +236,7 @@ const MarketHomeContainer: React.FC = () => {
   const defaultCpkAddress = context.relay ? context.account : null
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(defaultCpkAddress)
 
-  const [pageSize, setPageSize] = useState(4)
+  const pageSize = 12
   const [pageIndex, setPageIndex] = useState(0)
 
   const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
@@ -411,11 +411,6 @@ const MarketHomeContainer: React.FC = () => {
     setPageIndex(pageIndex - pageSize)
   }
 
-  const updatePageSize = (size: number): void => {
-    setPageSize(size)
-    setPageIndex(0)
-  }
-
   return (
     <>
       {hasSeenBanner === undefined && (context.relay || context.networkId === networkIds.MAINNET) && (
@@ -457,7 +452,6 @@ const MarketHomeContainer: React.FC = () => {
         onFilterChange={onFilterChange}
         onLoadNextPage={loadNextPage}
         onLoadPrevPage={loadPrevPage}
-        onUpdatePageSize={updatePageSize}
         pageIndex={pageIndex}
       />
     </>
