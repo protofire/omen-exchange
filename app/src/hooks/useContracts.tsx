@@ -10,6 +10,7 @@ import {
   OracleService,
   RealitioService,
 } from '../services'
+import { ERC20WrapperFactoryService } from '../services/erc20_wrapper_factory'
 import { getContractAddress } from '../util/networks'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
@@ -28,6 +29,12 @@ export const useContracts = (context: ConnectedWeb3Context) => {
     () => new MarketMakerFactoryService(marketMakerFactoryAddress, provider, account),
     [marketMakerFactoryAddress, provider, account],
   )
+
+  const erc20WrapperFactoryAddress = getContractAddress(networkId, 'erc20WrapperFactory')
+  const erc20WrapperFactory = useMemo(() => new ERC20WrapperFactoryService(erc20WrapperFactoryAddress, provider), [
+    erc20WrapperFactoryAddress,
+    provider,
+  ])
 
   const realitioAddress = getContractAddress(networkId, 'realitio')
   const realitioScalarAdapterAddress = getContractAddress(networkId, 'realitioScalarAdapter')
@@ -69,13 +76,14 @@ export const useContracts = (context: ConnectedWeb3Context) => {
     () => ({
       conditionalTokens,
       marketMakerFactory,
+      erc20WrapperFactory,
       realitio,
       oracle,
       buildMarketMaker,
       kleros,
       dxTCR,
     }),
-    [conditionalTokens, marketMakerFactory, realitio, oracle, kleros, buildMarketMaker, dxTCR],
+    [conditionalTokens, erc20WrapperFactory, marketMakerFactory, realitio, oracle, kleros, buildMarketMaker, dxTCR],
   )
 }
 

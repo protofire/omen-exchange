@@ -63,6 +63,7 @@ interface Network {
     realitio: string
     realitioScalarAdapter: string
     marketMakerFactory: string
+    erc20WrapperFactory: string
     conditionalTokens: string
     oracle: string
     klerosBadge: string
@@ -118,6 +119,7 @@ const networks: { [K in NetworkId]: Network } = {
       realitioScalarAdapter: '0xaa548EfBb0972e0c4b9551dcCfb6B787A1B90082',
       marketMakerFactory: '0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220',
       conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
+      erc20WrapperFactory: '0x0000000000000000000000000000000000000000',
       oracle: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
       klerosBadge: '0xcb4aae35333193232421e86cd2e9b6c91f3b125f',
       klerosTokenView: '0xf9b9b5440340123b21bff1ddafe1ad6feb9d6e7f',
@@ -164,6 +166,7 @@ const networks: { [K in NetworkId]: Network } = {
       realitioScalarAdapter: '0x0e8Db8caD541C0Bf5b611636e81fEc0828bc7902',
       marketMakerFactory: '0x0fB4340432e56c014fa96286de17222822a9281b',
       conditionalTokens: '0x36bede640D19981A82090519bC1626249984c908',
+      erc20WrapperFactory: '0x47C8bf756c91eB059581DaFEeAaf2eac2a54d5bb',
       oracle: '0x17174dC1b62add32a1DE477A357e75b0dcDEed6E',
       klerosBadge: '0x0000000000000000000000000000000000000000',
       klerosTokenView: '0x0000000000000000000000000000000000000000',
@@ -210,6 +213,7 @@ const networks: { [K in NetworkId]: Network } = {
       realitioScalarAdapter: '0x1D369EEC97cF2E62c8DBB804b3998Bf15bcb67dB',
       marketMakerFactory: '0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5',
       conditionalTokens: '0x0Db8C35045a830DC7F2A4dd87ef90e7A9Cd0534f',
+      erc20WrapperFactory: '0x0000000000000000000000000000000000000000',
       oracle: '0x9E6bd63aEbFb2E858B6111cea9C389f7664F7108',
       klerosBadge: '0x0000000000000000000000000000000000000000',
       klerosTokenView: '0x0000000000000000000000000000000000000000',
@@ -259,6 +263,7 @@ const networks: { [K in NetworkId]: Network } = {
       realitioScalarAdapter: '0xcA75aaC320089c9fb077E86857fF6e954Df06a6B',
       marketMakerFactory: '0x9083A2B699c0a4AD06F63580BDE2635d26a3eeF0',
       conditionalTokens: '0xCeAfDD6bc0bEF976fdCd1112955828E00543c0Ce',
+      erc20WrapperFactory: '0x0000000000000000000000000000000000000000',
       oracle: '0xAB16D643bA051C11962DA645f74632d3130c81E2',
       klerosBadge: '0x0000000000000000000000000000000000000000',
       klerosTokenView: '0x0000000000000000000000000000000000000000',

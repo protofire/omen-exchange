@@ -23,7 +23,7 @@ const MarketWizardCreatorContainer: FC = () => {
   const history = useHistory()
 
   const [isModalOpen, setModalState] = useState(false)
-  const { conditionalTokens, marketMakerFactory, realitio } = useContracts(context)
+  const { conditionalTokens, erc20WrapperFactory, marketMakerFactory, realitio } = useContracts(context)
 
   const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(MarketCreationStatus.ready())
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
@@ -79,6 +79,7 @@ const MarketWizardCreatorContainer: FC = () => {
           const { marketMakerAddress } = await cpk.createScalarMarket({
             marketData,
             conditionalTokens,
+            erc20WrapperFactory,
             realitio,
             marketMakerFactory,
             setTxHash,
@@ -107,6 +108,7 @@ const MarketWizardCreatorContainer: FC = () => {
             compoundTokenDetails,
             marketData,
             conditionalTokens,
+            erc20WrapperFactory,
             realitio,
             marketMakerFactory,
             setTxHash,

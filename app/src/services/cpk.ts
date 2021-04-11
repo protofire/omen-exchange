@@ -30,6 +30,7 @@ import { MarketData, Question, Token, TransactionStep } from '../util/types'
 import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
 import { ERC20Service } from './erc20'
+import { ERC20WrapperFactoryService } from './erc20_wrapper_factory'
 import { MarketMakerService } from './market_maker'
 import { MarketMakerFactoryService } from './market_maker_factory'
 import { OracleService } from './oracle'
@@ -70,6 +71,7 @@ interface CPKCreateMarketParams {
   compoundTokenDetails?: Token
   marketData: MarketData
   conditionalTokens: ConditionalTokenService
+  erc20WrapperFactory: ERC20WrapperFactoryService
   realitio: RealitioService
   marketMakerFactory: MarketMakerFactoryService
   useCompoundReserve?: boolean
@@ -396,6 +398,7 @@ class CPKService {
     compoundService,
     compoundTokenDetails,
     conditionalTokens,
+    erc20WrapperFactory,
     marketData,
     marketMakerFactory,
     realitio,
@@ -434,7 +437,7 @@ class CPKService {
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
 
-      let collateral
+      let collateral: any
       const fundingAmount = this.cpk.relay ? marketData.funding.sub(RELAY_FEE) : marketData.funding
       if (marketData.collateral.address === pseudoNativeAssetAddress && !useCompoundReserve) {
         // ultimately WETH will be the collateral if we fund with native ether
@@ -588,6 +591,19 @@ class CPKService {
         ),
       })
 
+      // Step 6: create ERC20 wrappers for each position
+      await Promise.all(
+        outcomes.map(async (_, index) => {
+          const collectionId = await conditionalTokens.getCollectionIdForOutcome(conditionId, index)
+          const positionId = await conditionalTokens.getPositionId(collateral.address, collectionId)
+          transactions.push({
+            to: erc20WrapperFactory.contract.address,
+            // TODO: choose proper name and symbol
+            data: ERC20WrapperFactoryService.encodeCreateWrapperCall('Test', 'TEST', positionId),
+          })
+        }),
+      )
+
       const transaction = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       return {
         transaction,
@@ -601,6 +617,7 @@ class CPKService {
 
   createScalarMarket = async ({
     conditionalTokens,
+    erc20WrapperFactory,
     marketData,
     marketMakerFactory,
     realitio,
@@ -783,6 +800,17 @@ class CPKService {
           distributionHint,
         ),
       })
+
+      // Step 6: create ERC20 wrappers for each position
+      for (let i = 0; i < 2; i++) {
+        const collectionId = await conditionalTokens.getCollectionIdForOutcome(conditionId, i)
+        const positionId = await conditionalTokens.getPositionId(collateral.address, collectionId)
+        transactions.push({
+          to: erc20WrapperFactory.contract.address,
+          // TODO: use proper name and symbol
+          data: ERC20WrapperFactoryService.encodeCreateWrapperCall('Test', 'TEST', positionId),
+        })
+      }
 
       const transaction = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
 
