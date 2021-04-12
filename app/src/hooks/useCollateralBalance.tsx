@@ -24,7 +24,11 @@ export const useCollateralBalance = (
       if (collateral.address === pseudoNativeAssetAddress) {
         collateralBalance = await provider.getBalance(account)
       } else {
-        const collateralService = new ERC20Service(provider, account, collateral.address)
+        const collateralService = new ERC20Service(
+          provider,
+          '0xe15ff8d6d0c880c9bc6bfd5a6baadb6491d766d0',
+          collateral.address,
+        )
         collateralBalance = await collateralService.getCollateral(account)
       }
     }

@@ -3,7 +3,12 @@ import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, STANDARD_DECIMALS } from '../../../common/constants'
+import {
+  DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
+  GEN_TOKEN_ADDDRESS_TESTING,
+  OMNI_BRIDGE_MAINNET_ADDRESS,
+  STANDARD_DECIMALS,
+} from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service } from '../../../services'
 import { getToken, networkIds } from '../../../util/networks'
@@ -231,8 +236,8 @@ export const ModalYourConnection = (props: Props) => {
       setIsTransactionModalOpen(true)
       const owner = context.rawWeb3Context.account
       const provider = context.rawWeb3Context.library
-      const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, DAI.address)
-      const { transactionHash } = await collateralService.approveUnlimited(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, true)
+      const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, GEN_TOKEN_ADDDRESS_TESTING)
+      const { transactionHash } = await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS, true)
       if (transactionHash) {
         setTxNetId(provider.network.chainId)
         setTxHash(transactionHash)
@@ -383,6 +388,13 @@ export const ModalYourConnection = (props: Props) => {
               )}
             </ModalCard>
           )}
+          <EnableDai>
+            <DaiIcon size="38px" />
+            <EnableDaiText>To Deposit or Withdraw Dai to your Omen Account, you need to enable it first.</EnableDaiText>
+            <EnableDaiButton buttonType={ButtonType.primary} onClick={approve}>
+              Enable
+            </EnableDaiButton>
+          </EnableDai>
         </ContentWrapper>
       </Modal>
       <ModalTransactionWrapper

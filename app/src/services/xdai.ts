@@ -127,11 +127,11 @@ class XdaiService {
 
   generateXdaiBridgeContractInstance = (currency?: ExchangeCurrency) => {
     const signer = this.provider.relay ? this.provider.signer.signer : this.provider.signer
-    console.log(currency)
+    console.log(signer)
     console.log(currency === ExchangeCurrency.Omen ? OMNI_BRIDGE_MAINNET_ADDRESS : DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
     return new ethers.Contract(
       currency === ExchangeCurrency.Omen ? OMNI_BRIDGE_MAINNET_ADDRESS : DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
-      currency === ExchangeCurrency.Omen ? this.omniAbi : this.abi,
+      this.omniAbi,
       signer,
     )
   }

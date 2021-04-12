@@ -4,8 +4,8 @@ import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { STANDARD_DECIMALS } from '../../../common/constants'
-import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
+import { GEN_TOKEN_ADDDRESS_TESTING, STANDARD_DECIMALS } from '../../../common/constants'
+import { useCollateral, useCollateralBalance, useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { getToken } from '../../../util/networks'
 import { formatBigNumber, waitForConfirmations } from '../../../util/tools'
 import { ExchangeCurrency, ExchangeType, TransactionStep } from '../../../util/types'
@@ -74,6 +74,11 @@ export const ModalDepositWithdraw = (props: Props) => {
   } = props
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
+
+  const collateral = useCollateralBalance(
+    { address: '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599', decimals: 18, symbol: 'GEN' },
+    context,
+  )
 
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
@@ -222,7 +227,9 @@ export const ModalDepositWithdraw = (props: Props) => {
                     <BalanceItemTitle>Omen</BalanceItemTitle>
                   </BalanceItemSide>
                   <BalanceItemSide>
-                    <BalanceItemBalance>{formattedxDaiBalance} OMN</BalanceItemBalance>
+                    <BalanceItemBalance>
+                      {collateral.collateralBalance && formatBigNumber(collateral.collateralBalance, 18)} GEN
+                    </BalanceItemBalance>
                   </BalanceItemSide>
                 </BalanceItem>
               </BalanceItems>
