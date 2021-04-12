@@ -81,7 +81,7 @@ export const ScalarMarketBuy = (props: Props) => {
     scalarHigh,
     scalarLow,
   } = marketMakerData
-  const { buildMarketMaker } = useContracts(context)
+  const { buildMarketMaker, conditionalTokens, erc20WrapperFactory } = useContracts(context)
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const Tabs = {
@@ -255,6 +255,8 @@ export const ScalarMarketBuy = (props: Props) => {
       await cpk.buyOutcomes({
         amount,
         collateral,
+        conditionalTokens,
+        erc20WrapperFactory,
         outcomeIndex,
         marketMaker,
         setTxHash,

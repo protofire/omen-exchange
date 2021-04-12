@@ -1,4 +1,5 @@
 import { Contract, utils } from 'ethers'
+import { BigNumber } from 'ethers/utils'
 
 const WRAPPER_FACTORY_INTERFACE = new utils.Interface([
   `function createWrapper(string _name, string _symbol, uint256 _positionId) external`,
@@ -16,11 +17,11 @@ class ERC20WrapperFactoryService {
     return this.contract.address
   }
 
-  async wrapperForPosition(positionId: number): Promise<string> {
+  async wrapperForPosition(positionId: BigNumber): Promise<string> {
     return await this.contract.wrapperForPosition(positionId)
   }
 
-  static encodeCreateWrapperCall = (name: string, symbol: string, positionId: number): string => {
+  static encodeCreateWrapperCall = (name: string, symbol: string, positionId: BigNumber): string => {
     return WRAPPER_FACTORY_INTERFACE.functions.createWrapper.encode([name, symbol, positionId])
   }
 }

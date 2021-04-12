@@ -85,7 +85,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const { library: provider, networkId, relay } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
-  const { buildMarketMaker } = useContracts(context)
+  const { buildMarketMaker, conditionalTokens, erc20WrapperFactory } = useContracts(context)
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, fee, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
@@ -237,6 +237,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         amount: inputAmount,
         collateral,
         compoundService,
+        conditionalTokens,
+        erc20WrapperFactory,
         marketMaker,
         outcomeIndex,
         setTxHash,

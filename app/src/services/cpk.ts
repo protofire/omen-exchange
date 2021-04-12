@@ -48,6 +48,8 @@ interface CPKBuyOutcomesParams {
   amount: BigNumber
   collateral: Token
   compoundService?: CompoundService | null
+  conditionalTokens: ConditionalTokenService
+  erc20WrapperFactory: ERC20WrapperFactoryService
   outcomeIndex: number
   useBaseToken?: boolean
   marketMaker: MarketMakerService
@@ -267,6 +269,8 @@ class CPKService {
     amount,
     collateral,
     compoundService,
+    conditionalTokens,
+    erc20WrapperFactory,
     marketMaker,
     outcomeIndex,
     setTxHash,
@@ -282,7 +286,6 @@ class CPKService {
       const transactions: Transaction[] = []
 
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
 
       const buyAmount = this.cpk.relay ? amount.sub(RELAY_FEE) : amount
 
@@ -385,6 +388,29 @@ class CPKService {
       transactions.push({
         to: marketMakerAddress,
         data: MarketMakerService.encodeBuy(minCollateralAmount, outcomeIndex, outcomeTokensToBuy),
+      })
+
+      // Step 4: wrap ERC1155 outcome tokens
+      const collectionId = await conditionalTokens.getCollectionIdForOutcome(
+        await marketMaker.getConditionId(),
+        1 << outcomeIndex,
+      )
+      const positionId = await conditionalTokens.getPositionId(collateralAddress, collectionId)
+      const erc20WrapperAddress = await erc20WrapperFactory.wrapperForPosition(positionId)
+      transactions.push({
+        to: conditionalTokens.address,
+        data: ConditionalTokenService.encodeSafeTransferFrom(
+          this.cpk.address,
+          erc20WrapperAddress,
+          positionId,
+          outcomeTokensToBuy,
+        ),
+      })
+
+      // Step 5: send wrapped, ERC20 tokens directly to user
+      transactions.push({
+        to: erc20WrapperAddress,
+        data: ERC20Service.encodeTransfer(account, outcomeTokensToBuy),
       })
 
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
@@ -593,7 +619,7 @@ class CPKService {
       // Step 6: create ERC20 wrappers for each position
       await Promise.all(
         outcomes.map(async (_, index) => {
-          const collectionId = await conditionalTokens.getCollectionIdForOutcome(conditionId, index)
+          const collectionId = await conditionalTokens.getCollectionIdForOutcome(conditionId, 1 << index)
           const positionId = await conditionalTokens.getPositionId(collateral.address, collectionId)
           transactions.push({
             to: erc20WrapperFactory.contract.address,
