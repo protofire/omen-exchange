@@ -594,12 +594,12 @@ class CPKService {
       // Step 6: create ERC20 wrappers for each position
       await Promise.all(
         outcomes.map(async (_, index) => {
-          const collectionId = await conditionalTokens.getCollectionIdForOutcome(conditionId, index)
-          const positionId = await conditionalTokens.getPositionId(collateral.address, collectionId)
+          // const collectionId = await conditionalTokens.getCollectionIdForOutcome(conditionId, index)
+          // const positionId = await conditionalTokens.getPositionId(collateral.address, collectionId)
           transactions.push({
             to: erc20WrapperFactory.contract.address,
             // TODO: choose proper name and symbol
-            data: ERC20WrapperFactoryService.encodeCreateWrapperCall('Test', 'TEST', positionId),
+            data: ERC20WrapperFactoryService.encodeCreateWrapperCall('Test', 'TEST', 1),
           })
         }),
       )
