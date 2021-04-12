@@ -1,3 +1,4 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { ChangeEvent, useEffect, useState } from 'react'
 import styled from 'styled-components'
@@ -120,29 +121,37 @@ export const CreateScalarMarket = (props: Props) => {
     upperBound,
   } = props
 
+  const [lowerBoundFocus, setLowerBoundFocus] = useState(false)
+  const [startingPointFocus, setStartingPointFocus] = useState(false)
+  const [upperBoundFocus, setUpperBoundFocus] = useState(false)
+
   const [lowerBoundError, setLowerBoundError] = useState('')
   const [startingPointError, setStartingPointError] = useState('')
   const [upperBoundError, setUpperBoundError] = useState('')
 
   useEffect(() => {
-    Number(lowerBound) < 0
-      ? setLowerBoundError('Value cannot be negative')
-      : upperBound && !upperBound.eq(0) && lowerBound?.gt(upperBound)
-      ? setLowerBoundError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
-      : setLowerBoundError('')
-
-    lowerBound && startingPoint && !startingPoint.eq(0) && startingPoint.lt(lowerBound)
-      ? setStartingPointError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
-      : upperBound && !upperBound.eq(0) && startingPoint && startingPoint.gt(upperBound)
-      ? setStartingPointError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
-      : setStartingPointError('')
-
-    lowerBound && upperBound && !upperBound.eq(0) && upperBound.lt(lowerBound)
-      ? setUpperBoundError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
-      : startingPoint && upperBound && !upperBound.eq(0) && upperBound.lt(startingPoint)
-      ? setUpperBoundError(`Amount must be greater than ${formatBigNumber(startingPoint, STANDARD_DECIMALS, 2)}`)
-      : setUpperBoundError('')
-  }, [lowerBound, upperBound, startingPoint])
+    if (lowerBoundFocus) {
+      lowerBound?.lt(Zero)
+        ? setLowerBoundError('Value cannot be negative')
+        : upperBound && !upperBound.eq(Zero) && lowerBound?.gt(upperBound)
+        ? setLowerBoundError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
+        : setLowerBoundError('')
+    }
+    if (startingPointFocus) {
+      lowerBound && startingPoint && !startingPoint.eq(Zero) && startingPoint.lt(lowerBound)
+        ? setStartingPointError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
+        : upperBound && !upperBound.eq(Zero) && startingPoint && startingPoint.gt(upperBound)
+        ? setStartingPointError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
+        : setStartingPointError('')
+    }
+    if (upperBoundFocus) {
+      lowerBound && upperBound && !upperBound.eq(Zero) && upperBound.lt(lowerBound)
+        ? setUpperBoundError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
+        : startingPoint && upperBound && !upperBound.eq(Zero) && upperBound.lt(startingPoint)
+        ? setUpperBoundError(`Amount must be greater than ${formatBigNumber(startingPoint, STANDARD_DECIMALS, 2)}`)
+        : setUpperBoundError('')
+    }
+  }, [lowerBound, upperBound, startingPoint, lowerBoundFocus, upperBoundFocus, startingPointFocus])
 
   return (
     <>
@@ -170,8 +179,16 @@ export const CreateScalarMarket = (props: Props) => {
                 formatOnMount
                 min={0}
                 name="lowerBound"
+                onBlur={() => {
+                  setLowerBoundError('')
+                }}
                 onChange={value => {
                   handleChange(value)
+                }}
+                onFocus={() => {
+                  setLowerBoundFocus(!lowerBoundFocus)
+                  setStartingPointFocus(false)
+                  setUpperBoundFocus(false)
                 }}
                 placeholder={'0'}
                 value={lowerBound}
@@ -190,8 +207,16 @@ export const CreateScalarMarket = (props: Props) => {
                 error={upperBoundError}
                 min={0}
                 name="upperBound"
+                onBlur={() => {
+                  setUpperBoundError('')
+                }}
                 onChange={value => {
                   handleChange(value)
+                }}
+                onFocus={() => {
+                  setUpperBoundFocus(!upperBoundFocus)
+                  setLowerBoundFocus(false)
+                  setStartingPointFocus(false)
                 }}
                 placeholder={'1000'}
                 value={upperBound}
@@ -210,8 +235,16 @@ export const CreateScalarMarket = (props: Props) => {
                 error={startingPointError}
                 min={0}
                 name="startingPoint"
+                onBlur={() => {
+                  setStartingPointError('')
+                }}
                 onChange={value => {
                   handleChange(value)
+                }}
+                onFocus={() => {
+                  setStartingPointFocus(!startingPointFocus)
+                  setLowerBoundFocus(false)
+                  setUpperBoundFocus(false)
                 }}
                 placeholder={'500'}
                 value={startingPoint}
