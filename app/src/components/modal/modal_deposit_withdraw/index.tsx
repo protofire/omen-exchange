@@ -28,6 +28,7 @@ import {
   ModalNavigationLeft,
   ModalTitle,
 } from '../common_styled'
+import { ModalClaimWrapper } from '../modal_claim'
 import { ModalTransactionWrapper } from '../modal_transaction'
 
 const InputInfo = styled.p`
@@ -54,6 +55,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   formattedxDaiBalance: string
   daiBalance: BigNumber
   xDaiBalance: Maybe<BigNumber>
+  unclaimedAmount: BigNumber
 }
 
 export const ModalDepositWithdraw = (props: Props) => {
@@ -67,6 +69,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     onBack,
     onClose,
     theme,
+    unclaimedAmount,
     xDaiBalance,
   } = props
   const context = useConnectedWeb3Context()
@@ -75,6 +78,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [isClaimModalOpen, setIsClaimModalOpen] = useState<boolean>(false)
   const [txHash, setTxHash] = useState('')
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
   const [txNetId, setTxNetId] = useState()
@@ -88,7 +92,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const DAI = getToken(1, 'dai')
 
   const wallet = exchangeType === ExchangeType.deposit ? daiBalance : xDaiBalance
-  const minDeposit = exchangeType === ExchangeType.deposit ? parseEther('0.005') : parseEther('10')
+  const minDeposit = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
   const isDepositWithdrawDisabled =
     displayFundAmount.isZero() || !wallet || displayFundAmount.gt(wallet) || displayFundAmount.lt(minDeposit)
 
@@ -114,18 +118,47 @@ export const ModalDepositWithdraw = (props: Props) => {
       setTxNetId(provider.network.chainId)
       setTxHash(hash)
       await waitForConfirmations(hash, provider, setConfirmations, setTxState)
+      await fetchBalances()
+      if (exchangeType === ExchangeType.withdraw) {
+        setIsTransactionModalOpen(false)
+        setIsClaimModalOpen(true)
+      }
       setDisplayFundAmount(new BigNumber(0))
       setAmountToDisplay('')
+    } catch (e) {
+      setIsTransactionModalOpen(false)
+    }
+  }
+
+  const claim = async () => {
+    if (!cpk) {
+      return
+    }
+
+    try {
+      setMessage(`Claim ${formatBigNumber(unclaimedAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`)
+      setTxState(TransactionStep.waitingConfirmation)
+      setConfirmations(0)
+      setIsTransactionModalOpen(true)
+      setIsClaimModalOpen(false)
+
+      const transaction = await cpk.claimDaiTokens()
+
+      const provider = context.rawWeb3Context.library
+      setTxNetId(provider.network.chainId)
+      setTxHash(transaction.hash)
+      await waitForConfirmations(transaction.hash, provider, setConfirmations, setTxState, 1)
       fetchBalances()
     } catch (e) {
       setIsTransactionModalOpen(false)
+      setIsClaimModalOpen(true)
     }
   }
 
   return (
     <>
       <Modal
-        isOpen={isOpen && !isTransactionModalOpen}
+        isOpen={isOpen && !isTransactionModalOpen && !isClaimModalOpen}
         onRequestClose={onClose}
         shouldCloseOnOverlayClick={true}
         style={theme.fluidHeightModal}
@@ -210,10 +243,21 @@ export const ModalDepositWithdraw = (props: Props) => {
           </DepositWithdrawButton>
         </ContentWrapper>
       </Modal>
+      <ModalClaimWrapper
+        isOpen={isClaimModalOpen && !isTransactionModalOpen}
+        message={`Claim ${formatBigNumber(unclaimedAmount, STANDARD_DECIMALS)} DAI`}
+        onClick={() => {
+          claim()
+        }}
+        onClose={() => {
+          setIsClaimModalOpen(false)
+          onClose()
+        }}
+      />
       <ModalTransactionWrapper
         confirmations={confirmations}
         icon={DAI.image}
-        isOpen={isTransactionModalOpen}
+        isOpen={isTransactionModalOpen && !isClaimModalOpen}
         message={message}
         netId={txNetId}
         onClose={() => {

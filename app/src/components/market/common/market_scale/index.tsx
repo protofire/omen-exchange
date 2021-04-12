@@ -228,6 +228,7 @@ interface Props {
   lowerBound: BigNumber
   startingPoint?: Maybe<BigNumber>
   unit: string
+  currentAnswer?: string
   upperBound: BigNumber
   startingPointTitle: string
   currentPrediction?: Maybe<string>
@@ -247,6 +248,10 @@ interface Props {
   additionalShares?: Maybe<number>
   additionalSharesType?: Maybe<AdditionalSharesType>
   currentTab?: MarketDetailsTab
+  isBonded?: boolean
+  currentAnswerBond?: Maybe<BigNumber>
+  isClosed?: boolean
+  outcomePredictedByMarket?: Maybe<string>
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
@@ -257,14 +262,19 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     balances,
     borderTop,
     collateral,
+    currentAnswer,
+    currentAnswerBond,
     currentPrediction,
     currentTab,
     fee,
+    isBonded,
+    isClosed,
     liquidityAmount,
     liquidityTxs,
     long,
     lowerBound,
     newPrediction,
+    outcomePredictedByMarket,
     positionTable,
     short,
     startingPoint,
@@ -275,6 +285,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     unit,
     upperBound,
   } = props
+  const { networkId, relay } = useConnectedWeb3Context()
+  const { decimals: NativeDecimals, symbol: NativeSymbol } = getNativeAsset(networkId, relay)
 
   const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, STANDARD_DECIMALS))
   const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, STANDARD_DECIMALS))
@@ -283,6 +295,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const currentPredictionNumber = calcPrediction(currentPrediction || '', lowerBound, upperBound)
   const newPredictionNumber = calcPrediction(newPrediction?.toString() || '', lowerBound, upperBound)
+  const marketPredictionNumber = calcPrediction(outcomePredictedByMarket || '', lowerBound, upperBound)
 
   const amountSharesNumber =
     collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals))
@@ -414,7 +427,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     setScaleValue(Number(scaleBall?.value))
     setScaleValuePrediction(calcPrediction((Number(scaleBall?.value) / 100).toString(), lowerBound, upperBound))
   }
-
   useEffect(() => {
     setScaleValue(
       newPrediction
@@ -536,7 +548,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       isDust(longShares || new BigNumber(0), collateral.decimals))
 
   const showSingleValueBox =
-    !isAmountInputted && !(additionalShares && additionalShares > 0.000001) && currentTab !== MarketDetailsTab.sell
+    !isAmountInputted &&
+    !(additionalShares && additionalShares > 0.000001) &&
+    currentTab !== MarketDetailsTab.sell &&
+    currentTab !== MarketDetailsTab.finalize &&
+    currentTab !== MarketDetailsTab.setOutcome
 
   const showLiquidityBox =
     !!liquidityAmount && liquidityAmount.gt(0) && !!additionalShares && additionalShares > 0.000001
@@ -605,6 +621,26 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       displayAddtionalShares = parseFloat(displayAddtionalSharesString)
     }
   }
+
+  const bondedValueBoxData = [
+    {
+      title: `${
+        outcomePredictedByMarket ? marketPredictionNumber.toFixed(2) : currentPredictionNumber.toFixed(2)
+      } ${unit}`,
+      subtitle: 'Predicted Outcome',
+    },
+    {
+      title: currentAnswerBond ? `${formatBigNumber(currentAnswerBond, NativeDecimals)}  ${NativeSymbol}` : '-',
+      subtitle: 'Bonded',
+    },
+    {
+      title:
+        currentAnswer && collateral
+          ? `${formatBigNumber(new BigNumber(currentAnswer), STANDARD_DECIMALS)} ${unit}`
+          : '-',
+      subtitle: isBonded ? 'Pending Outcome' : 'Final Outcome',
+    },
+  ]
 
   const amountValueBoxData = [
     {
@@ -729,10 +765,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
             </>
           )}
-          {showSingleValueBox && <ValueBoxes valueBoxData={singleValueBoxData} />}
+          {showSingleValueBox && !isClosed && <ValueBoxes valueBoxData={singleValueBoxData} />}
         </Scale>
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
         {showLiquidityBox && <ValueBoxes valueBoxData={liquidityValueBoxData} />}
+        {(isBonded || isClosed) && <ValueBoxes valueBoxData={bondedValueBoxData} />}
       </ScaleWrapper>
       {!isPositionTableDisabled && balances && collateral && trades && (
         <PositionTable

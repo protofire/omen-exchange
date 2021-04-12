@@ -51,6 +51,7 @@ const query = gql`
       question {
         id
         data
+        currentAnswer
         answers {
           answer
           bondAggregate
@@ -100,6 +101,7 @@ type GraphResponseFixedProductMarketMaker = {
   question: {
     id: string
     data: string
+    currentAnswer: string
     answers: {
       answer: string
       bondAggregate: BigNumber
@@ -216,6 +218,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
       arbitrationOccurred: data.arbitrationOccurred,
       currentAnswerTimestamp: data.currentAnswerTimestamp ? bigNumberify(data.currentAnswerTimestamp) : null,
       currentAnswerBond: data.currentAnswerBond,
+      currentAnswer: data.currentAnswer,
       answers: data.question.answers,
       bonds: getBondedItems(outcomes, data.question.answers),
     },

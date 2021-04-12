@@ -61,7 +61,7 @@ TRExtended.defaultProps = {
 }
 
 const TDRadio = styled(TD as any)`
-  ${PaddingCSS}
+  ${PaddingCSS};
   width: 20px;
 `
 
@@ -106,6 +106,7 @@ export const OutcomeTable = (props: Props) => {
   const { networkId, relay } = context
   const nativeAsset = getNativeAsset(networkId, relay)
   let winningBondIndex = -1
+
   bonds.forEach((bond, bondIndex) => {
     if ((winningBondIndex === -1 || bonds[winningBondIndex].bondedEth.lt(bond.bondedEth)) && bond.bondedEth.gt(0)) {
       winningBondIndex = bondIndex
