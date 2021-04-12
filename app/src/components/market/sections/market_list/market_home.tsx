@@ -193,7 +193,7 @@ const Actions = styled.div`
 const BottomContents = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 20px 0px 25px 0px;
   border-top: 1px solid ${props => props.theme.borders.borderColor};
 `

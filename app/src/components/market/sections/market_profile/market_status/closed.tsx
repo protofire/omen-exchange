@@ -67,6 +67,7 @@ const StyledButtonContainer = styled(ButtonContainer)`
 
 const BorderedButtonContainer = styled(ButtonContainer)`
   ${MarginsButton};
+  border-top: 1px solid ${props => props.theme.colors.verticalDivider};
 `
 
 const SellBuyWrapper = styled.div`
@@ -485,7 +486,7 @@ const Wrapper = (props: Props) => {
                     </BorderedButtonContainer>
                   )}
                   {isConditionResolved && hasWinningOutcomes && (
-                    <BorderedButtonContainer className="border">
+                    <BorderedButtonContainer>
                       <Button
                         buttonType={ButtonType.primary}
                         disabled={status === Status.Loading}
