@@ -192,20 +192,21 @@ export const ModalConnectWallet = (props: Props) => {
       !context.account &&
       context.connectorName === Wallet.WalletConnect
     ) {
-      const uri = context.connector.walletConnector.uri
-      WalletConnectQRCodeModal.open(uri, () => {
-        // Callback passed to the onClose click of the QRCode modal
-        setConnectingToWalletConnect(false)
-        onClickCloseButton()
-        localStorage.removeItem('CONNECTOR')
-        context.unsetConnector()
-      })
+      context.connector.connect.enable()
+      // const uri = context.connector.walletConnector.uri
+      // WalletConnectQRCodeModal.open(uri, () => {
+      //   // Callback passed to the onClose click of the QRCode modal
+      //   setConnectingToWalletConnect(false)
+      //   onClickCloseButton()
+      //   localStorage.removeItem('CONNECTOR')
+      //   context.unsetConnector()
+      // })
 
-      context.connector.walletConnector.on('connect', () => {
-        setConnectingToWalletConnect(false)
-        WalletConnectQRCodeModal.close()
-        onClickCloseButton()
-      })
+      // context.connector.walletConnector.on('connect', () => {
+      //   setConnectingToWalletConnect(false)
+      //   WalletConnectQRCodeModal.close()
+      //   onClickCloseButton()
+      // })
     }
     if (connectingToWalletConnect && context.account && context.connectorName === Wallet.WalletConnect) {
       onClickCloseButton()

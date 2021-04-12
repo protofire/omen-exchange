@@ -60,6 +60,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
+
     if (safeAppInfo) {
       if (context.connectorName !== 'Safe') {
         localStorage.removeItem('CONNECTOR')
