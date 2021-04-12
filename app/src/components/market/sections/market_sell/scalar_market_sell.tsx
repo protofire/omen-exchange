@@ -233,7 +233,9 @@ export const ScalarMarketSell = (props: Props) => {
       if (!tradedCollateral) {
         return
       }
-
+      if (!cpk) {
+        return
+      }
       const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
       let displaySharesAmount = sharesAmount
       if (collateral.symbol.toLowerCase() in CompoundTokenType && amountShares && compoundService) {
@@ -246,8 +248,6 @@ export const ScalarMarketSell = (props: Props) => {
       }
       setStatus(Status.Loading)
       setMessage(`Selling ${displaySharesAmount} shares...`)
-
-      const cpk = await CPKService.create(provider)
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,

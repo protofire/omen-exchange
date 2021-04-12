@@ -694,7 +694,7 @@ class CPKService {
           transactions.push({
             to: collateral.address,
             data: encodedMintFunction,
-            value: marketData.funding,
+            value: fundingAmount.toString(),
           })
         } else {
           collateral = marketData.collateral

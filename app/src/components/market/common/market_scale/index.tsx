@@ -323,7 +323,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
   const context = useConnectedWeb3Context()
-  const { networkId } = context
 
   const { compoundService: CompoundService } = useCompoundService(collateral ? collateral : null, context)
   const compoundService = CompoundService || null
