@@ -65,8 +65,9 @@ export const useContracts = (context: ConnectedWeb3Context) => {
   )
 
   const buildMarketMaker = useMemo(
-    () => (address: string) => new MarketMakerService(address, conditionalTokens, realitio, provider, account),
-    [conditionalTokens, realitio, provider, account],
+    () => (address: string) =>
+      new MarketMakerService(address, conditionalTokens, erc20WrapperFactory, realitio, provider, account),
+    [conditionalTokens, erc20WrapperFactory, realitio, provider, account],
   )
 
   const dxTCRAddress = getContractAddress(networkId, 'dxTCR')

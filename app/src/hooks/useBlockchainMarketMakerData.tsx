@@ -126,8 +126,8 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
     } = await promiseProps({
       marketMakerShares: marketMaker.getBalanceInformation(graphMarketMakerData.address, outcomesLength),
       userShares:
-        cpk && cpk.address
-          ? marketMaker.getBalanceInformation(cpk.address, outcomesLength)
+        cpk && cpk.address && context.account
+          ? marketMaker.getBalanceInformation(context.account, outcomesLength)
           : outcomes.length
           ? outcomes.map(() => new BigNumber(0))
           : [],

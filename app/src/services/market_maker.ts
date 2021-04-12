@@ -6,6 +6,8 @@ import { calcDistributionHint, calcPrice } from '../util/tools'
 import { Market, MarketStatus, MarketWithExtraData } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
+import { ERC20Service } from './erc20'
+import { ERC20WrapperFactoryService } from './erc20_wrapper_factory'
 import { RealitioService } from './realitio'
 
 const logger = getLogger('Services::MarketMaker')
@@ -30,12 +32,14 @@ const marketMakerAbi = [
 class MarketMakerService {
   contract: Contract
   conditionalTokens: ConditionalTokenService
+  erc20WrapperFactoryService: ERC20WrapperFactoryService
   realitio: RealitioService
   provider: any
 
   constructor(
     address: string,
     conditionalTokens: ConditionalTokenService,
+    erc20WrapperFactoryService: ERC20WrapperFactoryService,
     realitio: RealitioService,
     provider: any,
     signerAddress: Maybe<string>,
@@ -49,6 +53,7 @@ class MarketMakerService {
     }
 
     this.conditionalTokens = conditionalTokens
+    this.erc20WrapperFactoryService = erc20WrapperFactoryService
     this.realitio = realitio
     this.provider = provider
   }
@@ -139,12 +144,15 @@ class MarketMakerService {
         `Balance information :: Collection ID for outcome index ${i} and condition id ${conditionId} : ${collectionId}`,
       )
       const positionIdForCollectionId = await this.conditionalTokens.getPositionId(collateralTokenAddress, collectionId)
-      const balance = await this.conditionalTokens.getBalanceOf(ownerAddress, positionIdForCollectionId)
+      const erc20WrapperAddress = await this.erc20WrapperFactoryService.wrapperForPosition(positionIdForCollectionId)
+      const erc20Wrapper = new ERC20Service(this.provider, ownerAddress, erc20WrapperAddress)
+      const balance = await erc20Wrapper.balanceOf(ownerAddress)
       logger.debug(`Balance information :: Balance ${balance.toString()}`)
       balances.push(balance)
     }
     return balances
   }
+
   getBalanceInformationByBlock = async (
     ownerAddress: any,
     outcomeQuantity: number,
@@ -161,12 +169,9 @@ class MarketMakerService {
         `Balance information :: Collection ID for outcome index ${i} and condition id ${conditionId} : ${collectionId}`,
       )
       const positionIdForCollectionId = await this.conditionalTokens.getPositionId(collateralTokenAddress, collectionId)
-
-      const balance = await this.conditionalTokens.getBalanceOfByBlock(
-        ownerAddress,
-        positionIdForCollectionId,
-        block.blockNumber,
-      )
+      const erc20WrapperAddress = await this.erc20WrapperFactoryService.wrapperForPosition(positionIdForCollectionId)
+      const erc20Wrapper = new ERC20Service(this.provider, ownerAddress, erc20WrapperAddress)
+      const balance = await erc20Wrapper.balanceOfByBlock(ownerAddress, block.blockNumber)
 
       logger.debug(`Balance information :: Balance ${balance.toString()}`)
       balances.push(balance)

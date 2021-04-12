@@ -7,6 +7,7 @@ import { getLogger } from '../util/logger'
 import { Log, Market, MarketWithExtraData } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
+import { ERC20WrapperFactoryService } from './erc20_wrapper_factory'
 import { MarketMakerService } from './market_maker'
 import { RealitioService } from './realitio'
 
@@ -162,6 +163,7 @@ class MarketMakerFactoryService {
   getMarketsWithExtraData = async (
     { from, to }: GetMarketsOptions,
     conditionalTokens: ConditionalTokenService,
+    erc20WrapperFactory: ERC20WrapperFactoryService,
     realitio: RealitioService,
   ): Promise<MarketWithExtraData[]> => {
     const markets = await this.getMarkets({ from, to })
@@ -171,6 +173,7 @@ class MarketMakerFactoryService {
         const marketMaker = new MarketMakerService(
           market.address,
           conditionalTokens,
+          erc20WrapperFactory,
           realitio,
           this.provider,
           this.signerAddress,

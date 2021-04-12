@@ -128,6 +128,14 @@ class ERC20Service {
     }
   }
 
+  balanceOf = (account: string): BigNumber => {
+    return this.contract.balanceOf(account)
+  }
+
+  balanceOfByBlock = async (account: string, block: number): Promise<BigNumber> => {
+    return this.contract.balanceOf(account, { blockTag: block })
+  }
+
   static encodeTransferFrom = (from: string, to: string, amount: BigNumber): string => {
     const transferFromInterface = new utils.Interface(erc20Abi)
 
