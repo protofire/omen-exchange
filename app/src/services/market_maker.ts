@@ -7,6 +7,7 @@ import { Market, MarketStatus, MarketWithExtraData } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'
 import { ERC20Service } from './erc20'
+import { ERC20WrapperService } from './erc20_wrapper'
 import { ERC20WrapperFactoryService } from './erc20_wrapper_factory'
 import { RealitioService } from './realitio'
 
@@ -167,8 +168,11 @@ class MarketMakerService {
         `Balance information :: Collection ID for outcome index ${i} and condition id ${conditionId} : ${collectionId}`,
       )
       const positionIdForCollectionId = await this.conditionalTokens.getPositionId(collateralTokenAddress, collectionId)
-      const erc20WrapperAddress = await this.erc20WrapperFactoryService.wrapperForPosition(positionIdForCollectionId)
-      const erc20Wrapper = new ERC20Service(this.provider, ownerAddress, erc20WrapperAddress)
+      const erc20Wrapper = new ERC20Service(
+        this.provider,
+        ownerAddress,
+        ERC20WrapperService.predictAddress(this.erc20WrapperFactoryService.address, positionIdForCollectionId),
+      )
       const balance = await erc20Wrapper.balanceOf(ownerAddress)
       logger.debug(`Balance information :: Balance ${balance.toString()}`)
       balances.push(balance)
@@ -192,8 +196,11 @@ class MarketMakerService {
         `Balance information :: Collection ID for outcome index ${i} and condition id ${conditionId} : ${collectionId}`,
       )
       const positionIdForCollectionId = await this.conditionalTokens.getPositionId(collateralTokenAddress, collectionId)
-      const erc20WrapperAddress = await this.erc20WrapperFactoryService.wrapperForPosition(positionIdForCollectionId)
-      const erc20Wrapper = new ERC20Service(this.provider, ownerAddress, erc20WrapperAddress)
+      const erc20Wrapper = new ERC20Service(
+        this.provider,
+        ownerAddress,
+        ERC20WrapperService.predictAddress(this.erc20WrapperFactoryService.address, positionIdForCollectionId),
+      )
       const balance = await erc20Wrapper.balanceOfByBlock(ownerAddress, block.blockNumber)
 
       logger.debug(`Balance information :: Balance ${balance.toString()}`)

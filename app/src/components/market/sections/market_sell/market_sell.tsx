@@ -77,7 +77,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const { networkId, relay } = context
   const cpk = useConnectedCPKContext()
   const { fetchBalances } = useConnectedBalanceContext()
-  const { buildMarketMaker, conditionalTokens } = useContracts(context)
+  const { buildMarketMaker, conditionalTokens, erc20WrapperFactory } = useContracts(context)
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, collateral, conditionId, fee, outcomeTokenAmounts } = marketMakerData
   const erc20PositionWrappers = useERC1155TokenWrappers(conditionId, outcomeTokenAmounts.length, collateral.address)
@@ -121,10 +121,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     if (!amountShares || amountShares.isZero()) return Ternary.True
     return RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountShares))
   }, [allowance, amountShares])
-  const selectedOutcomeERC20Wrapper = useMemo(() => erc20PositionWrappers[outcomeIndex], [
-    erc20PositionWrappers,
-    outcomeIndex,
-  ])
 
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
@@ -263,7 +259,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       await cpk.sellOutcomes({
         amount: tradedCollateral,
         compoundService,
-        erc20Wrapper: selectedOutcomeERC20Wrapper,
+        erc20WrapperFactory,
         outcomeIndex,
         marketMaker,
         conditionalTokens,

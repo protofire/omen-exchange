@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { ERC20Service } from '../services'
+import { ERC20WrapperService } from '../services/erc20_wrapper'
 
 import { useConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
@@ -16,8 +17,13 @@ export const useERC1155TokenWrappers = (conditionId: string, outcomesAmount: num
       for (let i = 0; i < outcomesAmount; i++) {
         const collectionId = await conditionalTokens.getCollectionIdForOutcome(conditionId, 1 << i)
         const positionId = await conditionalTokens.getPositionId(collateralAddress, collectionId)
-        const erc20WrapperAddress = await erc20WrapperFactory.wrapperForPosition(positionId)
-        wrappers.push(new ERC20Service(web3Context.library, web3Context.account, erc20WrapperAddress))
+        wrappers.push(
+          new ERC20Service(
+            web3Context.library,
+            web3Context.account,
+            ERC20WrapperService.predictAddress(erc20WrapperFactory.address, positionId),
+          ),
+        )
       }
       setWrappers(wrappers)
     }
