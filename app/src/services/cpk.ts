@@ -36,6 +36,7 @@ import { OracleService } from './oracle'
 import { OvmService } from './ovm'
 import { RealitioService } from './realitio'
 import { SafeService } from './safe'
+import { StakingService } from './staking'
 import { UnwrapTokenService } from './unwrap_token'
 import { XdaiService } from './xdai'
 
@@ -1413,6 +1414,32 @@ class CPKService {
       return txObject
     } catch (e) {
       logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)
+      throw e
+    }
+  }
+
+  stakePoolTokens = async (amount: BigNumber, campaignAddress: string, marketMakerAddress: string) => {
+    try {
+      const transactions: Transaction[] = []
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
+
+      // Approve pool tokens to be sent to campaign address
+      transactions.push({
+        to: marketMakerAddress,
+        data: ERC20Service.encodeApproveUnlimited(campaignAddress),
+      })
+
+      // Stake pool tokens
+      transactions.push({
+        to: campaignAddress,
+        data: StakingService.encodeStakePoolTokens(amount),
+      })
+
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      return txObject.hash
+    } catch (e) {
+      logger.error('Failed to stake pool tokens', e.message)
       throw e
     }
   }

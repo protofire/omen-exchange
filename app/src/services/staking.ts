@@ -1,4 +1,5 @@
-import { Contract, ethers, Wallet } from 'ethers'
+import { Contract, Wallet, ethers, utils } from 'ethers'
+import { BigNumber } from 'ethers/utils'
 
 const abi = [
   {
@@ -30,7 +31,10 @@ class StakingService {
     }
   }
 
-  stakePoolTokens = async () => {}
+  static encodeStakePoolTokens = (amount: BigNumber): string => {
+    const stakingInterface = new utils.Interface(abi)
+    return stakingInterface.functions.stake.encode([amount])
+  }
 }
 
 export { StakingService }
