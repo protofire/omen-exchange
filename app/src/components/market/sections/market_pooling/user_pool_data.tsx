@@ -67,11 +67,13 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
     <UserData>
       <UserDataTitleValue
         title="Your Liquidity"
-        value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals))} ${symbol}`}
+        value={`${formatNumber(
+          formatBigNumber(totalUserLiquidity, collateral.decimals, collateral.decimals),
+        )} ${symbol}`}
       />
       <UserDataTitleValue
         title="Total Pool Tokens"
-        value={`${formatNumber(formatBigNumber(totalPoolShares, collateral.decimals))}`}
+        value={`${formatNumber(formatBigNumber(totalPoolShares, collateral.decimals, collateral.decimals))}`}
       />
       <UserDataTitleValue
         state={userEarnings.gt(0) ? ValueStates.success : undefined}

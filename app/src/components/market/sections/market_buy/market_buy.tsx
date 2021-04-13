@@ -139,7 +139,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
-    setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals).includes('-'))
+    setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals, collateral.decimals).includes('-'))
   }, [amount, collateral.decimals])
 
   useEffect(() => {
@@ -226,10 +226,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           useBaseToken = true
         }
       }
-      const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals)
+      const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals)
       setTweet('')
       setStatus(Status.Loading)
-      setMessage(`Buying ${sharesAmount} shares...`)
+      setMessage(`Buying ${formatNumber(sharesAmount)} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
@@ -257,7 +257,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )
       setDisplayAmountToFund(new BigNumber('0'))
       setStatus(Status.Ready)
-      setMessage(`Successfully bought ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      setMessage(`Successfully bought ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
@@ -295,13 +295,19 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     displayTradedShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, tradedShares)
   }
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
-  const feeFormatted = `${formatNumber(formatBigNumber(displayFeePaid.mul(-1), displayCollateral.decimals))} ${symbol}`
-  const baseCostFormatted = `${formatNumber(formatBigNumber(displayBaseCost || Zero, displayCollateral.decimals))}
+  const feeFormatted = `${formatNumber(
+    formatBigNumber(displayFeePaid.mul(-1), displayCollateral.decimals, displayCollateral.decimals),
+  )} ${symbol}`
+  const baseCostFormatted = `${formatNumber(
+    formatBigNumber(displayBaseCost || Zero, displayCollateral.decimals, displayCollateral.decimals),
+  )}
     ${symbol}`
   const potentialProfitFormatted = `${formatNumber(
-    formatBigNumber(displayPotentialProfit, displayCollateral.decimals),
+    formatBigNumber(displayPotentialProfit, displayCollateral.decimals, displayCollateral.decimals),
   )} ${symbol}`
-  const sharesTotal = formatNumber(formatBigNumber(displayTradedShares, baseCollateral.decimals))
+  const sharesTotal = formatNumber(
+    formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals),
+  )
   const total = `${sharesTotal} Shares`
 
   const amountError = isTransactionProcessing
