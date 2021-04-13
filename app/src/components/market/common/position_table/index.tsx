@@ -58,8 +58,12 @@ export const PositionTable = (props: Props) => {
 
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
-  const shortSharesFormatted = formatNumber(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals))
-  const longSharesFormatted = formatNumber(formatBigNumber(longShares || new BigNumber(0), collateral.decimals))
+  const shortSharesFormatted = formatNumber(
+    formatBigNumber(shortShares || new BigNumber(0), collateral.decimals, collateral.decimals),
+  )
+  const longSharesFormatted = formatNumber(
+    formatBigNumber(longShares || new BigNumber(0), collateral.decimals, collateral.decimals),
+  )
 
   const isShortPositive = shortProfitLoss > 0 ? true : shortProfitLoss < 0 ? false : undefined
   const isLongPositive = longProfitLoss > 0 ? true : longProfitLoss < 0 ? false : undefined
