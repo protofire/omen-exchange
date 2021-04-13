@@ -16,34 +16,58 @@ const MetaMask = new InjectedConnector({
 
 class WalletConnectConnector extends Connectors.Connector {
   provider: any
+  connect: any
 
   onActivation(): Promise<void> {
-    this.connect = new WalletConnectProvider({
-      infuraId: INFURA_PROJECT_ID,
-    })
-    this.provider = new ethers.providers.Web3Provider(this.connect)
-
-    this.connect.on('accountsChanged', (accounts: string[]) => {
-      this.account = accounts[0]
-      this._web3ReactUpdateHandler({
-        updateAccount: true,
-        account: this.account,
+    // eslint-disable-next-line
+    return new Promise(async resolve => {
+      this.connect = new WalletConnectProvider({
+        infuraId: INFURA_PROJECT_ID,
       })
-    })
+      this.provider = new ethers.providers.Web3Provider(this.connect)
 
-    this.connect.on('chainChanged', (chainId: number) => {
-      this.networkId = chainId
-      this._web3ReactUpdateHandler({
-        updateNetworkId: true,
-        networkId: this.networkId,
+      this.connect.on('accountsChanged', (accounts: string[]) => {
+        this.account = accounts[0]
+        this._web3ReactUpdateHandler({
+          updateAccount: true,
+          account: this.account,
+        })
       })
-    })
 
-    this.connect.on('disconnect', () => {
-      this._web3ReactResetHandler()
-    })
+      this.connect.on('chainChanged', (chainId: number) => {
+        this.networkId = chainId
+        this._web3ReactUpdateHandler({
+          updateNetworkId: true,
+          networkId: this.networkId,
+        })
+      })
 
-    return this.connect.enable()
+      this.connect.onConnect(() => resolve())
+
+      // initial connection
+      if (!this.connect.connected && !this.activating) {
+        this.activating = true
+        try {
+          await this.connect.enable()
+        } catch (e) {
+          localStorage.setItem('CONNECTOR', '')
+          this.activating = false
+          if (this.onError) {
+            this.onError(e.message)
+          }
+        }
+      }
+
+      // on reload, check if already connected
+      if (this.connect.connected) {
+        resolve()
+      }
+    })
+  }
+
+  onDeactivation = () => {
+    this.activating = false
+    this.connect.disconnect()
   }
 
   getProvider = () => this.provider
@@ -53,7 +77,7 @@ class WalletConnectConnector extends Connectors.Connector {
   }
 
   public async getNetworkId(): Promise<number> {
-    return this._validateNetworkId(this.networkId)
+    return this._validateNetworkId(this.networkId || null)
   }
 }
 

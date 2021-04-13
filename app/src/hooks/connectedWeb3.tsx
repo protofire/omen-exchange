@@ -68,10 +68,8 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
         connectors.Safe.init(safeAppInfo.safeAddress, netId)
         context.setConnector('Safe')
       }
-    } else if (active) {
-      if (connector && connector in connectors) {
-        context.setConnector(connector)
-      }
+    } else if (active && connector && connector in connectors) {
+      context.setConnector(connector)
     } else if (error) {
       logger.log(error.message)
       localStorage.removeItem('CONNECTOR')
