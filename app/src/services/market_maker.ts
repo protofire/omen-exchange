@@ -130,9 +130,32 @@ class MarketMakerService {
   }
 
   /**
-   * Return the holdings of each outcome for the given address
+   * Return the raw ERC1155 holdings of each outcome for the given address (useful to query market maker holdings)
    */
-  getBalanceInformation = async (ownerAddress: string, outcomeQuantity: number): Promise<BigNumber[]> => {
+  getERC1155BalanceInformation = async (ownerAddress: string, outcomeQuantity: number): Promise<BigNumber[]> => {
+    const conditionId = await this.getConditionId()
+    const collateralTokenAddress = await this.getCollateralToken()
+
+    const balances = []
+    logger.debug(`Balance information :: Outcomes quantity ${outcomeQuantity}`)
+    for (let i = 0; i < outcomeQuantity; i++) {
+      const collectionId = await this.conditionalTokens.getCollectionIdForOutcome(conditionId, 1 << i)
+      logger.debug(
+        `Balance information :: Collection ID for outcome index ${i} and condition id ${conditionId} : ${collectionId}`,
+      )
+      const positionIdForCollectionId = await this.conditionalTokens.getPositionId(collateralTokenAddress, collectionId)
+      const balance = await this.conditionalTokens.getBalanceOf(ownerAddress, positionIdForCollectionId)
+      logger.debug(`Balance information :: Balance ${balance.toString()}`)
+      balances.push(balance)
+    }
+    return balances
+  }
+
+  /**
+   * Return the wrapped ERC1155->ERC20 holdings of each outcome for the given address
+   * (useful to query user holdings, which are always wrapped)
+   */
+  getERC20BalanceInformation = async (ownerAddress: string, outcomeQuantity: number): Promise<BigNumber[]> => {
     const conditionId = await this.getConditionId()
     const collateralTokenAddress = await this.getCollateralToken()
 

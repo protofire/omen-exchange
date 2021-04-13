@@ -1,6 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -15,9 +15,12 @@ import {
   useContracts,
   useSymbol,
 } from '../../../../hooks'
+import { useCpkAllowances } from '../../../../hooks/useCpkAllowances'
+import { useERC1155TokenWrappers } from '../../../../hooks/useERC1155TokenWrappers'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
-import { getNativeAsset, getWrapToken } from '../../../../util/networks'
+import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { RemoteData } from '../../../../util/remote_data'
 import {
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
@@ -34,6 +37,7 @@ import {
   MarketMakerData,
   OutcomeTableValue,
   Status,
+  Ternary,
   Token,
   TransactionStep,
 } from '../../../../util/types'
@@ -45,6 +49,7 @@ import { ModalTransactionWrapper } from '../../../modal'
 import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
+import { SetAllowance } from '../../common/set_allowance'
 import { SwitchTransactionToken } from '../../common/switch_transaction_token'
 import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
@@ -74,7 +79,13 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const { fetchBalances } = useConnectedBalanceContext()
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
-  const { address: marketMakerAddress, balances, collateral, fee } = marketMakerData
+  const { address: marketMakerAddress, balances, collateral, conditionId, fee, outcomeTokenAmounts } = marketMakerData
+  const erc20PositionWrappers = useERC1155TokenWrappers(conditionId, outcomeTokenAmounts.length, collateral.address)
+  const erc20PositionWrapperAddresses = useMemo(() => erc20PositionWrappers.map(wrapper => wrapper.address), [
+    erc20PositionWrappers,
+  ])
+  const cpkAllowances = useCpkAllowances(context.account, erc20PositionWrapperAddresses)
+
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
     const shares = parseInt(formatBigNumber(balances[i].shares, collateral.decimals))
@@ -101,6 +112,19 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
+  const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const allowance = useMemo(
+    () => (cpkAllowances[outcomeIndex] ? cpkAllowances[outcomeIndex].allowance : RemoteData.success(new BigNumber(0))),
+    [cpkAllowances, outcomeIndex],
+  )
+  const hasEnoughAllowance = useMemo(() => {
+    if (!amountShares || amountShares.isZero()) return Ternary.True
+    return RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountShares))
+  }, [allowance, amountShares])
+  const selectedOutcomeERC20Wrapper = useMemo(() => erc20PositionWrappers[outcomeIndex], [
+    erc20PositionWrappers,
+    outcomeIndex,
+  ])
 
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
@@ -185,6 +209,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     calcSellAmount,
   )
 
+  const unlockCollateral = useCallback(async () => {
+    if (!cpk) return
+    await cpkAllowances[outcomeIndex].unlock()
+    setAllowanceFinished(true)
+  }, [cpk, cpkAllowances, outcomeIndex])
+
   let potentialValueNormalized = potentialValue
   let costFeeNormalized = costFee
   let normalizedTradedCollateral = tradedCollateral
@@ -233,6 +263,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       await cpk.sellOutcomes({
         amount: tradedCollateral,
         compoundService,
+        erc20Wrapper: selectedOutcomeERC20Wrapper,
         outcomeIndex,
         marketMaker,
         conditionalTokens,
@@ -311,7 +342,12 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     (status !== Status.Ready && status !== Status.Error) ||
     amountShares?.isZero() ||
     amountError !== null ||
-    isNegativeAmountShares
+    isNegativeAmountShares ||
+    hasEnoughAllowance !== Ternary.True
+
+  const showSetAllowance =
+    collateral.address !== pseudoNativeAssetAddress && !cpk?.isSafeApp && hasEnoughAllowance === Ternary.False
+
   let toggleCollateral = collateral
   if (collateralSymbol in CompoundTokenType) {
     if (collateral.address === displayCollateral.address) {
@@ -449,6 +485,15 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           href={''}
           hyperlinkDescription={''}
           marginBottom={true}
+        />
+      )}
+      {showSetAllowance && (
+        <SetAllowance
+          collateral={displayCollateral}
+          description="This permission allows Omen smart contracts to interact with your Outcome Shares. This has to be done for each new Outcome Share"
+          finished={allowanceFinished && RemoteData.is.success(allowance)}
+          loading={RemoteData.is.asking(allowance)}
+          onUnlock={unlockCollateral}
         />
       )}
       <StyledButtonContainer borderTop={true} marginTop={isNegativeAmountShares}>

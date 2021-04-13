@@ -30,6 +30,7 @@ import { MarketData, Question, Token, TransactionStep } from '../util/types'
 import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
 import { ERC20Service } from './erc20'
+import { ERC20WrapperService } from './erc20_wrapper'
 import { ERC20WrapperFactoryService } from './erc20_wrapper_factory'
 import { MarketMakerService } from './market_maker'
 import { MarketMakerFactoryService } from './market_maker_factory'
@@ -60,6 +61,7 @@ interface CPKBuyOutcomesParams {
 interface CPKSellOutcomesParams {
   amount: BigNumber
   compoundService?: CompoundService | null
+  erc20Wrapper: ERC20WrapperService
   outcomeIndex: number
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
@@ -853,6 +855,7 @@ class CPKService {
     amount,
     compoundService,
     conditionalTokens,
+    erc20Wrapper,
     marketMaker,
     outcomeIndex,
     setTxHash,
@@ -867,8 +870,6 @@ class CPKService {
       const collateralAddress = await marketMaker.getCollateralToken()
 
       const transactions: Transaction[] = []
-      const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
 
       const network = await this.provider.getNetwork()
       const networkId = network.chainId
@@ -889,6 +890,18 @@ class CPKService {
         this.cpk.address,
         marketMaker.address,
       )
+
+      // Transfer wrapped ERC20 tokens from signer to CPK (requires approval)
+      transactions.push({
+        to: erc20Wrapper.address,
+        data: ERC20Service.encodeTransferFrom(account, this.cpk.address, outcomeTokensToSell),
+      })
+
+      // Unwrap ERC20 tokens to get back underlying ERC1155s
+      transactions.push({
+        to: erc20Wrapper.address,
+        data: ERC20WrapperService.encodeWithdraw(outcomeTokensToSell),
+      })
 
       if (!isAlreadyApprovedForMarketMaker) {
         transactions.push({
@@ -952,7 +965,7 @@ class CPKService {
         }
       }
 
-      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+      return this.execTransactions(transactions, {}, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error selling '${amount.toString()}' of shares`, err.message)
       throw err

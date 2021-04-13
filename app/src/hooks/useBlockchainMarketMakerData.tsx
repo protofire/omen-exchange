@@ -124,10 +124,10 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       userPoolShares,
       userShares,
     } = await promiseProps({
-      marketMakerShares: marketMaker.getBalanceInformation(graphMarketMakerData.address, outcomesLength),
+      marketMakerShares: marketMaker.getERC1155BalanceInformation(graphMarketMakerData.address, outcomesLength),
       userShares:
         cpk && cpk.address && context.account
-          ? marketMaker.getBalanceInformation(context.account, outcomesLength)
+          ? marketMaker.getERC20BalanceInformation(context.account, outcomesLength)
           : outcomes.length
           ? outcomes.map(() => new BigNumber(0))
           : [],
@@ -167,6 +167,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       arbitrator,
       balances,
       collateral,
+      conditionId: graphMarketMakerData.conditionId,
       creator: graphMarketMakerData.creator,
       fee: graphMarketMakerData.fee,
       collateralVolume: graphMarketMakerData.collateralVolume,
@@ -199,7 +200,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
     setMarketMakerData(newMarketMakerData)
     setStatus(Status.Ready)
-  }, [graphMarketMakerData, provider, contracts, networkId, cpk])
+  }, [context.account, graphMarketMakerData, provider, contracts, networkId, cpk])
 
   const fetchData = useCallback(async () => {
     try {

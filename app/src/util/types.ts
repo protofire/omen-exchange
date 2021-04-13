@@ -287,6 +287,7 @@ export interface MarketMakerData {
   userInputCollateral: Token | null
   creator: string
   fee: BigNumber
+  conditionId: string
   isConditionResolved: boolean
   isQuestionFinalized: boolean
   collateralVolume: BigNumber

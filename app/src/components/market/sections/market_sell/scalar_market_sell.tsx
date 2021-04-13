@@ -13,6 +13,7 @@ import {
   useSymbol,
 } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
+import { ERC20WrapperService } from '../../../../services/erc20_wrapper'
 import { getLogger } from '../../../../util/logger'
 import {
   calcPrediction,
@@ -190,6 +191,8 @@ export const ScalarMarketSell = (props: Props) => {
       await cpk.sellOutcomes({
         amount: tradedCollateral,
         conditionalTokens,
+        // TODO: actually implement allowance check for scalar markets
+        erc20Wrapper: new ERC20WrapperService('0x0', context.library),
         marketMaker,
         outcomeIndex,
         setTxHash,
