@@ -51,6 +51,19 @@ const abi = [
     stateMutability: 'view',
     type: 'function',
   },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_recipient',
+        type: 'address',
+      },
+    ],
+    name: 'claimAll',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
 ]
 
 class StakingService {
@@ -79,6 +92,11 @@ class StakingService {
   static encodeWithdrawStakedPoolTokens = (amount: BigNumber) => {
     const stakingInterface = new utils.Interface(abi)
     return stakingInterface.functions.withdraw.encode([amount])
+  }
+
+  static encodeClaimAll = (address: string) => {
+    const stakingInterface = new utils.Interface(abi)
+    return stakingInterface.functions.claimAll.encode([address])
   }
 }
 
