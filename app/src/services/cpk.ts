@@ -1,6 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
-import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
+import { BigNumber, bigNumberify, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
 import { RELAY_ADDRESS, RELAY_FEE, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
@@ -10,6 +10,7 @@ import {
   getBySafeTx,
   getContractAddress,
   getNativeAsset,
+  getOMNToken,
   getTargetSafeImplementation,
   getToken,
   getTokenFromAddress,
@@ -1465,6 +1466,11 @@ class CPKService {
 
   claimRewardTokens = async (campaignAddress: string) => {
     try {
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
+
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
@@ -1473,6 +1479,28 @@ class CPKService {
         to: campaignAddress,
         data: StakingService.encodeClaimAll(this.cpk.address),
       })
+
+      // If relay used, keep reward tokens in relay
+      if (!this.cpk.relay) {
+        const omnToken = getOMNToken(networkId).address
+        const erc20Service = new ERC20Service(this.provider, this.cpk.address, omnToken)
+        const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(this.cpk.address, account, new BigNumber(1))
+
+        // Approve unlimited if not already done
+        if (!hasEnoughAllowance) {
+          transactions.push({
+            to: omnToken,
+            data: ERC20Service.encodeApproveUnlimited(account),
+          })
+        }
+
+        // Transfer all rewards from cpk to EOA
+        const claimableRewards = await erc20Service.getCollateral(this.cpk.address)
+        transactions.push({
+          to: omnToken,
+          data: ERC20Service.encodeTransfer(account, claimableRewards),
+        })
+      }
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
       return txObject.hash
