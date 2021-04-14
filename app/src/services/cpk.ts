@@ -1415,14 +1415,13 @@ class CPKService {
           transactions.push({
             to: GEN_XDAI_ADDRESS_TESTING,
             data: XdaiService.encodeOmnTokenClaim(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
-            value: RELAY_FEE,
           })
         }
         console.log(transactions)
         console.log(txOptions)
-        const txObject = await this.cpk.execTransactions(transactions, txOptions)
+        const txObject = await this.execTransactions(transactions, txOptions)
         console.log('txObject', txObject)
-        return txObject.hash
+        return txObject
       } else {
         const xDaiService = new XdaiService(this.provider)
         const transaction = await xDaiService.sendXdaiToBridge(amount)

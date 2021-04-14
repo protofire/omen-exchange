@@ -134,6 +134,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           : await cpk.sendXdaiToBridge(displayFundAmount, currencySelected)
 
       const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
+      console.log('probider', provider)
       setTxNetId(provider.network.chainId)
       setTxHash(hash)
       await waitForConfirmations(hash, provider, setConfirmations, setTxState)
