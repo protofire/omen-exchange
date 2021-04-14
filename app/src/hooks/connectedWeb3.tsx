@@ -2,7 +2,7 @@ import { providers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
-import connectors, { handleGsMultiSend } from '../util/connectors'
+import connectors from '../util/connectors'
 import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
@@ -77,8 +77,6 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     } else {
       context.setConnector('Infura')
     }
-
-    handleGsMultiSend()
 
     // disabled block tracker
     if (context.connector) {
