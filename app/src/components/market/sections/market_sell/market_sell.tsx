@@ -205,7 +205,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     calcSellAmount,
   )
 
-  const unlockCollateral = useCallback(async () => {
+  const unlockWrappedToken = useCallback(async () => {
     if (!cpk) return
     await cpkAllowances[outcomeIndex].unlock()
     setAllowanceFinished(true)
@@ -489,7 +489,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           description="This permission allows Omen smart contracts to interact with your Outcome Shares. This has to be done for each new Outcome Share"
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
-          onUnlock={unlockCollateral}
+          onUnlock={unlockWrappedToken}
+          style={{ marginBottom: 20 }}
         />
       )}
       <StyledButtonContainer borderTop={true} marginTop={isNegativeAmountShares}>
