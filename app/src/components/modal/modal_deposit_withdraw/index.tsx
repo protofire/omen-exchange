@@ -4,9 +4,9 @@ import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { GEN_TOKEN_ADDDRESS_TESTING, STANDARD_DECIMALS } from '../../../common/constants'
-import { useCollateral, useCollateralBalance, useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
-import { getToken } from '../../../util/networks'
+import { STANDARD_DECIMALS } from '../../../common/constants'
+import { useCollateralBalance, useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
+import { getToken, networkIds } from '../../../util/networks'
 import { formatBigNumber, waitForConfirmations } from '../../../util/tools'
 import { ExchangeCurrency, ExchangeType, TransactionStep } from '../../../util/types'
 import { Button } from '../../button'
@@ -75,10 +75,16 @@ export const ModalDepositWithdraw = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
 
-  const collateral = useCollateralBalance(
-    { address: '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599', decimals: 18, symbol: 'GEN' },
-    context,
-  )
+  // const collateral = useCollateralBalance(
+  //   {
+  //     address: context.relay
+  //       ? '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599'
+  //       : '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
+  //     decimals: 18,
+  //     symbol: 'GEN',
+  //   },
+  //   context,
+  // )
 
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
@@ -114,7 +120,9 @@ export const ModalDepositWithdraw = (props: Props) => {
 
     try {
       setMessage(
-        `${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`,
+        `${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), DAI.decimals)} ${
+          currencySelected === ExchangeCurrency.Dai ? DAI.symbol : 'OMN'
+        }`,
       )
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
@@ -227,9 +235,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                     <BalanceItemTitle>Omen</BalanceItemTitle>
                   </BalanceItemSide>
                   <BalanceItemSide>
-                    <BalanceItemBalance>
-                      {collateral.collateralBalance && formatBigNumber(collateral.collateralBalance, 18)} GEN
-                    </BalanceItemBalance>
+                    <BalanceItemBalance>{formatBigNumber(Zero, 18)} GEN</BalanceItemBalance>
                   </BalanceItemSide>
                 </BalanceItem>
               </BalanceItems>

@@ -3,7 +3,14 @@ import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
-import { RELAY_ADDRESS, RELAY_FEE, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
+import {
+  GEN_TOKEN_ADDDRESS_TESTING,
+  GEN_XDAI_ADDRESS_TESTING,
+  OMNI_BRIDGE_XDAI_ADDRESS,
+  RELAY_ADDRESS,
+  RELAY_FEE,
+  XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
+} from '../common/constants'
 import { Transaction, verifyProxyAddress } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
@@ -21,7 +28,6 @@ import {
 import {
   calcDistributionHint,
   clampBigNumber,
-  formatBigNumber,
   getBaseTokenForCToken,
   signaturesFormatted,
   waitABit,
@@ -238,13 +244,17 @@ class CPKService {
     setTxHash?: (arg0: string) => void,
     setTxState?: (step: TransactionStep) => void,
   ) => {
+    console.log('here')
     if (this.cpk.relay) {
       // pay tx fee
+      console.log('work relay fee')
       transactions.push({
         to: RELAY_ADDRESS,
         value: RELAY_FEE,
       })
     }
+    console.log(transactions)
+    console.log('after rekay')
     const txObject = await this.cpk.execTransactions(transactions, txOptions)
     setTxState && setTxState(TransactionStep.transactionSubmitted)
     setTxHash && setTxHash(txObject.hash)
@@ -1325,6 +1335,23 @@ class CPKService {
       throw err
     }
   }
+  approveCpk = async () => {
+    try {
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
+      console.log(this.cpk.address)
+      console.log(ERC20Service)
+      const transactions: Transaction[] = [
+        {
+          to: GEN_XDAI_ADDRESS_TESTING,
+          data: ERC20Service.encodeApproveUnlimited(OMNI_BRIDGE_XDAI_ADDRESS),
+        },
+      ]
+      return this.execTransactions(transactions)
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   sendDaiToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
     try {
@@ -1339,7 +1366,11 @@ class CPKService {
         // verify proxy address before deposit
         await verifyProxyAddress(sender, receiver, this.cpk)
 
-        const transaction = await contract.relayTokens(sender, receiver, amount)
+        const transaction = await contract.relayTokens(
+          currency === ExchangeCurrency.Omen ? GEN_TOKEN_ADDDRESS_TESTING : sender,
+          receiver,
+          amount,
+        )
         return transaction.hash
       } else {
         console.log(currency)
@@ -1363,15 +1394,34 @@ class CPKService {
 
         // get mainnet relay signer
         const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
+        console.log(to)
 
         // relay to signer address on mainnet
-        transactions.push({
-          to: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
-          data: XdaiService.encodeRelayTokens(to),
-          value: amount.toString(),
-        })
-
+        if (currency === ExchangeCurrency.Dai) {
+          transactions.push({
+            to: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
+            data: XdaiService.encodeRelayTokens(to),
+            value: amount.toString(),
+          })
+        } else {
+          console.log('here')
+          // transactions.push({
+          //   to: GEN_XDAI_ADDRESS_TESTING,
+          //   data: XdaiService.encodeOmnTokenClaim(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
+          // })
+          console.log(this.cpk)
+          console.log(to)
+          console.log(amount)
+          transactions.push({
+            to: GEN_XDAI_ADDRESS_TESTING,
+            data: XdaiService.encodeOmnTokenClaim(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
+            value: RELAY_FEE,
+          })
+        }
+        console.log(transactions)
+        console.log(txOptions)
         const txObject = await this.cpk.execTransactions(transactions, txOptions)
+        console.log('txObject', txObject)
         return txObject.hash
       } else {
         const xDaiService = new XdaiService(this.provider)

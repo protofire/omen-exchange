@@ -18,8 +18,7 @@ import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconClose, IconMetaMask, IconOmen, IconWalletConnect } from '../../common/icons'
 import { IconJazz } from '../../common/icons/IconJazz'
-import { DaiIcon, EtherIcon } from '../../common/icons/currencies'
-import { OmenLogo } from '../../common/logos/omen'
+import { DaiIcon } from '../../common/icons/currencies'
 import {
   BalanceItem,
   BalanceItemBalance,
@@ -226,7 +225,13 @@ export const ModalYourConnection = (props: Props) => {
   }
 
   const approve = async () => {
-    if (!relay) {
+    if (relay) {
+      setMessage(`Enable OMN`)
+      setTxState(TransactionStep.waitingConfirmation)
+      setConfirmations(0)
+      setIsTransactionModalOpen(true)
+      const hash = await cpk?.approveCpk()
+      console.log(hash)
       return
     }
     try {
@@ -236,6 +241,8 @@ export const ModalYourConnection = (props: Props) => {
       setIsTransactionModalOpen(true)
       const owner = context.rawWeb3Context.account
       const provider = context.rawWeb3Context.library
+      console.log(owner)
+      console.log(provider)
       const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, GEN_TOKEN_ADDDRESS_TESTING)
       const { transactionHash } = await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS, true)
       if (transactionHash) {

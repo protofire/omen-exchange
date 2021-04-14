@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { Contract, ethers, utils } from 'ethers'
+import { MaxUint256 } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 
 import {
@@ -53,21 +54,21 @@ const abi = [
     type: 'function',
   },
 ]
-const omni_abi = [
-  {
-    constant: false,
-    inputs: [
-      { name: 'token', type: 'address' },
-      { name: '_receiver', type: 'address' },
-      { name: '_value', type: 'uint256' },
-    ],
-    name: 'relayTokens',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-]
+// const omni_abi = [
+//   {
+//     constant: false,
+//     inputs: [
+//       { name: 'token', type: 'address' },
+//       { name: '_receiver', type: 'address' },
+//       { name: '_value', type: 'uint256' },
+//     ],
+//     name: 'relayTokens',
+//     outputs: [],
+//     payable: false,
+//     stateMutability: 'nonpayable',
+//     type: 'function',
+//   },
+// ]
 const xdaiBridgeAbi = [
   {
     type: 'function',
@@ -100,6 +101,45 @@ const multiClaimAbi = [
     type: 'function',
   },
 ]
+const omenAbi = [
+  {
+    type: 'function',
+    stateMutability: 'nonpayable',
+    payable: false,
+    outputs: [{ type: 'bool', name: '' }],
+    name: 'transferAndCall',
+    inputs: [
+      { type: 'address', name: '_to' },
+      { type: 'uint256', name: '_value' },
+      { type: 'bytes', name: '_data' },
+    ],
+    constant: false,
+  },
+]
+const approveAbi = [
+  {
+    type: 'function',
+    stateMutability: 'nonpayable',
+    payable: false,
+    outputs: [{ type: 'bool', name: '' }],
+    name: 'approve',
+    inputs: [
+      { type: 'address', name: '_spender' },
+      { type: 'uint256', name: '_value' },
+    ],
+    constant: false,
+  },
+
+  {
+    type: 'function',
+    stateMutability: 'nonpayable',
+    payable: false,
+    outputs: [],
+    name: 'transferOwnership',
+    inputs: [{ type: 'address', name: '_newOwner' }],
+    constant: false,
+  },
+]
 
 class XdaiService {
   provider: any
@@ -109,7 +149,6 @@ class XdaiService {
   constructor(provider: any) {
     this.provider = provider
     this.abi = abi
-    this.omniAbi = omni_abi
   }
 
   generateErc20ContractInstance = async (currency?: ExchangeCurrency) => {
@@ -127,11 +166,10 @@ class XdaiService {
 
   generateXdaiBridgeContractInstance = (currency?: ExchangeCurrency) => {
     const signer = this.provider.relay ? this.provider.signer.signer : this.provider.signer
-    console.log(signer)
-    console.log(currency === ExchangeCurrency.Omen ? OMNI_BRIDGE_MAINNET_ADDRESS : DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
+
     return new ethers.Contract(
       currency === ExchangeCurrency.Omen ? OMNI_BRIDGE_MAINNET_ADDRESS : DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
-      this.omniAbi,
+      this.abi,
       signer,
     )
   }
@@ -151,7 +189,9 @@ class XdaiService {
   sendXdaiToBridge = async (amount: BigNumber) => {
     try {
       const signer = this.provider.getSigner()
+
       const account = await signer.getAddress()
+
       const params = [
         {
           from: account,
@@ -176,10 +216,25 @@ class XdaiService {
     const transferFromInterface = new utils.Interface(xdaiBridgeAbi)
     return transferFromInterface.functions.relayTokens.encode([receiver])
   }
+  static encodeApprove = (address: any, value: any) => {
+    const transferFromInterface = new utils.Interface(approveAbi)
+    return transferFromInterface.functions.approve.encode([address, value])
+  }
+  static encodeRelayTokensThree = (token: any, reciever: any, amount: any) => {
+    const transferFromInterface = new utils.Interface(abi)
+    return transferFromInterface.functions.relayTokens.encode([token, reciever, amount])
+  }
 
   encodeClaimDaiTokens = (message: string, signatures: string): string => {
     const transferFromInterface = new utils.Interface(abi)
     return transferFromInterface.functions.executeSignatures.encode([message, signatures])
+  }
+  static encodeOmnTokenClaim = (reciever: string, amount: BigNumber, data: any) => {
+    const transferFromInterface = new utils.Interface(omenAbi)
+    console.log(reciever)
+    console.log(amount)
+    console.log(data)
+    return transferFromInterface.functions.transferAndCall.encode([reciever, amount, data])
   }
 
   fetchCrossChainBalance = async (chain: number) => {
