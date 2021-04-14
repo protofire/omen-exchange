@@ -236,7 +236,7 @@ const MarketHomeContainer: React.FC = () => {
   const defaultCpkAddress = context.relay ? context.account : null
   const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(defaultCpkAddress)
 
-  const pageSize = 12
+  const PAGE_SIZE = 12
   const [pageIndex, setPageIndex] = useState(0)
 
   const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
@@ -249,7 +249,7 @@ const MarketHomeContainer: React.FC = () => {
   const fetchMyMarkets = filter.state === MarketStates.myMarkets
 
   const marketsQueryVariables = {
-    first: pageSize,
+    first: PAGE_SIZE,
     skip: pageIndex,
     accounts: cpkAddress ? [cpkAddress] : null,
     account: (cpkAddress && cpkAddress.toLowerCase()) || '',
@@ -303,7 +303,7 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(RemoteData.failure(error))
       setIsFiltering(false)
     }
-  }, [fetchedMarkets, loading, error, context.networkId, pageSize, pageIndex])
+  }, [fetchedMarkets, loading, error, context.networkId, PAGE_SIZE, pageIndex])
 
   useEffect(() => {
     if (categoriesLoading) {
@@ -400,7 +400,7 @@ const MarketHomeContainer: React.FC = () => {
       return
     }
 
-    setPageIndex(pageIndex + pageSize)
+    setPageIndex(pageIndex + PAGE_SIZE)
   }
 
   const loadPrevPage = () => {
@@ -408,7 +408,7 @@ const MarketHomeContainer: React.FC = () => {
       return
     }
 
-    setPageIndex(pageIndex - pageSize)
+    setPageIndex(pageIndex - PAGE_SIZE)
   }
 
   return (
