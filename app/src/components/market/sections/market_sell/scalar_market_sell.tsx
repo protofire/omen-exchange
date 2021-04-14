@@ -1,6 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber, parseUnits } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
@@ -12,8 +12,12 @@ import {
   useContracts,
   useSymbol,
 } from '../../../../hooks'
+import { useCpkAllowances } from '../../../../hooks/useCpkAllowances'
+import { useERC1155TokenWrappers } from '../../../../hooks/useERC1155TokenWrappers'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
+import { pseudoNativeAssetAddress } from '../../../../util/networks'
+import { RemoteData } from '../../../../util/remote_data'
 import {
   calcPrediction,
   calcSellAmountInCollateral,
@@ -24,7 +28,14 @@ import {
   getUnit,
   mulBN,
 } from '../../../../util/tools'
-import { BalanceItem, MarketDetailsTab, MarketMakerData, Status, TransactionStep } from '../../../../util/types'
+import {
+  BalanceItem,
+  MarketDetailsTab,
+  MarketMakerData,
+  Status,
+  Ternary,
+  TransactionStep,
+} from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -34,6 +45,7 @@ import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
 import { PositionSelectionBox } from '../../common/position_selection_box'
+import { SetAllowance } from '../../common/set_allowance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
@@ -68,6 +80,7 @@ export const ScalarMarketSell = (props: Props) => {
     address: marketMakerAddress,
     balances,
     collateral,
+    conditionId,
     fee,
     outcomeTokenMarginalPrices,
     question,
@@ -76,6 +89,11 @@ export const ScalarMarketSell = (props: Props) => {
   } = marketMakerData
   const { buildMarketMaker, conditionalTokens, erc20WrapperFactory } = useContracts(context)
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
+  const erc20PositionWrappers = useERC1155TokenWrappers(conditionId, 2, collateral.address)
+  const erc20PositionWrapperAddresses = useMemo(() => erc20PositionWrappers.map(wrapper => wrapper.address), [
+    erc20PositionWrappers,
+  ])
+  const cpkAllowances = useCpkAllowances(context.account, erc20PositionWrapperAddresses)
 
   const [positionIndex, setPositionIndex] = useState(balances[0].shares.gte(balances[1].shares) ? 0 : 1)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[positionIndex])
@@ -87,6 +105,19 @@ export const ScalarMarketSell = (props: Props) => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
+  const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const allowance = useMemo(
+    () =>
+      cpkAllowances[positionIndex] ? cpkAllowances[positionIndex].allowance : RemoteData.success(new BigNumber(0)),
+    [cpkAllowances, positionIndex],
+  )
+  const hasEnoughAllowance = useMemo(() => {
+    if (!amountShares || amountShares.isZero()) return Ternary.True
+    return RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountShares))
+  }, [allowance, amountShares])
+
+  const showSetAllowance =
+    collateral.address !== pseudoNativeAssetAddress && !cpk?.isSafeApp && hasEnoughAllowance === Ternary.False
 
   const symbol = useSymbol(collateral)
 
@@ -106,6 +137,12 @@ export const ScalarMarketSell = (props: Props) => {
     setAmountSharesToDisplay('')
     // eslint-disable-next-line
   }, [collateral.address])
+
+  const unlockWrappedToken = useCallback(async () => {
+    if (!cpk) return
+    await cpkAllowances[positionIndex].unlock()
+    setAllowanceFinished(true)
+  }, [cpk, cpkAllowances, positionIndex])
 
   const calcSellAmount = useMemo(
     () => async (
@@ -190,7 +227,6 @@ export const ScalarMarketSell = (props: Props) => {
       await cpk.sellOutcomes({
         amount: tradedCollateral,
         conditionalTokens,
-        // TODO: actually implement allowance check for scalar markets
         erc20WrapperFactory,
         marketMaker,
         outcomeIndex,
@@ -330,6 +366,16 @@ export const ScalarMarketSell = (props: Props) => {
           description={`Your sell amount should not be negative.`}
           href={''}
           hyperlinkDescription={''}
+        />
+      )}
+      {showSetAllowance && (
+        <SetAllowance
+          collateral={collateral}
+          description="This permission allows Omen smart contracts to interact with your Outcome Shares. This has to be done for each new Outcome Share"
+          finished={allowanceFinished && RemoteData.is.success(allowance)}
+          loading={RemoteData.is.asking(allowance)}
+          onUnlock={unlockWrappedToken}
+          style={{ marginBottom: 20 }}
         />
       )}
       <StyledButtonContainer>
