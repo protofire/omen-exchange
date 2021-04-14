@@ -179,6 +179,7 @@ export const ModalYourConnection = (props: Props) => {
   } = props
 
   const context = useConnectedWeb3Context()
+  const owner = context.rawWeb3Context.account
   const cpk = useConnectedCPKContext()
 
   const { account, networkId, relay } = context
@@ -218,8 +219,6 @@ export const ModalYourConnection = (props: Props) => {
   const DAI = getToken(1, 'dai')
 
   const fetchAllowance = async () => {
-    const owner = context.rawWeb3Context.account
-
     if (relay && owner && context.rawWeb3Context.networkId === networkIds.MAINNET) {
       const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, DAI.address)
       const allowance = await collateralService.allowance(owner, DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
@@ -236,7 +235,6 @@ export const ModalYourConnection = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
       setIsTransactionModalOpen(true)
-      const owner = context.rawWeb3Context.account
       const provider = context.rawWeb3Context.library
       const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, DAI.address)
       const { transactionHash } = await collateralService.approveUnlimited(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, true)
@@ -289,12 +287,10 @@ export const ModalYourConnection = (props: Props) => {
               <TopCardHeaderLeft>
                 <ConnectionIconWrapper>
                   <ConnectorCircle>{connectorIcon}</ConnectorCircle>
-                  <IconJazz account={context.rawWeb3Context.account || ''} size={28} />
+                  <IconJazz account={owner || ''} size={28} />
                 </ConnectionIconWrapper>
                 <AccountInfo>
-                  <AccountInfoAddress>
-                    {truncateStringInTheMiddle(context.rawWeb3Context.account || '', 5, 3)}
-                  </AccountInfoAddress>
+                  <AccountInfoAddress>{truncateStringInTheMiddle(owner || '', 5, 3)}</AccountInfoAddress>
                   <AccountInfoWallet>{context.rawWeb3Context.connectorName}</AccountInfoWallet>
                 </AccountInfo>
               </TopCardHeaderLeft>
