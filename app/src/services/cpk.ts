@@ -1477,7 +1477,26 @@ class CPKService {
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
       return txObject.hash
     } catch (e) {
-      logger.error('Failed to withdraw staked pool tokens', e.message)
+      logger.error('Failed to claim reward tokens', e.message)
+      throw e
+    }
+  }
+
+  withdrawStakedAndClaim = async (campaignAddress: string) => {
+    try {
+      const transactions: Transaction[] = []
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
+
+      transactions.push({
+        to: campaignAddress,
+        data: StakingService.encodeExit(this.cpk.address),
+      })
+
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      return txObject.hash
+    } catch (e) {
+      logger.error('Failed to withdraw staked pool tokens and claim reward tokens', e.message)
       throw e
     }
   }
