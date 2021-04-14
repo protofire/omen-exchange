@@ -5,6 +5,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../../common/constants'
 import {
   useConnectedBalanceContext,
   useConnectedCPKContext,
@@ -15,7 +16,7 @@ import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/con
 import { ERC20Service } from '../../../../../services'
 import { CompoundService } from '../../../../../services/compound_service'
 import { getLogger } from '../../../../../util/logger'
-import { getUnit, isDust } from '../../../../../util/tools'
+import { formatBigNumber, getUnit, isDust } from '../../../../../util/tools'
 import {
   CompoundTokenType,
   INVALID_ANSWER_ID,
@@ -347,7 +348,16 @@ const Wrapper = (props: Props) => {
     cpk?.address.toLowerCase(),
   )
 
-  const unclampedFinalAnswerPercentage = realitioAnswer && realitioAnswer.eq(MaxUint256) ? 0.5 : balances[1].payout
+  const realitioAnswerNumber = Number(formatBigNumber(realitioAnswer || new BigNumber(0), STANDARD_DECIMALS))
+  const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), STANDARD_DECIMALS))
+  const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), STANDARD_DECIMALS))
+
+  const unclampedFinalAnswerPercentage =
+    realitioAnswer && realitioAnswer.eq(MaxUint256)
+      ? 0.5
+      : isConditionResolved
+      ? balances[1].payout
+      : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
 
   const finalAnswerPercentage =
     unclampedFinalAnswerPercentage > 1 ? 1 : unclampedFinalAnswerPercentage < 0 ? 0 : unclampedFinalAnswerPercentage
