@@ -185,7 +185,7 @@ export const ModalConnectWallet = (props: Props) => {
   }, [onClose, resetEverything])
   useEffect(() => {
     if (connectingToWalletConnect) {
-      // connectors.WalletConnect.connect.onConnect(() => onClickCloseButton())
+      connectors.WalletConnect.connect.onConnect(() => onClickCloseButton())
       connectors.WalletConnect.onError = () => onClickCloseButton()
     }
     if (connectingToWalletConnect && context.account && context.connectorName === Wallet.WalletConnect) {
@@ -193,7 +193,6 @@ export const ModalConnectWallet = (props: Props) => {
       setConnectingToWalletConnect(false)
     }
   }, [context, onClickCloseButton, connectingToWalletConnect])
-
   useEffect(() => {
     if (connectingToMetamask && context.account && context.connectorName === Wallet.MetaMask) {
       onClickCloseButton()
