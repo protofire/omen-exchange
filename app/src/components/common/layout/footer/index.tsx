@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { version as appVersion } from '../../../../../package.json'
 import { DISCLAIMER_TEXT, DOCUMENT_FAQ, DOCUMENT_VALIDITY_RULES, SHOW_FOOTER } from '../../../../common/constants'
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { getContractBlockExplorerURL } from '../../../../util/networks'
 
 const Wrapper = styled.div<{ paddingBottomSmall?: boolean }>`
   align-items: center;
@@ -43,12 +44,19 @@ const Break = styled.span`
 export const Footer = () => {
   const context = useConnectedWeb3Context()
   const { marketMakerFactory } = useContracts(context)
+
   return SHOW_FOOTER ? (
     <>
       <Wrapper paddingBottomSmall={DISCLAIMER_TEXT ? true : false}>
         <Link href="https://github.com/protofire/gnosis-conditional-exchange">Version {appVersion}</Link>
         <Break>·</Break>
-        <Link href={`https://etherscan.io/address/${marketMakerFactory.address}`}>Omen Contract</Link>
+        <Link
+          href={getContractBlockExplorerURL(context.networkId, marketMakerFactory.address)}
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Omen Contract
+        </Link>
         <Break>·</Break>
         <Link href="https://explore.duneanalytics.com/dashboard/omen-stats" rel="noopener noreferrer" target="_blank">
           Statistics

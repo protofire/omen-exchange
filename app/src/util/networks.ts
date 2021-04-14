@@ -141,7 +141,7 @@ const networks: { [K in NetworkId]: Network } = {
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
-    blockExplorerURL: 'https://etherscan.io/tx/',
+    blockExplorerURL: 'https://etherscan.io',
   },
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
@@ -187,7 +187,7 @@ const networks: { [K in NetworkId]: Network } = {
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
-    blockExplorerURL: 'https://rinkeby.etherscan.io/tx/',
+    blockExplorerURL: 'https://rinkeby.etherscan.io',
   },
   [networkIds.SOKOL]: {
     label: 'Sokol',
@@ -232,7 +232,7 @@ const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
     blockExplorer: 'blockscout',
-    blockExplorerURL: 'https://blockscout.com/poa/sokol/tx/',
+    blockExplorerURL: 'https://blockscout.com/poa/sokol',
   },
   [networkIds.XDAI]: {
     label: 'xDai',
@@ -282,7 +282,7 @@ const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     blockExplorer: 'blockscout',
-    blockExplorerURL: 'https://blockscout.com/poa/xdai/tx/',
+    blockExplorerURL: 'https://blockscout.com/poa/xdai',
   },
 }
 
@@ -850,5 +850,12 @@ export const getTxHashBlockExplorerURL = (networkId: number, txHash: string): st
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
-  return `${networks[networkId].blockExplorerURL}${txHash}`
+  return `${networks[networkId].blockExplorerURL}/tx/${txHash}`
+}
+
+export const getContractBlockExplorerURL = (networkId: number, contractAddress: string): string => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return `${networks[networkId].blockExplorerURL}/address/${contractAddress}`
 }
