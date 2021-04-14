@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import { version as appVersion } from '../../../../../package.json'
 import { DISCLAIMER_TEXT, DOCUMENT_FAQ, DOCUMENT_VALIDITY_RULES, SHOW_FOOTER } from '../../../../common/constants'
 import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
-import { getContractBlockExplorerURL } from '../../../../util/networks'
+import { getAddressBlockExplorerURL } from '../../../../util/networks'
 
 const Wrapper = styled.div<{ paddingBottomSmall?: boolean }>`
   align-items: center;
@@ -51,7 +51,7 @@ export const Footer = () => {
         <Link href="https://github.com/protofire/gnosis-conditional-exchange">Version {appVersion}</Link>
         <Break>·</Break>
         <Link
-          href={getContractBlockExplorerURL(context.networkId, marketMakerFactory.address)}
+          href={getAddressBlockExplorerURL(context.networkId, marketMakerFactory.address)}
           rel="noopener noreferrer"
           target="_blank"
         >

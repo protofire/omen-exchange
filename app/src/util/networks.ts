@@ -853,7 +853,7 @@ export const getTxHashBlockExplorerURL = (networkId: number, txHash: string): st
   return `${networks[networkId].blockExplorerURL}/tx/${txHash}`
 }
 
-export const getContractBlockExplorerURL = (networkId: number, contractAddress: string): string => {
+export const getAddressBlockExplorerURL = (networkId: number, contractAddress: string): string => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
