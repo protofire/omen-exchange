@@ -1443,6 +1443,25 @@ class CPKService {
       throw e
     }
   }
+
+  withdrawStakedPoolTokens = async (amount: BigNumber, campaignAddress: string) => {
+    try {
+      const transactions: Transaction[] = []
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
+
+      transactions.push({
+        to: campaignAddress,
+        data: StakingService.encodeWithdrawStakedPoolTokens(amount),
+      })
+
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      return txObject.hash
+    } catch (e) {
+      logger.error('Failed to withdraw staked pool tokens', e.message)
+      throw e
+    }
+  }
 }
 
 export { CPKService }
