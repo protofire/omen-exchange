@@ -1512,6 +1512,11 @@ class CPKService {
 
   withdrawStakedAndClaim = async (campaignAddress: string) => {
     try {
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
+
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
@@ -1520,6 +1525,28 @@ class CPKService {
         to: campaignAddress,
         data: StakingService.encodeExit(this.cpk.address),
       })
+
+      // If relay used, keep reward tokens in relay
+      if (!this.cpk.relay) {
+        const omnToken = getOMNToken(networkId).address
+        const erc20Service = new ERC20Service(this.provider, this.cpk.address, omnToken)
+        const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(this.cpk.address, account, new BigNumber(1))
+
+        // Approve unlimited if not already done
+        if (!hasEnoughAllowance) {
+          transactions.push({
+            to: omnToken,
+            data: ERC20Service.encodeApproveUnlimited(account),
+          })
+        }
+
+        // Transfer all rewards from cpk to EOA
+        const claimableRewards = await erc20Service.getCollateral(this.cpk.address)
+        transactions.push({
+          to: omnToken,
+          data: ERC20Service.encodeTransfer(account, claimableRewards),
+        })
+      }
 
       const txObject = await this.cpk.execTransactions(transactions, txOptions)
       return txObject.hash
