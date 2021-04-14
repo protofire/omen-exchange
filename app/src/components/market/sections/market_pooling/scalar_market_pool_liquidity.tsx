@@ -17,6 +17,8 @@ import {
   useFundingBalance,
   useSymbol,
 } from '../../../../hooks'
+import { ERC20Service } from '../../../../services'
+import { StakingService } from '../../../../services/staking'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
@@ -302,6 +304,24 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setMessage(`Error trying to withdraw funds.`)
       logger.error(`${message} - ${err.message}`)
     }
+  }
+
+  // TODO: Cleanup and remove hardcoded address if function kept in component
+  const stake = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await cpk.stakePoolTokens(amountToFund || Zero, '0xE2D380F4B16B8371fD3dC2990A29109642d4ea96', marketMakerAddress)
+  }
+
+  // TODO: Cleanup and remove hardcoded address if function kept in component
+  const withdraw = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await cpk.withdrawStakedPoolTokens(amountToFund || Zero, '0xE2D380F4B16B8371fD3dC2990A29109642d4ea96')
   }
 
   const unlockCollateral = async () => {
@@ -606,6 +626,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
             Withdraw
           </Button>
         )}
+        <Button onClick={stake}>Stake</Button>
+        <Button onClick={withdraw}>Withdraw</Button>
       </BottomButtonWrapper>
       <ModalTransactionWrapper
         confirmations={0}

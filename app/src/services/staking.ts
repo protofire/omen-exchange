@@ -1,6 +1,10 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
+import { getLogger } from '../util/logger'
+
+const logger = getLogger('Services::Staking')
+
 const abi = [
   {
     inputs: [
@@ -13,6 +17,38 @@ const abi = [
     name: 'stake',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'withdraw',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'stakedTokensOf',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
     type: 'function',
   },
 ]
@@ -31,9 +67,18 @@ class StakingService {
     }
   }
 
+  getStakedTokensOfAmount = (address: string): string => {
+    return this.contract.stakedTokensOf(address)
+  }
+
   static encodeStakePoolTokens = (amount: BigNumber): string => {
     const stakingInterface = new utils.Interface(abi)
     return stakingInterface.functions.stake.encode([amount])
+  }
+
+  static encodeWithdrawStakedPoolTokens = (amount: BigNumber) => {
+    const stakingInterface = new utils.Interface(abi)
+    return stakingInterface.functions.withdraw.encode([amount])
   }
 }
 
