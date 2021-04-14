@@ -700,7 +700,6 @@ class CPKService {
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
 
       let collateral
 
