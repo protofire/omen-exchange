@@ -333,6 +333,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     await cpk.claimRewardTokens('0xE2D380F4B16B8371fD3dC2990A29109642d4ea96')
   }
 
+  // TODO: Cleanup and remove hardcoded address if function kept in component
+  const withdrawAndClaim = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await cpk.withdrawStakedAndClaim('0xE2D380F4B16B8371fD3dC2990A29109642d4ea96')
+  }
+
   const unlockCollateral = async () => {
     if (!cpk) {
       return
@@ -638,6 +647,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         <Button onClick={stake}>Stake</Button>
         <Button onClick={withdraw}>Withdraw</Button>
         <Button onClick={claim}>Claim</Button>
+        <Button onClick={withdrawAndClaim}>Exit</Button>
       </BottomButtonWrapper>
       <ModalTransactionWrapper
         confirmations={0}
