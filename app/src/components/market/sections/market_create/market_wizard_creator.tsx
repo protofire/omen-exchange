@@ -44,6 +44,7 @@ export const MarketWizardCreator = (props: Props) => {
   const marketDataDefault: MarketData = {
     arbitrator: defaultArbitrator,
     arbitratorsCustom: [],
+    baseERC20TokenSymbol: '',
     categoriesCustom: [],
     category: '',
     collateral: defaultCollateral,

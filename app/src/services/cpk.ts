@@ -438,6 +438,7 @@ class CPKService {
     try {
       const {
         arbitrator,
+        baseERC20TokenSymbol,
         category,
         loadedQuestionId,
         outcomes,
@@ -449,6 +450,10 @@ class CPKService {
 
       if (!resolution) {
         throw new Error('Resolution time was not specified')
+      }
+
+      if (!baseERC20TokenSymbol) {
+        throw new Error('Base ERC20 token symbol was not specified')
       }
 
       const signer = this.provider.getSigner()
@@ -624,10 +629,14 @@ class CPKService {
         outcomes.map(async (_, index) => {
           const collectionId = await conditionalTokens.getCollectionIdForOutcome(conditionId, 1 << index)
           const positionId = await conditionalTokens.getPositionId(collateral.address, collectionId)
+          const outcome = outcomes[index]
           transactions.push({
             to: erc20WrapperFactory.contract.address,
-            // TODO: choose proper name and symbol
-            data: ERC20WrapperFactoryService.encodeCreateWrapperCall('Test', 'TEST', positionId),
+            data: ERC20WrapperFactoryService.encodeCreateWrapperCall(
+              ERC20WrapperService.predictName(question, outcome.name, resolution),
+              ERC20WrapperService.predictSymbol(baseERC20TokenSymbol, outcome.name, resolution),
+              positionId,
+            ),
           })
         }),
       )
@@ -655,6 +664,7 @@ class CPKService {
     try {
       const {
         arbitrator,
+        baseERC20TokenSymbol,
         category,
         loadedQuestionId,
         lowerBound,
@@ -680,6 +690,10 @@ class CPKService {
 
       if (!startingPoint) {
         throw new Error('Starting expected value not specified')
+      }
+
+      if (!baseERC20TokenSymbol) {
+        throw new Error('Base ERC20 token symbol expected value not specified')
       }
 
       if (lowerBound.gt(startingPoint) || startingPoint.gt(upperBound)) {
@@ -832,10 +846,14 @@ class CPKService {
       for (let i = 0; i < 2; i++) {
         const collectionId = await conditionalTokens.getCollectionIdForOutcome(conditionId, 1 << i)
         const positionId = await conditionalTokens.getPositionId(collateral.address, collectionId)
+        const outcomeName = i === 0 ? 'Short' : 'Long'
         transactions.push({
           to: erc20WrapperFactory.contract.address,
-          // TODO: choose proper name and symbol
-          data: ERC20WrapperFactoryService.encodeCreateWrapperCall('Test', 'TEST', positionId),
+          data: ERC20WrapperFactoryService.encodeCreateWrapperCall(
+            ERC20WrapperService.predictName(question, outcomeName, resolution),
+            ERC20WrapperService.predictSymbol(baseERC20TokenSymbol, outcomeName, resolution),
+            positionId,
+          ),
         })
       }
 

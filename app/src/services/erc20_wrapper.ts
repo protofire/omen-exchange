@@ -1,5 +1,6 @@
 import { Contract, utils } from 'ethers'
 import { BigNumber, getCreate2Address, solidityKeccak256, solidityPack } from 'ethers/utils'
+import moment from 'moment'
 
 const INIT_CODE_HASH = '0x5058e67e4d72ed90876a53ce32f1bdd8b0f8a4f56cce190f0f25fa4dbe3e1160'
 const WRAPPER_INTERFACE = new utils.Interface([`function withdraw(uint256 _amount) external`])
@@ -20,6 +21,14 @@ class ERC20WrapperService {
 
   static encodeWithdraw = (amount: BigNumber): string => {
     return WRAPPER_INTERFACE.functions.withdraw.encode([amount])
+  }
+
+  static predictName = (question: string, outcomeName: string, resolution: Date): string => {
+    return `${question} - ${outcomeName} - ${moment(resolution).format('DD/MM/YYYY HH:mm')}`
+  }
+
+  static predictSymbol = (baseERC20TokenSymbol: string, outcomeName: string, resolution: Date): string => {
+    return `o${baseERC20TokenSymbol}.${outcomeName.toUpperCase()}.${moment(resolution).format('DD/MM/YYYY/HH:mm')}`
   }
 }
 

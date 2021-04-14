@@ -97,6 +97,7 @@ interface Props {
   toggleCategoryButtonFocus: () => void
   arbitrator: Arbitrator
   handleArbitratorChange: (arbitrator: Arbitrator) => any
+  baseERC20TokenSymbol: string
   arbitratorsCustom: Arbitrator[]
 }
 
@@ -104,6 +105,7 @@ export const CreateScalarMarket = (props: Props) => {
   const {
     arbitrator,
     arbitratorsCustom,
+    baseERC20TokenSymbol,
     categoriesCustom,
     category,
     categoryButtonFocus,
@@ -187,6 +189,17 @@ export const CreateScalarMarket = (props: Props) => {
             title={'Unit of measurement'}
           />
         </Row>
+        <FormRow
+          formField={
+            <Textfield
+              name="baseERC20TokenSymbol"
+              onChange={handleChange}
+              placeholder="ETHLONG"
+              value={baseERC20TokenSymbol}
+            />
+          }
+          title="Base ERC20 token name"
+        />
         <Row>
           <FormRow
             formField={

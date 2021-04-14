@@ -9,7 +9,7 @@ import { useConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
 import { Arbitrator, FormState, Question } from '../../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
-import { DateField, FormRow, FormStateButton } from '../../../../../common'
+import { DateField, FormRow, FormStateButton, Textfield } from '../../../../../common'
 import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
 import { CommonDisabledCSS } from '../../../../../common/form/common_styled'
 import { QuestionInput } from '../../../../../common/form/question_input'
@@ -122,6 +122,7 @@ interface Props {
     upperBound: Maybe<BigNumber>
     startingPoint: Maybe<BigNumber>
     unit: string
+    baseERC20TokenSymbol: string
   }
   addArbitratorCustom: (arbitrator: Arbitrator) => void
   addCategoryCustom: (category: string) => void
@@ -158,6 +159,7 @@ const AskQuestionStep = (props: Props) => {
   const {
     arbitrator,
     arbitratorsCustom,
+    baseERC20TokenSymbol,
     categoriesCustom,
     category,
     loadedQuestionId,
@@ -293,6 +295,7 @@ const AskQuestionStep = (props: Props) => {
         <CreateScalarMarket
           arbitrator={arbitrator}
           arbitratorsCustom={arbitratorsCustom}
+          baseERC20TokenSymbol={baseERC20TokenSymbol}
           categoriesCustom={categoriesCustom}
           category={category}
           categoryButtonFocus={categoryButtonFocus}
@@ -333,6 +336,17 @@ const AskQuestionStep = (props: Props) => {
             onChange={handleOutcomesChange}
             outcomes={outcomes}
             totalProbabilities={totalProbabilities}
+          />
+          <FormRow
+            formField={
+              <Textfield
+                name="baseERC20TokenSymbol"
+                onChange={handleChange}
+                placeholder="The base symbol of the ERC20 token"
+                value={baseERC20TokenSymbol}
+              />
+            }
+            title="Base ERC20 token symbol"
           />
           <GridTwoColumns>
             <Column>

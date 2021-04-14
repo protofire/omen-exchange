@@ -19,6 +19,7 @@ import {
   useCpkProxy,
 } from '../../../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
+import { ERC20WrapperService } from '../../../../../../services/erc20_wrapper'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { getNativeAsset, networkIds, pseudoNativeAssetAddress } from '../../../../../../util/networks'
@@ -167,6 +168,7 @@ interface Props {
   back: (state: string) => void
   submit: (isScalar: boolean) => void
   values: {
+    baseERC20TokenSymbol: string
     collateral: Token
     question: string
     category: string
@@ -218,6 +220,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
 
   const {
     arbitrator,
+    baseERC20TokenSymbol,
     category,
     collateral,
     funding,
@@ -438,8 +441,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             <OutcomesTable>
               <OutcomesTHead>
                 <OutcomesTR>
-                  <OutcomesTH style={{ width: '60%' }}>Outcome</OutcomesTH>
+                  <OutcomesTH style={{ width: '40%' }}>Outcome</OutcomesTH>
                   <OutcomesTH>Probability</OutcomesTH>
+                  <OutcomesTH>ERC20 token</OutcomesTH>
                 </OutcomesTR>
               </OutcomesTHead>
               <OutcomesTBody>
@@ -453,6 +457,13 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                         </OutcomeItemTextWrapper>
                       </OutcomesTD>
                       <OutcomesTD>{outcome.probability.toFixed(2)}%</OutcomesTD>
+                      <OutcomesTD>
+                        {ERC20WrapperService.predictSymbol(
+                          baseERC20TokenSymbol,
+                          outcome.name,
+                          resolution || new Date(),
+                        )}
+                      </OutcomesTD>
                     </OutcomesTR>
                   )
                 })}

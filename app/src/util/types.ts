@@ -194,6 +194,7 @@ export interface MarketData {
   collateral: Token
   userInputCollateral: Token
   arbitratorsCustom: Arbitrator[]
+  baseERC20TokenSymbol: string
   categoriesCustom: string[]
   compoundInterestRate: string
   question: string
