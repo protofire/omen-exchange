@@ -220,6 +220,7 @@ const HeaderContainer: React.FC = (props: any) => {
     if (active || (error && connectorName)) {
       localStorage.removeItem('CONNECTOR')
       if (context.rawWeb3Context.connectorName === 'WalletConnect') {
+        localStorage.removeItem('walletconnect')
         context.rawWeb3Context.connector.onDeactivation()
       }
       context.rawWeb3Context.setConnector('Infura')

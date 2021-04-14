@@ -28,21 +28,15 @@ class WalletConnectConnector extends Connectors.Connector {
 
       this.connect.on('accountsChanged', (accounts: string[]) => {
         this.account = accounts[0]
+        this.networkId = this.connect.chainId
         this._web3ReactUpdateHandler({
           updateAccount: true,
           account: this.account,
-        })
-      })
-
-      this.connect.on('chainChanged', (chainId: number) => {
-        this.networkId = chainId
-        this._web3ReactUpdateHandler({
           updateNetworkId: true,
           networkId: this.networkId,
         })
+        resolve()
       })
-
-      this.connect.onConnect(() => resolve())
 
       // initial connection
       if (!this.connect.connected && !this.activating) {
@@ -56,10 +50,8 @@ class WalletConnectConnector extends Connectors.Connector {
             this.onError(e.message)
           }
         }
-      }
-
-      // on reload, check if already connected
-      if (this.connect.connected) {
+        // on reload, check if already connected
+      } else if (this.connect.connected) {
         resolve()
       }
     })
