@@ -180,10 +180,10 @@ export const ScalarMarketSell = (props: Props) => {
         return
       }
 
-      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
+      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals, collateral.decimals)
 
       setStatus(Status.Loading)
-      setMessage(`Selling ${sharesAmount} shares...`)
+      setMessage(`Selling ${formatNumber(sharesAmount)} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
@@ -203,7 +203,7 @@ export const ScalarMarketSell = (props: Props) => {
       setAmountShares(null)
       setAmountSharesToDisplay('')
       setStatus(Status.Ready)
-      setMessage(`Successfully sold ${sharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      setMessage(`Successfully sold ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
     } catch (err) {
       setStatus(Status.Error)
       setTxState(TransactionStep.error)
@@ -212,7 +212,9 @@ export const ScalarMarketSell = (props: Props) => {
     }
   }
 
-  const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
+  const selectedOutcomeBalance = formatNumber(
+    formatBigNumber(balanceItem.shares, collateral.decimals, collateral.decimals),
+  )
 
   const amountError =
     balanceItem.shares === null
@@ -285,7 +287,9 @@ export const ScalarMarketSell = (props: Props) => {
           <TransactionDetailsCard>
             <TransactionDetailsRow
               title={'Sell Amount'}
-              value={`${formatNumber(formatBigNumber(amountShares || Zero, collateral.decimals))} Shares`}
+              value={`${formatNumber(
+                formatBigNumber(amountShares || Zero, collateral.decimals, collateral.decimals),
+              )} Shares`}
             />
             <TransactionDetailsRow
               emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
@@ -293,13 +297,19 @@ export const ScalarMarketSell = (props: Props) => {
               title={'Revenue'}
               value={
                 potentialValue
-                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, 2))} ${symbol}`
+                  ? `${formatNumber(
+                      formatBigNumber(potentialValue, collateral.decimals, collateral.decimals),
+                    )} ${symbol}`
                   : '0.00'
               }
             />
             <TransactionDetailsRow
               title={'Fee'}
-              value={`${costFee ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, 2)) : '0.00'}
+              value={`${
+                costFee
+                  ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, collateral.decimals))
+                  : '0.00'
+              }
                 ${symbol}`}
             />
             <TransactionDetailsLine />
@@ -315,7 +325,9 @@ export const ScalarMarketSell = (props: Props) => {
               }
               title={'Total'}
               value={`${
-                tradedCollateral ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, 2)) : '0.00'
+                tradedCollateral
+                  ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, collateral.decimals))
+                  : '0.00'
               } ${symbol}`}
             />
           </TransactionDetailsCard>
