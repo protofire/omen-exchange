@@ -184,6 +184,7 @@ const HeaderContainer: React.FC = (props: any) => {
     fetchBalances,
     formattedDaiBalance,
     formattedEthBalance,
+    formattedOmenBalance,
     formattedxDaiBalance,
     unclaimedAmount,
     xDaiBalance,
@@ -324,6 +325,7 @@ const HeaderContainer: React.FC = (props: any) => {
           fetchBalances={fetchBalances}
           formattedDaiBalance={formattedDaiBalance}
           formattedEthBalance={formattedEthBalance}
+          formattedOmenBalance={formattedOmenBalance}
           formattedxDaiBalance={formattedxDaiBalance}
           isOpen={isYourConnectionModalOpen && !isDepositWithdrawModalOpen}
           onClose={() => setYourConnectionModalState(false)}
@@ -348,6 +350,7 @@ const HeaderContainer: React.FC = (props: any) => {
           exchangeType={depositWithdrawType}
           fetchBalances={fetchBalances}
           formattedDaiBalance={formattedDaiBalance}
+          formattedOmenBalance={formattedOmenBalance}
           formattedxDaiBalance={formattedxDaiBalance}
           isOpen={isDepositWithdrawModalOpen}
           onBack={() => {

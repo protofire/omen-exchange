@@ -15,6 +15,7 @@ export const useCollateralBalance = (
   fetchCollateralBalance: () => Promise<void>
 } => {
   const { account, library: provider } = context
+  console.log(account, collateral)
 
   const [collateralBalance, setCollateralBalance] = useState<Maybe<BigNumber>>(null)
 

@@ -2,11 +2,11 @@ import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 
-import { STANDARD_DECIMALS } from '../common/constants'
+import { GEN_XDAI_ADDRESS_TESTING, STANDARD_DECIMALS } from '../common/constants'
 import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../hooks'
 import { XdaiService } from '../services'
 import { getLogger } from '../util/logger'
-import { getNativeAsset, networkIds } from '../util/networks'
+import { getNativeAsset, getTokenFromAddress, networkIds } from '../util/networks'
 import { formatBigNumber, formatNumber } from '../util/tools'
 
 const logger = getLogger('Hooks::ConnectedBalance')
@@ -20,6 +20,7 @@ export interface ConnectedBalanceContext {
   formattedDaiBalance: string
   xDaiBalance: BigNumber
   formattedxDaiBalance: string
+  formattedOmenBalance: string
   fetchBalances: () => Promise<void>
 }
 
@@ -62,9 +63,19 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, STANDARD_DECIMALS, STANDARD_DECIMALS))
 
   const nativeAsset = getNativeAsset(context.networkId)
+
   const { collateralBalance, fetchCollateralBalance } = useCollateralBalance(nativeAsset, context)
   const xDaiBalance = collateralBalance || Zero
   const formattedxDaiBalance = `${formatBigNumber(xDaiBalance, nativeAsset.decimals, 2)}`
+
+  // const omenToken = { address: GEN_XDAI_ADDRESS_TESTING, decimals: 18, symbol: 'GEN' }
+  // const { collateralBalance: omenCollateral, fetchCollateralBalance: fetchOmenBalance } = useCollateralBalance(
+  //   omenToken,
+  //   context,
+  // )
+  // const omenBalance = omenCollateral || Zero
+  // const formattedOmenBalance = `${formatBigNumber(omenBalance, omenToken.decimals, 2)}`
+  const formattedOmenBalance = '22'
 
   const fetchUnclaimedAssets = async () => {
     if (account && networkId === networkIds.MAINNET) {
@@ -110,6 +121,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     xDaiBalance,
     formattedxDaiBalance,
     fetchBalances,
+    formattedOmenBalance,
   }
 
   return <ConnectedBalanceContext.Provider value={value}>{props.children}</ConnectedBalanceContext.Provider>

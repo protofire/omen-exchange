@@ -73,9 +73,9 @@ export const BalanceItemSide = styled.div`
   align-items: center;
 `
 
-export const BalanceItemTitle = styled.p`
+export const BalanceItemTitle = styled.p<{ notSelected?: boolean }>`
   font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => props.theme.colors.textColorDark};
+  color: ${props => (props.notSelected ? props.theme.colors.textColorLighter : props.theme.colors.textColorDark)};
   margin: 0;
 `
 

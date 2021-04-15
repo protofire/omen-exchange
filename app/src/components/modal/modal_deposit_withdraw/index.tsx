@@ -14,6 +14,7 @@ import { ButtonType } from '../../button/button_styling_types'
 import { BigNumberInput, RadioInput, TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInputReturn } from '../../common/form/big_number_input'
 import { IconArrowBack, IconClose, IconOmen } from '../../common/icons'
+import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
 import { DaiIcon } from '../../common/icons/currencies'
 import {
   BalanceItem,
@@ -34,9 +35,22 @@ import { ModalTransactionWrapper } from '../modal_transaction'
 const InputInfo = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorLighter};
-  margin: 0;
-  margin-top: 12px;
+  margin: 12px 0 0;
   width: 100%;
+
+  display: flex;
+  align-items: center;
+  border: ${props => props.theme.borders.borderLineDisabled};
+  border-radius: 4px;
+  padding: ${props => props.theme.textfield.paddingVertical + ' ' + props.theme.textfield.paddingHorizontal};
+  line-height: 16.41px;
+  letter-spacing: 0.2px;
+`
+const WalletText = styled.div`
+  margin-bottom: 14px;
+  color: ${props => props.theme.colors.textColorLighter};
+  line-height: 16.41px;
+  letter-spacing: 0.2px;
 `
 
 const DepositWithdrawButton = styled(Button)`
@@ -53,6 +67,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   fetchBalances: () => void
   formattedDaiBalance: string
   formattedxDaiBalance: string
+  formattedOmenBalance: string
   daiBalance: BigNumber
   xDaiBalance: Maybe<BigNumber>
   unclaimedAmount: BigNumber
@@ -64,6 +79,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     exchangeType,
     fetchBalances,
     formattedDaiBalance,
+    formattedOmenBalance,
     formattedxDaiBalance,
     isOpen,
     onBack,
@@ -93,13 +109,14 @@ export const ModalDepositWithdraw = (props: Props) => {
   const DAI = getToken(1, 'dai')
 
   const wallet = exchangeType === ExchangeType.deposit ? daiBalance : xDaiBalance
-  const minExchangeAmount = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
 
   const minDaiExchange = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
   const minOmenExchange = exchangeType === ExchangeType.deposit ? parseEther('1') : parseEther('1')
   const isDepositWithdrawDisabled =
-    displayFundAmount.isZero() || !wallet || displayFundAmount.gt(wallet) || displayFundAmount.lt(minExchangeAmount)
-  displayFundAmount.isZero() ||
+    displayFundAmount.isZero() ||
+    !wallet ||
+    displayFundAmount.gt(wallet) ||
+    displayFundAmount.isZero() ||
     !wallet ||
     displayFundAmount.gt(wallet) ||
     displayFundAmount.lt(currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange)
@@ -185,7 +202,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                   setAmountToDisplay('')
                 }}
               />
-              <ModalTitle style={{ marginLeft: '16px' }}>{exchangeType} Dai</ModalTitle>
+              <ModalTitle style={{ marginLeft: '16px' }}>{exchangeType} Asset</ModalTitle>
             </ModalNavigationLeft>
             <IconClose
               hoverEffect={true}
@@ -198,7 +215,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           </ModalNavigation>
           <ModalCard style={{ marginBottom: '16px', marginTop: '12px' }}>
             <BalanceSection>
-              <div>Wallet</div>
+              <WalletText>Wallet</WalletText>
               <BalanceItems>
                 <BalanceItem
                   onClick={() => {
@@ -208,7 +225,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                   <BalanceItemSide>
                     <RadioInput checked={currencySelected === ExchangeCurrency.Dai} name={'Dai'} outcomeIndex={-1} />
                     <DaiIcon size="24px" style={{ marginLeft: '12px', marginRight: '12px' }} />
-                    <BalanceItemTitle>Dai</BalanceItemTitle>
+                    <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Dai}>Dai</BalanceItemTitle>
                   </BalanceItemSide>
                   <BalanceItemSide>
                     <BalanceItemBalance>
@@ -224,7 +241,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                   <BalanceItemSide>
                     <RadioInput checked={currencySelected === ExchangeCurrency.Omen} name={'Dai'} outcomeIndex={-1} />
                     <IconOmen size="24" style={{ marginLeft: '12px', marginRight: '12px' }} />
-                    <BalanceItemTitle>Omen</BalanceItemTitle>
+                    <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Omen}>Omen</BalanceItemTitle>
                   </BalanceItemSide>
                   <BalanceItemSide>
                     <BalanceItemBalance>{formatBigNumber(Zero, 18)} GEN</BalanceItemBalance>
@@ -254,10 +271,18 @@ export const ModalDepositWithdraw = (props: Props) => {
             shouldDisplayMaxButton={true}
             symbol={currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}
           />
+
           <InputInfo>
+            <IconAlertInverted color={theme.colors.tertiary} size={'20'} style={{ marginRight: '12px' }} />
             You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least{' '}
-            {formatBigNumber(minDaiExchange, STANDARD_DECIMALS, exchangeType === ExchangeType.deposit ? 3 : 0)} DAI.
+            {formatBigNumber(
+              currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange,
+              STANDARD_DECIMALS,
+              0,
+            )}{' '}
+            {currencySelected === ExchangeCurrency.Dai ? 'Dai' : 'Omn'}.
           </InputInfo>
+
           <DepositWithdrawButton
             buttonType={ButtonType.primaryAlternative}
             disabled={isDepositWithdrawDisabled}
