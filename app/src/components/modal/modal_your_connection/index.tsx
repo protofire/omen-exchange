@@ -3,12 +3,7 @@ import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import {
-  DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
-  GEN_XDAI_ADDRESS_TESTING,
-  OMNI_BRIDGE_XDAI_ADDRESS,
-  STANDARD_DECIMALS,
-} from '../../../common/constants'
+import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service } from '../../../services'
 import { getToken, networkIds } from '../../../util/networks'
@@ -225,16 +220,16 @@ export const ModalYourConnection = (props: Props) => {
   }
 
   const approve = async () => {
-    if (relay) {
-      setMessage(`Enable OMN`)
-      setTxState(TransactionStep.waitingConfirmation)
-      setConfirmations(0)
-      setIsTransactionModalOpen(true)
-      await cpk?.approveCpk(OMNI_BRIDGE_XDAI_ADDRESS, GEN_XDAI_ADDRESS_TESTING)
-
+    if (!relay) {
       return
     }
     try {
+      //enabling omen token
+      // setMessage(`Enable OMN`)
+      // setTxState(TransactionStep.waitingConfirmation)
+      // setConfirmations(0)
+      // setIsTransactionModalOpen(true)
+      // await cpk?.approveCpk(OMNI_BRIDGE_XDAI_ADDRESS, GEN_XDAI_ADDRESS_TESTING)
       setMessage(`Enable ${DAI.symbol}`)
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
@@ -390,13 +385,6 @@ export const ModalYourConnection = (props: Props) => {
               )}
             </ModalCard>
           )}
-          <EnableDai>
-            <DaiIcon size="38px" />
-            <EnableDaiText>To Deposit or Withdraw Dai to your Omen Account, you need to enable it first.</EnableDaiText>
-            <EnableDaiButton buttonType={ButtonType.primary} onClick={approve}>
-              Enable
-            </EnableDaiButton>
-          </EnableDai>
         </ContentWrapper>
       </Modal>
       <ModalTransactionWrapper
