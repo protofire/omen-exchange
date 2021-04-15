@@ -1403,7 +1403,7 @@ class CPKService {
         } else {
           transactions.push({
             to: GEN_XDAI_ADDRESS_TESTING,
-            data: XdaiService.encodeOmnTokenClaim(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
+            data: XdaiService.encodeTokenBridgeTransfer(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
           })
           const { transactionHash } = await this.execTransactions(transactions, txOptions)
 

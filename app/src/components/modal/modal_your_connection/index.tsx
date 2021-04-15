@@ -5,9 +5,7 @@ import styled, { withTheme } from 'styled-components'
 
 import {
   DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
-  GEN_TOKEN_ADDDRESS_TESTING,
   GEN_XDAI_ADDRESS_TESTING,
-  OMNI_BRIDGE_MAINNET_ADDRESS,
   OMNI_BRIDGE_XDAI_ADDRESS,
   STANDARD_DECIMALS,
 } from '../../../common/constants'
@@ -242,8 +240,8 @@ export const ModalYourConnection = (props: Props) => {
       setConfirmations(0)
       setIsTransactionModalOpen(true)
       const provider = context.rawWeb3Context.library
-      const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, GEN_TOKEN_ADDDRESS_TESTING)
-      const { transactionHash } = await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS, true)
+      const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, DAI.address)
+      const { transactionHash } = await collateralService.approveUnlimited(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, true)
       if (transactionHash) {
         setTxNetId(provider.network.chainId)
         setTxHash(transactionHash)

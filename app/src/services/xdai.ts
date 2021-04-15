@@ -53,21 +53,7 @@ const abi = [
     type: 'function',
   },
 ]
-// const omni_abi = [
-//   {
-//     constant: false,
-//     inputs: [
-//       { name: 'token', type: 'address' },
-//       { name: '_receiver', type: 'address' },
-//       { name: '_value', type: 'uint256' },
-//     ],
-//     name: 'relayTokens',
-//     outputs: [],
-//     payable: false,
-//     stateMutability: 'nonpayable',
-//     type: 'function',
-//   },
-// ]
+
 const xdaiBridgeAbi = [
   {
     type: 'function',
@@ -126,16 +112,6 @@ const approveAbi = [
       { type: 'address', name: '_spender' },
       { type: 'uint256', name: '_value' },
     ],
-    constant: false,
-  },
-
-  {
-    type: 'function',
-    stateMutability: 'nonpayable',
-    payable: false,
-    outputs: [],
-    name: 'transferOwnership',
-    inputs: [{ type: 'address', name: '_newOwner' }],
     constant: false,
   },
 ]
@@ -219,9 +195,9 @@ class XdaiService {
     const transferFromInterface = new utils.Interface(approveAbi)
     return transferFromInterface.functions.approve.encode([address, value])
   }
-  static encodeOmnTokenClaim = (reciever: string, amount: BigNumber, data: any) => {
+  static encodeTokenBridgeTransfer = (receiver: string, amount: BigNumber, data: any) => {
     const transferFromInterface = new utils.Interface(omenAbi)
-    return transferFromInterface.functions.transferAndCall.encode([reciever, amount, data])
+    return transferFromInterface.functions.transferAndCall.encode([receiver, amount, data])
   }
 
   encodeClaimDaiTokens = (message: string, signatures: string): string => {
