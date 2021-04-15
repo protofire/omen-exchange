@@ -15,6 +15,7 @@ import {
   useCpkAllowance,
   useCpkProxy,
   useFundingBalance,
+  useGraphLiquidityMiningCampaigns,
   useSymbol,
 } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
