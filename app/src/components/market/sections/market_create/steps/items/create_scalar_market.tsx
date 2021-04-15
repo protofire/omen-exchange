@@ -180,15 +180,13 @@ export const CreateScalarMarket = (props: Props) => {
                 min={0}
                 name="lowerBound"
                 onBlur={() => {
-                  setLowerBoundError('')
+                  setLowerBoundFocus(false)
                 }}
                 onChange={value => {
                   handleChange(value)
                 }}
                 onFocus={() => {
-                  setLowerBoundFocus(!lowerBoundFocus)
-                  setStartingPointFocus(false)
-                  setUpperBoundFocus(false)
+                  setLowerBoundFocus(true)
                 }}
                 placeholder={'0'}
                 value={lowerBound}
@@ -208,15 +206,13 @@ export const CreateScalarMarket = (props: Props) => {
                 min={0}
                 name="upperBound"
                 onBlur={() => {
-                  setUpperBoundError('')
+                  setUpperBoundFocus(false)
                 }}
                 onChange={value => {
                   handleChange(value)
                 }}
                 onFocus={() => {
-                  setUpperBoundFocus(!upperBoundFocus)
-                  setLowerBoundFocus(false)
-                  setStartingPointFocus(false)
+                  setUpperBoundFocus(true)
                 }}
                 placeholder={'1000'}
                 value={upperBound}
@@ -236,15 +232,13 @@ export const CreateScalarMarket = (props: Props) => {
                 min={0}
                 name="startingPoint"
                 onBlur={() => {
-                  setStartingPointError('')
+                  setStartingPointFocus(false)
                 }}
                 onChange={value => {
                   handleChange(value)
                 }}
                 onFocus={() => {
-                  setStartingPointFocus(!startingPointFocus)
-                  setLowerBoundFocus(false)
-                  setUpperBoundFocus(false)
+                  setStartingPointFocus(true)
                 }}
                 placeholder={'500'}
                 value={startingPoint}
