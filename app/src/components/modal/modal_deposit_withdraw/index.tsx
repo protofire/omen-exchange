@@ -5,8 +5,8 @@ import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import { useCollateralBalance, useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
-import { getToken, networkIds } from '../../../util/networks'
+import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
+import { getToken } from '../../../util/networks'
 import { formatBigNumber, waitForConfirmations } from '../../../util/tools'
 import { ExchangeCurrency, ExchangeType, TransactionStep } from '../../../util/types'
 import { Button } from '../../button'
@@ -75,17 +75,6 @@ export const ModalDepositWithdraw = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
 
-  // const collateral = useCollateralBalance(
-  //   {
-  //     address: context.relay
-  //       ? '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599'
-  //       : '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
-  //     decimals: 18,
-  //     symbol: 'GEN',
-  //   },
-  //   context,
-  // )
-
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
@@ -134,7 +123,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           : await cpk.sendXdaiToBridge(displayFundAmount, currencySelected)
 
       const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
-      console.log('probider', provider)
+
       setTxNetId(provider.network.chainId)
       setTxHash(hash)
       await waitForConfirmations(hash, provider, setConfirmations, setTxState)

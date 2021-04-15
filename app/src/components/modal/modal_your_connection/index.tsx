@@ -6,7 +6,9 @@ import styled, { withTheme } from 'styled-components'
 import {
   DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   GEN_TOKEN_ADDDRESS_TESTING,
+  GEN_XDAI_ADDRESS_TESTING,
   OMNI_BRIDGE_MAINNET_ADDRESS,
+  OMNI_BRIDGE_XDAI_ADDRESS,
   STANDARD_DECIMALS,
 } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
@@ -230,8 +232,8 @@ export const ModalYourConnection = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
       setIsTransactionModalOpen(true)
-      const hash = await cpk?.approveCpk()
-      console.log(hash)
+      await cpk?.approveCpk(OMNI_BRIDGE_XDAI_ADDRESS, GEN_XDAI_ADDRESS_TESTING)
+
       return
     }
     try {
@@ -241,8 +243,6 @@ export const ModalYourConnection = (props: Props) => {
       setIsTransactionModalOpen(true)
       const owner = context.rawWeb3Context.account
       const provider = context.rawWeb3Context.library
-      console.log(owner)
-      console.log(provider)
       const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, GEN_TOKEN_ADDDRESS_TESTING)
       const { transactionHash } = await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS, true)
       if (transactionHash) {

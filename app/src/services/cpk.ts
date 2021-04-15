@@ -244,17 +244,14 @@ class CPKService {
     setTxHash?: (arg0: string) => void,
     setTxState?: (step: TransactionStep) => void,
   ) => {
-    console.log('here')
     if (this.cpk.relay) {
       // pay tx fee
-      console.log('work relay fee')
       transactions.push({
         to: RELAY_ADDRESS,
         value: RELAY_FEE,
       })
     }
-    console.log(transactions)
-    console.log('after rekay')
+
     const txObject = await this.cpk.execTransactions(transactions, txOptions)
     setTxState && setTxState(TransactionStep.transactionSubmitted)
     setTxHash && setTxHash(txObject.hash)
@@ -1335,21 +1332,21 @@ class CPKService {
       throw err
     }
   }
-  approveCpk = async () => {
+  approveCpk = async (addressToApprove: string, tokenAddress: string) => {
     try {
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
-      console.log(this.cpk.address)
-      console.log(ERC20Service)
+
       const transactions: Transaction[] = [
         {
-          to: GEN_XDAI_ADDRESS_TESTING,
+          to: tokenAddress,
           data: ERC20Service.encodeApproveUnlimited(OMNI_BRIDGE_XDAI_ADDRESS),
         },
       ]
       return this.execTransactions(transactions)
     } catch (e) {
-      console.log(e)
+      logger.error(`Error while approving ERC20 Token to CPK address : `, e.message)
+      throw e
     }
   }
 
@@ -1373,7 +1370,6 @@ class CPKService {
         )
         return transaction.hash
       } else {
-        console.log(currency)
         const xDaiService = new XdaiService(this.provider)
         const contract = await xDaiService.generateErc20ContractInstance(currency)
         const transaction = await xDaiService.generateSendTransaction(amount, contract, currency)
@@ -1394,7 +1390,6 @@ class CPKService {
 
         // get mainnet relay signer
         const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
-        console.log(to)
 
         // relay to signer address on mainnet
         if (currency === ExchangeCurrency.Dai) {
@@ -1403,25 +1398,17 @@ class CPKService {
             data: XdaiService.encodeRelayTokens(to),
             value: amount.toString(),
           })
+          const { hash } = await this.cpk.execTransactions(transactions, txOptions)
+          return hash
         } else {
-          console.log('here')
-          // transactions.push({
-          //   to: GEN_XDAI_ADDRESS_TESTING,
-          //   data: XdaiService.encodeOmnTokenClaim(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
-          // })
-          console.log(this.cpk)
-          console.log(to)
-          console.log(amount)
           transactions.push({
             to: GEN_XDAI_ADDRESS_TESTING,
             data: XdaiService.encodeOmnTokenClaim(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
           })
+          const { transactionHash } = await this.execTransactions(transactions, txOptions)
+
+          return transactionHash
         }
-        console.log(transactions)
-        console.log(txOptions)
-        const txObject = await this.execTransactions(transactions, txOptions)
-        console.log('txObject', txObject)
-        return txObject
       } else {
         const xDaiService = new XdaiService(this.provider)
         const transaction = await xDaiService.sendXdaiToBridge(amount)

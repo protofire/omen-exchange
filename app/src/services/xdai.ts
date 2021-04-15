@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { Contract, ethers, utils } from 'ethers'
-import { MaxUint256 } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 
 import {
@@ -220,21 +219,14 @@ class XdaiService {
     const transferFromInterface = new utils.Interface(approveAbi)
     return transferFromInterface.functions.approve.encode([address, value])
   }
-  static encodeRelayTokensThree = (token: any, reciever: any, amount: any) => {
-    const transferFromInterface = new utils.Interface(abi)
-    return transferFromInterface.functions.relayTokens.encode([token, reciever, amount])
+  static encodeOmnTokenClaim = (reciever: string, amount: BigNumber, data: any) => {
+    const transferFromInterface = new utils.Interface(omenAbi)
+    return transferFromInterface.functions.transferAndCall.encode([reciever, amount, data])
   }
 
   encodeClaimDaiTokens = (message: string, signatures: string): string => {
     const transferFromInterface = new utils.Interface(abi)
     return transferFromInterface.functions.executeSignatures.encode([message, signatures])
-  }
-  static encodeOmnTokenClaim = (reciever: string, amount: BigNumber, data: any) => {
-    const transferFromInterface = new utils.Interface(omenAbi)
-    console.log(reciever)
-    console.log(amount)
-    console.log(data)
-    return transferFromInterface.functions.transferAndCall.encode([reciever, amount, data])
   }
 
   fetchCrossChainBalance = async (chain: number) => {
