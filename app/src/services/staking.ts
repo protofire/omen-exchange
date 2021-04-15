@@ -1,7 +1,8 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
+import { getOMNToken } from '../util/networks'
 
 const logger = getLogger('Services::Staking')
 
@@ -77,6 +78,73 @@ const abi = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'earnedRewards',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'claimedReward',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '_staker',
+        type: 'address',
+      },
+    ],
+    name: 'claimableRewards',
+    outputs: [
+      {
+        internalType: 'uint256[]',
+        name: '',
+        type: 'uint256[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
 ]
 
 class StakingService {
@@ -95,6 +163,18 @@ class StakingService {
 
   getStakedTokensOfAmount = (address: string): string => {
     return this.contract.stakedTokensOf(address)
+  }
+
+  getEarnedRewards = async (accountAddress: string, tokenAddress: string): Promise<string> => {
+    return this.contract.earnedRewards(accountAddress, tokenAddress)
+  }
+
+  getClaimedRewards = async (accountAddress: string, tokenAddress: string): Promise<string> => {
+    return this.contract.claimedReward(accountAddress, tokenAddress)
+  }
+
+  getClaimableRewards = async (address: string): Promise<BigNumber[]> => {
+    return await this.contract.claimableRewards(address)
   }
 
   static encodeStakePoolTokens = (amount: BigNumber): string => {

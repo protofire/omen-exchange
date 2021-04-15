@@ -1494,11 +1494,17 @@ class CPKService {
           })
         }
 
+        // Calculate amount to send from CPK to EOA
+        // claimable rewards + unclaimed rewards (if any)
+        const stakingService = new StakingService(this.provider, this.cpk.address, campaignAddress)
+        const claimableRewards = (await stakingService.getClaimableRewards(this.cpk.address))[0]
+        const unclaimedRewards = bigNumberify(await erc20Service.getCollateral(this.cpk.address))
+        const totalRewardsAmount = claimableRewards.add(unclaimedRewards)
+
         // Transfer all rewards from cpk to EOA
-        const claimableRewards = await erc20Service.getCollateral(this.cpk.address)
         transactions.push({
           to: omnToken,
-          data: ERC20Service.encodeTransfer(account, claimableRewards),
+          data: ERC20Service.encodeTransfer(account, totalRewardsAmount),
         })
       }
 
@@ -1541,6 +1547,7 @@ class CPKService {
         }
 
         // Transfer all rewards from cpk to EOA
+        // TODO: Fix not updated with amount sent during transaction
         const claimableRewards = await erc20Service.getCollateral(this.cpk.address)
         transactions.push({
           to: omnToken,
