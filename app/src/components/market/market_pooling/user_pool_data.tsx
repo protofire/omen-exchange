@@ -14,7 +14,7 @@ const UserDataTitleValue = styled(TitleValue)`
   &:nth-child(odd) {
     margin-right: 32px;
   }
-  &:nth-child(-n + 2) {
+  &:nth-child(-n + 6) {
     margin-bottom: 12px;
   }
 
@@ -91,6 +91,14 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
           collateral.symbol
         }`}
       />
+      {/* TODO: Replace hardcoded data */}
+      <UserDataTitleValue state={ValueStates.success} title="Current APY" value={'60%'} />
+      {/* TODO: Replace hardcoded data */}
+      <UserDataTitleValue state={ValueStates.success} title="Total Rewards left" value={'250.00 OMN'} />
+      {/* TODO: Replace hardcoded data */}
+      <UserDataTitleValue state={ValueStates.success} title="Your Rewards" value={'45.00 OMN'} />
+      {/* TODO: Replace hardcoded data */}
+      <UserDataTitleValue state={ValueStates.success} title="Total Rewards" value={'500.00 OMN'} />
     </UserData>
   )
 }
