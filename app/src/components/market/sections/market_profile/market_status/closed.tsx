@@ -59,13 +59,10 @@ const StyledButtonContainer = styled(ButtonContainer)`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  &.border {
-    border-top: 1px solid ${props => props.theme.colors.verticalDivider};
-  }
 `
 
 const BorderedButtonContainer = styled(ButtonContainer)`
+  border-top: 1px solid ${props => props.theme.colors.verticalDivider};
   ${MarginsButton};
 `
 
@@ -485,7 +482,7 @@ const Wrapper = (props: Props) => {
                     </BorderedButtonContainer>
                   )}
                   {isConditionResolved && hasWinningOutcomes && (
-                    <BorderedButtonContainer className="border">
+                    <BorderedButtonContainer>
                       <Button
                         buttonType={ButtonType.primary}
                         disabled={status === Status.Loading}
