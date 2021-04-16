@@ -265,8 +265,20 @@ class RelayTransactionManager {
 
   private async signTransactionHash(ethLibAdapter: any, txHash: string) {
     const messageArray = ethers.utils.arrayify(txHash)
-    // sign transaction with the real, underlying mainnet signer
-    let sig = await ethLibAdapter.signer.signer.signMessage(messageArray)
+
+    // https://github.com/WalletConnect/walletconnect-monorepo/issues/347
+    let sig
+    if (ethLibAdapter.signer.signer?.provider?.provider?.bridge) {
+      const address = await ethLibAdapter.signer.signer.getAddress()
+      sig = await ethLibAdapter.signer.signer.provider.provider.send({
+        method: 'personal_sign',
+        params: [messageArray, address.toLowerCase()],
+      })
+    } else {
+      // sign transaction with the real, underlying mainnet signer
+      sig = await ethLibAdapter.signer.signer.signMessage(messageArray)
+    }
+
     let sigV = parseInt(sig.slice(-2), 16)
 
     switch (sigV) {
@@ -283,6 +295,9 @@ class RelayTransactionManager {
     }
 
     sig = sig.slice(0, -2) + sigV.toString(16)
+
+    // test recovery
+    // const recovered = ethers.utils.verifyMessage(messageArray, sig)
     return sig
   }
 }
