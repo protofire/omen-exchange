@@ -60,12 +60,14 @@ interface Props {
   totalEarnings: BigNumber
   currentApr: number
   remainingRewards: number
+  earnedRewards: number
 }
 
 export const UserPoolData: React.FC<Props> = (props: Props) => {
   const {
     collateral,
     currentApr,
+    earnedRewards,
     remainingRewards,
     symbol,
     totalEarnings,
@@ -113,7 +115,11 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
         value={`${formatNumber(remainingRewards.toString())} OMN`}
       />
       {/* TODO: Replace hardcoded data */}
-      <UserDataTitleValue state={ValueStates.success} title="Your Rewards" value={'45.00 OMN'} />
+      <UserDataTitleValue
+        state={earnedRewards > 0 ? ValueStates.success : undefined}
+        title="Your Rewards"
+        value={`${formatNumber(earnedRewards.toString())} OMN`}
+      />
       {/* TODO: Replace hardcoded data */}
       <UserDataTitleValue state={ValueStates.success} title="Total Rewards" value={'500.00 OMN'} />
     </UserData>

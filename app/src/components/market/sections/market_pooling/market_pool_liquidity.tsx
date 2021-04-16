@@ -19,7 +19,13 @@ import {
 } from '../../../../hooks'
 import { StakingService } from '../../../../services/staking'
 import { getLogger } from '../../../../util/logger'
-import { getNativeAsset, getToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import {
+  getNativeAsset,
+  getOMNToken,
+  getToken,
+  getWrapToken,
+  pseudoNativeAssetAddress,
+} from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   calcAddFundingSendAmounts,
@@ -136,6 +142,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [txHash, setTxHash] = useState('')
   const [rewardApr, setRewardApr] = useState(0)
   const [remainingRewards, setRemainingRewards] = useState(0)
+  const [earnedRewards, setEarnedRewards] = useState(0)
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
@@ -405,6 +412,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       const rewardAPR = calculateRewardAPR(userStakedTokens, totalStakedTokens, timeRemaining, remainingRewards)
       setRewardApr(rewardAPR)
+
+      // TODO: Replace hardcoded decimals
+      const earnedRewards =
+        Number(await stakingService.getEarnedRewards(cpk?.address || '', getOMNToken(networkId).address)) / 10 ** 18
+      setEarnedRewards(earnedRewards)
     }
     cpk && getStakingData()
   }, [cpk?.address])
@@ -600,6 +612,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       <UserPoolData
         collateral={baseCollateral}
         currentApr={rewardApr}
+        earnedRewards={earnedRewards}
         remainingRewards={remainingRewards}
         symbol={symbol}
         totalEarnings={displayTotalEarnings}
