@@ -1,6 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
-import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
+import { BigNumber, bigNumberify, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
 import { RELAY_ADDRESS, RELAY_FEE, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
@@ -10,6 +10,7 @@ import {
   getBySafeTx,
   getContractAddress,
   getNativeAsset,
+  getOMNToken,
   getTargetSafeImplementation,
   getToken,
   getTokenFromAddress,
@@ -36,6 +37,7 @@ import { OracleService } from './oracle'
 import { OvmService } from './ovm'
 import { RealitioService } from './realitio'
 import { SafeService } from './safe'
+import { StakingService } from './staking'
 import { UnwrapTokenService } from './unwrap_token'
 import { XdaiService } from './xdai'
 
@@ -1413,6 +1415,155 @@ class CPKService {
       return txObject
     } catch (e) {
       logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)
+      throw e
+    }
+  }
+
+  stakePoolTokens = async (amount: BigNumber, campaignAddress: string, marketMakerAddress: string) => {
+    try {
+      const transactions: Transaction[] = []
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
+
+      // Approve pool tokens to be sent to campaign address
+      transactions.push({
+        to: marketMakerAddress,
+        data: ERC20Service.encodeApproveUnlimited(campaignAddress),
+      })
+
+      // Stake pool tokens
+      transactions.push({
+        to: campaignAddress,
+        data: StakingService.encodeStakePoolTokens(amount),
+      })
+
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      return txObject.hash
+    } catch (e) {
+      logger.error('Failed to stake pool tokens', e.message)
+      throw e
+    }
+  }
+
+  withdrawStakedPoolTokens = async (amount: BigNumber, campaignAddress: string) => {
+    try {
+      const transactions: Transaction[] = []
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
+
+      transactions.push({
+        to: campaignAddress,
+        data: StakingService.encodeWithdrawStakedPoolTokens(amount),
+      })
+
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      return txObject.hash
+    } catch (e) {
+      logger.error('Failed to withdraw staked pool tokens', e.message)
+      throw e
+    }
+  }
+
+  claimRewardTokens = async (campaignAddress: string) => {
+    try {
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
+
+      const transactions: Transaction[] = []
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
+
+      transactions.push({
+        to: campaignAddress,
+        data: StakingService.encodeClaimAll(this.cpk.address),
+      })
+
+      // If relay used, keep reward tokens in relay
+      if (!this.cpk.relay) {
+        const omnToken = getOMNToken(networkId).address
+        const erc20Service = new ERC20Service(this.provider, this.cpk.address, omnToken)
+        const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(this.cpk.address, account, new BigNumber(1))
+
+        // Approve unlimited if not already done
+        if (!hasEnoughAllowance) {
+          transactions.push({
+            to: omnToken,
+            data: ERC20Service.encodeApproveUnlimited(account),
+          })
+        }
+
+        // Calculate amount to send from CPK to EOA
+        // claimable rewards + unclaimed rewards (if any)
+        const stakingService = new StakingService(this.provider, this.cpk.address, campaignAddress)
+        const claimableRewards = (await stakingService.getClaimableRewards(this.cpk.address))[0]
+        const unclaimedRewards = bigNumberify(await erc20Service.getCollateral(this.cpk.address))
+        const totalRewardsAmount = claimableRewards.add(unclaimedRewards)
+
+        // Transfer all rewards from cpk to EOA
+        transactions.push({
+          to: omnToken,
+          data: ERC20Service.encodeTransfer(account, totalRewardsAmount),
+        })
+      }
+
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      return txObject.hash
+    } catch (e) {
+      logger.error('Failed to claim reward tokens', e.message)
+      throw e
+    }
+  }
+
+  withdrawStakedAndClaim = async (campaignAddress: string) => {
+    try {
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
+
+      const transactions: Transaction[] = []
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
+
+      transactions.push({
+        to: campaignAddress,
+        data: StakingService.encodeExit(this.cpk.address),
+      })
+
+      // If relay used, keep reward tokens in relay
+      if (!this.cpk.relay) {
+        const omnToken = getOMNToken(networkId).address
+        const erc20Service = new ERC20Service(this.provider, this.cpk.address, omnToken)
+        const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(this.cpk.address, account, new BigNumber(1))
+
+        // Approve unlimited if not already done
+        if (!hasEnoughAllowance) {
+          transactions.push({
+            to: omnToken,
+            data: ERC20Service.encodeApproveUnlimited(account),
+          })
+        }
+
+        // Calculate amount to send from CPK to EOA
+        // claimable rewards + unclaimed rewards (if any)
+        const stakingService = new StakingService(this.provider, this.cpk.address, campaignAddress)
+        const claimableRewards = (await stakingService.getClaimableRewards(this.cpk.address))[0]
+        const unclaimedRewards = bigNumberify(await erc20Service.getCollateral(this.cpk.address))
+        const totalRewardsAmount = claimableRewards.add(unclaimedRewards)
+
+        // Transfer all rewards from cpk to EOA
+        transactions.push({
+          to: omnToken,
+          data: ERC20Service.encodeTransfer(account, totalRewardsAmount),
+        })
+      }
+
+      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      return txObject.hash
+    } catch (e) {
+      logger.error('Failed to withdraw staked pool tokens and claim reward tokens', e.message)
       throw e
     }
   }

@@ -58,10 +58,11 @@ interface Props {
   symbol: string
   userEarnings: BigNumber
   totalEarnings: BigNumber
+  currentApr: number
 }
 
 export const UserPoolData: React.FC<Props> = (props: Props) => {
-  const { collateral, symbol, totalEarnings, totalPoolShares, totalUserLiquidity, userEarnings } = props
+  const { collateral, currentApr, symbol, totalEarnings, totalPoolShares, totalUserLiquidity, userEarnings } = props
 
   return (
     <UserData>
@@ -90,7 +91,11 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
         )} ${symbol}`}
       />
       {/* TODO: Replace hardcoded data */}
-      <UserDataTitleValue state={ValueStates.success} title="Current APY" value={'60%'} />
+      <UserDataTitleValue
+        state={ValueStates.success}
+        title="Current APY"
+        value={`${formatNumber(currentApr.toString())}%`}
+      />
       {/* TODO: Replace hardcoded data */}
       <UserDataTitleValue state={ValueStates.success} title="Total Rewards left" value={'250.00 OMN'} />
       {/* TODO: Replace hardcoded data */}

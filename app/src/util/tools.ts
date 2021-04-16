@@ -1,6 +1,7 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import axios from 'axios'
 import Big from 'big.js'
+import { Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 
@@ -11,6 +12,7 @@ import {
   SOKOL_NETWORKS,
   STANDARD_DECIMALS,
   XDAI_NETWORKS,
+  YEAR_IN_SECONDS,
 } from '../common/constants'
 import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
 import { CompoundService } from '../services/compound_service'
@@ -755,4 +757,35 @@ export const getInitialCollateral = (networkId: number, collateral: Token, relay
 export const reverseArray = (array: any[]): any[] => {
   const newArray = array.map((e, i, a) => a[a.length - 1 - i])
   return newArray
+}
+
+export const getRemainingRewards = (
+  rewardsAmount: BigNumber,
+  timeRemaining: number,
+  duration: number,
+  decimals: number,
+): BigNumber => {
+  const durationFraction = timeRemaining / duration
+  const rewardsAmountNumber = Number(formatBigNumber(rewardsAmount, decimals, decimals))
+  return parseUnits((rewardsAmountNumber * durationFraction).toString(), decimals)
+}
+
+export const calculateRewardAPR = (
+  userStakedTokens: number,
+  totalStakedTokens: number,
+  timeRemaining: number,
+  remainingRewards: number,
+): number => {
+  if (remainingRewards <= 0 || userStakedTokens <= 0) {
+    return 0
+  }
+  const percentageOfTotalStake = userStakedTokens / totalStakedTokens
+  const rewardsToUser = percentageOfTotalStake * remainingRewards
+  const timeMultiple = YEAR_IN_SECONDS / timeRemaining
+  const tokensPerYear = timeMultiple * rewardsToUser
+  // TODO: Replace hardcoded token value
+  const usdPerYear = tokensPerYear * 1
+  // TODO: Replace hardcoded token value
+  const stakedUsd = userStakedTokens * 1
+  return (usdPerYear / stakedUsd) * 100
 }
