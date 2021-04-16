@@ -144,6 +144,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [rewardApr, setRewardApr] = useState(0)
   const [remainingRewards, setRemainingRewards] = useState(0)
   const [earnedRewards, setEarnedRewards] = useState(0)
+  const [totalRewards, setTotalRewards] = useState(0)
 
   useEffect(() => {
     setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
@@ -376,10 +377,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       const rewardAPR = calculateRewardAPR(userStakedTokens, totalStakedTokens, timeRemaining, remainingRewards)
       setRewardApr(rewardAPR)
 
+      const rewardToken = getOMNToken(networkId).address
+
       // TODO: Replace hardcoded decimals
-      const earnedRewards =
-        Number(await stakingService.getEarnedRewards(cpk?.address || '', getOMNToken(networkId).address)) / 10 ** 18
+      const earnedRewards = Number(await stakingService.getEarnedRewards(cpk?.address || '', rewardToken)) / 10 ** 18
       setEarnedRewards(earnedRewards)
+
+      // TODO: Replace hardcoded decimals
+      const totalRewards = Number(await stakingService.getRewardAmount(rewardToken)) / 10 ** 18
+      setTotalRewards(totalRewards)
     }
     cpk && getStakingData()
   }, [cpk?.address])
@@ -484,6 +490,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         symbol={symbol}
         totalEarnings={totalEarnings}
         totalPoolShares={totalPoolShares}
+        totalRewards={totalRewards}
         totalUserLiquidity={totalUserLiquidity}
         userEarnings={userEarnings}
       />
