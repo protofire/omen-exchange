@@ -20,7 +20,7 @@ import {
 import { ERC20Service } from '../../../../services'
 import { StakingService } from '../../../../services/staking'
 import { getLogger } from '../../../../util/logger'
-import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { getNativeAsset, getOMNToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
   bigMax,
@@ -143,6 +143,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [txHash, setTxHash] = useState('')
   const [rewardApr, setRewardApr] = useState(0)
   const [remainingRewards, setRemainingRewards] = useState(0)
+  const [earnedRewards, setEarnedRewards] = useState(0)
 
   useEffect(() => {
     setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
@@ -374,6 +375,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       const rewardAPR = calculateRewardAPR(userStakedTokens, totalStakedTokens, timeRemaining, remainingRewards)
       setRewardApr(rewardAPR)
+
+      // TODO: Replace hardcoded decimals
+      const earnedRewards =
+        Number(await stakingService.getEarnedRewards(cpk?.address || '', getOMNToken(networkId).address)) / 10 ** 18
+      setEarnedRewards(earnedRewards)
     }
     cpk && getStakingData()
   }, [cpk?.address])
@@ -473,6 +479,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       <UserPoolData
         collateral={collateral}
         currentApr={rewardApr}
+        earnedRewards={earnedRewards}
         remainingRewards={remainingRewards}
         symbol={symbol}
         totalEarnings={totalEarnings}
