@@ -143,6 +143,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [rewardApr, setRewardApr] = useState(0)
   const [remainingRewards, setRemainingRewards] = useState(0)
   const [earnedRewards, setEarnedRewards] = useState(0)
+  const [totalRewards, setTotalRewards] = useState(0)
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
@@ -413,10 +414,15 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       const rewardAPR = calculateRewardAPR(userStakedTokens, totalStakedTokens, timeRemaining, remainingRewards)
       setRewardApr(rewardAPR)
 
+      const rewardToken = getOMNToken(networkId).address
+
       // TODO: Replace hardcoded decimals
-      const earnedRewards =
-        Number(await stakingService.getEarnedRewards(cpk?.address || '', getOMNToken(networkId).address)) / 10 ** 18
+      const earnedRewards = Number(await stakingService.getEarnedRewards(cpk?.address || '', rewardToken)) / 10 ** 18
       setEarnedRewards(earnedRewards)
+
+      // TODO: Replace hardcoded decimals
+      const totalRewards = Number(await stakingService.getRewardAmount(rewardToken)) / 10 ** 18
+      setTotalRewards(totalRewards)
     }
     cpk && getStakingData()
   }, [cpk?.address])
@@ -617,6 +623,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         symbol={symbol}
         totalEarnings={displayTotalEarnings}
         totalPoolShares={displayTotalPoolShares}
+        totalRewards={totalRewards}
         totalUserLiquidity={displayTotalUserLiquidity}
         userEarnings={displayUserEarnings}
       />

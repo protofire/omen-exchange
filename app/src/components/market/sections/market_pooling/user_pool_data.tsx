@@ -61,6 +61,7 @@ interface Props {
   currentApr: number
   remainingRewards: number
   earnedRewards: number
+  totalRewards: number
 }
 
 export const UserPoolData: React.FC<Props> = (props: Props) => {
@@ -72,6 +73,7 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
     symbol,
     totalEarnings,
     totalPoolShares,
+    totalRewards,
     totalUserLiquidity,
     userEarnings,
   } = props
@@ -102,26 +104,26 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
           formatBigNumber(totalEarnings, collateral.decimals),
         )} ${symbol}`}
       />
-      {/* TODO: Replace hardcoded data */}
       <UserDataTitleValue
         state={currentApr > 0 ? ValueStates.success : undefined}
         title="Current APY"
         value={`${formatNumber(currentApr.toString())}%`}
       />
-      {/* TODO: Replace hardcoded data */}
       <UserDataTitleValue
         state={remainingRewards > 0 ? ValueStates.success : undefined}
         title="Total Rewards left"
         value={`${formatNumber(remainingRewards.toString())} OMN`}
       />
-      {/* TODO: Replace hardcoded data */}
       <UserDataTitleValue
         state={earnedRewards > 0 ? ValueStates.success : undefined}
         title="Your Rewards"
         value={`${formatNumber(earnedRewards.toString())} OMN`}
       />
-      {/* TODO: Replace hardcoded data */}
-      <UserDataTitleValue state={ValueStates.success} title="Total Rewards" value={'500.00 OMN'} />
+      <UserDataTitleValue
+        state={totalRewards > 0 ? ValueStates.success : undefined}
+        title="Total Rewards"
+        value={`${formatNumber(totalRewards.toString())} OMN`}
+      />
     </UserData>
   )
 }
