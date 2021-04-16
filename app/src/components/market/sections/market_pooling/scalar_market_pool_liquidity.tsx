@@ -141,6 +141,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
+  const [rewardApr, setRewardApr] = useState(0)
+  const [remainingRewards, setRemainingRewards] = useState(0)
 
   useEffect(() => {
     setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
@@ -342,6 +344,40 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     await cpk.withdrawStakedAndClaim('0xE2D380F4B16B8371fD3dC2990A29109642d4ea96')
   }
 
+  // Get necessary data and calculate APR
+  // TODO: Consider moving calculations to useMemo
+  useEffect(() => {
+    const getStakingData = async () => {
+      // TODO: Replace hardcoded campaign address
+      const stakingService = new StakingService(
+        provider,
+        cpk && cpk.address,
+        '0xE2D380F4B16B8371fD3dC2990A29109642d4ea96',
+      )
+      // TODO: Replace hardcoded decimals
+      const userStakedTokens = Number(await stakingService.getStakedTokensOfAmount(cpk?.address || '')) / 10 ** 18
+      // TODO: Replace hardcoded decimals
+      const totalStakedTokens = Number(await stakingService.getTotalStakedTokensAmount()) / 10 ** 18
+
+      // TODO: Replace hardcoded timestamp with subgraph datum
+      const endingTimestamp = 1618902000
+      const timeRemaining = endingTimestamp - Math.floor(Date.now() / 1000)
+      // TODO: Replace hardcoded value with subgraph datum
+      const rewardsAmount = parseUnits('1', 18)
+      // TODO: Replace hardcoded value with subgraph datum
+      const duration = 604800
+      // TODO: Replace hardcoded decimals with reward token decimals
+      const remainingRewards = Number(
+        formatBigNumber(getRemainingRewards(rewardsAmount, timeRemaining, duration, 18), 18, 18),
+      )
+      setRemainingRewards(remainingRewards)
+
+      const rewardAPR = calculateRewardAPR(userStakedTokens, totalStakedTokens, timeRemaining, remainingRewards)
+      setRewardApr(rewardAPR)
+    }
+    cpk && getStakingData()
+  }, [cpk?.address])
+
   const unlockCollateral = async () => {
     if (!cpk) {
       return
@@ -436,6 +472,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     <>
       <UserPoolData
         collateral={collateral}
+        currentApr={rewardApr}
+        remainingRewards={remainingRewards}
         symbol={symbol}
         totalEarnings={totalEarnings}
         totalPoolShares={totalPoolShares}

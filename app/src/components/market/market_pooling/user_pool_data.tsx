@@ -59,10 +59,21 @@ interface Props {
   symbol: string
   userEarnings: BigNumber
   totalEarnings: BigNumber
+  currentApr: number
+  remainingRewards: number
 }
 
 export const UserPoolData: React.FC<Props> = (props: Props) => {
-  const { totalEarnings, totalPoolShares, totalUserLiquidity, userEarnings } = props
+  const {
+    collateral,
+    currentApr,
+    remainingRewards,
+    symbol,
+    totalEarnings,
+    totalPoolShares,
+    totalUserLiquidity,
+    userEarnings,
+  } = props
   const context = useConnectedWeb3Context()
   const { networkId } = context
   const collateral = getInitialCollateral(networkId, props.collateral)
@@ -92,9 +103,17 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
         }`}
       />
       {/* TODO: Replace hardcoded data */}
-      <UserDataTitleValue state={ValueStates.success} title="Current APY" value={'60%'} />
+      <UserDataTitleValue
+        state={currentApr > 0 ? ValueStates.success : undefined}
+        title="Current APY"
+        value={`${formatNumber(currentApr.toString())}%`}
+      />
       {/* TODO: Replace hardcoded data */}
-      <UserDataTitleValue state={ValueStates.success} title="Total Rewards left" value={'250.00 OMN'} />
+      <UserDataTitleValue
+        state={remainingRewards > 0 ? ValueStates.success : undefined}
+        title="Total Rewards left"
+        value={`${formatNumber(remainingRewards.toString())} OMN`}
+      />
       {/* TODO: Replace hardcoded data */}
       <UserDataTitleValue state={ValueStates.success} title="Your Rewards" value={'45.00 OMN'} />
       {/* TODO: Replace hardcoded data */}
