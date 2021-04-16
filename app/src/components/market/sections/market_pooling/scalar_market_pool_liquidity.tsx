@@ -356,10 +356,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         cpk && cpk.address,
         '0xE2D380F4B16B8371fD3dC2990A29109642d4ea96',
       )
-      // TODO: Replace hardcoded decimals
-      const userStakedTokens = Number(await stakingService.getStakedTokensOfAmount(cpk?.address || '')) / 10 ** 18
-      // TODO: Replace hardcoded decimals
-      const totalStakedTokens = Number(await stakingService.getTotalStakedTokensAmount()) / 10 ** 18
+
+      const rewardToken = getOMNToken(networkId)
+
+      const userStakedTokens =
+        Number(await stakingService.getStakedTokensOfAmount(cpk?.address || '')) / 10 ** collateral.decimals
+      const totalStakedTokens = Number(await stakingService.getTotalStakedTokensAmount()) / 10 ** collateral.decimals
 
       // TODO: Replace hardcoded timestamp with subgraph datum
       const endingTimestamp = 1618902000
@@ -368,23 +370,25 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       const rewardsAmount = parseUnits('1', 18)
       // TODO: Replace hardcoded value with subgraph datum
       const duration = 604800
-      // TODO: Replace hardcoded decimals with reward token decimals
       const remainingRewards = Number(
-        formatBigNumber(getRemainingRewards(rewardsAmount, timeRemaining, duration, 18), 18, 18),
+        formatBigNumber(
+          getRemainingRewards(rewardsAmount, timeRemaining, duration, rewardToken.decimals),
+          rewardToken.decimals,
+          rewardToken.decimals,
+        ),
       )
       setRemainingRewards(remainingRewards)
 
       const rewardAPR = calculateRewardAPR(userStakedTokens, totalStakedTokens, timeRemaining, remainingRewards)
       setRewardApr(rewardAPR)
 
-      const rewardToken = getOMNToken(networkId).address
-
-      // TODO: Replace hardcoded decimals
-      const earnedRewards = Number(await stakingService.getEarnedRewards(cpk?.address || '', rewardToken)) / 10 ** 18
+      const earnedRewards =
+        Number(await stakingService.getEarnedRewards(cpk?.address || '', rewardToken.address)) /
+        10 ** rewardToken.decimals
       setEarnedRewards(earnedRewards)
 
-      // TODO: Replace hardcoded decimals
-      const totalRewards = Number(await stakingService.getRewardAmount(rewardToken)) / 10 ** 18
+      const totalRewards =
+        Number(await stakingService.getRewardAmount(rewardToken.address)) / 10 ** rewardToken.decimals
       setTotalRewards(totalRewards)
     }
     cpk && getStakingData()
