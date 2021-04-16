@@ -296,8 +296,6 @@ class RelayTransactionManager {
 
     sig = sig.slice(0, -2) + sigV.toString(16)
 
-    // test recovery
-    // const recovered = ethers.utils.verifyMessage(messageArray, sig)
     return sig
   }
 }
