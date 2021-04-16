@@ -15,7 +15,6 @@ export const useCollateralBalance = (
   fetchCollateralBalance: () => Promise<void>
 } => {
   const { account, library: provider } = context
-  console.log(account, collateral)
 
   const [collateralBalance, setCollateralBalance] = useState<Maybe<BigNumber>>(null)
 
@@ -33,6 +32,8 @@ export const useCollateralBalance = (
   }
 
   useEffect(() => {
+    console.log('here looping', collateral.symbol)
+    console.log(collateral)
     fetchCollateralBalance()
     // eslint-disable-next-line
   }, [account, provider, collateral])

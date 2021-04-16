@@ -1,14 +1,15 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber, parseEther } from 'ethers/utils'
-import React, { HTMLAttributes, useState } from 'react'
+import React, { HTMLAttributes, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { STANDARD_DECIMALS } from '../../../common/constants'
+import { OMNI_BRIDGE_MAINNET_ADDRESS, STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
-import { getToken } from '../../../util/networks'
+import { ERC20Service } from '../../../services'
+import { getToken, networkIds } from '../../../util/networks'
 import { formatBigNumber, waitForConfirmations } from '../../../util/tools'
-import { ExchangeCurrency, ExchangeType, TransactionStep } from '../../../util/types'
+import { ExchangeCurrency, ExchangeType, TransactionStep, WalletState } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { BigNumberInput, RadioInput, TextfieldCustomPlaceholder } from '../../common'
@@ -101,10 +102,42 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [confirmations, setConfirmations] = useState(0)
   const [message, setMessage] = useState('')
   const [currencySelected, setCurrencySelected] = useState<ExchangeCurrency>(ExchangeCurrency.Dai)
+  const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const [mainnetAllowance, setMainnetAllowance] = useState<BigNumber>(new BigNumber(0))
+  const { account, relay } = context.rawWeb3Context
+
+  const fetchAllowance = async () => {
+    if (context.relay && account && context.rawWeb3Context.networkId === networkIds.MAINNET) {
+      const { address } = getToken(1, 'omn')
+      console.log(address)
+      const collateralService = new ERC20Service(context.rawWeb3Context.library, account, address)
+      const allowance = await collateralService.allowance(account, OMNI_BRIDGE_MAINNET_ADDRESS)
+      console.log(formatBigNumber(allowance, 18, 2))
+      setMainnetAllowance(allowance)
+    }
+  }
+
+  const approve = async () => {
+    console.log('button works')
+    if (exchangeType === ExchangeType.deposit) {
+      console.log('deposit')
+    } else {
+      console.log('withdraw')
+    }
+  }
+  const mainnetWalletAllowance =
+    mainnetAllowance.isZero() && exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Omen
+      ? WalletState.enable
+      : WalletState.ready
+  console.log(mainnetAllowance.isZero())
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
   }, [])
+
+  useEffect(() => {
+    fetchAllowance()
+  }, [account, relay])
 
   const DAI = getToken(1, 'dai')
 
@@ -119,7 +152,10 @@ export const ModalDepositWithdraw = (props: Props) => {
     displayFundAmount.isZero() ||
     !wallet ||
     displayFundAmount.gt(wallet) ||
-    displayFundAmount.lt(currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange)
+    displayFundAmount.lt(currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange) ||
+    (currencySelected === ExchangeCurrency.Omen &&
+      exchangeType === ExchangeType.deposit &&
+      displayFundAmount.gt(mainnetAllowance))
 
   const deposit = async () => {
     if (!cpk) {
@@ -244,7 +280,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                     <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Omen}>Omen</BalanceItemTitle>
                   </BalanceItemSide>
                   <BalanceItemSide>
-                    <BalanceItemBalance>{formatBigNumber(Zero, 18)} GEN</BalanceItemBalance>
+                    <BalanceItemBalance>{formattedOmenBalance} OMN</BalanceItemBalance>
                   </BalanceItemSide>
                 </BalanceItem>
               </BalanceItems>
@@ -282,6 +318,20 @@ export const ModalDepositWithdraw = (props: Props) => {
             )}{' '}
             {currencySelected === ExchangeCurrency.Dai ? 'Dai' : 'Omn'}.
           </InputInfo>
+          {/*<SetAllowance*/}
+          {/*  collateral={getToken(1, 'omn')}*/}
+          {/*  finished={allowanceFinished && RemoteData.is.success(mainnetAllowance)}*/}
+          {/*  loading={RemoteData.is.asking(mainnetAllowance)}*/}
+          {/*  marginBottom*/}
+          {/*  onUnlock={unlockCollateral}*/}
+          {/*  style={{ marginBottom: 20 }}*/}
+          {/*/>*/}
+          {mainnetWalletAllowance === WalletState.enable && (
+            <div style={{ display: 'flex' }}>
+              <Button onClick={approve}>Set</Button>{' '}
+              <div>This permission allows Omni Bridge smart contracts to interact with your OMN.</div>
+            </div>
+          )}
 
           <DepositWithdrawButton
             buttonType={ButtonType.primaryAlternative}

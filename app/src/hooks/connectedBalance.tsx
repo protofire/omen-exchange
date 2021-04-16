@@ -2,11 +2,11 @@ import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 
-import { GEN_XDAI_ADDRESS_TESTING, STANDARD_DECIMALS } from '../common/constants'
+import { GEN_TOKEN_ADDDRESS_TESTING, GEN_XDAI_ADDRESS_TESTING, STANDARD_DECIMALS } from '../common/constants'
 import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../hooks'
 import { XdaiService } from '../services'
 import { getLogger } from '../util/logger'
-import { getNativeAsset, getTokenFromAddress, networkIds } from '../util/networks'
+import { getNativeAsset, getToken, getTokenFromAddress, knownTokens, networkIds } from '../util/networks'
 import { formatBigNumber, formatNumber } from '../util/tools'
 
 const logger = getLogger('Hooks::ConnectedBalance')
@@ -61,20 +61,23 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const formattedEthBalance = formatNumber(formatBigNumber(ethBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 3)
   const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
   const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, STANDARD_DECIMALS, STANDARD_DECIMALS))
-
   const nativeAsset = getNativeAsset(context.networkId)
 
   const { collateralBalance, fetchCollateralBalance } = useCollateralBalance(nativeAsset, context)
   const xDaiBalance = collateralBalance || Zero
   const formattedxDaiBalance = `${formatBigNumber(xDaiBalance, nativeAsset.decimals, 2)}`
 
-  // const omenToken = { address: GEN_XDAI_ADDRESS_TESTING, decimals: 18, symbol: 'GEN' }
+  // const omenToken = getToken(1, 'omn')
+  // console.log(omenToken)
+  //
   // const { collateralBalance: omenCollateral, fetchCollateralBalance: fetchOmenBalance } = useCollateralBalance(
   //   omenToken,
   //   context,
   // )
+  //
   // const omenBalance = omenCollateral || Zero
   // const formattedOmenBalance = `${formatBigNumber(omenBalance, omenToken.decimals, 2)}`
+
   const formattedOmenBalance = '22'
 
   const fetchUnclaimedAssets = async () => {
@@ -103,6 +106,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     if (relay) {
+      console.log('here')
       fetchBalances()
     } else {
       setUnclaimedAmount(Zero)
