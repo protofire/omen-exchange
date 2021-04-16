@@ -190,29 +190,12 @@ const Actions = styled.div`
   }
 `
 
-const Display = styled.span`
-  color: ${props => props.theme.colors.textColorLighter};
-  font-size: 14px;
-  line-height: 1.2;
-  margin-right: 6px;
-`
-
 const BottomContents = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   padding: 20px 0px 25px 0px;
   border-top: 1px solid ${props => props.theme.borders.borderColor};
-`
-
-const DisplayButtonWrapper = styled.div`
-  padding: 0 15px 0 25px;
-`
-
-const DisplayDropdown = styled(Dropdown)`
-  .dropdownItems {
-    min-width: auto;
-  }
 `
 
 const FiltersLeftWrapper = styled.div`
@@ -237,7 +220,6 @@ interface Props {
   moreMarkets: boolean
   pageIndex: number
   onFilterChange: (filter: MarketFilters) => void
-  onUpdatePageSize: (size: number) => void
   onLoadNextPage: () => void
   onLoadPrevPage: () => void
 }
@@ -257,7 +239,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     onFilterChange,
     onLoadNextPage,
     onLoadPrevPage,
-    onUpdatePageSize,
     pageIndex,
   } = props
   const [counts, setCounts] = useState({
@@ -516,21 +497,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           },
         ]
 
-  const sizeOptions = [4, 8, 12]
-
-  const sizeItems: Array<DropdownItemProps> = sizeOptions.map(item => {
-    return {
-      content: (
-        <CustomDropdownItem>
-          <Display className="display">Display</Display> {item}
-        </CustomDropdownItem>
-      ),
-      onClick: () => {
-        onUpdatePageSize(item)
-      },
-    }
-  })
-
   const noOwnMarkets = RemoteData.is.success(markets) && markets.data.length === 0 && state === MarketStates.myMarkets
   const noMarketsAvailable =
     RemoteData.is.success(markets) && markets.data.length === 0 && state !== MarketStates.myMarkets
@@ -624,15 +590,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
           {showFilteringInlineLoading && <InlineLoading message="Loading Markets..." />}
         </ListWrapper>
         <BottomContents>
-          <DisplayButtonWrapper>
-            <DisplayDropdown
-              currentItem={0}
-              dirty={true}
-              dropdownPosition={DropdownPosition.center}
-              items={sizeItems}
-              placeholder={<Display>Display</Display>}
-            />
-          </DisplayButtonWrapper>
           <LoadMoreWrapper>
             <ButtonRoundStyled disabled={disableLoadPrevButton} onClick={onLoadPrevPage}>
               Prev
