@@ -144,6 +144,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
   const [rewardApr, setRewardApr] = useState(0)
+  const [remainingRewards, setRemainingRewards] = useState(0)
 
   useEffect(() => {
     setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
@@ -371,6 +372,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       const remainingRewards = Number(
         formatBigNumber(getRemainingRewards(rewardsAmount, timeRemaining, duration, 18), 18, 18),
       )
+      setRemainingRewards(remainingRewards)
 
       const rewardAPR = calculateRewardAPR(userStakedTokens, totalStakedTokens, timeRemaining, remainingRewards)
       setRewardApr(rewardAPR)
@@ -473,6 +475,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       <UserPoolData
         collateral={collateral}
         currentApr={rewardApr}
+        remainingRewards={remainingRewards}
         symbol={symbol}
         totalEarnings={totalEarnings}
         totalPoolShares={totalPoolShares}

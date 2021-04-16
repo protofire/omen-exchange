@@ -135,6 +135,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
   const [rewardApr, setRewardApr] = useState(0)
+  const [remainingRewards, setRemainingRewards] = useState(0)
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
@@ -400,6 +401,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       const remainingRewards = Number(
         formatBigNumber(getRemainingRewards(rewardsAmount, timeRemaining, duration, 18), 18, 18),
       )
+      setRemainingRewards(remainingRewards)
 
       const rewardAPR = calculateRewardAPR(userStakedTokens, totalStakedTokens, timeRemaining, remainingRewards)
       setRewardApr(rewardAPR)
@@ -598,6 +600,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       <UserPoolData
         collateral={baseCollateral}
         currentApr={rewardApr}
+        remainingRewards={remainingRewards}
         symbol={symbol}
         totalEarnings={displayTotalEarnings}
         totalPoolShares={displayTotalPoolShares}
