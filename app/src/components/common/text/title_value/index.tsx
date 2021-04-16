@@ -12,8 +12,8 @@ const Wrapper = styled.div`
   margin: 0px;
 `
 
-const Title = styled.h2`
-  color: ${props => props.theme.colors.textColorLighter};
+const Title = styled.h2<{ vertical: boolean | undefined }>`
+  color: ${props => (props.vertical ? props.theme.colors.textColor : props.theme.colors.textColorLighter)};
   flex-shrink: 0;
   font-size: 14px;
   font-weight: 400;
@@ -22,15 +22,17 @@ const Title = styled.h2`
   white-space: nowrap;
 `
 
-const Value = styled.p<{ state: ValueStates }>`
+const Value = styled.p<{ state: ValueStates; vertical: boolean | undefined }>`
   color: ${props =>
     props.state === ValueStates.success
       ? props.theme.colors.green
       : props.state === ValueStates.error
       ? props.theme.colors.error
+      : props.vertical
+      ? props.theme.colors.textColorDarker
       : props.theme.colors.textColorDark};
   font-size: 14px;
-  font-weight: 500;
+  font-weight: ${props => !props.vertical && '500'};
   line-height: 1.2;
   margin: 0;
   text-align: right;
@@ -42,7 +44,9 @@ const Value = styled.p<{ state: ValueStates }>`
         ? props.theme.colors.green
         : props.state === ValueStates.error
         ? props.theme.colors.error
-        : props.theme.colors.textColorDark};
+        : props.vertical
+        ? props.theme.colors.textColorDarker
+        : props.theme.colors.textColor};
     text-decoration: underline;
 
     &:hover {
@@ -63,10 +67,11 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   date?: Date
   title: string
   value: any
+  vertical?: boolean
 }
 
 export const TitleValue: React.FC<Props> = (props: Props) => {
-  const { state = ValueStates.normal, title, value, tooltip, date, ...restProps } = props
+  const { state = ValueStates.normal, title, value, tooltip, date, vertical, ...restProps } = props
 
   const now = moment()
   const localResolution = moment(date).local()
@@ -83,7 +88,7 @@ export const TitleValue: React.FC<Props> = (props: Props) => {
 
   return (
     <Wrapper {...restProps}>
-      <Title>{title}</Title>
+      <Title vertical={vertical}>{title}</Title>
       <Value
         className={tooltip ? 'tooltip' : ''}
         data-delay-hide={tooltip ? '500' : ''}
@@ -92,6 +97,7 @@ export const TitleValue: React.FC<Props> = (props: Props) => {
         data-multiline={tooltip ? 'true' : ''}
         data-tip={tooltip ? localResolution.format(formatting) + '<br />' + endsMessage : null}
         state={state}
+        vertical={vertical}
       >
         {value}
       </Value>
