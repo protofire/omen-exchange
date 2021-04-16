@@ -17,6 +17,7 @@ import { BigNumberInputReturn } from '../../common/form/big_number_input'
 import { IconArrowBack, IconClose, IconOmen } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
 import { DaiIcon } from '../../common/icons/currencies'
+import { ToggleTokenLock } from '../../market/common/toggle_token_lock'
 import {
   BalanceItem,
   BalanceItemBalance,
@@ -91,6 +92,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   } = props
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
+  const omenToken = getToken(1, 'omn')
 
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
@@ -102,7 +104,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [confirmations, setConfirmations] = useState(0)
   const [message, setMessage] = useState('')
   const [currencySelected, setCurrencySelected] = useState<ExchangeCurrency>(ExchangeCurrency.Dai)
-  const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const [allowanceState, setAllowanceState] = useState<TransactionStep>(TransactionStep.idle)
   const [mainnetAllowance, setMainnetAllowance] = useState<BigNumber>(new BigNumber(0))
   const { account, relay } = context.rawWeb3Context
 
@@ -118,11 +120,24 @@ export const ModalDepositWithdraw = (props: Props) => {
   }
 
   const approve = async () => {
-    console.log('button works')
-    if (exchangeType === ExchangeType.deposit) {
-      console.log('deposit')
-    } else {
-      console.log('withdraw')
+    setAllowanceState(TransactionStep.waitingConfirmation)
+    try {
+      if (exchangeType === ExchangeType.deposit) {
+        console.log('deposit')
+
+        const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenToken.address)
+        // const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, marketData.funding)
+
+        const hash = await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS)
+        console.log(hash)
+      } else {
+        console.log('withdraw')
+      }
+      await fetchAllowance()
+      setAllowanceState(TransactionStep.transactionConfirmed)
+    } catch (e) {
+      setAllowanceState(TransactionStep.idle)
+      console.log(e)
     }
   }
   const mainnetWalletAllowance =
@@ -328,7 +343,12 @@ export const ModalDepositWithdraw = (props: Props) => {
           {/*/>*/}
           {mainnetWalletAllowance === WalletState.enable && (
             <div style={{ display: 'flex' }}>
-              <Button onClick={approve}>Set</Button>{' '}
+              <ToggleTokenLock
+                finished={allowanceState === TransactionStep.transactionConfirmed}
+                loading={allowanceState === TransactionStep.waitingConfirmation}
+                onUnlock={approve}
+              />
+
               <div>This permission allows Omni Bridge smart contracts to interact with your OMN.</div>
             </div>
           )}
