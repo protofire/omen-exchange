@@ -85,8 +85,8 @@ export const PositionTable = (props: Props) => {
   let displayShortPayout = shortPayout
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
-  let shortSharesFormatted = formatNumber(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals))
-  let longSharesFormatted = formatNumber(formatBigNumber(longShares || new BigNumber(0), collateral.decimals))
+  let shortSharesFormatted = formatNumber(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals, collateral.decimals))
+  let longSharesFormatted = formatNumber(formatBigNumber(longShares || new BigNumber(0), collateral.decimals, collateral.decimals))
   let displayLongProfitLoss = longProfitLoss
   let displayShortProfitLoss = shortProfitLoss
 
@@ -107,7 +107,7 @@ export const PositionTable = (props: Props) => {
       const displayPositionProfitLossNum = formatBigNumber(
         displayPositionProfitLossBaseCollateralBN,
         baseCollateral.decimals,
-        4,
+        baseCollateral.decimals,
       )
       let displayPositionProfitLoss = parseFloat(displayPositionProfitLossNum)
       if (positionProfitLoss < 0) {

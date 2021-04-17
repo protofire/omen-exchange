@@ -236,7 +236,7 @@ export const ScalarMarketSell = (props: Props) => {
       if (!cpk) {
         return
       }
-      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
+      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals, collateral.decimals)
       let displaySharesAmount = sharesAmount
       if (collateral.symbol.toLowerCase() in CompoundTokenType && amountShares && compoundService) {
         const displaySharesAmountValue = compoundService.calculateCTokenToBaseExchange(baseCollateral, amountShares)
@@ -248,6 +248,8 @@ export const ScalarMarketSell = (props: Props) => {
       }
       setStatus(Status.Loading)
       setMessage(`Selling ${displaySharesAmount} shares...`)
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,
@@ -269,7 +271,7 @@ export const ScalarMarketSell = (props: Props) => {
       setAmountShares(null)
       setAmountSharesToDisplay('')
       setStatus(Status.Ready)
-      setMessage(`Successfully sold ${displaySharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      setMessage(`Successfully sold ${formatNumber(displaySharesAmount)} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
       setStatus(Status.Error)
       setTxState(TransactionStep.error)
@@ -278,7 +280,9 @@ export const ScalarMarketSell = (props: Props) => {
     }
   }
 
-  const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
+  const selectedOutcomeBalance = formatNumber(
+    formatBigNumber(balanceItem.shares, collateral.decimals, collateral.decimals),
+  )
 
   let displaySelectedOutcomeBalance = selectedOutcomeBalance
   let displaySelectedOutcomeBalanceValue = balanceItem.shares
@@ -417,7 +421,7 @@ export const ScalarMarketSell = (props: Props) => {
               title={'Revenue'}
               value={
                 potentialValueNormalized
-                  ? `${formatNumber(formatBigNumber(potentialValueNormalized, displayCollateral.decimals, 2))} 
+                  ? `${formatNumber(formatBigNumber(potentialValueNormalized, displayCollateral.decimals, displayCollateral.decimals))} 
                   ${symbol}`
                   : '0.00'
               }
@@ -426,7 +430,7 @@ export const ScalarMarketSell = (props: Props) => {
               title={'Fee'}
               value={`${
                 costFeeNormalized
-                  ? formatNumber(formatBigNumber(costFeeNormalized.mul(-1), displayCollateral.decimals, 2))
+                  ? formatNumber(formatBigNumber(costFeeNormalized.mul(-1), displayCollateral.decimals, displayCollateral.decimals))
                   : '0.00'
               } ${symbol}`}
             />
@@ -444,7 +448,7 @@ export const ScalarMarketSell = (props: Props) => {
               title={'Total'}
               value={`${
                 normalizedTradedCollateral
-                  ? formatNumber(formatBigNumber(normalizedTradedCollateral, displayCollateral.decimals, 2))
+                  ? formatNumber(formatBigNumber(normalizedTradedCollateral, displayCollateral.decimals, displayCollateral.decimals))
                   : '0.00'
               } ${displayTotalSymbol}`}
             />

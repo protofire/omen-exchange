@@ -1,25 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Helmet } from 'react-helmet'
 import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import { useWeb3Context } from 'web3-react'
 
-import {
-  DISCLAIMER_TEXT,
-  DOCUMENT_DESCRIPTION,
-  DOCUMENT_TITLE,
-  MAINNET_LOCATION,
-  MAIN_NETWORKS,
-  OG_DESCRIPTION,
-  OG_IMAGE,
-  OG_SITE_NAME,
-  OG_TITLE,
-  OG_URL,
-  TWITTER_CARD,
-  TWITTER_IMAGE_ALT,
-  TWITTER_SITE,
-  XDAI_LOCATION,
-  XDAI_NETWORKS,
-} from '../../common/constants'
+import { DISCLAIMER_TEXT, MAINNET_LOCATION, MAIN_NETWORKS, XDAI_LOCATION, XDAI_NETWORKS } from '../../common/constants'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
 import { Disclaimer } from '../common/disclaimer'
 import { Footer } from '../common/layout/footer'
@@ -68,19 +51,6 @@ export const Main: React.FC = () => {
       {wrongNetwork && <SwitchNetworkModal currentNetworkId={networkId} />}
       <Router>
         <MainWrapper>
-          <Helmet>
-            <title>{DOCUMENT_TITLE}</title>
-            <meta content={DOCUMENT_DESCRIPTION} name="description" />
-            <meta content={OG_TITLE} property="og:title" />
-            <meta content={OG_DESCRIPTION} property="og:description" />
-            <meta content={`/${OG_IMAGE}`} property="og:image" />
-            <meta content={OG_URL} property="og:url" />
-            <meta content={OG_SITE_NAME} property="og:site_name" />
-            <meta content={TWITTER_CARD} name="twitter:card" />
-            <meta content={TWITTER_IMAGE_ALT} name="twitter:image:alt" />
-            <meta content={TWITTER_SITE} name="twitter:site" />
-            <link href={`${OG_IMAGE}`} rel="icon" type="image/png" />
-          </Helmet>
           <Header />
           <MainScroll>
             {context.error && <WrongNetworkMessage />}

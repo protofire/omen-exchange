@@ -298,9 +298,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const marketPredictionNumber = calcPrediction(outcomePredictedByMarket || '', lowerBound, upperBound)
 
   const amountSharesNumber =
-    collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals))
+    collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals, collateral.decimals))
 
-  const tradeAmountNumber = collateral && Number(formatBigNumber(tradeAmount || new BigNumber(0), collateral.decimals))
+  const tradeAmountNumber =
+    collateral && Number(formatBigNumber(tradeAmount || new BigNumber(0), collateral.decimals, collateral.decimals))
   const feeNumber = fee && collateral && Number(formatBigNumber(fee, collateral.decimals))
 
   const shortBalances = balances && balances.filter(balance => balance.outcomeName === 'short')
@@ -316,9 +317,9 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     longBalances.map(longBalance => longBalance.shares).reduce((a, b) => a.add(b))
 
   const shortSharesNumber =
-    collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals, STANDARD_DECIMALS))
+    collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals, collateral.decimals))
   const longSharesNumber =
-    collateral && Number(formatBigNumber(longShares || new BigNumber(0), collateral.decimals, STANDARD_DECIMALS))
+    collateral && Number(formatBigNumber(longShares || new BigNumber(0), collateral.decimals, collateral.decimals))
 
   const [isAmountInputted, setIsAmountInputted] = useState(false)
 
@@ -481,13 +482,13 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       setProfitLoss(calcProfit(amountSharesNumber || 0, 100 - scaleValue, tradeAmountNumber || 0))
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
-        const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, STANDARD_DECIMALS))
+        const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
         setShortPayout(calcPayout(shortSharesNumber || 0, 100 - scaleValue))
         setShortProfitAmount(calcProfit(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
         setShortProfitPercentage(calcProfitPercentage(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
-        const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, STANDARD_DECIMALS))
+        const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
         setLongPayout(calcPayout(longSharesNumber || 0, scaleValue))
 
         setLongProfitAmount(calcProfit(longSharesNumber || 0, scaleValue, totalLongPriceNumber))
@@ -673,7 +674,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'Current prediction',
     },
     {
-      title: `+ ${displayAddtionalShares?.toFixed(2)} Shares`,
+      title: `+ ${formatNumber(displayAddtionalShares ? displayAddtionalShares.toString() : '0')} Shares `,
       subtitle: `${additionalSharesType} position`,
       tooltip: `To keep the market stable, you receive additional shares for depositing and removing liquidity.`,
       ball: true,

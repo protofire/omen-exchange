@@ -262,6 +262,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
       }
 
+<<<<<<< HEAD
       let useBaseToken = false
       if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
         useBaseToken = true
@@ -272,6 +273,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       }
 
       setMessage(`Depositing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
+=======
+      const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals, collateral.decimals)
+
+      setMessage(`Depositing funds: ${formatNumber(fundsAmount)} ${collateral.symbol}...`)
+>>>>>>> be8d9102dee49093e7b08e52af5632dd582e084a
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
@@ -293,8 +299,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       setAmountToFund(null)
       setAmountToFundDisplay('')
+<<<<<<< HEAD
       setAmountToFundNormalized(null)
       setMessage(`Successfully deposited ${fundsAmount} ${displayCollateral.symbol}`)
+=======
+      setMessage(`Successfully deposited ${formatNumber(fundsAmount)} ${collateral.symbol}`)
+>>>>>>> be8d9102dee49093e7b08e52af5632dd582e084a
     } catch (err) {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to deposit funds.`)
@@ -307,6 +317,13 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       if (!cpk) {
         return
       }
+<<<<<<< HEAD
+=======
+
+      const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
+
+      setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${collateral.symbol}...`)
+>>>>>>> be8d9102dee49093e7b08e52af5632dd582e084a
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
       let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
@@ -357,8 +374,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
+<<<<<<< HEAD
       setAmountToRemoveNormalized(null)
       setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
+=======
+      setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${collateral.symbol}`)
+>>>>>>> be8d9102dee49093e7b08e52af5632dd582e084a
     } catch (err) {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to withdraw funds.`)
@@ -682,7 +703,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 emphasizeValue={displayPoolTokens.gt(0)}
                 state={(displayPoolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Pool Tokens"
+<<<<<<< HEAD
                 value={`${formatNumber(formatBigNumber(displayPoolTokens, baseCollateral.decimals))}`}
+=======
+                value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals, collateral.decimals))}`}
+>>>>>>> be8d9102dee49093e7b08e52af5632dd582e084a
               />
             </TransactionDetailsCard>
           )}
@@ -693,24 +718,39 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 state={ValueStates.success}
                 title="Earned"
                 value={`${formatNumber(
+<<<<<<< HEAD
                   formatBigNumber(sellNoteUserEarnings, displayCollateral.decimals),
                 )} ${displayTotalSymbol}`}
+=======
+                  formatBigNumber(userEarnings, collateral.decimals, collateral.decimals),
+                )} ${symbol}`}
+>>>>>>> be8d9102dee49093e7b08e52af5632dd582e084a
               />
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"
                 value={`${formatNumber(
+<<<<<<< HEAD
                   formatBigNumber(sellNoteDepositedTokens, displayCollateral.decimals),
                 )} ${displayTotalSymbol}`}
+=======
+                  formatBigNumber(depositedTokens, collateral.decimals, collateral.decimals),
+                )} ${symbol}`}
+>>>>>>> be8d9102dee49093e7b08e52af5632dd582e084a
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={depositedTokensTotal.gt(0)}
                 state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Total"
+<<<<<<< HEAD
                 value={`${formatNumber(
                   formatBigNumber(sellNoteDepositedTokensTotal, displayCollateral.decimals),
                 )} ${displayTotalSymbol}`}
+=======
+                value={`${formatNumber(formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals))}
+                ${symbol}`}
+>>>>>>> be8d9102dee49093e7b08e52af5632dd582e084a
               />
               {collateral.address === pseudoNativeAssetAddress ? (
                 <SwitchTransactionToken onToggleCollateral={setToggleCollateral} toggleCollatral={toggleCollateral} />
