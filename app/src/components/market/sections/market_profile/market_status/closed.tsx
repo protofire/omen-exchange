@@ -62,7 +62,9 @@ const StyledButtonContainer = styled(ButtonContainer)`
 `
 
 const BorderedButtonContainer = styled(ButtonContainer)`
-  border-top: 1px solid ${props => props.theme.colors.verticalDivider};
+  &.border {
+    border-top: 1px solid ${props => props.theme.colors.verticalDivider};!important
+  }
   ${MarginsButton};
 `
 
@@ -457,7 +459,7 @@ const Wrapper = (props: Props) => {
                 ></MarketResolutionMessageStyled>
               )}
               {isConditionResolved && !hasWinningOutcomes ? (
-                <StyledButtonContainer>
+                <StyledButtonContainer className="border">
                   <Button
                     buttonType={ButtonType.secondaryLine}
                     onClick={() => {
@@ -470,7 +472,7 @@ const Wrapper = (props: Props) => {
                 </StyledButtonContainer>
               ) : (
                 <>
-                  {!isConditionResolved && (
+                  {!isConditionResolved && !hasWinningOutcomes ? (
                     <BorderedButtonContainer>
                       <Button
                         buttonType={ButtonType.primary}
@@ -480,17 +482,29 @@ const Wrapper = (props: Props) => {
                         Resolve Condition
                       </Button>
                     </BorderedButtonContainer>
-                  )}
-                  {isConditionResolved && hasWinningOutcomes && (
-                    <BorderedButtonContainer>
+                  ) : !isConditionResolved && hasWinningOutcomes ? (
+                    <BorderedButtonContainer className="border">
                       <Button
                         buttonType={ButtonType.primary}
                         disabled={status === Status.Loading}
-                        onClick={() => redeem()}
+                        onClick={resolveCondition}
                       >
-                        Redeem
+                        Resolve Condition
                       </Button>
                     </BorderedButtonContainer>
+                  ) : (
+                    isConditionResolved &&
+                    hasWinningOutcomes && (
+                      <BorderedButtonContainer className="border">
+                        <Button
+                          buttonType={ButtonType.primary}
+                          disabled={status === Status.Loading}
+                          onClick={() => redeem()}
+                        >
+                          Redeem
+                        </Button>
+                      </BorderedButtonContainer>
+                    )
                   )}
                 </>
               )}
