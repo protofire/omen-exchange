@@ -63,7 +63,7 @@ const StyledButtonContainer = styled(ButtonContainer)`
 
 const BorderedButtonContainer = styled(ButtonContainer)`
   &.border {
-    border-top: 1px solid ${props => props.theme.colors.verticalDivider};!important
+    border-top: 1px solid ${props => props.theme.colors.verticalDivider};
   }
   ${MarginsButton};
 `
