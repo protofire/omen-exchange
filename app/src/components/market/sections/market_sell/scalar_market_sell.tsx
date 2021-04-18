@@ -271,7 +271,9 @@ export const ScalarMarketSell = (props: Props) => {
       setAmountShares(null)
       setAmountSharesToDisplay('')
       setStatus(Status.Ready)
-      setMessage(`Successfully sold ${formatNumber(displaySharesAmount)} '${balances[outcomeIndex].outcomeName}' shares.`)
+      setMessage(
+        `Successfully sold ${formatNumber(displaySharesAmount)} '${balances[outcomeIndex].outcomeName}' shares.`,
+      )
     } catch (err) {
       setStatus(Status.Error)
       setTxState(TransactionStep.error)
@@ -421,7 +423,9 @@ export const ScalarMarketSell = (props: Props) => {
               title={'Revenue'}
               value={
                 potentialValueNormalized
-                  ? `${formatNumber(formatBigNumber(potentialValueNormalized, displayCollateral.decimals, displayCollateral.decimals))} 
+                  ? `${formatNumber(
+                      formatBigNumber(potentialValueNormalized, displayCollateral.decimals, displayCollateral.decimals),
+                    )}
                   ${symbol}`
                   : '0.00'
               }
@@ -430,7 +434,13 @@ export const ScalarMarketSell = (props: Props) => {
               title={'Fee'}
               value={`${
                 costFeeNormalized
-                  ? formatNumber(formatBigNumber(costFeeNormalized.mul(-1), displayCollateral.decimals, displayCollateral.decimals))
+                  ? formatNumber(
+                      formatBigNumber(
+                        costFeeNormalized.mul(-1),
+                        displayCollateral.decimals,
+                        displayCollateral.decimals,
+                      ),
+                    )
                   : '0.00'
               } ${symbol}`}
             />
@@ -448,7 +458,13 @@ export const ScalarMarketSell = (props: Props) => {
               title={'Total'}
               value={`${
                 normalizedTradedCollateral
-                  ? formatNumber(formatBigNumber(normalizedTradedCollateral, displayCollateral.decimals, displayCollateral.decimals))
+                  ? formatNumber(
+                      formatBigNumber(
+                        normalizedTradedCollateral,
+                        displayCollateral.decimals,
+                        displayCollateral.decimals,
+                      ),
+                    )
                   : '0.00'
               } ${displayTotalSymbol}`}
             />
