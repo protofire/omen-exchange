@@ -11,7 +11,6 @@ import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
 import { IconClose, IconDone, IconFail, IconTwitter } from '../../common/icons'
-import { DaiIcon } from '../../common/icons/currencies'
 import { ContentWrapper, ModalNavigation, ModalNavigationLeft } from '../common_styled'
 
 const ModalMainText = styled.p`
@@ -23,12 +22,6 @@ const ModalMainText = styled.p`
   margin-bottom: 8px;
   display: flex;
   align-items: center;
-`
-
-const ModalTokenIcon = styled.img`
-  width: 24px;
-  height: 24px;
-  margin-left: 10px;
 `
 
 const ModalSubText = styled.p`
