@@ -383,8 +383,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setRewardApr(rewardAPR)
 
       const earnedRewards =
-        Number(await stakingService.getEarnedRewards(cpk?.address || '', rewardToken.address)) /
-        10 ** rewardToken.decimals
+        Number((await stakingService.getClaimableRewards(cpk?.address || ''))[0]) / 10 ** rewardToken.decimals
       setEarnedRewards(earnedRewards)
 
       const totalRewards =
