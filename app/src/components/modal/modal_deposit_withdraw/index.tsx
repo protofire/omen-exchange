@@ -123,7 +123,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     setAllowanceState(TransactionStep.waitingConfirmation)
     try {
       if (exchangeType === ExchangeType.deposit) {
-        console.log('deposit')
+        console.log('depositWithdraw')
 
         const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenToken.address)
         // const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, marketData.funding)
@@ -172,7 +172,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       exchangeType === ExchangeType.deposit &&
       displayFundAmount.gt(mainnetAllowance))
 
-  const deposit = async () => {
+  const depositWithdraw = async () => {
     if (!cpk) {
       return
     }
@@ -325,7 +325,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
           <InputInfo>
             <IconAlertInverted color={theme.colors.tertiary} size={'20'} style={{ marginRight: '12px' }} />
-            You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least{' '}
+            You need to {exchangeType === ExchangeType.deposit ? 'depositWithdraw' : 'withdraw'} at least{' '}
             {formatBigNumber(
               currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange,
               STANDARD_DECIMALS,
@@ -356,7 +356,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           <DepositWithdrawButton
             buttonType={ButtonType.primaryAlternative}
             disabled={isDepositWithdrawDisabled}
-            onClick={deposit}
+            onClick={depositWithdraw}
           >
             {exchangeType}
           </DepositWithdrawButton>
