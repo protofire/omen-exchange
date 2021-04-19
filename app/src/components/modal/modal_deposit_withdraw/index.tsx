@@ -341,7 +341,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           />
 
           <InputInfo>
-            <IconAlertInverted color={theme.colors.tertiary} size={'20'} style={{ marginRight: '12px' }} />
+            <IconAlertInverted style={{ marginRight: '12px' }} />
             You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least{' '}
             {formatBigNumber(
               currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange,
