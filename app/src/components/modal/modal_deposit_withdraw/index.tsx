@@ -73,6 +73,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   daiBalance: BigNumber
   xDaiBalance: Maybe<BigNumber>
   unclaimedAmount: BigNumber
+  formattedxOmenBalance: string
 }
 
 export const ModalDepositWithdraw = (props: Props) => {
@@ -83,6 +84,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     formattedDaiBalance,
     formattedOmenBalance,
     formattedxDaiBalance,
+    formattedxOmenBalance,
     isOpen,
     onBack,
     onClose,
@@ -295,7 +297,9 @@ export const ModalDepositWithdraw = (props: Props) => {
                     <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Omen}>Omen</BalanceItemTitle>
                   </BalanceItemSide>
                   <BalanceItemSide>
-                    <BalanceItemBalance>{formattedOmenBalance} OMN</BalanceItemBalance>
+                    <BalanceItemBalance>
+                      {exchangeType === ExchangeType.deposit ? formattedOmenBalance : formattedxOmenBalance} OMN
+                    </BalanceItemBalance>
                   </BalanceItemSide>
                 </BalanceItem>
               </BalanceItems>

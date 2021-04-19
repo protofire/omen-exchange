@@ -33,7 +33,7 @@ export const useCollateralBalance = (
 
   useEffect(() => {
     console.log('here looping', collateral.symbol)
-    console.log(collateral)
+    // console.log(collateral)
     fetchCollateralBalance()
     // eslint-disable-next-line
   }, [account, provider, collateral])

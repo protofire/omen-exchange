@@ -20,6 +20,7 @@ export interface ConnectedBalanceContext {
   formattedDaiBalance: string
   xDaiBalance: BigNumber
   formattedxDaiBalance: string
+  formattedxOmenBalance: string
   formattedOmenBalance: string
   fetchBalances: () => Promise<void>
 }
@@ -54,7 +55,9 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
 
   const { refetch, tokens } = useTokens(context.rawWeb3Context, true, true)
-
+  console.log(account)
+  console.log(networkId)
+  console.log(tokens)
   const ethBalance = new BigNumber(
     tokens.filter(token => token.symbol === getNativeAsset(context.rawWeb3Context.networkId).symbol)[0]?.balance || '',
   )
@@ -67,8 +70,10 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const xDaiBalance = collateralBalance || Zero
   const formattedxDaiBalance = `${formatBigNumber(xDaiBalance, nativeAsset.decimals, 2)}`
 
-  // const omenToken = getToken(1, 'omn')
-  // console.log(omenToken)
+  const omenBalance = new BigNumber(tokens.filter(token => token.symbol === 'OMN')[0]?.balance || '')
+  const formattedOmenBalance = formatNumber(formatBigNumber(omenBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 3)
+
+  // const omenToken = getToken(100, 'omn')
   //
   // const { collateralBalance: omenCollateral, fetchCollateralBalance: fetchOmenBalance } = useCollateralBalance(
   //   omenToken,
@@ -77,8 +82,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   //
   // const omenBalance = omenCollateral || Zero
   // const formattedOmenBalance = `${formatBigNumber(omenBalance, omenToken.decimals, 2)}`
-
-  const formattedOmenBalance = '22'
+  const formattedxOmenBalance = '22'
 
   const fetchUnclaimedAssets = async () => {
     if (account && networkId === networkIds.MAINNET) {
@@ -126,6 +130,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     formattedxDaiBalance,
     fetchBalances,
     formattedOmenBalance,
+    formattedxOmenBalance,
   }
 
   return <ConnectedBalanceContext.Provider value={value}>{props.children}</ConnectedBalanceContext.Provider>
