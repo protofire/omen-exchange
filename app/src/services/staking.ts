@@ -1,8 +1,11 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
 
+import { STANDARD_DECIMALS } from '../common/constants'
 import { getLogger } from '../util/logger'
 import { getOMNToken } from '../util/networks'
+import { calculateRewardApr, formatBigNumber, getRemainingRewards } from '../util/tools'
+import { Token } from '../util/types'
 
 const logger = getLogger('Services::Staking')
 
@@ -235,6 +238,35 @@ class StakingService {
   static encodeExit = (address: string) => {
     const stakingInterface = new utils.Interface(abi)
     return stakingInterface.functions.exit.encode([address])
+  }
+
+  getStakingData = async (
+    rewardToken: Token,
+    address: string,
+  ): Promise<{ earnedRewards: number; remainingRewards: number; rewardApr: number; totalRewards: number }> => {
+    const userStakedTokens = Number(await this.getStakedTokensOfAmount(address)) / 10 ** STANDARD_DECIMALS
+    const totalStakedTokens = Number(await this.getTotalStakedTokensAmount()) / 10 ** STANDARD_DECIMALS
+
+    // TODO: Replace hardcoded timestamp with subgraph datum
+    const endingTimestamp = 1618902000
+    const timeRemaining = endingTimestamp - Math.floor(Date.now() / 1000)
+    // TODO: Replace hardcoded value with subgraph datum
+    const rewardsAmount = parseUnits('1', 18)
+    // TODO: Replace hardcoded value with subgraph datum
+    const duration = 604800
+
+    const remainingRewards = Number(
+      formatBigNumber(
+        getRemainingRewards(rewardsAmount, timeRemaining, duration, rewardToken.decimals),
+        rewardToken.decimals,
+        rewardToken.decimals,
+      ),
+    )
+    const rewardApr = calculateRewardApr(userStakedTokens, totalStakedTokens, timeRemaining, remainingRewards)
+    const earnedRewards = Number((await this.getClaimableRewards(address))[0]) / 10 ** rewardToken.decimals
+    const totalRewards = Number(await this.getRewardAmount(rewardToken.address)) / 10 ** rewardToken.decimals
+
+    return { earnedRewards, remainingRewards, rewardApr, totalRewards }
   }
 }
 

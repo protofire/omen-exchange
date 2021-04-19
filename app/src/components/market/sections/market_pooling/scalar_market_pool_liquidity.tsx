@@ -349,7 +349,50 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   // Get necessary data and calculate APR
   // TODO: Consider moving calculations to useMemo
   useEffect(() => {
-    const getStakingData = async () => {
+    // const getStakingData = async () => {
+    //   // TODO: Replace hardcoded campaign address
+    //   const stakingService = new StakingService(
+    //     provider,
+    //     cpk && cpk.address,
+    //     '0xE2D380F4B16B8371fD3dC2990A29109642d4ea96',
+    //   )
+
+    //   const rewardToken = getOMNToken(networkId)
+
+    //   const userStakedTokens =
+    //     Number(await stakingService.getStakedTokensOfAmount(cpk?.address || '')) / 10 ** collateral.decimals
+    //   const totalStakedTokens = Number(await stakingService.getTotalStakedTokensAmount()) / 10 ** collateral.decimals
+
+    //   // TODO: Replace hardcoded timestamp with subgraph datum
+    //   const endingTimestamp = 1618902000
+    //   const timeRemaining = endingTimestamp - Math.floor(Date.now() / 1000)
+    //   // TODO: Replace hardcoded value with subgraph datum
+    //   const rewardsAmount = parseUnits('1', 18)
+    //   // TODO: Replace hardcoded value with subgraph datum
+    //   const duration = 604800
+    //   const remainingRewards = Number(
+    //     formatBigNumber(
+    //       getRemainingRewards(rewardsAmount, timeRemaining, duration, rewardToken.decimals),
+    //       rewardToken.decimals,
+    //       rewardToken.decimals,
+    //     ),
+    //   )
+    //   setRemainingRewards(remainingRewards)
+
+    //   const rewardAPR = calculateRewardAPR(userStakedTokens, totalStakedTokens, timeRemaining, remainingRewards)
+    //   setRewardApr(rewardAPR)
+
+    //   const earnedRewards =
+    //     Number((await stakingService.getClaimableRewards(cpk?.address || ''))[0]) / 10 ** rewardToken.decimals
+    //   setEarnedRewards(earnedRewards)
+
+    //   const totalRewards =
+    //     Number(await stakingService.getRewardAmount(rewardToken.address)) / 10 ** rewardToken.decimals
+    //   setTotalRewards(totalRewards)
+    // }
+    // cpk && getStakingData()
+
+    const fetchStakingData = async () => {
       // TODO: Replace hardcoded campaign address
       const stakingService = new StakingService(
         provider,
@@ -357,40 +400,19 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         '0xE2D380F4B16B8371fD3dC2990A29109642d4ea96',
       )
 
-      const rewardToken = getOMNToken(networkId)
-
-      const userStakedTokens =
-        Number(await stakingService.getStakedTokensOfAmount(cpk?.address || '')) / 10 ** collateral.decimals
-      const totalStakedTokens = Number(await stakingService.getTotalStakedTokensAmount()) / 10 ** collateral.decimals
-
-      // TODO: Replace hardcoded timestamp with subgraph datum
-      const endingTimestamp = 1618902000
-      const timeRemaining = endingTimestamp - Math.floor(Date.now() / 1000)
-      // TODO: Replace hardcoded value with subgraph datum
-      const rewardsAmount = parseUnits('1', 18)
-      // TODO: Replace hardcoded value with subgraph datum
-      const duration = 604800
-      const remainingRewards = Number(
-        formatBigNumber(
-          getRemainingRewards(rewardsAmount, timeRemaining, duration, rewardToken.decimals),
-          rewardToken.decimals,
-          rewardToken.decimals,
-        ),
+      const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
+        getOMNToken(networkId),
+        // TODO: Include relay if available
+        cpk?.address || '',
       )
-      setRemainingRewards(remainingRewards)
 
-      const rewardAPR = calculateRewardAPR(userStakedTokens, totalStakedTokens, timeRemaining, remainingRewards)
-      setRewardApr(rewardAPR)
-
-      const earnedRewards =
-        Number((await stakingService.getClaimableRewards(cpk?.address || ''))[0]) / 10 ** rewardToken.decimals
       setEarnedRewards(earnedRewards)
-
-      const totalRewards =
-        Number(await stakingService.getRewardAmount(rewardToken.address)) / 10 ** rewardToken.decimals
+      setRemainingRewards(remainingRewards)
+      setRewardApr(rewardApr)
       setTotalRewards(totalRewards)
     }
-    cpk && getStakingData()
+    // TODO: Include relay
+    cpk && fetchStakingData()
   }, [cpk?.address])
 
   const unlockCollateral = async () => {
