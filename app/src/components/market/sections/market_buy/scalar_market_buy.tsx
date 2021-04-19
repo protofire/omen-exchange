@@ -1,7 +1,7 @@
 import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
 import { BigNumber, parseUnits } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
@@ -16,6 +16,7 @@ import {
   useCpkAllowance,
   useCpkProxy,
 } from '../../../../hooks'
+import { useERC1155TokenWrappers } from '../../../../hooks/useERC1155TokenWrappers'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
@@ -44,6 +45,7 @@ import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WarningMessage } from '../../common/warning_message'
+import { WrapERC1155 } from '../../common/wrap_erc1155'
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
@@ -75,7 +77,9 @@ export const ScalarMarketBuy = (props: Props) => {
   const {
     address: marketMakerAddress,
     balances,
+    conditionId,
     fee,
+    outcomeTokenAmounts,
     outcomeTokenMarginalPrices,
     question,
     scalarHigh,
@@ -113,6 +117,9 @@ export const ScalarMarketBuy = (props: Props) => {
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
+  const [erc20UpgradeLoading, setERC20UpgradeLoading] = useState(false)
+  const [erc20UpgradeFinished, setERC20UpgradeFinished] = useState(false)
+
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
@@ -122,6 +129,12 @@ export const ScalarMarketBuy = (props: Props) => {
   )
   const collateralBalance = maybeCollateralBalance || Zero
   const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
+  const erc20PositionWrappers = useERC1155TokenWrappers(
+    marketMaker,
+    conditionId,
+    outcomeTokenAmounts.length,
+    collateral.address,
+  )
 
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount, collateral.decimals).includes('-'))
@@ -215,7 +228,39 @@ export const ScalarMarketBuy = (props: Props) => {
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals))
   const total = `${sharesTotal} Shares`
 
+  const totalERC1155Shares = balances.reduce((total, balance) => total.add(balance.erc1155Shares), new BigNumber(0))
+
+  const wrapERC1155Tokens = useCallback(async () => {
+    if (!cpk || !erc20PositionWrappers || !context.account) return
+    try {
+      setERC20UpgradeLoading(true)
+      await cpk.wrapERC1155Tokens({
+        conditionalTokens,
+        erc20WrapperFactory,
+        marketMaker,
+        outcomesAmount: outcomeTokenAmounts.length,
+        setTxHash,
+        setTxState,
+      })
+    } finally {
+      setERC20UpgradeLoading(false)
+      setERC20UpgradeFinished(true)
+    }
+  }, [
+    cpk,
+    context.account,
+    conditionalTokens,
+    erc20PositionWrappers,
+    erc20WrapperFactory,
+    marketMaker,
+    outcomeTokenAmounts.length,
+  ])
+
+  // If the market has wrappers set up but the user still has erc1155 tokens, ask to upgrade
+  const showWrapERC1155 = !!erc20PositionWrappers && totalERC1155Shares.gt('0')
+
   const showSetAllowance =
+    !showWrapERC1155 &&
     collateral.address !== pseudoNativeAssetAddress &&
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
@@ -236,7 +281,9 @@ export const ScalarMarketBuy = (props: Props) => {
     amount.isZero() ||
     (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
-    isNegativeAmount
+    isNegativeAmount ||
+    showSetAllowance ||
+    showWrapERC1155
 
   const finish = async () => {
     const outcomeIndex = positionIndex
@@ -258,6 +305,7 @@ export const ScalarMarketBuy = (props: Props) => {
         conditionalTokens,
         erc20WrapperFactory,
         outcomeIndex,
+        outcomesAmount: 2,
         marketMaker,
         setTxHash,
         setTxState,
@@ -411,6 +459,14 @@ export const ScalarMarketBuy = (props: Props) => {
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}
+          style={{ marginBottom: 20 }}
+        />
+      )}
+      {showWrapERC1155 && (
+        <WrapERC1155
+          finished={erc20UpgradeFinished && totalERC1155Shares.isZero()}
+          loading={erc20UpgradeLoading}
+          onWrap={wrapERC1155Tokens}
           style={{ marginBottom: 20 }}
         />
       )}

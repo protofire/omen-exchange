@@ -193,8 +193,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     totalPoolShares,
   )
   const sharesAfterAddingFunding = sendAmountsAfterAddingFunding
-    ? balances.map((balance, i) => balance.shares.add(sendAmountsAfterAddingFunding[i]))
-    : balances.map(balance => balance.shares)
+    ? balances.map((balance, i) => balance.totalShares.add(sendAmountsAfterAddingFunding[i]))
+    : balances.map(balance => balance.totalShares)
 
   const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(
     amountToRemove || Zero,
@@ -206,7 +206,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const sharesAfterRemovingFunding = balances.map((balance, i) => {
-    return balance.shares.add(sendAmountsAfterRemovingFunding[i]).sub(depositedTokens)
+    return balance.totalShares.add(sendAmountsAfterRemovingFunding[i]).sub(depositedTokens)
   })
 
   const showSharesChange = activeTab === Tabs.deposit ? amountToFund?.gt(0) : amountToRemove?.gt(0)

@@ -52,8 +52,18 @@ interface CPKBuyOutcomesParams {
   conditionalTokens: ConditionalTokenService
   erc20WrapperFactory: ERC20WrapperFactoryService
   outcomeIndex: number
+  outcomesAmount: number
   useBaseToken?: boolean
   marketMaker: MarketMakerService
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
+}
+
+interface CPKWrapERC1155TokensParams {
+  marketMaker: MarketMakerService
+  erc20WrapperFactory: ERC20WrapperFactoryService
+  conditionalTokens: ConditionalTokenService
+  outcomesAmount: number
   setTxHash: (arg0: string) => void
   setTxState: (step: TransactionStep) => void
 }
@@ -63,6 +73,7 @@ interface CPKSellOutcomesParams {
   compoundService?: CompoundService | null
   erc20WrapperFactory: ERC20WrapperFactoryService
   outcomeIndex: number
+  outcomesAmount: number
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
   useBaseToken?: boolean
@@ -275,6 +286,7 @@ class CPKService {
     erc20WrapperFactory,
     marketMaker,
     outcomeIndex,
+    outcomesAmount,
     setTxHash,
     setTxState,
     useBaseToken = false,
@@ -361,13 +373,6 @@ class CPKService {
       const outcomeTokensToBuy = await marketMaker.calcBuyAmount(minCollateralAmount, outcomeIndex)
       logger.log(`Min outcome tokens to buy: ${outcomeTokensToBuy}`)
 
-      const collectionId = await conditionalTokens.getCollectionIdForOutcome(
-        await marketMaker.getConditionId(),
-        1 << outcomeIndex,
-      )
-      const positionId = await conditionalTokens.getPositionId(collateralAddress, collectionId)
-      const erc20WrapperAddress = await ERC20WrapperService.predictAddress(erc20WrapperFactory.address, positionId)
-
       // Check  if the allowance of the CPK to the market maker is enough.
       const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
         this.cpk.address,
@@ -399,22 +404,33 @@ class CPKService {
         data: MarketMakerService.encodeBuy(minCollateralAmount, outcomeIndex, outcomeTokensToBuy),
       })
 
-      // Step 4: wrap ERC1155 outcome tokens
-      transactions.push({
-        to: conditionalTokens.address,
-        data: ConditionalTokenService.encodeSafeTransferFrom(
-          this.cpk.address,
-          erc20WrapperAddress,
-          positionId,
-          outcomeTokensToBuy,
-        ),
-      })
+      // performs wrapping only if the given market actually supports ERC20 wrapping
+      if (await erc20WrapperFactory.marketWrapped(conditionalTokens, marketMaker, outcomesAmount)) {
+        logger.log('Performing ERC20 wrapping')
+        const collectionId = await conditionalTokens.getCollectionIdForOutcome(
+          await marketMaker.getConditionId(),
+          1 << outcomeIndex,
+        )
+        const positionId = await conditionalTokens.getPositionId(collateralAddress, collectionId)
+        const erc20WrapperAddress = await ERC20WrapperService.predictAddress(erc20WrapperFactory.address, positionId)
 
-      // Step 5: send wrapped, ERC20 tokens directly to user
-      transactions.push({
-        to: erc20WrapperAddress,
-        data: ERC20Service.encodeTransfer(account, outcomeTokensToBuy),
-      })
+        // Step 4 (maybe): wrap ERC1155 outcome tokens
+        transactions.push({
+          to: conditionalTokens.address,
+          data: ConditionalTokenService.encodeSafeTransferFrom(
+            this.cpk.address,
+            erc20WrapperAddress,
+            positionId,
+            outcomeTokensToBuy,
+          ),
+        })
+
+        // Step 5 (maybe): send wrapped, ERC20 tokens directly to user
+        transactions.push({
+          to: erc20WrapperAddress,
+          data: ERC20Service.encodeTransfer(account, outcomeTokensToBuy),
+        })
+      }
 
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
@@ -842,7 +858,7 @@ class CPKService {
         ),
       })
 
-      // Step 6: create ERC20 wrappers for each position
+      // Step 6: create ERC20 wrappers for the market
       for (let i = 0; i < 2; i++) {
         const collectionId = await conditionalTokens.getCollectionIdForOutcome(conditionId, 1 << i)
         const positionId = await conditionalTokens.getPositionId(collateral.address, collectionId)
@@ -876,6 +892,7 @@ class CPKService {
     erc20WrapperFactory,
     marketMaker,
     outcomeIndex,
+    outcomesAmount,
     setTxHash,
     setTxState,
     useBaseToken,
@@ -891,13 +908,6 @@ class CPKService {
 
       const network = await this.provider.getNetwork()
       const networkId = network.chainId
-
-      const collectionId = await conditionalTokens.getCollectionIdForOutcome(
-        await marketMaker.getConditionId(),
-        1 << outcomeIndex,
-      )
-      const positionId = await conditionalTokens.getPositionId(collateralAddress, collectionId)
-      const erc20WrapperAddress = ERC20WrapperService.predictAddress(erc20WrapperFactory.address, positionId)
 
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
@@ -916,17 +926,28 @@ class CPKService {
         marketMaker.address,
       )
 
-      // Transfer wrapped ERC20 tokens from signer to CPK (requires approval)
-      transactions.push({
-        to: erc20WrapperAddress,
-        data: ERC20Service.encodeTransferFrom(account, this.cpk.address, outcomeTokensToSell),
-      })
+      // only transfers and unwraps ERC20 tokens if the market supports ERC20 wrapping
+      if (await erc20WrapperFactory.marketWrapped(conditionalTokens, marketMaker, outcomesAmount)) {
+        logger.log('Unwrapping ERC1155 tokens')
+        const collectionId = await conditionalTokens.getCollectionIdForOutcome(
+          await marketMaker.getConditionId(),
+          1 << outcomeIndex,
+        )
+        const positionId = await conditionalTokens.getPositionId(collateralAddress, collectionId)
+        const erc20WrapperAddress = ERC20WrapperService.predictAddress(erc20WrapperFactory.address, positionId)
 
-      // Unwrap ERC20 tokens to get back underlying ERC1155s
-      transactions.push({
-        to: erc20WrapperAddress,
-        data: ERC20WrapperService.encodeWithdraw(outcomeTokensToSell),
-      })
+        // Transfer wrapped ERC20 tokens from signer to CPK (requires approval)
+        transactions.push({
+          to: erc20WrapperAddress,
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, outcomeTokensToSell),
+        })
+
+        // Unwrap ERC20 tokens to get back underlying ERC1155s
+        transactions.push({
+          to: erc20WrapperAddress,
+          data: ERC20WrapperService.encodeWithdraw(outcomeTokensToSell),
+        })
+      }
 
       if (!isAlreadyApprovedForMarketMaker) {
         transactions.push({
@@ -1245,6 +1266,67 @@ class CPKService {
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error removing amount '${sharesToBurn.toString()}' for funding`, err.message)
+      throw err
+    }
+  }
+
+  wrapERC1155Tokens = async ({
+    conditionalTokens,
+    erc20WrapperFactory,
+    marketMaker,
+    outcomesAmount,
+    setTxHash,
+    setTxState,
+  }: CPKWrapERC1155TokensParams): Promise<TransactionReceipt> => {
+    try {
+      if (await erc20WrapperFactory.marketWrapped(conditionalTokens, marketMaker, outcomesAmount)) {
+        throw new Error('market already wrapped')
+      }
+
+      const conditionId = await marketMaker.getConditionId()
+      const collateralAddress = await marketMaker.getCollateralToken()
+
+      const wrappers = []
+      for (let i = 0; i < outcomesAmount; i++) {
+        const collectionId = await conditionalTokens.getCollectionIdForOutcome(conditionId, 1 << i)
+        const positionId = await conditionalTokens.getPositionId(collateralAddress, collectionId)
+        wrappers.push(
+          new ERC20WrapperService(
+            ERC20WrapperService.predictAddress(erc20WrapperFactory.address, positionId),
+            positionId,
+            this.provider,
+          ),
+        )
+      }
+
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+      const erc1155Balances = await marketMaker.getERC1155BalanceInformation(account, outcomesAmount)
+
+      const transactions = wrappers.flatMap((wrapper, index) => {
+        const amount = erc1155Balances[index]
+        return [
+          {
+            // transfer tokens to the wrapper tog et back ERC20s
+            to: conditionalTokens.address,
+            data: ConditionalTokenService.encodeSafeTransferFrom(
+              this.cpk.address,
+              wrapper.address,
+              wrapper.positionId,
+              amount,
+            ),
+          },
+          {
+            // transfer wrapped tokens back to the user
+            to: wrapper.address,
+            data: ERC20Service.encodeTransfer(account, amount),
+          },
+        ]
+      })
+
+      return this.execTransactions(transactions, {}, setTxHash, setTxState)
+    } catch (err) {
+      logger.error('There was an error wrapping ERC1155 tokens', err.message)
       throw err
     }
   }

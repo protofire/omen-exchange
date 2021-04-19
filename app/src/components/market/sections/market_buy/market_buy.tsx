@@ -1,7 +1,7 @@
 import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
@@ -19,6 +19,7 @@ import {
   useCpkProxy,
   useSymbol,
 } from '../../../../hooks'
+import { useERC1155TokenWrappers } from '../../../../hooks/useERC1155TokenWrappers'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
@@ -55,6 +56,7 @@ import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WarningMessage } from '../../common/warning_message'
+import { WrapERC1155 } from '../../common/wrap_erc1155'
 
 const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
@@ -87,7 +89,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const { buildMarketMaker, conditionalTokens, erc20WrapperFactory } = useContracts(context)
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
-  const { address: marketMakerAddress, balances, fee, question } = marketMakerData
+  const { address: marketMakerAddress, balances, conditionId, fee, outcomeTokenAmounts, question } = marketMakerData
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
   const wrapToken = getWrapToken(networkId)
@@ -102,6 +104,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
+  const erc20PositionWrappers = useERC1155TokenWrappers(
+    marketMaker,
+    conditionId,
+    outcomeTokenAmounts.length,
+    collateral.address,
+  )
 
   const baseCollateral = getInitialCollateral(networkId, collateral, relay)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(baseCollateral)
@@ -125,6 +133,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [newShares, setNewShares] = useState<Maybe<BigNumber[]>>(null)
   const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const [erc20UpgradeLoading, setERC20UpgradeLoading] = useState(false)
+  const [erc20UpgradeFinished, setERC20UpgradeFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, displayCollateral.address)
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount || Zero))
@@ -168,7 +178,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
       const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
       setNewShares(
-        balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)),
+        balances.map((balance, i) =>
+          i === outcomeIndex ? balance.totalShares.add(tradedShares) : balance.totalShares,
+        ),
       )
       return [tradedShares, probabilities, amount]
     },
@@ -239,6 +251,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         compoundService,
         conditionalTokens,
         erc20WrapperFactory,
+        outcomesAmount: outcomeTokenAmounts.length,
         marketMaker,
         outcomeIndex,
         setTxHash,
@@ -270,7 +283,39 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
+  const totalERC1155Shares = balances.reduce((total, balance) => total.add(balance.erc1155Shares), new BigNumber(0))
+
+  const wrapERC1155Tokens = useCallback(async () => {
+    if (!cpk || !erc20PositionWrappers || !context.account) return
+    try {
+      setERC20UpgradeLoading(true)
+      await cpk.wrapERC1155Tokens({
+        conditionalTokens,
+        erc20WrapperFactory,
+        marketMaker,
+        outcomesAmount: outcomeTokenAmounts.length,
+        setTxHash,
+        setTxState,
+      })
+    } finally {
+      setERC20UpgradeLoading(false)
+      setERC20UpgradeFinished(true)
+    }
+  }, [
+    cpk,
+    context.account,
+    conditionalTokens,
+    erc20PositionWrappers,
+    erc20WrapperFactory,
+    marketMaker,
+    outcomeTokenAmounts.length,
+  ])
+
+  // If the market has wrappers set up but the user still has erc1155 tokens, ask to upgrade
+  const showWrapERC1155 = !!erc20PositionWrappers && totalERC1155Shares.gt('0')
+
   const showSetAllowance =
+    !showWrapERC1155 &&
     collateral.address !== pseudoNativeAssetAddress &&
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
@@ -326,7 +371,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount ||
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress)
+    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
+    showSetAllowance ||
+    showWrapERC1155
 
   let currencyFilters =
     collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress
@@ -342,7 +389,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const switchOutcome = (value: number) => {
-    setNewShares(balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)))
+    setNewShares(
+      balances.map((balance, i) => (i === outcomeIndex ? balance.totalShares.add(tradedShares) : balance.totalShares)),
+    )
     setOutcomeIndex(value)
   }
 
@@ -488,6 +537,14 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
           onUnlock={unlockCollateral}
+        />
+      )}
+      {showWrapERC1155 && (
+        <WrapERC1155
+          finished={erc20UpgradeFinished && totalERC1155Shares.isZero()}
+          loading={erc20UpgradeLoading}
+          onWrap={wrapERC1155Tokens}
+          style={{ marginBottom: 20 }}
         />
       )}
       {showUpgrade && (

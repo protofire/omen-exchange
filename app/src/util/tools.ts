@@ -376,7 +376,7 @@ export const getSharesInBaseToken = (
   displayCollateral: Token,
 ): BalanceItem[] => {
   const displayBalances = balances.map(function(bal) {
-    const baseTokenShares = compoundService.calculateCTokenToBaseExchange(displayCollateral, bal.shares)
+    const baseTokenShares = compoundService.calculateCTokenToBaseExchange(displayCollateral, bal.totalShares)
     const newBalanceObject = Object.assign({}, bal, {
       shares: baseTokenShares,
     })

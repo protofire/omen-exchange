@@ -2,14 +2,18 @@ import { Contract, utils } from 'ethers'
 import { BigNumber, getCreate2Address, solidityKeccak256, solidityPack } from 'ethers/utils'
 import moment from 'moment'
 
-const INIT_CODE_HASH = '0x5058e67e4d72ed90876a53ce32f1bdd8b0f8a4f56cce190f0f25fa4dbe3e1160'
+const INIT_CODE_HASH = '0x9d473860035a1e482325c8b924eb5ec7b81c1cc92980847da7016a582acdf82f'
 const WRAPPER_INTERFACE = new utils.Interface([`function withdraw(uint256 _amount) external`])
 
 class ERC20WrapperService {
+  public readonly address: string
   public readonly contract: Contract
+  public readonly positionId: BigNumber
 
-  constructor(address: string, provider: any) {
+  constructor(address: string, positionId: BigNumber, provider: any) {
     this.contract = new Contract(address, WRAPPER_INTERFACE, provider).connect(provider.getSigner())
+    this.positionId = positionId
+    this.address = address
   }
 
   static predictAddress = (factoryAddress: string, positionId: BigNumber): string =>

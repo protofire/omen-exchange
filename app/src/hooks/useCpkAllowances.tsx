@@ -14,7 +14,7 @@ interface CpkAllowance {
   unlock: () => Promise<void>
 }
 
-export const useCpkAllowances = (account: string | null, tokenAddresses: string[]): CpkAllowance[] => {
+export const useCpkAllowances = (account: string | null, tokenAddresses: string[] | null): CpkAllowance[] => {
   const { library: provider } = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
   const [allowances, setAllowances] = useState<CpkAllowance[]>([])
@@ -24,6 +24,7 @@ export const useCpkAllowances = (account: string | null, tokenAddresses: string[
       cpk &&
       provider &&
       account &&
+      tokenAddresses &&
       tokenAddresses.length > 0 &&
       tokenAddresses.every(tokenAddress => tokenAddress !== pseudoNativeAssetAddress)
     ) {

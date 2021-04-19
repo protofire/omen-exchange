@@ -18,7 +18,8 @@ const logger = getLogger('useBlockchainMarketMakerData')
 const getBalances = (
   outcomes: string[],
   marketMakerShares: BigNumber[],
-  userShares: BigNumber[],
+  erc20UserShares: BigNumber[],
+  erc1155UserShares: BigNumber[],
   payouts: Maybe<Big[]>,
 ): BalanceItem[] => {
   const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
@@ -28,14 +29,17 @@ const getBalances = (
         const outcomeName = outcome
         const probability = actualPrices[index] * 100
         const currentPrice = actualPrices[index]
-        const shares = userShares[index]
+        const erc20Shares = erc20UserShares[index]
+        const erc1155Shares = erc1155UserShares[index]
         const holdings = marketMakerShares[index]
 
         return {
           outcomeName,
           probability,
           currentPrice,
-          shares,
+          erc20Shares,
+          erc1155Shares,
+          totalShares: erc20Shares.add(erc1155Shares),
           holdings,
           payout: payouts ? payouts[index] : new Big(0),
         }
@@ -47,7 +51,8 @@ const getBalances = (
 
 const getScalarBalances = (
   marketMakerShares: BigNumber[],
-  userShares: BigNumber[],
+  erc20UserShares: BigNumber[],
+  erc1155UserShares: BigNumber[],
   payouts: Maybe<Big[]>,
 ): BalanceItem[] => {
   const actualPrices = MarketMakerService.getActualPrice(marketMakerShares)
@@ -58,14 +63,17 @@ const getScalarBalances = (
     const outcomeName = i === 0 ? 'short' : 'long'
     const probability = actualPrices[i] * 100
     const currentPrice = actualPrices[i]
-    const shares = userShares[i]
+    const erc20Shares = erc20UserShares[i]
+    const erc1155Shares = erc1155UserShares[i]
     const holdings = marketMakerShares[i]
 
     const balance = {
       outcomeName,
       probability,
       currentPrice,
-      shares,
+      erc20Shares,
+      erc1155Shares,
+      totalShares: erc20Shares.add(erc1155Shares),
       holdings,
       payout: payouts ? payouts[i] : new Big(0),
     }
@@ -98,7 +106,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       return
     }
 
-    const { buildMarketMaker, conditionalTokens } = contracts
+    const { buildMarketMaker, conditionalTokens, erc20WrapperFactory } = contracts
 
     const marketMaker = buildMarketMaker(graphMarketMakerData.address)
 
@@ -114,6 +122,8 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
     const {
       collateral,
+      erc20UserShares,
+      erc1155UserShares,
       isConditionResolved,
       marketMakerFunding,
       marketMakerShares,
@@ -122,15 +132,16 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       totalEarnings,
       totalPoolShares,
       userPoolShares,
-      userShares,
     } = await promiseProps({
-      marketMakerShares: marketMaker.getERC1155BalanceInformation(graphMarketMakerData.address, outcomesLength),
-      userShares:
-        cpk && cpk.address && context.account
+      erc20UserShares:
+        context.account && (await erc20WrapperFactory.marketWrapped(conditionalTokens, marketMaker, outcomesLength))
           ? marketMaker.getERC20BalanceInformation(context.account, outcomesLength)
-          : outcomes.length
-          ? outcomes.map(() => new BigNumber(0))
-          : [],
+          : new Array(outcomesLength).fill(new BigNumber(0)),
+      erc1155UserShares:
+        cpk && cpk.address
+          ? marketMaker.getERC1155BalanceInformation(cpk.address, outcomesLength)
+          : new Array(outcomesLength).fill(new BigNumber(0)),
+      marketMakerShares: marketMaker.getERC1155BalanceInformation(graphMarketMakerData.address, outcomesLength),
       collateral: getERC20Token(provider, graphMarketMakerData.collateralAddress),
       isConditionResolved: conditionalTokens.isConditionResolved(graphMarketMakerData.conditionId),
       marketMakerFunding: marketMaker.getTotalSupply(),
@@ -157,9 +168,8 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       : null
 
     let balances: BalanceItem[]
-    isScalar
-      ? (balances = getScalarBalances(marketMakerShares, userShares, payouts))
-      : (balances = getBalances(outcomes, marketMakerShares, userShares, payouts))
+    if (isScalar) balances = getScalarBalances(marketMakerShares, erc20UserShares, erc1155UserShares, payouts)
+    else balances = getBalances(outcomes, marketMakerShares, erc20UserShares, erc1155UserShares, payouts)
 
     const newMarketMakerData: MarketMakerData = {
       address: graphMarketMakerData.address,

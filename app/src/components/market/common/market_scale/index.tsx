@@ -93,7 +93,7 @@ const HorizontalBar = styled.div`
   top: calc(50% - ${BAR_WIDTH} / 2);
   left: 0;
   right: 0;
-  width: 100%
+  width: 100%;
   height: ${BAR_WIDTH};
   background: ${props => props.theme.scale.bar};
 `
@@ -298,13 +298,13 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const shortShares =
     shortBalances &&
     shortBalances.length &&
-    shortBalances.map(shortBalance => shortBalance.shares).reduce((a, b) => a.add(b))
+    shortBalances.map(shortBalance => shortBalance.totalShares).reduce((a, b) => a.add(b))
 
   const longBalances = balances && balances.filter(balance => balance.outcomeName === 'long')
   const longShares =
     longBalances &&
     longBalances.length &&
-    longBalances.map(longBalance => longBalance.shares).reduce((a, b) => a.add(b))
+    longBalances.map(longBalance => longBalance.totalShares).reduce((a, b) => a.add(b))
 
   const shortSharesNumber =
     collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals, STANDARD_DECIMALS))

@@ -161,8 +161,8 @@ const Wrapper = (props: Props) => {
     displayBalances = getSharesInBaseToken(balances, compoundService, displayCollateral)
   }
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
-    const { shares } = balanceItem
-    return shares && !isDust(shares, collateral.decimals)
+    const { totalShares } = balanceItem
+    return totalShares && !isDust(totalShares, collateral.decimals)
   })
 
   const probabilities = balances.map(balance => balance.probability)

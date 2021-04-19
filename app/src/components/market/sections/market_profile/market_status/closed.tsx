@@ -364,18 +364,18 @@ const Wrapper = (props: Props) => {
   const earnedCollateral = isScalar
     ? scalarComputeEarnedCollateral(
         finalAnswerPercentage,
-        balances.map(balance => balance.shares),
+        balances.map(balance => balance.totalShares),
       )
     : computeEarnedCollateral(
         payouts,
-        balances.map(balance => balance.shares),
+        balances.map(balance => balance.totalShares),
       )
 
   const hasWinningOutcomes = earnedCollateral && !isDust(earnedCollateral, collateralToken.decimals)
 
   const { userWinningOutcomes, userWinningShares, winningOutcomes } = calcUserWinningsData(
     isScalar,
-    balances.map(balance => balance.shares),
+    balances.map(balance => balance.totalShares),
     payouts,
     finalAnswerPercentage,
   )

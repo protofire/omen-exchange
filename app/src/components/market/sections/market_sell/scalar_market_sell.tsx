@@ -50,6 +50,7 @@ import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WarningMessage } from '../../common/warning_message'
+import { WrapERC1155 } from '../../common/wrap_erc1155'
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
@@ -82,6 +83,7 @@ export const ScalarMarketSell = (props: Props) => {
     collateral,
     conditionId,
     fee,
+    outcomeTokenAmounts,
     outcomeTokenMarginalPrices,
     question,
     scalarHigh,
@@ -89,13 +91,14 @@ export const ScalarMarketSell = (props: Props) => {
   } = marketMakerData
   const { buildMarketMaker, conditionalTokens, erc20WrapperFactory } = useContracts(context)
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
-  const erc20PositionWrappers = useERC1155TokenWrappers(conditionId, 2, collateral.address)
-  const erc20PositionWrapperAddresses = useMemo(() => erc20PositionWrappers.map(wrapper => wrapper.address), [
-    erc20PositionWrappers,
-  ])
+  const erc20PositionWrappers = useERC1155TokenWrappers(marketMaker, conditionId, 2, collateral.address)
+  const erc20PositionWrapperAddresses = useMemo(
+    () => erc20PositionWrappers && erc20PositionWrappers.map(wrapper => wrapper.address),
+    [erc20PositionWrappers],
+  )
   const cpkAllowances = useCpkAllowances(context.account, erc20PositionWrapperAddresses)
 
-  const [positionIndex, setPositionIndex] = useState(balances[0].shares.gte(balances[1].shares) ? 0 : 1)
+  const [positionIndex, setPositionIndex] = useState(balances[0].totalShares.gte(balances[1].totalShares) ? 0 : 1)
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[positionIndex])
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState<string>('')
@@ -106,6 +109,8 @@ export const ScalarMarketSell = (props: Props) => {
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
   const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const [erc20UpgradeLoading, setERC20UpgradeLoading] = useState(false)
+  const [erc20UpgradeFinished, setERC20UpgradeFinished] = useState(false)
   const allowance = useMemo(
     () =>
       cpkAllowances[positionIndex] ? cpkAllowances[positionIndex].allowance : RemoteData.success(new BigNumber(0)),
@@ -116,8 +121,17 @@ export const ScalarMarketSell = (props: Props) => {
     return RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountShares))
   }, [allowance, amountShares])
 
+  const totalERC1155Shares = balances.reduce((total, balance) => total.add(balance.erc1155Shares), new BigNumber(0))
+
+  // If the market has wrappers set up but the user still has erc1155 tokens, ask to upgrade
+  const showWrapERC1155 = !!erc20PositionWrappers && totalERC1155Shares.gt('0')
+
   const showSetAllowance =
-    collateral.address !== pseudoNativeAssetAddress && !cpk?.isSafeApp && hasEnoughAllowance === Ternary.False
+    erc20PositionWrappers &&
+    !showWrapERC1155 &&
+    collateral.address !== pseudoNativeAssetAddress &&
+    !cpk?.isSafeApp &&
+    hasEnoughAllowance === Ternary.False
 
   const symbol = useSymbol(collateral)
 
@@ -131,7 +145,7 @@ export const ScalarMarketSell = (props: Props) => {
   }, [balances[positionIndex]])
 
   useEffect(() => {
-    setPositionIndex(balances[0].shares.gte(balances[1].shares) ? 0 : 1)
+    setPositionIndex(balances[0].totalShares.gte(balances[1].totalShares) ? 0 : 1)
     setBalanceItem(balances[positionIndex])
     setAmountShares(null)
     setAmountSharesToDisplay('')
@@ -143,6 +157,32 @@ export const ScalarMarketSell = (props: Props) => {
     await cpkAllowances[positionIndex].unlock()
     setAllowanceFinished(true)
   }, [cpk, cpkAllowances, positionIndex])
+
+  const wrapERC1155Tokens = useCallback(async () => {
+    if (!cpk || !erc20PositionWrappers || !context.account) return
+    try {
+      setERC20UpgradeLoading(true)
+      await cpk.wrapERC1155Tokens({
+        conditionalTokens,
+        erc20WrapperFactory,
+        marketMaker,
+        outcomesAmount: outcomeTokenAmounts.length,
+        setTxHash,
+        setTxState,
+      })
+    } finally {
+      setERC20UpgradeLoading(false)
+      setERC20UpgradeFinished(true)
+    }
+  }, [
+    cpk,
+    context.account,
+    conditionalTokens,
+    erc20PositionWrappers,
+    erc20WrapperFactory,
+    marketMaker,
+    outcomeTokenAmounts.length,
+  ])
 
   const calcSellAmount = useMemo(
     () => async (
@@ -230,6 +270,7 @@ export const ScalarMarketSell = (props: Props) => {
         erc20WrapperFactory,
         marketMaker,
         outcomeIndex,
+        outcomesAmount: outcomeTokenAmounts.length,
         setTxHash,
         setTxState,
       })
@@ -250,14 +291,14 @@ export const ScalarMarketSell = (props: Props) => {
     }
   }
 
-  const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
+  const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.totalShares, collateral.decimals))
 
   const amountError =
-    balanceItem.shares === null
+    balanceItem.totalShares === null
       ? null
-      : balanceItem.shares.isZero() && amountShares?.gt(balanceItem.shares)
+      : balanceItem.totalShares.isZero() && amountShares?.gt(balanceItem.totalShares)
       ? `Insufficient balance`
-      : amountShares?.gt(balanceItem.shares)
+      : amountShares?.gt(balanceItem.totalShares)
       ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
       : null
 
@@ -266,7 +307,9 @@ export const ScalarMarketSell = (props: Props) => {
     (status !== Status.Ready && status !== Status.Error) ||
     amountShares?.isZero() ||
     amountError !== null ||
-    isNegativeAmountShares
+    isNegativeAmountShares ||
+    !!showSetAllowance ||
+    !!showWrapERC1155
 
   const isNewPrediction =
     formattedNewPrediction !== 0 && formattedNewPrediction !== Number(outcomeTokenMarginalPrices[1].substring(0, 20))
@@ -311,8 +354,8 @@ export const ScalarMarketSell = (props: Props) => {
               />
             }
             onClickMaxButton={() => {
-              setAmountShares(balanceItem.shares)
-              setAmountSharesToDisplay(formatBigNumber(balanceItem.shares, collateral.decimals, 5))
+              setAmountShares(balanceItem.totalShares)
+              setAmountSharesToDisplay(formatBigNumber(balanceItem.totalShares, collateral.decimals, 5))
             }}
             shouldDisplayMaxButton
             symbol={'Shares'}
@@ -375,6 +418,14 @@ export const ScalarMarketSell = (props: Props) => {
           finished={allowanceFinished && RemoteData.is.success(allowance)}
           loading={RemoteData.is.asking(allowance)}
           onUnlock={unlockWrappedToken}
+          style={{ marginBottom: 20 }}
+        />
+      )}
+      {showWrapERC1155 && (
+        <WrapERC1155
+          finished={erc20UpgradeFinished && totalERC1155Shares.isZero()}
+          loading={erc20UpgradeLoading}
+          onWrap={wrapERC1155Tokens}
           style={{ marginBottom: 20 }}
         />
       )}

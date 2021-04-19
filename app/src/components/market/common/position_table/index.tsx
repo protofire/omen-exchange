@@ -16,8 +16,8 @@ import {
 } from '../../common/common_styled'
 
 const TableWrapper = styled.div`
-  margin-left: -24px
-  margin-right: -24px
+  margin-left: -24px;
+  margin-right: -24px;
 `
 
 const ColoredTDStyled = styled(TDStyled as any)<{ positive?: boolean | undefined }>`
@@ -56,8 +56,8 @@ export const PositionTable = (props: Props) => {
 
   const symbol = useSymbol(collateral)
 
-  const shortShares = balances[0].shares
-  const longShares = balances[1].shares
+  const shortShares = balances[0].totalShares
+  const longShares = balances[1].totalShares
   const shortSharesFormatted = formatNumber(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals))
   const longSharesFormatted = formatNumber(formatBigNumber(longShares || new BigNumber(0), collateral.decimals))
 

@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback } from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useSymbol } from '../../../../hooks'
+import { useCompoundService, useConnectedWeb3Context, useSymbol } from '../../../../hooks'
 import { getOutcomeColor } from '../../../../theme/utils'
 import { getNativeAsset, getToken } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, getBaseTokenForCToken, mulBN } from '../../../../util/tools'
@@ -103,6 +103,7 @@ export const OutcomeTable = (props: Props) => {
     newBonds,
   } = props
   const context = useConnectedWeb3Context()
+  const { compoundService } = useCompoundService(collateral, context)
   const { networkId, relay } = context
   const nativeAsset = getNativeAsset(networkId, relay)
   let winningBondIndex = -1
@@ -228,7 +229,7 @@ export const OutcomeTable = (props: Props) => {
         baseCollateral = getToken(networkId, baseCollateralSymbol)
       }
     }
-    const { currentDisplayPrice, currentPrice, outcomeName, payout, shares } = balanceItem
+    const { currentDisplayPrice, currentPrice, outcomeName, payout, totalShares } = balanceItem
     let currentPriceValue = Number(currentPrice)
     if (currentDisplayPrice && Number(currentDisplayPrice) > 0) {
       currentPriceValue = Number(currentDisplayPrice)
@@ -240,8 +241,14 @@ export const OutcomeTable = (props: Props) => {
     const currentPriceFormatted = withWinningOutcome ? payout.toFixed(2) : currentPriceDisplay
     const probability = withWinningOutcome ? Number(payout.mul(100).toString()) : probabilities[outcomeIndex]
     const newPrice = (probabilities[outcomeIndex] / 100).toFixed(2)
-    const formattedPayout = formatBigNumber(mulBN(shares, Number(payout.toString())), currentCollateral.decimals)
-    const formattedShares = formatBigNumber(shares, baseCollateral.decimals)
+    const formattedPayout = formatBigNumber(mulBN(totalShares, Number(payout.toString())), currentCollateral.decimals)
+    let formattedShares
+    if (collateralSymbol in CompoundTokenType && compoundService) {
+      const base = compoundService.calculateCTokenToBaseExchange(baseCollateral, totalShares)
+      formattedShares = formatBigNumber(base, baseCollateral.decimals)
+    } else {
+      formattedShares = formatBigNumber(totalShares, baseCollateral.decimals)
+    }
     const isWinningOutcome = payouts && payouts[outcomeIndex] && payouts[outcomeIndex].gt(0)
     const formattedNewShares = newShares ? formatBigNumber(newShares[outcomeIndex], baseCollateral.decimals) : null
     const showBondBadge = isBond && withWinningOutcome && outcomeIndex === winningBondIndex

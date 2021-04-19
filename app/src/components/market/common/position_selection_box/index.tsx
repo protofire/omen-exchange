@@ -59,7 +59,7 @@ export const PositionSelectionBox = (props: Props) => {
       <PositionSelectionBoxItem>
         <PositionSelectionLeft
           onClick={() => {
-            if (!isDust(balance.shares, decimals)) {
+            if (!isDust(balance.totalShares, decimals)) {
               setBalanceItem(balance)
               setPositionIndex(balances.indexOf(balance))
             }
@@ -67,7 +67,7 @@ export const PositionSelectionBox = (props: Props) => {
         >
           <RadioInput
             checked={balances.indexOf(balance) === positionIndex}
-            disabled={isDust(balance.shares, decimals)}
+            disabled={isDust(balance.totalShares, decimals)}
             name={'position'}
             onClick={() => {
               setBalanceItem(balance)
@@ -78,7 +78,7 @@ export const PositionSelectionBox = (props: Props) => {
           <PositionSelectionTitle>{balance.outcomeName}</PositionSelectionTitle>
         </PositionSelectionLeft>
         <PositionSelectionAmount>
-          {formatNumber(formatBigNumber(balance.shares, decimals))} Shares
+          {formatNumber(formatBigNumber(balance.totalShares, decimals))} Shares
         </PositionSelectionAmount>
       </PositionSelectionBoxItem>
     )

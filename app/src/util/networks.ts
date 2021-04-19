@@ -166,7 +166,7 @@ const networks: { [K in NetworkId]: Network } = {
       realitioScalarAdapter: '0x0e8Db8caD541C0Bf5b611636e81fEc0828bc7902',
       marketMakerFactory: '0x0fB4340432e56c014fa96286de17222822a9281b',
       conditionalTokens: '0x36bede640D19981A82090519bC1626249984c908',
-      erc20WrapperFactory: '0xBF689CE7Dad8957113637A6b05a665c29f4F991b',
+      erc20WrapperFactory: '0x06eC7651dA53b805438d3292E9Fa6ae3CdED8B61',
       oracle: '0x17174dC1b62add32a1DE477A357e75b0dcDEed6E',
       klerosBadge: '0x0000000000000000000000000000000000000000',
       klerosTokenView: '0x0000000000000000000000000000000000000000',
