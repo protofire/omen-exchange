@@ -310,7 +310,7 @@ export const ModalYourConnection = (props: Props) => {
                 {(networkId === networkIds.MAINNET || relay) && (
                   <BalanceItem>
                     <BalanceItemSide>
-                      <IconOmen size={'24'} />
+                      <IconOmen size={24} />
                       <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
                     </BalanceItemSide>
                     <BalanceItemBalance>{formattedOmenBalance} OMN</BalanceItemBalance>
@@ -352,7 +352,7 @@ export const ModalYourConnection = (props: Props) => {
                       </BalanceItem>
                       <BalanceItem>
                         <BalanceItemSide>
-                          <IconOmen size={'24'} />
+                          <IconOmen size={24} />
                           <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
                         </BalanceItemSide>
                         <BalanceItemBalance>{formattedOmenBalance} OMN</BalanceItemBalance>

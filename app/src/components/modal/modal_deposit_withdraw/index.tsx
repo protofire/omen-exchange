@@ -301,7 +301,8 @@ export const ModalDepositWithdraw = (props: Props) => {
                 >
                   <BalanceItemSide>
                     <RadioInput checked={currencySelected === ExchangeCurrency.Omen} name={'Dai'} outcomeIndex={-1} />
-                    <IconOmen size="24" style={{ marginLeft: '12px', marginRight: '12px' }} />
+                    {/*<IconOmen size="24" style={{ marginLeft: '12px', marginRight: '12px' }} />*/}
+                    <IconOmen size={24} style={{ marginLeft: '12px', marginRight: '12px' }} />
                     <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Omen}>Omen</BalanceItemTitle>
                   </BalanceItemSide>
                   <BalanceItemSide>
@@ -384,7 +385,13 @@ export const ModalDepositWithdraw = (props: Props) => {
       />
       <ModalTransactionWrapper
         confirmations={confirmations}
-        icon={DAI.image}
+        icon={
+          currencySelected === ExchangeCurrency.Dai ? (
+            <DaiIcon size={'24'} style={{ marginLeft: '10px' }} />
+          ) : (
+            <IconOmen size={24} style={{ marginLeft: '10px' }} />
+          )
+        }
         isOpen={isTransactionModalOpen && !isClaimModalOpen}
         message={message}
         netId={txNetId}

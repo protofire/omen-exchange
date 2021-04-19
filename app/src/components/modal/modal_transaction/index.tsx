@@ -11,6 +11,7 @@ import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
 import { IconClose, IconDone, IconFail, IconTwitter } from '../../common/icons'
+import { DaiIcon } from '../../common/icons/currencies'
 import { ContentWrapper, ModalNavigation, ModalNavigationLeft } from '../common_styled'
 
 const ModalMainText = styled.p`
@@ -57,7 +58,7 @@ const ModalButtonText = styled.span`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  icon?: string
+  icon?: any
   isOpen: boolean
   message: string
   onClose: () => void
@@ -122,7 +123,7 @@ export const ModalTransaction = (props: Props) => {
         )}
         <ModalMainText>
           {message}
-          {icon && <ModalTokenIcon src={icon} />}
+          {icon}
         </ModalMainText>
         <ModalSubText>
           {txState === TransactionStep.waitingConfirmation
