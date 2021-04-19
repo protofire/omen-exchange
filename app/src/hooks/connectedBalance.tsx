@@ -18,7 +18,7 @@ export interface ConnectedBalanceContext {
   formattedEthBalance: string
   daiBalance: BigNumber
   formattedDaiBalance: string
-  xOmen: BigNumber
+  xOmenBalance: BigNumber
   xDaiBalance: BigNumber
   formattedxDaiBalance: string
   formattedxOmenBalance: string
@@ -55,7 +55,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const { account, networkId } = context.rawWeb3Context
   const [claimState, setClaimState] = useState<boolean>(false)
   const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
-  const [xOmen, setxOmen] = useState<BigNumber>(Zero)
+  const [xOmenBalance, setxOmenBalance] = useState<BigNumber>(Zero)
 
   const { refetch, tokens } = useTokens(context.rawWeb3Context, true, true)
 
@@ -80,6 +80,9 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   //   omenToken,
   //   context,
   // )
+  // const omenBalance = omenCollateral || Zero
+  // const formattedxOmenBalance = `${formatBigNumber(omenBalance, omenToken.decimals, 2)}`
+  //console.log(formattedxOmenBalance)
   //this above triggers infinite re render i tested it and found out that omenToken/Collateral inside useCollateralBalance triggers useEffect for some reason not apparent to me
 
   const fetchxOmenBalance = async () => {
@@ -89,10 +92,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     const collateralService = new ERC20Service(context.library, context.account, omenToken.address)
     omenCollateral = await collateralService.getCollateral(context.account)
 
-    setxOmen(omenCollateral)
-    //
-    // const omenBalance = omenCollateral || Zero
-    // const formattedxOmenBalance = `${formatBigNumber(omenBalance, omenToken.decimals, 2)}`
+    setxOmenBalance(omenCollateral)
   }
 
   const fetchUnclaimedAssets = async () => {
@@ -141,8 +141,8 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     fetchBalances,
     formattedOmenBalance,
     omenBalance,
-    xOmen,
-    formattedxOmenBalance: formatBigNumber(xOmen, omenToken.decimals, 2),
+    xOmenBalance,
+    formattedxOmenBalance: formatBigNumber(xOmenBalance, omenToken.decimals, 2),
   }
 
   return <ConnectedBalanceContext.Provider value={value}>{props.children}</ConnectedBalanceContext.Provider>

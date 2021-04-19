@@ -72,7 +72,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   formattedOmenBalance: string
   daiBalance: BigNumber
   xDaiBalance: Maybe<BigNumber>
-  xOmen: BigNumber
+  xOmenBalance: BigNumber
   unclaimedAmount: BigNumber
   formattedxOmenBalance: string
   omenBalance: BigNumber
@@ -94,7 +94,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     theme,
     unclaimedAmount,
     xDaiBalance,
-    xOmen,
+    xOmenBalance,
   } = props
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
@@ -122,9 +122,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       context.rawWeb3Context.networkId === networkIds.MAINNET &&
       exchangeType === ExchangeType.deposit
     ) {
-      const { address } = getToken(1, 'omn')
-
-      const collateralService = new ERC20Service(context.rawWeb3Context.library, account, address)
+      const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenToken.address)
       const allowance = await collateralService.allowance(account, OMNI_BRIDGE_MAINNET_ADDRESS)
 
       setMainnetAllowance(allowance)
@@ -168,7 +166,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         : omenBalance
       : currencySelected === ExchangeCurrency.Dai
       ? xDaiBalance
-      : xOmen
+      : xOmenBalance
 
   const minDaiExchange = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
   const minOmenExchange = exchangeType === ExchangeType.deposit ? parseEther('1') : parseEther('1')
@@ -344,7 +342,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
           <InputInfo>
             <IconAlertInverted color={theme.colors.tertiary} size={'20'} style={{ marginRight: '12px' }} />
-            You need to {exchangeType === ExchangeType.deposit ? 'depositWithdraw' : 'withdraw'} at least{' '}
+            You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least{' '}
             {formatBigNumber(
               currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange,
               STANDARD_DECIMALS,
@@ -352,14 +350,6 @@ export const ModalDepositWithdraw = (props: Props) => {
             )}{' '}
             {currencySelected === ExchangeCurrency.Dai ? 'Dai' : 'Omn'}.
           </InputInfo>
-          {/*<SetAllowance*/}
-          {/*  collateral={getToken(1, 'omn')}*/}
-          {/*  finished={allowanceFinished && RemoteData.is.success(mainnetAllowance)}*/}
-          {/*  loading={RemoteData.is.asking(mainnetAllowance)}*/}
-          {/*  marginBottom*/}
-          {/*  onUnlock={unlockCollateral}*/}
-          {/*  style={{ marginBottom: 20 }}*/}
-          {/*/>*/}
           {mainnetWalletAllowance === WalletState.enable && (
             <div style={{ display: 'flex' }}>
               <ToggleTokenLock

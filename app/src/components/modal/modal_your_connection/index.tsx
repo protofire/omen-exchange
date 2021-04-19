@@ -226,12 +226,6 @@ export const ModalYourConnection = (props: Props) => {
       return
     }
     try {
-      //enabling omen token
-      // setMessage(`Enable OMN`)
-      // setTxState(TransactionStep.waitingConfirmation)
-      // setConfirmations(0)
-      // setIsTransactionModalOpen(true)
-      // await cpk?.approveCpk(OMNI_BRIDGE_XDAI_ADDRESS, GEN_XDAI_ADDRESS_TESTING)
       setMessage(`Enable ${DAI.symbol}`)
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
@@ -319,7 +313,7 @@ export const ModalYourConnection = (props: Props) => {
                       <IconOmen size={'24'} />
                       <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
                     </BalanceItemSide>
-                    <BalanceItemBalance>{formattedEthBalance} OMN</BalanceItemBalance>
+                    <BalanceItemBalance>{formattedOmenBalance} OMN</BalanceItemBalance>
                   </BalanceItem>
                 )}
               </BalanceItems>
