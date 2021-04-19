@@ -770,7 +770,7 @@ export const getRemainingRewards = (
   return parseUnits((rewardsAmountNumber * durationFraction).toString(), decimals)
 }
 
-export const calculateRewardAPR = (
+export const calculateRewardApr = (
   userStakedTokens: number,
   totalStakedTokens: number,
   timeRemaining: number,
