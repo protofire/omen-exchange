@@ -696,14 +696,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 state={ValueStates.success}
                 title="Earned"
                 value={`${formatNumber(
-                  formatBigNumber(sellNoteUserEarnings, displayCollateral.decimals),
+                  formatBigNumber(sellNoteUserEarnings, displayCollateral.decimals, displayCollateral.decimals),
                 )} ${displayTotalSymbol}`}
               />
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"
                 value={`${formatNumber(
-                  formatBigNumber(sellNoteDepositedTokens, displayCollateral.decimals),
+                  formatBigNumber(sellNoteDepositedTokens, displayCollateral.decimals, displayCollateral.decimals),
                 )} ${displayTotalSymbol}`}
               />
               <TransactionDetailsLine />
@@ -712,7 +712,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 state={(sellNoteDepositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Total"
                 value={`${formatNumber(
-                  formatBigNumber(sellNoteDepositedTokensTotal, displayCollateral.decimals),
+                  formatBigNumber(sellNoteDepositedTokensTotal, displayCollateral.decimals, displayCollateral.decimals),
                 )} ${displayTotalSymbol}`}
               />
               {!relay && collateral.address === pseudoNativeAssetAddress ? (
