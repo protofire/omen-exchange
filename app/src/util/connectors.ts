@@ -4,7 +4,7 @@ import { ethers } from 'ethers'
 import { Connectors } from 'web3-react'
 
 import { INFURA_PROJECT_ID } from '../common/constants'
-import { getInfuraUrl, infuraNetworkURL, supportedNetworkIds } from '../util/networks'
+import { getInfuraUrl, infuraNetworkURL, networkIds, supportedNetworkIds } from '../util/networks'
 
 const { InjectedConnector, NetworkOnlyConnector } = Connectors
 
@@ -20,10 +20,14 @@ class WalletConnectConnector extends Connectors.Connector {
     // eslint-disable-next-line
     return new Promise(async resolve => {
       this.connect = new WalletConnectProvider({
+        bridge: 'https://safe-walletconnect.gnosis.io',
         infuraId: INFURA_PROJECT_ID,
+        rpc: {
+          [networkIds.XDAI]: getInfuraUrl(networkIds.XDAI),
+        },
       })
-      this.provider = new ethers.providers.Web3Provider(this.connect)
 
+      this.provider = new ethers.providers.Web3Provider(this.connect)
       this.connect.on('accountsChanged', (accounts: string[]) => {
         this.account = accounts[0]
         this._web3ReactUpdateHandler({

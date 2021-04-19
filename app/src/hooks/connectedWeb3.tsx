@@ -87,6 +87,9 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
       ) {
         context.connector.engine.stop()
       }
+      if (connector === 'WalletConnect' && context.connector.connect && context.connector.connect._running) {
+        context.connector.connect.stop()
+      }
     }
 
     const checkIfReady = async () => {

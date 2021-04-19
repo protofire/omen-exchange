@@ -8,7 +8,6 @@ import { ethers } from 'ethers'
 import { Web3Provider } from 'ethers/providers'
 
 import { proxyFactoryAbi } from '../abi/proxy_factory'
-import { MAIN_NETWORKS } from '../common/constants'
 import { RelayService } from '../services/relay'
 import { SafeService } from '../services/safe'
 
@@ -362,12 +361,8 @@ export const getRelayProvider = (
   library: any,
   account: string | null | undefined,
 ) => {
-  const windowObj: any = window
-  const chainId = windowObj.ethereum?.chainId
-  const correctChainId = chainId ? MAIN_NETWORKS.includes(chainId) : true
-
   // provider override if running as relay
-  if (relay && networkId === networkIds.MAINNET && correctChainId) {
+  if (relay && networkId === networkIds.MAINNET) {
     const netId = networkIds.XDAI
     const provider = new ethers.providers.JsonRpcProvider(getInfuraUrl(netId)) as any
     const address = account ? calcRelayProxyAddress(account, provider) : ''
