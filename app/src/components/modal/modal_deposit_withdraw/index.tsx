@@ -72,8 +72,10 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   formattedOmenBalance: string
   daiBalance: BigNumber
   xDaiBalance: Maybe<BigNumber>
+  xOmen: BigNumber
   unclaimedAmount: BigNumber
   formattedxOmenBalance: string
+  omenBalance: BigNumber
 }
 
 export const ModalDepositWithdraw = (props: Props) => {
@@ -86,11 +88,13 @@ export const ModalDepositWithdraw = (props: Props) => {
     formattedxDaiBalance,
     formattedxOmenBalance,
     isOpen,
+    omenBalance,
     onBack,
     onClose,
     theme,
     unclaimedAmount,
     xDaiBalance,
+    xOmen,
   } = props
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
@@ -108,15 +112,21 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [currencySelected, setCurrencySelected] = useState<ExchangeCurrency>(ExchangeCurrency.Dai)
   const [allowanceState, setAllowanceState] = useState<TransactionStep>(TransactionStep.idle)
   const [mainnetAllowance, setMainnetAllowance] = useState<BigNumber>(new BigNumber(0))
+
   const { account, relay } = context.rawWeb3Context
 
   const fetchAllowance = async () => {
-    if (context.relay && account && context.rawWeb3Context.networkId === networkIds.MAINNET) {
+    if (
+      context.relay &&
+      account &&
+      context.rawWeb3Context.networkId === networkIds.MAINNET &&
+      exchangeType === ExchangeType.deposit
+    ) {
       const { address } = getToken(1, 'omn')
-      console.log(address)
+
       const collateralService = new ERC20Service(context.rawWeb3Context.library, account, address)
       const allowance = await collateralService.allowance(account, OMNI_BRIDGE_MAINNET_ADDRESS)
-      console.log(formatBigNumber(allowance, 18, 2))
+
       setMainnetAllowance(allowance)
     }
   }
@@ -125,28 +135,20 @@ export const ModalDepositWithdraw = (props: Props) => {
     setAllowanceState(TransactionStep.waitingConfirmation)
     try {
       if (exchangeType === ExchangeType.deposit) {
-        console.log('depositWithdraw')
-
         const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenToken.address)
-        // const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, marketData.funding)
 
-        const hash = await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS)
-        console.log(hash)
-      } else {
-        console.log('withdraw')
+        await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS)
       }
       await fetchAllowance()
       setAllowanceState(TransactionStep.transactionConfirmed)
     } catch (e) {
       setAllowanceState(TransactionStep.idle)
-      console.log(e)
     }
   }
   const mainnetWalletAllowance =
     mainnetAllowance.isZero() && exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Omen
       ? WalletState.enable
       : WalletState.ready
-  console.log(mainnetAllowance.isZero())
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
@@ -154,11 +156,19 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   useEffect(() => {
     fetchAllowance()
-  }, [account, relay])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [account, relay, exchangeType])
 
   const DAI = getToken(1, 'dai')
 
-  const wallet = exchangeType === ExchangeType.deposit ? daiBalance : xDaiBalance
+  const wallet =
+    exchangeType === ExchangeType.deposit
+      ? currencySelected === ExchangeCurrency.Dai
+        ? daiBalance
+        : omenBalance
+      : currencySelected === ExchangeCurrency.Dai
+      ? xDaiBalance
+      : xOmen
 
   const minDaiExchange = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
   const minOmenExchange = exchangeType === ExchangeType.deposit ? parseEther('1') : parseEther('1')
@@ -319,7 +329,12 @@ export const ModalDepositWithdraw = (props: Props) => {
               />
             }
             onClickMaxButton={() => {
-              const maxBalance = exchangeType === ExchangeType.deposit ? daiBalance : xDaiBalance || Zero
+              const maxBalance =
+                exchangeType === ExchangeType.deposit
+                  ? currencySelected === ExchangeCurrency.Dai
+                    ? daiBalance
+                    : omenBalance
+                  : xDaiBalance || Zero
               setDisplayFundAmount(maxBalance)
               setAmountToDisplay(formatBigNumber(maxBalance, STANDARD_DECIMALS, 5))
             }}

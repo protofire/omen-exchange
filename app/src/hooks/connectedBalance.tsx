@@ -2,11 +2,11 @@ import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 
-import { GEN_TOKEN_ADDDRESS_TESTING, GEN_XDAI_ADDRESS_TESTING, STANDARD_DECIMALS } from '../common/constants'
+import { STANDARD_DECIMALS } from '../common/constants'
 import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../hooks'
-import { XdaiService } from '../services'
+import { ERC20Service, XdaiService } from '../services'
 import { getLogger } from '../util/logger'
-import { getNativeAsset, getToken, getTokenFromAddress, knownTokens, networkIds } from '../util/networks'
+import { getNativeAsset, getToken, networkIds } from '../util/networks'
 import { formatBigNumber, formatNumber } from '../util/tools'
 
 const logger = getLogger('Hooks::ConnectedBalance')
@@ -18,10 +18,12 @@ export interface ConnectedBalanceContext {
   formattedEthBalance: string
   daiBalance: BigNumber
   formattedDaiBalance: string
+  xOmen: BigNumber
   xDaiBalance: BigNumber
   formattedxDaiBalance: string
   formattedxOmenBalance: string
   formattedOmenBalance: string
+  omenBalance: BigNumber
   fetchBalances: () => Promise<void>
 }
 
@@ -53,11 +55,10 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const { account, networkId } = context.rawWeb3Context
   const [claimState, setClaimState] = useState<boolean>(false)
   const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
+  const [xOmen, setxOmen] = useState<BigNumber>(Zero)
 
   const { refetch, tokens } = useTokens(context.rawWeb3Context, true, true)
-  console.log(account)
-  console.log(networkId)
-  console.log(tokens)
+
   const ethBalance = new BigNumber(
     tokens.filter(token => token.symbol === getNativeAsset(context.rawWeb3Context.networkId).symbol)[0]?.balance || '',
   )
@@ -73,16 +74,26 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const omenBalance = new BigNumber(tokens.filter(token => token.symbol === 'OMN')[0]?.balance || '')
   const formattedOmenBalance = formatNumber(formatBigNumber(omenBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 3)
 
-  // const omenToken = getToken(100, 'omn')
-  //
+  const omenToken = getToken(100, 'omn')
+
   // const { collateralBalance: omenCollateral, fetchCollateralBalance: fetchOmenBalance } = useCollateralBalance(
   //   omenToken,
   //   context,
   // )
-  //
-  // const omenBalance = omenCollateral || Zero
-  // const formattedOmenBalance = `${formatBigNumber(omenBalance, omenToken.decimals, 2)}`
-  const formattedxOmenBalance = '22'
+  //this above triggers infinite re render i tested it and found out that omenToken/Collateral inside useCollateralBalance triggers useEffect for some reason not apparent to me
+
+  const fetchxOmenBalance = async () => {
+    if (!context.account) return
+    let omenCollateral = new BigNumber(0)
+
+    const collateralService = new ERC20Service(context.library, context.account, omenToken.address)
+    omenCollateral = await collateralService.getCollateral(context.account)
+
+    setxOmen(omenCollateral)
+    //
+    // const omenBalance = omenCollateral || Zero
+    // const formattedxOmenBalance = `${formatBigNumber(omenBalance, omenToken.decimals, 2)}`
+  }
 
   const fetchUnclaimedAssets = async () => {
     if (account && networkId === networkIds.MAINNET) {
@@ -102,7 +113,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
 
   const fetchBalances = async () => {
     try {
-      await Promise.all([fetchUnclaimedAssets(), fetchCollateralBalance(), refetch()])
+      await Promise.all([fetchUnclaimedAssets(), fetchCollateralBalance(), refetch(), fetchxOmenBalance()])
     } catch (e) {
       logger.log(e.message)
     }
@@ -110,7 +121,6 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     if (relay) {
-      console.log('here')
       fetchBalances()
     } else {
       setUnclaimedAmount(Zero)
@@ -130,7 +140,9 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     formattedxDaiBalance,
     fetchBalances,
     formattedOmenBalance,
-    formattedxOmenBalance,
+    omenBalance,
+    xOmen,
+    formattedxOmenBalance: formatBigNumber(xOmen, omenToken.decimals, 2),
   }
 
   return <ConnectedBalanceContext.Provider value={value}>{props.children}</ConnectedBalanceContext.Provider>
