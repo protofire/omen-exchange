@@ -2,7 +2,7 @@ import { providers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
-import connectors, { handleGsMultiSend } from '../util/connectors'
+import connectors from '../util/connectors'
 import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
@@ -68,10 +68,8 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
         connectors.Safe.init(safeAppInfo.safeAddress, netId)
         context.setConnector('Safe')
       }
-    } else if (active) {
-      if (connector && connector in connectors) {
-        context.setConnector(connector)
-      }
+    } else if (active && connector && connector in connectors) {
+      context.setConnector(connector)
     } else if (error) {
       logger.log(error.message)
       localStorage.removeItem('CONNECTOR')
@@ -89,8 +87,6 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
       context.setConnector('Safe')
     }
 
-    handleGsMultiSend()
-
     // disabled block tracker
     if (context.connector) {
       if (
@@ -99,6 +95,9 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
         context.connector.engine._blockTracker._isRunning
       ) {
         context.connector.engine.stop()
+      }
+      if (connector === 'WalletConnect' && context.connector.connect && context.connector.connect._running) {
+        context.connector.connect.stop()
       }
     }
 
