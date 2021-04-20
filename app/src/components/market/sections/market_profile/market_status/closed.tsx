@@ -62,11 +62,7 @@ const StyledButtonContainer = styled(ButtonContainer)`
 `
 
 const BorderedButtonContainer = styled(ButtonContainer)`
-  &.border {
-    border-top: 1px solid ${props => props.theme.colors.verticalDivider};
-  }
   ${MarginsButton};
-  border-top: 1px solid ${props => props.theme.colors.verticalDivider};
 `
 
 const SellBuyWrapper = styled.div`
@@ -460,7 +456,7 @@ const Wrapper = (props: Props) => {
                 ></MarketResolutionMessageStyled>
               )}
               {isConditionResolved && !hasWinningOutcomes ? (
-                <StyledButtonContainer className="border">
+                <StyledButtonContainer borderTop={true}>
                   <Button
                     buttonType={ButtonType.secondaryLine}
                     onClick={() => {
@@ -484,7 +480,7 @@ const Wrapper = (props: Props) => {
                       </Button>
                     </BorderedButtonContainer>
                   ) : !isConditionResolved && hasWinningOutcomes ? (
-                    <BorderedButtonContainer className="border">
+                    <BorderedButtonContainer borderTop={true}>
                       <Button
                         buttonType={ButtonType.primary}
                         disabled={status === Status.Loading}
@@ -496,7 +492,7 @@ const Wrapper = (props: Props) => {
                   ) : (
                     isConditionResolved &&
                     hasWinningOutcomes && (
-                      <BorderedButtonContainer className="border">
+                      <BorderedButtonContainer borderTop={true}>
                         <Button
                           buttonType={ButtonType.primary}
                           disabled={status === Status.Loading}
