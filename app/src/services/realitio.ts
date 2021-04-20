@@ -28,6 +28,11 @@ const realitioScalarAdapterAbi = [
   'function resolve(bytes32 questionId, string question, uint256 low, uint256 high)',
 ]
 
+interface TransactionResult {
+  hash?: string
+  safeTxHash?: string
+}
+
 function getQuestionArgs(
   question: string,
   outcomes: Outcome[],
@@ -225,14 +230,14 @@ class RealitioService {
     amount: BigNumber,
     setTxHash?: (arg0: string) => void,
     setTxState?: (step: TransactionStep) => void,
-  ): Promise<void> => {
+  ): Promise<TransactionResult> => {
     try {
       const result = await this.contract.submitAnswer(questionId, answer, 0, { value: amount })
       setTxState && setTxState(TransactionStep.transactionSubmitted)
       setTxHash && setTxHash(result.hash)
       const tx = await this.provider.waitForTransaction(result.hash)
       setTxState && setTxState(TransactionStep.transactionConfirmed)
-      return tx
+      return { ...tx, hash: tx.transactionHash }
     } catch (error) {
       logger.error(`There was an error submitting answer '${questionId}'`, error.message)
       throw error
