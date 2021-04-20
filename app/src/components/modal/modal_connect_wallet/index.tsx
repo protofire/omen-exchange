@@ -1,9 +1,9 @@
-import WalletConnectQRCodeModal from '@walletconnect/qrcode-modal'
 import React, { HTMLAttributes, useCallback, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { css, withTheme } from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
+import connectors from '../../../util/connectors'
 import { getLogger } from '../../../util/logger'
 import { Wallet } from '../../../util/types'
 import { Button } from '../../button'
@@ -177,42 +177,22 @@ export const ModalConnectWallet = (props: Props) => {
     setConnectingToWalletConnect(false)
     setConnectingToMetamask(false)
     setConnectingToAuthereum(false)
-    WalletConnectQRCodeModal.close()
   }, [])
 
   const onClickCloseButton = useCallback(() => {
     resetEverything() // we need to do this or the states and functions will keep executing even when the modal is closed by the user
     onClose()
   }, [onClose, resetEverything])
-
   useEffect(() => {
-    if (
-      connectingToWalletConnect &&
-      context.active &&
-      !context.account &&
-      context.connectorName === Wallet.WalletConnect
-    ) {
-      const uri = context.connector.walletConnector.uri
-      WalletConnectQRCodeModal.open(uri, () => {
-        // Callback passed to the onClose click of the QRCode modal
-        setConnectingToWalletConnect(false)
-        onClickCloseButton()
-        localStorage.removeItem('CONNECTOR')
-        context.unsetConnector()
-      })
-
-      context.connector.walletConnector.on('connect', () => {
-        setConnectingToWalletConnect(false)
-        WalletConnectQRCodeModal.close()
-        onClickCloseButton()
-      })
+    if (connectingToWalletConnect) {
+      connectors.WalletConnect.connect.onConnect(() => onClickCloseButton())
+      connectors.WalletConnect.onError = () => onClickCloseButton()
     }
     if (connectingToWalletConnect && context.account && context.connectorName === Wallet.WalletConnect) {
       onClickCloseButton()
       setConnectingToWalletConnect(false)
     }
   }, [context, onClickCloseButton, connectingToWalletConnect])
-
   useEffect(() => {
     if (connectingToMetamask && context.account && context.connectorName === Wallet.MetaMask) {
       onClickCloseButton()
@@ -246,7 +226,7 @@ export const ModalConnectWallet = (props: Props) => {
   return (
     <>
       <Modal
-        isOpen={!context.account && isOpen}
+        isOpen={!context.account && isOpen && !connectingToWalletConnect}
         onRequestClose={onClickCloseButton}
         shouldCloseOnOverlayClick={!isConnectingToWallet}
         style={theme.fixedHeightModal}

@@ -1,65 +1,91 @@
-import WalletConnectApi from '@walletconnect/web3-subprovider'
+import WalletConnectProvider from '@walletconnect/web3-provider'
 import AuthereumApi from 'authereum'
 import { ethers } from 'ethers'
 import { Connectors } from 'web3-react'
 
-import { getInfuraUrl, infuraNetworkURL, supportedNetworkIds, supportedNetworkURLs } from '../util/networks'
+import { INFURA_PROJECT_ID } from '../common/constants'
+import { getInfuraUrl, infuraNetworkURL, networkIds, supportedNetworkIds } from '../util/networks'
 
-import { Transaction } from './cpk'
-
-const { InjectedConnector, NetworkOnlyConnector, WalletConnectConnector } = Connectors
+const { InjectedConnector, NetworkOnlyConnector } = Connectors
 
 const MetaMask = new InjectedConnector({
   supportedNetworks: supportedNetworkIds,
 })
 
-const WalletConnect = new WalletConnectConnector({
-  api: WalletConnectApi,
-  bridge: 'https://safe-walletconnect.gnosis.io',
-  supportedNetworkURLs,
-  defaultNetwork: 1,
-})
+class WalletConnectConnector extends Connectors.Connector {
+  provider: any
+  connect: any
 
-interface Payload {
-  method: string
-  params: Transaction[]
-}
+  onActivation(): Promise<void> {
+    // eslint-disable-next-line
+    return new Promise(async resolve => {
+      this.connect = new WalletConnectProvider({
+        bridge: 'https://safe-walletconnect.gnosis.io',
+        infuraId: INFURA_PROJECT_ID,
+        rpc: {
+          [networkIds.XDAI]: getInfuraUrl(networkIds.XDAI),
+        },
+      })
 
-type End = (error?: string, safeTxHash?: string) => number
+      this.provider = new ethers.providers.Web3Provider(this.connect)
+      this.connect.on('accountsChanged', (accounts: string[]) => {
+        this.account = accounts[0]
+        this._web3ReactUpdateHandler({
+          updateAccount: true,
+          account: this.account,
+        })
+      })
 
-/**
- *  adds a handler for the gs_multi_send method to the wallet connect provider
- */
-export function handleGsMultiSend() {
-  // @ts-expect-error ignore
-  const subprovider = WalletConnect.walletConnectSubprovider
+      this.connect.on('chainChanged', (chainId: number) => {
+        this.networkId = chainId
+        this._web3ReactUpdateHandler({
+          updateNetworkId: true,
+          networkId: this.networkId,
+        })
+      })
 
-  if (subprovider && !WalletConnect.gs_multi_send) {
-    WalletConnect.gs_multi_send = true
-    const handleRequest = subprovider.handleRequest
-
-    subprovider.handleRequest = function(payload: Payload, next: () => void, end: End) {
-      if (payload.method === 'gs_multi_send') {
-        const gsMultiSend = async () => {
-          const request = subprovider._walletConnector._formatRequest({
-            method: payload.method,
-            params: payload.params.map(tx => ({ ...tx, value: tx.value && tx.value.toString() })),
+      if (!this.activating) {
+        this.activating = true
+        try {
+          const accounts = await this.connect.enable()
+          const networkId = await this.connect.send('eth_chainId')
+          this.account = accounts[0]
+          this.networkId = networkId
+          this._web3ReactUpdateHandler({
+            updateAccount: true,
+            account: this.account,
+            updateNetworkId: true,
+            networkId: this.networkId,
           })
-          try {
-            const safeTxHash = await subprovider._walletConnector._sendCallRequest(request)
-            return end(undefined, safeTxHash)
-          } catch (error) {
-            return end(error)
+          resolve()
+        } catch (e) {
+          localStorage.setItem('CONNECTOR', '')
+          this.activating = false
+          if (this.onError) {
+            this.onError(e.message)
           }
         }
-        return gsMultiSend()
       }
+    })
+  }
 
-      // eslint-disable-next-line
-      return handleRequest.apply(this, arguments)
-    }
+  onDeactivation = () => {
+    this.activating = false
+    this.connect.disconnect()
+  }
+
+  getProvider = () => this.provider
+
+  getAccount = () => {
+    return this.account || null
+  }
+
+  public async getNetworkId(): Promise<number> {
+    return this._validateNetworkId(this.networkId || null)
   }
 }
+
+const WalletConnect = new WalletConnectConnector()
 
 const Infura = new NetworkOnlyConnector({
   providerURL: infuraNetworkURL,
