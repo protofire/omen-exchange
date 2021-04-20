@@ -42,6 +42,7 @@ import {
   strip0x,
   truncateStringInTheMiddle as truncate,
   getRemainingRewards,
+  calculateRewardApr,
 } from './tools'
 import { Token } from './types'
 
@@ -772,9 +773,25 @@ describe('tools', () => {
     }
   })
 
-  // describe('calculateRewardApr', () => {
-  //   const testCases: [[number, number, number, number], number][] = [
-  //     [[1, 10, 1000, 100], ]
-  //   ]
-  // })
+  describe('calculateRewardApr', () => {
+    const testCases: [[number, number, number, number, number, number], number][] = [
+      [[1, 10, 1000, 100, 1, 1], 31536000],
+      [[3, 10, 200000, 10, 1, 1], 15768],
+      [[3, 10, 200000, 10, 3.4, 5.8], 26898.352941176472],
+    ]
+    for (const [
+      [userStakedTokens, totalStakedTokens, timeRemaining, remainingRewards, stakedTokenPrice, rewardTokenPrice],
+      result,
+    ] of testCases) {
+      const rewardApr = calculateRewardApr(
+        userStakedTokens,
+        totalStakedTokens,
+        timeRemaining,
+        remainingRewards,
+        stakedTokenPrice,
+        rewardTokenPrice,
+      )
+      expect(result).toStrictEqual(rewardApr)
+    }
+  })
 })
