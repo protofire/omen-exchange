@@ -60,6 +60,18 @@ const DepositWithdrawButton = styled(Button)`
   margin-top: 28px;
 `
 
+const Allowance = styled.div`
+  display: flex;
+  margin-top: 16px;
+  padding: 16px 20px;
+  border-radius: 4px;
+  border: ${props => props.theme.borders.borderLineDisabled};
+  line-height: 20px;
+  letter-spacing: 0.2px;
+  color: ${props => props.theme.colors.textColorLightish};
+  align-items: center;
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   exchangeType: ExchangeType
   isOpen: boolean
@@ -279,6 +291,7 @@ export const ModalDepositWithdraw = (props: Props) => {
               <WalletText>Wallet</WalletText>
               <BalanceItems>
                 <BalanceItem
+                  hover
                   onClick={() => {
                     setCurrencySelected(ExchangeCurrency.Dai)
                   }}
@@ -295,13 +308,13 @@ export const ModalDepositWithdraw = (props: Props) => {
                   </BalanceItemSide>
                 </BalanceItem>
                 <BalanceItem
+                  hover
                   onClick={() => {
                     setCurrencySelected(ExchangeCurrency.Omen)
                   }}
                 >
                   <BalanceItemSide>
-                    <RadioInput checked={currencySelected === ExchangeCurrency.Omen} name={'Dai'} outcomeIndex={-1} />
-                    {/*<IconOmen size="24" style={{ marginLeft: '12px', marginRight: '12px' }} />*/}
+                    <RadioInput checked={currencySelected === ExchangeCurrency.Omen} name={'Dai'} outcomeIndex={-2} />
                     <IconOmen size={24} style={{ marginLeft: '12px', marginRight: '12px' }} />
                     <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Omen}>Omen</BalanceItemTitle>
                   </BalanceItemSide>
@@ -352,17 +365,15 @@ export const ModalDepositWithdraw = (props: Props) => {
             {currencySelected === ExchangeCurrency.Dai ? 'Dai' : 'Omn'}.
           </InputInfo>
           {mainnetWalletAllowance === WalletState.enable && (
-            <div style={{ display: 'flex' }}>
+            <Allowance>
+              <div>This permission allows Omni smart contracts to interact with your OMN.</div>
               <ToggleTokenLock
                 finished={allowanceState === TransactionStep.transactionConfirmed}
                 loading={allowanceState === TransactionStep.waitingConfirmation}
                 onUnlock={approve}
               />
-
-              <div>This permission allows Omni Bridge smart contracts to interact with your OMN.</div>
-            </div>
+            </Allowance>
           )}
-
           <DepositWithdrawButton
             buttonType={ButtonType.primaryAlternative}
             disabled={isDepositWithdrawDisabled}

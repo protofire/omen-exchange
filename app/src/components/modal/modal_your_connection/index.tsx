@@ -154,6 +154,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   formattedDaiBalance: string
   formattedOmenBalance: string
   formattedxDaiBalance: string
+  formattedxOmenBalance: string
 }
 
 export const ModalYourConnection = (props: Props) => {
@@ -165,6 +166,7 @@ export const ModalYourConnection = (props: Props) => {
     formattedEthBalance,
     formattedOmenBalance,
     formattedxDaiBalance,
+    formattedxOmenBalance,
     isOpen,
     onClose,
     openDepositModal,
@@ -355,7 +357,7 @@ export const ModalYourConnection = (props: Props) => {
                           <IconOmen size={24} />
                           <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
                         </BalanceItemSide>
-                        <BalanceItemBalance>{formattedOmenBalance} OMN</BalanceItemBalance>
+                        <BalanceItemBalance>{formattedxOmenBalance} OMN</BalanceItemBalance>
                       </BalanceItem>
                     </BalanceItems>
                   </BalanceSection>

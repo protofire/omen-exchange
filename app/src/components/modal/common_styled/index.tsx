@@ -11,7 +11,7 @@ export const ContentWrapper = styled.div`
 export const ModalNavigation = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between
+  justify-content: space-between;
   width: 100%;
   padding: 5px;
   margin-bottom: 14px;
@@ -57,17 +57,6 @@ export const BalanceItems = styled.div`
   width: 100%;
 `
 
-export const BalanceItem = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-
-  &:nth-of-type(2) {
-    margin-top: 12px;
-  }
-`
-
 export const BalanceItemSide = styled.div`
   display: flex;
   align-items: center;
@@ -83,4 +72,24 @@ export const BalanceItemBalance = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorLighter};
   margin: 0;
+`
+export const BalanceItem = styled.div<{ hover?: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+
+  &:nth-of-type(2) {
+    margin-top: 12px;
+  }
+
+  &:hover {
+    
+   ${BalanceItemSide}{
+   ${BalanceItemTitle}{
+   color: ${props => props.theme.colors.textColorDark}; !important;
+   }
+ 
+   }
+  }
 `
