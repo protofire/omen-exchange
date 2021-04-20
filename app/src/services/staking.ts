@@ -243,6 +243,8 @@ class StakingService {
   getStakingData = async (
     rewardToken: Token,
     address: string,
+    stakedTokenPrice: number,
+    rewardTokenPrice: number,
   ): Promise<{ earnedRewards: number; remainingRewards: number; rewardApr: number; totalRewards: number }> => {
     const userStakedTokens = Number(await this.getStakedTokensOfAmount(address)) / 10 ** STANDARD_DECIMALS
     const totalStakedTokens = Number(await this.getTotalStakedTokensAmount()) / 10 ** STANDARD_DECIMALS
@@ -263,7 +265,14 @@ class StakingService {
       ),
     )
     const clampedRemainingRewards = remainingRewards < 0 ? 0 : remainingRewards
-    const rewardApr = calculateRewardApr(userStakedTokens, totalStakedTokens, timeRemaining, remainingRewards)
+    const rewardApr = calculateRewardApr(
+      userStakedTokens,
+      totalStakedTokens,
+      timeRemaining,
+      remainingRewards,
+      stakedTokenPrice,
+      rewardTokenPrice,
+    )
     const earnedRewards = Number((await this.getClaimableRewards(address))[0]) / 10 ** rewardToken.decimals
     const totalRewards = Number(await this.getRewardAmount(rewardToken.address)) / 10 ** rewardToken.decimals
 
