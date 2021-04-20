@@ -785,9 +785,7 @@ export const calculateRewardApr = (
   const rewardsToUser = percentageOfTotalStake * remainingRewards
   const timeMultiple = YEAR_IN_SECONDS / timeRemaining
   const tokensPerYear = timeMultiple * rewardsToUser
-  // TODO: Replace hardcoded token value
   const usdPerYear = tokensPerYear * rewardTokenPrice
-  // TODO: Replace hardcoded token value
   const stakedUsd = userStakedTokens * stakedTokenPrice
   return (usdPerYear / stakedUsd) * 100
 }
