@@ -41,6 +41,7 @@ import {
   signaturesFormatted,
   strip0x,
   truncateStringInTheMiddle as truncate,
+  getRemainingRewards,
 } from './tools'
 import { Token } from './types'
 
@@ -755,6 +756,19 @@ describe('tools', () => {
     for (const [array, result] of testCases) {
       const reversedArray = reverseArray(array)
       expect(result).toStrictEqual(reversedArray)
+    }
+  })
+
+  describe('getRemainingRewards', () => {
+    const testCases: [[BigNumber, number, number, number], BigNumber][] = [
+      [[parseUnits('1', 18), 1000, 10000, 18], parseUnits('1', 17)],
+      [[parseUnits('5', 8), 2000, 50000, 8], parseUnits('2', 7)],
+      [[parseUnits('5', 18), 5000, 5000, 18], parseUnits('5', 18)],
+      [[parseUnits('5', 18), 0, 5000, 18], new BigNumber(0)],
+    ]
+    for (const [[rewardsAmount, timeRemaining, duration, decimals], result] of testCases) {
+      const remainingRewards = getRemainingRewards(rewardsAmount, timeRemaining, duration, decimals)
+      expect(result).toStrictEqual(remainingRewards)
     }
   })
 })
