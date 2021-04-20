@@ -771,4 +771,10 @@ describe('tools', () => {
       expect(result).toStrictEqual(remainingRewards)
     }
   })
+
+  // describe('calculateRewardApr', () => {
+  //   const testCases: [[number, number, number, number], number][] = [
+  //     [[1, 10, 1000, 100], ]
+  //   ]
+  // })
 })

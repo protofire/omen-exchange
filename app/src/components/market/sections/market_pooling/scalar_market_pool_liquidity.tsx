@@ -363,6 +363,10 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       getOMNToken(networkId),
       // TODO: Include relay if available
       cpk?.address || '',
+      // TODO: Replace hardcoded price param
+      1,
+      // TODO: Replace hardcoded price param
+      1,
     )
 
     setEarnedRewards(earnedRewards)
