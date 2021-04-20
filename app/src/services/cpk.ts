@@ -1421,15 +1421,24 @@ class CPKService {
 
   stakePoolTokens = async (amount: BigNumber, campaignAddress: string, marketMakerAddress: string) => {
     try {
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
+
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
 
-      // Approve pool tokens to be sent to campaign address
-      transactions.push({
-        to: marketMakerAddress,
-        data: ERC20Service.encodeApproveUnlimited(campaignAddress),
-      })
+      const omnToken = getOMNToken(networkId).address
+      const erc20Service = new ERC20Service(this.provider, this.cpk.address, omnToken)
+      const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(this.cpk.address, campaignAddress, amount)
+
+      // Approve pool tokens to be sent to campaign address if not already done
+      if (!hasEnoughAllowance) {
+        transactions.push({
+          to: marketMakerAddress,
+          data: ERC20Service.encodeApproveUnlimited(campaignAddress),
+        })
+      }
 
       // Stake pool tokens
       transactions.push({
@@ -1484,7 +1493,15 @@ class CPKService {
       if (!this.cpk.relay) {
         const omnToken = getOMNToken(networkId).address
         const erc20Service = new ERC20Service(this.provider, this.cpk.address, omnToken)
-        const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(this.cpk.address, account, new BigNumber(1))
+
+        // Calculate amount to send from CPK to EOA
+        // claimable rewards + unclaimed rewards (if any)
+        const stakingService = new StakingService(this.provider, this.cpk.address, campaignAddress)
+        const claimableRewards = (await stakingService.getClaimableRewards(this.cpk.address))[0]
+        const unclaimedRewards = bigNumberify(await erc20Service.getCollateral(this.cpk.address))
+        const totalRewardsAmount = claimableRewards.add(unclaimedRewards)
+
+        const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(this.cpk.address, account, totalRewardsAmount)
 
         // Approve unlimited if not already done
         if (!hasEnoughAllowance) {
@@ -1493,13 +1510,6 @@ class CPKService {
             data: ERC20Service.encodeApproveUnlimited(account),
           })
         }
-
-        // Calculate amount to send from CPK to EOA
-        // claimable rewards + unclaimed rewards (if any)
-        const stakingService = new StakingService(this.provider, this.cpk.address, campaignAddress)
-        const claimableRewards = (await stakingService.getClaimableRewards(this.cpk.address))[0]
-        const unclaimedRewards = bigNumberify(await erc20Service.getCollateral(this.cpk.address))
-        const totalRewardsAmount = claimableRewards.add(unclaimedRewards)
 
         // Transfer all rewards from cpk to EOA
         transactions.push({
@@ -1536,7 +1546,15 @@ class CPKService {
       if (!this.cpk.relay) {
         const omnToken = getOMNToken(networkId).address
         const erc20Service = new ERC20Service(this.provider, this.cpk.address, omnToken)
-        const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(this.cpk.address, account, new BigNumber(1))
+
+        // Calculate amount to send from CPK to EOA
+        // claimable rewards + unclaimed rewards (if any)
+        const stakingService = new StakingService(this.provider, this.cpk.address, campaignAddress)
+        const claimableRewards = (await stakingService.getClaimableRewards(this.cpk.address))[0]
+        const unclaimedRewards = bigNumberify(await erc20Service.getCollateral(this.cpk.address))
+        const totalRewardsAmount = claimableRewards.add(unclaimedRewards)
+
+        const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(this.cpk.address, account, totalRewardsAmount)
 
         // Approve unlimited if not already done
         if (!hasEnoughAllowance) {
@@ -1545,13 +1563,6 @@ class CPKService {
             data: ERC20Service.encodeApproveUnlimited(account),
           })
         }
-
-        // Calculate amount to send from CPK to EOA
-        // claimable rewards + unclaimed rewards (if any)
-        const stakingService = new StakingService(this.provider, this.cpk.address, campaignAddress)
-        const claimableRewards = (await stakingService.getClaimableRewards(this.cpk.address))[0]
-        const unclaimedRewards = bigNumberify(await erc20Service.getCollateral(this.cpk.address))
-        const totalRewardsAmount = claimableRewards.add(unclaimedRewards)
 
         // Transfer all rewards from cpk to EOA
         transactions.push({
