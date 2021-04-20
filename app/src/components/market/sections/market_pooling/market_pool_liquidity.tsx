@@ -382,28 +382,28 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
-  // Get necessary data and calculate APR
-  // TODO: Consider moving calculations to useMemo
+  const fetchStakingData = async () => {
+    // TODO: Replace hardcoded campaign address
+    const stakingService = new StakingService(
+      provider,
+      cpk && cpk.address,
+      '0xE2D380F4B16B8371fD3dC2990A29109642d4ea96',
+    )
+
+    const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
+      getOMNToken(networkId),
+      // TODO: Include relay if available
+      cpk?.address || '',
+    )
+
+    setEarnedRewards(earnedRewards)
+    setRemainingRewards(remainingRewards)
+    setRewardApr(rewardApr)
+    setTotalRewards(totalRewards)
+  }
+
+  // TODO: Consider switching to useMemo
   useEffect(() => {
-    const fetchStakingData = async () => {
-      // TODO: Replace hardcoded campaign address
-      const stakingService = new StakingService(
-        provider,
-        cpk && cpk.address,
-        '0xE2D380F4B16B8371fD3dC2990A29109642d4ea96',
-      )
-
-      const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
-        getOMNToken(networkId),
-        // TODO: Include relay if available
-        cpk?.address || '',
-      )
-
-      setEarnedRewards(earnedRewards)
-      setRemainingRewards(remainingRewards)
-      setRewardApr(rewardApr)
-      setTotalRewards(totalRewards)
-    }
     // TODO: Include relay
     cpk && fetchStakingData()
   }, [cpk?.address])
