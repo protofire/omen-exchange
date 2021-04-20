@@ -262,11 +262,12 @@ class StakingService {
         rewardToken.decimals,
       ),
     )
+    const clampedRemainingRewards = remainingRewards < 0 ? 0 : remainingRewards
     const rewardApr = calculateRewardApr(userStakedTokens, totalStakedTokens, timeRemaining, remainingRewards)
     const earnedRewards = Number((await this.getClaimableRewards(address))[0]) / 10 ** rewardToken.decimals
     const totalRewards = Number(await this.getRewardAmount(rewardToken.address)) / 10 ** rewardToken.decimals
 
-    return { earnedRewards, remainingRewards, rewardApr, totalRewards }
+    return { earnedRewards, remainingRewards: clampedRemainingRewards, rewardApr, totalRewards }
   }
 }
 
