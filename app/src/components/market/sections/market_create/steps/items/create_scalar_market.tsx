@@ -134,7 +134,7 @@ export const CreateScalarMarket = (props: Props) => {
             disabled={false}
             name="question"
             onChange={handleChange}
-            placeholder="What question do you want the world to predict the answer to?"
+            placeholder="What would you like to see the world predict?"
             value={question}
           />
         }
