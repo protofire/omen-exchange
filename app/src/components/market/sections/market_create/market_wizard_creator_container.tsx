@@ -74,13 +74,27 @@ const MarketWizardCreatorContainer: FC = () => {
             await collateralService.approveUnlimited(cpk.address)
           }
         }
+        let compoundTokenDetails = marketData.userInputCollateral
+        let compoundService = null
+        const userInputCollateralSymbol = marketData.userInputCollateral.symbol.toLowerCase()
+        const useCompoundReserve = marketData.useCompoundReserve
+        if (useCompoundReserve) {
+          const cToken = `c${userInputCollateralSymbol}`
+          const compoundCollateralToken = cToken as KnownToken
+          compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
+          compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
+          await compoundService.init()
+        }
         if (isScalar) {
           setMessage('Creating scalar market...')
           const { marketMakerAddress } = await cpk.createScalarMarket({
+            compoundService,
+            compoundTokenDetails,
             marketData,
             conditionalTokens,
             realitio,
             marketMakerFactory,
+            useCompoundReserve,
             setTxHash,
             setTxState,
           })
