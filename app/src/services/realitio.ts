@@ -29,8 +29,7 @@ const realitioScalarAdapterAbi = [
 ]
 
 interface TransactionResult {
-  hash?: string
-  safeTxHash?: string
+  hash: string
 }
 
 function getQuestionArgs(
@@ -224,20 +223,9 @@ class RealitioService {
     }
   }
 
-  submitAnswer = async (
-    questionId: string,
-    answer: string,
-    amount: BigNumber,
-    setTxHash?: (arg0: string) => void,
-    setTxState?: (step: TransactionStep) => void,
-  ): Promise<TransactionResult> => {
+  submitAnswer = async (questionId: string, answer: string, amount: BigNumber): Promise<TransactionResult> => {
     try {
-      const result = await this.contract.submitAnswer(questionId, answer, 0, { value: amount })
-      setTxState && setTxState(TransactionStep.transactionSubmitted)
-      setTxHash && setTxHash(result.hash)
-      const tx = await this.provider.waitForTransaction(result.hash)
-      setTxState && setTxState(TransactionStep.transactionConfirmed)
-      return { ...tx, hash: tx.transactionHash }
+      return await this.contract.submitAnswer(questionId, answer, 0, { value: amount })
     } catch (error) {
       logger.error(`There was an error submitting answer '${questionId}'`, error.message)
       throw error
