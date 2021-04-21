@@ -185,6 +185,7 @@ const HeaderContainer: React.FC = (props: any) => {
     formattedDaiBalance,
     formattedEthBalance,
     formattedxDaiBalance,
+    omenBalance,
     unclaimedAmount,
     xDaiBalance,
   } = useConnectedBalanceContext()
@@ -279,6 +280,8 @@ const HeaderContainer: React.FC = (props: any) => {
               placeholder={networkPlacholder}
             />
           )}
+
+          <HeaderButton />
 
           {!account && (
             <ButtonConnectWalletStyled
