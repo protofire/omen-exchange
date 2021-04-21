@@ -317,7 +317,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       return
     }
 
-    await cpk.stakePoolTokens(amountToFund || Zero, '0xE2D380F4B16B8371fD3dC2990A29109642d4ea96', marketMakerAddress)
+    await cpk.stakePoolTokens(amountToFund || Zero, '0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B', marketMakerAddress)
     fetchStakingData()
   }
 
@@ -327,7 +327,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       return
     }
 
-    await cpk.withdrawStakedPoolTokens(amountToFund || Zero, '0xE2D380F4B16B8371fD3dC2990A29109642d4ea96')
+    await cpk.withdrawStakedPoolTokens(amountToFund || Zero, '0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B')
     fetchStakingData()
   }
 
@@ -337,7 +337,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       return
     }
 
-    await cpk.claimRewardTokens('0xE2D380F4B16B8371fD3dC2990A29109642d4ea96')
+    await cpk.claimRewardTokens('0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B')
     fetchStakingData()
   }
 
@@ -347,7 +347,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       return
     }
 
-    await cpk.withdrawStakedAndClaim('0xE2D380F4B16B8371fD3dC2990A29109642d4ea96')
+    await cpk.withdrawStakedAndClaim('0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B')
     fetchStakingData()
   }
 
@@ -356,7 +356,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     const stakingService = new StakingService(
       provider,
       cpk && cpk.address,
-      '0xE2D380F4B16B8371fD3dC2990A29109642d4ea96',
+      '0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B',
     )
 
     const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
