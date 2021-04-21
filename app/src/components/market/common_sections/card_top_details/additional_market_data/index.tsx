@@ -2,11 +2,13 @@ import React, { DOMAttributes } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../../contexts'
-import { useRealityLink } from '../../../../../hooks'
-import { networkIds } from '../../../../../util/networks'
-import { Arbitrator, KlerosItemStatus, KlerosSubmission, Token } from '../../../../../util/types'
-import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../../common/icons'
+import { useConnectedCPKContext, useConnectedWeb3Context, useRealityLink } from '../../../../hooks'
+import { CompoundService } from '../../../../services/compound_service'
+import { StakingService } from '../../../../services/staking'
+import { getOMNToken, networkIds } from '../../../../util/networks'
+import { Arbitrator, CompoundTokenType, KlerosItemStatus, KlerosSubmission, Token } from '../../../../util/types'
+import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
+import { CompoundIconNoBorder } from '../../../common/icons/currencies/CompoundIconNoBorder'
 
 const AdditionalMarketDataWrapper = styled.div`
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
@@ -118,7 +120,8 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   const { address, arbitrator, category, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
 
   const context = useConnectedWeb3Context()
-  const { relay } = context
+  const { account, library: provider, networkId, relay } = context
+  const cpk = useConnectedCPKContext()
 
   const realitioBaseUrl = useRealityLink(!!relay)
   const realitioUrl = id ? `${realitioBaseUrl}/#!/question/${id}` : `${realitioBaseUrl}/`
@@ -135,6 +138,46 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   const queryParams = new URLSearchParams()
   queryParams.append('col1', title)
   queryParams.append('col2', `https://omen.eth.link/#/${address}`)
+
+  const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
+  const [rewardApr, setRewardApr] = useState(0)
+
+  useEffect(() => {
+    const getAPY = async () => {
+      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
+      const supplyRate = await compoundServiceObject.calculateSupplyRateAPY()
+      setCompoundInterestRate(supplyRate.toFixed(2))
+    }
+    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      getAPY()
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // TODO: Consider switching to useMemo
+  useEffect(() => {
+    const fetchStakingData = async () => {
+      // TODO: Replace hardcoded campaign address
+      const stakingService = new StakingService(
+        provider,
+        cpk && cpk.address,
+        '0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B',
+      )
+
+      const { rewardApr } = await stakingService.getStakingData(
+        getOMNToken(networkId),
+        // TODO: Include relay if available
+        cpk?.address || '',
+        // TODO: Replace hardcoded price param
+        1,
+        // TODO: Replace hardcoded price param
+        1,
+      )
+
+      setRewardApr(rewardApr)
+    }
+    // TODO: Include relay
+    cpk && fetchStakingData()
+  }, [cpk?.address])
 
   return (
     <AdditionalMarketDataWrapper>
