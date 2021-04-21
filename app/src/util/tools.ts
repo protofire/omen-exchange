@@ -771,21 +771,18 @@ export const getRemainingRewards = (
 }
 
 export const calculateRewardApr = (
-  userStakedTokens: number,
   totalStakedTokens: number,
   timeRemaining: number,
   remainingRewards: number,
   stakedTokenPrice: number,
   rewardTokenPrice: number,
 ): number => {
-  if (remainingRewards <= 0 || userStakedTokens <= 0) {
+  if (remainingRewards <= 0) {
     return 0
   }
-  const percentageOfTotalStake = userStakedTokens / totalStakedTokens
-  const rewardsToUser = percentageOfTotalStake * remainingRewards
   const timeMultiple = YEAR_IN_SECONDS / timeRemaining
-  const tokensPerYear = timeMultiple * rewardsToUser
+  const tokensPerYear = timeMultiple * remainingRewards
   const usdPerYear = tokensPerYear * rewardTokenPrice
-  const stakedUsd = userStakedTokens * stakedTokenPrice
+  const stakedUsd = totalStakedTokens * stakedTokenPrice
   return (usdPerYear / stakedUsd) * 100
 }
