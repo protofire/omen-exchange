@@ -241,7 +241,6 @@ export const calcSellAmountInCollateral = (
   fee: number,
 ): Maybe<BigNumber> => {
   Big.DP = 90
-
   const sharesToSellBig = new Big(sharesToSell.toString())
   const holdingsBig = new Big(holdings.toString())
   const otherHoldingsBig = otherHoldings.map(x => new Big(x.toString()))
@@ -375,12 +374,16 @@ export const getSharesInBaseToken = (
   displayCollateral: Token,
 ): BalanceItem[] => {
   const displayBalances = balances.map(function(bal) {
-    const baseTokenShares = compoundService.calculateCTokenToBaseExchange(displayCollateral, bal.shares)
-    const newBalanceObject = Object.assign({}, bal, {
-      shares: baseTokenShares,
-    })
-    delete newBalanceObject.currentDisplayPrice
-    return newBalanceObject
+    if (bal.shares) {
+      const baseTokenShares = compoundService.calculateCTokenToBaseExchange(displayCollateral, bal.shares)
+      const newBalanceObject = Object.assign({}, bal, {
+        shares: baseTokenShares,
+      })
+      delete newBalanceObject.currentDisplayPrice
+      return newBalanceObject
+    } else {
+      return bal
+    }
   })
   return displayBalances
 }
