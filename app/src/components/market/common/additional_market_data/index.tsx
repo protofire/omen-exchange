@@ -6,8 +6,9 @@ import { useConnectedCPKContext, useConnectedWeb3Context, useRealityLink } from 
 import { CompoundService } from '../../../../services/compound_service'
 import { StakingService } from '../../../../services/staking'
 import { getOMNToken, networkIds } from '../../../../util/networks'
+import { formatNumber } from '../../../../util/tools'
 import { Arbitrator, CompoundTokenType, KlerosItemStatus, KlerosSubmission, Token } from '../../../../util/types'
-import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
+import { IconAlert, IconApy, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
 import { CompoundIconNoBorder } from '../../../common/icons/currencies/CompoundIconNoBorder'
 
 const AdditionalMarketDataWrapper = styled.div`
@@ -50,13 +51,15 @@ const CompoundInterestWrapper = styled.div<{ customColor: string }>`
   }
 `
 
-const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean }>`
+const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean; isSuccess?: boolean }>`
   margin: 0;
   margin-left: 8px;
   font-size: ${props => props.theme.textfield.fontSize};
   line-height: 16px;
   white-space: nowrap;
-  color: ${({ isError, theme }) => (isError ? theme.colors.alert : theme.colors.clickable)};
+  color: ${({ isError, isSuccess, theme }) =>
+    isError ? theme.colors.alert : isSuccess ? theme.colors.green : theme.colors.clickable};
+  font-weight: ${({ isSuccess }) => (isSuccess ? '500' : '400')};
   &:first-letter {
     text-transform: capitalize;
   }
@@ -218,6 +221,20 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           <IconArbitrator size={'24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
+        {rewardApr > 0 && (
+          <AdditionalMarketDataSectionWrapper
+            data-arrow-color="transparent"
+            data-for="marketData"
+            data-tip={'Current liquidity mining rewards APY.'}
+            // Update if we change verified data section
+            hasMarginRight={context.networkId === networkIds.XDAI}
+          >
+            <IconApy />
+            <AdditionalMarketDataSectionTitle isSuccess={rewardApr > 0}>
+              {formatNumber(rewardApr.toString())}% APY
+            </AdditionalMarketDataSectionTitle>
+          </AdditionalMarketDataSectionWrapper>
+        )}
         {context.networkId !== networkIds.XDAI && (
           <AdditionalMarketDataSectionWrapper
             data-arrow-color="transparent"
