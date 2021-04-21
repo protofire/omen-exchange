@@ -37,7 +37,7 @@ import { ModalTransactionWrapper } from '../modal_transaction'
 const InputInfo = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorLighter};
-  margin: 12px 0 0;
+  margin: 16px 0 0;
   width: 100%;
 
   display: flex;
@@ -149,7 +149,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
         await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS)
       }
-      await fetchAllowance()
+
       setAllowanceState(TransactionStep.transactionConfirmed)
     } catch (e) {
       setAllowanceState(TransactionStep.idle)
@@ -342,11 +342,13 @@ export const ModalDepositWithdraw = (props: Props) => {
             }
             onClickMaxButton={() => {
               const maxBalance =
-                exchangeType === ExchangeType.deposit
+                (exchangeType === ExchangeType.deposit
                   ? currencySelected === ExchangeCurrency.Dai
                     ? daiBalance
                     : omenBalance
-                  : xDaiBalance || Zero
+                  : currencySelected === ExchangeCurrency.Dai
+                  ? xDaiBalance
+                  : xOmenBalance) || Zero
               setDisplayFundAmount(maxBalance)
               setAmountToDisplay(formatBigNumber(maxBalance, STANDARD_DECIMALS, 5))
             }}
