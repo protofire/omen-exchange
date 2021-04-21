@@ -181,6 +181,7 @@ export const CreateScalarMarket = (props: Props) => {
                 name="lowerBound"
                 onBlur={() => {
                   setLowerBoundFocus(false)
+                  setLowerBoundError('')
                 }}
                 onChange={value => {
                   handleChange(value)
@@ -207,6 +208,7 @@ export const CreateScalarMarket = (props: Props) => {
                 name="upperBound"
                 onBlur={() => {
                   setUpperBoundFocus(false)
+                  setUpperBoundError('')
                 }}
                 onChange={value => {
                   handleChange(value)
@@ -233,6 +235,7 @@ export const CreateScalarMarket = (props: Props) => {
                 name="startingPoint"
                 onBlur={() => {
                   setStartingPointFocus(false)
+                  setStartingPointError('')
                 }}
                 onChange={value => {
                   handleChange(value)

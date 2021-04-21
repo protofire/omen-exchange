@@ -23,7 +23,7 @@ const TitleWrapper = styled.div`
 `
 
 const Error = styled(FormError)`
-  line-height: 4px;
+  line-height: 15px;
   letter-spacing: 0.2px;
 `
 
