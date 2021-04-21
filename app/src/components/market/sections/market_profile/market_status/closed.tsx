@@ -456,7 +456,7 @@ const Wrapper = (props: Props) => {
                 ></MarketResolutionMessageStyled>
               )}
               {isConditionResolved && !hasWinningOutcomes ? (
-                <StyledButtonContainer borderTop={true}>
+                <StyledButtonContainer>
                   <Button
                     buttonType={ButtonType.secondaryLine}
                     onClick={() => {
