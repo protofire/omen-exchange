@@ -44,7 +44,6 @@ import {
   CompoundTokenType,
   MarketDetailsTab,
   MarketMakerData,
-  Status,
   Ternary,
   Token,
   TransactionStep,
@@ -149,7 +148,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [amountToRemoveDisplay, setAmountToRemoveDisplay] = useState<string>('')
   const [message, setMessage] = useState<string>('')
   const [displayCollateral, setDisplayCollateral] = useState<Token>(getInitialCollateral(context.networkId, collateral))
-  const [isModalTransactionResultOpen, setIsModalTransactionResultOpen] = useState(false)
   const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
   const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
   const [additionalShares, setAdditionalShares] = useState<number>(0)

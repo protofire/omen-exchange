@@ -120,12 +120,12 @@ export const MarketData: React.FC<Props> = props => {
   let baseCurrency = currency
   const currencySymbol = currency.symbol.toLowerCase()
   if (compoundService && currencySymbol in CompoundTokenType) {
-    const nativeCompoundAsset = getNativeCompoundAsset(context.networkId)
+    const nativeCompoundAsset = getNativeCompoundAsset(networkId)
     if (currencySymbol === nativeCompoundAsset.symbol.toLowerCase()) {
-      baseCurrency = getNativeAsset(context.networkId)
+      baseCurrency = getNativeAsset(networkId, relay)
     } else {
       const baseCurrencySymbol = getBaseTokenForCToken(currency.symbol) as KnownToken
-      baseCurrency = getToken(context.networkId, baseCurrencySymbol)
+      baseCurrency = getToken(networkId, baseCurrencySymbol)
     }
     const displayTotalVolumeValue = compoundService.calculateCTokenToBaseExchange(baseCurrency, collateralVolume)
     displayTotalVolume = formatBigNumber(displayTotalVolumeValue, baseCurrency.decimals)
