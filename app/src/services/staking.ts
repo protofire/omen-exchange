@@ -246,7 +246,6 @@ class StakingService {
     stakedTokenPrice: number,
     rewardTokenPrice: number,
   ): Promise<{ earnedRewards: number; remainingRewards: number; rewardApr: number; totalRewards: number }> => {
-    const userStakedTokens = Number(await this.getStakedTokensOfAmount(address)) / 10 ** STANDARD_DECIMALS
     const totalStakedTokens = Number(await this.getTotalStakedTokensAmount()) / 10 ** STANDARD_DECIMALS
 
     // TODO: Replace hardcoded timestamp with subgraph datum
@@ -266,7 +265,6 @@ class StakingService {
     )
     const clampedRemainingRewards = remainingRewards < 0 ? 0 : remainingRewards
     const rewardApr = calculateRewardApr(
-      userStakedTokens,
       totalStakedTokens,
       timeRemaining,
       remainingRewards,
