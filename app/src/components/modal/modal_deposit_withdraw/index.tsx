@@ -181,7 +181,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       : xOmenBalance
 
   const minDaiExchange = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
-  const minOmenExchange = exchangeType === ExchangeType.deposit ? parseEther('1') : parseEther('1')
+  const minOmenExchange = exchangeType === ExchangeType.deposit ? parseEther('1') : parseEther('0.1')
   const isDepositWithdrawDisabled =
     displayFundAmount.isZero() ||
     !wallet ||
@@ -206,7 +206,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         }`,
       )
       setTxState(TransactionStep.waitingConfirmation)
-      setConfirmations(0)
+      setConfirmations(8)
       setIsTransactionModalOpen(true)
 
       const hash =
@@ -218,12 +218,13 @@ export const ModalDepositWithdraw = (props: Props) => {
 
       setTxNetId(provider.network.chainId)
       setTxHash(hash)
+
       await waitForConfirmations(hash, provider, setConfirmations, setTxState)
+
       await fetchBalances()
-      if (exchangeType === ExchangeType.withdraw) {
-        setIsTransactionModalOpen(false)
-        setIsClaimModalOpen(true)
-      }
+
+      setIsTransactionModalOpen(false)
+      onBack()
       setDisplayFundAmount(new BigNumber(0))
       setAmountToDisplay('')
     } catch (e) {
@@ -249,7 +250,8 @@ export const ModalDepositWithdraw = (props: Props) => {
       setTxNetId(provider.network.chainId)
       setTxHash(transaction.hash)
       await waitForConfirmations(transaction.hash, provider, setConfirmations, setTxState, 1)
-      fetchBalances()
+      setTxState(TransactionStep.transactionConfirmed)
+      await fetchBalances()
     } catch (e) {
       setIsTransactionModalOpen(false)
       setIsClaimModalOpen(true)
@@ -362,7 +364,7 @@ export const ModalDepositWithdraw = (props: Props) => {
             {formatBigNumber(
               currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange,
               STANDARD_DECIMALS,
-              0,
+              1,
             )}{' '}
             {currencySelected === ExchangeCurrency.Dai ? 'Dai' : 'Omn'}.
           </InputInfo>

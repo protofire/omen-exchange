@@ -207,6 +207,7 @@ export const ModalYourConnection = (props: Props) => {
       setTxHash(transaction.hash)
 
       await waitForConfirmations(transaction.hash, provider, setConfirmations, setTxState, 1)
+      setTxState(TransactionStep.transactionConfirmed)
       fetchBalances()
     } catch (e) {
       setIsTransactionModalOpen(false)
@@ -239,6 +240,7 @@ export const ModalYourConnection = (props: Props) => {
         setTxNetId(provider.network.chainId)
         setTxHash(transactionHash)
         await waitForConfirmations(transactionHash, provider, setConfirmations, setTxState, 1)
+        setTxState(TransactionStep.transactionConfirmed)
         await fetchAllowance()
       }
     } catch (e) {

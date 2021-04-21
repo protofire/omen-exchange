@@ -300,7 +300,6 @@ export const waitForConfirmations = async (
     }
     await waitABit(2000)
   }
-  setTxState(TransactionStep.transactionConfirmed)
 }
 
 export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string => {
