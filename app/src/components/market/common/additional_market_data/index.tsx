@@ -229,7 +229,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
             // Update if we change verified data section
             hasMarginRight={context.networkId === networkIds.XDAI}
           >
-            <IconApy />
+            <IconApy size={'24'} />
             <AdditionalMarketDataSectionTitle isSuccess={rewardApr > 0}>
               {formatNumber(rewardApr.toString())}% APY
             </AdditionalMarketDataSectionTitle>
