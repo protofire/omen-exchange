@@ -378,7 +378,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     setCollateralBalance(newCollateralBalance)
     setCollateralBalanceFormatted(formatBigNumber(newCollateralBalance, token.decimals, 5))
 
-    const newAmount = ethers.utils.parseUnits(formattedAmount, token.decimals)
+    const newAmount = ethers.utils.parseUnits(Number(formattedAmount).toFixed(token.decimals), token.decimals)
 
     setAmount(newAmount)
     handleCollateralChange(token, newAmount)
