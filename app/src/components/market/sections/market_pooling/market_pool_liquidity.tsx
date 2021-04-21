@@ -387,7 +387,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     const stakingService = new StakingService(
       provider,
       cpk && cpk.address,
-      '0xE2D380F4B16B8371fD3dC2990A29109642d4ea96',
+      '0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B',
     )
 
     const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
