@@ -250,12 +250,12 @@ class StakingService {
     const totalStakedTokens = Number(await this.getTotalStakedTokensAmount()) / 10 ** STANDARD_DECIMALS
 
     // TODO: Replace hardcoded timestamp with subgraph datum
-    const endingTimestamp = 1618902000
+    const endingTimestamp = 1622271600
     const timeRemaining = endingTimestamp - Math.floor(Date.now() / 1000)
     // TODO: Replace hardcoded value with subgraph datum
-    const rewardsAmount = parseUnits('1', 18)
+    const rewardsAmount = parseUnits('10', 18)
     // TODO: Replace hardcoded value with subgraph datum
-    const duration = 604800
+    const duration = 3232800
 
     const remainingRewards = Number(
       formatBigNumber(
