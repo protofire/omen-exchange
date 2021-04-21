@@ -3,12 +3,12 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { STANDARD_DECIMALS } from '../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../contexts'
 import { useSymbol } from '../../../../../hooks'
 import { ERC20Service } from '../../../../../services'
+import { StakingService } from '../../../../../services/staking'
 import { getLogger } from '../../../../../util/logger'
-import { getTokenFromAddress } from '../../../../../util/networks'
+import { getOMNToken, getTokenFromAddress } from '../../../../../util/networks'
 import {
   bigNumberToNumber,
   calcPrediction,
@@ -20,7 +20,7 @@ import {
   isScalarMarket,
 } from '../../../../../util/tools'
 import { MarketMakerDataItem, Token } from '../../../../../util/types'
-import { IconStar } from '../../../../common/icons/IconStar'
+import { IconApy, IconStar } from '../../../../common/icons'
 
 const Wrapper = styled(NavLink)`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
@@ -73,6 +73,12 @@ const Outcome = styled.span`
   max-width: 200px;
 `
 
+const ApyIndicator = styled.span`
+  color: ${props => props.theme.colors.green};
+  margin-left: 6px;
+  font-weight: 500;
+`
+
 const Separator = styled.span`
   font-size: 18px;
   margin: 0 8px;
@@ -88,7 +94,8 @@ const logger = getLogger('Market::ListItem')
 
 export const ListItem: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { account, library: provider } = context
+  const { account, library: provider, networkId } = context
+  const cpk = useConnectedCPKContext()
 
   const { currentFilter, market } = props
   const {
@@ -120,7 +127,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   }
 
   const [details, setDetails] = useState(token || { decimals: STANDARD_DECIMALS, symbol: '', volume: 0 })
-
+  const [rewardApr, setRewardApr] = useState(0)
   const { decimals, volume } = details
   const symbol = useSymbol(details as Token)
   const now = moment()
@@ -147,6 +154,34 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
     setToken()
   }, [account, collateralToken, collateralVolume, provider, context.networkId, token])
+
+  // TODO: Consider switching to useMemo
+  useEffect(() => {
+    const fetchStakingData = async () => {
+      // TODO: Replace hardcoded campaign address
+      const stakingService = new StakingService(
+        provider,
+        cpk && cpk.address,
+        '0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B',
+      )
+
+      const { rewardApr } = await stakingService.getStakingData(
+        getOMNToken(networkId),
+        // TODO: Include relay if available
+        cpk?.address || '',
+        // TODO: Replace hardcoded price param
+        1,
+        // TODO: Replace hardcoded price param
+        1,
+      )
+
+      setRewardApr(rewardApr)
+    }
+    // TODO: Include relay
+    cpk && fetchStakingData()
+  }, [cpk?.address])
+
+  console.log(title, rewardApr)
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
@@ -177,6 +212,13 @@ export const ListItem: React.FC<Props> = (props: Props) => {
             : outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}
         </Outcome>
         <Separator>|</Separator>
+        {rewardApr > 0 && (
+          <>
+            <IconApy size={'16'} />
+            <ApyIndicator>{formatNumber(rewardApr.toString())}% APY</ApyIndicator>
+            <Separator>|</Separator>
+          </>
+        )}
         <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Closed ${endsText} ago`}</span>
         <Separator>|</Separator>
         <span>

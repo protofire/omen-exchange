@@ -14,12 +14,11 @@ import {
   XDAI_NETWORKS,
   YEAR_IN_SECONDS,
 } from '../common/constants'
-import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
-import { CompoundService } from '../services/compound_service'
+import { MarketTokenPair } from '../hooks/graph/useGraphMarketsFromQuestion'
 
 import { getLogger } from './logger'
 import { getContractAddress, getNativeAsset, getToken, getWrapToken, networkIds } from './networks'
-import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token, TransactionStep } from './types'
+import { BalanceItem, Token, TransactionStep } from './types'
 
 const logger = getLogger('Tools')
 

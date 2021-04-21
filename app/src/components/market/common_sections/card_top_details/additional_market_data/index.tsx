@@ -2,14 +2,13 @@ import React, { DOMAttributes } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useConnectedCPKContext, useConnectedWeb3Context, useRealityLink } from '../../../../hooks'
-import { CompoundService } from '../../../../services/compound_service'
-import { StakingService } from '../../../../services/staking'
-import { getOMNToken, networkIds } from '../../../../util/networks'
-import { formatNumber } from '../../../../util/tools'
-import { Arbitrator, CompoundTokenType, KlerosItemStatus, KlerosSubmission, Token } from '../../../../util/types'
-import { IconAlert, IconApy, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
-import { CompoundIconNoBorder } from '../../../common/icons/currencies/CompoundIconNoBorder'
+import { useConnectedCPKContext, useConnectedWeb3Context, useRealityLink } from '../../../../../hooks'
+import { StakingService } from '../../../../../services/staking'
+import { getOMNToken, networkIds } from '../../../../../util/networks'
+import { formatNumber } from '../../../../../util/tools'
+import { Arbitrator, KlerosItemStatus, KlerosSubmission, Token } from '../../../../../util/types'
+import { IconAlert, IconApy, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../../common/icons'
+import { CompoundIconNoBorder } from '../../../../common/icons/currencies/CompoundIconNoBorder'
 
 const AdditionalMarketDataWrapper = styled.div`
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
@@ -223,7 +222,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
             // Update if we change verified data section
             hasMarginRight={context.networkId === networkIds.XDAI}
           >
-            <IconApy />
+            <IconApy size={'24'} />
             <AdditionalMarketDataSectionTitle isSuccess={rewardApr > 0}>
               {formatNumber(rewardApr.toString())}% APY
             </AdditionalMarketDataSectionTitle>
