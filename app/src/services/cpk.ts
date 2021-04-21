@@ -1284,7 +1284,12 @@ class CPKService {
         txOptions.gas = defaultGas
         return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       }
-      return realitio.submitAnswer(question.id, answer, amount, setTxHash, setTxState)
+      const txObject = await realitio.submitAnswer(question.id, answer, amount)
+      setTxState && setTxState(TransactionStep.transactionSubmitted)
+      setTxHash && setTxHash(txObject.hash)
+      const tx = await this.waitForTransaction(txObject)
+      setTxState && setTxState(TransactionStep.transactionConfirmed)
+      return tx
     } catch (error) {
       logger.error(`There was an error submitting answer '${question.id}'`, error.message)
       throw error
