@@ -37,7 +37,7 @@ import { ModalTransactionWrapper } from '../modal_transaction'
 const InputInfo = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorLighter};
-  margin: 16px 0 0;
+  margin: 20px 0 0;
   width: 100%;
 
   display: flex;
@@ -57,12 +57,12 @@ const WalletText = styled.div`
 
 const DepositWithdrawButton = styled(Button)`
   width: 100%;
-  margin-top: 28px;
+  margin-top: 32px;
 `
 
 const Allowance = styled.div`
   display: flex;
-  margin-top: 16px;
+  margin-top: 20px;
   padding: 16px 20px;
   border-radius: 4px;
   border: ${props => props.theme.borders.borderLineDisabled};
@@ -286,7 +286,7 @@ export const ModalDepositWithdraw = (props: Props) => {
               }}
             />
           </ModalNavigation>
-          <ModalCard style={{ marginBottom: '16px', marginTop: '12px' }}>
+          <ModalCard style={{ marginBottom: '20px', marginTop: '18px' }}>
             <BalanceSection>
               <WalletText>Wallet</WalletText>
               <BalanceItems>
