@@ -382,6 +382,46 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
+  // TODO: Cleanup and remove hardcoded address if function kept in component
+  const stake = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await cpk.stakePoolTokens(amountToFund || Zero, '0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B', marketMakerAddress)
+    fetchStakingData()
+  }
+
+  // TODO: Cleanup and remove hardcoded address if function kept in component
+  const withdraw = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await cpk.withdrawStakedPoolTokens(amountToFund || Zero, '0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B')
+    fetchStakingData()
+  }
+
+  // TODO: Cleanup and remove hardcoded address if function kept in component
+  const claim = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await cpk.claimRewardTokens('0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B')
+    fetchStakingData()
+  }
+
+  // TODO: Cleanup and remove hardcoded address if function kept in component
+  const withdrawAndClaim = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await cpk.withdrawStakedAndClaim('0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B')
+    fetchStakingData()
+  }
+
   const fetchStakingData = async () => {
     // TODO: Replace hardcoded campaign address
     const stakingService = new StakingService(
@@ -830,6 +870,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             Withdraw
           </Button>
         )}
+        <Button onClick={stake}>Stake</Button>
+        <Button onClick={withdraw}>Withdraw</Button>
+        <Button onClick={claim}>Claim</Button>
+        <Button onClick={withdrawAndClaim}>Exit</Button>
       </BottomButtonWrapper>
       <ModalTransactionWrapper
         confirmations={0}
