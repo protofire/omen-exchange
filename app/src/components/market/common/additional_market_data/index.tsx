@@ -2,9 +2,10 @@ import React, { DOMAttributes, useEffect, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useRealityLink } from '../../../../hooks'
+import { useConnectedCPKContext, useConnectedWeb3Context, useRealityLink } from '../../../../hooks'
 import { CompoundService } from '../../../../services/compound_service'
-import { networkIds } from '../../../../util/networks'
+import { StakingService } from '../../../../services/staking'
+import { getOMNToken, networkIds } from '../../../../util/networks'
 import { Arbitrator, CompoundTokenType, KlerosItemStatus, KlerosSubmission, Token } from '../../../../util/types'
 import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
 import { CompoundIconNoBorder } from '../../../common/icons/currencies/CompoundIconNoBorder'
@@ -125,7 +126,8 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   const { address, arbitrator, category, collateral, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
 
   const context = useConnectedWeb3Context()
-  const { account, library: provider, relay } = context
+  const { account, library: provider, networkId, relay } = context
+  const cpk = useConnectedCPKContext()
 
   const realitioBaseUrl = useRealityLink(!!relay)
   const realitioUrl = id ? `${realitioBaseUrl}/#!/question/${id}` : `${realitioBaseUrl}/`
@@ -144,6 +146,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   queryParams.append('col2', `https://omen.eth.link/#/${address}`)
 
   const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
+  const [rewardApr, setRewardApr] = useState(0)
 
   useEffect(() => {
     const getAPY = async () => {
@@ -155,6 +158,33 @@ export const AdditionalMarketData: React.FC<Props> = props => {
       getAPY()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // TODO: Consider switching to useMemo
+  useEffect(() => {
+    const fetchStakingData = async () => {
+      // TODO: Replace hardcoded campaign address
+      const stakingService = new StakingService(
+        provider,
+        cpk && cpk.address,
+        '0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B',
+      )
+
+      const { rewardApr } = await stakingService.getStakingData(
+        getOMNToken(networkId),
+        // TODO: Include relay if available
+        cpk?.address || '',
+        // TODO: Replace hardcoded price param
+        1,
+        // TODO: Replace hardcoded price param
+        1,
+      )
+
+      setRewardApr(rewardApr)
+    }
+    // TODO: Include relay
+    cpk && fetchStakingData()
+  }, [cpk?.address])
+
   return (
     <AdditionalMarketDataWrapper>
       <AdditionalMarketDataLeft>
