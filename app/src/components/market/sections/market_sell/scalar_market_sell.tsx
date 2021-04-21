@@ -13,7 +13,7 @@ import {
   useContracts,
   useSymbol,
 } from '../../../../hooks'
-import { CPKService, MarketMakerService } from '../../../../services'
+import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken } from '../../../../util/networks'
 import {
@@ -142,7 +142,6 @@ export const ScalarMarketSell = (props: Props) => {
     // eslint-disable-next-line
   }, [collateral.address])
 
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, 18))
   const calcSellAmount = useMemo(
     () => async (
       amountShares: BigNumber,
@@ -188,7 +187,7 @@ export const ScalarMarketSell = (props: Props) => {
       logger.log(`Amount to sell ${amountToSell}`)
       return [costFee, newPrediction, amountToSell, potentialValue]
     },
-    [balances, positionIndex, scalarLow, scalarHigh, marketFeeWithTwoDecimals],
+    [balances, positionIndex, scalarLow, scalarHigh, fee],
   )
 
   const [costFee, newPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(

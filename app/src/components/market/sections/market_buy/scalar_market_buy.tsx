@@ -259,9 +259,9 @@ export const ScalarMarketBuy = (props: Props) => {
     formatBigNumber(displayPotentialProfit, displayCollateral.decimals, displayCollateral.decimals),
   )} ${displayCollateral.symbol}`
 
-  const potentialLossFormatted = formatNumber(
+  const potentialLossFormatted = `${formatNumber(
     formatBigNumber(displayPotentialLoss, displayCollateral.decimals, displayCollateral.decimals),
-  )
+  )} ${displayCollateral.symbol}`
 
   const sharesTotal = formatNumber(
     formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals),
@@ -421,7 +421,7 @@ export const ScalarMarketBuy = (props: Props) => {
               balance={walletBalance}
               context={context}
               currency={displayCollateral.address}
-              disabled={currencyFilters.length ? false : true}
+              disabled={currencySelectorIsDisabled}
               filters={currencyFilters}
               onSelect={(token: Token | null) => {
                 if (token) {
@@ -466,12 +466,7 @@ export const ScalarMarketBuy = (props: Props) => {
               value={feeFormatted}
             />
             <TransactionDetailsLine />
-            <TransactionDetailsRow
-              title={'Max. Loss'}
-              value={`${formatNumber(formatBigNumber(amount, collateral.decimals, collateral.decimals))} ${
-                collateral.symbol
-              }`}
-            />
+            <TransactionDetailsRow title={'Max. Loss'} value={potentialLossFormatted} />
             <TransactionDetailsRow
               emphasizeValue={potentialProfit.gt(0)}
               state={ValueStates.success}
