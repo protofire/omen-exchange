@@ -43,12 +43,13 @@ export const ModalCard = styled.div`
   }
 `
 
-export const BalanceSection = styled.div`
+export const BalanceSection = styled.div<{ borderBottom?: boolean }>`
   padding: 16px 20px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
+  ${props => props.borderBottom && `border-bottom: ${props.theme.borders.borderLineDisabled};`}};
 `
 
 export const BalanceItems = styled.div`
