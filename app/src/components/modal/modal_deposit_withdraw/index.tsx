@@ -57,7 +57,7 @@ const WalletText = styled.div`
 
 const DepositWithdrawButton = styled(Button)`
   width: 100%;
-  margin-top: 32px;
+  margin-top: 24px;
 `
 
 const Allowance = styled.div`
@@ -288,7 +288,7 @@ export const ModalDepositWithdraw = (props: Props) => {
               }}
             />
           </ModalNavigation>
-          <ModalCard style={{ marginBottom: '20px', marginTop: '18px' }}>
+          <ModalCard style={{ marginBottom: '20px', marginTop: '10px' }}>
             <BalanceSection>
               <WalletText>Wallet</WalletText>
               <BalanceItems>
