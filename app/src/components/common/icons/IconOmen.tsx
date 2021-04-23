@@ -1,8 +1,14 @@
 import React from 'react'
 
-export const IconOmen = () => {
+export const IconOmen = (props: any) => {
   return (
-    <svg fill="none" height="24" viewBox="0 0 56 56" width="24" xmlns="http://www.w3.org/2000/svg">
+    <svg
+      fill="none"
+      height={props.height || 56}
+      viewBox="0 0 56 56"
+      width={props.width || 56}
+      xmlns="http://www.w3.org/2000/svg"
+    >
       <g filter="url(#filter0_d)">
         <path
           d="M4 26C4 12.7452 14.7452 2 28 2C41.2548 2 52 12.7452 52 26C52 39.2548 41.2548 50 28 50C14.7452 50 4 39.2548 4 26Z"
