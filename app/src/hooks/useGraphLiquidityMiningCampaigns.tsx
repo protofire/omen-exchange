@@ -44,7 +44,7 @@ type LMRecovery = {
   amounts: BigNumber[]
 }
 
-type GraphResponseLiquidityMiningCampaign = {
+export type GraphResponseLiquidityMiningCampaign = {
   id: string
   initialized: boolean
   owner: string

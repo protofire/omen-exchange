@@ -18,6 +18,7 @@ import {
   useGraphLiquidityMiningCampaigns,
   useSymbol,
 } from '../../../../hooks'
+import { GraphResponseLiquidityMiningCampaign } from '../../../../hooks/useGraphLiquidityMiningCampaigns'
 import { ERC20Service } from '../../../../services'
 import { StakingService } from '../../../../services/staking'
 import { getLogger } from '../../../../util/logger'
@@ -147,6 +148,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [remainingRewards, setRemainingRewards] = useState(0)
   const [earnedRewards, setEarnedRewards] = useState(0)
   const [totalRewards, setTotalRewards] = useState(0)
+  const [liquidityMiningCampaign, setLiquidityMiningCampaign] = useState<Maybe<GraphResponseLiquidityMiningCampaign>>()
 
   useEffect(() => {
     setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
@@ -312,53 +314,79 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     }
   }
 
-  // TODO: Cleanup and remove hardcoded address if function kept in component
+  const {
+    fetchData: refetchLiquidityMiningCampaigns,
+    liquidityMiningCampaigns,
+    status,
+  } = useGraphLiquidityMiningCampaigns()
+
+  useEffect(() => {
+    if (liquidityMiningCampaigns) {
+      const marketLiquidityMiningCampaign = liquidityMiningCampaigns.filter(campaign => {
+        return campaign.fpmm.id === marketMakerAddress
+      })[0]
+      setLiquidityMiningCampaign(marketLiquidityMiningCampaign)
+    }
+  }, [liquidityMiningCampaigns])
+
+  // TODO: Remove if unused, otherwise clean up
   const stake = async () => {
     if (!cpk) {
       return
     }
+    if (!liquidityMiningCampaign) {
+      throw 'No liquidity mining campaign'
+    }
 
-    await cpk.stakePoolTokens(amountToFund || Zero, '0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B', marketMakerAddress)
+    await cpk.stakePoolTokens(amountToFund || Zero, liquidityMiningCampaign.id, marketMakerAddress)
     fetchStakingData()
   }
 
-  // TODO: Cleanup and remove hardcoded address if function kept in component
+  // TODO: Remove if unused, otherwise clean up
   const withdraw = async () => {
     if (!cpk) {
       return
     }
+    if (!liquidityMiningCampaign) {
+      throw 'No liquidity mining campaign'
+    }
 
-    await cpk.withdrawStakedPoolTokens(amountToFund || Zero, '0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B')
+    await cpk.withdrawStakedPoolTokens(amountToFund || Zero, liquidityMiningCampaign.id)
     fetchStakingData()
   }
 
-  // TODO: Cleanup and remove hardcoded address if function kept in component
+  // TODO: Remove if unused, otherwise clean up
   const claim = async () => {
     if (!cpk) {
       return
     }
+    if (!liquidityMiningCampaign) {
+      throw 'No liquidity mining campaign'
+    }
 
-    await cpk.claimRewardTokens('0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B')
+    await cpk.claimRewardTokens(liquidityMiningCampaign.id)
     fetchStakingData()
   }
 
-  // TODO: Cleanup and remove hardcoded address if function kept in component
+  // TODO: Remove if unused, otherwise clean up
   const withdrawAndClaim = async () => {
     if (!cpk) {
       return
     }
+    if (!liquidityMiningCampaign) {
+      throw 'No liquidity mining campaign'
+    }
 
-    await cpk.withdrawStakedAndClaim('0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B')
+    await cpk.withdrawStakedAndClaim(liquidityMiningCampaign.id)
     fetchStakingData()
   }
 
   const fetchStakingData = async () => {
-    // TODO: Replace hardcoded campaign address
-    const stakingService = new StakingService(
-      provider,
-      cpk && cpk.address,
-      '0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B',
-    )
+    if (!liquidityMiningCampaign) {
+      throw 'No liquidity mining campaign'
+    }
+
+    const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
 
     const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
       getOMNToken(networkId),
@@ -376,11 +404,10 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     setTotalRewards(totalRewards)
   }
 
-  // TODO: Consider switching to useMemo
   useEffect(() => {
     // TODO: Include relay
-    cpk && fetchStakingData()
-  }, [cpk?.address])
+    cpk && liquidityMiningCampaign && fetchStakingData()
+  }, [cpk?.address, liquidityMiningCampaign])
 
   const unlockCollateral = async () => {
     if (!cpk) {
