@@ -55,7 +55,7 @@ export const TRADING_FEE_OPTIONS = [
 
 export const GRAPH_MAINNET_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen'
 export const GRAPH_MAINNET_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen'
-export const GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
+export const GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/kadenzipfel/omen-rinkeby' // TODO: change back 'https://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
 export const GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
 export const GRAPH_SOKOL_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-sokol'
 export const GRAPH_SOKOL_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen-sokol'
