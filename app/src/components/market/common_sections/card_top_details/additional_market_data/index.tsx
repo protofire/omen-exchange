@@ -60,7 +60,7 @@ const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean; isSuccess
 const AdditionalMarketDataSectionWrapper = styled.a<{
   noColorChange?: boolean
   isError?: boolean
-  customColorChange?: boolean
+  isSuccess?: boolean
   customColor?: string
   noMarginLeft?: boolean
   hasMarginRight?: boolean
@@ -74,15 +74,20 @@ const AdditionalMarketDataSectionWrapper = styled.a<{
   text-transform: capitalize;
   &:hover {
     p {
-      color: ${props => (props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight)};
+      color: ${props =>
+        props.isError
+          ? props.theme.colors.alertHover
+          : props.isSuccess
+          ? props.theme.colors.darkGreen
+          : props.theme.colors.primaryLight};
     }
     svg {
       circle {
-        stroke: ${props => props.theme.colors.primaryLight};
+        stroke: ${props => (props.customColor ? props.customColor : props.theme.colors.primaryLight)};
       }
       path {
         fill: ${props =>
-          props.customColorChange
+          props.customColor
             ? props.customColor
             : props.noColorChange
             ? ''
@@ -92,7 +97,7 @@ const AdditionalMarketDataSectionWrapper = styled.a<{
       }
 
       path:nth-child(even) {
-        fill: ${props => props.theme.colors.primaryLight};
+        fill: ${props => (props.customColor ? props.customColor : props.theme.colors.primaryLight)};
       }
     }
   }
@@ -216,11 +221,13 @@ export const AdditionalMarketData: React.FC<Props> = props => {
         </AdditionalMarketDataSectionWrapper>
         {rewardApr > 0 && (
           <AdditionalMarketDataSectionWrapper
+            customColor={'#4B948F'}
             data-arrow-color="transparent"
             data-for="marketData"
             data-tip={'Current liquidity mining rewards APY.'}
             // Update if we change verified data section
             hasMarginRight={context.networkId === networkIds.XDAI}
+            isSuccess={true}
           >
             <IconApy size={'24'} />
             <AdditionalMarketDataSectionTitle isSuccess={rewardApr > 0}>
