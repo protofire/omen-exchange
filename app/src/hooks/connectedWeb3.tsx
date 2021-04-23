@@ -78,6 +78,15 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
       context.setConnector('Infura')
     }
 
+    // debug particular address and network id
+    const url = new URL(window.location.href.replace('#', ''))
+    const debugAddress = url.searchParams.get('debugAddress')
+    const debugNetworkId = url.searchParams.get('debugNetworkId')
+    if (debugAddress) {
+      connectors.Safe.init(debugAddress, debugNetworkId ? Number(debugNetworkId) : 1)
+      context.setConnector('Safe')
+    }
+
     // disabled block tracker
     if (context.connector) {
       if (
