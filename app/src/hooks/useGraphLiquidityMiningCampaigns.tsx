@@ -17,8 +17,12 @@ const query = gql`
       endsAt
       duration
       locked
-      fpmm
-      rewardTokens
+      fpmm {
+        id
+      }
+      rewardTokens {
+        id
+      }
       rewardAmounts
       stakedAmount
     }
@@ -40,12 +44,6 @@ type LMRecovery = {
   amounts: BigNumber[]
 }
 
-type Token = {
-  id: string
-  scale: BigNumber
-  ethPerToken: BigNumber
-}
-
 type GraphResponseLiquidityMiningCampaign = {
   id: string
   initialized: boolean
@@ -55,7 +53,7 @@ type GraphResponseLiquidityMiningCampaign = {
   duration: string
   locked: boolean
   fpmm: GraphResponseFixedProductMarketMaker
-  rewardTokens: Token[]
+  rewardTokens: string
   rewardAmounts: BigNumber[]
   stakedAmount: BigNumber
   deposits: LMStakeEvent[]
@@ -85,11 +83,7 @@ export const useGraphLiquidityMiningCampaigns = (networkId: number): Result => {
 
   useEffect(() => {
     if (!loading && data && data.liquidityMiningCampaigns) {
-      const campaigns = data.liquidityMiningCampaigns.map((campaign: GraphResponseLiquidityMiningCampaign) => ({
-        ...campaign,
-        fpmm: wrangleMarketDataResponse(campaign.fpmm, networkId),
-      }))
-      setLiquidityMiningCampaignData(campaigns)
+      setLiquidityMiningCampaignData(data.liquidityMiningCampaigns)
     }
     // eslint-disable-next-line
   }, [loading])
