@@ -287,7 +287,7 @@ const HeaderContainer: React.FC = (props: any) => {
           )}
 
           <HeaderButton>
-            {relay ? xOmenBalance.toString() : omenBalance.toString()}
+            {relay ? `${xOmenBalance}` : `${omenBalance}`}
             <OmenIconWrapper>
               <IconOmen height={24} width={24} />
             </OmenIconWrapper>
