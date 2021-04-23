@@ -366,7 +366,7 @@ export const ModalDepositWithdraw = (props: Props) => {
               STANDARD_DECIMALS,
               1,
             )}{' '}
-            {currencySelected === ExchangeCurrency.Dai ? 'Dai' : 'Omn'}.
+            {currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}.
           </InputInfo>
           {mainnetWalletAllowance === WalletState.enable && (
             <Allowance>
