@@ -12,7 +12,7 @@ import { Button, ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../..
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
-import { IconAdd, IconClose } from '../../icons'
+import { IconAdd, IconClose, IconOmen } from '../../icons'
 import { IconSettings } from '../../icons/IconSettings'
 
 export const HeaderWrapper = styled.div`
@@ -164,6 +164,10 @@ const HeaderDropdown = styled(Dropdown)`
   height: 40px;
 `
 
+const OmenIconWrapper = styled.div`
+  margin-left: 12px;
+`
+
 const HeaderContainer: React.FC = (props: any) => {
   const context = useConnectedWeb3Context()
   const { relay, toggleRelay } = context
@@ -188,6 +192,7 @@ const HeaderContainer: React.FC = (props: any) => {
     omenBalance,
     unclaimedAmount,
     xDaiBalance,
+    xOmenBalance,
   } = useConnectedBalanceContext()
 
   const networkPlacholder = (
@@ -281,7 +286,12 @@ const HeaderContainer: React.FC = (props: any) => {
             />
           )}
 
-          <HeaderButton />
+          <HeaderButton>
+            {relay ? xOmenBalance.toString() : omenBalance.toString()}
+            <OmenIconWrapper>
+              <IconOmen />
+            </OmenIconWrapper>
+          </HeaderButton>
 
           {!account && (
             <ButtonConnectWalletStyled
