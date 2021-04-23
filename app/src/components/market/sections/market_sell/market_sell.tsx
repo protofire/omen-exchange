@@ -272,7 +272,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     })
   }
   const selectedOutcomeBalance = formatNumber(
-    formatBigNumber(balanceItem.shares, collateral.decimals, collateral.decimals),
+    formatBigNumber(balanceItem.shares, baseCollateral.decimals, baseCollateral.decimals),
   )
   let displaySelectedOutcomeBalance = selectedOutcomeBalance
   let displaySelectedOutcomeBalanceValue = balanceItem.shares
