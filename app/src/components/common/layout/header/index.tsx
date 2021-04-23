@@ -164,6 +164,29 @@ const HeaderDropdown = styled(Dropdown)`
   height: 40px;
 `
 
+const MarketHeaderNav = styled.div`
+  cursor: pointer;
+  color: ${props => props.theme.colors.clickable};
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  margin: 0px 20px 0px 68px;
+`
+
+const GovernanceHeaderNav = styled.div`
+  background-color: ${props => props.theme.buttonSecondary.backgroundColor};
+  border-radius: 32px;
+  color: ${props => props.theme.colors.primary};
+  cursor: pointer;
+  font-weight: 500;
+  letter-spacing: 1px;
+  padding: 12px 20px;
+
+  &:hover {
+    background-color: transparent;
+  }
+`
+
 const HeaderContainer: React.FC = (props: any) => {
   const context = useConnectedWeb3Context()
   const { relay, toggleRelay } = context
@@ -245,6 +268,8 @@ const HeaderContainer: React.FC = (props: any) => {
           <LogoWrapper disabled={!hasRouter} onClick={() => props.history && props.history.push('/')}>
             <Logo />
           </LogoWrapper>
+          <MarketHeaderNav>Markets</MarketHeaderNav>
+          <GovernanceHeaderNav>Governance</GovernanceHeaderNav>
         </ContentsLeft>
         <ContentsRight>
           {isMarketCreatePage ? (
