@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 
 import { Status } from '../util/types'
 
-import { GraphResponseFixedProductMarketMaker, wrangleMarketDataResponse } from './useGraphMarketMakerData'
+import { GraphResponseFixedProductMarketMaker } from './useGraphMarketMakerData'
 
 const query = gql`
   query GetLiquidityMiningCampaignData {
@@ -71,7 +71,7 @@ type Result = {
 /**
  * Get lm campaigns from the subgraph
  */
-export const useGraphLiquidityMiningCampaigns = (networkId: number): Result => {
+export const useGraphLiquidityMiningCampaigns = (): Result => {
   const [liquidityMiningCampaigns, setLiquidityMiningCampaignData] = useState<
     Maybe<GraphResponseLiquidityMiningCampaign[]>
   >(null)
