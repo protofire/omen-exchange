@@ -469,40 +469,25 @@ const Wrapper = (props: Props) => {
                 </StyledButtonContainer>
               ) : (
                 <>
-                  {!isConditionResolved && !hasWinningOutcomes ? (
-                    <BorderedButtonContainer>
-                      <Button
-                        buttonType={ButtonType.primary}
-                        disabled={status === Status.Loading}
-                        onClick={resolveCondition}
-                      >
-                        Resolve Condition
-                      </Button>
-                    </BorderedButtonContainer>
-                  ) : !isConditionResolved && hasWinningOutcomes ? (
-                    <BorderedButtonContainer borderTop={true}>
-                      <Button
-                        buttonType={ButtonType.primary}
-                        disabled={status === Status.Loading}
-                        onClick={resolveCondition}
-                      >
-                        Resolve Condition
-                      </Button>
-                    </BorderedButtonContainer>
-                  ) : (
-                    isConditionResolved &&
-                    hasWinningOutcomes && (
-                      <BorderedButtonContainer borderTop={true}>
-                        <Button
-                          buttonType={ButtonType.primary}
-                          disabled={status === Status.Loading}
-                          onClick={() => redeem()}
-                        >
-                          Redeem
-                        </Button>
-                      </BorderedButtonContainer>
-                    )
-                  )}
+                  <BorderedButtonContainer
+                    borderTop={
+                      (!isConditionResolved && hasWinningOutcomes) || (isConditionResolved && hasWinningOutcomes)
+                        ? true
+                        : false
+                    }
+                  >
+                    <Button
+                      buttonType={ButtonType.primary}
+                      disabled={status === Status.Loading}
+                      onClick={isConditionResolved && hasWinningOutcomes ? () => redeem() : resolveCondition}
+                    >
+                      {(!isConditionResolved && hasWinningOutcomes) || (!isConditionResolved && !hasWinningOutcomes)
+                        ? 'Resolve Condition'
+                        : isConditionResolved && hasWinningOutcomes
+                        ? 'Redeem'
+                        : ''}
+                    </Button>
+                  </BorderedButtonContainer>
                 </>
               )}
             </WhenConnected>
