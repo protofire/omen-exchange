@@ -191,10 +191,8 @@ const HeaderContainer: React.FC = (props: any) => {
     formattedOmenBalance,
     formattedxDaiBalance,
     formattedxOmenBalance,
-    omenBalance,
     unclaimedAmount,
     xDaiBalance,
-    xOmenBalance,
   } = useConnectedBalanceContext()
 
   const networkPlacholder = (
@@ -289,7 +287,9 @@ const HeaderContainer: React.FC = (props: any) => {
           )}
 
           <HeaderButton>
-            {relay ? `${formattedxOmenBalance}` : `${formattedOmenBalance}`}
+            {relay
+              ? `${formattedxOmenBalance.slice(0, formattedOmenBalance.length - 4)}`
+              : `${formattedOmenBalance.slice(0, formattedOmenBalance.length - 4)}`}
             <OmenIconWrapper>
               <IconOmen height={24} width={24} />
             </OmenIconWrapper>
