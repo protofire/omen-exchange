@@ -322,7 +322,7 @@ const AskQuestionStep = (props: Props) => {
                 disabled={!!loadedQuestionId}
                 name="question"
                 onChange={handleChange}
-                placeholder="What question do you want the world predict?"
+                placeholder="What would you like to see the world predict?"
                 value={question}
               />
             }

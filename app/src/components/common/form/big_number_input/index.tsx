@@ -62,20 +62,26 @@ export const BigNumberInput: React.FC<Props> = props => {
 
   const inputRef = useRef<HTMLInputElement>(null)
   const mounted = useRef(false)
+  const prevDecimals = useRef(0)
 
   useEffect(() => {
-    if (!value) {
-      setCurrentValue('')
-    } else if (
-      (!mounted.current && formatOnMount) ||
-      (value &&
-        !ethers.utils.parseUnits((currentValue && Number(currentValue).toFixed(decimals)) || '0', decimals).eq(value))
-    ) {
-      if (!mounted.current) {
-        mounted.current = true
+    try {
+      if (!value) {
+        setCurrentValue('')
+      } else if (
+        (!mounted.current && formatOnMount) ||
+        (prevDecimals.current && prevDecimals.current !== decimals) ||
+        (value && !ethers.utils.parseUnits(currentValue || '0', decimals).eq(value))
+      ) {
+        if (!mounted.current) {
+          mounted.current = true
+        }
+        const formatted = ethers.utils.formatUnits(value, decimals)
+        setCurrentValue(formatted.endsWith('.0') ? formatted.substring(0, formatted.length - 2) : formatted)
       }
-      const formatted = ethers.utils.formatUnits(value, decimals)
-      setCurrentValue(formatted.endsWith('.0') ? formatted.substring(0, formatted.length - 2) : formatted)
+      prevDecimals.current = decimals
+    } catch (e) {
+      logger.log(e.message)
     }
   }, [value, decimals, currentValue, formatOnMount])
 

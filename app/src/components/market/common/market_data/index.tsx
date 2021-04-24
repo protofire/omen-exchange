@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context, useSymbol, useTokens } from '../../../../hooks'
 import { CompoundService } from '../../../../services'
-import { getNativeAsset, getToken } from '../../../../util/networks'
+import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../util/networks'
 import { formatBigNumber, formatDate, formatToShortNumber, getBaseTokenForCToken } from '../../../../util/tools'
 import { CompoundTokenType, Token } from '../../../../util/types'
 import { TextToggle } from '../TextToggle'
@@ -120,11 +120,12 @@ export const MarketData: React.FC<Props> = props => {
   let baseCurrency = currency
   const currencySymbol = currency.symbol.toLowerCase()
   if (compoundService && currencySymbol in CompoundTokenType) {
-    if (currencySymbol === 'ceth') {
+    const nativeCompoundAsset = getNativeCompoundAsset(networkId)
+    if (currencySymbol === nativeCompoundAsset.symbol.toLowerCase()) {
       baseCurrency = getNativeAsset(networkId, relay)
     } else {
       const baseCurrencySymbol = getBaseTokenForCToken(currency.symbol) as KnownToken
-      baseCurrency = getToken(context.networkId, baseCurrencySymbol)
+      baseCurrency = getToken(networkId, baseCurrencySymbol)
     }
     const displayTotalVolumeValue = compoundService.calculateCTokenToBaseExchange(baseCurrency, collateralVolume)
     displayTotalVolume = formatBigNumber(displayTotalVolumeValue, baseCurrency.decimals)
