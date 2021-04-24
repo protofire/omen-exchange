@@ -96,7 +96,7 @@ const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): 
   return earnedCollateral
 }
 
-const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: BigNumber[]): Maybe<BigNumber> => {
+const scalarComputeEarnedCollateral = (finalAnswerPercentage: Big, balances: BigNumber[]): Maybe<BigNumber> => {
   if (
     (!balances[0] && !balances[1]) ||
     (balances[0].isZero() && !balances[1]) ||
@@ -344,13 +344,14 @@ const Wrapper = (props: Props) => {
   )
 
   const realitioAnswerNumber = Number(formatBigNumber(realitioAnswer || new BigNumber(0), STANDARD_DECIMALS))
-
   const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), STANDARD_DECIMALS))
   const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), STANDARD_DECIMALS))
 
   const unclampedFinalAnswerPercentage =
     realitioAnswer && realitioAnswer.eq(MaxUint256)
       ? 0.5
+      : isConditionResolved
+      ? balances[1].payout
       : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
 
   const finalAnswerPercentage =
@@ -358,7 +359,7 @@ const Wrapper = (props: Props) => {
 
   const earnedCollateral = isScalar
     ? scalarComputeEarnedCollateral(
-        finalAnswerPercentage,
+        new Big(finalAnswerPercentage),
         balances.map(balance => balance.shares),
       )
     : computeEarnedCollateral(
@@ -372,7 +373,7 @@ const Wrapper = (props: Props) => {
     isScalar,
     balances.map(balance => balance.shares),
     payouts,
-    finalAnswerPercentage,
+    Number(finalAnswerPercentage),
   )
 
   const EPS = 0.01
