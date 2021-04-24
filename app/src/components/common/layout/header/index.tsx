@@ -188,7 +188,9 @@ const HeaderContainer: React.FC = (props: any) => {
     fetchBalances,
     formattedDaiBalance,
     formattedEthBalance,
+    formattedOmenBalance,
     formattedxDaiBalance,
+    formattedxOmenBalance,
     omenBalance,
     unclaimedAmount,
     xDaiBalance,
@@ -287,7 +289,7 @@ const HeaderContainer: React.FC = (props: any) => {
           )}
 
           <HeaderButton>
-            {relay ? `${xOmenBalance}` : `${omenBalance}`}
+            {relay ? `${formattedxOmenBalance}` : `${formattedOmenBalance}`}
             <OmenIconWrapper>
               <IconOmen height={24} width={24} />
             </OmenIconWrapper>
