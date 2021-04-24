@@ -469,13 +469,7 @@ const Wrapper = (props: Props) => {
                 </StyledButtonContainer>
               ) : (
                 <>
-                  <BorderedButtonContainer
-                    borderTop={
-                      (!isConditionResolved && hasWinningOutcomes) || (isConditionResolved && hasWinningOutcomes)
-                        ? true
-                        : false
-                    }
-                  >
+                  <BorderedButtonContainer borderTop={hasWinningOutcomes !== null && hasWinningOutcomes}>
                     <Button
                       buttonType={ButtonType.primary}
                       disabled={status === Status.Loading}
