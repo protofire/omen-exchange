@@ -230,7 +230,7 @@ const Wrapper = (props: Props) => {
       }
     }
     getDisplayEarnedCollateral()
-  }, [isConditionResolved]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [marketCollateralToken.address, isConditionResolved, account, provider, balances]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const resolveCondition = async () => {
     if (!cpk) {
