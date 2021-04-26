@@ -174,11 +174,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const {
-    fetchData: refetchLiquidityMiningCampaigns,
-    liquidityMiningCampaigns,
-    status,
-  } = useGraphLiquidityMiningCampaigns()
+  const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
   useEffect(() => {
     if (liquidityMiningCampaigns) {
@@ -187,32 +183,30 @@ export const AdditionalMarketData: React.FC<Props> = props => {
       })[0]
       setLiquidityMiningCampaign(marketLiquidityMiningCampaign)
     }
-  }, [liquidityMiningCampaigns])
-
-  const fetchStakingData = async () => {
-    if (!liquidityMiningCampaign) {
-      throw 'No liquidity mining campaign'
-    }
-
-    const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
-
-    const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
-      getOMNToken(networkId),
-      // TODO: Include relay if available
-      cpk?.address || '',
-      // TODO: Replace hardcoded price param
-      1,
-      // TODO: Replace hardcoded price param
-      1,
-    )
-
-    setRewardApr(rewardApr)
-  }
+  }, [liquidityMiningCampaigns, address])
 
   useEffect(() => {
-    // TODO: Include relay
+    const fetchStakingData = async () => {
+      if (!liquidityMiningCampaign) {
+        throw 'No liquidity mining campaign'
+      }
+
+      const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
+
+      const { rewardApr } = await stakingService.getStakingData(
+        getOMNToken(networkId),
+        cpk?.address || '',
+        // TODO: Replace hardcoded price param
+        1,
+        // TODO: Replace hardcoded price param
+        1,
+      )
+
+      setRewardApr(rewardApr)
+    }
+
     cpk && liquidityMiningCampaign && fetchStakingData()
-  }, [cpk?.address, liquidityMiningCampaign])
+  }, [cpk, cpk?.address, liquidityMiningCampaign, networkId, provider])
 
   return (
     <AdditionalMarketDataWrapper>

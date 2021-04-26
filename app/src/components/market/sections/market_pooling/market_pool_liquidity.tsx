@@ -1,6 +1,6 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber, parseUnits } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import { BigNumber } from 'ethers/utils'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -39,7 +39,6 @@ import {
   formatNumber,
   getBaseTokenForCToken,
   getInitialCollateral,
-  getRemainingRewards,
   getSharesInBaseToken,
 } from '../../../../util/tools'
 import {
@@ -387,11 +386,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const {
-    fetchData: refetchLiquidityMiningCampaigns,
-    liquidityMiningCampaigns,
-    status,
-  } = useGraphLiquidityMiningCampaigns()
+  const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
   useEffect(() => {
     if (liquidityMiningCampaigns) {
@@ -400,7 +395,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       })[0]
       setLiquidityMiningCampaign(marketLiquidityMiningCampaign)
     }
-  }, [liquidityMiningCampaigns])
+  }, [liquidityMiningCampaigns, marketMakerAddress])
 
   // TODO: Remove if unused, otherwise clean up
   const stake = async () => {
@@ -454,7 +449,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     fetchStakingData()
   }
 
-  const fetchStakingData = async () => {
+  const fetchStakingData = useCallback(async () => {
     if (!liquidityMiningCampaign) {
       throw 'No liquidity mining campaign'
     }
@@ -463,7 +458,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
     const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
       getOMNToken(networkId),
-      // TODO: Include relay if available
       cpk?.address || '',
       // TODO: Replace hardcoded price param
       1,
@@ -475,12 +469,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     setRemainingRewards(remainingRewards)
     setRewardApr(rewardApr)
     setTotalRewards(totalRewards)
-  }
+  }, [cpk, liquidityMiningCampaign, networkId, provider])
 
   useEffect(() => {
-    // TODO: Include relay
     cpk && liquidityMiningCampaign && fetchStakingData()
-  }, [cpk?.address, liquidityMiningCampaign])
+  }, [cpk?.address, liquidityMiningCampaign, cpk, fetchStakingData])
 
   const unlockCollateral = async () => {
     if (!cpk) {

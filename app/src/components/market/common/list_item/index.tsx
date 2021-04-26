@@ -158,11 +158,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     setToken()
   }, [account, collateralToken, collateralVolume, provider, context.networkId, token])
 
-  const {
-    fetchData: refetchLiquidityMiningCampaigns,
-    liquidityMiningCampaigns,
-    status,
-  } = useGraphLiquidityMiningCampaigns()
+  const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
   useEffect(() => {
     if (liquidityMiningCampaigns) {
@@ -173,30 +169,28 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     }
   }, [liquidityMiningCampaigns, address])
 
-  const fetchStakingData = async () => {
-    if (!liquidityMiningCampaign) {
-      throw 'No liquidity mining campaign'
+  useEffect(() => {
+    const fetchStakingData = async () => {
+      if (!liquidityMiningCampaign) {
+        throw 'No liquidity mining campaign'
+      }
+
+      const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
+
+      const { rewardApr } = await stakingService.getStakingData(
+        getOMNToken(networkId),
+        cpk?.address || '',
+        // TODO: Replace hardcoded price param
+        1,
+        // TODO: Replace hardcoded price param
+        1,
+      )
+
+      setRewardApr(rewardApr)
     }
 
-    const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
-
-    const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
-      getOMNToken(networkId),
-      // TODO: Include relay if available
-      cpk?.address || '',
-      // TODO: Replace hardcoded price param
-      1,
-      // TODO: Replace hardcoded price param
-      1,
-    )
-
-    setRewardApr(rewardApr)
-  }
-
-  useEffect(() => {
-    // TODO: Include relay
     cpk && liquidityMiningCampaign && fetchStakingData()
-  }, [cpk?.address, liquidityMiningCampaign])
+  }, [cpk, cpk?.address, liquidityMiningCampaign, networkId, provider])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))

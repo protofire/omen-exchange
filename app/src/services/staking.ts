@@ -1,13 +1,9 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
-import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 
 import { STANDARD_DECIMALS } from '../common/constants'
-import { getLogger } from '../util/logger'
-import { getOMNToken } from '../util/networks'
 import { calculateRewardApr, formatBigNumber, getRemainingRewards } from '../util/tools'
 import { Token } from '../util/types'
-
-const logger = getLogger('Services::Staking')
 
 const abi = [
   {
