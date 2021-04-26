@@ -205,7 +205,7 @@ const HeaderContainer: React.FC = (props: any) => {
   const [isDepositWithdrawModalOpen, setDepositWithdrawModalState] = useState(false)
   const [depositWithdrawType, setDepositWithdrawType] = useState<ExchangeType>(ExchangeType.deposit)
   const [governancePage, setGovernancePage] = useState(false)
-  const [marketPage, setMarketPage] = useState(false)
+  const [marketPage, setMarketPage] = useState(true)
 
   const hasRouter = props.history !== undefined
   const disableConnectButton = isConnectWalletModalOpen
