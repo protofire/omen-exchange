@@ -20,7 +20,7 @@ const query = gql`
       fpmm {
         id
       }
-      rewardTokens {
+      rewardToken {
         id
       }
       rewardAmounts
@@ -53,7 +53,7 @@ export type GraphResponseLiquidityMiningCampaign = {
   duration: string
   locked: boolean
   fpmm: GraphResponseFixedProductMarketMaker
-  rewardTokens: string
+  rewardToken: string
   rewardAmounts: BigNumber[]
   stakedAmount: BigNumber
   deposits: LMStakeEvent[]

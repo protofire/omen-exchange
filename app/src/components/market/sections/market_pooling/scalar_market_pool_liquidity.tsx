@@ -385,10 +385,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
       getOMNToken(networkId),
       cpk?.address || '',
+      1, // Assume pool token value is 1 DAI
       // TODO: Replace hardcoded price param
       1,
-      // TODO: Replace hardcoded price param
-      1,
+      Number(liquidityMiningCampaign.endsAt),
+      liquidityMiningCampaign.rewardAmounts[0],
+      Number(liquidityMiningCampaign.duration),
     )
 
     setEarnedRewards(earnedRewards)
