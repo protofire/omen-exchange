@@ -196,10 +196,12 @@ export const AdditionalMarketData: React.FC<Props> = props => {
       const { rewardApr } = await stakingService.getStakingData(
         getOMNToken(networkId),
         cpk?.address || '',
+        1, // Assume pool token value is 1 DAI
         // TODO: Replace hardcoded price param
         1,
-        // TODO: Replace hardcoded price param
-        1,
+        Number(liquidityMiningCampaign.endsAt),
+        liquidityMiningCampaign.rewardAmounts[0],
+        Number(liquidityMiningCampaign.duration),
       )
 
       setRewardApr(rewardApr)

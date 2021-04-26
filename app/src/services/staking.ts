@@ -1,5 +1,5 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
-import { BigNumber, parseUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 
 import { STANDARD_DECIMALS } from '../common/constants'
 import { calculateRewardApr, formatBigNumber, getRemainingRewards } from '../util/tools'
@@ -241,16 +241,13 @@ class StakingService {
     address: string,
     stakedTokenPrice: number,
     rewardTokenPrice: number,
+    endingTimestamp: number,
+    rewardsAmount: BigNumber,
+    duration: number,
   ): Promise<{ earnedRewards: number; remainingRewards: number; rewardApr: number; totalRewards: number }> => {
     const totalStakedTokens = Number(await this.getTotalStakedTokensAmount()) / 10 ** STANDARD_DECIMALS
 
-    // TODO: Replace hardcoded timestamp with subgraph datum
-    const endingTimestamp = 1622271600
     const timeRemaining = endingTimestamp - Math.floor(Date.now() / 1000)
-    // TODO: Replace hardcoded value with subgraph datum
-    const rewardsAmount = parseUnits('10', 18)
-    // TODO: Replace hardcoded value with subgraph datum
-    const duration = 3232800
 
     const remainingRewards = Number(
       formatBigNumber(
