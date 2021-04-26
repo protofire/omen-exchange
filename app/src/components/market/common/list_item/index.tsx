@@ -3,7 +3,13 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedCPKContext, useConnectedWeb3Context, useSymbol } from '../../../../hooks'
+import {
+  useConnectedCPKContext,
+  useConnectedWeb3Context,
+  useGraphLiquidityMiningCampaigns,
+  useSymbol,
+} from '../../../../hooks'
+import { GraphResponseLiquidityMiningCampaign } from '../../../../hooks/useGraphLiquidityMiningCampaigns'
 import { ERC20Service } from '../../../../services'
 import { StakingService } from '../../../../services/staking'
 import { getLogger } from '../../../../util/logger'
@@ -123,6 +129,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
   const [details, setDetails] = useState(token || { decimals: 0, symbol: '', volume: '' })
   const [rewardApr, setRewardApr] = useState(0)
+  const [liquidityMiningCampaign, setLiquidityMiningCampaign] = useState<Maybe<GraphResponseLiquidityMiningCampaign>>()
+
   const { decimals, volume } = details
   const symbol = useSymbol(details as Token)
   const now = moment()
@@ -150,33 +158,45 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     setToken()
   }, [account, collateralToken, collateralVolume, provider, context.networkId, token])
 
-  // TODO: Consider switching to useMemo
+  const {
+    fetchData: refetchLiquidityMiningCampaigns,
+    liquidityMiningCampaigns,
+    status,
+  } = useGraphLiquidityMiningCampaigns()
+
   useEffect(() => {
-    const fetchStakingData = async () => {
-      // TODO: Replace hardcoded campaign address
-      const stakingService = new StakingService(
-        provider,
-        cpk && cpk.address,
-        '0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B',
-      )
-
-      const { rewardApr } = await stakingService.getStakingData(
-        getOMNToken(networkId),
-        // TODO: Include relay if available
-        cpk?.address || '',
-        // TODO: Replace hardcoded price param
-        1,
-        // TODO: Replace hardcoded price param
-        1,
-      )
-
-      setRewardApr(rewardApr)
+    if (liquidityMiningCampaigns) {
+      const marketLiquidityMiningCampaign = liquidityMiningCampaigns.filter(campaign => {
+        return campaign.fpmm.id === address
+      })[0]
+      setLiquidityMiningCampaign(marketLiquidityMiningCampaign)
     }
-    // TODO: Include relay
-    cpk && fetchStakingData()
-  }, [cpk?.address])
+  }, [liquidityMiningCampaigns, address])
 
-  console.log(title, rewardApr)
+  const fetchStakingData = async () => {
+    if (!liquidityMiningCampaign) {
+      throw 'No liquidity mining campaign'
+    }
+
+    const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
+
+    const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
+      getOMNToken(networkId),
+      // TODO: Include relay if available
+      cpk?.address || '',
+      // TODO: Replace hardcoded price param
+      1,
+      // TODO: Replace hardcoded price param
+      1,
+    )
+
+    setRewardApr(rewardApr)
+  }
+
+  useEffect(() => {
+    // TODO: Include relay
+    cpk && liquidityMiningCampaign && fetchStakingData()
+  }, [cpk?.address, liquidityMiningCampaign])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
