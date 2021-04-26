@@ -318,6 +318,28 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
+  const addFundingAndStake = async () => {
+    if (!cpk) {
+      return
+    }
+
+    let useBaseToken = false
+    if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
+      useBaseToken = true
+    }
+
+    await cpk.addFundingAndStake({
+      amount: amountToFundNormalized || Zero,
+      campaignAddress: liquidityMiningCampaign?.id || '',
+      compoundService,
+      collateral,
+      marketMaker,
+      setTxHash,
+      setTxState,
+      useBaseToken,
+    })
+  }
+
   const removeFunding = async () => {
     try {
       if (!cpk) {
@@ -900,6 +922,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             Withdraw
           </Button>
         )}
+        <Button onClick={addFundingAndStake}>Deposit and Stake</Button>
         <Button onClick={stake}>Stake</Button>
         <Button onClick={withdraw}>Withdraw</Button>
         <Button onClick={claim}>Claim</Button>
