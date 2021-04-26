@@ -1,11 +1,7 @@
 import React from 'react'
 
-interface Props {
-  size: string
-}
-
-export const IconApy = (props: Props) => (
-  <svg fill="none" height={props.size} viewBox="0 0 24 24" width={props.size} xmlns="http://www.w3.org/2000/svg">
+export const IconApy = () => (
+  <svg fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg">
     <circle cx="12" cy="12" r="9.25" stroke="#4B9E98" strokeWidth="1.5" />
     <path
       clipRule="evenodd"

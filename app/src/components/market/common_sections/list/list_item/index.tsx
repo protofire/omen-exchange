@@ -20,7 +20,7 @@ import {
   isScalarMarket,
 } from '../../../../../util/tools'
 import { MarketMakerDataItem, Token } from '../../../../../util/types'
-import { IconApy, IconStar } from '../../../../common/icons'
+import { IconApySmall, IconStar } from '../../../../common/icons'
 
 const Wrapper = styled(NavLink)`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
@@ -214,7 +214,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         <Separator>|</Separator>
         {rewardApr > 0 && (
           <>
-            <IconApy size={'16'} />
+            <IconApySmall />
             <ApyIndicator>{formatNumber(rewardApr.toString())}% APY</ApyIndicator>
             <Separator>|</Separator>
           </>
