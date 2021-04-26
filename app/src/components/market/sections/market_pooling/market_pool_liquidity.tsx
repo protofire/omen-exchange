@@ -17,8 +17,10 @@ import {
   useFundingBalance,
   useSymbol,
 } from '../../../../hooks'
-import { useGraphLiquidityMiningCampaigns } from '../../../../hooks/useGraphLiquidityMiningCampaigns'
-import { GraphResponseLiquidityMiningCampaign } from '../../../../hooks/useGraphLiquidityMiningCampaigns'
+import {
+  GraphResponseLiquidityMiningCampaign,
+  useGraphLiquidityMiningCampaigns,
+} from '../../../../hooks/useGraphLiquidityMiningCampaigns'
 import { StakingService } from '../../../../services/staking'
 import { getLogger } from '../../../../util/logger'
 import {
