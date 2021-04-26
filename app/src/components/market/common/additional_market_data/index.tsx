@@ -236,7 +236,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
             hasMarginRight={context.networkId === networkIds.XDAI}
             isSuccess={true}
           >
-            <IconApy size={'24'} />
+            <IconApy />
             <AdditionalMarketDataSectionTitle isSuccess={rewardApr > 0}>
               {formatNumber(rewardApr.toString())}% APY
             </AdditionalMarketDataSectionTitle>
