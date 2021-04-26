@@ -1,8 +1,12 @@
-import React, { DOMAttributes } from 'react'
+import React, { DOMAttributes, useEffect, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { useConnectedCPKContext, useConnectedWeb3Context, useRealityLink } from '../../../../../hooks'
+import {
+  GraphResponseLiquidityMiningCampaign,
+  useGraphLiquidityMiningCampaigns,
+} from '../../../../../hooks/useGraphLiquidityMiningCampaigns'
 import { StakingService } from '../../../../../services/staking'
 import { getOMNToken, networkIds } from '../../../../../util/networks'
 import { formatNumber } from '../../../../../util/tools'
@@ -148,43 +152,47 @@ export const AdditionalMarketData: React.FC<Props> = props => {
 
   const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
   const [rewardApr, setRewardApr] = useState(0)
+  const [liquidityMiningCampaign, setLiquidityMiningCampaign] = useState<Maybe<GraphResponseLiquidityMiningCampaign>>()
+
+  const {
+    fetchData: refetchLiquidityMiningCampaigns,
+    liquidityMiningCampaigns,
+    status,
+  } = useGraphLiquidityMiningCampaigns()
 
   useEffect(() => {
-    const getAPY = async () => {
-      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
-      const supplyRate = await compoundServiceObject.calculateSupplyRateAPY()
-      setCompoundInterestRate(supplyRate.toFixed(2))
+    if (liquidityMiningCampaigns) {
+      const marketLiquidityMiningCampaign = liquidityMiningCampaigns.filter(campaign => {
+        return campaign.fpmm.id === address
+      })[0]
+      setLiquidityMiningCampaign(marketLiquidityMiningCampaign)
     }
-    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-      getAPY()
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [liquidityMiningCampaigns])
 
-  // TODO: Consider switching to useMemo
+  const fetchStakingData = async () => {
+    if (!liquidityMiningCampaign) {
+      throw 'No liquidity mining campaign'
+    }
+
+    const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
+
+    const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
+      getOMNToken(networkId),
+      // TODO: Include relay if available
+      cpk?.address || '',
+      // TODO: Replace hardcoded price param
+      1,
+      // TODO: Replace hardcoded price param
+      1,
+    )
+
+    setRewardApr(rewardApr)
+  }
+
   useEffect(() => {
-    const fetchStakingData = async () => {
-      // TODO: Replace hardcoded campaign address
-      const stakingService = new StakingService(
-        provider,
-        cpk && cpk.address,
-        '0x9Db41154300fa140b0F3BB8c6B65eB4E98C6Ab5B',
-      )
-
-      const { rewardApr } = await stakingService.getStakingData(
-        getOMNToken(networkId),
-        // TODO: Include relay if available
-        cpk?.address || '',
-        // TODO: Replace hardcoded price param
-        1,
-        // TODO: Replace hardcoded price param
-        1,
-      )
-
-      setRewardApr(rewardApr)
-    }
     // TODO: Include relay
-    cpk && fetchStakingData()
-  }, [cpk?.address])
+    cpk && liquidityMiningCampaign && fetchStakingData()
+  }, [cpk?.address, liquidityMiningCampaign])
 
   return (
     <AdditionalMarketDataWrapper>
