@@ -1,7 +1,6 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import axios from 'axios'
 import Big from 'big.js'
-import { Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 import moment from 'moment-timezone'
 

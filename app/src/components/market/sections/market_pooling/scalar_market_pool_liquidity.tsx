@@ -1,7 +1,7 @@
 import Big from 'big.js'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -19,7 +19,6 @@ import {
   useSymbol,
 } from '../../../../hooks'
 import { GraphResponseLiquidityMiningCampaign } from '../../../../hooks/useGraphLiquidityMiningCampaigns'
-import { ERC20Service } from '../../../../services'
 import { StakingService } from '../../../../services/staking'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getOMNToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
@@ -313,11 +312,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     }
   }
 
-  const {
-    fetchData: refetchLiquidityMiningCampaigns,
-    liquidityMiningCampaigns,
-    status,
-  } = useGraphLiquidityMiningCampaigns()
+  const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
   useEffect(() => {
     if (liquidityMiningCampaigns) {
@@ -326,7 +321,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       })[0]
       setLiquidityMiningCampaign(marketLiquidityMiningCampaign)
     }
-  }, [liquidityMiningCampaigns])
+  }, [liquidityMiningCampaigns, marketMakerAddress])
 
   // TODO: Remove if unused, otherwise clean up
   const stake = async () => {
@@ -380,7 +375,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     fetchStakingData()
   }
 
-  const fetchStakingData = async () => {
+  const fetchStakingData = useCallback(async () => {
     if (!liquidityMiningCampaign) {
       throw 'No liquidity mining campaign'
     }
@@ -389,7 +384,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
     const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
       getOMNToken(networkId),
-      // TODO: Include relay if available
       cpk?.address || '',
       // TODO: Replace hardcoded price param
       1,
@@ -401,12 +395,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     setRemainingRewards(remainingRewards)
     setRewardApr(rewardApr)
     setTotalRewards(totalRewards)
-  }
+  }, [cpk, liquidityMiningCampaign, networkId, provider])
 
   useEffect(() => {
-    // TODO: Include relay
     cpk && liquidityMiningCampaign && fetchStakingData()
-  }, [cpk?.address, liquidityMiningCampaign])
+  }, [cpk?.address, liquidityMiningCampaign, cpk, fetchStakingData])
 
   const unlockCollateral = async () => {
     if (!cpk) {
