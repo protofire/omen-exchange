@@ -164,30 +164,17 @@ const HeaderDropdown = styled(Dropdown)`
   height: 40px;
 `
 
-const MarketHeaderNav = styled.div<{ disabled?: boolean }>`
+const MarketAndGovernanceNav = styled.div<{ disabled?: boolean }>`
   background-color: ${props => (props.disabled ? props => props.theme.buttonSecondary.backgroundColor : 'transparent')};
   ${props => (props.disabled ? 'pointer-events:none;' : '')};
   border-radius: 32px;
-  cursor: pointer;
-  color: ${props => props.theme.colors.clickable};
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 1px;
-  padding: 12px 20px;
-  margin: 0px 20px 0px 68px;
-  &:hover {
-    color: ${props => (!props.disabled ? props.theme.colors.primary : '')};
-  }
-`
-
-const GovernanceHeaderNav = styled.div<{ disabled?: boolean }>`
-  background-color: ${props => (props.disabled ? props => props.theme.buttonSecondary.backgroundColor : 'transparent')};
-  ${props => (props.disabled ? 'pointer-events:none;' : '')};
-  border-radius: 32px;
-  color: ${props => props.theme.colors.clickable};
+  color: ${props => (!props.disabled ? props.theme.colors.clickable : props.theme.colors.primary)};
   cursor: pointer;
   font-weight: 500;
   letter-spacing: 1px;
+  line-height: 16.41px;
+  margin: 0px -60px 0px 68px;
+  text-align: center;
   padding: 12px 20px;
   &:hover {
     color: ${props => (!props.disabled ? props.theme.colors.primary : '')};
@@ -270,17 +257,10 @@ const HeaderContainer: React.FC = (props: any) => {
     onClick: () => history && history.push('/'),
   }
 
-  const governanceProps = {
+  const governanceMarketProps = {
     onClick: () => {
-      setGovernancePage(true)
-      setMarketPage(false)
-    },
-  }
-
-  const marketProps = {
-    onClick: () => {
-      setMarketPage(true)
-      setGovernancePage(false)
+      setGovernancePage(!governancePage)
+      setMarketPage(!marketPage)
     },
   }
 
@@ -291,12 +271,12 @@ const HeaderContainer: React.FC = (props: any) => {
           <LogoWrapper disabled={!hasRouter} onClick={() => props.history && props.history.push('/')}>
             <Logo />
           </LogoWrapper>
-          <MarketHeaderNav disabled={marketPage} {...marketProps}>
+          <MarketAndGovernanceNav disabled={marketPage} {...governanceMarketProps}>
             Markets
-          </MarketHeaderNav>
-          <GovernanceHeaderNav disabled={governancePage} {...governanceProps}>
+          </MarketAndGovernanceNav>
+          <MarketAndGovernanceNav disabled={governancePage} {...governanceMarketProps}>
             Governance
-          </GovernanceHeaderNav>
+          </MarketAndGovernanceNav>
         </ContentsLeft>
         <ContentsRight>
           {isMarketCreatePage ? (
