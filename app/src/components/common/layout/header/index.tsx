@@ -164,26 +164,33 @@ const HeaderDropdown = styled(Dropdown)`
   height: 40px;
 `
 
-const MarketHeaderNav = styled.div`
+const MarketHeaderNav = styled.div<{ disabled?: boolean }>`
+  background-color: ${props => (props.disabled ? props => props.theme.buttonSecondary.backgroundColor : 'transparent')};
+  ${props => (props.disabled ? 'pointer-events:none;' : '')};
+  border-radius: 32px;
   cursor: pointer;
   color: ${props => props.theme.colors.clickable};
   font-size: 14px;
   font-weight: 500;
   letter-spacing: 1px;
+  padding: 12px 20px;
   margin: 0px 20px 0px 68px;
+  &:hover {
+    color: ${props => (!props.disabled ? props.theme.colors.primary : '')};
+  }
 `
 
-const GovernanceHeaderNav = styled.div`
-  background-color: ${props => props.theme.buttonSecondary.backgroundColor};
+const GovernanceHeaderNav = styled.div<{ disabled?: boolean }>`
+  background-color: ${props => (props.disabled ? props => props.theme.buttonSecondary.backgroundColor : 'transparent')};
+  ${props => (props.disabled ? 'pointer-events:none;' : '')};
   border-radius: 32px;
-  color: ${props => props.theme.colors.primary};
+  color: ${props => props.theme.colors.clickable};
   cursor: pointer;
   font-weight: 500;
   letter-spacing: 1px;
   padding: 12px 20px;
-
   &:hover {
-    background-color: transparent;
+    color: ${props => (!props.disabled ? props.theme.colors.primary : '')};
   }
 `
 
@@ -197,6 +204,8 @@ const HeaderContainer: React.FC = (props: any) => {
   const [isYourConnectionModalOpen, setYourConnectionModalState] = useState(false)
   const [isDepositWithdrawModalOpen, setDepositWithdrawModalState] = useState(false)
   const [depositWithdrawType, setDepositWithdrawType] = useState<ExchangeType>(ExchangeType.deposit)
+  const [governancePage, setGovernancePage] = useState(false)
+  const [marketPage, setMarketPage] = useState(false)
 
   const hasRouter = props.history !== undefined
   const disableConnectButton = isConnectWalletModalOpen
@@ -261,6 +270,20 @@ const HeaderContainer: React.FC = (props: any) => {
     onClick: () => history && history.push('/'),
   }
 
+  const governanceProps = {
+    onClick: () => {
+      setGovernancePage(true)
+      setMarketPage(false)
+    },
+  }
+
+  const marketProps = {
+    onClick: () => {
+      setMarketPage(true)
+      setGovernancePage(false)
+    },
+  }
+
   return (
     <HeaderWrapper {...restProps}>
       <HeaderInner>
@@ -268,8 +291,12 @@ const HeaderContainer: React.FC = (props: any) => {
           <LogoWrapper disabled={!hasRouter} onClick={() => props.history && props.history.push('/')}>
             <Logo />
           </LogoWrapper>
-          <MarketHeaderNav>Markets</MarketHeaderNav>
-          <GovernanceHeaderNav>Governance</GovernanceHeaderNav>
+          <MarketHeaderNav disabled={marketPage} {...marketProps}>
+            Markets
+          </MarketHeaderNav>
+          <GovernanceHeaderNav disabled={governancePage} {...governanceProps}>
+            Governance
+          </GovernanceHeaderNav>
         </ContentsLeft>
         <ContentsRight>
           {isMarketCreatePage ? (
