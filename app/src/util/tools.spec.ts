@@ -16,6 +16,7 @@ import {
   calcPrice,
   calcSellAmountInCollateral,
   calcXValue,
+  calculateRewardApr,
   calculateSharesBought,
   clampBigNumber,
   computeBalanceAfterTrade,
@@ -30,6 +31,7 @@ import {
   getIndexSets,
   getInitialCollateral,
   getNetworkFromChain,
+  getRemainingRewards,
   getScalarTitle,
   getUnit,
   isDust,
@@ -41,8 +43,6 @@ import {
   signaturesFormatted,
   strip0x,
   truncateStringInTheMiddle as truncate,
-  getRemainingRewards,
-  calculateRewardApr,
 } from './tools'
 import { Token } from './types'
 
