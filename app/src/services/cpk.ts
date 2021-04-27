@@ -21,7 +21,9 @@ import {
 import {
   calcDistributionHint,
   clampBigNumber,
+  getBaseToken,
   getBaseTokenForCToken,
+  isCToken,
   signaturesFormatted,
   waitABit,
 } from '../util/tools'
@@ -1293,22 +1295,55 @@ class CPKService {
         data: ConditionalTokenService.encodeRedeemPositions(collateralToken.address, conditionId, numOutcomes),
       })
 
-      if (this.cpk.relay && earnedCollateral) {
-        // Pseudonative asset to base asset flow
-        const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, earnedCollateral)
-        // If use prefers to get paid in the base native asset then unwrap the asset
+      let earnings = earnedCollateral
+      let token = collateralToken
+
+      if (isCToken(collateralToken.symbol)) {
+        const compound = new CompoundService(collateralToken.address, collateralToken.symbol, this.provider, account)
+        await compound.init()
+
+        // Convert compound token to base token
+        const encodedRedeemFunction = CompoundService.encodeRedeemTokens(
+          collateralToken.symbol,
+          earnedCollateral.toString(),
+        )
+
+        // Redeeem underlying token
         transactions.push({
           to: collateralToken.address,
+          data: encodedRedeemFunction,
+        })
+
+        token = getBaseToken(networkId, collateralToken.symbol)
+        earnings = compound.calculateCTokenToBaseExchange(token, earnedCollateral)
+      }
+
+      const wrapToken = getWrapToken(networkId)
+      const nativeAsset = getNativeAsset(networkId)
+
+      if (token.address === wrapToken.address && earnings) {
+        // unwrap token
+        const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(token.symbol, earnings)
+        transactions.push({
+          to: token.address,
           data: encodedWithdrawFunction,
         })
+        token = nativeAsset
       }
 
       // If we are signed in as a safe we don't need to transfer
-      if (!this.isSafeApp && earnedCollateral) {
-        transactions.push({
-          to: collateralToken.address,
-          data: ERC20Service.encodeTransfer(account, earnedCollateral),
-        })
+      if (!this.isSafeApp && earnings) {
+        if (token.address === nativeAsset.address) {
+          transactions.push({
+            to: account,
+            value: earnings.toString(),
+          })
+        } else {
+          transactions.push({
+            to: token.address,
+            data: ERC20Service.encodeTransfer(account, earnings),
+          })
+        }
       }
 
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
