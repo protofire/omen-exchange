@@ -89,11 +89,13 @@ export const CurrencySelector: React.FC<Props> = props => {
     currentItem = 0
   }
 
+  const lowerCaseFilters = filters.map(address => address.toLowerCase())
+
   tokens
     .filter(({ address }) =>
-      filters.length === 0 || negativeFilter
-        ? filters.indexOf(address.toLowerCase()) === -1
-        : filters.indexOf(address.toLowerCase()) >= 0,
+      lowerCaseFilters.length === 0 || negativeFilter
+        ? lowerCaseFilters.indexOf(address.toLowerCase()) === -1
+        : lowerCaseFilters.indexOf(address.toLowerCase()) >= 0,
     )
     .forEach(({ address, balance: tokenBalance, decimals, image, symbol }, index) => {
       const selected = currency && currency.toLowerCase() === address.toLowerCase()
