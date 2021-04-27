@@ -360,7 +360,7 @@ export const getCTokenForToken = (token: string): string => {
 
 export const isCToken = (symbol: string): boolean => {
   const tokenSymbol = symbol.toLowerCase()
-  if (tokenSymbol.startsWith('c')) {
+  if (tokenSymbol in CompoundTokenType) {
     return true
   }
   return false
