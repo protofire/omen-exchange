@@ -252,13 +252,36 @@ class CPKService {
     return tx
   }
 
-  getGas = async (gas: number): Promise<number> => {
-    const deployed = await this.cpk.isProxyDeployed()
-    if (deployed) {
-      return gas
+  getGas = async (networkId: number, isCompound = false): Promise<number> => {
+    if (networkId === networkIds.XDAI) {
+      return defaultGas
     }
-    const addProxyDeploymentGas = 500000
-    return gas + addProxyDeploymentGas
+    let gas = 500000
+    const deployed = await this.cpk.isProxyDeployed()
+    if (!deployed) {
+      gas += gas
+    }
+    if (isCompound) {
+      gas += gas
+    }
+    return gas
+  }
+
+  claimEthFromProxy = async () => {
+    // helper function if eth gets stuck in proxy
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
+    const transactions: Transaction[] = []
+    const txOptions: TxOptions = {}
+    txOptions.gas = await this.getGas(networkId)
+    const signer = this.provider.getSigner()
+    const account = await signer.getAddress()
+    const balance = await this.provider.getBalance(this.cpk.address)
+    transactions.push({
+      to: account,
+      value: balance.toString(),
+    })
+    return this.execTransactions(transactions, txOptions)
   }
 
   buyOutcomes = async ({
@@ -280,7 +303,8 @@ class CPKService {
       const transactions: Transaction[] = []
 
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      const isCompound = compoundService != null
+      txOptions.gas = await this.getGas(networkId, isCompound)
 
       const buyAmount = this.cpk.relay ? amount.sub(RELAY_FEE) : amount
 
@@ -432,7 +456,9 @@ class CPKService {
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      const isCompound = compoundService != null
+
+      txOptions.gas = await this.getGas(networkId, isCompound)
 
       let collateral
       const fundingAmount = this.cpk.relay ? marketData.funding.sub(RELAY_FEE) : marketData.funding
@@ -659,7 +685,9 @@ class CPKService {
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      const isCompound = compoundService != null
+
+      txOptions.gas = await this.getGas(networkId, isCompound)
 
       let collateral
 
@@ -859,16 +887,16 @@ class CPKService {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
 
       const outcomeTokensToSell = await marketMaker.calcSellAmount(amount, outcomeIndex)
       const collateralAddress = await marketMaker.getCollateralToken()
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
-
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
+      const isCompound = compoundService != null
+      txOptions.gas = await this.getGas(networkId, isCompound)
 
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
@@ -975,7 +1003,8 @@ class CPKService {
       const transactions: Transaction[] = []
 
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      const isCompound = compoundService != null
+      txOptions.gas = await this.getGas(networkId, isCompound)
 
       let collateralSymbol = ''
       let userInputCollateralSymbol: KnownToken
@@ -1122,7 +1151,8 @@ class CPKService {
       transactions.push(mergePositionsTx)
 
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      const isCompound = compoundService != null
+      txOptions.gas = await this.getGas(networkId, isCompound)
 
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
@@ -1242,10 +1272,12 @@ class CPKService {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      txOptions.gas = await this.getGas(networkId)
 
       if (!isConditionResolved) {
         transactions.push({
@@ -1300,7 +1332,9 @@ class CPKService {
     try {
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
+      txOptions.gas = await this.getGas(networkId)
 
       if (isScalar && scalarLow && scalarHigh) {
         transactions.push({
@@ -1331,7 +1365,9 @@ class CPKService {
           },
         ]
         const txOptions: TxOptions = {}
-        txOptions.gas = defaultGas
+        const network = await this.provider.getNetwork()
+        const networkId = network.chainId
+        txOptions.gas = await this.getGas(networkId)
         return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       }
       const txObject = await realitio.submitAnswer(question.id, answer, amount)
@@ -1364,8 +1400,9 @@ class CPKService {
   upgradeProxyImplementation = async (): Promise<TransactionReceipt> => {
     try {
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
       const network = await this.provider.getNetwork()
+      const networkId = network.chainId
+      txOptions.gas = await this.getGas(networkId)
       const targetGnosisSafeImplementation = getTargetSafeImplementation(network.chainId)
       const transactions: Transaction[] = [
         {
@@ -1448,8 +1485,6 @@ class CPKService {
 
   claimDaiTokens = async () => {
     try {
-      const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
       const xDaiService = new XdaiService(this.provider)
 
       const transactions = await this.fetchLatestUnclaimedTransactions()
