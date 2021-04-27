@@ -20,7 +20,7 @@ const query = gql`
       fpmm {
         id
       }
-      rewardToken {
+      rewardTokens {
         id
       }
       rewardAmounts
