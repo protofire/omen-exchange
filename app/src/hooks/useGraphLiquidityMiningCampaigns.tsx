@@ -52,8 +52,8 @@ export type GraphResponseLiquidityMiningCampaign = {
   endsAt: string
   duration: string
   locked: boolean
-  fpmm: GraphResponseFixedProductMarketMaker
-  rewardToken: string
+  fpmm: { id: string }
+  rewardToken: { id: string }[]
   rewardAmounts: BigNumber[]
   stakedAmount: BigNumber
   deposits: LMStakeEvent[]
