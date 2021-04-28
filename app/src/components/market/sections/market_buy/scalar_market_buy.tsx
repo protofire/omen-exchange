@@ -365,9 +365,9 @@ export const ScalarMarketBuy = (props: Props) => {
   const currencySelectorIsDisabled = relay ? true : currencyFilters.length ? false : true
   if (collateralSymbol in CompoundTokenType) {
     if (baseCollateral.address === pseudoNativeAssetAddress) {
-      currencyFilters = [collateral.address, pseudoNativeAssetAddress.toLowerCase()]
+      currencyFilters = [collateral.address.toLowerCase(), pseudoNativeAssetAddress.toLowerCase()]
     } else {
-      currencyFilters = [collateral.address, baseCollateral.address]
+      currencyFilters = [collateral.address.toLowerCase(), baseCollateral.address.toLowerCase()]
     }
   }
 
