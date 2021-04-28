@@ -60,15 +60,10 @@ const StyledButtonContainer = styled(ButtonContainer)`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  &.border {
-    border-top: 1px solid ${props => props.theme.colors.verticalDivider};
-  }
 `
 
 const BorderedButtonContainer = styled(ButtonContainer)`
   ${MarginsButton};
-  border-top: 1px solid ${props => props.theme.colors.verticalDivider};
 `
 
 const SellBuyWrapper = styled.div`
@@ -503,28 +498,19 @@ const Wrapper = (props: Props) => {
                 </StyledButtonContainer>
               ) : (
                 <>
-                  {!isConditionResolved && (
-                    <BorderedButtonContainer>
-                      <Button
-                        buttonType={ButtonType.primary}
-                        disabled={status === Status.Loading}
-                        onClick={resolveCondition}
-                      >
-                        Resolve Condition
-                      </Button>
-                    </BorderedButtonContainer>
-                  )}
-                  {isConditionResolved && hasWinningOutcomes && (
-                    <BorderedButtonContainer>
-                      <Button
-                        buttonType={ButtonType.primary}
-                        disabled={status === Status.Loading}
-                        onClick={() => redeem()}
-                      >
-                        Redeem
-                      </Button>
-                    </BorderedButtonContainer>
-                  )}
+                  <BorderedButtonContainer borderTop={hasWinningOutcomes !== null && hasWinningOutcomes}>
+                    <Button
+                      buttonType={ButtonType.primary}
+                      disabled={status === Status.Loading}
+                      onClick={isConditionResolved && hasWinningOutcomes ? () => redeem() : resolveCondition}
+                    >
+                      {(!isConditionResolved && hasWinningOutcomes) || (!isConditionResolved && !hasWinningOutcomes)
+                        ? 'Resolve Condition'
+                        : isConditionResolved && hasWinningOutcomes
+                        ? 'Redeem'
+                        : ''}
+                    </Button>
+                  </BorderedButtonContainer>
                 </>
               )}
             </WhenConnected>
