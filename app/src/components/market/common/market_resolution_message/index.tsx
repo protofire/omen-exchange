@@ -2,7 +2,6 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { useSymbol } from '../../../../hooks'
 import { formatBigNumber } from '../../../../util/tools'
 import { Arbitrator, Token } from '../../../../util/types'
 
@@ -53,19 +52,19 @@ const TextHighlight = styled.span`
 interface Props {
   arbitrator: Arbitrator
   collateralToken: Token
-  earnedCollateral: Maybe<BigNumber>
   invalid: boolean
   userWinningShares: BigNumber
   userWinningOutcomes: number
   winningOutcomes: number
+  redeemString: string
 }
 
 const MarketResolutionMessage = (props: Props) => {
   const {
     arbitrator,
     collateralToken,
-    earnedCollateral,
     invalid,
+    redeemString,
     userWinningOutcomes,
     userWinningShares,
     winningOutcomes,
@@ -73,10 +72,6 @@ const MarketResolutionMessage = (props: Props) => {
   } = props
 
   const shares = formatBigNumber(userWinningShares, collateralToken.decimals)
-  const symbol = useSymbol(collateralToken)
-  const redeemString = earnedCollateral
-    ? `${formatBigNumber(earnedCollateral, collateralToken.decimals)} ${symbol}`
-    : 'NaN'
 
   const lost = !invalid && userWinningOutcomes === 0 && parseFloat(shares) > 0
   const wonSingle = !invalid && userWinningOutcomes === 1
