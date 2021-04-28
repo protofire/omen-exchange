@@ -255,7 +255,7 @@ class CPKService {
   getGas = async (txOptions: TxOptions): Promise<void> => {
     const network = await this.provider.getNetwork()
     const networkId = network.chainId
-    if (networkId === networkIds.XDAI) {
+    if (networkId === networkIds.XDAI || this.isSafeApp) {
       txOptions.gas = defaultGas
     }
   }
@@ -1345,7 +1345,7 @@ class CPKService {
 
   proxyIsUpToDate = async (): Promise<boolean> => {
     const network = await this.provider.getNetwork()
-    if (network.chainId === networkIds.XDAI) {
+    if (network.chainId === networkIds.XDAI || this.isSafeApp) {
       return true
     }
     const deployed = await this.cpk.isProxyDeployed()
