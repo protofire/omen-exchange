@@ -63,17 +63,14 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const ethBalance = new BigNumber(
     tokens.filter(token => token.symbol === getNativeAsset(context.rawWeb3Context.networkId).symbol)[0]?.balance || '',
   )
-  const formattedEthBalance = formatNumber(formatBigNumber(ethBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 3)
   const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
-  const formattedDaiBalance = formatNumber(formatBigNumber(daiBalance, STANDARD_DECIMALS, STANDARD_DECIMALS))
+
   const nativeAsset = getNativeAsset(context.networkId)
 
   const { collateralBalance, fetchCollateralBalance } = useCollateralBalance(nativeAsset, context)
   const xDaiBalance = collateralBalance || Zero
-  const formattedxDaiBalance = `${formatBigNumber(xDaiBalance, nativeAsset.decimals, 2)}`
 
   const omenBalance = new BigNumber(tokens.filter(token => token.symbol === 'OMN')[0]?.balance || '')
-  const formattedOmenBalance = formatNumber(formatBigNumber(omenBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 3)
 
   const omenToken = getToken(100, 'omn')
 
@@ -134,13 +131,13 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     claimState,
     unclaimedAmount,
     ethBalance,
-    formattedEthBalance,
+    formattedEthBalance: formatNumber(formatBigNumber(ethBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 3),
     daiBalance,
-    formattedDaiBalance,
+    formattedDaiBalance: formatNumber(formatBigNumber(daiBalance, STANDARD_DECIMALS, STANDARD_DECIMALS)),
     xDaiBalance,
-    formattedxDaiBalance,
+    formattedxDaiBalance: formatBigNumber(xDaiBalance, nativeAsset.decimals, 2),
     fetchBalances,
-    formattedOmenBalance,
+    formattedOmenBalance: formatNumber(formatBigNumber(omenBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 3),
     omenBalance,
     xOmenBalance,
     formattedxOmenBalance: formatBigNumber(xOmenBalance, omenToken.decimals, 2),
