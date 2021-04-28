@@ -345,7 +345,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       throw 'No liquidity mining campaign'
     }
 
-    await cpk.withdrawStakedPoolTokens(amountToFund || Zero, liquidityMiningCampaign.id)
+    await cpk.unstakePoolTokens(amountToFund || Zero, liquidityMiningCampaign.id)
     fetchStakingData()
   }
 
@@ -371,7 +371,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       throw 'No liquidity mining campaign'
     }
 
-    await cpk.withdrawStakedAndClaim(liquidityMiningCampaign.id)
+    await cpk.unstakeAndClaim(liquidityMiningCampaign.id)
     fetchStakingData()
   }
 

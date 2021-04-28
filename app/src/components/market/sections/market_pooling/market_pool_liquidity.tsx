@@ -447,7 +447,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       throw 'No liquidity mining campaign'
     }
 
-    await cpk.withdrawStakedPoolTokens(amountToFund || Zero, liquidityMiningCampaign.id)
+    await cpk.unstakePoolTokens(amountToFund || Zero, liquidityMiningCampaign.id)
     fetchStakingData()
   }
 
@@ -473,7 +473,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       throw 'No liquidity mining campaign'
     }
 
-    await cpk.withdrawStakedAndClaim(liquidityMiningCampaign.id)
+    await cpk.unstakeAndClaim(liquidityMiningCampaign.id)
     fetchStakingData()
   }
 
