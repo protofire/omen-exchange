@@ -151,6 +151,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       }
 
       setAllowanceState(TransactionStep.transactionConfirmed)
+      await fetchAllowance()
     } catch (e) {
       setAllowanceState(TransactionStep.idle)
     }
@@ -166,8 +167,9 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   useEffect(() => {
     fetchAllowance()
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, relay, exchangeType])
+  }, [account, relay, exchangeType, currencySelected])
 
   const DAI = getToken(1, 'dai')
 
@@ -206,7 +208,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         }`,
       )
       setTxState(TransactionStep.waitingConfirmation)
-      setConfirmations(8)
+      setConfirmations(9)
       setIsTransactionModalOpen(true)
 
       const hash =
@@ -368,7 +370,9 @@ export const ModalDepositWithdraw = (props: Props) => {
             )}{' '}
             {currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}.
           </InputInfo>
-          {mainnetWalletAllowance === WalletState.enable && (
+          {(mainnetWalletAllowance === WalletState.enable ||
+            (mainnetWalletAllowance === WalletState.ready &&
+              allowanceState === TransactionStep.transactionConfirmed)) && (
             <Allowance>
               <div>This permission allows Omni smart contracts to interact with your OMN.</div>
               <ToggleTokenLock
