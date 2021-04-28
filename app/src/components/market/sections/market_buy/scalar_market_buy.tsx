@@ -344,7 +344,11 @@ export const ScalarMarketBuy = (props: Props) => {
       setDisplayAmountToFund(new BigNumber('0'))
       setAmount(new BigNumber(0))
       setStatus(Status.Ready)
-      setMessage(`Successfully bought ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
+      setMessage(
+        `Successfully bought ${formatNumber(sharesAmount, baseCollateral.decimals)} ${
+          balances[outcomeIndex].outcomeName
+        } shares.`,
+      )
     } catch (err) {
       setStatus(Status.Error)
       setTxState(TransactionStep.error)

@@ -110,11 +110,13 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
             : props.isScalar
-            ? `${formatBigNumber(bondOutcomeSelected, nativeAsset.decimals)} ${getUnit(
-                props.marketMakerData.question.title,
-              )}`
+            ? `${formatNumber(
+                formatBigNumber(bondOutcomeSelected, nativeAsset.decimals, nativeAsset.decimals),
+              )} ${getUnit(props.marketMakerData.question.title)}`
             : marketMakerData.question.outcomes[outcomeIndex]
-        } with ${formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals)} ${symbol}`,
+        } with ${formatNumber(
+          formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals, nativeAsset.decimals),
+        )} ${symbol}`,
       )
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
@@ -134,11 +136,13 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       await fetchGraphMarketMakerData()
 
       setMessage(
-        `Successfully bonded ${formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals)} ${symbol} on ${
+        `Successfully bonded ${formatNumber(
+          formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals, nativeAsset.decimals),
+        )} ${symbol} on ${
           outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
             : props.isScalar
-            ? `${formatBigNumber(bondOutcomeSelected, nativeAsset.decimals)} ${getUnit(
+            ? `${formatNumber(formatBigNumber(bondOutcomeSelected, nativeAsset.decimals))} ${getUnit(
                 props.marketMakerData.question.title,
               )}`
             : marketMakerData.question.outcomes[outcomeIndex]
@@ -213,7 +217,10 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
                   decimals={nativeAsset.decimals}
                   name="bondAmount"
                   // eslint-disable-next-line @typescript-eslint/no-empty-function
-                  onChange={() => {}}
+                  onChange={(e: BigNumberInputReturn) => {
+                    setBondOutcomeSelected(e.value.gt(Zero) ? e.value : Zero)
+                    setBondOutcomeDisplay('')
+                  }}
                   style={{ width: 0 }}
                   value={bondNativeAssetAmount}
                 />
@@ -228,7 +235,6 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
                     name="bondAmount"
                     onChange={(e: BigNumberInputReturn) => {
                       setBondOutcomeSelected(e.value.gt(Zero) ? e.value : Zero)
-
                       setBondOutcomeDisplay('')
                     }}
                     style={{ width: 0 }}
@@ -281,7 +287,14 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             Set Invalid
           </Button>
         )}
-        <Button buttonType={ButtonType.primary} disabled={amountError} onClick={() => bondOutcome(false)}>
+        <Button
+          buttonType={ButtonType.primary}
+          disabled={amountError}
+          onClick={() => {
+            bondOutcome(false)
+            setBondOutcomeDisplay('')
+          }}
+        >
           Bond {symbol}
         </Button>
       </BottomButtonWrapper>
