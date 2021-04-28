@@ -358,6 +358,14 @@ export const getCTokenForToken = (token: string): string => {
   }
 }
 
+export const isCToken = (symbol: string): boolean => {
+  const tokenSymbol = symbol.toLowerCase()
+  if (tokenSymbol in CompoundTokenType) {
+    return true
+  }
+  return false
+}
+
 /**
  * Gets base token symbol for a given ctoken
  */
@@ -367,6 +375,14 @@ export const getBaseTokenForCToken = (token: string): string => {
     return tokenSymbol.substring(1, tokenSymbol.length)
   }
   return ''
+}
+
+export const getBaseToken = (networkId: number, symbol: string): Token => {
+  const baseTokenSymbol = getBaseTokenForCToken(symbol)
+  if (baseTokenSymbol === 'eth') {
+    return getNativeAsset(networkId)
+  }
+  return getToken(networkId, baseTokenSymbol as KnownToken)
 }
 
 export const getSharesInBaseToken = (
