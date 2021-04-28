@@ -1566,7 +1566,7 @@ class CPKService {
       const erc20Service = new ERC20Service(this.provider, this.cpk.address, omnToken)
       const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(this.cpk.address, campaignAddress, amountToStake)
 
-      // Approve pool tokens to be sent to campaign address if not already done
+      // Step 4: Approve pool tokens to be sent to campaign address if not already done
       if (!hasEnoughAllowance) {
         transactions.push({
           to: marketMaker.address,
@@ -1574,7 +1574,7 @@ class CPKService {
         })
       }
 
-      // Stake pool tokens
+      // Step 5: Stake pool tokens
       transactions.push({
         to: campaignAddress,
         data: StakingService.encodeStakePoolTokens(amountToStake),
@@ -1622,7 +1622,7 @@ class CPKService {
     }
   }
 
-  withdrawStakedPoolTokens = async (amount: BigNumber, campaignAddress: string) => {
+  unstakePoolTokens = async (amount: BigNumber, campaignAddress: string) => {
     try {
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
@@ -1694,7 +1694,7 @@ class CPKService {
     }
   }
 
-  withdrawStakedAndClaim = async (campaignAddress: string) => {
+  unstakeAndClaim = async (campaignAddress: string) => {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
