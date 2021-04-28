@@ -208,6 +208,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
+
   const sharesAfterAddingFunding = sendAmountsAfterAddingFunding
     ? balances.map((balance, i) => balance.shares.add(sendAmountsAfterAddingFunding[i]))
     : balances.map(balance => balance.shares)
@@ -315,6 +316,33 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       logger.error(`${message} - ${err.message}`)
       setIsTransactionProcessing(false)
     }
+  }
+
+  const addFundingAndStake = async () => {
+    if (!cpk) {
+      return
+    }
+    if (!liquidityMiningCampaign) {
+      throw 'No liquidity mining campaign'
+    }
+
+    let useBaseToken = false
+    if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
+      useBaseToken = true
+    }
+
+    await cpk.depositAndStake({
+      amount: amountToFundNormalized || Zero,
+      campaignAddress: liquidityMiningCampaign.id,
+      collateral,
+      compoundService,
+      holdingsBN: balances.map(b => b.holdings),
+      marketMaker,
+      poolShareSupply: totalPoolShares,
+      setTxHash,
+      setTxState,
+      useBaseToken,
+    })
   }
 
   const removeFunding = async () => {
@@ -895,6 +923,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             Withdraw
           </Button>
         )}
+        <Button onClick={addFundingAndStake}>Deposit and stake</Button>
         <Button onClick={stake}>Stake</Button>
         <Button onClick={withdraw}>Withdraw</Button>
         <Button onClick={claim}>Claim</Button>
