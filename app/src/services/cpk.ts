@@ -1241,6 +1241,8 @@ class CPKService {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
