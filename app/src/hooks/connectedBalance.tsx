@@ -53,6 +53,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { relay } = context
   const { account, networkId } = context.rawWeb3Context
+  console.log(account)
   const [claimState, setClaimState] = useState<boolean>(false)
   const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
   const [xOmenBalance, setxOmenBalance] = useState<BigNumber>(Zero)

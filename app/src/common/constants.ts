@@ -70,6 +70,8 @@ export const KLEROS_CURATE_GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/
 //xDai transaction data subgraphs
 export const XDAI_HOME_BRIDGE = 'https://api.thegraph.com/subgraphs/name/maxaleks/home-bridge-xdai'
 export const XDAI_FOREIGN_BRIDGE = 'https://api.thegraph.com/subgraphs/name/maxaleks/foreign-bridge-mainnet'
+export const OMNI_HOME_BRIDGE = 'https://api.thegraph.com/subgraphs/name/raid-guild/xdai-omnibridge'
+export const OMNI_FOREIGN_BRIDGE = 'https://api.thegraph.com/subgraphs/name/raid-guild/mainnet-omnibridge'
 
 export const IPFS_GATEWAY = 'https://ipfs.kleros.io'
 

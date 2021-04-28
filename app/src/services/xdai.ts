@@ -8,6 +8,8 @@ import {
   GEN_TOKEN_ADDDRESS_TESTING,
   MULTI_CLAIM_ADDRESS,
   OMNI_BRIDGE_MAINNET_ADDRESS,
+  OMNI_FOREIGN_BRIDGE,
+  OMNI_HOME_BRIDGE,
   XDAI_FOREIGN_BRIDGE,
   XDAI_HOME_BRIDGE,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
@@ -207,6 +209,7 @@ class XdaiService {
 
   fetchCrossChainBalance = async (chain: number) => {
     try {
+      this.fetchOmniTransactionData()
       let userAddress
       if (this.provider.relay && chain === networkIds.MAINNET) {
         userAddress = await this.provider.signer.signer.getAddress()
@@ -243,6 +246,7 @@ class XdaiService {
 
   fetchXdaiTransactionData = async () => {
     try {
+      await this.fetchOmniTransactionData()
       const query = `
       query Requests($address: String) {
           requests(first:1000,orderBy:timestamp,orderDirection:desc,where:{recipient: $address}) {
@@ -277,6 +281,103 @@ class XdaiService {
         query: queryForeign,
         variables,
       })
+      console.log('------------soeratodrer')
+      console.log(xDaiRequests)
+      console.log(xDaiExecutions)
+
+      const { requests } = xDaiRequests.data.data
+      const { executions } = xDaiExecutions.data.data
+      let results = requests.filter(
+        ({ transactionHash: id1 }: any) => !executions.some(({ transactionHash: id2 }: any) => id2 === id1),
+      )
+
+      // double check if txs have been executed
+      const bridge = new ethers.Contract(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, this.abi, this.provider.signer.signer)
+      const relayed = await Promise.all(
+        results.map(async ({ transactionHash }: any) => await bridge.relayedMessages(transactionHash)),
+      )
+      // filter out executed claims
+      results = results.filter((_: any, index: number) => !relayed[index])
+
+      return results
+    } catch (e) {
+      console.error(e)
+    }
+  }
+  fetchOmniTransactionData = async () => {
+    try {
+      const query = `
+query getRequests($address: String) {
+    userRequests(first:1000,where:{user: $address}) {
+       
+        recipient
+        timestamp
+        amount
+        message{
+          id
+          msgId
+          signatures
+        }
+    }
+}`
+      const queryExecutions = `
+query getRequests($address: String) {
+    executions(first:1000,where:{user: $address}) {
+       
+        id
+        user
+        token
+        amount
+    }
+}`
+
+      const queryForeign = `
+        query GetTransactions($address: String!) {
+          executions(first:1000,where:{user: $address}) {
+            user
+            token 
+            amount
+          }
+        }
+        `
+      const queryForeignReq = `
+        query GetTransactions($address: String!) {
+          userRequests(first:1000,where:{user: $address}) {
+         id
+         user
+         token 
+         decimals
+          }
+        }
+        `
+
+      // const account = this.provider.relay
+      //   ? await this.provider.signer.signer.getAddress()
+      //   : await this.provider.getSigner().getAddress()
+      // const account = '0x32654C77B9Cb34Dc6e90301C2fc7B0f5c1EFe5d5'
+      const account = '0x162eb61A498c34676625CA3Aceb3f92508f49Aac'
+      const account2 = '0x32654C77B9Cb34Dc6e90301C2fc7B0f5c1EFe5d5'
+      console.log('0x32654C77B9Cb34Dc6e90301C2fc7B0f5c1EFe5d5')
+
+      const variables = { address: account2 }
+      const variables2 = { address: account2 }
+      const xDaiRequests = await axios.post(OMNI_HOME_BRIDGE, { query, variables })
+      const xDaiReqExec = await axios.post(OMNI_HOME_BRIDGE, { query: queryExecutions, variables })
+      const xDaiExecutions = await axios.post(OMNI_FOREIGN_BRIDGE, {
+        query: queryForeign,
+        variables: variables2,
+      })
+      const xDaiExecutionsReqeusts = await axios.post(OMNI_FOREIGN_BRIDGE, {
+        query: queryForeignReq,
+        variables: variables2,
+      })
+      console.log('XDAI :------------------')
+      console.log(xDaiRequests)
+      console.log(xDaiReqExec)
+      console.log('----------------------')
+      console.log('mainnet-------------')
+      console.log(xDaiExecutions)
+      console.log(xDaiExecutionsReqeusts)
 
       const { requests } = xDaiRequests.data.data
       const { executions } = xDaiExecutions.data.data
