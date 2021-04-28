@@ -252,36 +252,12 @@ class CPKService {
     return tx
   }
 
-  getGas = async (networkId: number, isCompound = false): Promise<number> => {
-    if (networkId === networkIds.XDAI) {
-      return defaultGas
-    }
-    let gas = 500000
-    const deployed = await this.cpk.isProxyDeployed()
-    if (!deployed) {
-      gas += gas
-    }
-    if (isCompound) {
-      gas += gas
-    }
-    return gas
-  }
-
-  claimEthFromProxy = async () => {
-    // helper function if eth gets stuck in proxy
+  getGas = async (txOptions: TxOptions): Promise<void> => {
     const network = await this.provider.getNetwork()
     const networkId = network.chainId
-    const transactions: Transaction[] = []
-    const txOptions: TxOptions = {}
-    txOptions.gas = await this.getGas(networkId)
-    const signer = this.provider.getSigner()
-    const account = await signer.getAddress()
-    const balance = await this.provider.getBalance(this.cpk.address)
-    transactions.push({
-      to: account,
-      value: balance.toString(),
-    })
-    return this.execTransactions(transactions, txOptions)
+    if (networkId === networkIds.XDAI) {
+      txOptions.gas = defaultGas
+    }
   }
 
   buyOutcomes = async ({
@@ -303,8 +279,7 @@ class CPKService {
       const transactions: Transaction[] = []
 
       const txOptions: TxOptions = {}
-      const isCompound = compoundService != null
-      txOptions.gas = await this.getGas(networkId, isCompound)
+      await this.getGas(txOptions)
 
       const buyAmount = this.cpk.relay ? amount.sub(RELAY_FEE) : amount
 
@@ -456,9 +431,7 @@ class CPKService {
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      const isCompound = compoundService != null
-
-      txOptions.gas = await this.getGas(networkId, isCompound)
+      await this.getGas(txOptions)
 
       let collateral
       const fundingAmount = this.cpk.relay ? marketData.funding.sub(RELAY_FEE) : marketData.funding
@@ -685,9 +658,7 @@ class CPKService {
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      const isCompound = compoundService != null
-
-      txOptions.gas = await this.getGas(networkId, isCompound)
+      await this.getGas(txOptions)
 
       let collateral
 
@@ -708,7 +679,6 @@ class CPKService {
           value: fundingAmount.toString(),
         })
       } else if (useCompoundReserve && compoundTokenDetails) {
-        txOptions.gas = defaultGas
         if (userInputCollateral.address === pseudoNativeAssetAddress) {
           // If user chosen collateral is ETH
           collateral = marketData.collateral
@@ -895,8 +865,7 @@ class CPKService {
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      const isCompound = compoundService != null
-      txOptions.gas = await this.getGas(networkId, isCompound)
+      await this.getGas(txOptions)
 
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
@@ -1003,8 +972,7 @@ class CPKService {
       const transactions: Transaction[] = []
 
       const txOptions: TxOptions = {}
-      const isCompound = compoundService != null
-      txOptions.gas = await this.getGas(networkId, isCompound)
+      await this.getGas(txOptions)
 
       let collateralSymbol = ''
       let userInputCollateralSymbol: KnownToken
@@ -1151,8 +1119,7 @@ class CPKService {
       transactions.push(mergePositionsTx)
 
       const txOptions: TxOptions = {}
-      const isCompound = compoundService != null
-      txOptions.gas = await this.getGas(networkId, isCompound)
+      await this.getGas(txOptions)
 
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
@@ -1272,12 +1239,10 @@ class CPKService {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = await this.getGas(networkId)
+      await this.getGas(txOptions)
 
       if (!isConditionResolved) {
         transactions.push({
@@ -1332,9 +1297,7 @@ class CPKService {
     try {
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
-      txOptions.gas = await this.getGas(networkId)
+      await this.getGas(txOptions)
 
       if (isScalar && scalarLow && scalarHigh) {
         transactions.push({
@@ -1365,9 +1328,7 @@ class CPKService {
           },
         ]
         const txOptions: TxOptions = {}
-        const network = await this.provider.getNetwork()
-        const networkId = network.chainId
-        txOptions.gas = await this.getGas(networkId)
+        await this.getGas(txOptions)
         return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       }
       const txObject = await realitio.submitAnswer(question.id, answer, amount)
@@ -1401,8 +1362,7 @@ class CPKService {
     try {
       const txOptions: TxOptions = {}
       const network = await this.provider.getNetwork()
-      const networkId = network.chainId
-      txOptions.gas = await this.getGas(networkId)
+      await this.getGas(txOptions)
       const targetGnosisSafeImplementation = getTargetSafeImplementation(network.chainId)
       const transactions: Transaction[] = [
         {
@@ -1447,7 +1407,7 @@ class CPKService {
       if (this.cpk.relay) {
         const transactions: Transaction[] = []
         const txOptions: TxOptions = {}
-        txOptions.gas = defaultGas
+        await this.getGas(txOptions)
 
         // get mainnet relay signer
         const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()

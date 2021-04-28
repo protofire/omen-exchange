@@ -184,7 +184,7 @@ const networks: { [K in NetworkId]: Network } = {
       symbol: 'ETH',
       decimals: 18,
     },
-    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    targetSafeImplementation: '0x79C18dfa69A8Fdf5B55Aff6423DF1e660B0B0399',
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
     blockExplorerURL: 'https://rinkeby.etherscan.io',
