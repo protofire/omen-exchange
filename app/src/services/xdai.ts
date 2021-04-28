@@ -6,6 +6,7 @@ import {
   DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   DEFAULT_TOKEN_ADDRESS,
   GEN_TOKEN_ADDDRESS_TESTING,
+  GEN_XDAI_ADDRESS_TESTING,
   MULTI_CLAIM_ADDRESS,
   OMNI_BRIDGE_MAINNET_ADDRESS,
   OMNI_FOREIGN_BRIDGE,
@@ -246,7 +247,6 @@ class XdaiService {
 
   fetchXdaiTransactionData = async () => {
     try {
-      await this.fetchOmniTransactionData()
       const query = `
       query Requests($address: String) {
           requests(first:1000,orderBy:timestamp,orderDirection:desc,where:{recipient: $address}) {
@@ -281,9 +281,6 @@ class XdaiService {
         query: queryForeign,
         variables,
       })
-      console.log('------------soeratodrer')
-      console.log(xDaiRequests)
-      console.log(xDaiExecutions)
 
       const { requests } = xDaiRequests.data.data
       const { executions } = xDaiExecutions.data.data
@@ -307,91 +304,69 @@ class XdaiService {
   fetchOmniTransactionData = async () => {
     try {
       const query = `
-query getRequests($address: String) {
-    userRequests(first:1000,where:{user: $address}) {
-       
+query getRequests($address: String,$token:String) {
+    userRequests(first:1000,where:{user: $address,token:$token}) {
+       id
         recipient
         timestamp
         amount
+        txHash
+        messageId
+        encodedData
         message{
           id
           msgId
           signatures
+          txHash
+          msgHash
+          msgData
         }
-    }
-}`
-      const queryExecutions = `
-query getRequests($address: String) {
-    executions(first:1000,where:{user: $address}) {
-       
-        id
-        user
-        token
-        amount
     }
 }`
 
       const queryForeign = `
-        query GetTransactions($address: String!) {
-          executions(first:1000,where:{user: $address}) {
+        query GetTransactions($address: String!,$token:String) {
+          executions(first:1000,where:{user: $address,token:$token}) {
+          id
             user
             token 
             amount
-          }
-        }
-        `
-      const queryForeignReq = `
-        query GetTransactions($address: String!) {
-          userRequests(first:1000,where:{user: $address}) {
-         id
-         user
-         token 
-         decimals
+            txHash
+            messageId
+            status
+            
           }
         }
         `
 
-      // const account = this.provider.relay
-      //   ? await this.provider.signer.signer.getAddress()
-      //   : await this.provider.getSigner().getAddress()
-      // const account = '0x32654C77B9Cb34Dc6e90301C2fc7B0f5c1EFe5d5'
-      const account = '0x162eb61A498c34676625CA3Aceb3f92508f49Aac'
-      const account2 = '0x32654C77B9Cb34Dc6e90301C2fc7B0f5c1EFe5d5'
-      console.log('0x32654C77B9Cb34Dc6e90301C2fc7B0f5c1EFe5d5')
+      const relayerOrMainnetAccount = this.provider.relay
+        ? await this.provider.signer.signer.getAddress()
+        : await this.provider.getSigner().getAddress()
+      const mainnetAccount = await this.provider.getSigner().getAddress()
 
-      const variables = { address: account2 }
-      const variables2 = { address: account2 }
+      const variables = { address: mainnetAccount, token: GEN_XDAI_ADDRESS_TESTING }
+      const variables2 = { address: relayerOrMainnetAccount, token: GEN_TOKEN_ADDDRESS_TESTING }
       const xDaiRequests = await axios.post(OMNI_HOME_BRIDGE, { query, variables })
-      const xDaiReqExec = await axios.post(OMNI_HOME_BRIDGE, { query: queryExecutions, variables })
+
       const xDaiExecutions = await axios.post(OMNI_FOREIGN_BRIDGE, {
         query: queryForeign,
         variables: variables2,
       })
-      const xDaiExecutionsReqeusts = await axios.post(OMNI_FOREIGN_BRIDGE, {
-        query: queryForeignReq,
-        variables: variables2,
-      })
-      console.log('XDAI :------------------')
-      console.log(xDaiRequests)
-      console.log(xDaiReqExec)
-      console.log('----------------------')
-      console.log('mainnet-------------')
-      console.log(xDaiExecutions)
-      console.log(xDaiExecutionsReqeusts)
 
-      const { requests } = xDaiRequests.data.data
+      const { userRequests } = xDaiRequests.data.data
       const { executions } = xDaiExecutions.data.data
-      let results = requests.filter(
-        ({ transactionHash: id1 }: any) => !executions.some(({ transactionHash: id2 }: any) => id2 === id1),
-      )
 
-      // double check if txs have been executed
-      const bridge = new ethers.Contract(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, this.abi, this.provider.signer.signer)
-      const relayed = await Promise.all(
-        results.map(async ({ transactionHash }: any) => await bridge.relayedMessages(transactionHash)),
+      let results = userRequests.filter(
+        ({ messageId: id1 }: any) => !executions.some(({ messageId: id2 }: any) => id2 === id1),
       )
-      // filter out executed claims
-      results = results.filter((_: any, index: number) => !relayed[index])
+      console.log(results)
+      results = results.map((item: any) => {
+        return {
+          value: item.amount,
+          ...item,
+        }
+      })
+      console.log(results)
 
       return results
     } catch (e) {

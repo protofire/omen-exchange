@@ -188,7 +188,8 @@ const HeaderContainer: React.FC = (props: any) => {
     formattedxDaiBalance,
     formattedxOmenBalance,
     omenBalance,
-    unclaimedAmount,
+    unclaimedDaiAmount,
+    unclaimedOmenAmount,
     xDaiBalance,
     xOmenBalance,
   } = useConnectedBalanceContext()
@@ -347,7 +348,8 @@ const HeaderContainer: React.FC = (props: any) => {
             setDepositWithdrawType(ExchangeType.withdraw)
             setDepositWithdrawModalState(true)
           }}
-          unclaimedAmount={unclaimedAmount}
+          unclaimedDaiAmount={unclaimedDaiAmount}
+          unclaimedOmenAmount={unclaimedOmenAmount}
         />
         <ModalConnectWalletWrapper
           isOpen={isConnectWalletModalOpen}
@@ -368,7 +370,7 @@ const HeaderContainer: React.FC = (props: any) => {
             setYourConnectionModalState(true)
           }}
           onClose={() => setDepositWithdrawModalState(false)}
-          unclaimedAmount={unclaimedAmount}
+          unclaimedAmount={unclaimedDaiAmount}
           xDaiBalance={xDaiBalance}
           xOmenBalance={xOmenBalance}
         />

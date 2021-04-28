@@ -12,7 +12,6 @@ import { TransactionStep, WalletState } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconClose, IconMetaMask, IconOmen, IconWalletConnect } from '../../common/icons'
-import { IconArrowUp } from '../../common/icons/IconArrowUp'
 import { IconChevronDown } from '../../common/icons/IconChevronDown'
 import { IconChevronUp } from '../../common/icons/IconChevronUp'
 import { IconJazz } from '../../common/icons/IconJazz'
@@ -165,7 +164,8 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   openWithdrawModal: () => void
   theme?: any
   claimState: boolean
-  unclaimedAmount: BigNumber
+  unclaimedDaiAmount: BigNumber
+  unclaimedOmenAmount: BigNumber
   fetchBalances: () => void
   formattedEthBalance: string
   formattedDaiBalance: string
@@ -189,7 +189,8 @@ export const ModalYourConnection = (props: Props) => {
     openDepositModal,
     openWithdrawModal,
     theme,
-    unclaimedAmount,
+    unclaimedDaiAmount,
+    unclaimedOmenAmount,
   } = props
 
   const context = useConnectedWeb3Context()
@@ -213,7 +214,7 @@ export const ModalYourConnection = (props: Props) => {
     }
 
     try {
-      setMessage(`Claim ${formatBigNumber(unclaimedAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`)
+      setMessage(`Claim ${formatBigNumber(unclaimedDaiAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`)
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
       setIsTransactionModalOpen(true)
@@ -341,7 +342,7 @@ export const ModalYourConnection = (props: Props) => {
               </BalanceItems>
             </BalanceSection>
           </ModalCard>
-          {relay && claimState && (
+          {relay && (!unclaimedDaiAmount.isZero() || !unclaimedOmenAmount.isZero()) && (
             <ModalCard>
               <BalanceSection borderBottom={displayClaim} style={{ flexDirection: 'row' }}>
                 <ClaimLeft>
@@ -372,7 +373,7 @@ export const ModalYourConnection = (props: Props) => {
                       <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
                     </BalanceItemSide>
                     <BalanceItemBalance>
-                      {formatBigNumber(unclaimedAmount, STANDARD_DECIMALS, 2)} DAI
+                      {formatBigNumber(unclaimedDaiAmount, STANDARD_DECIMALS, 2)} DAI
                     </BalanceItemBalance>
                   </BalanceItem>
                   <BalanceItem>
@@ -381,7 +382,7 @@ export const ModalYourConnection = (props: Props) => {
                       <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
                     </BalanceItemSide>
                     <BalanceItemBalance>
-                      {formatBigNumber(unclaimedAmount, STANDARD_DECIMALS, 2)} OMN
+                      {formatBigNumber(unclaimedOmenAmount, STANDARD_DECIMALS, 2)} OMN
                     </BalanceItemBalance>
                   </BalanceItem>
                 </BalanceSection>
