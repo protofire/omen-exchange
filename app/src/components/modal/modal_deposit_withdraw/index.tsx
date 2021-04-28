@@ -45,7 +45,7 @@ const InputInfo = styled.p`
   border: ${props => props.theme.borders.borderLineDisabled};
   border-radius: 4px;
   padding: ${props => props.theme.textfield.paddingVertical + ' ' + props.theme.textfield.paddingHorizontal};
-  line-height: 16.41px;
+  line-height: 20px;
   letter-spacing: 0.2px;
 `
 const WalletText = styled.div`
@@ -167,6 +167,8 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   useEffect(() => {
     fetchAllowance()
+    setDisplayFundAmount(Zero)
+    setAmountToDisplay(' ')
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, relay, exchangeType, currencySelected])
@@ -183,7 +185,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       : xOmenBalance
 
   const minDaiExchange = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
-  const minOmenExchange = exchangeType === ExchangeType.deposit ? parseEther('1') : parseEther('0.1')
+  const minOmenExchange = exchangeType === ExchangeType.deposit ? parseEther('1') : parseEther('1')
   const isDepositWithdrawDisabled =
     displayFundAmount.isZero() ||
     !wallet ||
@@ -194,7 +196,8 @@ export const ModalDepositWithdraw = (props: Props) => {
     displayFundAmount.lt(currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange) ||
     (currencySelected === ExchangeCurrency.Omen &&
       exchangeType === ExchangeType.deposit &&
-      displayFundAmount.gt(mainnetAllowance))
+      displayFundAmount.gt(mainnetAllowance)) ||
+    (currencySelected === ExchangeCurrency.Omen && exchangeType === ExchangeType.withdraw && xDaiBalance?.isZero())
 
   const depositWithdraw = async () => {
     if (!cpk) {
@@ -362,13 +365,17 @@ export const ModalDepositWithdraw = (props: Props) => {
 
           <InputInfo>
             <IconAlertInverted style={{ marginRight: '12px' }} />
-            You need to {exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least{' '}
-            {formatBigNumber(
-              currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange,
-              STANDARD_DECIMALS,
-              1,
-            )}{' '}
-            {currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}.
+            {currencySelected === ExchangeCurrency.Omen &&
+            exchangeType === ExchangeType.withdraw &&
+            xDaiBalance?.isZero()
+              ? 'Fund your Omen Account with Dai to proceed with the withdrawal.'
+              : `You need to ${exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least ${' '}
+${formatBigNumber(
+  currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange,
+  STANDARD_DECIMALS,
+  0,
+)} ${' '}
+${currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}.`}
           </InputInfo>
           {(mainnetWalletAllowance === WalletState.enable ||
             (mainnetWalletAllowance === WalletState.ready &&
