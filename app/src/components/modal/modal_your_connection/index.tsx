@@ -176,7 +176,6 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const ModalYourConnection = (props: Props) => {
   const {
     changeWallet,
-
     fetchBalances,
     formattedDaiBalance,
     formattedEthBalance,
@@ -206,6 +205,7 @@ export const ModalYourConnection = (props: Props) => {
   const [allowance, setAllowance] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState('')
   const [displayClaim, setDisplayClaim] = useState<boolean>(false)
+  const omenToken = getToken(100, 'omn')
 
   const claim = async () => {
     if (!cpk) {
@@ -213,7 +213,19 @@ export const ModalYourConnection = (props: Props) => {
     }
 
     try {
-      setMessage(`Claim ${formatBigNumber(unclaimedDaiAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`)
+      setMessage(
+        `Claim ${
+          !unclaimedDaiAmount.isZero() && !unclaimedOmenAmount.isZero()
+            ? `${formatBigNumber(unclaimedDaiAmount || new BigNumber(0), DAI.decimals, 2)} ${
+                DAI.symbol
+              }, ${formatBigNumber(unclaimedOmenAmount || new BigNumber(0), omenToken.decimals, 2)} ${
+                omenToken.symbol
+              } `
+            : unclaimedDaiAmount.isZero()
+            ? `${formatBigNumber(unclaimedOmenAmount || new BigNumber(0), omenToken.decimals, 2)} ${omenToken.symbol}`
+            : `${formatBigNumber(unclaimedDaiAmount || new BigNumber(0), DAI.decimals, 2)} ${DAI.symbol}`
+        }   `,
+      )
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
       setIsTransactionModalOpen(true)
@@ -347,10 +359,10 @@ export const ModalYourConnection = (props: Props) => {
                 <ClaimLeft>
                   <StrongText>Claimable Assets</StrongText>
                   <BalanceItemBalance as="div">
-                    {unclaimedDaiAmount.isZero()
-                      ? 'OMN'
-                      : !unclaimedDaiAmount.isZero() && !unclaimedOmenAmount.isZero()
+                    {!unclaimedDaiAmount.isZero() && !unclaimedOmenAmount.isZero()
                       ? 'DAI, OMEN'
+                      : unclaimedDaiAmount.isZero()
+                      ? 'OMN'
                       : 'DAI'}
                   </BalanceItemBalance>
                 </ClaimLeft>
