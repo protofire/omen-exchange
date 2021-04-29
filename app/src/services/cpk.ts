@@ -4,6 +4,7 @@ import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
 import {
+  DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   GEN_TOKEN_ADDDRESS_TESTING,
   GEN_XDAI_ADDRESS_TESTING,
   OMNI_BRIDGE_XDAI_ADDRESS,
@@ -1516,6 +1517,7 @@ class CPKService {
     try {
       const xDaiService = new XdaiService(this.provider)
       const data = await xDaiService.fetchXdaiTransactionData()
+
       return data
     } catch (e) {
       logger.error('Error fetching xDai subgraph data', e.message)
@@ -1532,6 +1534,7 @@ class CPKService {
       const transactions = await this.fetchLatestUnclaimedTransactions()
       const messages = []
       const signatures = []
+      //const addresses = []
 
       for (let i = 0; i < transactions.length; i++) {
         const message = transactions[i].message
@@ -1541,7 +1544,7 @@ class CPKService {
         signatures.push(signature)
       }
 
-      const txObject = await xDaiService.claim(messages, signatures)
+      const txObject = await xDaiService.claim(messages, signatures, DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
       return txObject
     } catch (e) {
       logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)

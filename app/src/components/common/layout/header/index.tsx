@@ -179,7 +179,6 @@ const HeaderContainer: React.FC = (props: any) => {
   const disableConnectButton = isConnectWalletModalOpen
 
   const {
-    claimState,
     daiBalance,
     fetchBalances,
     formattedDaiBalance,
@@ -329,7 +328,6 @@ const HeaderContainer: React.FC = (props: any) => {
             logout()
             setConnectWalletModalState(true)
           }}
-          claimState={claimState}
           fetchBalances={fetchBalances}
           formattedDaiBalance={formattedDaiBalance}
           formattedEthBalance={formattedEthBalance}

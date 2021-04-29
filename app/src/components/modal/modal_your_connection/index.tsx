@@ -163,7 +163,6 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   openDepositModal: () => void
   openWithdrawModal: () => void
   theme?: any
-  claimState: boolean
   unclaimedDaiAmount: BigNumber
   unclaimedOmenAmount: BigNumber
   fetchBalances: () => void
@@ -177,7 +176,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const ModalYourConnection = (props: Props) => {
   const {
     changeWallet,
-    claimState,
+
     fetchBalances,
     formattedDaiBalance,
     formattedEthBalance,

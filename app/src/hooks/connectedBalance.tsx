@@ -111,14 +111,12 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
       if (daiTransactions && daiTransactions.length) {
         const aggregatedDai = aggregator(daiTransactions)
         setUnclaimedDaiAmount(aggregatedDai)
-        console.log(formatBigNumber(aggregatedDai, 18, 2))
       } else {
-        console.log('here')
         setUnclaimedDaiAmount(Zero)
       }
       if (omenTransactions && omenTransactions.length) {
         const aggregatedOmen = aggregator(omenTransactions)
-        console.log(formatBigNumber(aggregatedOmen, 18, 2))
+
         setUnclaimedOmenAmount(aggregatedOmen)
       } else {
         setUnclaimedOmenAmount(Zero)

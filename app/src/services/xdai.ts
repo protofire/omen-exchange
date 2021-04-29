@@ -9,6 +9,7 @@ import {
   GEN_XDAI_ADDRESS_TESTING,
   MULTI_CLAIM_ADDRESS,
   OMNI_BRIDGE_MAINNET_ADDRESS,
+  OMNI_CLAIM_ADDRESS,
   OMNI_FOREIGN_BRIDGE,
   OMNI_HOME_BRIDGE,
   XDAI_FOREIGN_BRIDGE,
@@ -72,16 +73,9 @@ const xdaiBridgeAbi = [
 const multiClaimAbi = [
   {
     inputs: [
-      {
-        internalType: 'bytes[]',
-        name: 'messages',
-        type: 'bytes[]',
-      },
-      {
-        internalType: 'bytes[]',
-        name: 'signatures',
-        type: 'bytes[]',
-      },
+      { internalType: 'address', name: 'bridge', type: 'address' },
+      { internalType: 'bytes[]', name: 'messages', type: 'bytes[]' },
+      { internalType: 'bytes[]', name: 'signatures', type: 'bytes[]' },
     ],
     name: 'claim',
     outputs: [],
@@ -185,9 +179,9 @@ class XdaiService {
     }
   }
 
-  claim = async (messages: string[], signatures: string[]) => {
+  claim = async (messages: string[], signatures: string[], address: string) => {
     const multiclaim = new ethers.Contract(MULTI_CLAIM_ADDRESS, multiClaimAbi, this.provider.signer.signer)
-    return multiclaim.claim(messages, signatures)
+    return multiclaim.claim(address, messages, signatures)
   }
 
   static encodeRelayTokens = (receiver: string): string => {
@@ -296,6 +290,12 @@ class XdaiService {
       // filter out executed claims
       results = results.filter((_: any, index: number) => !relayed[index])
 
+      results = results.map((item: any) => {
+        return {
+          address: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
+          ...item,
+        }
+      })
       return results
     } catch (e) {
       console.error(e)
@@ -359,14 +359,17 @@ query getRequests($address: String,$token:String) {
       let results = userRequests.filter(
         ({ messageId: id1 }: any) => !executions.some(({ messageId: id2 }: any) => id2 === id1),
       )
-      console.log(results)
+
       results = results.map((item: any) => {
         return {
+          address: OMNI_CLAIM_ADDRESS,
           value: item.amount,
-          ...item,
+          message: {
+            signatures: item.message.signatures,
+            content: item.message.msgData,
+          },
         }
       })
-      console.log(results)
 
       return results
     } catch (e) {
