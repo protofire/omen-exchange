@@ -135,6 +135,8 @@ export const CreateScalarMarket = (props: Props) => {
         ? setLowerBoundError('Value cannot be negative')
         : upperBound && !upperBound.eq(Zero) && lowerBound?.gt(upperBound)
         ? setLowerBoundError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
+        : startingPoint && !startingPoint.eq(Zero) && lowerBound?.gt(startingPoint)
+        ? setLowerBoundError(`Value must be less than ${formatBigNumber(startingPoint, STANDARD_DECIMALS, 2)}`)
         : setLowerBoundError('')
     }
     if (startingPointFocus) {
@@ -142,13 +144,17 @@ export const CreateScalarMarket = (props: Props) => {
         ? setStartingPointError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
         : upperBound && !upperBound.eq(Zero) && startingPoint && startingPoint.gt(upperBound)
         ? setStartingPointError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
+        : upperBound && !upperBound.eq(Zero) && startingPoint && startingPoint.eq(upperBound)
+        ? setStartingPointError('Value cannot be equal to Upper Bound')
         : setStartingPointError('')
     }
     if (upperBoundFocus) {
       lowerBound && upperBound && !upperBound.eq(Zero) && upperBound.lt(lowerBound)
         ? setUpperBoundError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
         : startingPoint && upperBound && !upperBound.eq(Zero) && upperBound.lt(startingPoint)
-        ? setUpperBoundError(`Amount must be greater than ${formatBigNumber(startingPoint, STANDARD_DECIMALS, 2)}`)
+        ? setUpperBoundError(`Value must be greater than ${formatBigNumber(startingPoint, STANDARD_DECIMALS, 2)}`)
+        : startingPoint && upperBound && !upperBound.eq(Zero) && upperBound.eq(startingPoint)
+        ? setUpperBoundError('Value cannot be equal to Starting Point')
         : setUpperBoundError('')
     }
   }, [lowerBound, upperBound, startingPoint, lowerBoundFocus, upperBoundFocus, startingPointFocus])
@@ -181,14 +187,17 @@ export const CreateScalarMarket = (props: Props) => {
                 name="lowerBound"
                 onBlur={() => {
                   setLowerBoundFocus(false)
+                  setStartingPointFocus(false)
+                  setUpperBoundFocus(false)
                 }}
                 onChange={value => {
                   handleChange(value)
+
+                  upperBoundError && setUpperBoundFocus(true)
+                  startingPointError && setStartingPointFocus(true)
                 }}
                 onFocus={() => {
-                  setLowerBoundFocus(true)
-                  setUpperBoundError('')
-                  setStartingPointError('')
+                  !upperBoundError && !startingPointError && setLowerBoundFocus(true)
                 }}
                 placeholder={'0'}
                 value={lowerBound}
@@ -209,14 +218,18 @@ export const CreateScalarMarket = (props: Props) => {
                 name="upperBound"
                 onBlur={() => {
                   setUpperBoundFocus(false)
+                  setLowerBoundFocus(false)
+                  setStartingPointFocus(false)
                 }}
                 onChange={value => {
                   handleChange(value)
+                  startingPointError && setStartingPointFocus(true)
+                  lowerBoundError && setLowerBoundFocus(true)
                 }}
                 onFocus={() => {
-                  setUpperBoundFocus(true)
-                  setLowerBoundError('')
-                  setStartingPointError('')
+                  {
+                    !startingPointError && !lowerBoundError && setUpperBoundFocus(true)
+                  }
                 }}
                 placeholder={'1000'}
                 value={upperBound}
@@ -237,14 +250,19 @@ export const CreateScalarMarket = (props: Props) => {
                 name="startingPoint"
                 onBlur={() => {
                   setStartingPointFocus(false)
+                  setUpperBoundFocus(false)
+                  setLowerBoundFocus(false)
                 }}
                 onChange={value => {
                   handleChange(value)
+
+                  upperBoundError && setUpperBoundFocus(true)
+                  lowerBoundError && setLowerBoundFocus(true)
                 }}
                 onFocus={() => {
-                  setStartingPointFocus(true)
-                  setLowerBoundError('')
-                  setUpperBoundError('')
+                  {
+                    !lowerBoundError && !upperBoundError && setStartingPointFocus(true)
+                  }
                 }}
                 placeholder={'500'}
                 value={startingPoint}
