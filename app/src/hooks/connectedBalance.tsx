@@ -83,13 +83,17 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   //this above triggers infinite re render i tested it and found out that omenToken/Collateral inside useCollateralBalance triggers useEffect for some reason not apparent to me
 
   const fetchxOmenBalance = async () => {
-    if (!context.account) return
-    let omenCollateral = new BigNumber(0)
+    try {
+      if (!context.account) return
+      let omenCollateral = new BigNumber(0)
 
-    const collateralService = new ERC20Service(context.library, context.account, omenToken.address)
-    omenCollateral = await collateralService.getCollateral(context.account)
+      const collateralService = new ERC20Service(context.library, context.account, omenToken.address)
+      omenCollateral = await collateralService.getCollateral(context.account)
 
-    setxOmenBalance(omenCollateral)
+      setxOmenBalance(omenCollateral)
+    } catch (e) {
+      setxOmenBalance(Zero)
+    }
   }
 
   const fetchUnclaimedAssets = async () => {

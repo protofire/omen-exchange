@@ -250,6 +250,7 @@ export const ModalYourConnection = (props: Props) => {
 
   React.useEffect(() => {
     fetchAllowance()
+    fetchBalances()
     // eslint-disable-next-line
   }, [relay, account])
 
