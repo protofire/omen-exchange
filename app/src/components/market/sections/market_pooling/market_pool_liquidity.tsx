@@ -345,6 +345,42 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     })
   }
 
+  const unstakeClaimAndRemoveFunding = async () => {
+    if (!cpk) {
+      return
+    }
+    if (!liquidityMiningCampaign) {
+      throw 'No liquidity mining campaign'
+    }
+
+    const collateralAddress = await marketMaker.getCollateralToken()
+    const conditionId = await marketMaker.getConditionId()
+    let useBaseToken = false
+    if (displayCollateral.address === pseudoNativeAssetAddress) {
+      useBaseToken = true
+    } else if (collateral.symbol.toLowerCase() in CompoundTokenType) {
+      if (displayCollateral.address !== collateral.address) {
+        useBaseToken = true
+      }
+    }
+
+    await cpk.unstakeClaimAndWithdraw({
+      amountToMerge: depositedTokens,
+      campaignAddress: liquidityMiningCampaign.id,
+      collateralAddress,
+      conditionId,
+      conditionalTokens,
+      compoundService,
+      earnings: userEarnings,
+      marketMaker,
+      outcomesCount: balances.length,
+      setTxHash,
+      setTxState,
+      sharesToBurn: amountToRemove || Zero,
+      useBaseToken,
+    })
+  }
+
   const removeFunding = async () => {
     try {
       if (!cpk) {
@@ -924,6 +960,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           </Button>
         )}
         <Button onClick={addFundingAndStake}>Deposit and stake</Button>
+        <Button onClick={unstakeClaimAndRemoveFunding}>Unstake, claim, withdraw</Button>
         <Button onClick={stake}>Stake</Button>
         <Button onClick={withdraw}>Withdraw</Button>
         <Button onClick={claim}>Claim</Button>

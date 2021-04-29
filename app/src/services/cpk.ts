@@ -152,6 +152,22 @@ interface CPKDepositAndStakeParams {
   setTxState: (step: TransactionStep) => void
 }
 
+interface CPKUnstakeClaimAndWithdrawParams {
+  amountToMerge: BigNumber
+  campaignAddress: string
+  collateralAddress: string
+  compoundService?: CompoundService | null
+  conditionId: string
+  conditionalTokens: ConditionalTokenService
+  earnings: BigNumber
+  marketMaker: MarketMakerService
+  outcomesCount: number
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
+  sharesToBurn: BigNumber
+  useBaseToken?: boolean
+}
+
 interface TransactionResult {
   hash?: string
   safeTxHash?: string
@@ -1562,8 +1578,7 @@ class CPKService {
       // addedFunds * poolShareSupply / poolWeight
       const amountToStake = amount.mul(poolShareSupply).div(holdingsBN.reduce((a, b) => (a.gt(b) ? a : b)))
 
-      const omnToken = getOMNToken(networkId).address
-      const erc20Service = new ERC20Service(this.provider, this.cpk.address, omnToken)
+      const erc20Service = new ERC20Service(this.provider, this.cpk.address, marketMaker.address)
       const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(this.cpk.address, campaignAddress, amountToStake)
 
       // Step 4: Approve pool tokens to be sent to campaign address if not already done
@@ -1589,15 +1604,11 @@ class CPKService {
 
   stakePoolTokens = async (amount: BigNumber, campaignAddress: string, marketMakerAddress: string) => {
     try {
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
-
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
 
-      const omnToken = getOMNToken(networkId).address
-      const erc20Service = new ERC20Service(this.provider, this.cpk.address, omnToken)
+      const erc20Service = new ERC20Service(this.provider, this.cpk.address, marketMakerAddress)
       const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(this.cpk.address, campaignAddress, amount)
 
       // Approve pool tokens to be sent to campaign address if not already done
@@ -1691,6 +1702,172 @@ class CPKService {
     } catch (e) {
       logger.error('Failed to claim reward tokens', e.message)
       throw e
+    }
+  }
+
+  unstakeClaimAndWithdraw = async ({
+    amountToMerge,
+    campaignAddress,
+    collateralAddress,
+    compoundService,
+    conditionId,
+    conditionalTokens,
+    earnings,
+    marketMaker,
+    outcomesCount,
+    setTxHash,
+    setTxState,
+    sharesToBurn,
+    useBaseToken,
+  }: CPKUnstakeClaimAndWithdrawParams): Promise<TransactionReceipt> => {
+    try {
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
+
+      const transactions: Transaction[] = []
+
+      transactions.push({
+        to: campaignAddress,
+        data: StakingService.encodeClaimAll(this.cpk.address),
+      })
+
+      // If relay used, keep reward tokens in relay
+      if (!this.cpk.relay) {
+        const omnToken = getOMNToken(networkId).address
+        const erc20Service = new ERC20Service(this.provider, this.cpk.address, omnToken)
+
+        // Calculate amount to send from CPK to EOA
+        // claimable rewards + unclaimed rewards (if any)
+        const stakingService = new StakingService(this.provider, this.cpk.address, campaignAddress)
+        const claimableRewards = (await stakingService.getClaimableRewards(this.cpk.address))[0]
+        const unclaimedRewards = bigNumberify(await erc20Service.getCollateral(this.cpk.address))
+        const totalRewardsAmount = claimableRewards.add(unclaimedRewards)
+
+        const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(this.cpk.address, account, totalRewardsAmount)
+
+        // Approve unlimited if not already done
+        if (!hasEnoughAllowance) {
+          transactions.push({
+            to: omnToken,
+            data: ERC20Service.encodeApproveUnlimited(account),
+          })
+        }
+
+        // Transfer all rewards from cpk to EOA
+        transactions.push({
+          to: omnToken,
+          data: ERC20Service.encodeTransfer(account, totalRewardsAmount),
+        })
+      }
+
+      transactions.push({
+        to: campaignAddress,
+        data: StakingService.encodeWithdrawStakedPoolTokens(sharesToBurn),
+      })
+
+      const removeFundingTx = {
+        to: marketMaker.address,
+        data: MarketMakerService.encodeRemoveFunding(sharesToBurn),
+      }
+
+      const mergePositionsTx = {
+        to: conditionalTokens.address,
+        data: ConditionalTokenService.encodeMergePositions(
+          collateralAddress,
+          conditionId,
+          outcomesCount,
+          amountToMerge,
+        ),
+      }
+      transactions.push(removeFundingTx)
+      transactions.push(mergePositionsTx)
+
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
+
+      const collateralToken = getTokenFromAddress(networkId, collateralAddress)
+      const collateralSymbol = collateralToken.symbol.toLowerCase()
+      let userInputCollateral = collateralToken
+      const totalAmountToSend = amountToMerge.add(earnings)
+      // transfer to the user the merged collateral plus the earned fees
+      if (useBaseToken || this.cpk.relay) {
+        if (compoundService != null) {
+          // cToken to base token flow
+          if (collateralSymbol === 'ceth') {
+            userInputCollateral = getNativeAsset(networkId)
+          } else {
+            const userInputCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
+            userInputCollateral = getToken(networkId, userInputCollateralSymbol)
+          }
+          // Convert cpk token to base token if user wants to redeem in base
+          const encodedRedeemFunction = CompoundService.encodeRedeemTokens(
+            collateralSymbol,
+            totalAmountToSend.toString(),
+          )
+          // Approve cToken for the cpk contract
+          transactions.push({
+            to: userInputCollateral.address,
+            data: ERC20Service.encodeApproveUnlimited(collateralToken.address),
+          })
+          // redeeem underlying token from the ctoken token
+          transactions.push({
+            to: collateralToken.address,
+            data: encodedRedeemFunction,
+          })
+        } else {
+          // Pseudonative asset to base asset flow
+          const collateralToken = getTokenFromAddress(networkId, collateralAddress)
+          const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, totalAmountToSend)
+          // If use prefers to get paid in the base native asset then unwrap the asset
+          transactions.push({
+            to: collateralAddress,
+            data: encodedWithdrawFunction,
+          })
+        }
+      }
+      // If we are signed in as a safe we don't need to transfer
+      if (!this.isSafeApp) {
+        // transfer to the user the merged collateral plus the earned fees
+        if (useBaseToken) {
+          if (compoundService != null) {
+            const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(
+              userInputCollateral,
+              totalAmountToSend,
+            )
+            if (userInputCollateral.address === pseudoNativeAssetAddress) {
+              // If user wants to redeem in ether simply transfer the funds back to user
+              transactions.push({
+                to: account,
+                value: minCollateralAmount.toString(),
+              })
+            } else {
+              // Transfer base token to the user
+              transactions.push({
+                to: userInputCollateral.address,
+                data: ERC20Service.encodeTransfer(account, minCollateralAmount),
+              })
+            }
+          } else {
+            // Transfer unwrapped asset back to user
+            transactions.push({
+              to: account,
+              value: totalAmountToSend.toString(),
+            })
+          }
+        } else {
+          transactions.push({
+            to: collateralAddress,
+            data: ERC20Service.encodeTransfer(account, totalAmountToSend),
+          })
+        }
+      }
+
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+    } catch (err) {
+      logger.error(`There was an error unstaking, claiming and withdrawing funding`, err.message)
+      throw err
     }
   }
 
