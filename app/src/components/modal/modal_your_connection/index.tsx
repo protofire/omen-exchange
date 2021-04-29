@@ -347,7 +347,13 @@ export const ModalYourConnection = (props: Props) => {
               <BalanceSection borderBottom={displayClaim} style={{ flexDirection: 'row' }}>
                 <ClaimLeft>
                   <StrongText>Claimable Assets</StrongText>
-                  <BalanceItemBalance as="div">DAI,OMEN</BalanceItemBalance>
+                  <BalanceItemBalance as="div">
+                    {unclaimedDaiAmount.isZero()
+                      ? 'OMN'
+                      : !unclaimedDaiAmount.isZero() && !unclaimedOmenAmount.isZero()
+                      ? 'DAI, OMEN'
+                      : 'DAI'}
+                  </BalanceItemBalance>
                 </ClaimLeft>
 
                 <ClaimRight>
@@ -367,24 +373,28 @@ export const ModalYourConnection = (props: Props) => {
 
               {displayClaim && (
                 <BalanceSection>
-                  <BalanceItem>
-                    <BalanceItemSide>
-                      <DaiIcon size="24px" />
-                      <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
-                    </BalanceItemSide>
-                    <BalanceItemBalance>
-                      {formatBigNumber(unclaimedDaiAmount, STANDARD_DECIMALS, 2)} DAI
-                    </BalanceItemBalance>
-                  </BalanceItem>
-                  <BalanceItem>
-                    <BalanceItemSide>
-                      <IconOmen size={24} />
-                      <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
-                    </BalanceItemSide>
-                    <BalanceItemBalance>
-                      {formatBigNumber(unclaimedOmenAmount, STANDARD_DECIMALS, 2)} OMN
-                    </BalanceItemBalance>
-                  </BalanceItem>
+                  {!unclaimedDaiAmount.isZero() && (
+                    <BalanceItem>
+                      <BalanceItemSide>
+                        <DaiIcon size="24px" />
+                        <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
+                      </BalanceItemSide>
+                      <BalanceItemBalance>
+                        {formatBigNumber(unclaimedDaiAmount, STANDARD_DECIMALS, 2)} DAI
+                      </BalanceItemBalance>
+                    </BalanceItem>
+                  )}
+                  {!unclaimedOmenAmount.isZero() && (
+                    <BalanceItem>
+                      <BalanceItemSide>
+                        <IconOmen size={24} />
+                        <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
+                      </BalanceItemSide>
+                      <BalanceItemBalance>
+                        {formatBigNumber(unclaimedOmenAmount, STANDARD_DECIMALS, 2)} OMN
+                      </BalanceItemBalance>
+                    </BalanceItem>
+                  )}
                 </BalanceSection>
               )}
             </ModalCard>
