@@ -89,7 +89,6 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
 
       const collateralService = new ERC20Service(context.library, context.account, omenToken.address)
       omenCollateral = await collateralService.getCollateral(context.account)
-
       setxOmenBalance(omenCollateral)
     } catch (e) {
       setxOmenBalance(Zero)
