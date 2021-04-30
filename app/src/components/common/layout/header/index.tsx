@@ -293,7 +293,7 @@ const HeaderContainer: React.FC = (props: any) => {
               ? `${formattedxOmenBalance.slice(0, formattedOmenBalance.length - 4)}`
               : `${formattedOmenBalance.slice(0, formattedOmenBalance.length - 4)}`}
             <OmenIconWrapper>
-              <IconOmen dropShadow size={56} />
+              <IconOmen size={24} />
             </OmenIconWrapper>
           </HeaderButton>
 
