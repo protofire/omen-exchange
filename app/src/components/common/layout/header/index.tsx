@@ -191,8 +191,10 @@ const HeaderContainer: React.FC = (props: any) => {
     formattedOmenBalance,
     formattedxDaiBalance,
     formattedxOmenBalance,
+    omenBalance,
     unclaimedAmount,
     xDaiBalance,
+    xOmenBalance,
   } = useConnectedBalanceContext()
 
   const networkPlacholder = (
@@ -291,7 +293,7 @@ const HeaderContainer: React.FC = (props: any) => {
               ? `${formattedxOmenBalance.slice(0, formattedOmenBalance.length - 4)}`
               : `${formattedOmenBalance.slice(0, formattedOmenBalance.length - 4)}`}
             <OmenIconWrapper>
-              <IconOmen height={24} width={24} />
+              <IconOmen dropShadow size={56} />
             </OmenIconWrapper>
           </HeaderButton>
 
@@ -343,7 +345,9 @@ const HeaderContainer: React.FC = (props: any) => {
           fetchBalances={fetchBalances}
           formattedDaiBalance={formattedDaiBalance}
           formattedEthBalance={formattedEthBalance}
+          formattedOmenBalance={formattedOmenBalance}
           formattedxDaiBalance={formattedxDaiBalance}
+          formattedxOmenBalance={formattedxOmenBalance}
           isOpen={isYourConnectionModalOpen && !isDepositWithdrawModalOpen}
           onClose={() => setYourConnectionModalState(false)}
           openDepositModal={() => {
@@ -367,8 +371,11 @@ const HeaderContainer: React.FC = (props: any) => {
           exchangeType={depositWithdrawType}
           fetchBalances={fetchBalances}
           formattedDaiBalance={formattedDaiBalance}
+          formattedOmenBalance={formattedOmenBalance}
           formattedxDaiBalance={formattedxDaiBalance}
+          formattedxOmenBalance={formattedxOmenBalance}
           isOpen={isDepositWithdrawModalOpen}
+          omenBalance={omenBalance}
           onBack={() => {
             setDepositWithdrawModalState(false)
             setYourConnectionModalState(true)
@@ -376,6 +383,7 @@ const HeaderContainer: React.FC = (props: any) => {
           onClose={() => setDepositWithdrawModalState(false)}
           unclaimedAmount={unclaimedAmount}
           xDaiBalance={xDaiBalance}
+          xOmenBalance={xOmenBalance}
         />
       </HeaderInner>
     </HeaderWrapper>
