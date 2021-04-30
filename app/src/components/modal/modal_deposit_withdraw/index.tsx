@@ -6,7 +6,7 @@ import styled, { withTheme } from 'styled-components'
 
 import { OMNI_BRIDGE_MAINNET_ADDRESS, STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
-import { ERC20Service } from '../../../services'
+import { ERC20Service, XdaiService } from '../../../services'
 import { getToken, networkIds } from '../../../util/networks'
 import { formatBigNumber, waitForConfirmations } from '../../../util/tools'
 import { ExchangeCurrency, ExchangeType, TransactionStep, WalletState } from '../../../util/types'
@@ -225,6 +225,10 @@ export const ModalDepositWithdraw = (props: Props) => {
       setTxHash(hash)
 
       await waitForConfirmations(hash, provider, setConfirmations, setTxState)
+
+      if (currencySelected === ExchangeCurrency.Omen) {
+        await XdaiService.waitForBridgeMessageStatus(hash, context.library)
+      }
 
       await fetchBalances()
 
