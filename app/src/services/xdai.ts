@@ -347,12 +347,10 @@ query getRequests($address: String,$token:String) {
         messageId
         encodedData
         message{
-          id
           msgId
+           msgData
           signatures
           txHash
-          msgHash
-          msgData
         }
     }
 }`
@@ -361,13 +359,7 @@ query getRequests($address: String,$token:String) {
         query GetTransactions($address: String!,$token:String) {
           executions(first:1000,where:{user: $address,token:$token}) {
           id
-            user
-            token 
-            amount
-            txHash
-            messageId
-            status
-            
+          messageId
           }
         }
         `
@@ -377,13 +369,13 @@ query getRequests($address: String,$token:String) {
         : await this.provider.getSigner().getAddress()
       const mainnetAccount = await this.provider.getSigner().getAddress()
 
-      const variables = { address: mainnetAccount, token: GEN_XDAI_ADDRESS_TESTING }
-      const variables2 = { address: relayerOrMainnetAccount, token: GEN_TOKEN_ADDDRESS_TESTING }
-      const xDaiRequests = await axios.post(OMNI_HOME_BRIDGE, { query, variables })
+      const requestsVariables = { address: mainnetAccount, token: GEN_XDAI_ADDRESS_TESTING }
+      const executionsVariables = { address: relayerOrMainnetAccount, token: GEN_TOKEN_ADDDRESS_TESTING }
+      const xDaiRequests = await axios.post(OMNI_HOME_BRIDGE, { query, variables: requestsVariables })
 
       const xDaiExecutions = await axios.post(OMNI_FOREIGN_BRIDGE, {
         query: queryForeign,
-        variables: variables2,
+        variables: executionsVariables,
       })
 
       const { userRequests } = xDaiRequests.data.data

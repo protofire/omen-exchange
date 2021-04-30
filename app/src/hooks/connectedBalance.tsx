@@ -12,7 +12,6 @@ import { formatBigNumber, formatNumber } from '../util/tools'
 const logger = getLogger('Hooks::ConnectedBalance')
 
 export interface ConnectedBalanceContext {
-  claimState: boolean
   unclaimedDaiAmount: BigNumber
   unclaimedOmenAmount: BigNumber
   ethBalance: BigNumber
@@ -55,7 +54,6 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const { relay } = context
   const { account, networkId } = context.rawWeb3Context
 
-  const [claimState, setClaimState] = useState<boolean>(false)
   const [unclaimedDaiAmount, setUnclaimedDaiAmount] = useState<BigNumber>(Zero)
   const [unclaimedOmenAmount, setUnclaimedOmenAmount] = useState<BigNumber>(Zero)
 
@@ -132,13 +130,12 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
       fetchBalances()
     } else {
       setUnclaimedDaiAmount(Zero)
-      setClaimState(false)
+      setUnclaimedOmenAmount(Zero)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, networkId])
 
   const value = {
-    claimState,
     unclaimedDaiAmount,
     unclaimedOmenAmount,
     ethBalance,
