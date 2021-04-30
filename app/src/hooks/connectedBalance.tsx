@@ -58,7 +58,6 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const [claimState, setClaimState] = useState<boolean>(false)
   const [unclaimedDaiAmount, setUnclaimedDaiAmount] = useState<BigNumber>(Zero)
   const [unclaimedOmenAmount, setUnclaimedOmenAmount] = useState<BigNumber>(Zero)
-  const [xOmenBalance, setxOmenBalance] = useState<BigNumber>(Zero)
 
   // mainnet balances
   const { refetch, tokens } = useTokens(context.rawWeb3Context, true, true)

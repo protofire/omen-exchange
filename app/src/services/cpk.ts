@@ -1541,9 +1541,7 @@ class CPKService {
 
         signatures.push(signature)
       }
-      console.log(addresses)
-      console.log(messages)
-      console.log(signatures)
+
       const txObject = await xDaiService.claim(addresses, messages, signatures)
       return txObject
     } catch (e) {

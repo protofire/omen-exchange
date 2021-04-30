@@ -324,7 +324,7 @@ class XdaiService {
 
       results = results.map((item: any) => {
         return {
-          address: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
+          address: DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
           ...item,
         }
       })
