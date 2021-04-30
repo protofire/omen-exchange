@@ -21,7 +21,9 @@ import {
 import {
   calcDistributionHint,
   clampBigNumber,
+  getBaseToken,
   getBaseTokenForCToken,
+  isCToken,
   signaturesFormatted,
   waitABit,
 } from '../util/tools'
@@ -252,13 +254,12 @@ class CPKService {
     return tx
   }
 
-  getGas = async (gas: number): Promise<number> => {
-    const deployed = await this.cpk.isProxyDeployed()
-    if (deployed) {
-      return gas
+  getGas = async (txOptions: TxOptions): Promise<void> => {
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
+    if (networkId === networkIds.XDAI || this.isSafeApp) {
+      txOptions.gas = defaultGas
     }
-    const addProxyDeploymentGas = 500000
-    return gas + addProxyDeploymentGas
   }
 
   buyOutcomes = async ({
@@ -280,7 +281,7 @@ class CPKService {
       const transactions: Transaction[] = []
 
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       const buyAmount = this.cpk.relay ? amount.sub(RELAY_FEE) : amount
 
@@ -432,7 +433,7 @@ class CPKService {
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       let collateral
       const fundingAmount = this.cpk.relay ? marketData.funding.sub(RELAY_FEE) : marketData.funding
@@ -659,7 +660,7 @@ class CPKService {
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       let collateral
 
@@ -680,7 +681,6 @@ class CPKService {
           value: fundingAmount.toString(),
         })
       } else if (useCompoundReserve && compoundTokenDetails) {
-        txOptions.gas = defaultGas
         if (userInputCollateral.address === pseudoNativeAssetAddress) {
           // If user chosen collateral is ETH
           collateral = marketData.collateral
@@ -859,16 +859,15 @@ class CPKService {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
 
       const outcomeTokensToSell = await marketMaker.calcSellAmount(amount, outcomeIndex)
       const collateralAddress = await marketMaker.getCollateralToken()
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
-
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
+      await this.getGas(txOptions)
 
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
@@ -975,7 +974,7 @@ class CPKService {
       const transactions: Transaction[] = []
 
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       let collateralSymbol = ''
       let userInputCollateralSymbol: KnownToken
@@ -1122,7 +1121,7 @@ class CPKService {
       transactions.push(mergePositionsTx)
 
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
@@ -1242,10 +1241,12 @@ class CPKService {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       if (!isConditionResolved) {
         transactions.push({
@@ -1261,22 +1262,55 @@ class CPKService {
         data: ConditionalTokenService.encodeRedeemPositions(collateralToken.address, conditionId, numOutcomes),
       })
 
-      if (this.cpk.relay && earnedCollateral) {
-        // Pseudonative asset to base asset flow
-        const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, earnedCollateral)
-        // If use prefers to get paid in the base native asset then unwrap the asset
+      let earnings = earnedCollateral
+      let token = collateralToken
+
+      if (isCToken(collateralToken.symbol)) {
+        const compound = new CompoundService(collateralToken.address, collateralToken.symbol, this.provider, account)
+        await compound.init()
+
+        // Convert compound token to base token
+        const encodedRedeemFunction = CompoundService.encodeRedeemTokens(
+          collateralToken.symbol,
+          earnedCollateral.toString(),
+        )
+
+        // Redeeem underlying token
         transactions.push({
           to: collateralToken.address,
+          data: encodedRedeemFunction,
+        })
+
+        token = getBaseToken(networkId, collateralToken.symbol)
+        earnings = compound.calculateCTokenToBaseExchange(token, earnedCollateral)
+      }
+
+      const wrapToken = getWrapToken(networkId)
+      const nativeAsset = getNativeAsset(networkId)
+
+      if (token.address === wrapToken.address && earnings) {
+        // unwrap token
+        const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(token.symbol, earnings)
+        transactions.push({
+          to: token.address,
           data: encodedWithdrawFunction,
         })
+        token = nativeAsset
       }
 
       // If we are signed in as a safe we don't need to transfer
-      if (!this.isSafeApp && earnedCollateral) {
-        transactions.push({
-          to: collateralToken.address,
-          data: ERC20Service.encodeTransfer(account, earnedCollateral),
-        })
+      if (!this.isSafeApp && earnings) {
+        if (token.address === nativeAsset.address) {
+          transactions.push({
+            to: account,
+            value: earnings.toString(),
+          })
+        } else {
+          transactions.push({
+            to: token.address,
+            data: ERC20Service.encodeTransfer(account, earnings),
+          })
+        }
       }
 
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
@@ -1300,7 +1334,7 @@ class CPKService {
     try {
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       if (isScalar && scalarLow && scalarHigh) {
         transactions.push({
@@ -1331,7 +1365,7 @@ class CPKService {
           },
         ]
         const txOptions: TxOptions = {}
-        txOptions.gas = defaultGas
+        await this.getGas(txOptions)
         return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       }
       const txObject = await realitio.submitAnswer(question.id, answer, amount)
@@ -1348,7 +1382,7 @@ class CPKService {
 
   proxyIsUpToDate = async (): Promise<boolean> => {
     const network = await this.provider.getNetwork()
-    if (network.chainId === networkIds.XDAI) {
+    if (network.chainId === networkIds.XDAI || this.isSafeApp) {
       return true
     }
     const deployed = await this.cpk.isProxyDeployed()
@@ -1364,8 +1398,8 @@ class CPKService {
   upgradeProxyImplementation = async (): Promise<TransactionReceipt> => {
     try {
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
       const network = await this.provider.getNetwork()
+      await this.getGas(txOptions)
       const targetGnosisSafeImplementation = getTargetSafeImplementation(network.chainId)
       const transactions: Transaction[] = [
         {
@@ -1410,7 +1444,7 @@ class CPKService {
       if (this.cpk.relay) {
         const transactions: Transaction[] = []
         const txOptions: TxOptions = {}
-        txOptions.gas = defaultGas
+        await this.getGas(txOptions)
 
         // get mainnet relay signer
         const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
@@ -1448,8 +1482,6 @@ class CPKService {
 
   claimDaiTokens = async () => {
     try {
-      const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
       const xDaiService = new XdaiService(this.provider)
 
       const transactions = await this.fetchLatestUnclaimedTransactions()
