@@ -205,6 +205,7 @@ export const ModalYourConnection = (props: Props) => {
   const [allowance, setAllowance] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState('')
   const [displayClaim, setDisplayClaim] = useState<boolean>(false)
+
   const omenToken = getToken(100, 'omn')
 
   const claim = async () => {
@@ -230,7 +231,7 @@ export const ModalYourConnection = (props: Props) => {
       setConfirmations(0)
       setIsTransactionModalOpen(true)
 
-      const transaction = await cpk.claimDaiTokens()
+      const transaction = await cpk.claimAllTokens()
 
       const provider = context.rawWeb3Context.library
       setTxNetId(provider.network.chainId)
@@ -460,7 +461,7 @@ export const ModalYourConnection = (props: Props) => {
       <ModalTransactionWrapper
         confirmations={confirmations}
         confirmationsRequired={1}
-        icon={DAI.image}
+        icon={message.includes('Enable') && DAI.image}
         isOpen={isTransactionModalOpen}
         message={message}
         netId={txNetId}

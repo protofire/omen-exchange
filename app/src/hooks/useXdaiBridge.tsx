@@ -81,7 +81,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
   const claimAllTokens = async () => {
     try {
       if (!cpk) return
-      const transaction = await cpk.claimDaiTokens()
+      const transaction = await cpk.claimAllTokens()
       return transaction.hash
     } catch (e) {
       setIsClaimStateTransaction(false)

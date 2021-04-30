@@ -249,7 +249,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       setIsTransactionModalOpen(true)
       setIsClaimModalOpen(false)
 
-      const transaction = await cpk.claimDaiTokens()
+      const transaction = await cpk.claimAllTokens()
 
       const provider = context.rawWeb3Context.library
       setTxNetId(provider.network.chainId)

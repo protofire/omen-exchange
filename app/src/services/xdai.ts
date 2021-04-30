@@ -179,9 +179,10 @@ class XdaiService {
     }
   }
 
-  claim = async (messages: string[], signatures: string[], address: string[]) => {
+  claim = async (addresses: string[], messages: string[], signatures: string[]) => {
     const multiclaim = new ethers.Contract(MULTI_CLAIM_ADDRESS, multiClaimAbi, this.provider.signer.signer)
-    return multiclaim.claim(address, messages, signatures)
+
+    return multiclaim.claim(addresses, messages, signatures)
   }
 
   static encodeRelayTokens = (receiver: string): string => {
@@ -296,6 +297,7 @@ class XdaiService {
           ...item,
         }
       })
+
       return results
     } catch (e) {
       console.error(e)
