@@ -188,11 +188,10 @@ export const CreateScalarMarket = (props: Props) => {
                 onBlur={() => {
                   setLowerBoundFocus(false)
                   setStartingPointFocus(false)
-                  setUpperBoundFocus(false)
+                  !lowerBoundError && !upperBoundError && !startingPointError && setUpperBoundFocus(true)
                 }}
                 onChange={value => {
                   handleChange(value)
-
                   upperBoundError && setUpperBoundFocus(true)
                   startingPointError && setStartingPointFocus(true)
                 }}
@@ -219,17 +218,15 @@ export const CreateScalarMarket = (props: Props) => {
                 onBlur={() => {
                   setUpperBoundFocus(false)
                   setLowerBoundFocus(false)
-                  setStartingPointFocus(false)
+                  !upperBoundError && !lowerBoundError && !startingPointError && setStartingPointFocus(true)
                 }}
                 onChange={value => {
                   handleChange(value)
-                  startingPointError && setStartingPointFocus(true)
                   lowerBoundError && setLowerBoundFocus(true)
+                  startingPointError && setStartingPointFocus(true)
                 }}
                 onFocus={() => {
-                  {
-                    !startingPointError && !lowerBoundError && setUpperBoundFocus(true)
-                  }
+                  !lowerBoundError && !startingPointError && setUpperBoundFocus(true)
                 }}
                 placeholder={'1000'}
                 value={upperBound}
@@ -251,18 +248,15 @@ export const CreateScalarMarket = (props: Props) => {
                 onBlur={() => {
                   setStartingPointFocus(false)
                   setUpperBoundFocus(false)
-                  setLowerBoundFocus(false)
+                  !lowerBoundError && !upperBoundError && !startingPointError && setLowerBoundFocus(true)
                 }}
                 onChange={value => {
                   handleChange(value)
-
                   upperBoundError && setUpperBoundFocus(true)
                   lowerBoundError && setLowerBoundFocus(true)
                 }}
                 onFocus={() => {
-                  {
-                    !lowerBoundError && !upperBoundError && setStartingPointFocus(true)
-                  }
+                  !lowerBoundError && !upperBoundError && setStartingPointFocus(true)
                 }}
                 placeholder={'500'}
                 value={startingPoint}
