@@ -4,7 +4,6 @@ import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
 import {
-  DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   GEN_TOKEN_ADDDRESS_TESTING,
   GEN_XDAI_ADDRESS_TESTING,
   OMNI_BRIDGE_XDAI_ADDRESS,
@@ -1534,9 +1533,11 @@ class CPKService {
       const transactions = await this.fetchLatestUnclaimedTransactions()
       const messages = []
       const signatures = []
-      //const addresses = []
+      const addresses = []
 
       for (let i = 0; i < transactions.length; i++) {
+        addresses.push(transactions[i].address)
+
         const message = transactions[i].message
         messages.push(message.content)
 
@@ -1544,7 +1545,7 @@ class CPKService {
         signatures.push(signature)
       }
 
-      const txObject = await xDaiService.claim(messages, signatures, DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
+      const txObject = await xDaiService.claim(messages, signatures, addresses)
       return txObject
     } catch (e) {
       logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)

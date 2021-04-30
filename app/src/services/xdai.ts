@@ -73,7 +73,7 @@ const xdaiBridgeAbi = [
 const multiClaimAbi = [
   {
     inputs: [
-      { internalType: 'address', name: 'bridge', type: 'address' },
+      { internalType: 'address[]', name: 'bridges', type: 'address[]' },
       { internalType: 'bytes[]', name: 'messages', type: 'bytes[]' },
       { internalType: 'bytes[]', name: 'signatures', type: 'bytes[]' },
     ],
@@ -179,7 +179,7 @@ class XdaiService {
     }
   }
 
-  claim = async (messages: string[], signatures: string[], address: string) => {
+  claim = async (messages: string[], signatures: string[], address: string[]) => {
     const multiclaim = new ethers.Contract(MULTI_CLAIM_ADDRESS, multiClaimAbi, this.provider.signer.signer)
     return multiclaim.claim(address, messages, signatures)
   }
