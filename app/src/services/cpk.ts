@@ -262,13 +262,12 @@ class CPKService {
     return tx
   }
 
-  getGas = async (gas: number): Promise<number> => {
-    const deployed = await this.cpk.isProxyDeployed()
-    if (deployed) {
-      return gas
+  getGas = async (txOptions: TxOptions): Promise<void> => {
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
+    if (networkId === networkIds.XDAI || this.isSafeApp) {
+      txOptions.gas = defaultGas
     }
-    const addProxyDeploymentGas = 500000
-    return gas + addProxyDeploymentGas
   }
 
   buyOutcomes = async ({
@@ -290,7 +289,7 @@ class CPKService {
       const transactions: Transaction[] = []
 
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       const buyAmount = this.cpk.relay ? amount.sub(RELAY_FEE) : amount
 
@@ -442,7 +441,7 @@ class CPKService {
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       let collateral
       const fundingAmount = this.cpk.relay ? marketData.funding.sub(RELAY_FEE) : marketData.funding
@@ -669,7 +668,7 @@ class CPKService {
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       let collateral
 
@@ -690,7 +689,6 @@ class CPKService {
           value: fundingAmount.toString(),
         })
       } else if (useCompoundReserve && compoundTokenDetails) {
-        txOptions.gas = defaultGas
         if (userInputCollateral.address === pseudoNativeAssetAddress) {
           // If user chosen collateral is ETH
           collateral = marketData.collateral
@@ -869,16 +867,15 @@ class CPKService {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
 
       const outcomeTokensToSell = await marketMaker.calcSellAmount(amount, outcomeIndex)
       const collateralAddress = await marketMaker.getCollateralToken()
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
-
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
+      await this.getGas(txOptions)
 
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
@@ -985,7 +982,7 @@ class CPKService {
       const transactions: Transaction[] = []
 
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       let collateralSymbol = ''
       let userInputCollateralSymbol: KnownToken
@@ -1132,7 +1129,7 @@ class CPKService {
       transactions.push(mergePositionsTx)
 
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
@@ -1257,7 +1254,7 @@ class CPKService {
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       if (!isConditionResolved) {
         transactions.push({
@@ -1345,7 +1342,7 @@ class CPKService {
     try {
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       if (isScalar && scalarLow && scalarHigh) {
         transactions.push({
@@ -1376,7 +1373,7 @@ class CPKService {
           },
         ]
         const txOptions: TxOptions = {}
-        txOptions.gas = defaultGas
+        await this.getGas(txOptions)
         return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       }
       const txObject = await realitio.submitAnswer(question.id, answer, amount)
@@ -1393,7 +1390,7 @@ class CPKService {
 
   proxyIsUpToDate = async (): Promise<boolean> => {
     const network = await this.provider.getNetwork()
-    if (network.chainId === networkIds.XDAI) {
+    if (network.chainId === networkIds.XDAI || this.isSafeApp) {
       return true
     }
     const deployed = await this.cpk.isProxyDeployed()
@@ -1409,8 +1406,8 @@ class CPKService {
   upgradeProxyImplementation = async (): Promise<TransactionReceipt> => {
     try {
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
       const network = await this.provider.getNetwork()
+      await this.getGas(txOptions)
       const targetGnosisSafeImplementation = getTargetSafeImplementation(network.chainId)
       const transactions: Transaction[] = [
         {
@@ -1478,7 +1475,7 @@ class CPKService {
       if (this.cpk.relay) {
         const transactions: Transaction[] = []
         const txOptions: TxOptions = {}
-        txOptions.gas = defaultGas
+        await this.getGas(txOptions)
 
         // get mainnet relay signer
         const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
@@ -1527,8 +1524,6 @@ class CPKService {
 
   claimAllTokens = async () => {
     try {
-      const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
       const xDaiService = new XdaiService(this.provider)
 
       const transactions = await this.fetchLatestUnclaimedTransactions()

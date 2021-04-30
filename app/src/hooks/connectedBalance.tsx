@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 
 import { STANDARD_DECIMALS } from '../common/constants'
 import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../hooks'
-import { ERC20Service, XdaiService } from '../services'
+import { XdaiService } from '../services'
 import { getLogger } from '../util/logger'
 import { getNativeAsset, getToken, networkIds } from '../util/networks'
 import { formatBigNumber, formatNumber } from '../util/tools'
@@ -60,43 +60,33 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const [unclaimedOmenAmount, setUnclaimedOmenAmount] = useState<BigNumber>(Zero)
   const [xOmenBalance, setxOmenBalance] = useState<BigNumber>(Zero)
 
+  // mainnet balances
   const { refetch, tokens } = useTokens(context.rawWeb3Context, true, true)
-
   const ethBalance = new BigNumber(
     tokens.filter(token => token.symbol === getNativeAsset(context.rawWeb3Context.networkId).symbol)[0]?.balance || '',
   )
   const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
-
-  const nativeAsset = getNativeAsset(context.networkId)
-
-  const { collateralBalance, fetchCollateralBalance } = useCollateralBalance(nativeAsset, context)
-  const xDaiBalance = collateralBalance || Zero
-
   const omenBalance = new BigNumber(tokens.filter(token => token.symbol === 'OMN')[0]?.balance || '')
 
+  // relay balances
+  const nativeAsset = getNativeAsset(context.networkId)
+
+  // xdai
+  const { collateralBalance: xDaiCollateral, fetchCollateralBalance: fetchxDaiBalance } = useCollateralBalance(
+    nativeAsset,
+    context,
+  )
+  const xDaiBalance = xDaiCollateral || Zero
+
+  // omn
   const omenToken = getToken(100, 'omn')
+  const {
+    collateralBalance: xOmenCollateral,
+    errorMessage,
+    fetchCollateralBalance: fetchxOmenBalance,
+  } = useCollateralBalance(omenToken, context)
 
-  // const { collateralBalance: omenCollateral, fetchCollateralBalance: fetchOmenBalance } = useCollateralBalance(
-  //   omenToken,
-  //   context,
-  // )
-  // const omenBalance = omenCollateral || Zero
-  // const formattedxOmenBalance = `${formatBigNumber(omenBalance, omenToken.decimals, 2)}`
-  //console.log(formattedxOmenBalance)
-  //this above triggers infinite re render i tested it and found out that omenToken/Collateral inside useCollateralBalance triggers useEffect for some reason not apparent to me
-
-  const fetchxOmenBalance = async () => {
-    try {
-      if (!context.account) return
-      let omenCollateral = new BigNumber(0)
-
-      const collateralService = new ERC20Service(context.library, context.account, omenToken.address)
-      omenCollateral = await collateralService.getCollateral(context.account)
-      setxOmenBalance(omenCollateral)
-    } catch (e) {
-      setxOmenBalance(Zero)
-    }
-  }
+  const xOmenBalance = errorMessage ? Zero : xOmenCollateral || Zero
 
   const fetchUnclaimedAssets = async () => {
     const aggregator = (array: any) => {
@@ -126,7 +116,13 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
 
   const fetchBalances = async () => {
     try {
-      await Promise.all([fetchUnclaimedAssets(), fetchCollateralBalance(), refetch(), fetchxOmenBalance()])
+      await Promise.all([
+        fetchUnclaimedAssets(),
+        fetchxDaiBalance(),
+        fetchxOmenBalance(),
+        refetch(),
+        fetchxOmenBalance(),
+      ])
     } catch (e) {
       logger.log(e.message)
     }

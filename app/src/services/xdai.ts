@@ -17,6 +17,7 @@ import {
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
 } from '../common/constants'
 import { getInfuraUrl, networkIds } from '../util/networks'
+import { waitABit } from '../util/tools'
 import { ExchangeCurrency } from '../util/types'
 
 import { ERC20Service } from './erc20'
@@ -55,6 +56,18 @@ const abi = [
     payable: false,
     stateMutability: 'view',
     type: 'function',
+  },
+]
+
+const omniBridgeAbi = [
+  {
+    type: 'function',
+    stateMutability: 'view',
+    payable: false,
+    outputs: [{ type: 'bool', name: '' }],
+    name: 'messageCallStatus',
+    inputs: [{ type: 'bytes32', name: '_messageId' }],
+    constant: true,
   },
 ]
 
@@ -196,6 +209,24 @@ class XdaiService {
   static encodeTokenBridgeTransfer = (receiver: string, amount: BigNumber, data: any) => {
     const transferFromInterface = new utils.Interface(omenAbi)
     return transferFromInterface.functions.transferAndCall.encode([receiver, amount, data])
+  }
+
+  static waitForBridgeMessageStatus = async (hash: string, provider: any) => {
+    let status
+    while (!status) {
+      // get tx receipt from mainnet
+      const transaction = await provider.signer.signer.provider.getTransactionReceipt(hash)
+      if (transaction) {
+        // get messageId from transaction logs
+        const log = transaction.logs[transaction.logs.length - 1]
+        const messageId = log.topics[log.topics.length - 1]
+        // check if the message has been processed
+        const xdaiOmniAddress = '0x75Df5AF045d91108662D8080fD1FEFAd6aA0bb59'
+        const xdaiOmni = new ethers.Contract(xdaiOmniAddress, omniBridgeAbi, provider.signer)
+        status = await xdaiOmni.messageCallStatus(messageId)
+      }
+      await waitABit()
+    }
   }
 
   encodeClaimDaiTokens = (message: string, signatures: string): string => {

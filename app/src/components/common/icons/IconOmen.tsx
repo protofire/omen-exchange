@@ -8,7 +8,7 @@ interface Props {
 }
 
 const SvgStyling = styled.svg<{ dropShadow?: boolean }>`
-  ${props => props.dropShadow && 'filter: drop-shadow(3px 3px 2px rgba(0, 0, 0, 0.7));'};
+  ${props => props.dropShadow && 'filter: drop-shadow(0px 2px 4px rgba(13, 71, 161, 0.25));'};
 `
 
 export const IconOmen = (props: Props) => {
