@@ -118,6 +118,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals, nativeAsset.decimals),
         )} ${symbol}`,
       )
+
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
@@ -134,7 +135,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       })
 
       await fetchGraphMarketMakerData()
-
+      setBondOutcomeDisplay('0')
       setMessage(
         `Successfully bonded ${formatNumber(
           formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals, nativeAsset.decimals),
@@ -217,10 +218,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
                   decimals={nativeAsset.decimals}
                   name="bondAmount"
                   // eslint-disable-next-line @typescript-eslint/no-empty-function
-                  onChange={(e: BigNumberInputReturn) => {
-                    setBondOutcomeSelected(e.value.gt(Zero) ? e.value : Zero)
-                    setBondOutcomeDisplay('')
-                  }}
+                  onChange={() => {}}
                   style={{ width: 0 }}
                   value={bondNativeAssetAmount}
                 />
@@ -235,6 +233,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
                     name="bondAmount"
                     onChange={(e: BigNumberInputReturn) => {
                       setBondOutcomeSelected(e.value.gt(Zero) ? e.value : Zero)
+
                       setBondOutcomeDisplay('')
                     }}
                     style={{ width: 0 }}
@@ -287,14 +286,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             Set Invalid
           </Button>
         )}
-        <Button
-          buttonType={ButtonType.primary}
-          disabled={amountError}
-          onClick={() => {
-            bondOutcome(false)
-            setBondOutcomeDisplay('')
-          }}
-        >
+        <Button buttonType={ButtonType.primary} disabled={amountError} onClick={() => bondOutcome(false)}>
           Bond {symbol}
         </Button>
       </BottomButtonWrapper>
