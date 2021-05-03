@@ -226,7 +226,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
       await waitForConfirmations(hash, provider, setConfirmations, setTxState)
 
-      if (currencySelected === ExchangeCurrency.Omen) {
+      if (exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Omen) {
         await XdaiService.waitForBridgeMessageStatus(hash, context.library)
       }
 
@@ -308,7 +308,12 @@ export const ModalDepositWithdraw = (props: Props) => {
                   }}
                 >
                   <BalanceItemSide>
-                    <RadioInput checked={currencySelected === ExchangeCurrency.Dai} name={'Dai'} outcomeIndex={-1} />
+                    <RadioInput
+                      checked={currencySelected === ExchangeCurrency.Dai}
+                      name={'Dai'}
+                      outcomeIndex={-1}
+                      readOnly
+                    />
                     <DaiIcon size="24px" style={{ marginLeft: '12px', marginRight: '12px' }} />
                     <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Dai}>Dai</BalanceItemTitle>
                   </BalanceItemSide>
@@ -325,7 +330,12 @@ export const ModalDepositWithdraw = (props: Props) => {
                   }}
                 >
                   <BalanceItemSide>
-                    <RadioInput checked={currencySelected === ExchangeCurrency.Omen} name={'Dai'} outcomeIndex={-2} />
+                    <RadioInput
+                      checked={currencySelected === ExchangeCurrency.Omen}
+                      name={'Dai'}
+                      outcomeIndex={-2}
+                      readOnly
+                    />
                     <IconOmen size={24} style={{ marginLeft: '12px', marginRight: '12px' }} />
                     <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Omen}>Omen</BalanceItemTitle>
                   </BalanceItemSide>
