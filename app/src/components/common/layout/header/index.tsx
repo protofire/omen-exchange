@@ -4,11 +4,12 @@ import { matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 
-import { Logo } from '../../../../common/constants'
+import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedBalanceContext, useConnectedWeb3Context } from '../../../../hooks'
 import { networkIds } from '../../../../util/networks'
+import { formatBigNumber } from '../../../../util/tools'
 import { ExchangeType } from '../../../../util/types'
-import { Button, ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
+import { ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
@@ -119,8 +120,9 @@ export const ContentsRight = styled.div`
   }
 `
 
-const HeaderButton = styled(Button)`
+const HeaderButton = styled(ButtonRound)`
   ${ButtonCSS};
+  color: ${props => props.theme.colors.textColorLighter};
 `
 
 const DepositedBalance = styled.p`
@@ -290,8 +292,8 @@ const HeaderContainer: React.FC = (props: any) => {
 
           <HeaderButton>
             {relay
-              ? `${formattedxOmenBalance.slice(0, formattedOmenBalance.length - 4)}`
-              : `${formattedOmenBalance.slice(0, formattedOmenBalance.length - 4)}`}
+              ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
+              : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
             <OmenIconWrapper>
               <IconOmen size={24} />
             </OmenIconWrapper>
