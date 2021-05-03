@@ -89,6 +89,7 @@ const ClaimLeftSvg = styled.div`
   display: flex;
   justify-content: space-between;
   flex: 1;
+  cursor: pointer;
   &:hover {
     .chevronDown {
       path {
