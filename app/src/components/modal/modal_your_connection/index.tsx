@@ -92,7 +92,7 @@ const ClaimLeftSvg = styled.div`
   &:hover {
     .chevronDown {
       path {
-        fill: ${props => props.theme.colors.primary};
+        fill: ${props => props.theme.colors.primaryLight};
       }
     }
   }
