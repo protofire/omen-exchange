@@ -340,9 +340,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   if (collateralSymbol in CompoundTokenType) {
     if (baseCollateral.symbol.toLowerCase() === 'eth') {
-      currencyFilters = [collateral.address, pseudoNativeAssetAddress.toLowerCase()]
+      currencyFilters = [collateral.address.toLowerCase(), pseudoNativeAssetAddress.toLowerCase()]
     } else {
-      currencyFilters = [collateral.address, baseCollateral.address]
+      currencyFilters = [collateral.address.toLowerCase(), baseCollateral.address.toLowerCase()]
     }
   }
 

@@ -63,7 +63,6 @@ const MarketBottomNavGroupWrapper = styled.div`
 const MarketBottomFinalizeNavGroupWrapper = styled.div`
   display: flex;
   align-items: center;
-
   & > * + * {
     margin-left: 12px;
   }
@@ -373,7 +372,7 @@ const Wrapper = (props: Props) => {
               renderFinalizeTableData()
             )}
             <WhenConnected>
-              <StyledButtonContainer className={!hasFunding ? 'border' : ''}>
+              <StyledButtonContainer>
                 <Button
                   buttonType={ButtonType.secondaryLine}
                   onClick={() => {
