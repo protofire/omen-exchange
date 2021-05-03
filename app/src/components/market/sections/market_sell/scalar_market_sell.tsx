@@ -246,7 +246,7 @@ export const ScalarMarketSell = (props: Props) => {
         useBaseToken = true
       }
       setStatus(Status.Loading)
-      setMessage(`Selling ${displaySharesAmount} shares...`)
+      setMessage(`Selling ${formatNumber(displaySharesAmount)} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
