@@ -134,7 +134,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     xDaiBalance,
     formattedxDaiBalance: formatBigNumber(xDaiBalance, nativeAsset.decimals, 2),
     fetchBalances,
-    formattedOmenBalance: formatNumber(formatBigNumber(omenBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 3),
+    formattedOmenBalance: formatNumber(formatBigNumber(omenBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 2),
     omenBalance,
     xOmenBalance,
     formattedxOmenBalance: formatBigNumber(xOmenBalance, omenToken.decimals, 2),
