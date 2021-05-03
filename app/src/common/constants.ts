@@ -70,6 +70,8 @@ export const KLEROS_CURATE_GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/
 //xDai transaction data subgraphs
 export const XDAI_HOME_BRIDGE = 'https://api.thegraph.com/subgraphs/name/maxaleks/home-bridge-xdai'
 export const XDAI_FOREIGN_BRIDGE = 'https://api.thegraph.com/subgraphs/name/maxaleks/foreign-bridge-mainnet'
+export const OMNI_HOME_BRIDGE = 'https://api.thegraph.com/subgraphs/name/raid-guild/xdai-omnibridge'
+export const OMNI_FOREIGN_BRIDGE = 'https://api.thegraph.com/subgraphs/name/raid-guild/mainnet-omnibridge'
 
 export const IPFS_GATEWAY = 'https://ipfs.kleros.io'
 
@@ -119,7 +121,9 @@ export const DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS = '0x4aa42145Aa6Ebf72e164C9bBC74fb
 export const OMNI_BRIDGE_MAINNET_ADDRESS = '0x88ad09518695c6c3712AC10a214bE5109a655671'
 export const OMNI_BRIDGE_XDAI_ADDRESS = '0xf6A78083ca3e2a662D6dd1703c939c8aCE2e268d'
 
-export const MULTI_CLAIM_ADDRESS = '0xE0A392a61357F86f0da2d1586b91cA54e9097022'
+export const OMNI_CLAIM_ADDRESS = '0x4C36d2919e407f0Cc2Ee3c993ccF8ac26d9CE64e'
+
+export const MULTI_CLAIM_ADDRESS = '0x5699D0D42bc1a0501D7DC270fD800Af6654Ace3E'
 
 export const RELAY_FEE = '1000000000000000' // 0.001 xdai
 export const RELAY_ADDRESS = '0xa493f3Adf76560092088a61e9e314a08D0B1B2b8'

@@ -6,8 +6,12 @@ import {
   DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   DEFAULT_TOKEN_ADDRESS,
   GEN_TOKEN_ADDDRESS_TESTING,
+  GEN_XDAI_ADDRESS_TESTING,
   MULTI_CLAIM_ADDRESS,
   OMNI_BRIDGE_MAINNET_ADDRESS,
+  OMNI_CLAIM_ADDRESS,
+  OMNI_FOREIGN_BRIDGE,
+  OMNI_HOME_BRIDGE,
   XDAI_FOREIGN_BRIDGE,
   XDAI_HOME_BRIDGE,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
@@ -82,16 +86,9 @@ const xdaiBridgeAbi = [
 const multiClaimAbi = [
   {
     inputs: [
-      {
-        internalType: 'bytes[]',
-        name: 'messages',
-        type: 'bytes[]',
-      },
-      {
-        internalType: 'bytes[]',
-        name: 'signatures',
-        type: 'bytes[]',
-      },
+      { internalType: 'address[]', name: 'bridges', type: 'address[]' },
+      { internalType: 'bytes[]', name: 'messages', type: 'bytes[]' },
+      { internalType: 'bytes[]', name: 'signatures', type: 'bytes[]' },
     ],
     name: 'claim',
     outputs: [],
@@ -195,9 +192,10 @@ class XdaiService {
     }
   }
 
-  claim = async (messages: string[], signatures: string[]) => {
+  claim = async (addresses: string[], messages: string[], signatures: string[]) => {
     const multiclaim = new ethers.Contract(MULTI_CLAIM_ADDRESS, multiClaimAbi, this.provider.signer.signer)
-    return multiclaim.claim(messages, signatures)
+
+    return multiclaim.claim(addresses, messages, signatures)
   }
 
   static encodeRelayTokens = (receiver: string): string => {
@@ -238,6 +236,7 @@ class XdaiService {
 
   fetchCrossChainBalance = async (chain: number) => {
     try {
+      this.fetchOmniTransactionData()
       let userAddress
       if (this.provider.relay && chain === networkIds.MAINNET) {
         userAddress = await this.provider.signer.signer.getAddress()
@@ -322,6 +321,80 @@ class XdaiService {
       )
       // filter out executed claims
       results = results.filter((_: any, index: number) => !relayed[index])
+
+      results = results.map((item: any) => {
+        return {
+          address: DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
+          ...item,
+        }
+      })
+
+      return results
+    } catch (e) {
+      console.error(e)
+    }
+  }
+  fetchOmniTransactionData = async () => {
+    try {
+      const query = `
+query getRequests($address: String,$token:String) {
+    userRequests(first:1000,where:{user: $address,token:$token}) {
+       id
+        recipient
+        timestamp
+        amount
+        txHash
+        messageId
+        encodedData
+        message{
+          msgId
+           msgData
+          signatures
+          txHash
+        }
+    }
+}`
+
+      const queryForeign = `
+        query GetTransactions($address: String!,$token:String) {
+          executions(first:1000,where:{user: $address,token:$token}) {
+          id
+          messageId
+          }
+        }
+        `
+
+      const relayerOrMainnetAccount = this.provider.relay
+        ? await this.provider.signer.signer.getAddress()
+        : await this.provider.getSigner().getAddress()
+      const mainnetAccount = await this.provider.getSigner().getAddress()
+
+      const requestsVariables = { address: mainnetAccount, token: GEN_XDAI_ADDRESS_TESTING }
+      const executionsVariables = { address: relayerOrMainnetAccount, token: GEN_TOKEN_ADDDRESS_TESTING }
+      const xDaiRequests = await axios.post(OMNI_HOME_BRIDGE, { query, variables: requestsVariables })
+
+      const xDaiExecutions = await axios.post(OMNI_FOREIGN_BRIDGE, {
+        query: queryForeign,
+        variables: executionsVariables,
+      })
+
+      const { userRequests } = xDaiRequests.data.data
+      const { executions } = xDaiExecutions.data.data
+
+      let results = userRequests.filter(
+        ({ messageId: id1 }: any) => !executions.some(({ messageId: id2 }: any) => id2 === id1),
+      )
+
+      results = results.map((item: any) => {
+        return {
+          address: OMNI_CLAIM_ADDRESS,
+          value: item.amount,
+          message: {
+            signatures: item.message.signatures,
+            content: item.message.msgData,
+          },
+        }
+      })
 
       return results
     } catch (e) {

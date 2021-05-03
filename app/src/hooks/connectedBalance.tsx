@@ -12,8 +12,8 @@ import { formatBigNumber, formatNumber } from '../util/tools'
 const logger = getLogger('Hooks::ConnectedBalance')
 
 export interface ConnectedBalanceContext {
-  claimState: boolean
-  unclaimedAmount: BigNumber
+  unclaimedDaiAmount: BigNumber
+  unclaimedOmenAmount: BigNumber
   ethBalance: BigNumber
   formattedEthBalance: string
   daiBalance: BigNumber
@@ -53,8 +53,9 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { relay } = context
   const { account, networkId } = context.rawWeb3Context
-  const [claimState, setClaimState] = useState<boolean>(false)
-  const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
+
+  const [unclaimedDaiAmount, setUnclaimedDaiAmount] = useState<BigNumber>(Zero)
+  const [unclaimedOmenAmount, setUnclaimedOmenAmount] = useState<BigNumber>(Zero)
 
   // mainnet balances
   const { refetch, tokens } = useTokens(context.rawWeb3Context, true, true)
@@ -85,18 +86,28 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const xOmenBalance = errorMessage ? Zero : xOmenCollateral || Zero
 
   const fetchUnclaimedAssets = async () => {
+    const aggregator = (array: any) => {
+      return array.reduce((prev: BigNumber, { value }: any) => prev.add(value), Zero)
+    }
     if (account && networkId === networkIds.MAINNET) {
       const xDaiService = new XdaiService(context.library)
-      const transactions = await xDaiService.fetchXdaiTransactionData()
+      const daiTransactions = await xDaiService.fetchXdaiTransactionData()
 
-      if (transactions && transactions.length) {
-        const aggregator = transactions.reduce((prev: BigNumber, { value }: any) => prev.add(value), Zero)
-        setUnclaimedAmount(aggregator)
-        setClaimState(true)
-        return
+      const omenTransactions = await xDaiService.fetchOmniTransactionData()
+
+      if (daiTransactions && daiTransactions.length) {
+        const aggregatedDai = aggregator(daiTransactions)
+        setUnclaimedDaiAmount(aggregatedDai)
+      } else {
+        setUnclaimedDaiAmount(Zero)
       }
-      setUnclaimedAmount(Zero)
-      setClaimState(false)
+      if (omenTransactions && omenTransactions.length) {
+        const aggregatedOmen = aggregator(omenTransactions)
+
+        setUnclaimedOmenAmount(aggregatedOmen)
+      } else {
+        setUnclaimedOmenAmount(Zero)
+      }
     }
   }
 
@@ -118,15 +129,15 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     if (relay) {
       fetchBalances()
     } else {
-      setUnclaimedAmount(Zero)
-      setClaimState(false)
+      setUnclaimedDaiAmount(Zero)
+      setUnclaimedOmenAmount(Zero)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, networkId])
 
   const value = {
-    claimState,
-    unclaimedAmount,
+    unclaimedDaiAmount,
+    unclaimedOmenAmount,
     ethBalance,
     formattedEthBalance: formatNumber(formatBigNumber(ethBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 3),
     daiBalance,
