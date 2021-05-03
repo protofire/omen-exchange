@@ -78,17 +78,19 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
     displayUserEarnings = compoundService.calculateCTokenToBaseExchange(baseCollateral, userEarnings)
     displayTotalEarnings = compoundService.calculateCTokenToBaseExchange(baseCollateral, totalEarnings)
   }
-  const userLiquidityFormatted = formatNumber(
-    formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals),
-  )
-  const poolTokensFormatted = formatNumber(
-    formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals),
-  )
 
   return (
     <UserData>
-      <UserDataTitleValue title="Your Liquidity" value={`${userLiquidityFormatted} ${baseCollateral.symbol}`} />
-      <UserDataTitleValue title="Total Pool Tokens" value={`${poolTokensFormatted}`} />
+      <UserDataTitleValue
+        title="Your Liquidity"
+        value={`${formatNumber(
+          formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals),
+        )} ${baseCollateral.symbol}`}
+      />
+      <UserDataTitleValue
+        title="Total Pool Tokens"
+        value={`${formatNumber(formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals))}`}
+      />
       <UserDataTitleValue
         state={userEarnings.gt(0) ? ValueStates.success : undefined}
         title="Your Earnings"
