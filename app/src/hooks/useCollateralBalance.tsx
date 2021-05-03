@@ -32,6 +32,7 @@ export const useCollateralBalance = (
           collateralBalance = await collateralService.getCollateral(account)
         }
       }
+      setErrorMessage(null)
     } catch (e) {
       setErrorMessage(e.message)
     }
