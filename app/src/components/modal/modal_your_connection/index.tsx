@@ -85,9 +85,17 @@ const ClaimLeft = styled.div`
   flex-direction: column;
   align-self: center;
 `
-const ClaimRight = styled.div`
-  margin-left: auto;
+const ClaimLeftSvg = styled.div`
   display: flex;
+  justify-content: space-between;
+  flex: 1;
+  &:hover {
+    .chevronDown {
+      path {
+        fill: ${props => props.theme.colors.primary};
+      }
+    }
+  }
 `
 
 const AccountInfoAddress = styled.p`
@@ -110,7 +118,6 @@ const CardHeaderText = styled.p`
 
 const ClaimButton = styled(Button)`
   width: 72px;
-  margin-left: 22px;
 `
 
 const ChangeWalletButton = styled(Button)``
@@ -148,6 +155,7 @@ const EnableDaiButton = styled(Button)`
 `
 const SvgWrap = styled.div`
   align-self: center;
+  padding-right: 22px;
 `
 
 const ConnectionModalNavigation = styled(ModalNavigation as any)`
@@ -356,30 +364,29 @@ export const ModalYourConnection = (props: Props) => {
           {relay && (!unclaimedDaiAmount.isZero() || !unclaimedOmenAmount.isZero()) && (
             <ModalCard>
               <BalanceSection borderBottom={displayClaim} style={{ flexDirection: 'row' }}>
-                <ClaimLeft>
-                  <StrongText>Claimable Assets</StrongText>
-                  <BalanceItemBalance as="div">
-                    {!unclaimedDaiAmount.isZero() && !unclaimedOmenAmount.isZero()
-                      ? 'DAI, OMEN'
-                      : unclaimedDaiAmount.isZero()
-                      ? 'OMN'
-                      : 'DAI'}
-                  </BalanceItemBalance>
-                </ClaimLeft>
-
-                <ClaimRight>
-                  <SvgWrap
-                    onClick={() => {
-                      setDisplayClaim(!displayClaim)
-                    }}
-                  >
-                    {displayClaim ? <IconChevronUp /> : <IconChevronDown />}
+                <ClaimLeftSvg
+                  onClick={() => {
+                    setDisplayClaim(!displayClaim)
+                  }}
+                >
+                  <ClaimLeft>
+                    <StrongText>Claimable Assets</StrongText>
+                    <BalanceItemBalance as="div">
+                      {!unclaimedDaiAmount.isZero() && !unclaimedOmenAmount.isZero()
+                        ? 'DAI, OMEN'
+                        : unclaimedDaiAmount.isZero()
+                        ? 'OMN'
+                        : 'DAI'}
+                    </BalanceItemBalance>
+                  </ClaimLeft>
+                  <SvgWrap>
+                    {displayClaim ? <IconChevronUp /> : <IconChevronDown color={theme.colors.tertiary} />}
                   </SvgWrap>
+                </ClaimLeftSvg>
 
-                  <ClaimButton buttonType={ButtonType.primary} onClick={claim}>
-                    Claim
-                  </ClaimButton>
-                </ClaimRight>
+                <ClaimButton buttonType={ButtonType.primary} onClick={claim}>
+                  Claim
+                </ClaimButton>
               </BalanceSection>
 
               {displayClaim && (
