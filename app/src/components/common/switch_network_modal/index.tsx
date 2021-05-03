@@ -112,9 +112,9 @@ export const SwitchNetworkModal: React.FC<Props> = props => {
 
   const setLocation = (network: string) => {
     if (network === networks.mainnet) {
-      location.assign(`https://${MAINNET_LOCATION}`)
+      location.assign(`http://${MAINNET_LOCATION}`)
     } else if (network === networks.xdai) {
-      location.assign(`https://${XDAI_LOCATION}`)
+      location.assign(`http://${XDAI_LOCATION}`)
     }
   }
 
