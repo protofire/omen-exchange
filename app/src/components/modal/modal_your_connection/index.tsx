@@ -2,17 +2,22 @@ import { BigNumber } from 'ethers/utils'
 import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
+import Web3Provider from 'web3-react'
 
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, STANDARD_DECIMALS } from '../../../common/constants'
+import SettingsViewContainer from '../../../components/settings/settings_view'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service } from '../../../services'
+import connectors from '../../../util/connectors'
 import { getToken, networkIds } from '../../../util/networks'
 import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
 import { TransactionStep, WalletState } from '../../../util/types'
+import { ButtonRound } from '../../button'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
 import { IconJazz } from '../../common/icons/IconJazz'
+import { IconSettings } from '../../common/icons/IconSettings'
 import { DaiIcon, EtherIcon } from '../../common/icons/currencies'
 import {
   BalanceItem,
@@ -146,6 +151,11 @@ const ConnectionModalNavigation = styled(ModalNavigation as any)`
   padding: 0;
   margin-bottom: 16px;
 `
+const SettingsButton = styled(ButtonRound)`
+  border: none;
+`
+
+const SettingsView = styled(SettingsViewContainer)``
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   changeWallet: () => void
@@ -185,6 +195,7 @@ export const ModalYourConnection = (props: Props) => {
   const { account, networkId, relay } = context
 
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false)
   const [txHash, setTxHash] = useState('')
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
   const [txNetId, setTxNetId] = useState()
@@ -277,110 +288,124 @@ export const ModalYourConnection = (props: Props) => {
         shouldCloseOnOverlayClick={true}
         style={theme.fluidHeightModal}
       >
-        <ContentWrapper>
-          <ConnectionModalNavigation>
-            <ModalTitle>Your Connection</ModalTitle>
-            <IconClose hoverEffect={true} onClick={onClose} />
-          </ConnectionModalNavigation>
-          <ModalCard>
-            <TopCardHeader>
-              <TopCardHeaderLeft>
-                <ConnectionIconWrapper>
-                  <ConnectorCircle>{connectorIcon}</ConnectorCircle>
-                  <IconJazz account={owner || ''} size={28} />
-                </ConnectionIconWrapper>
-                <AccountInfo>
-                  <AccountInfoAddress>{truncateStringInTheMiddle(owner || '', 5, 3)}</AccountInfoAddress>
-                  <AccountInfoWallet>{context.rawWeb3Context.connectorName}</AccountInfoWallet>
-                </AccountInfo>
-              </TopCardHeaderLeft>
-              <ChangeWalletButton buttonType={ButtonType.secondaryLine} onClick={changeWallet}>
-                Change
-              </ChangeWalletButton>
-            </TopCardHeader>
-            <BalanceSection>
-              <CardHeaderText>Wallet</CardHeaderText>
-              <BalanceItems style={{ marginTop: '14px' }}>
-                {(networkId === networkIds.MAINNET || relay) && (
-                  <BalanceItem>
-                    <BalanceItemSide>
-                      <EtherIcon />
-                      <BalanceItemTitle style={{ marginLeft: '12px' }}>Ether</BalanceItemTitle>
-                    </BalanceItemSide>
-                    <BalanceItemBalance>{formattedEthBalance} ETH</BalanceItemBalance>
-                  </BalanceItem>
-                )}
-                <BalanceItem>
-                  <BalanceItemSide>
-                    <DaiIcon size="24px" />
-                    <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
-                  </BalanceItemSide>
-                  <BalanceItemBalance>
-                    {networkId === networkIds.XDAI && !relay
-                      ? `${formattedEthBalance} xDAI`
-                      : `${formattedDaiBalance} DAI`}
-                  </BalanceItemBalance>
-                </BalanceItem>
-                {relay && claimState && (
-                  <>
-                    <BalanceDivider />
+        {isSettingsModalOpen ? (
+          //testing
+
+          <div style={{ width: '100%', height: '100%' }}>
+            <Web3Provider connectors={connectors} libraryName="ethers.js">
+              <SettingsView networkId={networkId} />
+            </Web3Provider>
+            <button onClick={() => setIsSettingsModalOpen(false)}></button>
+          </div>
+        ) : (
+          <ContentWrapper>
+            <ConnectionModalNavigation>
+              <ModalTitle>Your Connection</ModalTitle>
+              <IconClose hoverEffect={true} onClick={onClose} />
+            </ConnectionModalNavigation>
+            <ModalCard>
+              <TopCardHeader>
+                <TopCardHeaderLeft>
+                  <ConnectionIconWrapper>
+                    <ConnectorCircle>{connectorIcon}</ConnectorCircle>
+                    <IconJazz account={owner || ''} size={28} />
+                  </ConnectionIconWrapper>
+                  <AccountInfo>
+                    <AccountInfoAddress>{truncateStringInTheMiddle(owner || '', 5, 3)}</AccountInfoAddress>
+                    <AccountInfoWallet>{context.rawWeb3Context.connectorName}</AccountInfoWallet>
+                  </AccountInfo>
+                </TopCardHeaderLeft>
+                <SettingsButton onClick={() => setIsSettingsModalOpen(!isSettingsModalOpen)}>
+                  <IconSettings />
+                </SettingsButton>
+                <ChangeWalletButton buttonType={ButtonType.secondaryLine} onClick={changeWallet}>
+                  Change
+                </ChangeWalletButton>
+              </TopCardHeader>
+              <BalanceSection>
+                <CardHeaderText>Wallet</CardHeaderText>
+                <BalanceItems style={{ marginTop: '14px' }}>
+                  {(networkId === networkIds.MAINNET || relay) && (
                     <BalanceItem>
                       <BalanceItemSide>
-                        <DaiIcon size="24px" />
-                        <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
-                        <BalanceItemInfo>(Claimable)</BalanceItemInfo>
+                        <EtherIcon />
+                        <BalanceItemTitle style={{ marginLeft: '12px' }}>Ether</BalanceItemTitle>
                       </BalanceItemSide>
-                      <BalanceItemBalance>
-                        {formatBigNumber(unclaimedAmount, STANDARD_DECIMALS, 2)} DAI
-                      </BalanceItemBalance>
+                      <BalanceItemBalance>{formattedEthBalance} ETH</BalanceItemBalance>
                     </BalanceItem>
-                    <ClaimButton buttonType={ButtonType.primary} onClick={claim}>
-                      Claim Now
-                    </ClaimButton>
-                  </>
-                )}
-              </BalanceItems>
-            </BalanceSection>
-          </ModalCard>
-          {relay && (
-            <ModalCard>
-              {walletState === WalletState.ready ? (
-                <>
-                  <BalanceSection>
-                    <CardHeaderText>Omen Account</CardHeaderText>
-                    <BalanceItems style={{ marginTop: '14px' }}>
+                  )}
+                  <BalanceItem>
+                    <BalanceItemSide>
+                      <DaiIcon size="24px" />
+                      <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
+                    </BalanceItemSide>
+                    <BalanceItemBalance>
+                      {networkId === networkIds.XDAI && !relay
+                        ? `${formattedEthBalance} xDAI`
+                        : `${formattedDaiBalance} DAI`}
+                    </BalanceItemBalance>
+                  </BalanceItem>
+                  {relay && claimState && (
+                    <>
+                      <BalanceDivider />
                       <BalanceItem>
                         <BalanceItemSide>
                           <DaiIcon size="24px" />
                           <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
+                          <BalanceItemInfo>(Claimable)</BalanceItemInfo>
                         </BalanceItemSide>
-                        <BalanceItemBalance>{formattedxDaiBalance} DAI</BalanceItemBalance>
+                        <BalanceItemBalance>
+                          {formatBigNumber(unclaimedAmount, STANDARD_DECIMALS, 2)} DAI
+                        </BalanceItemBalance>
                       </BalanceItem>
-                    </BalanceItems>
-                  </BalanceSection>
-                  <DepositWithdrawButtons>
-                    <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositModal}>
-                      Deposit
-                    </DepositWithdrawButton>
-                    <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openWithdrawModal}>
-                      Withdraw
-                    </DepositWithdrawButton>
-                  </DepositWithdrawButtons>
-                </>
-              ) : (
-                <EnableDai>
-                  <DaiIcon size="38px" />
-                  <EnableDaiText>
-                    To Deposit or Withdraw Dai to your Omen Account, you need to enable it first.
-                  </EnableDaiText>
-                  <EnableDaiButton buttonType={ButtonType.primary} onClick={approve}>
-                    Enable
-                  </EnableDaiButton>
-                </EnableDai>
-              )}
+                      <ClaimButton buttonType={ButtonType.primary} onClick={claim}>
+                        Claim Now
+                      </ClaimButton>
+                    </>
+                  )}
+                </BalanceItems>
+              </BalanceSection>
             </ModalCard>
-          )}
-        </ContentWrapper>
+            {relay && (
+              <ModalCard>
+                {walletState === WalletState.ready ? (
+                  <>
+                    <BalanceSection>
+                      <CardHeaderText>Omen Account</CardHeaderText>
+                      <BalanceItems style={{ marginTop: '14px' }}>
+                        <BalanceItem>
+                          <BalanceItemSide>
+                            <DaiIcon size="24px" />
+                            <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
+                          </BalanceItemSide>
+                          <BalanceItemBalance>{formattedxDaiBalance} DAI</BalanceItemBalance>
+                        </BalanceItem>
+                      </BalanceItems>
+                    </BalanceSection>
+                    <DepositWithdrawButtons>
+                      <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositModal}>
+                        Deposit
+                      </DepositWithdrawButton>
+                      <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openWithdrawModal}>
+                        Withdraw
+                      </DepositWithdrawButton>
+                    </DepositWithdrawButtons>
+                  </>
+                ) : (
+                  <EnableDai>
+                    <DaiIcon size="38px" />
+                    <EnableDaiText>
+                      To Deposit or Withdraw Dai to your Omen Account, you need to enable it first.
+                    </EnableDaiText>
+                    <EnableDaiButton buttonType={ButtonType.primary} onClick={approve}>
+                      Enable
+                    </EnableDaiButton>
+                  </EnableDai>
+                )}
+              </ModalCard>
+            )}
+          </ContentWrapper>
+        )}
       </Modal>
       <ModalTransactionWrapper
         confirmations={confirmations}
