@@ -273,7 +273,7 @@ const HeaderContainer: React.FC = (props: any) => {
             </>
           )}
 
-          {(networkId === networkIds.MAINNET || relay) && (
+          {((networkId === networkIds.MAINNET && context.rawWeb3Context.connectorName !== 'Safe') || relay) && (
             <HeaderDropdown
               currentItem={networkDropdownItems.length + 1}
               disableDirty
