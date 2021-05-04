@@ -1,3 +1,4 @@
+import { border } from 'polished'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
@@ -13,14 +14,14 @@ import { ListCard } from '../../market/common/list_card/index'
 const TopContent = styled.div`
   padding: 24px;
 `
-const MainContent = styled.div`
+const MainContent = styled.div<{ borderTop?: boolean }>`
   padding: 24px;
-  border-top: ${props => props.theme.borders.borderLineDisabled};
+  border-top: ${props => (props.borderTop ? props.theme.borders.borderLineDisabled : '')};
 `
 
 const BottomContent = styled(MainContent as any)`
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
 `
 
 const Column = styled.div``
@@ -59,6 +60,12 @@ const ButtonRow = styled.div`
   button:first-child {
     margin-right: 12px;
   }
+`
+
+const SetAndSaveButton = styled(ButtonRound)`
+  width: 166px;
+  height: 40px;
+  margin: 8px;
 `
 
 const FiltersControls = styled.div<{ disabled?: boolean }>`
@@ -113,6 +120,7 @@ const Input = styled.input`
 `
 const SettingsWrapper = styled(ListCard)`
   min-height: initial;
+  width: 420px;
 `
 
 const ImageWrap = styled.div`
@@ -120,13 +128,13 @@ const ImageWrap = styled.div`
 `
 interface Props {
   history?: any
-
+  style?: any
   networkId?: any
 }
 
 const SettingsViewContainer = (props: Props) => {
   const networkId = props.networkId
-
+  const style = props.style
   const network = getNetworkFromChain(networkId)
 
   const [current, setCurrent] = useState(0)
@@ -212,79 +220,68 @@ const SettingsViewContainer = (props: Props) => {
   }, [])
 
   return (
-    <SettingsWrapper>
-      <TopContent>
-        <Text>Settings</Text>
-      </TopContent>
-
-      <MainContent>
-        <Row>
-          <Column>
-            <Text>RPC Endpoint</Text>
-            <StatusSection>
-              <StatusBadge status={onlineStatus} />
-              <TextLighter>Status: {onlineStatus ? 'OK' : 'Unavailable'}</TextLighter>
-            </StatusSection>
-          </Column>
-          <FiltersControls>
-            <NodeDropdown currentItem={current} dirty dropdownPosition={DropdownPosition.center} items={filterItems} />
-          </FiltersControls>
-        </Row>
-        {current === dropdownItems.length - 1 && (
-          <Input
-            onChange={event => {
-              setUrl(event.target.value)
-              if (current === dropdownItems.length - 1) setCustomUrl(event.target.value)
-            }}
-            placeholder={'Paste your RPC URL'}
-            value={customUrl}
-          ></Input>
-        )}
-      </MainContent>
-
+    <>
+      <SettingsWrapper>
+        <MainContent borderTop={false}>
+          <Row>
+            <Column>
+              <StatusSection>
+                <StatusBadge status={onlineStatus} />
+                <TextLighter>Status: {onlineStatus ? 'OK' : 'Unavailable'}</TextLighter>
+              </StatusSection>
+            </Column>
+            <FiltersControls>
+              <NodeDropdown
+                currentItem={current}
+                dirty
+                dropdownPosition={DropdownPosition.center}
+                items={filterItems}
+              />
+            </FiltersControls>
+          </Row>
+          {current === dropdownItems.length - 1 && (
+            <Input
+              onChange={event => {
+                setUrl(event.target.value)
+                if (current === dropdownItems.length - 1) setCustomUrl(event.target.value)
+              }}
+              placeholder={'Paste your RPC URL'}
+              value={customUrl}
+            ></Input>
+          )}
+        </MainContent>
+      </SettingsWrapper>
       <BottomContent>
-        {props.history && (
-          <ButtonRound
-            onClick={() => {
-              props.history.push('/')
-            }}
-          >
-            Back
-          </ButtonRound>
-        )}
+        <SetAndSaveButton
+          onClick={() => {
+            setCurrent(0)
+            urlObject && setUrl(urlObject[0].rpcUrl)
+          }}
+        >
+          Set to Default
+        </SetAndSaveButton>
+        <SetAndSaveButton
+          disabled={
+            url.length === 0 || !isValidUrl || (network !== -1 && getInfuraUrl(network) === url) || !onlineStatus
+          }
+          onClick={async () => {
+            if (!(await checkRpcStatus(url, setOnlineStatus, network))) return
 
-        <ButtonRow>
-          <ButtonRound
-            onClick={() => {
-              setCurrent(0)
-              urlObject && setUrl(urlObject[0].rpcUrl)
-            }}
-          >
-            Set to Default
-          </ButtonRound>
-          <ButtonRound
-            disabled={
-              url.length === 0 || !isValidUrl || (network !== -1 && getInfuraUrl(network) === url) || !onlineStatus
-            }
-            onClick={async () => {
-              if (!(await checkRpcStatus(url, setOnlineStatus, network))) return
-
-              localStorage.setItem(
-                'rpcAddress',
-                JSON.stringify({
-                  url: url,
-                  network: network,
-                  index: current,
-                }),
-              )
-              window.location.reload()
-            }}
-          >
-            Save
-          </ButtonRound>
-        </ButtonRow>
+            localStorage.setItem(
+              'rpcAddress',
+              JSON.stringify({
+                url: url,
+                network: network,
+                index: current,
+              }),
+            )
+            window.location.reload()
+          }}
+        >
+          Save
+        </SetAndSaveButton>
       </BottomContent>
-    </SettingsWrapper>
+    </>
   )
 }
 

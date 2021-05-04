@@ -15,7 +15,7 @@ import { TransactionStep, WalletState } from '../../../util/types'
 import { ButtonRound } from '../../button'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
-import { IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
+import { IconArrowBack, IconChevronLeft, IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
 import { IconJazz } from '../../common/icons/IconJazz'
 import { IconSettings } from '../../common/icons/IconSettings'
 import { DaiIcon, EtherIcon } from '../../common/icons/currencies'
@@ -154,7 +154,11 @@ const ConnectionModalNavigation = styled(ModalNavigation as any)`
 const SettingsButton = styled(ButtonRound)`
   border: none;
 `
-
+const SettingsTopWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 23px;
+`
 const SettingsView = styled(SettingsViewContainer)``
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -294,12 +298,15 @@ export const ModalYourConnection = (props: Props) => {
         {isSettingsModalOpen ? (
           //testing
 
-          <div style={{ width: '100%', height: '100%' }}>
-            <Web3Provider connectors={connectors} libraryName="ethers.js">
-              <SettingsView networkId={chainId} />
-            </Web3Provider>
-            <button onClick={() => setIsSettingsModalOpen(false)}></button>
-          </div>
+          <>
+            <SettingsTopWrapper>
+              <IconArrowBack hoverEffect={true} onClick={() => setIsSettingsModalOpen(false)} />
+              <ModalTitle>Configure RPC Endpoints</ModalTitle>
+              <IconClose hoverEffect={true} onClick={onClose} />
+            </SettingsTopWrapper>
+
+            <SettingsView networkId={chainId} />
+          </>
         ) : (
           <ContentWrapper>
             <ConnectionModalNavigation>
