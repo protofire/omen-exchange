@@ -40,11 +40,11 @@ export const Main: React.FC = () => {
   useEffect(() => {
     if (networkId) {
       setWrongNetwork(
-        (location.host === MAINNET_LOCATION && XDAI_NETWORKS.includes(networkId)) ||
-          (location.host === XDAI_LOCATION && MAIN_NETWORKS.includes(networkId)),
+        (context.connectorName !== 'Safe' && location.host === MAINNET_LOCATION && XDAI_NETWORKS.includes(networkId)) ||
+          (context.connectorName !== 'Safe' && location.host === XDAI_LOCATION && MAIN_NETWORKS.includes(networkId)),
       )
     }
-  }, [networkId])
+  }, [networkId, context.connectorName])
 
   return (
     <>
