@@ -279,6 +279,9 @@ export const ModalYourConnection = (props: Props) => {
     )
 
   const walletState = allowance.isZero() ? WalletState.enable : WalletState.ready
+  const windowObj: any = window
+  const ethereum = windowObj.ethereum
+  const chainId = ethereum && ethereum.chainId
 
   return (
     <>
@@ -293,7 +296,7 @@ export const ModalYourConnection = (props: Props) => {
 
           <div style={{ width: '100%', height: '100%' }}>
             <Web3Provider connectors={connectors} libraryName="ethers.js">
-              <SettingsView networkId={networkId} />
+              <SettingsView networkId={chainId} />
             </Web3Provider>
             <button onClick={() => setIsSettingsModalOpen(false)}></button>
           </div>
