@@ -139,10 +139,10 @@ const networks: { [K in NetworkId]: Network } = {
       symbol: 'ETH',
       decimals: 18,
     },
-    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    targetSafeImplementation: '0xCB2E9FA32603Cdc2740b82a9A67ED3e977C33416',
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
-    blockExplorerURL: 'https://etherscan.io/tx/',
+    blockExplorerURL: 'https://etherscan.io',
   },
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
@@ -185,10 +185,10 @@ const networks: { [K in NetworkId]: Network } = {
       symbol: 'ETH',
       decimals: 18,
     },
-    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    targetSafeImplementation: '0xcb05C7D28766e4fFB71ccbdAf6Ae1Cec555D61f8',
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
-    blockExplorerURL: 'https://rinkeby.etherscan.io/tx/',
+    blockExplorerURL: 'https://rinkeby.etherscan.io',
   },
   [networkIds.SOKOL]: {
     label: 'Sokol',
@@ -233,7 +233,7 @@ const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
     blockExplorer: 'blockscout',
-    blockExplorerURL: 'https://blockscout.com/poa/sokol/tx/',
+    blockExplorerURL: 'https://blockscout.com/poa/sokol',
   },
   [networkIds.XDAI]: {
     label: 'xDai',
@@ -283,7 +283,7 @@ const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     blockExplorer: 'blockscout',
-    blockExplorerURL: 'https://blockscout.com/poa/xdai/tx/',
+    blockExplorerURL: 'https://blockscout.com/poa/xdai',
   },
 }
 
@@ -853,6 +853,15 @@ export const getNativeAsset = (networkId: number, relay = false): Token => {
   return asset
 }
 
+export const getNativeCompoundAsset = (networkId: number): Token => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  } else {
+    const knownToken = 'ceth' as KnownToken
+    return getToken(networkId, knownToken)
+  }
+}
+
 export const getTargetSafeImplementation = (networkId: number): string => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
@@ -902,5 +911,12 @@ export const getTxHashBlockExplorerURL = (networkId: number, txHash: string): st
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
-  return `${networks[networkId].blockExplorerURL}${txHash}`
+  return `${networks[networkId].blockExplorerURL}/tx/${txHash}`
+}
+
+export const getAddressBlockExplorerURL = (networkId: number, contractAddress: string): string => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return `${networks[networkId].blockExplorerURL}/address/${contractAddress}`
 }

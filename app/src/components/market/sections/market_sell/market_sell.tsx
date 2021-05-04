@@ -217,14 +217,18 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
-      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals)
+      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals, collateral.decimals)
       let displaySharesAmount = sharesAmount
       if (collateral.symbol.toLowerCase() in CompoundTokenType && amountShares && compoundService) {
         const displaySharesAmountValue = compoundService.calculateCTokenToBaseExchange(baseCollateral, amountShares)
-        displaySharesAmount = formatBigNumber(displaySharesAmountValue || Zero, baseCollateral.decimals)
+        displaySharesAmount = formatBigNumber(
+          displaySharesAmountValue || Zero,
+          baseCollateral.decimals,
+          baseCollateral.decimals,
+        )
       }
       setStatus(Status.Loading)
-      setMessage(`Selling ${displaySharesAmount} shares...`)
+      setMessage(`Selling ${formatNumber(displaySharesAmount)} shares...`)
 
       let useBaseToken = false
       if (collateral.address !== displayCollateral.address) {
@@ -247,7 +251,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setDisplaySellShares(null)
       setAmountShares(null)
       setStatus(Status.Ready)
-      setMessage(`Successfully sold ${displaySharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
+      setMessage(`Successfully sold ${formatNumber(displaySharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
@@ -267,7 +271,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       return compoundService.calculateCTokenToBaseExchange(baseCollateral, ns)
     })
   }
-  const selectedOutcomeBalance = formatNumber(formatBigNumber(balanceItem.shares, collateral.decimals))
+  const selectedOutcomeBalance = formatNumber(
+    formatBigNumber(balanceItem.shares, baseCollateral.decimals, baseCollateral.decimals),
+  )
   let displaySelectedOutcomeBalance = selectedOutcomeBalance
   let displaySelectedOutcomeBalanceValue = balanceItem.shares
   if (collateralSymbol in CompoundTokenType && compoundService) {
@@ -368,7 +374,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       />
       <GridTransactionDetails>
         <div>
-          <TokenBalance text="Your Shares" value={formatNumber(displaySelectedOutcomeBalance)} />
+          <TokenBalance text="Your Shares" value={displaySelectedOutcomeBalance} />
           <ReactTooltip id="walletBalanceTooltip" />
           <TextfieldCustomPlaceholder
             formField={
@@ -402,7 +408,9 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               title={'Profit'}
               value={
                 potentialValueNormalized
-                  ? `${formatNumber(formatBigNumber(potentialValueNormalized, displayCollateral.decimals, 2))} 
+                  ? `${formatNumber(
+                      formatBigNumber(potentialValueNormalized, displayCollateral.decimals, displayCollateral.decimals),
+                    )} 
                   ${symbol}`
                   : '0.00'
               }
@@ -411,7 +419,13 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               title={'Trading Fee'}
               value={`${
                 costFeeNormalized
-                  ? formatNumber(formatBigNumber(costFeeNormalized.mul(-1), displayCollateral.decimals, 2))
+                  ? formatNumber(
+                      formatBigNumber(
+                        costFeeNormalized.mul(-1),
+                        displayCollateral.decimals,
+                        displayCollateral.decimals,
+                      ),
+                    )
                   : '0.00'
               } ${symbol}`}
             />
@@ -429,7 +443,13 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               title={'Total'}
               value={`${
                 normalizedTradedCollateral
-                  ? formatNumber(formatBigNumber(normalizedTradedCollateral, displayCollateral.decimals, 2))
+                  ? formatNumber(
+                      formatBigNumber(
+                        normalizedTradedCollateral,
+                        displayCollateral.decimals,
+                        displayCollateral.decimals,
+                      ),
+                    )
                   : '0.00'
               } ${displayTotalSymbol}`}
             />

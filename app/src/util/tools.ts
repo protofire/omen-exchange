@@ -241,7 +241,6 @@ export const calcSellAmountInCollateral = (
   fee: number,
 ): Maybe<BigNumber> => {
   Big.DP = 90
-
   const sharesToSellBig = new Big(sharesToSell.toString())
   const holdingsBig = new Big(holdings.toString())
   const otherHoldingsBig = otherHoldings.map(x => new Big(x.toString()))
@@ -359,6 +358,14 @@ export const getCTokenForToken = (token: string): string => {
   }
 }
 
+export const isCToken = (symbol: string): boolean => {
+  const tokenSymbol = symbol.toLowerCase()
+  if (tokenSymbol in CompoundTokenType) {
+    return true
+  }
+  return false
+}
+
 /**
  * Gets base token symbol for a given ctoken
  */
@@ -370,18 +377,30 @@ export const getBaseTokenForCToken = (token: string): string => {
   return ''
 }
 
+export const getBaseToken = (networkId: number, symbol: string): Token => {
+  const baseTokenSymbol = getBaseTokenForCToken(symbol)
+  if (baseTokenSymbol === 'eth') {
+    return getNativeAsset(networkId)
+  }
+  return getToken(networkId, baseTokenSymbol as KnownToken)
+}
+
 export const getSharesInBaseToken = (
   balances: BalanceItem[],
   compoundService: CompoundService,
   displayCollateral: Token,
 ): BalanceItem[] => {
   const displayBalances = balances.map(function(bal) {
-    const baseTokenShares = compoundService.calculateCTokenToBaseExchange(displayCollateral, bal.shares)
-    const newBalanceObject = Object.assign({}, bal, {
-      shares: baseTokenShares,
-    })
-    delete newBalanceObject.currentDisplayPrice
-    return newBalanceObject
+    if (bal.shares) {
+      const baseTokenShares = compoundService.calculateCTokenToBaseExchange(displayCollateral, bal.shares)
+      const newBalanceObject = Object.assign({}, bal, {
+        shares: baseTokenShares,
+      })
+      delete newBalanceObject.currentDisplayPrice
+      return newBalanceObject
+    } else {
+      return bal
+    }
   })
   return displayBalances
 }
@@ -501,13 +520,16 @@ export const limitDecimalPlaces = (value: string, decimals: number) => {
 }
 
 export const formatNumber = (number: string, decimals = 2): string => {
+  const fixedInt = parseFloat(number.split(',').join('')).toFixed(decimals)
+  const splitFixedInt = fixedInt.split('.')[0]
+  const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
   if (number.length < 1) {
     return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
   }
 
-  const fixedInt = parseFloat(number.split(',').join('')).toFixed(decimals)
-  const splitFixedInt = fixedInt.split('.')[0]
-  const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+  if (Number(number) < 0.01 && Number(number) > 0) {
+    return '<0.01'
+  }
 
   return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
 }

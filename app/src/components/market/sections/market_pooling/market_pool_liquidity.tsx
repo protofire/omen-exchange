@@ -23,6 +23,7 @@ import { getLogger } from '../../../../util/logger'
 import {
   getDefaultGelatoData,
   getNativeAsset,
+  getNativeCompoundAsset,
   getToken,
   getWrapToken,
   pseudoNativeAssetAddress,
@@ -165,8 +166,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   let baseCollateral = collateral
   if (collateralSymbol in CompoundTokenType) {
-    if (collateralSymbol === 'ceth') {
-      baseCollateral = getNativeAsset(networkId, relay)
+    const nativeCompoundAsset = getNativeCompoundAsset(networkId)
+    if (collateralSymbol === nativeCompoundAsset.symbol.toLowerCase()) {
+      baseCollateral = getNativeAsset(networkId)
     } else {
       const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
       baseCollateral = getToken(networkId, baseCollateralSymbol)
@@ -330,10 +332,15 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
         useBaseToken = true
       }
-      let fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
+      let fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals, collateral.decimals)
       if (collateralSymbol in CompoundTokenType && displayCollateral.symbol === baseCollateral.symbol) {
-        fundsAmount = formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)
+        fundsAmount = formatBigNumber(
+          amountToFundNormalized || Zero,
+          displayCollateral.decimals,
+          displayCollateral.decimals,
+        )
       }
+      setMessage(`Depositing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
 
       withGelato && !belowGelatoMinimum
         ? setMessage(
@@ -378,7 +385,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setAmountToFund(null)
       setAmountToFundDisplay('')
       setAmountToFundNormalized(null)
-
+      setMessage(`Successfully deposited ${formatNumber(fundsAmount)} ${displayCollateral.symbol}`)
       setIsTransactionProcessing(false)
       withGelato && !belowGelatoMinimum
         ? setMessage(`Successfully deposited ${fundsAmount} ${displayCollateral.symbol}\n and scheduled auto-withdraw`)
@@ -399,7 +406,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         return
       }
 
-      let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
+      let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
       if (
         compoundService &&
         collateralSymbol in CompoundTokenType &&
@@ -409,13 +416,17 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           baseCollateral,
           depositedTokensTotal,
         )
-        fundsAmount = formatBigNumber(displayDepositedTokensTotal || Zero, displayCollateral.decimals)
+        fundsAmount = formatBigNumber(
+          displayDepositedTokensTotal || Zero,
+          displayCollateral.decimals,
+          displayCollateral.decimals,
+        )
       }
 
       withGelato
-        ? setMessage(`Withdrawing funds: ${fundsAmount} ${displayCollateral.symbol}\n
+        ? setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}\n
         and cancel future auto-withdraw`)
-        : setMessage(`Withdrawing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
+        : setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
@@ -454,10 +465,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
       setAmountToRemoveNormalized(null)
+      setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${displayCollateral.symbol}`)
 
       withGelato
         ? setMessage(`Successfully withdrew ${fundsAmount} ${displayCollateral.symbol}\n and canceled auto-withdraw`)
-        : setMessage(`Successfully withdrew ${fundsAmount} ${displayCollateral.symbol}`)
+        : setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${displayCollateral.symbol}`)
 
       setIsTransactionProcessing(false)
     } catch (err) {
@@ -798,7 +810,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 emphasizeValue={displayPoolTokens.gt(0)}
                 state={(displayPoolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Pool Tokens"
-                value={`${formatNumber(formatBigNumber(displayPoolTokens, baseCollateral.decimals))}`}
+                value={`${formatNumber(
+                  formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals),
+                )}`}
               />
             </TransactionDetailsCard>
           )}

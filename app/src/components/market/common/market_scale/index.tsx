@@ -1,15 +1,24 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks'
-import { getNativeAsset } from '../../../../util/networks'
-import { calcPrediction, calcXValue, formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
+import { useCompoundService, useConnectedWeb3Context } from '../../../../hooks'
+import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../util/networks'
+import {
+  calcPrediction,
+  calcXValue,
+  formatBigNumber,
+  formatNumber,
+  getBaseTokenForCToken,
+  isDust,
+  roundNumberStringToSignificantDigits,
+} from '../../../../util/tools'
 import {
   AdditionalSharesType,
   BalanceItem,
+  CompoundTokenType,
   LiquidityObject,
   LiquidityType,
   MarketDetailsTab,
@@ -289,9 +298,10 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const marketPredictionNumber = calcPrediction(outcomePredictedByMarket || '', lowerBound, upperBound)
 
   const amountSharesNumber =
-    collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals))
+    collateral && Number(formatBigNumber(amountShares || new BigNumber(0), collateral.decimals, collateral.decimals))
 
-  const tradeAmountNumber = collateral && Number(formatBigNumber(tradeAmount || new BigNumber(0), collateral.decimals))
+  const tradeAmountNumber =
+    collateral && Number(formatBigNumber(tradeAmount || new BigNumber(0), collateral.decimals, collateral.decimals))
   const feeNumber = fee && collateral && Number(formatBigNumber(fee, collateral.decimals))
 
   const shortBalances = balances && balances.filter(balance => balance.outcomeName === 'short')
@@ -307,11 +317,16 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     longBalances.map(longBalance => longBalance.shares).reduce((a, b) => a.add(b))
 
   const shortSharesNumber =
-    collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals, STANDARD_DECIMALS))
+    collateral && Number(formatBigNumber(shortShares || new BigNumber(0), collateral.decimals, collateral.decimals))
   const longSharesNumber =
-    collateral && Number(formatBigNumber(longShares || new BigNumber(0), collateral.decimals, STANDARD_DECIMALS))
+    collateral && Number(formatBigNumber(longShares || new BigNumber(0), collateral.decimals, collateral.decimals))
 
   const [isAmountInputted, setIsAmountInputted] = useState(false)
+
+  const context = useConnectedWeb3Context()
+
+  const { compoundService: CompoundService } = useCompoundService(collateral ? collateral : null, context)
+  const compoundService = CompoundService || null
 
   const initialMount = useRef(true)
   useEffect(() => {
@@ -340,7 +355,16 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const [longProfitAmount, setLongProfitAmount] = useState(0)
   const [longProfitPercentage, setLongProfitPercentage] = useState(0)
   const [shortProfitPercentage, setShortProfitPercentage] = useState(0)
-
+  let baseCollateral = collateral
+  if (collateral && collateral.symbol.toLowerCase() in CompoundTokenType) {
+    const nativeCompoundAsset = getNativeCompoundAsset(networkId)
+    if (collateral.symbol.toLowerCase() === nativeCompoundAsset.symbol.toLowerCase()) {
+      baseCollateral = getNativeAsset(networkId)
+    } else {
+      const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
+      baseCollateral = getToken(networkId, baseCollateralSymbol)
+    }
+  }
   useEffect(() => {
     let totalShortTradesCost = new BigNumber(0)
     let totalLongTradesCost = new BigNumber(0)
@@ -458,13 +482,13 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       setProfitLoss(calcProfit(amountSharesNumber || 0, 100 - scaleValue, tradeAmountNumber || 0))
     } else {
       if (shortShares && collateral && !isDust(shortShares, collateral.decimals)) {
-        const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, STANDARD_DECIMALS))
+        const totalShortPriceNumber = Number(formatBigNumber(totalShortPrice, collateral.decimals, collateral.decimals))
         setShortPayout(calcPayout(shortSharesNumber || 0, 100 - scaleValue))
         setShortProfitAmount(calcProfit(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
         setShortProfitPercentage(calcProfitPercentage(shortSharesNumber || 0, 100 - scaleValue, totalShortPriceNumber))
       }
       if (longShares && collateral && !isDust(longShares, collateral.decimals)) {
-        const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, STANDARD_DECIMALS))
+        const totalLongPriceNumber = Number(formatBigNumber(totalLongPrice, collateral.decimals, collateral.decimals))
         setLongPayout(calcPayout(longSharesNumber || 0, scaleValue))
 
         setLongProfitAmount(calcProfit(longSharesNumber || 0, scaleValue, totalLongPriceNumber))
@@ -547,6 +571,56 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         : 0.01,
     },
   ]
+  let displayYourPayout = yourPayout.toString()
+  let displayProfitLoss = profitLoss
+  let displayAddtionalShares = additionalShares
+  if (
+    baseCollateral &&
+    collateral &&
+    baseCollateral.address !== collateral.address &&
+    collateral.symbol.toLowerCase() in CompoundTokenType &&
+    compoundService
+  ) {
+    const significantDigits = 6
+    const yourPayoutCollateralValue = roundNumberStringToSignificantDigits(
+      Math.abs(yourPayout).toString(),
+      significantDigits,
+    )
+    const profitLossCollateralValue = roundNumberStringToSignificantDigits(
+      Math.abs(profitLoss).toString(),
+      significantDigits,
+    )
+
+    const yourPayoutCollateralBNValue = parseUnits(yourPayoutCollateralValue, collateral.decimals)
+    const profitLossCollateralBNValue = parseUnits(profitLossCollateralValue, collateral.decimals)
+    const displayPayoutCollateralBN = compoundService.calculateCTokenToBaseExchange(
+      baseCollateral,
+      yourPayoutCollateralBNValue,
+    )
+    const displayProfitLossCollateralBN = compoundService.calculateCTokenToBaseExchange(
+      baseCollateral,
+      profitLossCollateralBNValue,
+    )
+    displayYourPayout = formatBigNumber(displayPayoutCollateralBN, baseCollateral.decimals, 4)
+    const displayProfitLossString = formatBigNumber(displayProfitLossCollateralBN, baseCollateral.decimals, 4)
+    displayProfitLoss = parseFloat(displayProfitLossString)
+    if (profitLoss < 0) {
+      displayProfitLoss = -displayProfitLoss
+    }
+    if (additionalShares) {
+      const additionalSharesValue = roundNumberStringToSignificantDigits(
+        Math.abs(additionalShares).toString(),
+        significantDigits,
+      )
+      const additionalSharesBNValue = parseUnits(additionalSharesValue, collateral.decimals)
+      const additionalSharesBaseBN = compoundService.calculateCTokenToBaseExchange(
+        baseCollateral,
+        additionalSharesBNValue,
+      )
+      const displayAddtionalSharesString = formatBigNumber(additionalSharesBaseBN, baseCollateral.decimals, 4)
+      displayAddtionalShares = parseFloat(displayAddtionalSharesString)
+    }
+  }
 
   const bondedValueBoxData = [
     {
@@ -578,15 +652,16 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'New Prediction',
     },
     {
-      title: `${formatNumber(yourPayout.toString())} ${collateral && collateral.symbol}`,
+      title: `${formatNumber(displayYourPayout.toString())} ${baseCollateral && baseCollateral.symbol}`,
       subtitle: 'Your Payout',
       tooltip: `Your payout if the market resolves at ${formatNumber(scaleValuePrediction.toString())} ${unit}`,
       positive:
         yourPayout > (tradeAmountNumber || 0) ? true : yourPayout < (tradeAmountNumber || 0) ? false : undefined,
     },
     {
-      title: `${profitLoss > 0 ? '+' : ''}
-      ${formatNumber(profitLoss ? profitLoss.toString() : '0')} ${collateral && collateral.symbol}`,
+      title: `${displayProfitLoss > 0 ? '+' : ''}
+      ${formatNumber(displayProfitLoss ? displayProfitLoss.toString() : '0')} ${baseCollateral &&
+        baseCollateral.symbol}`,
       subtitle: 'Profit/Loss',
       tooltip: `Your profit/loss if the market resolves at ${formatNumber(scaleValuePrediction.toString())} ${unit}`,
       positive: profitLoss > 0 ? true : profitLoss < 0 ? false : undefined,
@@ -599,7 +674,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'Current prediction',
     },
     {
-      title: `+ ${additionalShares?.toFixed(2)} Shares`,
+      title: `+ ${formatNumber(displayAddtionalShares ? displayAddtionalShares.toString() : '0')} Shares `,
       subtitle: `${additionalSharesType} position`,
       tooltip: `To keep the market stable, you receive additional shares for depositing and removing liquidity.`,
       ball: true,

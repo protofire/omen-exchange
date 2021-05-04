@@ -266,7 +266,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const isETHNetwork = () => {
     return networkId === networkIds.MAINNET || networkId === networkIds.RINKEBY
   }
-  if (currentTokenSymbol in CompoundEnabledTokenType && isETHNetwork() && state !== 'SCALAR') {
+  if (currentTokenSymbol in CompoundEnabledTokenType && isETHNetwork()) {
     showAddCompoundService = true
   }
   useEffect(() => {
@@ -346,7 +346,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       const interestRate = await getCompoundInterestRate(userInputCollateral.symbol.toLowerCase())
       setCompoundInterestRate(interestRate.toFixed(2))
     }
-    if (userInputCollateral.symbol.toLowerCase() in CompoundEnabledTokenType && isETHNetwork() && state !== 'SCALAR') {
+    if (userInputCollateral.symbol.toLowerCase() in CompoundEnabledTokenType && isETHNetwork()) {
       getInterestRate(userInputCollateral)
     }
   }, [isCompoundServiceChecked, userInputCollateral, collateral]) // eslint-disable-line react-hooks/exhaustive-deps
@@ -418,7 +418,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     setCollateralBalance(newCollateralBalance)
     setCollateralBalanceFormatted(formatBigNumber(newCollateralBalance, token.decimals, 5))
 
-    const newAmount = ethers.utils.parseUnits(formattedAmount, token.decimals)
+    const newAmount = ethers.utils.parseUnits(Number(formattedAmount).toFixed(token.decimals), token.decimals)
 
     setAmount(newAmount)
     handleCollateralChange(token, newAmount)
@@ -581,7 +581,9 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 title={'Pool Tokens'}
-                value={formatNumber(formatBigNumber(funding, userInputCollateral.decimals))}
+                value={formatNumber(
+                  formatBigNumber(funding, userInputCollateral.decimals, userInputCollateral.decimals),
+                )}
               />
             </TransactionDetailsCard>
           </div>

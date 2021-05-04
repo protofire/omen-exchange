@@ -11,12 +11,13 @@ import {
   useConnectedCPKContext,
   useContracts,
   useGraphMarketUserTxData,
+  useSymbol,
 } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../../services'
 import { CompoundService } from '../../../../../services/compound_service'
 import { getLogger } from '../../../../../util/logger'
-import { formatBigNumber, getUnit, isDust } from '../../../../../util/tools'
+import { formatBigNumber, getBaseToken, getUnit, isCToken, isDust } from '../../../../../util/tools'
 import {
   CompoundTokenType,
   INVALID_ANSWER_ID,
@@ -59,15 +60,10 @@ const StyledButtonContainer = styled(ButtonContainer)`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  &.border {
-    border-top: 1px solid ${props => props.theme.colors.verticalDivider};
-  }
 `
 
 const BorderedButtonContainer = styled(ButtonContainer)`
   ${MarginsButton};
-  border-top: 1px solid ${props => props.theme.colors.verticalDivider};
 `
 
 const SellBuyWrapper = styled.div`
@@ -101,7 +97,7 @@ const computeEarnedCollateral = (payouts: Maybe<Big[]>, balances: BigNumber[]): 
   return earnedCollateral
 }
 
-const scalarComputeEarnedCollateral = (finalAnswerPercentage: number, balances: BigNumber[]): Maybe<BigNumber> => {
+const scalarComputeEarnedCollateral = (finalAnswerPercentage: Big, balances: BigNumber[]): Maybe<BigNumber> => {
   if (
     (!balances[0] && !balances[1]) ||
     (balances[0].isZero() && !balances[1]) ||
@@ -154,7 +150,7 @@ const Wrapper = (props: Props) => {
   const cpk = useConnectedCPKContext()
   const { fetchBalances } = useConnectedBalanceContext()
 
-  const { account, library: provider } = context
+  const { account, library: provider, networkId } = context
   const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
 
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props
@@ -183,6 +179,8 @@ const Wrapper = (props: Props) => {
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
 
+  const [displayEarnedCollateral, setDisplayEarnedCollateral] = useState<BigNumber>(new BigNumber(0))
+
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
   useMemo(() => {
     const getResult = async () => {
@@ -201,20 +199,34 @@ const Wrapper = (props: Props) => {
   }, [marketCollateralToken.address, account, marketCollateralToken.symbol, provider])
 
   useEffect(() => {
-    const getResult = async () => {
-      const compoundServiceObject = new CompoundService(
-        marketCollateralToken.address,
-        marketCollateralToken.symbol,
-        provider,
-        account,
-      )
-      await compoundServiceObject.init()
-      setCompoundService(compoundServiceObject)
+    const getDisplayEarnedCollateral = async () => {
+      if (isCToken(marketCollateralToken.symbol)) {
+        const compound = new CompoundService(
+          marketCollateralToken.address,
+          marketCollateralToken.symbol,
+          provider,
+          account,
+        )
+        await compound.init()
+        const earnedCollateral = isScalar
+          ? scalarComputeEarnedCollateral(
+              new Big(finalAnswerPercentage),
+              balances.map(balance => balance.shares),
+            )
+          : computeEarnedCollateral(
+              payouts,
+              balances.map(balance => balance.shares),
+            )
+        if (earnedCollateral) {
+          const baseToken = getBaseToken(networkId, collateralToken.symbol)
+          const earnings = compound.calculateCTokenToBaseExchange(baseToken, earnedCollateral)
+          setDisplayEarnedCollateral(earnings)
+        }
+      }
     }
-    if (marketCollateralToken.symbol.toLowerCase() in CompoundTokenType) {
-      getResult()
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    getDisplayEarnedCollateral()
+  }, [marketCollateralToken.address, isConditionResolved, account, provider, balances]) // eslint-disable-line react-hooks/exhaustive-deps
+
   const resolveCondition = async () => {
     if (!cpk) {
       return
@@ -349,13 +361,14 @@ const Wrapper = (props: Props) => {
   )
 
   const realitioAnswerNumber = Number(formatBigNumber(realitioAnswer || new BigNumber(0), STANDARD_DECIMALS))
-
   const scalarLowNumber = Number(formatBigNumber(scalarLow || new BigNumber(0), STANDARD_DECIMALS))
   const scalarHighNumber = Number(formatBigNumber(scalarHigh || new BigNumber(0), STANDARD_DECIMALS))
 
   const unclampedFinalAnswerPercentage =
     realitioAnswer && realitioAnswer.eq(MaxUint256)
       ? 0.5
+      : isConditionResolved
+      ? balances[1].payout
       : (realitioAnswerNumber - scalarLowNumber) / (scalarHighNumber - scalarLowNumber)
 
   const finalAnswerPercentage =
@@ -363,7 +376,7 @@ const Wrapper = (props: Props) => {
 
   const earnedCollateral = isScalar
     ? scalarComputeEarnedCollateral(
-        finalAnswerPercentage,
+        new Big(finalAnswerPercentage),
         balances.map(balance => balance.shares),
       )
     : computeEarnedCollateral(
@@ -377,7 +390,7 @@ const Wrapper = (props: Props) => {
     isScalar,
     balances.map(balance => balance.shares),
     payouts,
-    finalAnswerPercentage,
+    Number(finalAnswerPercentage),
   )
 
   const EPS = 0.01
@@ -399,6 +412,17 @@ const Wrapper = (props: Props) => {
             .lte(EPS),
         )
       : false
+  }
+
+  const symbol = useSymbol(collateralToken)
+  let redeemString = 'NaN'
+  if (earnedCollateral) {
+    if (isCToken(marketCollateralToken.symbol)) {
+      const baseToken = getBaseToken(networkId, collateralToken.symbol)
+      redeemString = `${formatBigNumber(displayEarnedCollateral, baseToken.decimals)} ${baseToken.symbol}`
+    } else {
+      redeemString = `${formatBigNumber(earnedCollateral, collateralToken.decimals)} ${symbol}`
+    }
   }
 
   return (
@@ -453,8 +477,8 @@ const Wrapper = (props: Props) => {
                 <MarketResolutionMessageStyled
                   arbitrator={arbitrator}
                   collateralToken={collateralToken}
-                  earnedCollateral={earnedCollateral}
                   invalid={invalid}
+                  redeemString={redeemString}
                   userWinningOutcomes={userWinningOutcomes}
                   userWinningShares={userWinningShares}
                   winningOutcomes={winningOutcomes}
@@ -474,28 +498,19 @@ const Wrapper = (props: Props) => {
                 </StyledButtonContainer>
               ) : (
                 <>
-                  {!isConditionResolved && (
-                    <BorderedButtonContainer>
-                      <Button
-                        buttonType={ButtonType.primary}
-                        disabled={status === Status.Loading}
-                        onClick={resolveCondition}
-                      >
-                        Resolve Condition
-                      </Button>
-                    </BorderedButtonContainer>
-                  )}
-                  {isConditionResolved && hasWinningOutcomes && (
-                    <BorderedButtonContainer>
-                      <Button
-                        buttonType={ButtonType.primary}
-                        disabled={status === Status.Loading}
-                        onClick={() => redeem()}
-                      >
-                        Redeem
-                      </Button>
-                    </BorderedButtonContainer>
-                  )}
+                  <BorderedButtonContainer borderTop={hasWinningOutcomes !== null && hasWinningOutcomes}>
+                    <Button
+                      buttonType={ButtonType.primary}
+                      disabled={status === Status.Loading}
+                      onClick={isConditionResolved && hasWinningOutcomes ? () => redeem() : resolveCondition}
+                    >
+                      {(!isConditionResolved && hasWinningOutcomes) || (!isConditionResolved && !hasWinningOutcomes)
+                        ? 'Resolve Condition'
+                        : isConditionResolved && hasWinningOutcomes
+                        ? 'Redeem'
+                        : ''}
+                    </Button>
+                  </BorderedButtonContainer>
                 </>
               )}
             </WhenConnected>
