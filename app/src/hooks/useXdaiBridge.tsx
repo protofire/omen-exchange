@@ -44,7 +44,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
       if (networkId === networkIds.MAINNET) {
         setTransactionStep(TransactionStep.waitingConfirmation)
 
-        const transaction = await cpk.sendDaiToBridge(amount)
+        const transaction = await cpk.sendMainnetTokenToBridge(amount)
 
         setTransactionHash(transaction.hash)
         setTransactionStep(TransactionStep.transactionSubmitted)
@@ -62,7 +62,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
         }
         setTransactionStep(TransactionStep.waitingConfirmation)
 
-        const transaction = await cpk.sendXdaiToBridge(amount)
+        const transaction = await cpk.sendXdaiChainTokenToBridge(amount)
 
         setTransactionHash(transaction)
         setTransactionStep(TransactionStep.transactionSubmitted)

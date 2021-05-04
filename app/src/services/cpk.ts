@@ -1439,7 +1439,7 @@ class CPKService {
     }
   }
 
-  sendDaiToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
+  sendMainnetTokenToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
     try {
       if (this.cpk.relay) {
         const xDaiService = new XdaiService(this.provider)
@@ -1470,7 +1470,7 @@ class CPKService {
     }
   }
 
-  sendXdaiToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
+  sendXdaiChainTokenToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
     try {
       if (this.cpk.relay) {
         const transactions: Transaction[] = []

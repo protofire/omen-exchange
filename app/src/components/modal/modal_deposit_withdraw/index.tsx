@@ -191,8 +191,6 @@ export const ModalDepositWithdraw = (props: Props) => {
     !wallet ||
     displayFundAmount.gt(wallet) ||
     displayFundAmount.isZero() ||
-    !wallet ||
-    displayFundAmount.gt(wallet) ||
     displayFundAmount.lt(currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange) ||
     (currencySelected === ExchangeCurrency.Omen &&
       exchangeType === ExchangeType.deposit &&
@@ -216,8 +214,8 @@ export const ModalDepositWithdraw = (props: Props) => {
 
       const hash =
         exchangeType === ExchangeType.deposit
-          ? await cpk.sendDaiToBridge(displayFundAmount, currencySelected)
-          : await cpk.sendXdaiToBridge(displayFundAmount, currencySelected)
+          ? await cpk.sendMainnetTokenToBridge(displayFundAmount, currencySelected)
+          : await cpk.sendXdaiChainTokenToBridge(displayFundAmount, currencySelected)
 
       const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
 

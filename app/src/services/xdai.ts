@@ -9,6 +9,7 @@ import {
   GEN_XDAI_ADDRESS_TESTING,
   MULTI_CLAIM_ADDRESS,
   OMNI_BRIDGE_MAINNET_ADDRESS,
+  OMNI_BRIDGE_VALIDATORS,
   OMNI_CLAIM_ADDRESS,
   OMNI_FOREIGN_BRIDGE,
   OMNI_HOME_BRIDGE,
@@ -221,8 +222,7 @@ class XdaiService {
         const log = transaction.logs[transaction.logs.length - 1]
         const messageId = log.topics[log.topics.length - 1]
         // check if the message has been processed
-        const xdaiOmniAddress = '0x75Df5AF045d91108662D8080fD1FEFAd6aA0bb59'
-        const xdaiOmni = new ethers.Contract(xdaiOmniAddress, omniBridgeAbi, provider.signer)
+        const xdaiOmni = new ethers.Contract(OMNI_BRIDGE_VALIDATORS, omniBridgeAbi, provider.signer)
         status = await xdaiOmni.messageCallStatus(messageId)
       }
       await waitABit()
