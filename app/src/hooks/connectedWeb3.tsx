@@ -120,7 +120,12 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     return null
   }
 
-  const { address, isRelay, netId, provider } = getRelayProvider(relay, networkId, library, account)
+  const { address, isRelay, netId, provider } = getRelayProvider(
+    relay && context.connectorName !== 'Safe',
+    networkId,
+    library,
+    account,
+  )
 
   const value = {
     account: address || null,
