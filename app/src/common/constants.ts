@@ -108,9 +108,6 @@ export const DEFAULT_TOKEN_ADDRESS = '0x6b175474e89094c44da98b954eedeac495271d0f
 export const GEN_TOKEN_ADDDRESS_TESTING = '0x543ff227f64aa17ea132bf9886cab5db55dcaddf'
 export const GEN_XDAI_ADDRESS_TESTING = '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599'
 
-export const MAINNET_LOCATION = 'omen.eth.link'
-export const XDAI_LOCATION = 'xdai.omen.eth.link'
-
 export const MAIN_NETWORKS = ['1', '0x1', '4', '0x4']
 export const XDAI_NETWORKS = ['100', '0x64', '77', '0x4d']
 export const RINKEBY_NETWORKS = ['4', '0x4']
