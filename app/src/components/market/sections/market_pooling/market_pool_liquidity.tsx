@@ -359,7 +359,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         poolShareSupply: totalPoolShares,
         setTxHash,
         setTxState,
-        useBaseToken: false, // Not using cTokens for staking
+        useBaseToken: false, // Not using base token for staking
       })
 
       await fetchGraphMarketMakerData()
@@ -394,39 +394,57 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const unstakeClaimAndRemoveFunding = async () => {
-    if (!cpk) {
-      return
-    }
-    if (!liquidityMiningCampaign) {
-      throw 'No liquidity mining campaign'
-    }
-
-    const collateralAddress = await marketMaker.getCollateralToken()
-    const conditionId = await marketMaker.getConditionId()
-    let useBaseToken = false
-    if (displayCollateral.address === pseudoNativeAssetAddress) {
-      useBaseToken = true
-    } else if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-      if (displayCollateral.address !== collateral.address) {
-        useBaseToken = true
+    try {
+      if (!cpk) {
+        return
       }
-    }
+      if (!liquidityMiningCampaign) {
+        throw 'No liquidity mining campaign'
+      }
 
-    await cpk.unstakeClaimAndWithdraw({
-      amountToMerge: depositedTokens,
-      campaignAddress: liquidityMiningCampaign.id,
-      collateralAddress,
-      conditionId,
-      conditionalTokens,
-      compoundService,
-      earnings: userEarnings,
-      marketMaker,
-      outcomesCount: balances.length,
-      setTxHash,
-      setTxState,
-      sharesToBurn: amountToRemove || Zero,
-      useBaseToken,
-    })
+      const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
+      setMessage(`Unstaking and withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
+
+      const collateralAddress = await marketMaker.getCollateralToken()
+      const conditionId = await marketMaker.getConditionId()
+
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
+
+      await cpk.unstakeClaimAndWithdraw({
+        amountToMerge: depositedTokens,
+        campaignAddress: liquidityMiningCampaign.id,
+        collateralAddress,
+        conditionId,
+        conditionalTokens,
+        compoundService,
+        earnings: userEarnings,
+        marketMaker,
+        outcomesCount: balances.length,
+        setTxHash,
+        setTxState,
+        sharesToBurn: amountToRemove || Zero,
+        useBaseToken: false, // Not using base token for staking
+      })
+
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
+      await fetchCollateralBalance()
+      await fetchBalances()
+      await fetchStakingData()
+
+      setAmountToRemove(null)
+      setAmountToRemoveDisplay('')
+      setAmountToRemoveNormalized(null)
+      setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${displayCollateral.symbol}`)
+      setIsTransactionProcessing(false)
+    } catch (err) {
+      setTxState(TransactionStep.error)
+      setMessage(`Error trying to unstaked and withdraw funds.`)
+      logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
+    }
   }
 
   const removeFunding = async () => {
