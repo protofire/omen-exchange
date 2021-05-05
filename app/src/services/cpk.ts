@@ -65,6 +65,7 @@ interface CPKBuyOutcomesParams {
 
 interface CPKSellOutcomesParams {
   amount: BigNumber
+  collateralToken: Token
   compoundService?: CompoundService | null
   outcomeIndex: number
   marketMaker: MarketMakerService
@@ -856,6 +857,7 @@ class CPKService {
 
   sellOutcomes = async ({
     amount,
+    collateralToken,
     compoundService,
     conditionalTokens,
     marketMaker,
@@ -877,7 +879,6 @@ class CPKService {
       const txOptions: TxOptions = {}
       await this.getGas(txOptions)
 
-      const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
       let userInputCollateral = collateralToken
       if (compoundService && useBaseToken) {
