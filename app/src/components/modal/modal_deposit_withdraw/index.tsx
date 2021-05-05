@@ -56,8 +56,11 @@ const WalletText = styled.div`
 `
 
 const DepositWithdrawButton = styled(Button)`
-  width: 100%;
-  margin-top: 24px;
+  flex: 1;
+`
+const ApproveButton = styled(Button)`
+  flex: 1;
+  margin-right: 16px;
 `
 
 const Allowance = styled.div`
@@ -70,6 +73,11 @@ const Allowance = styled.div`
   letter-spacing: 0.2px;
   color: ${props => props.theme.colors.textColorLightish};
   align-items: center;
+`
+const BottomButtons = styled.div`
+  display: flex;
+  margin-top: 24px;
+  width: 100%;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -401,13 +409,18 @@ ${currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}.`}
               />
             </Allowance>
           )}
-          <DepositWithdrawButton
-            buttonType={ButtonType.primaryAlternative}
-            disabled={isDepositWithdrawDisabled}
-            onClick={depositWithdraw}
-          >
-            {exchangeType}
-          </DepositWithdrawButton>
+          <BottomButtons>
+            <ApproveButton buttonType={ButtonType.primary} onClick={approve}>
+              Approve {currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}
+            </ApproveButton>
+            <DepositWithdrawButton
+              buttonType={ButtonType.primaryAlternative}
+              disabled={isDepositWithdrawDisabled}
+              onClick={depositWithdraw}
+            >
+              {exchangeType}
+            </DepositWithdrawButton>
+          </BottomButtons>
         </ContentWrapper>
       </Modal>
       <ModalClaimWrapper
