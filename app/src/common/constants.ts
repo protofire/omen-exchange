@@ -70,6 +70,8 @@ export const KLEROS_CURATE_GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/
 //xDai transaction data subgraphs
 export const XDAI_HOME_BRIDGE = 'https://api.thegraph.com/subgraphs/name/maxaleks/home-bridge-xdai'
 export const XDAI_FOREIGN_BRIDGE = 'https://api.thegraph.com/subgraphs/name/maxaleks/foreign-bridge-mainnet'
+export const OMNI_HOME_BRIDGE = 'https://api.thegraph.com/subgraphs/name/raid-guild/xdai-omnibridge'
+export const OMNI_FOREIGN_BRIDGE = 'https://api.thegraph.com/subgraphs/name/raid-guild/mainnet-omnibridge'
 
 export const IPFS_GATEWAY = 'https://ipfs.kleros.io'
 
@@ -103,6 +105,8 @@ export const IMPORT_QUESTION_ID_KEY = 'importQuestionId'
 
 export const DEFAULT_TOKEN_ADDRESS_RINKEBY = '0x5592ec0cfb4dbc12d3ab100b257153436a1f0fea'
 export const DEFAULT_TOKEN_ADDRESS = '0x6b175474e89094c44da98b954eedeac495271d0f'
+export const GEN_TOKEN_ADDDRESS_TESTING = '0x543ff227f64aa17ea132bf9886cab5db55dcaddf'
+export const GEN_XDAI_ADDRESS_TESTING = '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599'
 
 export const MAIN_NETWORKS = ['1', '0x1', '4', '0x4']
 export const XDAI_NETWORKS = ['100', '0x64', '77', '0x4d']
@@ -111,8 +115,13 @@ export const SOKOL_NETWORKS = ['77', '0x4d']
 
 export const XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS = '0x7301CFA0e1756B71869E93d4e4Dca5c7d0eb0AA6'
 export const DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS = '0x4aa42145Aa6Ebf72e164C9bBC74fbD3788045016'
+export const OMNI_BRIDGE_MAINNET_ADDRESS = '0x88ad09518695c6c3712AC10a214bE5109a655671'
+export const OMNI_BRIDGE_XDAI_ADDRESS = '0xf6A78083ca3e2a662D6dd1703c939c8aCE2e268d'
 
-export const MULTI_CLAIM_ADDRESS = '0xE0A392a61357F86f0da2d1586b91cA54e9097022'
+export const OMNI_CLAIM_ADDRESS = '0x4C36d2919e407f0Cc2Ee3c993ccF8ac26d9CE64e'
+export const OMNI_BRIDGE_VALIDATORS = '0x75Df5AF045d91108662D8080fD1FEFAd6aA0bb59'
+
+export const MULTI_CLAIM_ADDRESS = '0x5699D0D42bc1a0501D7DC270fD800Af6654Ace3E'
 
 export const RELAY_FEE = '1000000000000000' // 0.001 xdai
 export const RELAY_ADDRESS = '0xa493f3Adf76560092088a61e9e314a08D0B1B2b8'

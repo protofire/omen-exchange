@@ -328,6 +328,15 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     },
     order: 2,
   },
+  omn: {
+    symbol: 'OMN',
+    decimals: 18,
+    addresses: {
+      [networkIds.MAINNET]: '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
+      [networkIds.XDAI]: '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599',
+    },
+    order: 22,
+  },
   cbat: {
     symbol: 'cBAT',
     decimals: 8,
