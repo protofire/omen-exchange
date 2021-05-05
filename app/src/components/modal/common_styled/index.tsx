@@ -11,7 +11,7 @@ export const ContentWrapper = styled.div`
 export const ModalNavigation = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between
+  justify-content: space-between;
   width: 100%;
   padding: 5px;
   margin-bottom: 14px;
@@ -37,17 +37,19 @@ export const ModalCard = styled.div`
   border: ${props => props.theme.borders.borderLineDisabled};
   border-radius: ${props => props.theme.cards.borderRadius};
 
-  &:nth-child(3) {
+  &:nth-child(3),
+  &:nth-child(4) {
     margin-top: 16px;
   }
 `
 
-export const BalanceSection = styled.div`
+export const BalanceSection = styled.div<{ borderBottom?: boolean }>`
   padding: 16px 20px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   width: 100%;
+  ${props => props.borderBottom && `border-bottom: ${props.theme.borders.borderLineDisabled};`}};
 `
 
 export const BalanceItems = styled.div`
@@ -56,7 +58,23 @@ export const BalanceItems = styled.div`
   width: 100%;
 `
 
-export const BalanceItem = styled.div`
+export const BalanceItemSide = styled.div`
+  display: flex;
+  align-items: center;
+`
+
+export const BalanceItemTitle = styled.p<{ notSelected?: boolean }>`
+  font-size: ${props => props.theme.fonts.defaultSize};
+  color: ${props => (props.notSelected ? props.theme.colors.textColorLighter : props.theme.colors.textColorDark)};
+  margin: 0;
+`
+
+export const BalanceItemBalance = styled.p`
+  font-size: ${props => props.theme.fonts.defaultSize};
+  color: ${props => props.theme.colors.textColorLighter};
+  margin: 0;
+`
+export const BalanceItem = styled.div<{ hover?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -65,21 +83,14 @@ export const BalanceItem = styled.div`
   &:nth-of-type(2) {
     margin-top: 12px;
   }
-`
 
-export const BalanceItemSide = styled.div`
-  display: flex;
-  align-items: center;
-`
-
-export const BalanceItemTitle = styled.p`
-  font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => props.theme.colors.textColorDark};
-  margin: 0;
-`
-
-export const BalanceItemBalance = styled.p`
-  font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => props.theme.colors.textColorLighter};
-  margin: 0;
+  &:hover {
+    
+   ${BalanceItemSide}{
+   ${BalanceItemTitle}{
+   color: ${props => props.theme.colors.textColorDark}; !important;
+   }
+ 
+   }
+  }
 `

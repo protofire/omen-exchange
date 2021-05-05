@@ -6,6 +6,7 @@ import styled, { withTheme } from 'styled-components'
 import { CONFIRMATION_COUNT } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../hooks'
 import { getBlockExplorer, getTxHashBlockExplorerURL } from '../../../util/networks'
+import { isValidHttpUrl } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -24,12 +25,6 @@ const ModalMainText = styled.p`
   align-items: center;
 `
 
-const ModalTokenIcon = styled.img`
-  width: 24px;
-  height: 24px;
-  margin-left: 10px;
-`
-
 const ModalSubText = styled.p`
   font-size: ${props => props.theme.fonts.defaultFontSize};
   color: ${props => props.theme.colors.textColorLighter};
@@ -46,6 +41,11 @@ const ButtonContainer = styled.div`
 const ModalButton = styled(Button)`
   width: 100%;
 `
+const ModalTokenIcon = styled.img`
+  width: 24px;
+  height: 24px;
+  margin-left: 10px;
+`
 
 const ModalButtonWrapper = styled.a`
   width: 100%;
@@ -57,7 +57,7 @@ const ModalButtonText = styled.span`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  icon?: string
+  icon?: any
   isOpen: boolean
   message: string
   onClose: () => void
@@ -122,7 +122,7 @@ export const ModalTransaction = (props: Props) => {
         )}
         <ModalMainText>
           {message}
-          {icon && <ModalTokenIcon src={icon} />}
+          {isValidHttpUrl(icon) ? <ModalTokenIcon src={icon} /> : icon}
         </ModalMainText>
         <ModalSubText>
           {txState === TransactionStep.waitingConfirmation
