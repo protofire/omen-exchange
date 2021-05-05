@@ -86,8 +86,6 @@ interface ButtonStatefulProps extends ButtonProps {
 
 export const ButtonStateful: React.FC<ButtonStatefulProps> = (props: ButtonStatefulProps) => {
   const { extraText = false, children, disabled, onClick, state = ButtonStates.idle, ...restProps } = props
-  console.log(props.state === ButtonStates.working, extraText)
-  console.log(state === ButtonStates.working && extraText)
 
   return (
     <Wrapper

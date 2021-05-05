@@ -61,6 +61,19 @@ const ApproveButton = styled(ButtonStateful)`
   flex: 1;
   margin-right: 16px;
 `
+// const ExchangeData = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   flex: 1;
+// `
+const ExchangeDataItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  line-height: 16px;
+  letter-spacing: 0.2px;
+  color: ${props => props.theme.colors.textColorLightish};
+`
 
 const Allowance = styled.div`
   display: flex;
@@ -77,6 +90,11 @@ const BottomButtons = styled.div`
   display: flex;
   margin-top: 24px;
   width: 100%;
+`
+const Divider = styled.div`
+  border-bottom: ${props => props.theme.borders.borderLineDisabled};
+  width: 100%;
+  margin: 24px 0;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -386,8 +404,23 @@ export const ModalDepositWithdraw = (props: Props) => {
               setAmountToDisplay(formatBigNumber(maxBalance, STANDARD_DECIMALS, 5))
             }}
             shouldDisplayMaxButton={true}
+            style={{ marginBottom: '32px' }}
             symbol={currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}
           />
+
+          <ExchangeDataItem>
+            <span>Min amount</span>
+            <span>10</span>
+          </ExchangeDataItem>
+          <ExchangeDataItem style={{ marginTop: '12px' }}>
+            <span>Deposit Fee</span>
+            <span>0.1</span>
+          </ExchangeDataItem>
+          <Divider />
+          <ExchangeDataItem>
+            <span>Total</span>
+            <span>9.99</span>
+          </ExchangeDataItem>
 
           {/*          <InputInfo>*/}
           {/*            <IconAlertInverted style={{ marginRight: '12px' }} />*/}
@@ -415,12 +448,15 @@ export const ModalDepositWithdraw = (props: Props) => {
           {/*            </Allowance>*/}
           {/*          )}*/}
           <BottomButtons>
-            <ApproveButton extraText onClick={approve} state={allowanceState}>
-              {allowanceState === ButtonStates.idle &&
-                `Approve ${currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}`}
-              {allowanceState === ButtonStates.working && 'Approving'}
-              {allowanceState === ButtonStates.finished && 'Approved'}
-            </ApproveButton>
+            {exchangeType === ExchangeType.deposit && (
+              <ApproveButton extraText onClick={approve} state={allowanceState}>
+                {allowanceState === ButtonStates.idle &&
+                  `Approve ${currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}`}
+                {allowanceState === ButtonStates.working && 'Approving'}
+                {allowanceState === ButtonStates.finished && 'Approved'}
+              </ApproveButton>
+            )}
+
             <DepositWithdrawButton
               buttonType={ButtonType.primaryAlternative}
               disabled={isDepositWithdrawDisabled}
