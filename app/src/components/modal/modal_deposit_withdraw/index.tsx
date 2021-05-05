@@ -6,31 +6,16 @@ import styled, { withTheme } from 'styled-components'
 
 import { OMNI_BRIDGE_MAINNET_ADDRESS, STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
-import { ERC20Service, ERC20Service, XdaiService, XdaiService } from '../../../services'
-import { getToken, getToken, networkIds, networkIds } from '../../../util/networks'
-import {
-  formatBigNumber,
-  formatBigNumber,
-  formatNumber,
-  waitForConfirmations,
-  waitForConfirmations,
-} from '../../../util/tools'
-import {
-  ExchangeCurrency,
-  ExchangeCurrency,
-  ExchangeType,
-  ExchangeType,
-  TransactionStep,
-  TransactionStep,
-  WalletState,
-  WalletState,
-} from '../../../util/types'
-import { Button, Button, ButtonStateful } from '../../button'
+import { ERC20Service, XdaiService } from '../../../services'
+import { getToken, networkIds } from '../../../util/networks'
+import { formatBigNumber, formatNumber, waitForConfirmations } from '../../../util/tools'
+import { ExchangeCurrency, ExchangeType, TransactionStep, WalletState } from '../../../util/types'
+import { Button, ButtonStateful } from '../../button'
 import { ButtonStates } from '../../button/button_stateful'
 import { ButtonType } from '../../button/button_styling_types'
 import { BigNumberInput, RadioInput, TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInputReturn } from '../../common/form/big_number_input'
-import { IconArrowBack, IconArrowBack, IconClose, IconClose, IconOmen, IconOmen } from '../../common/icons'
+import { IconArrowBack, IconClose, IconOmen } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
 import { DaiIcon } from '../../common/icons/currencies'
 import { ToggleTokenLock } from '../../market/common/toggle_token_lock'
