@@ -713,10 +713,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
             Withdraw
           </Button>
         )}
-        <Button onClick={stake}>Stake</Button>
-        <Button onClick={withdraw}>Withdraw</Button>
-        <Button onClick={claim}>Claim</Button>
-        <Button onClick={withdrawAndClaim}>Exit</Button>
+        {/* <Button onClick={claim}>Claim</Button> */}
       </BottomButtonWrapper>
       <ModalTransactionWrapper
         confirmations={0}
