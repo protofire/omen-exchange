@@ -309,7 +309,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
-      let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
+      let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
       if (
         compoundService &&
         collateralSymbol in CompoundTokenType &&
