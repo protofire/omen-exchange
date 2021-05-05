@@ -12,6 +12,11 @@ export enum Status {
   Error = 'Error',
 }
 
+export enum ExchangeCurrency {
+  Dai,
+  Omen,
+}
+
 export enum KlerosItemStatus {
   Absent = 'Absent',
   Registered = 'Registered',
