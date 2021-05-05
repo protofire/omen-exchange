@@ -470,14 +470,16 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       liquidityMiningCampaign && new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
 
     const getUserStakedTokens = async () => {
-      const userStakedTokens = await stakingService?.getStakedTokensOfAmount((cpk && cpk.address) || '')
-      setUserStakedTokens(bigNumberify(userStakedTokens || 0))
+      if (cpk) {
+        const userStakedTokens = await stakingService?.getStakedTokensOfAmount(cpk.address)
+        setUserStakedTokens(bigNumberify(userStakedTokens || 0))
+      }
     }
 
     if (stakingService) {
       getUserStakedTokens()
     }
-  }, [liquidityMiningCampaign])
+  }, [liquidityMiningCampaign, cpk])
 
   // TODO: Remove if unused, otherwise clean up
   const stake = async () => {
