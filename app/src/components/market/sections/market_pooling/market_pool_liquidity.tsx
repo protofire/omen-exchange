@@ -696,16 +696,18 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     ? null
     : maybeFundingBalance === null
     ? null
-    : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
+    : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance) && amountToRemove?.gt(userStakedTokens)
     ? `Insufficient balance`
-    : amountToRemoveNormalized?.gt(displayFundingBalance)
-    ? `Value must be less than or equal to ${displaySharesBalance} pool shares`
+    : amountToRemoveNormalized?.gt(displayFundingBalance) && amountToRemoveNormalized?.gt(userStakedTokens)
+    ? `Value must be less than or equal to ${
+        userStakedTokens ? formatBigNumber(userStakedTokens, STANDARD_DECIMALS) : displaySharesBalance
+      } pool shares`
     : null
 
   const disableWithdrawButton =
     !amountToRemove ||
     amountToRemove?.isZero() ||
-    amountToRemoveNormalized?.gt(displayFundingBalance) ||
+    (amountToRemoveNormalized?.gt(displayFundingBalance) && amountToRemoveNormalized?.gt(userStakedTokens)) ||
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 
