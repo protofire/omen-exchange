@@ -7,7 +7,6 @@ import Web3Provider from 'web3-react'
 import 'react-datepicker/dist/react-datepicker.css'
 import 'sanitize.css'
 
-import { MAINNET_LOCATION, XDAI_LOCATION } from './common/constants'
 import { HeaderNoRouter } from './components/common/layout/header'
 import { Main } from './components/main'
 import { ApolloProviderWrapper } from './contexts/Apollo'
@@ -16,7 +15,7 @@ import balanceReducer from './store/reducer'
 import theme from './theme'
 import { GlobalStyle } from './theme/global_style'
 import connectors from './util/connectors'
-import { getInfuraUrl, networkIds } from './util/networks'
+import { getInfuraUrl } from './util/networks'
 import { checkRpcStatus, getNetworkFromChain } from './util/tools'
 
 const store = configureStore({ reducer: balanceReducer })
@@ -30,9 +29,6 @@ const App: React.FC = () => {
   const network = getNetworkFromChain(networkId)
 
   useEffect(() => {
-    if (location.host === MAINNET_LOCATION) network === networkIds.MAINNET
-    if (location.host === XDAI_LOCATION) network === networkIds.XDAI
-
     if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ethereum])
