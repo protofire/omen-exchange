@@ -320,30 +320,69 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const addFundingAndStake = async () => {
-    if (!cpk) {
-      return
-    }
-    if (!liquidityMiningCampaign) {
-      throw 'No liquidity mining campaign'
-    }
+    try {
+      if (!cpk) {
+        return
+      }
+      if (!liquidityMiningCampaign) {
+        throw 'No liquidity mining campaign'
+      }
+      if (!account) {
+        throw new Error('Please connect to your wallet to perform this action.')
+      }
+      if (
+        !cpk?.isSafeApp &&
+        collateral.address !== pseudoNativeAssetAddress &&
+        displayCollateral.address !== pseudoNativeAssetAddress &&
+        hasEnoughAllowance !== Ternary.True
+      ) {
+        throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
+      }
 
-    let useBaseToken = false
-    if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
-      useBaseToken = true
-    }
+      setMessage(
+        `Depositing and staking funds: ${formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)} ${
+          displayCollateral.symbol
+        }...`,
+      )
 
-    await cpk.depositAndStake({
-      amount: amountToFundNormalized || Zero,
-      campaignAddress: liquidityMiningCampaign.id,
-      collateral,
-      compoundService,
-      holdingsBN: balances.map(b => b.holdings),
-      marketMaker,
-      poolShareSupply: totalPoolShares,
-      setTxHash,
-      setTxState,
-      useBaseToken,
-    })
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
+
+      await cpk.depositAndStake({
+        amount: amountToFundNormalized || Zero,
+        campaignAddress: liquidityMiningCampaign.id,
+        collateral,
+        compoundService,
+        holdingsBN: balances.map(b => b.holdings),
+        marketMaker,
+        poolShareSupply: totalPoolShares,
+        setTxHash,
+        setTxState,
+        useBaseToken: false, // Not using cTokens for staking
+      })
+
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
+      await fetchCollateralBalance()
+      await fetchBalances()
+      await fetchStakingData()
+
+      setAmountToFund(null)
+      setAmountToFundDisplay('')
+      setAmountToFundNormalized(null)
+      setMessage(
+        `Successfully deposited ${formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)} ${
+          displayCollateral.symbol
+        }`,
+      )
+      setIsTransactionProcessing(false)
+    } catch (err) {
+      setTxState(TransactionStep.error)
+      setMessage(`Error trying to deposit and stake funds.`)
+      logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
+    }
   }
 
   const deposit = async () => {
