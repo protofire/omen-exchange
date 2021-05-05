@@ -1,4 +1,3 @@
-import { border } from 'polished'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
@@ -11,9 +10,6 @@ import { IconBlockscout, IconCloudflare, IconInfura } from '../../common/icons'
 import { IconXdai } from '../../common/icons/IconXdai'
 import { ListCard } from '../../market/common/list_card/index'
 
-const TopContent = styled.div`
-  padding: 24px;
-`
 const MainContent = styled.div<{ borderTop?: boolean }>`
   padding: 24px;
   border-top: ${props => (props.borderTop ? props.theme.borders.borderLineDisabled : '')};
@@ -38,13 +34,13 @@ const StatusSection = styled(Row as any)`
   margin-top: 6px;
 `
 
-const Text = styled.p`
-  color: ${props => props.theme.colors.textColorDark};
-  font-size: 16px;
-  line-height: 18.75px;
-  letter-spacing: 0.4px;
-  margin: 0;
-`
+// const Text = styled.p`
+//   color: ${props => props.theme.colors.textColorDark};
+//   font-size: 16px;
+//   line-height: 18.75px;
+//   letter-spacing: 0.4px;
+//   margin: 0;
+// `
 
 const TextLighter = styled.p`
   color: ${props => props.theme.colors.textColorLighter};
@@ -53,14 +49,14 @@ const TextLighter = styled.p`
   margin: 0;
 `
 
-const ButtonRow = styled.div`
-  display: flex;
-  margin-left: auto;
+// const ButtonRow = styled.div`
+//   display: flex;
+//   margin-left: auto;
 
-  button:first-child {
-    margin-right: 12px;
-  }
-`
+//   button:first-child {
+//     margin-right: 12px;
+//   }
+// `
 
 const SetAndSaveButton = styled(ButtonRound)`
   width: 166px;
@@ -126,15 +122,21 @@ const SettingsWrapper = styled(ListCard)`
 const ImageWrap = styled.div`
   margin-right: 10px;
 `
+
+const HorizontalDivider = styled.div`
+  border: 2px solid red;
+  padding: -50%;
+  width: 100%;
+`
 interface Props {
   history?: any
-  style?: any
+
   networkId?: any
 }
 
 const SettingsViewContainer = (props: Props) => {
   const networkId = props.networkId
-  const style = props.style
+
   const network = getNetworkFromChain(networkId)
 
   const [current, setCurrent] = useState(0)
@@ -222,9 +224,10 @@ const SettingsViewContainer = (props: Props) => {
   return (
     <>
       <SettingsWrapper>
-        <MainContent borderTop={false}>
+        <MainContent>
           <Row>
             <Column>
+              RPC Endpoint
               <StatusSection>
                 <StatusBadge status={onlineStatus} />
                 <TextLighter>Status: {onlineStatus ? 'OK' : 'Unavailable'}</TextLighter>
@@ -239,15 +242,19 @@ const SettingsViewContainer = (props: Props) => {
               />
             </FiltersControls>
           </Row>
+
           {current === dropdownItems.length - 1 && (
-            <Input
-              onChange={event => {
-                setUrl(event.target.value)
-                if (current === dropdownItems.length - 1) setCustomUrl(event.target.value)
-              }}
-              placeholder={'Paste your RPC URL'}
-              value={customUrl}
-            ></Input>
+            <>
+              <HorizontalDivider>Custom RPC URL</HorizontalDivider>
+              <Input
+                onChange={event => {
+                  setUrl(event.target.value)
+                  if (current === dropdownItems.length - 1) setCustomUrl(event.target.value)
+                }}
+                placeholder={'Paste your RPC URL'}
+                value={customUrl}
+              ></Input>
+            </>
           )}
         </MainContent>
       </SettingsWrapper>

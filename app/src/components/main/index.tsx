@@ -11,7 +11,6 @@ import { SwitchNetworkModal } from '../common/switch_network_modal'
 import { MarketRoutes } from '../market/routes/market_routes'
 import { MarketWizardCreatorContainer } from '../market/sections/market_create/market_wizard_creator_container'
 import { MarketHomeContainer } from '../market/sections/market_list/market_home_container'
-import SettingsViewContainer from '../settings/settings_view'
 const RedirectToHome = () => <Redirect to="/" />
 export const Main: React.FC = () => {
   const context = useWeb3Context()
@@ -60,11 +59,7 @@ export const Main: React.FC = () => {
                   <Redirect to="/liquidity" />
                 </Route>
                 {/*<Route component={() => <SettingsWithRouter />} exact networkId={networkId} path="/settings" />*/}
-                <Route
-                  exact
-                  path="/settings"
-                  render={props => <SettingsViewContainer networkId={networkId} {...props} />}
-                />
+
                 <Route component={MarketHomeContainer} path="/24h-volume" />
                 <Route component={MarketHomeContainer} path="/volume" />
                 <Route component={MarketHomeContainer} path="/newest" />

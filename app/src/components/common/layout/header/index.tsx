@@ -13,7 +13,6 @@ import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
 import { IconAdd, IconClose } from '../../icons'
-import { IconSettings } from '../../icons/IconSettings'
 
 export const HeaderWrapper = styled.div`
   align-items: flex-end;
@@ -310,13 +309,6 @@ const HeaderContainer: React.FC = (props: any) => {
               <Network claim={false} />
             </HeaderButton>
           )}
-          <ButtonSettings
-            disabled={!hasRouter}
-            {...exitButtonProps}
-            onClick={() => history && history.push('/settings')}
-          >
-            <IconSettings />
-          </ButtonSettings>
         </ContentsRight>
         <ModalYourConnectionWrapper
           changeWallet={() => {

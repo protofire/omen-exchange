@@ -2,20 +2,18 @@ import { BigNumber } from 'ethers/utils'
 import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
-import Web3Provider from 'web3-react'
 
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, STANDARD_DECIMALS } from '../../../common/constants'
 import SettingsViewContainer from '../../../components/settings/settings_view'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service } from '../../../services'
-import connectors from '../../../util/connectors'
 import { getToken, networkIds } from '../../../util/networks'
 import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
 import { TransactionStep, WalletState } from '../../../util/types'
 import { ButtonRound } from '../../button'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
-import { IconArrowBack, IconChevronLeft, IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
+import { IconArrowBack, IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
 import { IconJazz } from '../../common/icons/IconJazz'
 import { IconSettings } from '../../common/icons/IconSettings'
 import { DaiIcon, EtherIcon } from '../../common/icons/currencies'
@@ -159,7 +157,6 @@ const SettingsTopWrapper = styled.div`
   justify-content: space-between;
   margin-bottom: 23px;
 `
-const SettingsView = styled(SettingsViewContainer)``
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   changeWallet: () => void
@@ -291,7 +288,10 @@ export const ModalYourConnection = (props: Props) => {
     <>
       <Modal
         isOpen={isOpen && !isTransactionModalOpen}
-        onRequestClose={onClose}
+        onRequestClose={() => {
+          onClose()
+          setIsSettingsModalOpen(false)
+        }}
         shouldCloseOnOverlayClick={true}
         style={theme.fluidHeightModal}
       >
@@ -302,10 +302,16 @@ export const ModalYourConnection = (props: Props) => {
             <SettingsTopWrapper>
               <IconArrowBack hoverEffect={true} onClick={() => setIsSettingsModalOpen(false)} />
               <ModalTitle>Configure RPC Endpoints</ModalTitle>
-              <IconClose hoverEffect={true} onClick={onClose} />
+              <IconClose
+                hoverEffect={true}
+                onClick={() => {
+                  setIsSettingsModalOpen(false)
+                  onClose()
+                }}
+              />
             </SettingsTopWrapper>
 
-            <SettingsView networkId={chainId} />
+            <SettingsViewContainer networkId={chainId} {...props} />
           </>
         ) : (
           <ContentWrapper>
