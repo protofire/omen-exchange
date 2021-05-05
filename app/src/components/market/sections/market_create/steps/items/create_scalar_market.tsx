@@ -133,28 +133,27 @@ export const CreateScalarMarket = (props: Props) => {
     if (lowerBoundFocus) {
       lowerBound?.lt(Zero)
         ? setLowerBoundError('Value cannot be negative')
-        : upperBound && !upperBound.eq(Zero) && lowerBound?.gt(upperBound)
+        : (upperBound?.gt(Zero) && lowerBound?.gt(upperBound)) ||
+          (lowerBound && upperBound?.gt(Zero) && upperBound?.eq(lowerBound))
         ? setLowerBoundError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
-        : startingPoint && !startingPoint.eq(Zero) && lowerBound?.gt(startingPoint)
+        : (startingPoint?.gt(Zero) && lowerBound?.gt(startingPoint)) ||
+          (lowerBound && startingPoint?.gt(Zero) && startingPoint?.eq(lowerBound))
         ? setLowerBoundError(`Value must be less than ${formatBigNumber(startingPoint, STANDARD_DECIMALS, 2)}`)
         : setLowerBoundError('')
     }
     if (startingPointFocus) {
-      lowerBound && startingPoint && !startingPoint.eq(Zero) && startingPoint.lt(lowerBound)
+      ;(lowerBound && startingPoint?.eq(lowerBound)) || (lowerBound && startingPoint?.lt(lowerBound))
         ? setStartingPointError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
-        : upperBound && !upperBound.eq(Zero) && startingPoint && startingPoint.gt(upperBound)
+        : (upperBound?.gt(Zero) && startingPoint?.gt(upperBound)) ||
+          (upperBound?.gt(Zero) && startingPoint?.eq(upperBound))
         ? setStartingPointError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
-        : upperBound && !upperBound.eq(Zero) && startingPoint && startingPoint.eq(upperBound)
-        ? setStartingPointError('Value cannot be equal to Upper Bound')
         : setStartingPointError('')
     }
     if (upperBoundFocus) {
-      lowerBound && upperBound && !upperBound.eq(Zero) && upperBound.lt(lowerBound)
+      ;(lowerBound && upperBound?.eq(lowerBound)) || (lowerBound && upperBound?.lt(lowerBound))
         ? setUpperBoundError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
-        : startingPoint && upperBound && !upperBound.eq(Zero) && upperBound.lt(startingPoint)
+        : (startingPoint && upperBound?.eq(startingPoint)) || (startingPoint && upperBound?.lt(startingPoint))
         ? setUpperBoundError(`Value must be greater than ${formatBigNumber(startingPoint, STANDARD_DECIMALS, 2)}`)
-        : startingPoint && upperBound && !upperBound.eq(Zero) && upperBound.eq(startingPoint)
-        ? setUpperBoundError('Value cannot be equal to Starting Point')
         : setUpperBoundError('')
     }
   }, [lowerBound, upperBound, startingPoint, lowerBoundFocus, upperBoundFocus, startingPointFocus])
