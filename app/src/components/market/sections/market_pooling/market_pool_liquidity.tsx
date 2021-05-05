@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
@@ -147,6 +147,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [earnedRewards, setEarnedRewards] = useState(0)
   const [totalRewards, setTotalRewards] = useState(0)
   const [liquidityMiningCampaign, setLiquidityMiningCampaign] = useState<Maybe<GraphResponseLiquidityMiningCampaign>>()
+  const [userStakedTokens, setUserStakedTokens] = useState(new BigNumber(0))
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
@@ -461,6 +462,23 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }, [liquidityMiningCampaigns, marketMakerAddress])
 
+  let stakingService =
+    liquidityMiningCampaign && new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
+
+  useEffect(() => {
+    stakingService =
+      liquidityMiningCampaign && new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
+
+    const getUserStakedTokens = async () => {
+      const userStakedTokens = await stakingService?.getStakedTokensOfAmount((cpk && cpk.address) || '')
+      setUserStakedTokens(bigNumberify(userStakedTokens || 0))
+    }
+
+    if (stakingService) {
+      getUserStakedTokens()
+    }
+  }, [liquidityMiningCampaign])
+
   // TODO: Remove if unused, otherwise clean up
   const stake = async () => {
     if (!cpk) {
@@ -517,8 +535,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     if (!liquidityMiningCampaign) {
       throw 'No liquidity mining campaign'
     }
-
-    const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
+    if (!stakingService) {
+      throw 'No staking service'
+    }
 
     const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
       getOMNToken(networkId),
@@ -535,7 +554,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     setRemainingRewards(remainingRewards)
     setRewardApr(rewardApr)
     setTotalRewards(totalRewards)
-  }, [cpk, liquidityMiningCampaign, networkId, provider])
+  }, [cpk, liquidityMiningCampaign, networkId, provider, stakingService])
 
   useEffect(() => {
     cpk && liquidityMiningCampaign && fetchStakingData()
@@ -816,7 +835,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           )}
           {activeTab === Tabs.withdraw && (
             <>
-              <TokenBalance text="Pool Tokens" value={formatNumber(displaySharesBalance)} />
+              <TokenBalance
+                text={`${userStakedTokens.gt(0) ? 'Staked' : 'Pool'} Tokens`}
+                value={
+                  userStakedTokens.gt(0)
+                    ? formatBigNumber(userStakedTokens, STANDARD_DECIMALS)
+                    : formatNumber(displaySharesBalance)
+                }
+              />
 
               <TextfieldCustomPlaceholder
                 formField={
