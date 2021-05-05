@@ -346,6 +346,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     })
   }
 
+  const deposit = async () => {
+    if (liquidityMiningCampaign) {
+      addFundingAndStake()
+    } else {
+      addFunding()
+    }
+  }
+
   const unstakeClaimAndRemoveFunding = async () => {
     if (!cpk) {
       return
@@ -974,7 +982,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           Back
         </Button>
         {activeTab === Tabs.deposit && (
-          <Button buttonType={ButtonType.secondaryLine} disabled={disableDepositButton} onClick={() => addFunding()}>
+          <Button buttonType={ButtonType.secondaryLine} disabled={disableDepositButton} onClick={() => deposit()}>
             Deposit
           </Button>
         )}
@@ -987,10 +995,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             Withdraw
           </Button>
         )}
-        <Button onClick={addFundingAndStake}>Deposit and stake</Button>
         <Button onClick={unstakeClaimAndRemoveFunding}>Unstake, claim, withdraw</Button>
         <Button onClick={stake}>Stake</Button>
-        <Button onClick={withdraw}>Withdraw</Button>
+        <Button onClick={withdraw}>Unstake</Button>
         <Button onClick={claim}>Claim</Button>
         <Button onClick={withdrawAndClaim}>Exit</Button>
       </BottomButtonWrapper>
