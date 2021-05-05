@@ -8,7 +8,7 @@ import { OMNI_BRIDGE_MAINNET_ADDRESS, STANDARD_DECIMALS } from '../../../common/
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service, XdaiService } from '../../../services'
 import { getToken, networkIds } from '../../../util/networks'
-import { formatBigNumber, waitForConfirmations } from '../../../util/tools'
+import { formatBigNumber, formatNumber, waitForConfirmations } from '../../../util/tools'
 import { ExchangeCurrency, ExchangeType, TransactionStep, WalletState } from '../../../util/types'
 import { Button, ButtonStateful } from '../../button'
 import { ButtonStates } from '../../button/button_stateful'
@@ -410,16 +410,32 @@ export const ModalDepositWithdraw = (props: Props) => {
 
           <ExchangeDataItem>
             <span>Min amount</span>
-            <span>10</span>
+            <span>
+              {currencySelected === ExchangeCurrency.Dai
+                ? `${formatBigNumber(minDaiExchange, STANDARD_DECIMALS, 2)} DAI`
+                : `${formatBigNumber(minOmenExchange, omenToken.decimals, 2)} OMN`}
+            </span>
           </ExchangeDataItem>
           <ExchangeDataItem style={{ marginTop: '12px' }}>
-            <span>Deposit Fee</span>
-            <span>0.1</span>
+            <span>{exchangeType === ExchangeType.withdraw ? 'Withdraw' : 'Deposit'} Fee</span>
+            <span>
+              {currencySelected === ExchangeCurrency.Dai
+                ? '0.00 DAI'
+                : exchangeType === ExchangeType.withdraw
+                ? `${formatNumber(formatBigNumber(displayFundAmount.div(1000), omenToken.decimals, 3), 2)} OMN`
+                : '0.00 OMN'}
+            </span>
           </ExchangeDataItem>
           <Divider />
           <ExchangeDataItem>
             <span>Total</span>
-            <span>9.99</span>
+            <span>
+              {currencySelected === ExchangeCurrency.Omen && exchangeType === ExchangeType.withdraw
+                ? `${formatBigNumber(displayFundAmount.sub(displayFundAmount.div(1000)), omenToken.decimals, 3)} OMN`
+                : `${formatBigNumber(displayFundAmount, STANDARD_DECIMALS, 2)} ${
+                    currencySelected === ExchangeCurrency.Omen ? 'OMN' : 'DAI'
+                  }`}
+            </span>
           </ExchangeDataItem>
 
           {/*          <InputInfo>*/}
