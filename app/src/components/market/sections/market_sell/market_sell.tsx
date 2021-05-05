@@ -236,6 +236,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       }
       await cpk.sellOutcomes({
         amount: tradedCollateral,
+        collateralToken: collateral,
         compoundService,
         outcomeIndex,
         marketMaker,

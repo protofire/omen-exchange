@@ -252,6 +252,7 @@ export const ScalarMarketSell = (props: Props) => {
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,
+        collateralToken: collateral,
         compoundService,
         conditionalTokens,
         marketMaker,
