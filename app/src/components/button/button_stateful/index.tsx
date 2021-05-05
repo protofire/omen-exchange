@@ -40,29 +40,36 @@ const IdleDisabledCSS = css`
     opacity: 0.5;
   }
 `
+const SuccessCSS = css`
+  border: 1px solid #4b9e98 !important;
+  color: #4b9e98 !important;
+  opacity: 1 !important;
+`
 
 const Wrapper = styled.button<ButtonStatefulProps>`
-  ${ButtonCSS}
+  ${ButtonCSS};
   position: relative;
-  ${props => (props.state === ButtonStates.idle ? IdleDisabledCSS : DisabledCSS)};
+  ${props =>
+    props.state === ButtonStates.idle
+      ? IdleDisabledCSS
+      : props.state === ButtonStates.finished && props.extraText
+      ? SuccessCSS
+      : DisabledCSS};
 `
 
 const Text = styled.span<{ hide: boolean }>`
-  opacity: ${props => (props.hide ? '0' : '1')};
+  display: ${props => (props.hide ? 'none' : 'flex')};
   position: relative;
   user-select: none;
   z-index: 1;
 `
 
-const SVGWrapper = styled.span`
+const SVGWrapper = styled.span<{ marginLeft?: boolean }>`
   align-items: center;
   display: flex;
   height: 100%;
   justify-content: center;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
+  margin-left: ${props => (props.marginLeft ? '10px' : '')};
   z-index: 5;
 `
 
@@ -74,26 +81,30 @@ const Check = styled.img``
 
 interface ButtonStatefulProps extends ButtonProps {
   state?: ButtonStates
+  extraText?: boolean
 }
 
 export const ButtonStateful: React.FC<ButtonStatefulProps> = (props: ButtonStatefulProps) => {
-  const { children, disabled, onClick, state = ButtonStates.idle, ...restProps } = props
+  const { extraText = false, children, disabled, onClick, state = ButtonStates.idle, ...restProps } = props
+  console.log(props.state === ButtonStates.working, extraText)
+  console.log(state === ButtonStates.working && extraText)
 
   return (
     <Wrapper
       buttonType={state === ButtonStates.idle ? ButtonType.primary : ButtonType.primaryLine}
       disabled={disabled || state === ButtonStates.working}
+      extraText={extraText}
       onClick={onClick}
       state={state}
       {...restProps}
     >
-      <Text hide={state !== ButtonStates.idle}>{children}</Text>
+      <Text hide={state !== ButtonStates.idle && !extraText}>{children}</Text>
       {state === ButtonStates.working && (
-        <SVGWrapper>
+        <SVGWrapper marginLeft={extraText}>
           <Spinner alt="" src={SpinnerSVG} />
         </SVGWrapper>
       )}
-      {state === ButtonStates.finished && (
+      {state === ButtonStates.finished && !extraText && (
         <SVGWrapper>
           <Check alt="" src={CheckSVG} />
         </SVGWrapper>
