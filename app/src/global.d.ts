@@ -10,6 +10,6 @@ declare module 'react-share'
 
 declare type Maybe<T> = T | null
 
-declare type KnownToken = 'cdai' | 'cbat' | 'ceth' | 'cusdc' | 'cusdt' | 'cwbtc' | 'cuni' | 'usdc' | 'dai' | 'weth' | 'owl' | 'chai' | 'gno' | 'pnk' | 'dxd' | 'wspoa' | 'wxdai'
+declare type KnownToken = 'cdai' | 'cbat' | 'ceth' | 'cusdc' | 'cusdt' | 'cwbtc' | 'cuni' | 'usdc' | 'dai' | 'weth' | 'owl' | 'chai' | 'gno' | 'pnk' | 'dxd' | 'wspoa' | 'wxdai' | 'omn'
 
 declare type KnownArbitrator = 'kleros' | 'dxdao' | 'unknown'
