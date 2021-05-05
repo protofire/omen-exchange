@@ -459,6 +459,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
+  const withdraw = () => {
+    if (liquidityMiningCampaign) {
+      unstakeClaimAndRemoveFunding()
+    } else {
+      removeFunding()
+    }
+  }
+
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
   useEffect(() => {
@@ -503,7 +511,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   }
 
   // TODO: Remove if unused, otherwise clean up
-  const withdraw = async () => {
+  const unstake = async () => {
     if (!cpk) {
       return
     }
@@ -987,17 +995,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           </Button>
         )}
         {activeTab === Tabs.withdraw && (
-          <Button
-            buttonType={ButtonType.secondaryLine}
-            disabled={disableWithdrawButton}
-            onClick={() => removeFunding()}
-          >
+          <Button buttonType={ButtonType.secondaryLine} disabled={disableWithdrawButton} onClick={() => withdraw()}>
             Withdraw
           </Button>
         )}
-        <Button onClick={unstakeClaimAndRemoveFunding}>Unstake, claim, withdraw</Button>
         <Button onClick={stake}>Stake</Button>
-        <Button onClick={withdraw}>Unstake</Button>
+        <Button onClick={unstake}>Unstake</Button>
         <Button onClick={claim}>Claim</Button>
         <Button onClick={withdrawAndClaim}>Exit</Button>
       </BottomButtonWrapper>
