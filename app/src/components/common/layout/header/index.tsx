@@ -167,11 +167,6 @@ const HeaderDropdown = styled(Dropdown)`
 `
 
 const MarketAndGovernanceNav = styled.div<{ disabled?: boolean }>`
-  align-items: center;
-  position: static;
-  height: 40px;
-  left: 98px;
-  top: 0px;
   width: 124.65px;
 
   background-color: ${props => (props.disabled ? props => props.theme.buttonSecondary.backgroundColor : 'transparent')};
@@ -203,7 +198,6 @@ const HeaderContainer: React.FC = (props: any) => {
   const [isYourConnectionModalOpen, setYourConnectionModalState] = useState(false)
   const [isDepositWithdrawModalOpen, setDepositWithdrawModalState] = useState(false)
   const [depositWithdrawType, setDepositWithdrawType] = useState<ExchangeType>(ExchangeType.deposit)
-  const [governancePage, setGovernancePage] = useState(false)
   const [marketPage, setMarketPage] = useState(true)
 
   const hasRouter = props.history !== undefined
@@ -273,13 +267,6 @@ const HeaderContainer: React.FC = (props: any) => {
     onClick: () => history && history.push('/'),
   }
 
-  const governanceMarketProps = {
-    onClick: () => {
-      setGovernancePage(!governancePage)
-      setMarketPage(!marketPage)
-    },
-  }
-
   return (
     <HeaderWrapper {...restProps}>
       <HeaderInner>
@@ -287,10 +274,21 @@ const HeaderContainer: React.FC = (props: any) => {
           <LogoWrapper disabled={!hasRouter} onClick={() => props.history && props.history.push('/')}>
             <Logo />
           </LogoWrapper>
-          <MarketAndGovernanceNav disabled={marketPage} {...governanceMarketProps} style={{ marginLeft: '68px' }}>
+          <MarketAndGovernanceNav
+            disabled={marketPage}
+            onClick={() => {
+              setMarketPage(!marketPage)
+            }}
+            style={{ marginLeft: '48px' }}
+          >
             Markets
           </MarketAndGovernanceNav>
-          <MarketAndGovernanceNav disabled={governancePage} {...governanceMarketProps}>
+          <MarketAndGovernanceNav
+            disabled={!marketPage}
+            onClick={() => {
+              setMarketPage(!marketPage)
+            }}
+          >
             Governance
           </MarketAndGovernanceNav>
         </ContentsLeft>
