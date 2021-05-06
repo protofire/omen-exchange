@@ -167,6 +167,13 @@ const HeaderDropdown = styled(Dropdown)`
 `
 
 const MarketAndGovernanceNav = styled.div<{ disabled?: boolean }>`
+  align-items: center;
+  position: static;
+  height: 40px;
+  left: 98px;
+  top: 0px;
+  width: 124.65px;
+
   background-color: ${props => (props.disabled ? props => props.theme.buttonSecondary.backgroundColor : 'transparent')};
   ${props => (props.disabled ? 'pointer-events:none;' : '')};
   border-radius: 32px;
@@ -175,7 +182,7 @@ const MarketAndGovernanceNav = styled.div<{ disabled?: boolean }>`
   font-weight: 500;
   letter-spacing: 1px;
   line-height: 16.41px;
-  margin: 0px -60px 0px 68px;
+  font-size: 14px;
   text-align: center;
   padding: 12px 20px;
   &:hover {
@@ -280,7 +287,7 @@ const HeaderContainer: React.FC = (props: any) => {
           <LogoWrapper disabled={!hasRouter} onClick={() => props.history && props.history.push('/')}>
             <Logo />
           </LogoWrapper>
-          <MarketAndGovernanceNav disabled={marketPage} {...governanceMarketProps}>
+          <MarketAndGovernanceNav disabled={marketPage} {...governanceMarketProps} style={{ marginLeft: '68px' }}>
             Markets
           </MarketAndGovernanceNav>
           <MarketAndGovernanceNav disabled={governancePage} {...governanceMarketProps}>
