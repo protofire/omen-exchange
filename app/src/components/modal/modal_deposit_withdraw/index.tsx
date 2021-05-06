@@ -14,7 +14,7 @@ import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service, XdaiService } from '../../../services'
 import { getToken, networkIds } from '../../../util/networks'
 import { formatBigNumber, formatNumber, waitForConfirmations } from '../../../util/tools'
-import { ExchangeCurrency, ExchangeType, TransactionStep, WalletState } from '../../../util/types'
+import { ExchangeCurrency, ExchangeType, TransactionStep } from '../../../util/types'
 import { Button, ButtonStateful } from '../../button'
 import { ButtonStates } from '../../button/button_stateful'
 import { ButtonType } from '../../button/button_styling_types'
@@ -69,11 +69,7 @@ const ApproveButton = styled(ButtonStateful)`
   flex: 1;
   margin-right: 16px;
 `
-// const ExchangeData = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   flex: 1;
-// `
+
 const ExchangeDataItem = styled.div`
   display: flex;
   justify-content: space-between;
@@ -83,17 +79,6 @@ const ExchangeDataItem = styled.div`
   color: ${props => props.theme.colors.textColorLightish};
 `
 
-const Allowance = styled.div`
-  display: flex;
-  margin-top: 20px;
-  padding: 16px 20px;
-  border-radius: 4px;
-  border: ${props => props.theme.borders.borderLineDisabled};
-  line-height: 20px;
-  letter-spacing: 0.2px;
-  color: ${props => props.theme.colors.textColorLightish};
-  align-items: center;
-`
 const BottomButtons = styled.div`
   display: flex;
   margin-top: auto;
@@ -189,7 +174,6 @@ export const ModalDepositWithdraw = (props: Props) => {
           const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenToken.address)
 
           await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS)
-          console.log('awaiting logic for dai enable')
         }
       }
 
@@ -311,7 +295,6 @@ export const ModalDepositWithdraw = (props: Props) => {
       setIsClaimModalOpen(true)
     }
   }
-  console.log(xDaiBalance?.isZero())
 
   return (
     <>
@@ -481,7 +464,12 @@ export const ModalDepositWithdraw = (props: Props) => {
 
           <BottomButtons>
             {(currencySelected === ExchangeCurrency.Dai ? daiWalletAllowance : omenWalletAllowance) && (
-              <ApproveButton extraText onClick={approve} state={allowanceState}>
+              <ApproveButton
+                disabled={allowanceState !== ButtonStates.idle}
+                extraText
+                onClick={approve}
+                state={allowanceState}
+              >
                 {allowanceState === ButtonStates.idle &&
                   `Approve ${currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}`}
                 {allowanceState === ButtonStates.working && 'Approving'}
