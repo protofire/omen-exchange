@@ -423,47 +423,47 @@ export const ModalYourConnection = (props: Props) => {
           )}
           {relay && (
             <ModalCard>
-              {walletState === WalletState.ready ? (
-                <>
-                  <BalanceSection>
-                    <CardHeaderText>Omen Account</CardHeaderText>
-                    <BalanceItems style={{ marginTop: '14px' }}>
-                      <BalanceItem>
-                        <BalanceItemSide>
-                          <DaiIcon size="24px" />
-                          <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
-                        </BalanceItemSide>
-                        <BalanceItemBalance>{formattedxDaiBalance} DAI</BalanceItemBalance>
-                      </BalanceItem>
-                      <BalanceItem>
-                        <BalanceItemSide>
-                          <IconOmen size={24} />
-                          <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
-                        </BalanceItemSide>
-                        <BalanceItemBalance>{formattedxOmenBalance} OMN</BalanceItemBalance>
-                      </BalanceItem>
-                    </BalanceItems>
-                  </BalanceSection>
-                  <DepositWithdrawButtons>
-                    <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositModal}>
-                      Deposit
-                    </DepositWithdrawButton>
-                    <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openWithdrawModal}>
-                      Withdraw
-                    </DepositWithdrawButton>
-                  </DepositWithdrawButtons>
-                </>
-              ) : (
-                <EnableDai>
-                  <DaiIcon size="38px" />
-                  <EnableDaiText>
-                    To Deposit or Withdraw Dai to your Omen Account, you need to enable it first.
-                  </EnableDaiText>
-                  <EnableDaiButton buttonType={ButtonType.primary} onClick={approve}>
-                    Enable
-                  </EnableDaiButton>
-                </EnableDai>
-              )}
+              {/*{walletState === WalletState.ready ? (*/}
+              <>
+                <BalanceSection>
+                  <CardHeaderText>Omen Account</CardHeaderText>
+                  <BalanceItems style={{ marginTop: '14px' }}>
+                    <BalanceItem>
+                      <BalanceItemSide>
+                        <DaiIcon size="24px" />
+                        <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
+                      </BalanceItemSide>
+                      <BalanceItemBalance>{formattedxDaiBalance} DAI</BalanceItemBalance>
+                    </BalanceItem>
+                    <BalanceItem>
+                      <BalanceItemSide>
+                        <IconOmen size={24} />
+                        <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
+                      </BalanceItemSide>
+                      <BalanceItemBalance>{formattedxOmenBalance} OMN</BalanceItemBalance>
+                    </BalanceItem>
+                  </BalanceItems>
+                </BalanceSection>
+                <DepositWithdrawButtons>
+                  <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositModal}>
+                    Deposit
+                  </DepositWithdrawButton>
+                  <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openWithdrawModal}>
+                    Withdraw
+                  </DepositWithdrawButton>
+                </DepositWithdrawButtons>
+              </>
+              {/*   // ) : (
+              //   <EnableDai>
+              //     <DaiIcon size="38px" />
+              //     <EnableDaiText>
+              //       To Deposit or Withdraw Dai to your Omen Account, you need to enable it first.
+              //     </EnableDaiText>
+              //     <EnableDaiButton buttonType={ButtonType.primary} onClick={approve}>
+              //       Enable
+              //     </EnableDaiButton>
+              //   </EnableDai>
+              // )}*/}
             </ModalCard>
           )}
         </ContentWrapper>
