@@ -10,7 +10,6 @@ import { ERC20Service } from '../../../services'
 import { getToken, networkIds } from '../../../util/networks'
 import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
 import { TransactionStep, WalletState } from '../../../util/types'
-import { ButtonRound } from '../../button'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconArrowBack, IconClose, IconMetaMask, IconOmen, IconSettings, IconWalletConnect } from '../../common/icons'
@@ -165,13 +164,11 @@ const ConnectionModalNavigation = styled(ModalNavigation as any)`
   padding: 0;
   margin-bottom: 16px;
 `
-const SettingsButton = styled(ButtonRound)`
-  border: none;
-`
-const SettingsTopWrapper = styled.div`
+
+const IconSettingsWrapper = styled.div`
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 23px;
+  align-items: center;
+  margin-left: 65px;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -336,8 +333,10 @@ export const ModalYourConnection = (props: Props) => {
           //testing
           <ContentWrapper>
             <ConnectionModalNavigation>
-              <IconArrowBack hoverEffect={true} onClick={() => setIsSettingsModalOpen(false)} />
-              <ModalTitle>Settings</ModalTitle>
+              <ModalTitle>
+                <IconArrowBack hoverEffect={true} onClick={() => setIsSettingsModalOpen(false)} />
+                <span style={{ marginLeft: '15px' }}>Settings</span>
+              </ModalTitle>
 
               <IconClose
                 hoverEffect={true}
@@ -368,9 +367,9 @@ export const ModalYourConnection = (props: Props) => {
                     <AccountInfoWallet>{context.rawWeb3Context.connectorName}</AccountInfoWallet>
                   </AccountInfo>
                 </TopCardHeaderLeft>
-                <SettingsButton onClick={() => setIsSettingsModalOpen(!isSettingsModalOpen)}>
-                  <IconSettings />
-                </SettingsButton>
+                <IconSettingsWrapper>
+                  <IconSettings hoverEffect={true} onClick={() => setIsSettingsModalOpen(!isSettingsModalOpen)} />
+                </IconSettingsWrapper>
                 <ChangeWalletButton buttonType={ButtonType.secondaryLine} onClick={changeWallet}>
                   Change
                 </ChangeWalletButton>

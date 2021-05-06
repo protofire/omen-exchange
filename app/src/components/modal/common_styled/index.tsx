@@ -27,6 +27,8 @@ export const ModalTitle = styled.p`
   color: ${props => props.theme.colors.textColorDark};
   font-weight: 500;
   margin: 0;
+  line-height: 19px;
+  letter-spacing: 0.2px;
 `
 
 export const ModalCard = styled.div`

@@ -8,8 +8,7 @@ import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { TextfieldCSS } from '../../common/form/textfield'
 import { IconBlockscout, IconCloudflare, IconInfura } from '../../common/icons'
 import { IconXdai } from '../../common/icons/IconXdai'
-import { ListCard } from '../../market/common/list_card/index'
-import { TopCard } from '../../market/sections/market_profile/market_status/open'
+import { ModalCard } from '../../modal/common_styled'
 
 const MainContent = styled.div<{ borderTop?: boolean }>`
   display: flex;
@@ -61,6 +60,7 @@ const TextLighter = styled.p`
 // `
 
 const SetAndSaveButton = styled(ButtonRound)`
+  letter-spacing: 0.4px;
   width: 166px;
   height: 40px;
   margin: 8px;
@@ -121,42 +121,13 @@ const ImageWrap = styled.div`
   margin-right: 10px;
 `
 
-const HorizontalDivider = styled.div`
-  border: 2px solid red;
-  padding: -50%;
-  width: 100%;
-`
-
 const TopCardHeader = styled.div<{ borderTop?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 16px;
   width: 100%;
   border-top: ${props => (props.borderTop ? props.theme.borders.borderLineDisabled : '')};
-`
-
-const ModalCard = styled.div`
-  height: auto;
-
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  border: ${props => props.theme.borders.borderLineDisabled};
-  border-radius: ${props => props.theme.cards.borderRadius};
-
-  &:nth-child(3),
-  &:nth-child(4) {
-    margin-top: 16px;
-  }
-`
-
-const ModalTitle = styled.p`
-  font-size: 16px;
-  color: ${props => props.theme.colors.textColorDark};
-  font-weight: 500;
-  margin: 0;
 `
 
 interface Props {
@@ -254,7 +225,7 @@ const SettingsViewContainer = (props: Props) => {
 
   return (
     <>
-      <ModalCard>
+      <ModalCard style={{ minHeight: '146px' }}>
         <TopCardHeader>
           <Row>
             <Column>
