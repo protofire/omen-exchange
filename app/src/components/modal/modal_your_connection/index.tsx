@@ -13,11 +13,10 @@ import { TransactionStep, WalletState } from '../../../util/types'
 import { ButtonRound } from '../../button'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
-import { IconArrowBack, IconClose, IconMetaMask, IconOmen, IconWalletConnect } from '../../common/icons'
+import { IconArrowBack, IconClose, IconMetaMask, IconOmen, IconSettings, IconWalletConnect } from '../../common/icons'
 import { IconChevronDown } from '../../common/icons/IconChevronDown'
 import { IconChevronUp } from '../../common/icons/IconChevronUp'
 import { IconJazz } from '../../common/icons/IconJazz'
-import { IconSettings } from '../../common/icons/IconSettings'
 import { DaiIcon } from '../../common/icons/currencies'
 import {
   BalanceItem,
