@@ -313,7 +313,10 @@ export const ModalYourConnection = (props: Props) => {
         isOpen={isOpen && !isTransactionModalOpen}
         onRequestClose={onClose}
         shouldCloseOnOverlayClick={true}
-        style={theme.fluidHeightModal}
+        style={{
+          ...theme.fluidHeightModal,
+          content: { ...theme.fluidHeightModal.content, height: 'auto !important;' },
+        }}
       >
         <ContentWrapper>
           <ConnectionModalNavigation>
