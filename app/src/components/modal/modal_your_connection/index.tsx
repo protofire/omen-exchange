@@ -330,7 +330,6 @@ export const ModalYourConnection = (props: Props) => {
         style={theme.fluidHeightModal}
       >
         {isSettingsModalOpen ? (
-          //testing
           <ContentWrapper>
             <ConnectionModalNavigation>
               <ModalTitle>
