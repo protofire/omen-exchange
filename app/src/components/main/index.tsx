@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import { useWeb3Context } from 'web3-react'
 
@@ -13,14 +13,6 @@ import { MarketHomeContainer } from '../market/sections/market_list/market_home_
 const RedirectToHome = () => <Redirect to="/" />
 export const Main: React.FC = () => {
   const context = useWeb3Context()
-
-  const windowObj: any = window
-  const defaultChainID = 1
-  const [networkId, setNetworkId] = useState(windowObj.ethereum ? windowObj.ethereum.chainId : defaultChainID)
-
-  if (windowObj.ethereum) {
-    windowObj.ethereum.on('chainChanged', (chainId: string) => setNetworkId(chainId))
-  }
 
   return (
     <>

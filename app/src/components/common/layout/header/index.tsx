@@ -14,7 +14,6 @@ import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
 import { IconAdd, IconClose, IconOmen } from '../../icons'
-import { IconSettings } from '../../icons/IconSettings'
 
 export const HeaderWrapper = styled.div`
   align-items: flex-end;
