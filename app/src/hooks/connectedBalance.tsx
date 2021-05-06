@@ -14,8 +14,8 @@ const logger = getLogger('Hooks::ConnectedBalance')
 export interface ConnectedBalanceContext {
   unclaimedDaiAmount: BigNumber
   unclaimedOmenAmount: BigNumber
-  ethBalance: BigNumber
-  formattedEthBalance: string
+  nativeBalance: BigNumber
+  formattedNativeBalance: string
   daiBalance: BigNumber
   formattedDaiBalance: string
   xOmenBalance: BigNumber
@@ -59,7 +59,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
 
   // mainnet balances
   const { refetch, tokens } = useTokens(context.rawWeb3Context, true, true)
-  const ethBalance = new BigNumber(
+  const nativeBalance = new BigNumber(
     tokens.filter(token => token.symbol === getNativeAsset(context.rawWeb3Context.networkId).symbol)[0]?.balance || '',
   )
   const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
@@ -138,8 +138,11 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const value = {
     unclaimedDaiAmount,
     unclaimedOmenAmount,
-    ethBalance,
-    formattedEthBalance: formatNumber(formatBigNumber(ethBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 3),
+    nativeBalance,
+    formattedNativeBalance: formatNumber(
+      formatBigNumber(nativeBalance, STANDARD_DECIMALS, STANDARD_DECIMALS),
+      !relay && networkId === networkIds.XDAI ? 2 : 3,
+    ),
     daiBalance,
     formattedDaiBalance: formatNumber(formatBigNumber(daiBalance, STANDARD_DECIMALS, STANDARD_DECIMALS)),
     xDaiBalance,
