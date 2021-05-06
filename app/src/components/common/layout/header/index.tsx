@@ -3,11 +3,12 @@ import { withRouter } from 'react-router'
 import { matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
+import { isPropertySignature } from 'typescript'
 
 import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedBalanceContext, useConnectedWeb3Context } from '../../../../hooks'
 import { networkIds } from '../../../../util/networks'
-import { formatBigNumber } from '../../../../util/tools'
+import { formatBigNumber, promiseProps } from '../../../../util/tools'
 import { ExchangeType } from '../../../../util/types'
 import { ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
@@ -177,9 +178,9 @@ const MarketAndGovernanceNav = styled.div<{ disabled?: boolean }>`
   font-weight: 500;
   letter-spacing: 1px;
   line-height: 16.41px;
-  font-size: 14px;
+  font-size: ${props => props.theme.fonts.defaultSize}
   text-align: center;
-  padding: 12px 20px;
+  padding: ${props => props.theme.textfield.paddingVertical} ${props => props.theme.textfield.paddingHorizontal}
   &:hover {
     color: ${props => (!props.disabled ? props.theme.colors.primary : '')};
   }
