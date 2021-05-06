@@ -18,7 +18,6 @@ import { BigNumberInputReturn } from '../../common/form/big_number_input'
 import { IconArrowBack, IconClose, IconOmen } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
 import { DaiIcon } from '../../common/icons/currencies'
-import { ToggleTokenLock } from '../../market/common/toggle_token_lock'
 import {
   BalanceItem,
   BalanceItemBalance,
@@ -35,13 +34,14 @@ import {
 import { ModalClaimWrapper } from '../modal_claim'
 import { ModalTransactionWrapper } from '../modal_transaction'
 
-const InputInfo = styled.p`
+const InputInfo = styled.div`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorLighter};
-  margin: 20px 0 0;
-  width: 100%;
 
-  display: flex;
+  width: 100%;
+  margin-bottom: auto;
+
+  display: -webkit-box;
   align-items: center;
   border: ${props => props.theme.borders.borderLineDisabled};
   border-radius: 4px;
@@ -90,7 +90,7 @@ const Allowance = styled.div`
 `
 const BottomButtons = styled.div`
   display: flex;
-  margin-top: 24px;
+  margin-top: auto;
   width: 100%;
 `
 const Divider = styled.div`
@@ -298,6 +298,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       setIsClaimModalOpen(true)
     }
   }
+  console.log(xDaiBalance?.isZero())
 
   return (
     <>
@@ -409,51 +410,51 @@ export const ModalDepositWithdraw = (props: Props) => {
             style={{ marginBottom: '32px' }}
             symbol={currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}
           />
+          {exchangeType === ExchangeType.withdraw &&
+          currencySelected === ExchangeCurrency.Omen &&
+          xDaiBalance?.isZero ? (
+            <InputInfo>
+              <IconAlertInverted />
+              <div style={{ marginLeft: '12px' }}>Fund your Omen Account with Dai to proceed with the withdrawal.</div>
+            </InputInfo>
+          ) : (
+            <>
+              <ExchangeDataItem>
+                <span>Min amount</span>
+                <span>
+                  {currencySelected === ExchangeCurrency.Dai
+                    ? `${formatBigNumber(minDaiExchange, STANDARD_DECIMALS, 2)} DAI`
+                    : `${formatBigNumber(minOmenExchange, omenToken.decimals, 2)} OMN`}
+                </span>
+              </ExchangeDataItem>
+              <ExchangeDataItem style={{ marginTop: '12px' }}>
+                <span>{exchangeType === ExchangeType.withdraw ? 'Withdraw' : 'Deposit'} Fee</span>
+                <span>
+                  {currencySelected === ExchangeCurrency.Dai
+                    ? '0.00 DAI'
+                    : exchangeType === ExchangeType.withdraw
+                    ? `${formatNumber(formatBigNumber(displayFundAmount.div(1000), omenToken.decimals, 3), 2)} OMN`
+                    : '0.00 OMN'}
+                </span>
+              </ExchangeDataItem>
+              <Divider />
+              <ExchangeDataItem>
+                <span>Total</span>
+                <span>
+                  {currencySelected === ExchangeCurrency.Omen && exchangeType === ExchangeType.withdraw
+                    ? `${formatBigNumber(
+                        displayFundAmount.sub(displayFundAmount.div(1000)),
+                        omenToken.decimals,
+                        3,
+                      )} OMN`
+                    : `${formatBigNumber(displayFundAmount, STANDARD_DECIMALS, 2)} ${
+                        currencySelected === ExchangeCurrency.Omen ? 'OMN' : 'DAI'
+                      }`}
+                </span>
+              </ExchangeDataItem>
+            </>
+          )}
 
-          <ExchangeDataItem>
-            <span>Min amount</span>
-            <span>
-              {currencySelected === ExchangeCurrency.Dai
-                ? `${formatBigNumber(minDaiExchange, STANDARD_DECIMALS, 2)} DAI`
-                : `${formatBigNumber(minOmenExchange, omenToken.decimals, 2)} OMN`}
-            </span>
-          </ExchangeDataItem>
-          <ExchangeDataItem style={{ marginTop: '12px' }}>
-            <span>{exchangeType === ExchangeType.withdraw ? 'Withdraw' : 'Deposit'} Fee</span>
-            <span>
-              {currencySelected === ExchangeCurrency.Dai
-                ? '0.00 DAI'
-                : exchangeType === ExchangeType.withdraw
-                ? `${formatNumber(formatBigNumber(displayFundAmount.div(1000), omenToken.decimals, 3), 2)} OMN`
-                : '0.00 OMN'}
-            </span>
-          </ExchangeDataItem>
-          <Divider />
-          <ExchangeDataItem>
-            <span>Total</span>
-            <span>
-              {currencySelected === ExchangeCurrency.Omen && exchangeType === ExchangeType.withdraw
-                ? `${formatBigNumber(displayFundAmount.sub(displayFundAmount.div(1000)), omenToken.decimals, 3)} OMN`
-                : `${formatBigNumber(displayFundAmount, STANDARD_DECIMALS, 2)} ${
-                    currencySelected === ExchangeCurrency.Omen ? 'OMN' : 'DAI'
-                  }`}
-            </span>
-          </ExchangeDataItem>
-
-          {/*          <InputInfo>*/}
-          {/*            <IconAlertInverted style={{ marginRight: '12px' }} />*/}
-          {/*            {currencySelected === ExchangeCurrency.Omen &&*/}
-          {/*            exchangeType === ExchangeType.withdraw &&*/}
-          {/*            xDaiBalance?.isZero()*/}
-          {/*              ? 'Fund your Omen Account with Dai to proceed with the withdrawal.'*/}
-          {/*              : `You need to ${exchangeType === ExchangeType.deposit ? 'deposit' : 'withdraw'} at least ${' '}*/}
-          {/*${formatBigNumber(*/}
-          {/*  currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange,*/}
-          {/*  STANDARD_DECIMALS,*/}
-          {/*  0,*/}
-          {/*)} ${' '}*/}
-          {/*${currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}.`}*/}
-          {/*          </InputInfo>*/}
           {/*          {(omenWalletAllowance === WalletState.enable ||*/}
           {/*            (omenWalletAllowance === WalletState.ready && allowanceState === TransactionStep.transactionConfirmed)) && (*/}
           {/*            <Allowance>*/}

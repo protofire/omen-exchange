@@ -402,8 +402,8 @@ const theme = {
   },
   fluidHeightModal: {
     content: {
-      height: 'auto',
       width: '420px',
+      height: '510px',
       padding: '28px',
       borderRadius: '8px',
       border: '1px solid #ECEFF1',
