@@ -13,20 +13,28 @@ export const useCollateralBalance = (
 ): {
   collateralBalance: Maybe<BigNumber>
   fetchCollateralBalance: () => Promise<void>
+  errorMessage: Maybe<string>
 } => {
   const { account, library: provider } = context
 
   const [collateralBalance, setCollateralBalance] = useState<Maybe<BigNumber>>(null)
+  const [errorMessage, setErrorMessage] = useState<Maybe<string>>(null)
 
   const fetchCollateralBalance = async () => {
     let collateralBalance = new BigNumber(0)
-    if (account) {
-      if (collateral.address === pseudoNativeAssetAddress) {
-        collateralBalance = await provider.getBalance(account)
-      } else {
-        const collateralService = new ERC20Service(provider, account, collateral.address)
-        collateralBalance = await collateralService.getCollateral(account)
+    setErrorMessage(null)
+    try {
+      if (account) {
+        if (collateral.address === pseudoNativeAssetAddress) {
+          collateralBalance = await provider.getBalance(account)
+        } else {
+          const collateralService = new ERC20Service(provider, account, collateral.address)
+          collateralBalance = await collateralService.getCollateral(account)
+        }
       }
+      setErrorMessage(null)
+    } catch (e) {
+      setErrorMessage(e.message)
     }
     setCollateralBalance(collateralBalance)
   }
@@ -34,7 +42,7 @@ export const useCollateralBalance = (
   useEffect(() => {
     fetchCollateralBalance()
     // eslint-disable-next-line
-  }, [account, provider, collateral])
+  }, [account, provider, collateral.symbol])
 
-  return { collateralBalance, fetchCollateralBalance }
+  return { collateralBalance, fetchCollateralBalance, errorMessage }
 }
