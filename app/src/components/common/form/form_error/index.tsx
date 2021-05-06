@@ -9,7 +9,8 @@ const FormErrorWrapper = styled.div`
   line-height: 1.5px;
   align-items: center;
   letter-spacing: 0.2px;
-  margin-top: 15px;
+  margin-top: 10px;
+  white-space: nowrap;
   margin-bottom: -20px;
 
   &:last-child {
