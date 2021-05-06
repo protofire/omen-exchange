@@ -169,6 +169,9 @@ const IconSettingsWrapper = styled.div`
   display: flex;
   align-items: center;
   margin-left: 65px;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
