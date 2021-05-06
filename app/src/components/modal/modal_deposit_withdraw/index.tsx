@@ -201,12 +201,12 @@ export const ModalDepositWithdraw = (props: Props) => {
   }
   const omenWalletAllowance =
     omenAllowance.isZero() && exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Omen
-      ? WalletState.enable
-      : WalletState.ready
+      ? true
+      : false
   const daiWalletAllowance =
     daiAllowance.isZero() && exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Dai
-      ? WalletState.enable
-      : WalletState.ready
+      ? true
+      : false
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
