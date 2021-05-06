@@ -2,6 +2,7 @@ import { Zero } from 'ethers/constants'
 import { BigNumber, parseEther } from 'ethers/utils'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
 import Modal from 'react-modal'
+import ReactTooltip from 'react-tooltip'
 import styled, { withTheme } from 'styled-components'
 
 import {
@@ -439,7 +440,15 @@ export const ModalDepositWithdraw = (props: Props) => {
                 </span>
               </ExchangeDataItem>
               <ExchangeDataItem style={{ marginTop: '12px' }}>
-                <div>
+                <div
+                  data-arrow-color="transparent"
+                  data-for="feeInfo"
+                  data-tip={`Bridge Fee ${
+                    currencySelected === ExchangeCurrency.Omen && exchangeType === ExchangeType.withdraw
+                      ? '0.10%'
+                      : '0.00%'
+                  }`}
+                >
                   {exchangeType === ExchangeType.withdraw ? 'Withdraw' : 'Deposit'} Fee
                   <IconQuestion style={{ marginLeft: '8px' }} />
                 </div>
@@ -489,6 +498,15 @@ export const ModalDepositWithdraw = (props: Props) => {
             </DepositWithdrawButton>
           </BottomButtons>
         </ContentWrapper>
+        <ReactTooltip
+          className="customMarketTooltip"
+          data-multiline={true}
+          effect="solid"
+          id="feeInfo"
+          offset={{ top: 0, left: -42 }}
+          place="top"
+          type="light"
+        />
       </Modal>
       <ModalClaimWrapper
         isOpen={isClaimModalOpen && !isTransactionModalOpen}
