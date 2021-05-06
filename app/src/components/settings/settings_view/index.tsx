@@ -35,29 +35,12 @@ const StatusSection = styled(Row as any)`
   margin-top: 6px;
 `
 
-// const Text = styled.p`
-//   color: ${props => props.theme.colors.textColorDark};
-//   font-size: 16px;
-//   line-height: 18.75px;
-//   letter-spacing: 0.4px;
-//   margin: 0;
-// `
-
 const TextLighter = styled.p`
   color: ${props => props.theme.colors.textColorLighter};
   font-size: 12px;
   line-height: 14.06px;
   margin: 0;
 `
-
-// const ButtonRow = styled.div`
-//   display: flex;
-//   margin-left: auto;
-
-//   button:first-child {
-//     margin-right: 12px;
-//   }
-// `
 
 const SetAndSaveButton = styled(ButtonRound)`
   letter-spacing: 0.4px;
