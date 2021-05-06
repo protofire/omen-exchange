@@ -3,7 +3,6 @@ import { withRouter } from 'react-router'
 import { matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
-import { isPropertySignature } from 'typescript'
 
 import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedBalanceContext, useConnectedWeb3Context } from '../../../../hooks'
@@ -168,19 +167,17 @@ const HeaderDropdown = styled(Dropdown)`
 `
 
 const MarketAndGovernanceNav = styled.div<{ disabled?: boolean }>`
-  width: 124.65px;
-
   background-color: ${props => (props.disabled ? props => props.theme.buttonSecondary.backgroundColor : 'transparent')};
   ${props => (props.disabled ? 'pointer-events:none;' : '')};
   border-radius: 32px;
   color: ${props => (!props.disabled ? props.theme.colors.clickable : props.theme.colors.primary)};
   cursor: pointer;
-  font-weight: 500;
+  font-weight: ${props => props.theme.textfield.fontWeight};
   letter-spacing: 1px;
   line-height: 16.41px;
-  font-size: ${props => props.theme.fonts.defaultSize}
+  font-size: ${props => props.theme.fonts.defaultSize};
   text-align: center;
-  padding: ${props => props.theme.textfield.paddingVertical} ${props => props.theme.textfield.paddingHorizontal}
+  padding: ${props => props.theme.textfield.paddingVertical} ${props => props.theme.textfield.paddingHorizontal};
   &:hover {
     color: ${props => (!props.disabled ? props.theme.colors.primary : '')};
   }
@@ -280,7 +277,7 @@ const HeaderContainer: React.FC = (props: any) => {
             onClick={() => {
               setMarketPage(!marketPage)
             }}
-            style={{ marginLeft: '48px' }}
+            style={{ marginLeft: '48px', width: '98.32px' }}
           >
             Markets
           </MarketAndGovernanceNav>
@@ -289,6 +286,7 @@ const HeaderContainer: React.FC = (props: any) => {
             onClick={() => {
               setMarketPage(!marketPage)
             }}
+            style={{ width: '124.65px' }}
           >
             Governance
           </MarketAndGovernanceNav>
