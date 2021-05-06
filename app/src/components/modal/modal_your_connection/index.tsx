@@ -335,11 +335,11 @@ export const ModalYourConnection = (props: Props) => {
       >
         {isSettingsModalOpen ? (
           //testing
-
-          <>
-            <SettingsTopWrapper>
+          <ContentWrapper>
+            <ConnectionModalNavigation>
               <IconArrowBack hoverEffect={true} onClick={() => setIsSettingsModalOpen(false)} />
-              <ModalTitle>Configure RPC Endpoints</ModalTitle>
+              <ModalTitle>Settings</ModalTitle>
+
               <IconClose
                 hoverEffect={true}
                 onClick={() => {
@@ -347,10 +347,10 @@ export const ModalYourConnection = (props: Props) => {
                   onClose()
                 }}
               />
-            </SettingsTopWrapper>
+            </ConnectionModalNavigation>
 
             <SettingsViewContainer networkId={chainId} {...props} />
-          </>
+          </ContentWrapper>
         ) : (
           <ContentWrapper>
             <ConnectionModalNavigation>

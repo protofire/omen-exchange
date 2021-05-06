@@ -9,9 +9,11 @@ import { TextfieldCSS } from '../../common/form/textfield'
 import { IconBlockscout, IconCloudflare, IconInfura } from '../../common/icons'
 import { IconXdai } from '../../common/icons/IconXdai'
 import { ListCard } from '../../market/common/list_card/index'
+import { TopCard } from '../../market/sections/market_profile/market_status/open'
 
 const MainContent = styled.div<{ borderTop?: boolean }>`
-  padding: 24px;
+  display: flex;
+  justify-content: center;
   border-top: ${props => (props.borderTop ? props.theme.borders.borderLineDisabled : '')};
 `
 
@@ -114,10 +116,6 @@ const Input = styled.input`
 
   ${TextfieldCSS};
 `
-const SettingsWrapper = styled(ListCard)`
-  min-height: initial;
-  width: 420px;
-`
 
 const ImageWrap = styled.div`
   margin-right: 10px;
@@ -128,6 +126,39 @@ const HorizontalDivider = styled.div`
   padding: -50%;
   width: 100%;
 `
+
+const TopCardHeader = styled.div<{ borderTop?: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  width: 100%;
+  border-top: ${props => (props.borderTop ? props.theme.borders.borderLineDisabled : '')};
+`
+
+const ModalCard = styled.div`
+  height: auto;
+
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: ${props => props.theme.borders.borderLineDisabled};
+  border-radius: ${props => props.theme.cards.borderRadius};
+
+  &:nth-child(3),
+  &:nth-child(4) {
+    margin-top: 16px;
+  }
+`
+
+const ModalTitle = styled.p`
+  font-size: 16px;
+  color: ${props => props.theme.colors.textColorDark};
+  font-weight: 500;
+  margin: 0;
+`
+
 interface Props {
   history?: any
 
@@ -223,8 +254,8 @@ const SettingsViewContainer = (props: Props) => {
 
   return (
     <>
-      <SettingsWrapper>
-        <MainContent>
+      <ModalCard>
+        <TopCardHeader>
           <Row>
             <Column>
               RPC Endpoint
@@ -242,22 +273,27 @@ const SettingsViewContainer = (props: Props) => {
               />
             </FiltersControls>
           </Row>
+        </TopCardHeader>
 
-          {current === dropdownItems.length - 1 && (
-            <>
-              <HorizontalDivider>Custom RPC URL</HorizontalDivider>
-              <Input
-                onChange={event => {
-                  setUrl(event.target.value)
-                  if (current === dropdownItems.length - 1) setCustomUrl(event.target.value)
-                }}
-                placeholder={'Paste your RPC URL'}
-                value={customUrl}
-              ></Input>
-            </>
-          )}
-        </MainContent>
-      </SettingsWrapper>
+        {current === dropdownItems.length - 1 && (
+          <TopCardHeader borderTop={true}>
+            <Row>
+              <Column>
+                Custom RPC URL
+                <Input
+                  onChange={event => {
+                    setUrl(event.target.value)
+                    if (current === dropdownItems.length - 1) setCustomUrl(event.target.value)
+                  }}
+                  placeholder={'Paste your RPC URL'}
+                  value={customUrl}
+                ></Input>
+              </Column>
+            </Row>
+          </TopCardHeader>
+        )}
+      </ModalCard>
+
       <BottomContent>
         <SetAndSaveButton
           onClick={() => {
