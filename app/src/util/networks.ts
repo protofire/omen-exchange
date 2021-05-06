@@ -17,7 +17,6 @@ import {
   KLEROS_CURATE_GRAPH_MAINNET_WS,
   KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
   KLEROS_CURATE_GRAPH_RINKEBY_WS,
-  XDAI_LOCATION,
 } from '../common/constants'
 import { entries, isNotNull } from '../util/type-utils'
 
@@ -138,7 +137,7 @@ const networks: { [K in NetworkId]: Network } = {
       symbol: 'ETH',
       decimals: 18,
     },
-    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    targetSafeImplementation: '0xCB2E9FA32603Cdc2740b82a9A67ED3e977C33416',
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
     blockExplorerURL: 'https://etherscan.io',
@@ -184,7 +183,7 @@ const networks: { [K in NetworkId]: Network } = {
       symbol: 'ETH',
       decimals: 18,
     },
-    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    targetSafeImplementation: '0xcb05C7D28766e4fFB71ccbdAf6Ae1Cec555D61f8',
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
     blockExplorerURL: 'https://rinkeby.etherscan.io',
@@ -310,7 +309,7 @@ export const supportedNetworkURLs = entries(networks).reduce<{
   {},
 )
 
-export const infuraNetworkURL = location.host === XDAI_LOCATION ? networks[100].url : networks[1].url
+export const infuraNetworkURL = networks[1].url
 
 export const getInfuraUrl = (networkId: number): string => {
   if (!validNetworkId(networkId)) {
@@ -328,6 +327,15 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
       [networkIds.RINKEBY]: '0x6d7f0754ffeb405d23c51ce938289d4835be3b14',
     },
     order: 2,
+  },
+  omn: {
+    symbol: 'OMN',
+    decimals: 18,
+    addresses: {
+      [networkIds.MAINNET]: '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
+      [networkIds.XDAI]: '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599',
+    },
+    order: 22,
   },
   cbat: {
     symbol: 'cBAT',

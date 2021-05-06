@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import { useWeb3Context } from 'web3-react'
 
-import { DISCLAIMER_TEXT, MAINNET_LOCATION, MAIN_NETWORKS, XDAI_LOCATION, XDAI_NETWORKS } from '../../common/constants'
+import { DISCLAIMER_TEXT } from '../../common/constants'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
 import { Disclaimer } from '../common/disclaimer'
 import { Footer } from '../common/layout/footer'
 import { Header } from '../common/layout/header'
-import { SwitchNetworkModal } from '../common/switch_network_modal'
 import { MarketRoutes } from '../market/routes/market_routes'
 import { MarketWizardCreatorContainer } from '../market/sections/market_create/market_wizard_creator_container'
 import { MarketHomeContainer } from '../market/sections/market_list/market_home_container'
@@ -17,38 +16,15 @@ export const Main: React.FC = () => {
   const context = useWeb3Context()
 
   const windowObj: any = window
-  const host = window.location.hostname
-  let defaultChainID = 1
-  if (host === XDAI_LOCATION) {
-    defaultChainID = 100
-  }
+  const defaultChainID = 1
   const [networkId, setNetworkId] = useState(windowObj.ethereum ? windowObj.ethereum.chainId : defaultChainID)
-  const [wrongNetwork, setWrongNetwork] = useState(false)
 
   if (windowObj.ethereum) {
-    windowObj.ethereum.on('chainChanged', (chainId: string) => {
-      setNetworkId(chainId)
-      if (location.host === MAINNET_LOCATION && XDAI_NETWORKS.includes(chainId)) {
-        location.assign(`http://${XDAI_LOCATION}`)
-      }
-      if (location.host === XDAI_LOCATION && MAIN_NETWORKS.includes(chainId)) {
-        location.assign(`http://${MAINNET_LOCATION}`)
-      }
-    })
+    windowObj.ethereum.on('chainChanged', (chainId: string) => setNetworkId(chainId))
   }
-
-  useEffect(() => {
-    if (networkId) {
-      setWrongNetwork(
-        (location.host === MAINNET_LOCATION && XDAI_NETWORKS.includes(networkId)) ||
-          (location.host === XDAI_LOCATION && MAIN_NETWORKS.includes(networkId)),
-      )
-    }
-  }, [networkId])
 
   return (
     <>
-      {wrongNetwork && <SwitchNetworkModal currentNetworkId={networkId} />}
       <Router>
         <MainWrapper>
           <Header />
@@ -59,7 +35,6 @@ export const Main: React.FC = () => {
                 <Route exact path="/">
                   <Redirect to="/liquidity" />
                 </Route>
-                {/*<Route component={() => <SettingsWithRouter />} exact networkId={networkId} path="/settings" />*/}
                 <Route
                   exact
                   path="/settings"

@@ -236,6 +236,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       }
       await cpk.sellOutcomes({
         amount: tradedCollateral,
+        collateralToken: collateral,
         compoundService,
         outcomeIndex,
         marketMaker,
@@ -374,7 +375,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       />
       <GridTransactionDetails>
         <div>
-          <TokenBalance text="Your Shares" value={formatNumber(displaySelectedOutcomeBalance)} />
+          <TokenBalance text="Your Shares" value={displaySelectedOutcomeBalance} />
           <ReactTooltip id="walletBalanceTooltip" />
           <TextfieldCustomPlaceholder
             formField={
