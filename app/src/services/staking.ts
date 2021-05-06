@@ -176,6 +176,19 @@ const abi = [
     stateMutability: 'view',
     type: 'function',
   },
+  {
+    inputs: [],
+    name: 'getRewardTokens',
+    outputs: [
+      {
+        internalType: 'address[]',
+        name: '',
+        type: 'address[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
 ]
 
 class StakingService {
@@ -202,6 +215,10 @@ class StakingService {
 
   getRewardAmount = (tokenAddress: string): string => {
     return this.contract.rewardAmount(tokenAddress)
+  }
+
+  getRewardTokens = (): string[] => {
+    return this.contract.getRewardTokens()
   }
 
   getEarnedRewards = async (accountAddress: string, tokenAddress: string): Promise<string> => {
