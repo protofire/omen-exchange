@@ -67,6 +67,7 @@ const DepositWithdrawButton = styled(Button)`
 `
 const ApproveButton = styled(ButtonStateful)`
   flex: 1;
+  border-color: ${props => props.theme.buttonSecondary.borderColorHover};
   margin-right: 16px;
 `
 
@@ -74,7 +75,7 @@ const ExchangeDataItem = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
-  line-height: 16px;
+  line-height: ${props => props.theme.fonts.defaultLineHeight};
   letter-spacing: 0.2px;
   color: ${props => props.theme.colors.textColorLightish};
 `
