@@ -172,9 +172,9 @@ export const ModalDepositWithdraw = (props: Props) => {
 
           await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS)
         } else {
-          const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenToken.address)
+          const collateralService = new ERC20Service(context.rawWeb3Context.library, account, DAI.address)
 
-          await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS)
+          await collateralService.approveUnlimited(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
         }
       }
 
@@ -303,7 +303,10 @@ export const ModalDepositWithdraw = (props: Props) => {
         isOpen={isOpen && !isTransactionModalOpen && !isClaimModalOpen}
         onRequestClose={onClose}
         shouldCloseOnOverlayClick={true}
-        style={theme.fluidHeightModal}
+        style={{
+          ...theme.fluidHeightModal,
+          content: { ...theme.fluidHeightModal.content, height: '510px' },
+        }}
       >
         <ContentWrapper>
           <ModalNavigation>
