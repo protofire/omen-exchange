@@ -1,6 +1,6 @@
 import Big from 'big.js'
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
@@ -476,12 +476,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     if (!liquidityMiningCampaign) {
       throw 'No liquidity mining campaign'
     }
+    if (!cpk) {
+      throw 'No cpk'
+    }
 
     const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
 
     const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
       getOMNToken(networkId),
-      cpk?.address || '',
+      cpk.address,
       1, // Assume pool token value is 1 DAI
       // TODO: Replace hardcoded price param
       1,
@@ -489,7 +492,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       liquidityMiningCampaign.rewardAmounts[0],
       Number(liquidityMiningCampaign.duration),
     )
+    const userStakedTokens = await stakingService?.getStakedTokensOfAmount(cpk.address)
 
+    setUserStakedTokens(bigNumberify(userStakedTokens || 0))
     setEarnedRewards(earnedRewards)
     setRemainingRewards(remainingRewards)
     setRewardApr(rewardApr)
@@ -681,7 +686,14 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           )}
           {activeTab === Tabs.withdraw && (
             <>
-              <TokenBalance text="Pool Tokens" value={formatNumber(sharesBalance)} />
+              <TokenBalance
+                text={`${userStakedTokens.gt(0) ? 'Staked' : 'Pool'} Tokens`}
+                value={
+                  userStakedTokens.gt(0)
+                    ? formatBigNumber(userStakedTokens, STANDARD_DECIMALS)
+                    : formatNumber(displaySharesBalance)
+                }
+              />
 
               <TextfieldCustomPlaceholder
                 formField={
