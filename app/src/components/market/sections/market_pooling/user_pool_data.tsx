@@ -45,6 +45,31 @@ const UserData = styled.div`
   flex-wrap: wrap;
   margin: 0 -25px;
   padding: 20px 24px;
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    flex-wrap: nowrap;
+    flex-direction: column;
+  }
+`
+// ^^
+//border-top: ${({ theme }) => theme.borders.borderLineDisabled};
+
+const ContentsLeft = styled.div`
+  align-items: center;
+  display: flex;
+  margin: auto auto auto 0;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin: auto auto 0 0;
+  }
+`
+
+const TestDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0 -25px;
+  padding: 20px 20px 5px 24px;
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
   @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
     flex-wrap: nowrap;
@@ -80,31 +105,41 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
   }
 
   return (
-    <UserData>
-      <UserDataTitleValue
-        title="Your Liquidity"
-        value={`${formatNumber(
-          formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals),
-        )} ${baseCollateral.symbol}`}
-      />
-      <UserDataTitleValue
-        title="Total Pool Tokens"
-        value={`${formatNumber(formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals))}`}
-      />
-      <UserDataTitleValue
-        state={userEarnings.gt(0) ? ValueStates.success : undefined}
-        title="Your Earnings"
-        value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatNumber(
-          formatBigNumber(displayUserEarnings, baseCollateral.decimals, baseCollateral.decimals),
-        )} ${baseCollateral.symbol}`}
-      />
-      <UserDataTitleValue
-        state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
-        title="Total Earnings"
-        value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
-          formatBigNumber(displayTotalEarnings, baseCollateral.decimals, baseCollateral.decimals),
-        )} ${baseCollateral.symbol}`}
-      />
-    </UserData>
+    <>
+      {displayPoolTokens && (
+        <TestDiv>
+          <b>hey</b>
+        </TestDiv>
+      )}
+
+      <UserData>
+        <UserDataTitleValue
+          title="Your Liquidity"
+          value={`${formatNumber(
+            formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals),
+          )} ${baseCollateral.symbol}`}
+        />
+        <UserDataTitleValue
+          title="Total Pool Tokens"
+          value={`${formatNumber(
+            formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals),
+          )}`}
+        />
+        <UserDataTitleValue
+          state={userEarnings.gt(0) ? ValueStates.success : undefined}
+          title="Your Earnings"
+          value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatNumber(
+            formatBigNumber(displayUserEarnings, baseCollateral.decimals, baseCollateral.decimals),
+          )} ${baseCollateral.symbol}`}
+        />
+        <UserDataTitleValue
+          state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
+          title="Total Earnings"
+          value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
+            formatBigNumber(displayTotalEarnings, baseCollateral.decimals, baseCollateral.decimals),
+          )} ${baseCollateral.symbol}`}
+        />
+      </UserData>
+    </>
   )
 }
