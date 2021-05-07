@@ -537,25 +537,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }, [liquidityMiningCampaigns, marketMakerAddress, cpk, cpk?.address])
 
-  let stakingService =
-    liquidityMiningCampaign && new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
-
-  useEffect(() => {
-    stakingService =
-      liquidityMiningCampaign && new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
-
-    const getUserStakedTokens = async () => {
-      if (cpk) {
-        const userStakedTokens = await stakingService?.getStakedTokensOfAmount(cpk.address)
-        setUserStakedTokens(bigNumberify(userStakedTokens || 0))
-      }
-    }
-
-    if (stakingService) {
-      getUserStakedTokens()
-    }
-  }, [liquidityMiningCampaign, cpk, cpk?.address])
-
   // TODO: Remove if unused, otherwise clean up
   const claim = async () => {
     if (!cpk) {
@@ -573,13 +554,15 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     if (!liquidityMiningCampaign) {
       throw 'No liquidity mining campaign'
     }
-    if (!stakingService) {
-      throw 'No staking service'
+    if (!cpk) {
+      throw 'No cpk'
     }
+
+    const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
 
     const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
       getOMNToken(networkId),
-      cpk?.address || '',
+      cpk.address,
       1, // Assume pool token value is 1 DAI
       // TODO: Replace hardcoded price param
       1,
@@ -587,12 +570,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       liquidityMiningCampaign.rewardAmounts[0],
       Number(liquidityMiningCampaign.duration),
     )
+    const userStakedTokens = await stakingService?.getStakedTokensOfAmount(cpk.address)
 
+    setUserStakedTokens(bigNumberify(userStakedTokens || 0))
     setEarnedRewards(earnedRewards)
     setRemainingRewards(remainingRewards)
     setRewardApr(rewardApr)
     setTotalRewards(totalRewards)
-  }, [cpk, liquidityMiningCampaign, networkId, provider, stakingService])
+  }, [cpk, liquidityMiningCampaign, networkId, provider])
 
   useEffect(() => {
     cpk && liquidityMiningCampaign && fetchStakingData()
