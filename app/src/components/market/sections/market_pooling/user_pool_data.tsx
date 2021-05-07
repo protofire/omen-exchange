@@ -121,7 +121,7 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
       />
       <UserDataTitleValue
         state={currentApr > 0 ? ValueStates.success : undefined}
-        title="Current APY"
+        title="Current APR"
         value={`${formatNumber(currentApr.toString())}%`}
       />
       <UserDataTitleValue
