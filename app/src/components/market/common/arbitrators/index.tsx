@@ -14,16 +14,17 @@ const Wrapper = styled.div`
 `
 
 const ArbitratorButton = styled(Button)<{ isSelected: boolean }>`
-  margin: 0 8px 12px 0;
-  &,
+  margin: 0 12px 12px 0;
+  & {
+    border-color: ${props =>
+      props.isSelected ? props.theme.textfield.borderColorActive : props.theme.buttonSecondaryLine.borderColor}
+
   &:hover {
     border-color: ${props =>
-      props.isSelected ? props.theme.textfield.borderColorActive : props.theme.buttonSecondaryLine.borderColor};
+      !props.isSelected ? props.theme.textfield.borderColorHover : props.theme.textfield.borderColorActive};
   }
-
   & > * + * {
     margin-left: 10px;
-  }
 `
 
 interface Props {

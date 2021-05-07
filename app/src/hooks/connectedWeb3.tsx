@@ -2,7 +2,7 @@ import { providers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
-import connectors, { handleGsMultiSend } from '../util/connectors'
+import connectors from '../util/connectors'
 import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
@@ -60,6 +60,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
+
     if (safeAppInfo) {
       if (context.connectorName !== 'Safe') {
         localStorage.removeItem('CONNECTOR')
@@ -67,10 +68,8 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
         connectors.Safe.init(safeAppInfo.safeAddress, netId)
         context.setConnector('Safe')
       }
-    } else if (active) {
-      if (connector && connector in connectors) {
-        context.setConnector(connector)
-      }
+    } else if (active && connector && connector in connectors) {
+      context.setConnector(connector)
     } else if (error) {
       logger.log(error.message)
       localStorage.removeItem('CONNECTOR')
@@ -79,7 +78,14 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
       context.setConnector('Infura')
     }
 
-    handleGsMultiSend()
+    // debug particular address and network id
+    const url = new URL(window.location.href.replace('#', ''))
+    const debugAddress = url.searchParams.get('debugAddress')
+    const debugNetworkId = url.searchParams.get('debugNetworkId')
+    if (debugAddress) {
+      connectors.Safe.init(debugAddress, debugNetworkId ? Number(debugNetworkId) : 1)
+      context.setConnector('Safe')
+    }
 
     // disabled block tracker
     if (context.connector) {
@@ -89,6 +95,9 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
         context.connector.engine._blockTracker._isRunning
       ) {
         context.connector.engine.stop()
+      }
+      if (connector === 'WalletConnect' && context.connector.connect && context.connector.connect._running) {
+        context.connector.connect.stop()
       }
     }
 
@@ -111,7 +120,12 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     return null
   }
 
-  const { address, isRelay, netId, provider } = getRelayProvider(relay, networkId, library, account)
+  const { address, isRelay, netId, provider } = getRelayProvider(
+    relay && context.connectorName !== 'Safe',
+    networkId,
+    library,
+    account,
+  )
 
   const value = {
     account: address || null,

@@ -73,6 +73,10 @@ const Outcome = styled.span`
   color: ${props => props.theme.colors.primaryLight};
   margin-left: 8px;
   font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 200px;
 `
 
 const ApyIndicator = styled.span`

@@ -25,6 +25,7 @@ import { StakingService } from '../../../../services/staking'
 import { getLogger } from '../../../../util/logger'
 import {
   getNativeAsset,
+  getNativeCompoundAsset,
   getOMNToken,
   getToken,
   getWrapToken,
@@ -155,8 +156,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   let baseCollateral = collateral
   if (collateralSymbol in CompoundTokenType) {
-    if (collateralSymbol === 'ceth') {
-      baseCollateral = getNativeAsset(networkId, relay)
+    const nativeCompoundAsset = getNativeCompoundAsset(networkId)
+    if (collateralSymbol === nativeCompoundAsset.symbol.toLowerCase()) {
+      baseCollateral = getNativeAsset(networkId)
     } else {
       const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
       baseCollateral = getToken(networkId, baseCollateralSymbol)
@@ -935,14 +937,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 state={ValueStates.success}
                 title="Earned"
                 value={`${formatNumber(
-                  formatBigNumber(sellNoteUserEarnings, displayCollateral.decimals),
+                  formatBigNumber(sellNoteUserEarnings, displayCollateral.decimals, displayCollateral.decimals),
                 )} ${displayTotalSymbol}`}
               />
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"
                 value={`${formatNumber(
-                  formatBigNumber(sellNoteDepositedTokens, displayCollateral.decimals),
+                  formatBigNumber(sellNoteDepositedTokens, displayCollateral.decimals, displayCollateral.decimals),
                 )} ${displayTotalSymbol}`}
               />
               <TransactionDetailsLine />
@@ -951,7 +953,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 state={(sellNoteDepositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Total"
                 value={`${formatNumber(
-                  formatBigNumber(sellNoteDepositedTokensTotal, displayCollateral.decimals),
+                  formatBigNumber(sellNoteDepositedTokensTotal, displayCollateral.decimals, displayCollateral.decimals),
                 )} ${displayTotalSymbol}`}
               />
               {!relay && collateral.address === pseudoNativeAssetAddress ? (

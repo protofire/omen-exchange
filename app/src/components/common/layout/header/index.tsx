@@ -4,15 +4,16 @@ import { matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 
-import { Logo } from '../../../../common/constants'
+import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedBalanceContext, useConnectedWeb3Context } from '../../../../hooks'
 import { networkIds } from '../../../../util/networks'
+import { formatBigNumber } from '../../../../util/tools'
 import { ExchangeType } from '../../../../util/types'
-import { Button, ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
+import { ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
-import { IconAdd, IconClose } from '../../icons'
+import { IconAdd, IconClose, IconOmen } from '../../icons'
 import { IconSettings } from '../../icons/IconSettings'
 
 export const HeaderWrapper = styled.div`
@@ -119,8 +120,9 @@ export const ContentsRight = styled.div`
   }
 `
 
-const HeaderButton = styled(Button)`
+const HeaderButton = styled(ButtonRound)`
   ${ButtonCSS};
+  color: ${props => props.theme.colors.textColorLighter};
 `
 
 const DepositedBalance = styled.p`
@@ -164,6 +166,10 @@ const HeaderDropdown = styled(Dropdown)`
   height: 40px;
 `
 
+const OmenIconWrapper = styled.div`
+  margin-left: 12px;
+`
+
 const HeaderContainer: React.FC = (props: any) => {
   const context = useConnectedWeb3Context()
   const { relay, toggleRelay } = context
@@ -179,14 +185,18 @@ const HeaderContainer: React.FC = (props: any) => {
   const disableConnectButton = isConnectWalletModalOpen
 
   const {
-    claimState,
     daiBalance,
     fetchBalances,
     formattedDaiBalance,
-    formattedEthBalance,
+    formattedNativeBalance,
+    formattedOmenBalance,
     formattedxDaiBalance,
-    unclaimedAmount,
+    formattedxOmenBalance,
+    omenBalance,
+    unclaimedDaiAmount,
+    unclaimedOmenAmount,
     xDaiBalance,
+    xOmenBalance,
   } = useConnectedBalanceContext()
 
   const networkPlacholder = (
@@ -219,6 +229,10 @@ const HeaderContainer: React.FC = (props: any) => {
   const logout = () => {
     if (active || (error && connectorName)) {
       localStorage.removeItem('CONNECTOR')
+      if (context.rawWeb3Context.connectorName === 'WalletConnect') {
+        localStorage.removeItem('walletconnect')
+        context.rawWeb3Context.connector.onDeactivation()
+      }
       context.rawWeb3Context.setConnector('Infura')
     }
   }
@@ -265,7 +279,7 @@ const HeaderContainer: React.FC = (props: any) => {
             </>
           )}
 
-          {(networkId === networkIds.MAINNET || relay) && (
+          {((networkId === networkIds.MAINNET && context.rawWeb3Context.connectorName !== 'Safe') || relay) && (
             <HeaderDropdown
               currentItem={networkDropdownItems.length + 1}
               disableDirty
@@ -275,6 +289,15 @@ const HeaderContainer: React.FC = (props: any) => {
               placeholder={networkPlacholder}
             />
           )}
+
+          <HeaderButton>
+            {relay
+              ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
+              : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
+            <OmenIconWrapper>
+              <IconOmen size={24} />
+            </OmenIconWrapper>
+          </HeaderButton>
 
           {!account && (
             <ButtonConnectWalletStyled
@@ -298,8 +321,8 @@ const HeaderContainer: React.FC = (props: any) => {
                   {relay
                     ? `${formattedxDaiBalance} DAI`
                     : context.rawWeb3Context.networkId === networkIds.XDAI
-                    ? `${formattedxDaiBalance} xDAI`
-                    : `${formattedEthBalance} ETH`}
+                    ? `${formattedNativeBalance} xDAI`
+                    : `${formattedNativeBalance} ETH`}
                 </DepositedBalance>
                 <HeaderButtonDivider />
               </>
@@ -320,11 +343,12 @@ const HeaderContainer: React.FC = (props: any) => {
             logout()
             setConnectWalletModalState(true)
           }}
-          claimState={claimState}
           fetchBalances={fetchBalances}
           formattedDaiBalance={formattedDaiBalance}
-          formattedEthBalance={formattedEthBalance}
+          formattedNativeBalance={formattedNativeBalance}
+          formattedOmenBalance={formattedOmenBalance}
           formattedxDaiBalance={formattedxDaiBalance}
+          formattedxOmenBalance={formattedxOmenBalance}
           isOpen={isYourConnectionModalOpen && !isDepositWithdrawModalOpen}
           onClose={() => setYourConnectionModalState(false)}
           openDepositModal={() => {
@@ -337,7 +361,8 @@ const HeaderContainer: React.FC = (props: any) => {
             setDepositWithdrawType(ExchangeType.withdraw)
             setDepositWithdrawModalState(true)
           }}
-          unclaimedAmount={unclaimedAmount}
+          unclaimedDaiAmount={unclaimedDaiAmount}
+          unclaimedOmenAmount={unclaimedOmenAmount}
         />
         <ModalConnectWalletWrapper
           isOpen={isConnectWalletModalOpen}
@@ -348,15 +373,19 @@ const HeaderContainer: React.FC = (props: any) => {
           exchangeType={depositWithdrawType}
           fetchBalances={fetchBalances}
           formattedDaiBalance={formattedDaiBalance}
+          formattedOmenBalance={formattedOmenBalance}
           formattedxDaiBalance={formattedxDaiBalance}
+          formattedxOmenBalance={formattedxOmenBalance}
           isOpen={isDepositWithdrawModalOpen}
+          omenBalance={omenBalance}
           onBack={() => {
             setDepositWithdrawModalState(false)
             setYourConnectionModalState(true)
           }}
           onClose={() => setDepositWithdrawModalState(false)}
-          unclaimedAmount={unclaimedAmount}
+          unclaimedAmount={unclaimedDaiAmount}
           xDaiBalance={xDaiBalance}
+          xOmenBalance={xOmenBalance}
         />
       </HeaderInner>
     </HeaderWrapper>

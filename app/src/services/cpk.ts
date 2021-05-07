@@ -3,7 +3,14 @@ import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, bigNumberify, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
-import { RELAY_ADDRESS, RELAY_FEE, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
+import {
+  GEN_TOKEN_ADDDRESS_TESTING,
+  GEN_XDAI_ADDRESS_TESTING,
+  OMNI_BRIDGE_XDAI_ADDRESS,
+  RELAY_ADDRESS,
+  RELAY_FEE,
+  XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
+} from '../common/constants'
 import { Transaction, verifyProxyAddress } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
@@ -23,11 +30,13 @@ import {
   calcAddFundingSendAmounts,
   calcDistributionHint,
   clampBigNumber,
+  getBaseToken,
   getBaseTokenForCToken,
+  isCToken,
   signaturesFormatted,
   waitABit,
 } from '../util/tools'
-import { MarketData, Question, Token, TransactionStep } from '../util/types'
+import { ExchangeCurrency, MarketData, Question, Token, TransactionStep } from '../util/types'
 
 import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
@@ -59,6 +68,7 @@ interface CPKBuyOutcomesParams {
 
 interface CPKSellOutcomesParams {
   amount: BigNumber
+  collateralToken: Token
   compoundService?: CompoundService | null
   outcomeIndex: number
   marketMaker: MarketMakerService
@@ -276,6 +286,7 @@ class CPKService {
         value: RELAY_FEE,
       })
     }
+
     const txObject = await this.cpk.execTransactions(transactions, txOptions)
     setTxState && setTxState(TransactionStep.transactionSubmitted)
     setTxHash && setTxHash(txObject.hash)
@@ -284,13 +295,12 @@ class CPKService {
     return tx
   }
 
-  getGas = async (gas: number): Promise<number> => {
-    const deployed = await this.cpk.isProxyDeployed()
-    if (deployed) {
-      return gas
+  getGas = async (txOptions: TxOptions): Promise<void> => {
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
+    if (networkId === networkIds.XDAI || this.isSafeApp) {
+      txOptions.gas = defaultGas
     }
-    const addProxyDeploymentGas = 500000
-    return gas + addProxyDeploymentGas
   }
 
   buyOutcomes = async ({
@@ -312,7 +322,7 @@ class CPKService {
       const transactions: Transaction[] = []
 
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       const buyAmount = this.cpk.relay ? amount.sub(RELAY_FEE) : amount
 
@@ -464,7 +474,7 @@ class CPKService {
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       let collateral
       const fundingAmount = this.cpk.relay ? marketData.funding.sub(RELAY_FEE) : marketData.funding
@@ -632,12 +642,15 @@ class CPKService {
   }
 
   createScalarMarket = async ({
+    compoundService,
+    compoundTokenDetails,
     conditionalTokens,
     marketData,
     marketMakerFactory,
     realitio,
     setTxHash,
     setTxState,
+    useCompoundReserve,
   }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
       const {
@@ -651,6 +664,7 @@ class CPKService {
         startingPoint,
         unit,
         upperBound,
+        userInputCollateral,
       } = marketData
 
       if (!resolution) {
@@ -687,7 +701,7 @@ class CPKService {
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       let collateral
 
@@ -707,6 +721,45 @@ class CPKService {
           to: collateral.address,
           value: fundingAmount.toString(),
         })
+      } else if (useCompoundReserve && compoundTokenDetails) {
+        if (userInputCollateral.address === pseudoNativeAssetAddress) {
+          // If user chosen collateral is ETH
+          collateral = marketData.collateral
+          if (!this.cpk.isSafeApp()) {
+            txOptions.value = marketData.funding
+          }
+          const encodedMintFunction = CompoundService.encodeMintTokens(
+            compoundTokenDetails.symbol,
+            marketData.funding.toString(),
+          )
+          transactions.push({
+            to: collateral.address,
+            data: encodedMintFunction,
+            value: fundingAmount.toString(),
+          })
+        } else {
+          collateral = marketData.collateral
+          // For any other compound pair that is not ETH
+          const encodedMintFunction = CompoundService.encodeMintTokens(
+            compoundTokenDetails.symbol,
+            marketData.funding.toString(),
+          )
+          // Transfer user input collateral to cpk
+          transactions.push({
+            to: userInputCollateral.address,
+            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, marketData.funding),
+          })
+          // Approve cToken for the cpk contract
+          transactions.push({
+            to: userInputCollateral.address,
+            data: ERC20Service.encodeApproveUnlimited(collateral.address),
+          })
+          // Mint ctokens from the underlying token
+          transactions.push({
+            to: collateral.address,
+            data: encodedMintFunction,
+          })
+        }
       } else {
         collateral = marketData.collateral
       }
@@ -778,11 +831,17 @@ class CPKService {
       // Step 4: Transfer funding from user
       // If we are funding with native ether we can skip this step
       // If we are signed in as a safe we don't need to transfer
+      let minCollateralAmount = fundingAmount
+      if (useCompoundReserve && compoundService) {
+        minCollateralAmount = compoundService.calculateBaseToCTokenExchange(userInputCollateral, fundingAmount)
+      }
       if (!this.isSafeApp && marketData.collateral.address !== pseudoNativeAssetAddress) {
-        transactions.push({
-          to: collateral.address,
-          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, fundingAmount),
-        })
+        if (!useCompoundReserve) {
+          transactions.push({
+            to: collateral.address,
+            data: ERC20Service.encodeTransferFrom(account, this.cpk.address, fundingAmount),
+          })
+        }
       }
 
       // Step 4.5: Calculate distributionHint
@@ -811,7 +870,7 @@ class CPKService {
           collateral.address,
           conditionId,
           spread,
-          fundingAmount,
+          minCollateralAmount,
           distributionHint,
         ),
       })
@@ -830,6 +889,7 @@ class CPKService {
 
   sellOutcomes = async ({
     amount,
+    collateralToken,
     compoundService,
     conditionalTokens,
     marketMaker,
@@ -841,18 +901,16 @@ class CPKService {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
 
       const outcomeTokensToSell = await marketMaker.calcSellAmount(amount, outcomeIndex)
       const collateralAddress = await marketMaker.getCollateralToken()
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
-
-      const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
       let userInputCollateral = collateralToken
       if (compoundService && useBaseToken) {
@@ -957,7 +1015,7 @@ class CPKService {
       const transactions: Transaction[] = []
 
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       let collateralSymbol = ''
       let userInputCollateralSymbol: KnownToken
@@ -1104,7 +1162,7 @@ class CPKService {
       transactions.push(mergePositionsTx)
 
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
@@ -1224,10 +1282,12 @@ class CPKService {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
+      const network = await this.provider.getNetwork()
+      const networkId = network.chainId
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       if (!isConditionResolved) {
         transactions.push({
@@ -1243,22 +1303,55 @@ class CPKService {
         data: ConditionalTokenService.encodeRedeemPositions(collateralToken.address, conditionId, numOutcomes),
       })
 
-      if (this.cpk.relay && earnedCollateral) {
-        // Pseudonative asset to base asset flow
-        const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, earnedCollateral)
-        // If use prefers to get paid in the base native asset then unwrap the asset
+      let earnings = earnedCollateral
+      let token = collateralToken
+
+      if (isCToken(collateralToken.symbol)) {
+        const compound = new CompoundService(collateralToken.address, collateralToken.symbol, this.provider, account)
+        await compound.init()
+
+        // Convert compound token to base token
+        const encodedRedeemFunction = CompoundService.encodeRedeemTokens(
+          collateralToken.symbol,
+          earnedCollateral.toString(),
+        )
+
+        // Redeeem underlying token
         transactions.push({
           to: collateralToken.address,
+          data: encodedRedeemFunction,
+        })
+
+        token = getBaseToken(networkId, collateralToken.symbol)
+        earnings = compound.calculateCTokenToBaseExchange(token, earnedCollateral)
+      }
+
+      const wrapToken = getWrapToken(networkId)
+      const nativeAsset = getNativeAsset(networkId)
+
+      if (token.address === wrapToken.address && earnings) {
+        // unwrap token
+        const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(token.symbol, earnings)
+        transactions.push({
+          to: token.address,
           data: encodedWithdrawFunction,
         })
+        token = nativeAsset
       }
 
       // If we are signed in as a safe we don't need to transfer
-      if (!this.isSafeApp && earnedCollateral) {
-        transactions.push({
-          to: collateralToken.address,
-          data: ERC20Service.encodeTransfer(account, earnedCollateral),
-        })
+      if (!this.isSafeApp && earnings) {
+        if (token.address === nativeAsset.address) {
+          transactions.push({
+            to: account,
+            value: earnings.toString(),
+          })
+        } else {
+          transactions.push({
+            to: token.address,
+            data: ERC20Service.encodeTransfer(account, earnings),
+          })
+        }
       }
 
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
@@ -1282,7 +1375,7 @@ class CPKService {
     try {
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
+      await this.getGas(txOptions)
 
       if (isScalar && scalarLow && scalarHigh) {
         transactions.push({
@@ -1313,10 +1406,15 @@ class CPKService {
           },
         ]
         const txOptions: TxOptions = {}
-        txOptions.gas = defaultGas
+        await this.getGas(txOptions)
         return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       }
-      return realitio.submitAnswer(question.id, answer, amount, setTxHash, setTxState)
+      const txObject = await realitio.submitAnswer(question.id, answer, amount)
+      setTxState && setTxState(TransactionStep.transactionSubmitted)
+      setTxHash && setTxHash(txObject.hash)
+      const tx = await this.waitForTransaction(txObject)
+      setTxState && setTxState(TransactionStep.transactionConfirmed)
+      return tx
     } catch (error) {
       logger.error(`There was an error submitting answer '${question.id}'`, error.message)
       throw error
@@ -1325,7 +1423,7 @@ class CPKService {
 
   proxyIsUpToDate = async (): Promise<boolean> => {
     const network = await this.provider.getNetwork()
-    if (network.chainId === networkIds.XDAI) {
+    if (network.chainId === networkIds.XDAI || this.isSafeApp) {
       return true
     }
     const deployed = await this.cpk.isProxyDeployed()
@@ -1341,8 +1439,8 @@ class CPKService {
   upgradeProxyImplementation = async (): Promise<TransactionReceipt> => {
     try {
       const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
       const network = await this.provider.getNetwork()
+      await this.getGas(txOptions)
       const targetGnosisSafeImplementation = getTargetSafeImplementation(network.chainId)
       const transactions: Transaction[] = [
         {
@@ -1356,51 +1454,83 @@ class CPKService {
       throw err
     }
   }
+  approveCpk = async (addressToApprove: string, tokenAddress: string) => {
+    try {
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
 
-  sendDaiToBridge = async (amount: BigNumber) => {
+      const transactions: Transaction[] = [
+        {
+          to: tokenAddress,
+          data: ERC20Service.encodeApproveUnlimited(OMNI_BRIDGE_XDAI_ADDRESS),
+        },
+      ]
+      return this.execTransactions(transactions)
+    } catch (e) {
+      logger.error(`Error while approving ERC20 Token to CPK address : `, e.message)
+      throw e
+    }
+  }
+
+  sendMainnetTokenToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
     try {
       if (this.cpk.relay) {
         const xDaiService = new XdaiService(this.provider)
-        const contract = xDaiService.generateXdaiBridgeContractInstance()
+        const contract = await xDaiService.generateXdaiBridgeContractInstance(currency)
+
         const sender = await this.cpk.ethLibAdapter.signer.signer.getAddress()
+
         const receiver = this.cpk.address
 
         // verify proxy address before deposit
         await verifyProxyAddress(sender, receiver, this.cpk)
 
-        const transaction = await contract.relayTokens(sender, receiver, amount)
+        const transaction = await contract.relayTokens(
+          currency === ExchangeCurrency.Omen ? GEN_TOKEN_ADDDRESS_TESTING : sender,
+          receiver,
+          amount,
+        )
         return transaction.hash
       } else {
         const xDaiService = new XdaiService(this.provider)
-        const contract = await xDaiService.generateErc20ContractInstance()
-        const transaction = await xDaiService.generateSendTransaction(amount, contract)
+        const contract = await xDaiService.generateErc20ContractInstance(currency)
+        const transaction = await xDaiService.generateSendTransaction(amount, contract, currency)
         return transaction
       }
     } catch (e) {
-      logger.error(`Error trying to send Dai to bridge address`, e.message)
+      logger.error(`Error trying to send Dai to bridge address: `, e.message)
       throw e
     }
   }
 
-  sendXdaiToBridge = async (amount: BigNumber) => {
+  sendXdaiChainTokenToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
     try {
       if (this.cpk.relay) {
         const transactions: Transaction[] = []
         const txOptions: TxOptions = {}
-        txOptions.gas = defaultGas
+        await this.getGas(txOptions)
 
         // get mainnet relay signer
         const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
 
         // relay to signer address on mainnet
-        transactions.push({
-          to: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
-          data: XdaiService.encodeRelayTokens(to),
-          value: amount.toString(),
-        })
+        if (currency === ExchangeCurrency.Dai) {
+          transactions.push({
+            to: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
+            data: XdaiService.encodeRelayTokens(to),
+            value: amount.toString(),
+          })
+          const { hash } = await this.cpk.execTransactions(transactions, txOptions)
+          return hash
+        } else {
+          transactions.push({
+            to: GEN_XDAI_ADDRESS_TESTING,
+            data: XdaiService.encodeTokenBridgeTransfer(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
+          })
+          const { transactionHash } = await this.execTransactions(transactions, txOptions)
 
-        const txObject = await this.cpk.execTransactions(transactions, txOptions)
-        return txObject.hash
+          return transactionHash
+        }
       } else {
         const xDaiService = new XdaiService(this.provider)
         const transaction = await xDaiService.sendXdaiToBridge(amount)
@@ -1415,33 +1545,37 @@ class CPKService {
   fetchLatestUnclaimedTransactions = async () => {
     try {
       const xDaiService = new XdaiService(this.provider)
-      const data = await xDaiService.fetchXdaiTransactionData()
-      return data
+      const daiData = await xDaiService.fetchXdaiTransactionData()
+      const omenData = await xDaiService.fetchOmniTransactionData()
+
+      return daiData.concat(omenData)
     } catch (e) {
       logger.error('Error fetching xDai subgraph data', e.message)
       throw e
     }
   }
 
-  claimDaiTokens = async () => {
+  claimAllTokens = async () => {
     try {
-      const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
       const xDaiService = new XdaiService(this.provider)
 
       const transactions = await this.fetchLatestUnclaimedTransactions()
+
       const messages = []
       const signatures = []
+      const addresses = []
 
       for (let i = 0; i < transactions.length; i++) {
+        addresses.push(transactions[i].address)
+
         const message = transactions[i].message
         messages.push(message.content)
-
         const signature = signaturesFormatted(message.signatures)
+
         signatures.push(signature)
       }
 
-      const txObject = await xDaiService.claim(messages, signatures)
+      const txObject = await xDaiService.claim(addresses, messages, signatures)
       return txObject
     } catch (e) {
       logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)

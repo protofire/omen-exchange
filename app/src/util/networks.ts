@@ -17,7 +17,6 @@ import {
   KLEROS_CURATE_GRAPH_MAINNET_WS,
   KLEROS_CURATE_GRAPH_RINKEBY_HTTP,
   KLEROS_CURATE_GRAPH_RINKEBY_WS,
-  XDAI_LOCATION,
 } from '../common/constants'
 import { entries, isNotNull } from '../util/type-utils'
 
@@ -139,10 +138,10 @@ const networks: { [K in NetworkId]: Network } = {
       symbol: 'ETH',
       decimals: 18,
     },
-    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    targetSafeImplementation: '0xCB2E9FA32603Cdc2740b82a9A67ED3e977C33416',
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
-    blockExplorerURL: 'https://etherscan.io/tx/',
+    blockExplorerURL: 'https://etherscan.io',
   },
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
@@ -185,10 +184,10 @@ const networks: { [K in NetworkId]: Network } = {
       symbol: 'ETH',
       decimals: 18,
     },
-    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    targetSafeImplementation: '0xcb05C7D28766e4fFB71ccbdAf6Ae1Cec555D61f8',
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
-    blockExplorerURL: 'https://rinkeby.etherscan.io/tx/',
+    blockExplorerURL: 'https://rinkeby.etherscan.io',
     OMN: {
       // TODO: Replace temporary token address (and consider better location)
       address: '0xA8b4B1Dc4EfC8f8c48e430A4faaaF36075670139',
@@ -241,7 +240,7 @@ const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
     blockExplorer: 'blockscout',
-    blockExplorerURL: 'https://blockscout.com/poa/sokol/tx/',
+    blockExplorerURL: 'https://blockscout.com/poa/sokol',
   },
   [networkIds.XDAI]: {
     label: 'xDai',
@@ -291,7 +290,7 @@ const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     blockExplorer: 'blockscout',
-    blockExplorerURL: 'https://blockscout.com/poa/xdai/tx/',
+    blockExplorerURL: 'https://blockscout.com/poa/xdai',
   },
 }
 
@@ -319,7 +318,7 @@ export const supportedNetworkURLs = entries(networks).reduce<{
   {},
 )
 
-export const infuraNetworkURL = location.host === XDAI_LOCATION ? networks[100].url : networks[1].url
+export const infuraNetworkURL = networks[1].url
 
 export const getInfuraUrl = (networkId: number): string => {
   if (!validNetworkId(networkId)) {
@@ -337,6 +336,15 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
       [networkIds.RINKEBY]: '0x6d7f0754ffeb405d23c51ce938289d4835be3b14',
     },
     order: 2,
+  },
+  omn: {
+    symbol: 'OMN',
+    decimals: 18,
+    addresses: {
+      [networkIds.MAINNET]: '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
+      [networkIds.XDAI]: '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599',
+    },
+    order: 22,
   },
   cbat: {
     symbol: 'cBAT',
@@ -817,6 +825,15 @@ export const getOMNToken = (networkId: number): Token => {
   return networks[networkId].OMN as Token
 }
 
+export const getNativeCompoundAsset = (networkId: number): Token => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  } else {
+    const knownToken = 'ceth' as KnownToken
+    return getToken(networkId, knownToken)
+  }
+}
+
 export const getTargetSafeImplementation = (networkId: number): string => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
@@ -866,5 +883,12 @@ export const getTxHashBlockExplorerURL = (networkId: number, txHash: string): st
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
-  return `${networks[networkId].blockExplorerURL}${txHash}`
+  return `${networks[networkId].blockExplorerURL}/tx/${txHash}`
+}
+
+export const getAddressBlockExplorerURL = (networkId: number, contractAddress: string): string => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return `${networks[networkId].blockExplorerURL}/address/${contractAddress}`
 }

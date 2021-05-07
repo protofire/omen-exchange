@@ -1,6 +1,6 @@
 {
   "name": "app",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "private": true,
   "engines": {
     "node": ">=v12.13.0 <13"
@@ -36,8 +36,7 @@
     "@types/recharts": "^1.8.10",
     "@types/styled-components": "^4.1.18",
     "@ukstv/jazzicon-react": "^1.0.0",
-    "@walletconnect/qrcode-modal": "^1.0.0-beta.35",
-    "@walletconnect/web3-subprovider": "^1.0.0-beta.1",
+    "@walletconnect/web3-provider": "^1.4.1",
     "apollo-cache-inmemory": "^1.6.5",
     "apollo-client": "^2.6.8",
     "apollo-link": "^1.2.13",

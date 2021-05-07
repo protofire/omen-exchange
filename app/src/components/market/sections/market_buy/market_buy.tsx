@@ -282,6 +282,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   let displayBaseCost = baseCost
   let displayPotentialProfit = potentialProfit
   let displayTradedShares = tradedShares
+
   if (collateralSymbol in CompoundTokenType && compoundService) {
     if (collateralSymbol !== displayCollateral.symbol.toLowerCase()) {
       displayFeePaid = compoundService.calculateCTokenToBaseExchange(displayCollateral, feePaid)
@@ -339,9 +340,9 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   if (collateralSymbol in CompoundTokenType) {
     if (baseCollateral.symbol.toLowerCase() === 'eth') {
-      currencyFilters = [collateral.address, pseudoNativeAssetAddress.toLowerCase()]
+      currencyFilters = [collateral.address.toLowerCase(), pseudoNativeAssetAddress.toLowerCase()]
     } else {
-      currencyFilters = [collateral.address, baseCollateral.address]
+      currencyFilters = [collateral.address.toLowerCase(), baseCollateral.address.toLowerCase()]
     }
   }
 
