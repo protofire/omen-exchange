@@ -460,32 +460,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   }, [liquidityMiningCampaigns, marketMakerAddress])
 
   // TODO: Remove if unused, otherwise clean up
-  const stake = async () => {
-    if (!cpk) {
-      return
-    }
-    if (!liquidityMiningCampaign) {
-      throw 'No liquidity mining campaign'
-    }
-
-    await cpk.stakePoolTokens(amountToFund || Zero, liquidityMiningCampaign.id, marketMakerAddress)
-    fetchStakingData()
-  }
-
-  // TODO: Remove if unused, otherwise clean up
-  const withdraw = async () => {
-    if (!cpk) {
-      return
-    }
-    if (!liquidityMiningCampaign) {
-      throw 'No liquidity mining campaign'
-    }
-
-    await cpk.unstakePoolTokens(amountToFund || Zero, liquidityMiningCampaign.id)
-    fetchStakingData()
-  }
-
-  // TODO: Remove if unused, otherwise clean up
   const claim = async () => {
     if (!cpk) {
       return
@@ -495,19 +469,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     }
 
     await cpk.claimRewardTokens(liquidityMiningCampaign.id)
-    fetchStakingData()
-  }
-
-  // TODO: Remove if unused, otherwise clean up
-  const withdrawAndClaim = async () => {
-    if (!cpk) {
-      return
-    }
-    if (!liquidityMiningCampaign) {
-      throw 'No liquidity mining campaign'
-    }
-
-    await cpk.unstakeAndClaim(liquidityMiningCampaign.id)
     fetchStakingData()
   }
 
