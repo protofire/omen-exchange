@@ -103,10 +103,12 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
     displayUserEarnings = compoundService.calculateCTokenToBaseExchange(baseCollateral, userEarnings)
     displayTotalEarnings = compoundService.calculateCTokenToBaseExchange(baseCollateral, totalEarnings)
   }
-
+  {
+    console.log('total user liquidity' + totalUserLiquidity)
+  }
   return (
     <>
-      {displayPoolTokens && (
+      {totalUserLiquidity.gt(0) && (
         <TestDiv>
           <b>hey</b>
         </TestDiv>
