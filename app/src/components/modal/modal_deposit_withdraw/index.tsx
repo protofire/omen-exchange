@@ -22,8 +22,8 @@ import { BigNumberInput, RadioInput, TextfieldCustomPlaceholder } from '../../co
 import { BigNumberInputReturn } from '../../common/form/big_number_input'
 import { IconArrowBack, IconClose, IconOmen } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
-import { IconQuestion } from '../../common/icons/IconQuestion'
 import { DaiIcon } from '../../common/icons/currencies'
+import { IconInfo } from '../../common/tooltip/img/IconInfo'
 import {
   BalanceItem,
   BalanceItemBalance,
@@ -84,6 +84,7 @@ const BottomButtons = styled.div`
   margin-top: auto;
   width: 100%;
 `
+
 const Divider = styled.div`
   border-bottom: ${props => props.theme.borders.borderLineDisabled};
   width: 100%;
@@ -423,17 +424,19 @@ export const ModalDepositWithdraw = (props: Props) => {
                 </span>
               </ExchangeDataItem>
               <ExchangeDataItem style={{ marginTop: '12px' }}>
-                <div
-                  data-arrow-color="transparent"
-                  data-for="feeInfo"
-                  data-tip={`Bridge Fee ${
-                    currencySelected === ExchangeCurrency.Omen && exchangeType === ExchangeType.withdraw
-                      ? '0.10%'
-                      : '0.00%'
-                  }`}
-                >
+                <div style={{ display: 'flex' }}>
                   {exchangeType === ExchangeType.withdraw ? 'Withdraw' : 'Deposit'} Fee
-                  <IconQuestion style={{ marginLeft: '8px' }} />
+                  <div
+                    data-arrow-color="transparent"
+                    data-for="feeInfo"
+                    data-tip={`Bridge Fee ${
+                      currencySelected === ExchangeCurrency.Omen && exchangeType === ExchangeType.withdraw
+                        ? '0.10%'
+                        : '0.00%'
+                    }`}
+                  >
+                    <IconInfo hasCircle style={{ marginLeft: '8px' }} />
+                  </div>
                 </div>
 
                 <span>
@@ -491,7 +494,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           data-multiline={true}
           effect="solid"
           id="feeInfo"
-          offset={{ top: 0, left: -42 }}
+          offset={{ top: -5, left: 0 }}
           place="top"
           type="light"
         />
