@@ -155,7 +155,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   unclaimedDaiAmount: BigNumber
   unclaimedOmenAmount: BigNumber
   fetchBalances: () => void
-  formattedEthBalance: string
+  formattedNativeBalance: string
   formattedDaiBalance: string
   formattedOmenBalance: string
   formattedxDaiBalance: string
@@ -167,7 +167,7 @@ export const ModalYourConnection = (props: Props) => {
     changeWallet,
     fetchBalances,
     formattedDaiBalance,
-    formattedEthBalance,
+    formattedNativeBalance,
     formattedOmenBalance,
     formattedxDaiBalance,
     formattedxOmenBalance,
@@ -287,7 +287,7 @@ export const ModalYourConnection = (props: Props) => {
                   </BalanceItemSide>
                   <BalanceItemBalance>
                     {networkId === networkIds.XDAI && !relay
-                      ? `${formattedEthBalance} xDAI`
+                      ? `${formattedNativeBalance} xDAI`
                       : `${formattedDaiBalance} DAI`}
                   </BalanceItemBalance>
                 </BalanceItem>
