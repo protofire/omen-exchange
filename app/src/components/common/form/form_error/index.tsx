@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 const FormErrorWrapper = styled.div`
   color: ${props => props.theme.colors.alert};
-  font-family: Roboto;
+  font-family: ${props => props.theme.fonts.fontFamily};
   font-style: normal;
   font-weight: normal;
   line-height: 1.5px;
