@@ -229,12 +229,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       if (!cpk) {
         return
       }
-
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
-
-      if (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) {
+      if (
+        !cpk?.isSafeApp &&
+        collateral.address !== pseudoNativeAssetAddress &&
+        displayCollateral.address !== pseudoNativeAssetAddress &&
+        hasEnoughAllowance !== Ternary.True
+      ) {
         throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
       }
 
@@ -242,6 +245,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
       setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
 
       await cpk.addFunding({
@@ -265,6 +269,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to deposit funds.`)
       logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
     }
   }
 
@@ -383,6 +388,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to withdraw funds.`)
       logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
     }
   }
 
