@@ -263,12 +263,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       if (!cpk) {
         return
       }
-
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
       }
-
-      if (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) {
+      if (
+        !cpk?.isSafeApp &&
+        collateral.address !== pseudoNativeAssetAddress &&
+        displayCollateral.address !== pseudoNativeAssetAddress &&
+        hasEnoughAllowance !== Ternary.True
+      ) {
         throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
       }
 
@@ -278,12 +281,17 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       }
       let fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
       if (collateralSymbol in CompoundTokenType && displayCollateral.symbol === baseCollateral.symbol) {
-        fundsAmount = formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)
+        fundsAmount = formatBigNumber(
+          amountToFundNormalized || Zero,
+          displayCollateral.decimals,
+          displayCollateral.decimals,
+        )
       }
 
       setMessage(`Depositing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
 
       setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
 
       await cpk.addFunding({
@@ -306,10 +314,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setAmountToFundDisplay('')
       setAmountToFundNormalized(null)
       setMessage(`Successfully deposited ${formatNumber(fundsAmount)}  ${displayCollateral.symbol}`)
+      setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to deposit funds.`)
       logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
     }
   }
 
@@ -393,9 +403,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         return
       }
 
-      setTxState(TransactionStep.waitingConfirmation)
-      setIsTransactionModalOpen(true)
-      let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals)
+      let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
       if (
         compoundService &&
         collateralSymbol in CompoundTokenType &&
@@ -405,7 +413,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           baseCollateral,
           depositedTokensTotal,
         )
-        fundsAmount = formatBigNumber(displayDepositedTokensTotal || Zero, displayCollateral.decimals)
+        fundsAmount = formatBigNumber(
+          displayDepositedTokensTotal || Zero,
+          displayCollateral.decimals,
+          displayCollateral.decimals,
+        )
       }
 
       setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
@@ -420,6 +432,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           useBaseToken = true
         }
       }
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
         collateralAddress,
@@ -445,10 +460,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setAmountToRemoveDisplay('')
       setAmountToRemoveNormalized(null)
       setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${displayCollateral.symbol}`)
+      setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to withdraw funds.`)
       logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
     }
   }
 
