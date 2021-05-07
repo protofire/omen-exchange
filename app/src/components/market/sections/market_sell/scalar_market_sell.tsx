@@ -246,12 +246,13 @@ export const ScalarMarketSell = (props: Props) => {
         useBaseToken = true
       }
       setStatus(Status.Loading)
-      setMessage(`Selling ${displaySharesAmount} shares...`)
+      setMessage(`Selling ${formatNumber(displaySharesAmount)} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,
+        collateralToken: collateral,
         compoundService,
         conditionalTokens,
         marketMaker,
