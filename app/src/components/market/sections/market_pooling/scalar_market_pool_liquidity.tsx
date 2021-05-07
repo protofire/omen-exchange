@@ -166,6 +166,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [liquidityMiningCampaign, setLiquidityMiningCampaign] = useState<Maybe<GraphResponseLiquidityMiningCampaign>>()
   const [amountToFundNormalized, setAmountToFundNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToRemoveNormalized, setAmountToRemoveNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
+  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const collateralSymbol = collateral.symbol.toLowerCase()
 
   let baseCollateral = collateral
@@ -307,6 +308,80 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to deposit funds.`)
       logger.error(`${message} - ${err.message}`)
+    }
+  }
+
+  const addFundingAndStake = async () => {
+    try {
+      if (!cpk) {
+        return
+      }
+      if (!liquidityMiningCampaign) {
+        throw 'No liquidity mining campaign'
+      }
+      if (!account) {
+        throw new Error('Please connect to your wallet to perform this action.')
+      }
+      if (
+        !cpk?.isSafeApp &&
+        collateral.address !== pseudoNativeAssetAddress &&
+        displayCollateral.address !== pseudoNativeAssetAddress &&
+        hasEnoughAllowance !== Ternary.True
+      ) {
+        throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
+      }
+
+      setMessage(
+        `Depositing and staking funds: ${formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)} ${
+          displayCollateral.symbol
+        }...`,
+      )
+
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
+
+      await cpk.depositAndStake({
+        amount: amountToFundNormalized || Zero,
+        campaignAddress: liquidityMiningCampaign.id,
+        collateral,
+        compoundService,
+        holdingsBN: balances.map(b => b.holdings),
+        marketMaker,
+        poolShareSupply: totalPoolShares,
+        setTxHash,
+        setTxState,
+        useBaseToken: false, // Not using base token for staking
+      })
+
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
+      await fetchCollateralBalance()
+      await fetchBalances()
+      await fetchStakingData()
+
+      setAmountToFund(null)
+      setAmountToFundDisplay('')
+      setAmountToFundNormalized(null)
+      setMessage(
+        `Successfully deposited ${formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)} ${
+          displayCollateral.symbol
+        }`,
+      )
+      setIsTransactionProcessing(false)
+    } catch (err) {
+      setTxState(TransactionStep.error)
+      setMessage(`Error trying to deposit and stake funds.`)
+      logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
+    }
+  }
+
+  const deposit = async () => {
+    if (liquidityMiningCampaign) {
+      addFundingAndStake()
+    } else {
+      addFunding()
     }
   }
 
@@ -476,14 +551,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     setAllowanceFinished(true)
   }
 
-  const collateralAmountError =
-    maybeCollateralBalance === null
-      ? null
-      : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
-      ? `Insufficient balance`
-      : amountToFund?.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${walletBalance} ${displayCollateral.symbol}`
-      : null
+  const collateralAmountError = isTransactionProcessing
+    ? null
+    : maybeCollateralBalance === null
+    ? null
+    : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
+    ? `Insufficient balance`
+    : amountToFund?.gt(maybeCollateralBalance)
+    ? `Value must be less than or equal to ${walletBalance} ${displayCollateral.symbol}`
+    : null
 
   const disableDepositButton =
     !amountToFund ||
@@ -637,14 +713,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     }
   }
 
-  const sharesAmountError =
-    maybeFundingBalance === null
-      ? null
-      : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
-      ? `Insufficient balance`
-      : amountToRemove?.gt(maybeFundingBalance)
-      ? `Value must be less than or equal to ${displaySharesBalance} pool shares`
-      : null
+  const sharesAmountError = isTransactionProcessing
+    ? null
+    : maybeFundingBalance === null
+    ? null
+    : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
+    ? `Insufficient balance`
+    : amountToRemove?.gt(maybeFundingBalance)
+    ? `Value must be less than or equal to ${displaySharesBalance} pool shares`
+    : null
 
   const disableWithdrawButton =
     !amountToRemove ||
@@ -874,7 +951,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           Cancel
         </Button>
         {activeTab === Tabs.deposit && (
-          <Button buttonType={ButtonType.primaryAlternative} disabled={disableDepositButton} onClick={addFunding}>
+          <Button buttonType={ButtonType.primaryAlternative} disabled={disableDepositButton} onClick={deposit}>
             Deposit
           </Button>
         )}
