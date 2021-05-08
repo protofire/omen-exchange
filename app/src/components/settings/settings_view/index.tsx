@@ -10,15 +10,16 @@ import { IconBlockscout, IconCloudflare, IconInfura } from '../../common/icons'
 import { IconXdai } from '../../common/icons/IconXdai'
 import { ModalCard } from '../../modal/common_styled'
 
-const MainContent = styled.div<{ borderTop?: boolean }>`
+const CardBody = styled.div`
   display: flex;
+  flex-direction: row;
   justify-content: center;
-  border-top: ${props => (props.borderTop ? props.theme.borders.borderLineDisabled : '')};
-`
-
-const BottomContent = styled(MainContent as any)`
-  display: flex;
-  justify-content: center;
+  align-items: flex-end;
+  overflow: hidden;
+  padding: 0px;
+  width: 364px;
+  height: 302px;
+  margin: 24px 0px -70px;
 `
 
 const Column = styled.div``
@@ -41,12 +42,19 @@ const TextLighter = styled.p`
   line-height: 14.06px;
   margin: 0;
 `
-
+const ButtonContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 364px;
+  padding: 0px;
+  margin: 0px;
+`
 const SetAndSaveButton = styled(ButtonRound)`
   letter-spacing: 0.4px;
-  width: 166px;
+  width: 174px;
   height: 40px;
-  margin: 8px;
 `
 
 const FiltersControls = styled.div<{ disabled?: boolean }>`
@@ -108,6 +116,7 @@ const TopCardHeader = styled.div<{ borderTop?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding: 16px;
   width: 100%;
   border-top: ${props => (props.borderTop ? props.theme.borders.borderLineDisabled : '')};
@@ -115,11 +124,11 @@ const TopCardHeader = styled.div<{ borderTop?: boolean }>`
 
 interface Props {
   history?: any
-
+  theme?: any
   networkId?: any
 }
 
-const SettingsViewContainer = (props: Props) => {
+export const SettingsViewContainer = (props: Props) => {
   const networkId = props.networkId
 
   const network = getNetworkFromChain(networkId)
@@ -208,7 +217,7 @@ const SettingsViewContainer = (props: Props) => {
 
   return (
     <>
-      <ModalCard style={{ minHeight: '146px' }}>
+      <ModalCard>
         <TopCardHeader>
           <Row>
             <Column>
@@ -248,36 +257,42 @@ const SettingsViewContainer = (props: Props) => {
         )}
       </ModalCard>
 
-      <BottomContent>
-        <SetAndSaveButton
-          onClick={() => {
-            setCurrent(0)
-            urlObject && setUrl(urlObject[0].rpcUrl)
-          }}
-        >
-          Set to Default
-        </SetAndSaveButton>
-        <SetAndSaveButton
-          disabled={
-            url.length === 0 || !isValidUrl || (network !== -1 && getInfuraUrl(network) === url) || !onlineStatus
-          }
-          onClick={async () => {
-            if (!(await checkRpcStatus(url, setOnlineStatus, network))) return
+      <CardBody
+        style={{
+          height: current === dropdownItems.length - 1 ? '188px' : '302px',
+        }}
+      >
+        <ButtonContainer>
+          <SetAndSaveButton
+            onClick={() => {
+              setCurrent(0)
+              urlObject && setUrl(urlObject[0].rpcUrl)
+            }}
+          >
+            Set to Default
+          </SetAndSaveButton>
+          <SetAndSaveButton
+            disabled={
+              url.length === 0 || !isValidUrl || (network !== -1 && getInfuraUrl(network) === url) || !onlineStatus
+            }
+            onClick={async () => {
+              if (!(await checkRpcStatus(url, setOnlineStatus, network))) return
 
-            localStorage.setItem(
-              'rpcAddress',
-              JSON.stringify({
-                url: url,
-                network: network,
-                index: current,
-              }),
-            )
-            window.location.reload()
-          }}
-        >
-          Save
-        </SetAndSaveButton>
-      </BottomContent>
+              localStorage.setItem(
+                'rpcAddress',
+                JSON.stringify({
+                  url: url,
+                  network: network,
+                  index: current,
+                }),
+              )
+              window.location.reload()
+            }}
+          >
+            Save
+          </SetAndSaveButton>
+        </ButtonContainer>
+      </CardBody>
     </>
   )
 }
