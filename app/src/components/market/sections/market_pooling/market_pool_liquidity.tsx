@@ -669,8 +669,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   let displayTotalPoolShares = totalPoolShares
   let displaySharesAfterAddingFunding = sharesAfterAddingFunding
   let displaySharesAfterRemovingFunding = sharesAfterRemovingFunding
-  let displayFundingBalance = fundingBalance
-  let displaySharesBalance = sharesBalance
+  let displayFundingBalance = userStakedTokens ? userStakedTokens : fundingBalance
+  let displaySharesBalance = userStakedTokens ? formatBigNumber(userStakedTokens, STANDARD_DECIMALS) : sharesBalance
   let sellNoteUserEarnings = userEarnings
   let sellNoteDepositedTokens = depositedTokens
   let sellNoteDepositedTokensTotal = depositedTokensTotal
@@ -703,16 +703,14 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     ? null
     : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance) && amountToRemove?.gt(userStakedTokens)
     ? `Insufficient balance`
-    : amountToRemoveNormalized?.gt(displayFundingBalance) && amountToRemoveNormalized?.gt(userStakedTokens)
-    ? `Value must be less than or equal to ${
-        userStakedTokens ? formatBigNumber(userStakedTokens, STANDARD_DECIMALS) : displaySharesBalance
-      } pool shares`
+    : amountToRemoveNormalized?.gt(displayFundingBalance)
+    ? `Value must be less than or equal to ${displaySharesBalance} pool shares`
     : null
 
   const disableWithdrawButton =
     !amountToRemove ||
     amountToRemove?.isZero() ||
-    (amountToRemoveNormalized?.gt(displayFundingBalance) && amountToRemoveNormalized?.gt(userStakedTokens)) ||
+    amountToRemoveNormalized?.gt(displayFundingBalance) ||
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 

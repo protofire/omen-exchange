@@ -738,8 +738,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   let sellNoteDepositedTokensTotal = depositedTokensTotal
   let displayUserEarnings = userEarnings
   let displayPoolTokens = poolTokens
-  let displayFundingBalance = fundingBalance
-  let displaySharesBalance = sharesBalance
+  let displayFundingBalance = userStakedTokens ? userStakedTokens : fundingBalance
+  let displaySharesBalance = userStakedTokens ? formatBigNumber(userStakedTokens, STANDARD_DECIMALS) : sharesBalance
   // Set display values if the collateral is cToken type
   if (compoundService && collateralSymbol in CompoundTokenType) {
     displayPoolTokens = compoundService.calculateCTokenToBaseExchange(baseCollateral, poolTokens)
@@ -766,16 +766,14 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     ? null
     : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance) && amountToRemove?.gt(userStakedTokens)
     ? `Insufficient balance`
-    : amountToRemoveNormalized?.gt(displayFundingBalance) && amountToRemoveNormalized?.gt(userStakedTokens)
-    ? `Value must be less than or equal to ${
-        userStakedTokens ? formatBigNumber(userStakedTokens, STANDARD_DECIMALS) : displaySharesBalance
-      } pool shares`
+    : amountToRemoveNormalized?.gt(displayFundingBalance)
+    ? `Value must be less than or equal to ${displaySharesBalance} pool shares`
     : null
 
   const disableWithdrawButton =
     !amountToRemove ||
     amountToRemove?.isZero() ||
-    (amountToRemoveNormalized?.gt(displayFundingBalance) && amountToRemoveNormalized?.gt(userStakedTokens)) ||
+    amountToRemoveNormalized?.gt(displayFundingBalance) ||
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 
