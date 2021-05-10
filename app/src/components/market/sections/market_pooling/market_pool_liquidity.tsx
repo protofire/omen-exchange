@@ -340,7 +340,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       }
 
       setMessage(
-        `Depositing and staking funds: ${formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)} ${
+        `Depositing funds: ${formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)} ${
           displayCollateral.symbol
         }...`,
       )
@@ -403,7 +403,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       }
 
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
-      setMessage(`Unstaking and withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
+      setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
