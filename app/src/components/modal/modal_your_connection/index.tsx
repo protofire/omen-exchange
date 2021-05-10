@@ -104,18 +104,30 @@ const AccountInfoAddress = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorDark};
   margin: 0;
+  width: 78px;
+  line-height: ${props => props.theme.fonts.defaultLineHeight}
+  letter-spacing: 0.2px;
+  height: 16px;
 `
 
 const AccountInfoWallet = styled.p`
   font-size: 12px;
   color: ${props => props.theme.colors.textColorLighter};
   margin: 0;
+  line-height: 14px;
+  height: 14px;
+  margin: 4px 0px;
 `
 
 const CardHeaderText = styled.p`
+  width: 40px;
+  height: 16px;
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorLighter};
   margin: 0;
+  line-height: ${props => props.theme.fonts.defaultLineHeight};
+  letter-spacing: 0.2px;
+  white-space: nowrap;
 `
 
 const ClaimButton = styled(Button)`
@@ -171,7 +183,6 @@ const IconSettingsWrapper = styled.div`
   margin-left: 65px;
   width: 40px;
   height: 40px;
-  padding: 8px;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -503,44 +514,6 @@ export const ModalYourConnection = (props: Props) => {
                 )}
               </ModalCard>
             )}{' '}
-            {relay && (
-              <ModalCard>
-                {walletState === WalletState.ready ? (
-                  <>
-                    <BalanceSection>
-                      <CardHeaderText>Omen Account</CardHeaderText>
-                      <BalanceItems style={{ marginTop: '14px' }}>
-                        <BalanceItem>
-                          <BalanceItemSide>
-                            <DaiIcon size="24px" />
-                            <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
-                          </BalanceItemSide>
-                          <BalanceItemBalance>{formattedxDaiBalance} DAI</BalanceItemBalance>
-                        </BalanceItem>
-                      </BalanceItems>
-                    </BalanceSection>
-                    <DepositWithdrawButtons>
-                      <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositModal}>
-                        Deposit
-                      </DepositWithdrawButton>
-                      <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openWithdrawModal}>
-                        Withdraw
-                      </DepositWithdrawButton>
-                    </DepositWithdrawButtons>
-                  </>
-                ) : (
-                  <EnableDai>
-                    <DaiIcon size="38px" />
-                    <EnableDaiText>
-                      To Deposit or Withdraw Dai to your Omen Account, you need to enable it first.
-                    </EnableDaiText>
-                    <EnableDaiButton buttonType={ButtonType.primary} onClick={approve}>
-                      Enable
-                    </EnableDaiButton>
-                  </EnableDai>
-                )}
-              </ModalCard>
-            )}
           </ContentWrapper>
         )}
       </Modal>

@@ -103,7 +103,7 @@ const StatusBadge = styled.div<{ status: boolean }>`
 `
 
 const Input = styled.input`
-  margin-top: 20px;
+  margin: 12px 0px;
 
   ${TextfieldCSS};
 `
@@ -116,10 +116,13 @@ const TopCardHeader = styled.div<{ borderTop?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  padding: 16px;
+  padding: 20px;
   width: 100%;
   border-top: ${props => (props.borderTop ? props.theme.borders.borderLineDisabled : '')};
+`
+
+const RPCTextWrapper = styled.span`
+  line-height: ${props => props.theme.fonts.defaultLineHeight};
 `
 
 interface Props {
@@ -218,12 +221,13 @@ export const SettingsViewContainer = (props: Props) => {
   return (
     <>
       <ModalCard>
-        <TopCardHeader>
+        <TopCardHeader style={{ height: '80px' }}>
           <Row>
             <Column>
-              RPC Endpoint
+              <RPCTextWrapper>RPC Endpoint</RPCTextWrapper>
               <StatusSection>
                 <StatusBadge status={onlineStatus} />
+
                 <TextLighter>Status: {onlineStatus ? 'OK' : 'Unavailable'}</TextLighter>
               </StatusSection>
             </Column>
@@ -239,10 +243,10 @@ export const SettingsViewContainer = (props: Props) => {
         </TopCardHeader>
 
         {current === dropdownItems.length - 1 && (
-          <TopCardHeader borderTop={true}>
+          <TopCardHeader borderTop={true} style={{ height: '107px', padding: '0px 20px' }}>
             <Row>
               <Column>
-                Custom RPC URL
+                <RPCTextWrapper>Custom RPC URL</RPCTextWrapper>
                 <Input
                   onChange={event => {
                     setUrl(event.target.value)
