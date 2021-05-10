@@ -536,19 +536,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }, [liquidityMiningCampaigns, marketMakerAddress, cpk, cpk?.address])
 
-  // TODO: Remove if unused, otherwise clean up
-  const claim = async () => {
-    if (!cpk) {
-      return
-    }
-    if (!liquidityMiningCampaign) {
-      throw 'No liquidity mining campaign'
-    }
-
-    await cpk.claimRewardTokens(liquidityMiningCampaign.id)
-    fetchStakingData()
-  }
-
   const fetchStakingData = useCallback(async () => {
     if (!liquidityMiningCampaign) {
       throw 'No liquidity mining campaign'
@@ -1003,7 +990,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             Withdraw
           </Button>
         )}
-        {/* <Button onClick={claim}>Claim</Button> */}
       </BottomButtonWrapper>
       <ModalTransactionWrapper
         confirmations={0}
