@@ -10,7 +10,21 @@ import { StakingService } from '../../../../../services/staking'
 import { getLogger } from '../../../../../util/logger'
 import { getOMNToken, getTokenFromAddress } from '../../../../../util/networks'
 import {
+<<<<<<< HEAD:app/src/components/market/common_sections/list/list_item/index.tsx
   bigNumberToNumber,
+=======
+  useConnectedCPKContext,
+  useConnectedWeb3Context,
+  useGraphLiquidityMiningCampaigns,
+  useSymbol,
+} from '../../../../hooks'
+import { GraphResponseLiquidityMiningCampaign } from '../../../../hooks/useGraphLiquidityMiningCampaigns'
+import { ERC20Service } from '../../../../services'
+import { StakingService } from '../../../../services/staking'
+import { getLogger } from '../../../../util/logger'
+import { getToken, getTokenFromAddress } from '../../../../util/networks'
+import {
+>>>>>>> ca9bcb1e (Replace omn token retrieval mechanism):app/src/components/market/common/list_item/index.tsx
   calcPrediction,
   calcPrice,
   formatNumber,
@@ -177,7 +191,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
       const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
 
       const { rewardApr } = await stakingService.getStakingData(
-        getOMNToken(networkId),
+        getToken(networkId, 'omn'),
         cpk?.address || '',
         1, // Assume pool token value is 1 DAI
         // TODO: Replace hardcoded price param

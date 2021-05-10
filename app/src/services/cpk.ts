@@ -10,7 +10,6 @@ import {
   getBySafeTx,
   getContractAddress,
   getNativeAsset,
-  getOMNToken,
   getTargetSafeImplementation,
   getToken,
   getTokenFromAddress,

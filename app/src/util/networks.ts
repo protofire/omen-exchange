@@ -186,14 +186,6 @@ export const networks: { [K in NetworkId]: Network } = {
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
     blockExplorerURL: 'https://rinkeby.etherscan.io',
-    OMN: {
-      // TODO: Replace temporary token address (and consider better location)
-      address: '0xA8b4B1Dc4EfC8f8c48e430A4faaaF36075670139',
-      image: '',
-      // TODO: Replace with correct symbol
-      symbol: 'OMNx',
-      decimals: 18,
-    },
   },
   [networkIds.SOKOL]: {
     label: 'Sokol',
@@ -349,8 +341,14 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     symbol: 'STAKE',
     decimals: 18,
     addresses: {
+<<<<<<< HEAD
       [networkIds.MAINNET]: '0x0Ae055097C6d159879521C384F1D2123D1f195e6',
       [networkIds.XDAI]: '0xb7D311E2Eb55F2f68a9440da38e7989210b9A05e',
+=======
+      [networkIds.MAINNET]: '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
+      [networkIds.XDAI]: '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599',
+      [networkIds.RINKEBY]: '0xA8b4B1Dc4EfC8f8c48e430A4faaaF36075670139',
+>>>>>>> ca9bcb1e (Replace omn token retrieval mechanism)
     },
     order: 22,
   },
@@ -845,11 +843,21 @@ export const getNativeAsset = (networkId: number, relay = false): Token => {
   return asset
 }
 
+<<<<<<< HEAD
 export const getOMNToken = (networkId: number): Token => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
   return networks[networkId].OMN as Token
+=======
+export const getNativeCompoundAsset = (networkId: number): Token => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  } else {
+    const knownToken = 'ceth' as KnownToken
+    return getToken(networkId, knownToken)
+  }
+>>>>>>> ca9bcb1e (Replace omn token retrieval mechanism)
 }
 
 export const getTargetSafeImplementation = (networkId: number): string => {
