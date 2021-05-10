@@ -160,6 +160,8 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   formattedOmenBalance: string
   formattedxDaiBalance: string
   formattedxOmenBalance: string
+  xOmenBalance: BigNumber
+  xDaiBalance: BigNumber
 }
 
 export const ModalYourConnection = (props: Props) => {
@@ -178,6 +180,8 @@ export const ModalYourConnection = (props: Props) => {
     theme,
     unclaimedDaiAmount,
     unclaimedOmenAmount,
+    xDaiBalance,
+    xOmenBalance,
   } = props
 
   const context = useConnectedWeb3Context()
@@ -385,7 +389,11 @@ export const ModalYourConnection = (props: Props) => {
                   <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositModal}>
                     Deposit
                   </DepositWithdrawButton>
-                  <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openWithdrawModal}>
+                  <DepositWithdrawButton
+                    buttonType={ButtonType.secondaryLine}
+                    disabled={xOmenBalance.isZero() && xDaiBalance.isZero()}
+                    onClick={openWithdrawModal}
+                  >
                     Withdraw
                   </DepositWithdrawButton>
                 </DepositWithdrawButtons>
