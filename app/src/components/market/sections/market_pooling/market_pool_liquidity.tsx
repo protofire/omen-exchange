@@ -26,7 +26,6 @@ import { getLogger } from '../../../../util/logger'
 import {
   getNativeAsset,
   getNativeCompoundAsset,
-  getOMNToken,
   getToken,
   getWrapToken,
   pseudoNativeAssetAddress,
@@ -561,7 +560,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
 
     const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
-      getOMNToken(networkId),
+      getToken(networkId, 'omn'),
       cpk.address,
       1, // Assume pool token value is 1 DAI
       // TODO: Replace hardcoded price param

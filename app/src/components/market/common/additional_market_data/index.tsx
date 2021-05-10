@@ -11,7 +11,7 @@ import {
 import { GraphResponseLiquidityMiningCampaign } from '../../../../hooks/useGraphLiquidityMiningCampaigns'
 import { CompoundService } from '../../../../services/compound_service'
 import { StakingService } from '../../../../services/staking'
-import { getOMNToken, networkIds } from '../../../../util/networks'
+import { getToken, networkIds } from '../../../../util/networks'
 import { formatNumber } from '../../../../util/tools'
 import { Arbitrator, CompoundTokenType, KlerosItemStatus, KlerosSubmission, Token } from '../../../../util/types'
 import { IconAlert, IconApy, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
@@ -194,7 +194,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
       const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
 
       const { rewardApr } = await stakingService.getStakingData(
-        getOMNToken(networkId),
+        getToken(networkId, 'omn'),
         cpk?.address || '',
         1, // Assume pool token value is 1 DAI
         // TODO: Replace hardcoded price param

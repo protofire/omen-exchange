@@ -13,7 +13,7 @@ import { GraphResponseLiquidityMiningCampaign } from '../../../../hooks/useGraph
 import { ERC20Service } from '../../../../services'
 import { StakingService } from '../../../../services/staking'
 import { getLogger } from '../../../../util/logger'
-import { getOMNToken, getTokenFromAddress } from '../../../../util/networks'
+import { getToken, getTokenFromAddress } from '../../../../util/networks'
 import {
   calcPrediction,
   calcPrice,
@@ -182,7 +182,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
       const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
 
       const { rewardApr } = await stakingService.getStakingData(
-        getOMNToken(networkId),
+        getToken(networkId, 'omn'),
         cpk?.address || '',
         1, // Assume pool token value is 1 DAI
         // TODO: Replace hardcoded price param

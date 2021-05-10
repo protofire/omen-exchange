@@ -188,14 +188,6 @@ const networks: { [K in NetworkId]: Network } = {
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
     blockExplorerURL: 'https://rinkeby.etherscan.io',
-    OMN: {
-      // TODO: Replace temporary token address (and consider better location)
-      address: '0xA8b4B1Dc4EfC8f8c48e430A4faaaF36075670139',
-      image: '',
-      // TODO: Replace with correct symbol
-      symbol: 'OMNx',
-      decimals: 18,
-    },
   },
   [networkIds.SOKOL]: {
     label: 'Sokol',
@@ -343,6 +335,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     addresses: {
       [networkIds.MAINNET]: '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
       [networkIds.XDAI]: '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599',
+      [networkIds.RINKEBY]: '0xA8b4B1Dc4EfC8f8c48e430A4faaaF36075670139',
     },
     order: 22,
   },
@@ -816,13 +809,6 @@ export const getNativeAsset = (networkId: number, relay = false): Token => {
     return { ...asset, symbol }
   }
   return asset
-}
-
-export const getOMNToken = (networkId: number): Token => {
-  if (!validNetworkId(networkId)) {
-    throw new Error(`Unsupported network id: '${networkId}'`)
-  }
-  return networks[networkId].OMN as Token
 }
 
 export const getNativeCompoundAsset = (networkId: number): Token => {
