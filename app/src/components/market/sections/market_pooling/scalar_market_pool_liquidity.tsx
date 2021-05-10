@@ -465,19 +465,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     }
   }, [liquidityMiningCampaigns, marketMakerAddress])
 
-  // TODO: Remove if unused, otherwise clean up
-  const claim = async () => {
-    if (!cpk) {
-      return
-    }
-    if (!liquidityMiningCampaign) {
-      throw 'No liquidity mining campaign'
-    }
-
-    await cpk.claimRewardTokens(liquidityMiningCampaign.id)
-    fetchStakingData()
-  }
-
   const fetchStakingData = useCallback(async () => {
     if (!liquidityMiningCampaign) {
       throw 'No liquidity mining campaign'
@@ -824,7 +811,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
             Withdraw
           </Button>
         )}
-        {/* <Button onClick={claim}>Claim</Button> */}
       </BottomButtonWrapper>
       <ModalTransactionWrapper
         confirmations={0}
