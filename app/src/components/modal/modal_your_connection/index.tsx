@@ -180,6 +180,7 @@ const ConnectionModalNavigation = styled(ModalNavigation as any)`
 const IconSettingsWrapper = styled.div`
   display: flex;
   align-items: center;
+  justify-content: center;
   margin-left: 65px;
   width: 40px;
   height: 40px;

@@ -104,8 +104,8 @@ const StatusBadge = styled.div<{ status: boolean }>`
 
 const Input = styled.input`
   margin: 12px 0px;
-
   ${TextfieldCSS};
+  padding: 12px 20px;
 `
 
 const ImageWrap = styled.div`
@@ -243,7 +243,7 @@ export const SettingsViewContainer = (props: Props) => {
         </TopCardHeader>
 
         {current === dropdownItems.length - 1 && (
-          <TopCardHeader borderTop={true} style={{ height: '107px', padding: '0px 20px' }}>
+          <TopCardHeader borderTop={true} style={{ height: '114px' }}>
             <Row>
               <Column>
                 <RPCTextWrapper>Custom RPC URL</RPCTextWrapper>
