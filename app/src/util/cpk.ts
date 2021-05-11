@@ -306,7 +306,7 @@ export const createCPK = async (provider: Web3Provider, relay: boolean) => {
 
   const networks = cpkAddresses
     ? {
-        [network.chainId]: cpkAddresses,
+        [network.chainId]: { ...cpkAddresses },
       }
     : {}
 

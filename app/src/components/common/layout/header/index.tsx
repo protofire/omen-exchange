@@ -205,7 +205,7 @@ const HeaderContainer: React.FC = (props: any) => {
     daiBalance,
     fetchBalances,
     formattedDaiBalance,
-    formattedEthBalance,
+    formattedNativeBalance,
     formattedOmenBalance,
     formattedxDaiBalance,
     formattedxOmenBalance,
@@ -355,8 +355,8 @@ const HeaderContainer: React.FC = (props: any) => {
                   {relay
                     ? `${formattedxDaiBalance} DAI`
                     : context.rawWeb3Context.networkId === networkIds.XDAI
-                    ? `${formattedxDaiBalance} xDAI`
-                    : `${formattedEthBalance} ETH`}
+                    ? `${formattedNativeBalance} xDAI`
+                    : `${formattedNativeBalance} ETH`}
                 </DepositedBalance>
                 <HeaderButtonDivider />
               </>
@@ -379,7 +379,7 @@ const HeaderContainer: React.FC = (props: any) => {
           }}
           fetchBalances={fetchBalances}
           formattedDaiBalance={formattedDaiBalance}
-          formattedEthBalance={formattedEthBalance}
+          formattedNativeBalance={formattedNativeBalance}
           formattedOmenBalance={formattedOmenBalance}
           formattedxDaiBalance={formattedxDaiBalance}
           formattedxOmenBalance={formattedxOmenBalance}
