@@ -26,17 +26,21 @@ const NavLeft = styled.div`
 `
 const ModalMain = styled.div`
   width: 100%;
+  display: grid;
+  row-gap: 12px;
 `
 const DataRow = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
+  line-height: ${props => props.theme.fonts.defaultLineHeight};
 `
 const LightDataItem = styled.div`
-  color: grey;
+  color: ${props => props.theme.textfield.placeholderColor};
 `
 const DarkDataItem = styled.div`
-  color: black;
+  color: ${props => props.theme.colors.textColorDark};
+  font-weight: ${props => props.theme.textfield.fontWeight};
 `
 const ButtonSection = styled.div`
   display: flex;
@@ -51,9 +55,11 @@ const ButtonsLockUnlock = styled(Button)`
 const ConditionalWrapper = styled.div<{ hideWrapper: boolean }>`
   ${props => props.hideWrapper && 'display:contents'};
   padding: 20px;
+
   border: ${props => props.theme.borders.borderLineDisabled};
   border-radius: ${props => props.theme.borders.commonBorderRadius};
   margin-bottom: 24px;
+  column-gap: 20px;
 `
 const Divider = styled.div`
   border-top: ${props => props.theme.borders.borderLineDisabled};
