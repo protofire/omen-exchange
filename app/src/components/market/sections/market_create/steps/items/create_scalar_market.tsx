@@ -1,9 +1,11 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { ChangeEvent } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../../../hooks'
+import { formatBigNumber } from '../../../../../../util/tools'
 import { Arbitrator } from '../../../../../../util/types'
 import { ButtonType } from '../../../../../button/button_styling_types'
 import { DateField, FormRow, Textfield } from '../../../../../common'
@@ -25,16 +27,15 @@ const Row = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-
   & > * {
     width: calc(50% - 10px);
     margin-bottom: 0;
   }
 `
 
-const NumericalInput = styled(BigNumberInput)`
+const NumericalInput = styled(BigNumberInput)<{ error?: string }>`
   background-color: ${props => props.theme.textfield.backgroundColor};
-  border-color: ${props => props.theme.textfield.borderColor};
+  border-color: ${props => (props.error ? props.theme.colors.alert : props.theme.textfield.borderColor)};
   border-style: ${props => props.theme.textfield.borderStyle};
   border-width: ${props => props.theme.textfield.borderWidth};
   border-radius: ${props => props.theme.textfield.borderRadius};
@@ -47,27 +48,22 @@ const NumericalInput = styled(BigNumberInput)`
   padding: ${props => props.theme.textfield.paddingVertical + ' ' + props.theme.textfield.paddingHorizontal};
   transition: border-color 0.15s ease-in-out;
   width: 100%;
-
   &:hover {
-    border-color: ${props => props.theme.textfield.borderColorOnHover};
+    border-color: ${props => (props.error ? `${props.theme.colors.alert}` : props.theme.textfield.borderColorOnHover)};
   }
-
   &:active,
   &:focus {
-    border-color: ${props => props.theme.textfield.borderColorActive};
+    border-color: ${props => (props.error ? `${props.theme.colors.alert}` : props.theme.textfield.borderColorActive)};
   }
-
   &::placeholder {
     color: ${props => props.theme.textfield.placeholderColor};
     font-size: ${props => props.theme.textfield.placeholderFontSize};
     font-size: ${props => props.theme.textfield.placeholderFontWeight};
   }
-
   &:read-only,
   [readonly] {
     cursor: not-allowed;
   }
-
   &::-webkit-inner-spin-button {
     -webkit-appearance: none;
   }
@@ -125,6 +121,43 @@ export const CreateScalarMarket = (props: Props) => {
     upperBound,
   } = props
 
+  const [lowerBoundFocus, setLowerBoundFocus] = useState(false)
+  const [startingPointFocus, setStartingPointFocus] = useState(false)
+  const [upperBoundFocus, setUpperBoundFocus] = useState(false)
+
+  const [lowerBoundError, setLowerBoundError] = useState('')
+  const [startingPointError, setStartingPointError] = useState('')
+  const [upperBoundError, setUpperBoundError] = useState('')
+
+  useEffect(() => {
+    if (lowerBoundFocus) {
+      lowerBound?.lt(Zero)
+        ? setLowerBoundError('Value cannot be negative')
+        : (upperBound?.gt(Zero) && lowerBound?.gt(upperBound)) ||
+          (lowerBound && upperBound?.gt(Zero) && upperBound?.eq(lowerBound))
+        ? setLowerBoundError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
+        : (startingPoint?.gt(Zero) && lowerBound?.gt(startingPoint)) ||
+          (lowerBound && startingPoint?.gt(Zero) && startingPoint?.eq(lowerBound))
+        ? setLowerBoundError(`Value must be less than ${formatBigNumber(startingPoint, STANDARD_DECIMALS, 2)}`)
+        : setLowerBoundError('')
+    }
+    if (startingPointFocus) {
+      ;(lowerBound && startingPoint?.eq(lowerBound)) || (lowerBound && startingPoint?.lt(lowerBound))
+        ? setStartingPointError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
+        : (upperBound?.gt(Zero) && startingPoint?.gt(upperBound)) ||
+          (upperBound?.gt(Zero) && startingPoint?.eq(upperBound))
+        ? setStartingPointError(`Value must be less than ${formatBigNumber(upperBound, STANDARD_DECIMALS, 2)}`)
+        : setStartingPointError('')
+    }
+    if (upperBoundFocus) {
+      ;(lowerBound && upperBound?.eq(lowerBound)) || (lowerBound && upperBound?.lt(lowerBound))
+        ? setUpperBoundError(`Value must be greater than ${formatBigNumber(lowerBound, STANDARD_DECIMALS, 2)}`)
+        : (startingPoint && upperBound?.eq(startingPoint)) || (startingPoint && upperBound?.lt(startingPoint))
+        ? setUpperBoundError(`Value must be greater than ${formatBigNumber(startingPoint, STANDARD_DECIMALS, 2)}`)
+        : setUpperBoundError('')
+    }
+  }, [lowerBound, upperBound, startingPoint, lowerBoundFocus, upperBoundFocus, startingPointFocus])
+
   return (
     <>
       <FormRow
@@ -139,28 +172,61 @@ export const CreateScalarMarket = (props: Props) => {
           />
         }
       />
+
       <RowWrapper>
         <Row>
           <FormRow
+            error={lowerBoundError}
             formField={
               <NumericalInput
                 decimals={STANDARD_DECIMALS}
+                error={lowerBoundError}
                 formatOnMount
+                min={0}
                 name="lowerBound"
-                onChange={handleChange}
+                onBlur={() => {
+                  setLowerBoundFocus(false)
+                  setStartingPointFocus(false)
+                  !lowerBoundError && !upperBoundError && !startingPointError && setUpperBoundFocus(true)
+                }}
+                onChange={value => {
+                  handleChange(value)
+                  upperBoundError && setUpperBoundFocus(true)
+                  startingPointError && setStartingPointFocus(true)
+                }}
+                onFocus={() => {
+                  !upperBoundError && !startingPointError && setLowerBoundFocus(true)
+                }}
                 placeholder={'0'}
                 value={lowerBound}
+                valueToDisplay={''}
               />
             }
             style={{ marginTop: 0 }}
             title={'Lower Bound'}
           />
+
           <FormRow
+            error={upperBoundError}
             formField={
               <NumericalInput
                 decimals={STANDARD_DECIMALS}
+                error={upperBoundError}
+                min={0}
                 name="upperBound"
-                onChange={handleChange}
+                onBlur={() => {
+                  setUpperBoundFocus(false)
+                  setLowerBoundFocus(false)
+                  !upperBoundError && !lowerBoundError && !startingPointError && setStartingPointFocus(true)
+                }}
+                onChange={value => {
+                  handleChange(value)
+                  lowerBoundError && setLowerBoundFocus(true)
+                  startingPointError && setStartingPointFocus(true)
+                }}
+                onFocus={() => {
+                  !lowerBoundError && !startingPointError && setUpperBoundFocus(true)
+                }}
                 placeholder={'1000'}
                 value={upperBound}
               />
@@ -171,11 +237,26 @@ export const CreateScalarMarket = (props: Props) => {
         </Row>
         <Row>
           <FormRow
+            error={startingPointError}
             formField={
               <NumericalInput
                 decimals={STANDARD_DECIMALS}
+                error={startingPointError}
+                min={0}
                 name="startingPoint"
-                onChange={handleChange}
+                onBlur={() => {
+                  setStartingPointFocus(false)
+                  setUpperBoundFocus(false)
+                  !lowerBoundError && !upperBoundError && !startingPointError && setLowerBoundFocus(true)
+                }}
+                onChange={value => {
+                  handleChange(value)
+                  upperBoundError && setUpperBoundFocus(true)
+                  lowerBoundError && setLowerBoundFocus(true)
+                }}
+                onFocus={() => {
+                  !lowerBoundError && !upperBoundError && setStartingPointFocus(true)
+                }}
                 placeholder={'500'}
                 value={startingPoint}
               />
