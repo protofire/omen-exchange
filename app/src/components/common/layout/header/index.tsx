@@ -277,7 +277,7 @@ const HeaderContainer: React.FC = (props: any) => {
             onClick={() => {
               setMarketPage(!marketPage)
             }}
-            style={{ marginLeft: '48px', width: '98.32px' }}
+            style={{ marginLeft: '48px' }}
           >
             Markets
           </MarketAndGovernanceNav>
@@ -286,7 +286,6 @@ const HeaderContainer: React.FC = (props: any) => {
             onClick={() => {
               setMarketPage(!marketPage)
             }}
-            style={{ width: '124.65px' }}
           >
             Governance
           </MarketAndGovernanceNav>
