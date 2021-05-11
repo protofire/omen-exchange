@@ -12,6 +12,7 @@ import { ButtonType } from '../../button/button_styling_types'
 import { TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInput, BigNumberInputReturn } from '../../common/form/big_number_input'
 import { IconArrowBack, IconClose } from '../../common/icons'
+import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
 import { ContentWrapper, ModalNavigation } from '../common_styled'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -53,6 +54,10 @@ const ConditionalWrapper = styled.div<{ hideWrapper: boolean }>`
   border: ${props => props.theme.borders.borderLineDisabled};
   border-radius: ${props => props.theme.borders.commonBorderRadius};
   margin-bottom: 24px;
+`
+const Divider = styled.div`
+  border-top: ${props => props.theme.borders.borderLineDisabled};
+  margin: 32px 0;
 `
 
 const ModalLockTokens = (props: Props) => {
@@ -120,14 +125,17 @@ const ModalLockTokens = (props: Props) => {
               symbol={'OMN'}
             />
           )}
-
+          {isLockAmountOpen && <Divider />}
           <DataRow>
             <LightDataItem>Vote Weight</LightDataItem>
             <DarkDataItem>0.60%</DarkDataItem>
           </DataRow>
           <DataRow>
             <LightDataItem>Unlock Date</LightDataItem>
-            <DarkDataItem>March 31rd,2021-2:32 UTC</DarkDataItem>
+            <DarkDataItem>
+              March 31rd,2021-2:32 UTC{' '}
+              <IconAlertInverted size="16" style={{ marginLeft: '8px', verticalAlign: 'text-bottom' }} />
+            </DarkDataItem>
           </DataRow>
         </ModalMain>
         <ButtonSection>
