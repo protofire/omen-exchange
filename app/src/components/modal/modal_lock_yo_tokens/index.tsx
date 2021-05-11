@@ -11,7 +11,7 @@ import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInput, BigNumberInputReturn } from '../../common/form/big_number_input'
-import { IconClose } from '../../common/icons'
+import { IconArrowBack, IconClose } from '../../common/icons'
 import { ContentWrapper, ModalNavigation } from '../common_styled'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -19,7 +19,10 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   theme?: any
   onClose: () => void
 }
-const NavLeft = styled.div``
+const NavLeft = styled.div`
+  display: flex;
+  align-items: center;
+`
 const ModalMain = styled.div`
   width: 100%;
 `
@@ -44,6 +47,13 @@ const ButtonSection = styled.div`
 const ButtonsLockUnlock = styled(Button)`
   width: 100%;
 `
+const ConditionalWrapper = styled.div<{ hideWrapper: boolean }>`
+  ${props => props.hideWrapper && 'display:contents'};
+  padding: 20px;
+  border: ${props => props.theme.borders.borderLineDisabled};
+  border-radius: ${props => props.theme.borders.commonBorderRadius};
+  margin-bottom: 24px;
+`
 
 const ModalLockTokens = (props: Props) => {
   const { isOpen, onClose, theme } = props
@@ -54,9 +64,20 @@ const ModalLockTokens = (props: Props) => {
   return (
     <Modal isOpen={isOpen} style={theme.fluidHeightModal}>
       <ContentWrapper>
-        <ModalNavigation>
+        <ModalNavigation style={{ padding: '0' }}>
           <NavLeft>
-            <div>Omen Guild Membership</div>
+            {isLockAmountOpen && (
+              <IconArrowBack
+                hoverEffect={true}
+                onClick={() => {
+                  setIsLockAmountOpen(false)
+                  setDisplayLockAmount(new BigNumber(0))
+                  setAmountToDisplay('')
+                }}
+                style={{ marginRight: '12px' }}
+              />
+            )}
+            <div>{isLockAmountOpen ? 'Lock Omen Token' : 'Omen Guild Membership'}</div>
           </NavLeft>
           <IconClose
             hoverEffect={true}
@@ -66,14 +87,16 @@ const ModalLockTokens = (props: Props) => {
           />
         </ModalNavigation>
         <ModalMain>
-          <DataRow>
-            <LightDataItem>Omen Account</LightDataItem>
-            <DarkDataItem>450 OMN</DarkDataItem>
-          </DataRow>
-          <DataRow>
-            <LightDataItem>Locked in Guild</LightDataItem>
-            <DarkDataItem>450 000 OMN</DarkDataItem>
-          </DataRow>
+          <ConditionalWrapper hideWrapper={!isLockAmountOpen}>
+            <DataRow>
+              <LightDataItem>Omen Account</LightDataItem>
+              <DarkDataItem>450 OMN</DarkDataItem>
+            </DataRow>
+            <DataRow>
+              <LightDataItem>Locked in Guild</LightDataItem>
+              <DarkDataItem>450 000 OMN</DarkDataItem>
+            </DataRow>
+          </ConditionalWrapper>
           {isLockAmountOpen && (
             <TextfieldCustomPlaceholder
               formField={

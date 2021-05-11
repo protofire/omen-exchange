@@ -18,20 +18,21 @@ const Wrapper = styled.svg<{ hoverEffect: boolean | undefined }>`
 interface Props {
   hoverEffect?: boolean
   onClick?: () => void
+  style?: any
 }
 
 export const IconArrowBack = (props: Props) => {
-  const { hoverEffect = false, onClick } = props
+  const { hoverEffect = false, ...restProps } = props
 
   return (
     <Wrapper
       fill="none"
       height="24"
       hoverEffect={hoverEffect}
-      onClick={onClick}
       viewBox="0 0 24 24"
       width="24"
       xmlns="http://www.w3.org/2000/svg"
+      {...restProps}
     >
       <path
         className="path"
