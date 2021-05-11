@@ -23,12 +23,14 @@ const ModalMainText = styled.p`
   margin-bottom: 8px;
   display: flex;
   align-items: center;
+  text-align: center;
 `
 
 const ModalSubText = styled.p`
   font-size: ${props => props.theme.fonts.defaultFontSize};
   color: ${props => props.theme.colors.textColorLighter};
   margin: 0;
+  text-align: center;
 `
 
 const ButtonContainer = styled.div`
