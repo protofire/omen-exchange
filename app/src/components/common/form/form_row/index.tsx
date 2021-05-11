@@ -23,7 +23,8 @@ const TitleWrapper = styled.div`
 `
 
 const Error = styled(FormError)`
-  margin-top: 10px;
+  line-height: 15px;
+  letter-spacing: 0.2px;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
