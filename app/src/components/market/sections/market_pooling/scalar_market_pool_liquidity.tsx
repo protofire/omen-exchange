@@ -322,7 +322,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         fundsAmount = formatBigNumber(displayDepositedTokensTotal || Zero, displayCollateral.decimals)
       }
 
-      setMessage(`Withdrawing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
+      setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
@@ -358,7 +358,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
       setAmountToRemoveNormalized(null)
-      setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
+      setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${displayCollateral.symbol}`)
     } catch (err) {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to withdraw funds.`)
