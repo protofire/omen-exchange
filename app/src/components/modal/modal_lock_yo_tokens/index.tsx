@@ -1,10 +1,12 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { HTMLAttributes, useState } from 'react'
+import React, { HTMLAttributes, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
+import { useConnectedWeb3Context } from '../../../hooks'
+import { OmenGuildService } from '../../../services'
 import { formatBigNumber } from '../../../util/tools'
 import { ExchangeCurrency, ExchangeType } from '../../../util/types'
 import { Button } from '../../button/button'
@@ -18,6 +20,7 @@ import { ContentWrapper, ModalNavigation } from '../common_styled'
 interface Props extends HTMLAttributes<HTMLDivElement> {
   isOpen: boolean
   theme?: any
+  provider: any
   onClose: () => void
 }
 const NavLeft = styled.div`
@@ -67,10 +70,20 @@ const Divider = styled.div`
 `
 
 const ModalLockTokens = (props: Props) => {
+  const context = useConnectedWeb3Context()
   const { isOpen, onClose, theme } = props
   const [isLockAmountOpen, setIsLockAmountOpen] = useState<boolean>(false)
   const [displayLockAmount, setDisplayLockAmount] = useState<BigNumber>(Zero)
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
+  useEffect(() => {
+    const milan = async () => {
+      console.log(props.provider.networkId)
+      const omen = new OmenGuildService(context.library)
+      const locked = await omen.tokensLocked('0x26358E62C2eDEd350e311bfde51588b8383A9315')
+      console.log(formatBigNumber(locked.amount, 18, 2))
+    }
+    milan()
+  }, [])
   console.log(isLockAmountOpen)
   return (
     <Modal isOpen={isOpen} style={theme.fluidHeightModal}>

@@ -177,7 +177,7 @@ const OmenIconWrapper = styled.div`
 
 const HeaderContainer: React.FC = (props: any) => {
   const context = useConnectedWeb3Context()
-  const { relay, toggleRelay } = context
+  const { library: provider, relay, toggleRelay } = context
   const { account, active, connectorName, error, networkId } = context.rawWeb3Context
 
   const { history, ...restProps } = props
@@ -343,7 +343,11 @@ const HeaderContainer: React.FC = (props: any) => {
             <IconSettings />
           </ButtonSettings>
         </ContentsRight>
-        <ModalLockYoTokens isOpen={isModalLockTokensOpen} onClose={() => setModalLockTokensState(false)} />
+        <ModalLockYoTokens
+          isOpen={isModalLockTokensOpen}
+          onClose={() => setModalLockTokensState(false)}
+          provider={provider}
+        />
 
         <ModalYourConnectionWrapper
           changeWallet={() => {
