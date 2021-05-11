@@ -343,7 +343,7 @@ const HeaderContainer: React.FC = (props: any) => {
             <IconSettings />
           </ButtonSettings>
         </ContentsRight>
-        <ModalLockYoTokens isOpen={isModalLockTokensOpen} />
+        <ModalLockYoTokens isOpen={isModalLockTokensOpen} onClose={() => setModalLockTokensState(false)} />
 
         <ModalYourConnectionWrapper
           changeWallet={() => {
