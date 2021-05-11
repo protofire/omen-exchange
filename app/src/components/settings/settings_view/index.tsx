@@ -52,7 +52,7 @@ const SetAndSaveButton = styled(ButtonRound)`
   margin: 0 8px;
   position: static;
   width: 174px;
-  height: 40px;
+  height: ${props => props.theme.buttonRound.height};
   left: 0px;
   top: 0px;
 `
@@ -107,8 +107,8 @@ const Input = styled.input`
   ${TextfieldCSS};
   padding: 12px 20px;
   position: static;
-  width: 324px;
-  height: 40px;
+  width: 320px;
+  height: ${props => props.theme.textfield.height};
   left: 20px;
   top: 28px;
 `
@@ -121,7 +121,7 @@ const TopCardHeader = styled.div<{ borderTop?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px;
+  padding: ${props => props.theme.cards.paddingVertical};
   width: 100%;
 
   border-top: ${props => (props.borderTop ? props.theme.borders.borderLineDisabled : '')};
@@ -255,7 +255,7 @@ export const SettingsViewContainer = (props: Props) => {
         </TopCardHeader>
 
         {current === dropdownItems.length - 1 && (
-          <TopCardHeader borderTop={true}>
+          <TopCardHeader borderTop={true} style={{ paddingBottom: '10px' }}>
             <Row>
               <Column>
                 <RPCTextWrapper>Custom RPC URL</RPCTextWrapper>
