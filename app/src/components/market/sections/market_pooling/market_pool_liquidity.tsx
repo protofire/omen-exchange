@@ -577,7 +577,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }, [liquidityMiningCampaigns, marketMakerAddress, cpk, cpk?.address])
 
-  const fetchStakingData = useCallback(async () => {
+  const fetchStakingData = async () => {
     if (!liquidityMiningCampaign) {
       throw new Error('No liquidity mining campaign')
     }
@@ -604,7 +604,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     setRemainingRewards(remainingRewards)
     setRewardApr(rewardApr)
     setTotalRewards(totalRewards)
-  }, [cpk, liquidityMiningCampaign, networkId, provider])
+  }
 
   useEffect(() => {
     cpk && liquidityMiningCampaign && fetchStakingData()
