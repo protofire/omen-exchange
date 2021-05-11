@@ -186,6 +186,15 @@ const IconSettingsWrapper = styled.div`
   height: 40px;
 `
 
+const SettingsModalWrapper = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   changeWallet: () => void
   isOpen: boolean
@@ -360,8 +369,9 @@ export const ModalYourConnection = (props: Props) => {
                 }}
               />
             </ConnectionModalNavigation>
-
-            <SettingsViewContainer networkId={chainId} {...props} />
+            <SettingsModalWrapper>
+              <SettingsViewContainer networkId={chainId} {...props} />
+            </SettingsModalWrapper>
           </ContentWrapper>
         ) : (
           <ContentWrapper>

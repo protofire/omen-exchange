@@ -10,18 +10,6 @@ import { IconBlockscout, IconCloudflare, IconInfura } from '../../common/icons'
 import { IconXdai } from '../../common/icons/IconXdai'
 import { ModalCard } from '../../modal/common_styled'
 
-const CardBody = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: flex-end;
-  overflow: hidden;
-  padding: 0px;
-  width: 364px;
-  height: 302px;
-  margin: 24px 0px -70px;
-`
-
 const Column = styled.div``
 
 const Row = styled.div`
@@ -45,16 +33,28 @@ const TextLighter = styled.p`
 const ButtonContainer = styled.div`
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
+  justify-content: center;
   width: 364px;
   padding: 0px;
-  margin: 0px;
+  margin-top: 24px;
+  position: static;
+  left: 0px;
+  top: 262px;
+  width: 364px;
+  height: 100%;
 `
 const SetAndSaveButton = styled(ButtonRound)`
-  letter-spacing: 0.4px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  padding: 12px 17px;
+  margin: 0 8px;
+  position: static;
   width: 174px;
   height: 40px;
+  left: 0px;
+  top: 0px;
 `
 
 const FiltersControls = styled.div<{ disabled?: boolean }>`
@@ -106,6 +106,11 @@ const Input = styled.input`
   margin: 12px 0px;
   ${TextfieldCSS};
   padding: 12px 20px;
+  position: static;
+  width: 324px;
+  height: 40px;
+  left: 20px;
+  top: 28px;
 `
 
 const ImageWrap = styled.div`
@@ -118,11 +123,18 @@ const TopCardHeader = styled.div<{ borderTop?: boolean }>`
   justify-content: space-between;
   padding: 20px;
   width: 100%;
+
   border-top: ${props => (props.borderTop ? props.theme.borders.borderLineDisabled : '')};
 `
 
 const RPCTextWrapper = styled.span`
   line-height: ${props => props.theme.fonts.defaultLineHeight};
+`
+
+const SettingsButtonWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
 `
 
 interface Props {
@@ -221,7 +233,7 @@ export const SettingsViewContainer = (props: Props) => {
   return (
     <>
       <ModalCard>
-        <TopCardHeader style={{ height: '80px' }}>
+        <TopCardHeader>
           <Row>
             <Column>
               <RPCTextWrapper>RPC Endpoint</RPCTextWrapper>
@@ -243,7 +255,7 @@ export const SettingsViewContainer = (props: Props) => {
         </TopCardHeader>
 
         {current === dropdownItems.length - 1 && (
-          <TopCardHeader borderTop={true} style={{ height: '114px' }}>
+          <TopCardHeader borderTop={true}>
             <Row>
               <Column>
                 <RPCTextWrapper>Custom RPC URL</RPCTextWrapper>
@@ -261,12 +273,8 @@ export const SettingsViewContainer = (props: Props) => {
         )}
       </ModalCard>
 
-      <CardBody
-        style={{
-          height: current === dropdownItems.length - 1 ? '188px' : '302px',
-        }}
-      >
-        <ButtonContainer>
+      <ButtonContainer>
+        <SettingsButtonWrapper>
           <SetAndSaveButton
             onClick={() => {
               setCurrent(0)
@@ -295,8 +303,8 @@ export const SettingsViewContainer = (props: Props) => {
           >
             Save
           </SetAndSaveButton>
-        </ButtonContainer>
-      </CardBody>
+        </SettingsButtonWrapper>
+      </ButtonContainer>
     </>
   )
 }
