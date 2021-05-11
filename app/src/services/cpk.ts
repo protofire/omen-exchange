@@ -1284,7 +1284,7 @@ class CPKService {
           earnedCollateral.toString(),
         )
 
-        // Redeeem underlying token
+        // Redeem underlying token
         transactions.push({
           to: collateralToken.address,
           data: encodedRedeemFunction,

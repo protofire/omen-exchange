@@ -20,7 +20,7 @@ import { ContentWrapper, ModalNavigation } from '../common_styled'
 interface Props extends HTMLAttributes<HTMLDivElement> {
   isOpen: boolean
   theme?: any
-  provider: any
+  context: any
   onClose: () => void
 }
 const NavLeft = styled.div`
@@ -70,16 +70,16 @@ const Divider = styled.div`
 `
 
 const ModalLockTokens = (props: Props) => {
-  const context = useConnectedWeb3Context()
   const { isOpen, onClose, theme } = props
   const [isLockAmountOpen, setIsLockAmountOpen] = useState<boolean>(false)
   const [displayLockAmount, setDisplayLockAmount] = useState<BigNumber>(Zero)
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   useEffect(() => {
     const milan = async () => {
-      console.log(props.provider.networkId)
-      const omen = new OmenGuildService(context.library)
+      const omen = new OmenGuildService(props.context)
       const locked = await omen.tokensLocked('0x26358E62C2eDEd350e311bfde51588b8383A9315')
+      const total = await omen.totalLocked()
+      console.log(formatBigNumber(total, 18, 2))
       console.log(formatBigNumber(locked.amount, 18, 2))
     }
     milan()

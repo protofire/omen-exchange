@@ -503,7 +503,7 @@ export const getToken = (networkId: number, tokenId: KnownToken): Token => {
   if (!token) {
     throw new Error(`Unsupported token id: '${tokenId}'`)
   }
-  console.log(token)
+
   const address = token.addresses[networkId]
 
   if (!address) {

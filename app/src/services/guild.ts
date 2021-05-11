@@ -1,6 +1,7 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
+import { ConnectedWeb3Context } from '../hooks'
 import { getContractAddress } from '../util/networks'
 
 const GuildAbi = [
@@ -598,24 +599,28 @@ const GuildAbi = [
 ]
 
 class OmenGuildService {
-  provider: any
-  abi: any
   contract: Contract
 
-  constructor(provider: any) {
-    this.provider = provider
-    this.abi = GuildAbi
-    const omenGuildAddress = getContractAddress(provider.network.chainId, 'omenGuildProxy')
-    const signer: Wallet = provider.getSigner()
+  constructor(context: ConnectedWeb3Context) {
+    const { library: provider, networkId } = context
+    const signer = provider.getSigner()
+    const omenGuildAddress = getContractAddress(networkId, 'omenGuildProxy')
+
     this.contract = new ethers.Contract(omenGuildAddress, GuildAbi, provider).connect(signer)
   }
   get getContract(): Contract {
     return this.contract
   }
+  static encodeLockTokens = (amount: BigNumber) => {
+    const guildInterface = new utils.Interface(GuildAbi)
+    return guildInterface.functions.lockTokens.encode([amount])
+  }
 
   tokensLocked = async (address: string) => {
-    const tokens = this.getContract.tokensLocked(address)
-    return tokens
+    return this.getContract.tokensLocked(address)
+  }
+  totalLocked = async () => {
+    return this.getContract.totalLocked()
   }
 }
 export { OmenGuildService }
