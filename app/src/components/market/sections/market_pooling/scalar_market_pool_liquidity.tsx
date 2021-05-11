@@ -279,7 +279,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         return
       }
       if (!liquidityMiningCampaign) {
-        throw 'No liquidity mining campaign'
+        throw new Error('No liquidity mining campaign')
       }
       if (!account) {
         throw new Error('Please connect to your wallet to perform this action.')
@@ -398,7 +398,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         return
       }
       if (!liquidityMiningCampaign) {
-        throw 'No liquidity mining campaign'
+        throw new Error('No liquidity mining campaign')
       }
 
       const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
@@ -467,10 +467,10 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
   const fetchStakingData = useCallback(async () => {
     if (!liquidityMiningCampaign) {
-      throw 'No liquidity mining campaign'
+      throw new Error('No liquidity mining campaign')
     }
     if (!cpk) {
-      throw 'No cpk'
+      throw new Error('No cpk')
     }
 
     const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
