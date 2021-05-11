@@ -12,7 +12,12 @@ import { ExchangeType } from '../../../../util/types'
 import { ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
-import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
+import {
+  ModalConnectWalletWrapper,
+  ModalDepositWithdrawWrapper,
+  ModalLockYoTokens,
+  ModalYourConnectionWrapper,
+} from '../../../modal'
 import { IconAdd, IconClose, IconOmen } from '../../icons'
 import { IconSettings } from '../../icons/IconSettings'
 
@@ -179,6 +184,7 @@ const HeaderContainer: React.FC = (props: any) => {
   const [isConnectWalletModalOpen, setConnectWalletModalState] = useState(false)
   const [isYourConnectionModalOpen, setYourConnectionModalState] = useState(false)
   const [isDepositWithdrawModalOpen, setDepositWithdrawModalState] = useState(false)
+  const [isModalLockTokensOpen, setModalLockTokensState] = useState<boolean>(false)
   const [depositWithdrawType, setDepositWithdrawType] = useState<ExchangeType>(ExchangeType.deposit)
 
   const hasRouter = props.history !== undefined
@@ -290,7 +296,7 @@ const HeaderContainer: React.FC = (props: any) => {
             />
           )}
 
-          <HeaderButton>
+          <HeaderButton onClick={() => setModalLockTokensState(!isModalLockTokensOpen)}>
             {relay
               ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
               : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
@@ -337,6 +343,8 @@ const HeaderContainer: React.FC = (props: any) => {
             <IconSettings />
           </ButtonSettings>
         </ContentsRight>
+        <ModalLockYoTokens isOpen={isModalLockTokensOpen} />
+
         <ModalYourConnectionWrapper
           changeWallet={() => {
             setYourConnectionModalState(false)

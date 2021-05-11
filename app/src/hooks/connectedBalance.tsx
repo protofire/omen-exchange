@@ -76,7 +76,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const xDaiBalance = xDaiCollateral || Zero
 
   // omn
-  const omenToken = getToken(100, 'omn')
+  const omenToken = getToken(networkId, 'omn')
   const {
     collateralBalance: xOmenCollateral,
     errorMessage,
