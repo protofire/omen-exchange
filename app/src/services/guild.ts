@@ -600,10 +600,12 @@ const GuildAbi = [
 
 class OmenGuildService {
   contract: Contract
+  user: any
 
   constructor(context: ConnectedWeb3Context) {
     const { library: provider, networkId } = context
     const signer = provider.getSigner()
+    this.user = signer
     const omenGuildAddress = getContractAddress(networkId, 'omenGuildProxy')
 
     this.contract = new ethers.Contract(omenGuildAddress, GuildAbi, provider).connect(signer)
@@ -617,7 +619,10 @@ class OmenGuildService {
   }
 
   tokensLocked = async (address: string) => {
-    return this.getContract.tokensLocked(address)
+    const addresses = await this.user.getAddress()
+    console.log(addresses, address)
+    const locked = await this.getContract.tokensLocked(addresses)
+    return locked
   }
   totalLocked = async () => {
     return this.getContract.totalLocked()

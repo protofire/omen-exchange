@@ -346,6 +346,7 @@ const HeaderContainer: React.FC = (props: any) => {
         </ContentsRight>
         <ModalLockYoTokens
           context={context}
+          formattedOmenBalance={relay ? formattedxOmenBalance : formattedOmenBalance}
           isOpen={isModalLockTokensOpen}
           onClose={() => setModalLockTokensState(false)}
         />

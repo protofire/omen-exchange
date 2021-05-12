@@ -7,7 +7,7 @@ import styled, { withTheme } from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../hooks'
 import { OmenGuildService } from '../../../services'
-import { formatBigNumber } from '../../../util/tools'
+import { divBN, formatBigNumber, formatHistoryDate, formatTimestampToDate } from '../../../util/tools'
 import { ExchangeCurrency, ExchangeType } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -22,6 +22,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   theme?: any
   context: any
   onClose: () => void
+  formattedOmenBalance: string
 }
 const NavLeft = styled.div`
   display: flex;
@@ -70,17 +71,28 @@ const Divider = styled.div`
 `
 
 const ModalLockTokens = (props: Props) => {
-  const { isOpen, onClose, theme } = props
+  const { formattedOmenBalance, isOpen, onClose, theme } = props
   const [isLockAmountOpen, setIsLockAmountOpen] = useState<boolean>(false)
   const [displayLockAmount, setDisplayLockAmount] = useState<BigNumber>(Zero)
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
+  const [totalLocked, setTotalLocked] = useState<BigNumber>(Zero)
+  const [userLocked, setUserLocked] = useState<BigNumber>(Zero)
+  const [timestamp, setTimestamp] = useState<number>(0)
   useEffect(() => {
     const milan = async () => {
       const omen = new OmenGuildService(props.context)
       const locked = await omen.tokensLocked('0x26358E62C2eDEd350e311bfde51588b8383A9315')
       const total = await omen.totalLocked()
+      setTotalLocked(total)
+      setUserLocked(locked.amount)
+      setTimestamp(locked.timestamp.toNumber())
+
+      console.log(locked.amount)
+      console.log(total)
       console.log(formatBigNumber(total, 18, 2))
       console.log(formatBigNumber(locked.amount, 18, 2))
+      const division = divBN(total, locked.amount)
+      console.log(division)
     }
     milan()
   }, [])
@@ -114,11 +126,11 @@ const ModalLockTokens = (props: Props) => {
           <ConditionalWrapper hideWrapper={!isLockAmountOpen}>
             <DataRow>
               <LightDataItem>Omen Account</LightDataItem>
-              <DarkDataItem>450 OMN</DarkDataItem>
+              <DarkDataItem> {formattedOmenBalance} OMN</DarkDataItem>
             </DataRow>
             <DataRow>
               <LightDataItem>Locked in Guild</LightDataItem>
-              <DarkDataItem>450 000 OMN</DarkDataItem>
+              <DarkDataItem>{formatBigNumber(userLocked, 18, 2)} OMN</DarkDataItem>
             </DataRow>
           </ConditionalWrapper>
           {isLockAmountOpen && (
@@ -147,12 +159,14 @@ const ModalLockTokens = (props: Props) => {
           {isLockAmountOpen && <Divider />}
           <DataRow>
             <LightDataItem>Vote Weight</LightDataItem>
-            <DarkDataItem>0.60%</DarkDataItem>
+            <DarkDataItem>
+              {!totalLocked.isZero() && !userLocked.isZero() ? divBN(totalLocked, userLocked) * 100 : '0.00'}%
+            </DarkDataItem>
           </DataRow>
           <DataRow>
             <LightDataItem>Unlock Date</LightDataItem>
             <DarkDataItem>
-              March 31rd,2021-2:32 UTC{' '}
+              {formatHistoryDate(timestamp)}
               <IconAlertInverted size="16" style={{ marginLeft: '8px', verticalAlign: 'text-bottom' }} />
             </DarkDataItem>
           </DataRow>
