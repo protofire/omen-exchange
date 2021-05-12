@@ -9,6 +9,16 @@ import { TitleValue } from '../../../common'
 import { ValueStates } from '../../common/transaction_details_row'
 
 const UserDataTitleValue = styled(TitleValue)`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0px;
+
+  position: static;
+  width: 253px;
+  height: 16px;
+  left: 0px;
+  top: 0px;
   flex: 0 calc(50% - 16px);
 
   &:nth-child(odd) {
@@ -39,12 +49,12 @@ const UserDataTitleValue = styled(TitleValue)`
   }
 `
 
-const UserData = styled.div`
+const UserDataWrapper = styled.div`
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   margin: 0 -25px;
-  padding: 20px 24px;
+  padding: 24px;
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
   @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
     flex-wrap: nowrap;
@@ -52,6 +62,37 @@ const UserData = styled.div`
   }
 `
 
+const UserDataColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0px;
+  width: 253px;
+  height: 44px;
+  margin: 0px;
+`
+const ColumnWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  padding: 0px;
+
+  position: static;
+  width: 538px;
+  height: 44px;
+  left: 0px;
+  top: 32px;
+`
+
+const PoolOverview = styled.div`
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+`
 interface Props {
   totalUserLiquidity: BigNumber
   collateral: Token
@@ -94,51 +135,65 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
   }
 
   return (
-    <UserData>
-      <UserDataTitleValue
-        title="Your Liquidity"
-        value={`${formatNumber(
-          formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals),
-        )} ${baseCollateral.symbol}`}
-      />
-      <UserDataTitleValue
-        title="Total Pool Tokens"
-        value={`${formatNumber(formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals))}`}
-      />
-      <UserDataTitleValue
-        state={userEarnings.gt(0) ? ValueStates.success : undefined}
-        title="Your Earnings"
-        value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatNumber(
-          formatBigNumber(displayUserEarnings, baseCollateral.decimals, baseCollateral.decimals),
-        )} ${baseCollateral.symbol}`}
-      />
-      <UserDataTitleValue
-        state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
-        title="Total Earnings"
-        value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
-          formatBigNumber(displayTotalEarnings, baseCollateral.decimals, baseCollateral.decimals),
-        )} ${baseCollateral.symbol}`}
-      />
-      <UserDataTitleValue
-        state={currentApr > 0 ? ValueStates.success : undefined}
-        title="Current APR"
-        value={`${formatNumber(currentApr.toString())}%`}
-      />
-      <UserDataTitleValue
-        state={remainingRewards > 0 ? ValueStates.success : undefined}
-        title="Total Rewards left"
-        value={`${formatNumber(remainingRewards.toString())} OMN`}
-      />
-      <UserDataTitleValue
-        state={earnedRewards > 0 ? ValueStates.success : undefined}
-        title="Your Rewards"
-        value={`${formatNumber(earnedRewards.toString())} OMN`}
-      />
-      <UserDataTitleValue
-        state={totalRewards > 0 ? ValueStates.success : undefined}
-        title="Total Rewards"
-        value={`${formatNumber(totalRewards.toString())} OMN`}
-      />
-    </UserData>
+    <UserDataWrapper>
+      <PoolOverview>Pool Overview</PoolOverview>
+      <ColumnWrapper>
+        <UserDataColumn>
+          <UserDataTitleValue
+            title="Your Liquidity"
+            value={`${formatNumber(
+              formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals),
+            )} ${baseCollateral.symbol}`}
+          />
+          <UserDataTitleValue
+            title="Total Liquidity"
+            value={`${formatNumber(
+              formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals),
+            )}`}
+          />
+        </UserDataColumn>
+        <UserDataColumn>
+          <UserDataTitleValue
+            state={userEarnings.gt(0) ? ValueStates.success : undefined}
+            title="Your Earnings"
+            value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatNumber(
+              formatBigNumber(displayUserEarnings, baseCollateral.decimals, baseCollateral.decimals),
+            )} ${baseCollateral.symbol}`}
+          />
+          <UserDataTitleValue
+            state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
+            title="Total Earnings"
+            value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
+              formatBigNumber(displayTotalEarnings, baseCollateral.decimals, baseCollateral.decimals),
+            )} ${baseCollateral.symbol}`}
+          />
+        </UserDataColumn>
+      </ColumnWrapper>
+      {currentApr > 0 && (
+        <UserDataColumn>
+          <UserDataTitleValue
+            state={currentApr > 0 ? ValueStates.success : undefined}
+            title="Current APY"
+            value={`${formatNumber(currentApr.toString())}%`}
+          />
+          <UserDataTitleValue
+            state={remainingRewards > 0 ? ValueStates.success : undefined}
+            title="Rewards left"
+            value={`${formatNumber(remainingRewards.toString())} OMN`}
+          />
+
+          <UserDataTitleValue
+            state={earnedRewards > 0 ? ValueStates.success : undefined}
+            title="Your Rewards"
+            value={`${formatNumber(earnedRewards.toString())} OMN`}
+          />
+          <UserDataTitleValue
+            state={totalRewards > 0 ? ValueStates.success : undefined}
+            title="Total Rewards"
+            value={`${formatNumber(totalRewards.toString())} OMN`}
+          />
+        </UserDataColumn>
+      )}
+    </UserDataWrapper>
   )
 }
