@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const Wrapper = styled.svg<{ hoverEffect: boolean | undefined }>`
+const Wrapper = styled.svg<{ hoverEffect: boolean }>`
   cursor: pointer;
   &:hover {
     .path {

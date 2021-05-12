@@ -104,10 +104,9 @@ const AccountInfoAddress = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorDark};
   margin: 0;
-  width: 78px;
   line-height: ${props => props.theme.fonts.defaultLineHeight}
   letter-spacing: 0.2px;
-  height: 16px;
+  
 `
 
 const AccountInfoWallet = styled.p`
@@ -115,13 +114,10 @@ const AccountInfoWallet = styled.p`
   color: ${props => props.theme.colors.textColorLighter};
   margin: 0;
   line-height: 14px;
-  height: 14px;
   margin: 4px 0px;
 `
 
 const CardHeaderText = styled.p`
-  width: 40px;
-  height: 16px;
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorLighter};
   margin: 0;
@@ -181,9 +177,8 @@ const IconSettingsWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-left: 65px;
-  width: 40px;
-  height: 40px;
+  margin-left: auto;
+  margin-right: 18.66px;
 `
 
 const SettingsModalWrapper = styled.div`

@@ -9,6 +9,7 @@ import 'sanitize.css'
 
 import { HeaderNoRouter } from './components/common/layout/header'
 import { Main } from './components/main'
+import SettingsViewContainer from './components/settings/settings_view'
 import { ApolloProviderWrapper } from './contexts/Apollo'
 import { ConnectedBalance, ConnectedWeb3 } from './hooks'
 import balanceReducer from './store/reducer'
@@ -39,6 +40,7 @@ const App: React.FC = () => {
         {!status ? (
           <>
             <HeaderNoRouter />
+            <SettingsViewContainer networkId={networkId} />
           </>
         ) : (
           <ConnectedWeb3 setStatus={setStatus}>

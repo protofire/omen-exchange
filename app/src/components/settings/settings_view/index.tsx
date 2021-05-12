@@ -190,6 +190,8 @@ export const SettingsViewContainer = (props: Props) => {
     }
   })
 
+  const isDropDownActive = current === dropdownItems.length - 1
+
   useEffect(() => {
     if (url.length === 0 && current !== dropdownItems.length - 1 && urlObject) {
       setUrl(urlObject[current].rpcUrl)
@@ -242,7 +244,7 @@ export const SettingsViewContainer = (props: Props) => {
           </Row>
         </TopCardHeader>
 
-        {current === dropdownItems.length - 1 && (
+        {isDropDownActive && (
           <TopCardHeader borderTop={true} style={{ paddingBottom: '10px' }}>
             <Row>
               <Column>
@@ -250,7 +252,7 @@ export const SettingsViewContainer = (props: Props) => {
                 <Input
                   onChange={event => {
                     setUrl(event.target.value)
-                    if (current === dropdownItems.length - 1) setCustomUrl(event.target.value)
+                    if (isDropDownActive) setCustomUrl(event.target.value)
                   }}
                   placeholder={'Paste your RPC URL'}
                   value={customUrl}
@@ -261,7 +263,7 @@ export const SettingsViewContainer = (props: Props) => {
         )}
       </ModalCard>
 
-      <ButtonContainer>
+      <ButtonContainer style={{ minHeight: isDropDownActive ? '186.2px' : '302px' }}>
         <SettingsButtonWrapper>
           <SetAndSaveButton
             onClick={() => {
