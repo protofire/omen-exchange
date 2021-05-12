@@ -1,5 +1,7 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
+import { Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
+import { Web3Context } from 'web3-react/dist/context'
 
 import { ConnectedWeb3Context } from '../hooks'
 import { getContractAddress } from '../util/networks'
@@ -599,33 +601,42 @@ const GuildAbi = [
 ]
 
 class OmenGuildService {
-  contract: Contract
   user: any
 
-  constructor(context: ConnectedWeb3Context) {
-    const { library: provider, networkId } = context
+  provider: Web3Provider
+
+  constructor(provider: Web3Provider) {
     const signer = provider.getSigner()
     this.user = signer
-    const omenGuildAddress = getContractAddress(networkId, 'omenGuildProxy')
+    this.provider = provider
+  }
+  getContract = (address: string): Contract => {
+    return new ethers.Contract(address, GuildAbi, this.provider).connect(this.user)
+  }
+  getNetwork = async () => {
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
+    return networkId
+  }
 
-    this.contract = new ethers.Contract(omenGuildAddress, GuildAbi, provider).connect(signer)
-  }
-  get getContract(): Contract {
-    return this.contract
-  }
   static encodeLockTokens = (amount: BigNumber) => {
     const guildInterface = new utils.Interface(GuildAbi)
     return guildInterface.functions.lockTokens.encode([amount])
   }
 
-  tokensLocked = async (address: string) => {
-    const addresses = await this.user.getAddress()
-    console.log(addresses, address)
-    const locked = await this.getContract.tokensLocked(addresses)
-    return locked
+  tokensLocked = async () => {
+    const address = await this.user.getAddress()
+
+    return this.getContract().tokensLocked(address)
   }
   totalLocked = async () => {
     return this.getContract.totalLocked()
+  }
+  omenTokenAddress = async () => {
+    return this.getContract.token()
+  }
+  tokenVault = async () => {
+    return this.getContract.tokenVault()
   }
 }
 export { OmenGuildService }

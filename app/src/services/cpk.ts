@@ -39,6 +39,7 @@ import { ExchangeCurrency, MarketData, Question, Token, TransactionStep } from '
 import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
 import { ERC20Service } from './erc20'
+import { OmenGuildService } from './guild'
 import { MarketMakerService } from './market_maker'
 import { MarketMakerFactoryService } from './market_maker_factory'
 import { OracleService } from './oracle'
@@ -1436,6 +1437,23 @@ class CPKService {
       return this.execTransactions(transactions)
     } catch (e) {
       logger.error(`Error while approving ERC20 Token to CPK address : `, e.message)
+      throw e
+    }
+  }
+  lockToken = async (amount: BigNumber) => {
+    try {
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
+      const OmenGuild = new OmenGuildService(this.provider)
+      const transactions: Transaction[] = [
+        {
+          to: 'sdfsdfsdf',
+          data: OmenGuildService.encodeLockTokens(amount),
+        },
+      ]
+      return this.execTransactions(transactions)
+    } catch (e) {
+      logger.error(`Error while trying to lock Omen tokens : `, e.message)
       throw e
     }
   }

@@ -23,6 +23,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   context: any
   onClose: () => void
   formattedOmenBalance: string
+  omenBalance: BigNumber
 }
 const NavLeft = styled.div`
   display: flex;
@@ -71,7 +72,7 @@ const Divider = styled.div`
 `
 
 const ModalLockTokens = (props: Props) => {
-  const { formattedOmenBalance, isOpen, onClose, theme } = props
+  const { formattedOmenBalance, isOpen, omenBalance, onClose, theme } = props
   const [isLockAmountOpen, setIsLockAmountOpen] = useState<boolean>(false)
   const [displayLockAmount, setDisplayLockAmount] = useState<BigNumber>(Zero)
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
@@ -81,21 +82,19 @@ const ModalLockTokens = (props: Props) => {
   useEffect(() => {
     const milan = async () => {
       const omen = new OmenGuildService(props.context)
-      const locked = await omen.tokensLocked('0x26358E62C2eDEd350e311bfde51588b8383A9315')
+      const locked = await omen.tokensLocked()
       const total = await omen.totalLocked()
+
       setTotalLocked(total)
       setUserLocked(locked.amount)
       setTimestamp(locked.timestamp.toNumber())
-
-      console.log(locked.amount)
-      console.log(total)
-      console.log(formatBigNumber(total, 18, 2))
-      console.log(formatBigNumber(locked.amount, 18, 2))
-      const division = divBN(total, locked.amount)
-      console.log(division)
     }
     milan()
   }, [])
+
+  const lockMofo = () => {
+    console.log('here')
+  }
   console.log(isLockAmountOpen)
   return (
     <Modal isOpen={isOpen} style={theme.fluidHeightModal}>
@@ -148,9 +147,8 @@ const ModalLockTokens = (props: Props) => {
                 />
               }
               onClickMaxButton={() => {
-                const maxBalance = new BigNumber('1')
-                setDisplayLockAmount(maxBalance)
-                setAmountToDisplay(formatBigNumber(maxBalance, STANDARD_DECIMALS, 5))
+                setDisplayLockAmount(omenBalance)
+                setAmountToDisplay(formatBigNumber(omenBalance, STANDARD_DECIMALS, 2))
               }}
               shouldDisplayMaxButton={true}
               symbol={'OMN'}
@@ -176,7 +174,7 @@ const ModalLockTokens = (props: Props) => {
 
           <ButtonsLockUnlock
             buttonType={ButtonType.primaryAlternative}
-            onClick={() => setIsLockAmountOpen(!isLockAmountOpen)}
+            onClick={() => (isLockAmountOpen ? lockMofo() : setIsLockAmountOpen(true))}
           >
             Lock OMN
           </ButtonsLockUnlock>
