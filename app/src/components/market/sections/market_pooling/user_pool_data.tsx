@@ -54,8 +54,34 @@ const UserDataWrapper = styled.div`
   flex-direction: row;
   flex-wrap: wrap;
   margin: 0 -25px;
-  padding: 24px;
-  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
+  <<<<<<<headpadding: 24px;
+  =======padding: 20px 24px;
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    flex-wrap: nowrap;
+    flex-direction: column;
+  }
+`
+// ^^
+//border-top: ${({ theme }) => theme.borders.borderLineDisabled};
+
+const ContentsLeft = styled.div`
+  align-items: center;
+  display: flex;
+  margin: auto auto auto 0;
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    margin: auto auto 0 0;
+  }
+`
+
+const TestDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin: 0 -25px;
+  padding: 20px 20px 5px 24px;
+  >>>>>>>5c05eb5ac9dfcc038c134e01699a52660e4e73ddborder-top: ${({ theme }) => theme.borders.borderLineDisabled};
   @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
     flex-wrap: nowrap;
     flex-direction: column;
@@ -133,7 +159,9 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
     displayUserEarnings = compoundService.calculateCTokenToBaseExchange(baseCollateral, userEarnings)
     displayTotalEarnings = compoundService.calculateCTokenToBaseExchange(baseCollateral, totalEarnings)
   }
-
+  {
+    console.log('total user liquidity' + totalUserLiquidity)
+  }
   return (
     <UserDataWrapper>
       <PoolOverview>Pool Overview</PoolOverview>
