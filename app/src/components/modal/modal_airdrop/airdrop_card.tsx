@@ -1,6 +1,11 @@
-import React, { HTMLAttributes } from 'react'
+import { BigNumber } from 'ethers/utils'
+import React, { HTMLAttributes, useEffect, useState } from 'react'
 import styled, { withTheme } from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../common/constants'
+import { useConnectedWeb3Context } from '../../../hooks'
+import { Airdrop } from '../../../services/airdrop'
+import { formatBigNumber } from '../../../util/tools'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconOmen } from '../../common/icons'
@@ -34,8 +39,12 @@ const TopSectionHeading = styled.div`
   font-weight: 500;
 `
 
-const TopSectionSubHeading = styled.div`
-  color: ${props => props.theme.colors.green};
+interface Subheading {
+  green: boolean
+}
+
+const TopSectionSubHeading = styled.div<Subheading>`
+  color: ${props => (props.green ? props.theme.colors.green : props.theme.colors.textColorLighter)};
   font-weight: 500;
 `
 
@@ -70,50 +79,71 @@ const AirdropButton = styled(Button)`
 interface Props extends HTMLAttributes<HTMLDivElement> {
   theme: any
   displayButtons?: boolean
+  displayAmount?: BigNumber
+  claim?: (account: string, amount: BigNumber) => Promise<void>
   onCheckAddress?: () => void
 }
 
 const AirdropCard = (props: Props) => {
-  const { displayButtons = true, onCheckAddress } = props
-  const claim = async () => {
-    // TODO: implement claim
+  const { claim, displayAmount, displayButtons = true, onCheckAddress } = props
+
+  const { account, library, networkId, relay } = useConnectedWeb3Context()
+
+  const [amount, setAmount] = useState(new BigNumber('0'))
+
+  useEffect(() => {
+    const newAmount = Airdrop.getClaimAmount(account, networkId, relay, library)
+    setAmount(newAmount)
+  }, [account, library, networkId, relay])
+
+  const submitClaim = () => {
+    if (claim && account) {
+      claim(account, amount)
+    }
   }
 
+  const claimIsDisabled = false
+  // const claimIsDisabled = displayAmount ? displayAmount.isZero() : amount.isZero()
+
   return (
-    <ModalCard>
-      <TopSection>
-        <TopSectionLeft>
-          <IconOmen size={38} />
-          <TopSectionDetails>
-            <TopSectionHeading>Claimable Amount</TopSectionHeading>
-            <TopSectionSubHeading>400 OMN</TopSectionSubHeading>
-          </TopSectionDetails>
-        </TopSectionLeft>
-        {displayButtons && (
-          <AirdropButton buttonType={ButtonType.primary} onClick={claim}>
-            Claim
-          </AirdropButton>
-        )}
-      </TopSection>
-      <BottomSection>
-        <BottomSectionTextWrapper>
-          {displayButtons ? (
-            <BottomSectionTextWrapper>
-              <BottomSectionHeading>Claim OMN token</BottomSectionHeading>
-              <BottomSectionSubheading>Check address for claimable OMN</BottomSectionSubheading>
-            </BottomSectionTextWrapper>
-          ) : (
-            <BottomSectionTextWrapper>
-              <BottomSectionSubheading>
-                Enter an address to trigger a OMN claim. If the address has any claimable OMN it will be sent to them on
-                submission.
-              </BottomSectionSubheading>
-            </BottomSectionTextWrapper>
+    <>
+      <ModalCard>
+        <TopSection>
+          <TopSectionLeft>
+            <IconOmen size={38} />
+            <TopSectionDetails>
+              <TopSectionHeading>Claimable Amount</TopSectionHeading>
+              <TopSectionSubHeading green={!claimIsDisabled}>
+                {formatBigNumber(displayAmount || amount, STANDARD_DECIMALS)} OMN
+              </TopSectionSubHeading>
+            </TopSectionDetails>
+          </TopSectionLeft>
+          {displayButtons && (
+            <AirdropButton buttonType={ButtonType.primary} disabled={claimIsDisabled} onClick={submitClaim}>
+              Claim
+            </AirdropButton>
           )}
-        </BottomSectionTextWrapper>
-        {displayButtons && <AirdropButton onClick={onCheckAddress}>Check</AirdropButton>}
-      </BottomSection>
-    </ModalCard>
+        </TopSection>
+        <BottomSection>
+          <BottomSectionTextWrapper>
+            {displayButtons ? (
+              <BottomSectionTextWrapper>
+                <BottomSectionHeading>Claim OMN token</BottomSectionHeading>
+                <BottomSectionSubheading>Check address for claimable OMN</BottomSectionSubheading>
+              </BottomSectionTextWrapper>
+            ) : (
+              <BottomSectionTextWrapper>
+                <BottomSectionSubheading>
+                  Enter an address to trigger a OMN claim. If the address has any claimable OMN it will be sent to them
+                  on submission.
+                </BottomSectionSubheading>
+              </BottomSectionTextWrapper>
+            )}
+          </BottomSectionTextWrapper>
+          {displayButtons && <AirdropButton onClick={onCheckAddress}>Check</AirdropButton>}
+        </BottomSection>
+      </ModalCard>
+    </>
   )
 }
 

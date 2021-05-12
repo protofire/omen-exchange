@@ -6,9 +6,11 @@ import moment from 'moment'
 import {
   GEN_TOKEN_ADDDRESS_TESTING,
   GEN_XDAI_ADDRESS_TESTING,
+  MAINNET_AIRDROP_ADDRESS,
   OMNI_BRIDGE_XDAI_ADDRESS,
   RELAY_ADDRESS,
   RELAY_FEE,
+  XDAI_AIDROP_ADDRESS,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
 } from '../common/constants'
 import { Transaction, verifyProxyAddress } from '../util/cpk'
@@ -36,6 +38,7 @@ import {
 } from '../util/tools'
 import { ExchangeCurrency, MarketData, Question, Token, TransactionStep } from '../util/types'
 
+import { Airdrop } from './airdrop'
 import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
 import { ERC20Service } from './erc20'
@@ -142,6 +145,12 @@ interface CPKSubmitAnswerParams {
   question: Question
   answer: string
   amount: BigNumber
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
+}
+
+interface CPKClaimAirdropParams {
+  account: string
   setTxHash: (arg0: string) => void
   setTxState: (step: TransactionStep) => void
 }
@@ -1549,6 +1558,23 @@ class CPKService {
       logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)
       throw e
     }
+  }
+
+  claimAirdrop = async ({ account, setTxHash, setTxState }: CPKClaimAirdropParams) => {
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
+    const transactions: Transaction[] = []
+    const txOptions: TxOptions = {}
+    await this.getGas(txOptions)
+
+    const airdropAddress = networkId === networkIds.XDAI ? XDAI_AIDROP_ADDRESS : MAINNET_AIRDROP_ADDRESS
+
+    transactions.push({
+      to: airdropAddress,
+      data: Airdrop.encodeClaimAirdrop(account, networkId, this.cpk.relay, this.provider),
+    })
+
+    return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
   }
 }
 
