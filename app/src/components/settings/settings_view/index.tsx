@@ -21,7 +21,7 @@ const Row = styled.div`
 
 const StatusSection = styled(Row as any)`
   justify-content: flex-start;
-  margin-top: 6px;
+  margin-top: 5px;
 `
 
 const TextLighter = styled.p`
@@ -37,10 +37,6 @@ const ButtonContainer = styled.div`
   width: 364px;
   padding: 0px;
   margin-top: 24px;
-  position: static;
-  left: 0px;
-  top: 262px;
-  width: 364px;
   height: 100%;
 `
 const SetAndSaveButton = styled(ButtonRound)`
@@ -49,12 +45,8 @@ const SetAndSaveButton = styled(ButtonRound)`
   justify-content: center;
   align-items: center;
   padding: 12px 17px;
-  margin: 0 8px;
-  position: static;
   width: 174px;
   height: ${props => props.theme.buttonRound.height};
-  left: 0px;
-  top: 0px;
 `
 
 const FiltersControls = styled.div<{ disabled?: boolean }>`
@@ -106,11 +98,8 @@ const Input = styled.input`
   margin: 12px 0px;
   ${TextfieldCSS};
   padding: 12px 20px;
-  position: static;
   width: 320px;
   height: ${props => props.theme.textfield.height};
-  left: 20px;
-  top: 28px;
 `
 
 const ImageWrap = styled.div`
@@ -123,7 +112,6 @@ const TopCardHeader = styled.div<{ borderTop?: boolean }>`
   justify-content: space-between;
   padding: ${props => props.theme.cards.paddingVertical};
   width: 100%;
-
   border-top: ${props => (props.borderTop ? props.theme.borders.borderLineDisabled : '')};
 `
 
@@ -280,6 +268,7 @@ export const SettingsViewContainer = (props: Props) => {
               setCurrent(0)
               urlObject && setUrl(urlObject[0].rpcUrl)
             }}
+            style={{ marginRight: '8px' }}
           >
             Set to Default
           </SetAndSaveButton>
@@ -300,6 +289,7 @@ export const SettingsViewContainer = (props: Props) => {
               )
               window.location.reload()
             }}
+            style={{ marginLeft: '8px' }}
           >
             Save
           </SetAndSaveButton>

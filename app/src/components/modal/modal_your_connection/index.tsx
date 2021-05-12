@@ -74,7 +74,7 @@ const AccountInfo = styled.div`
   margin-left: 12px;
 `
 const StrongText = styled.div`
-  font-weight: 500;
+  font-weight: ${props => props.theme.textfield.fontweight};
   font-size: ${props => props.theme.fonts.defaultSize};
   line-height: 14.06px;
   color: ${props => props.theme.textfield.color};
