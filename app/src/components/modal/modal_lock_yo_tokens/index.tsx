@@ -29,16 +29,29 @@ const NavLeft = styled.div`
   display: flex;
   align-items: center;
 `
-const ModalMain = styled.div`
-  width: 100%;
-  display: grid;
-  row-gap: 12px;
+const HeaderText = styled.div`
+  font-family: Roboto;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 19px;
+  letter-spacing: 0.2px;
+  text-align: left;
+  color: #37474f;
 `
+
 const DataRow = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
   line-height: ${props => props.theme.fonts.defaultLineHeight};
+`
+const ModalMain = styled.div`
+  width: 100%;
+
+  & ${DataRow}:not(:last-child) {
+    margin-bottom: 12px;
+  }
 `
 const LightDataItem = styled.div`
   color: ${props => props.theme.textfield.placeholderColor};
@@ -64,7 +77,6 @@ const ConditionalWrapper = styled.div<{ hideWrapper: boolean }>`
   border: ${props => props.theme.borders.borderLineDisabled};
   border-radius: ${props => props.theme.borders.commonBorderRadius};
   margin-bottom: 24px;
-  column-gap: 20px;
 `
 const Divider = styled.div`
   border-top: ${props => props.theme.borders.borderLineDisabled};
@@ -103,7 +115,7 @@ const ModalLockTokens = (props: Props) => {
   return (
     <Modal isOpen={isOpen} style={theme.fluidHeightModal}>
       <ContentWrapper>
-        <ModalNavigation style={{ padding: '0' }}>
+        <ModalNavigation style={{ padding: '0', marginBottom: isLockAmountOpen ? '32px' : '24px' }}>
           <NavLeft>
             {isLockAmountOpen && (
               <IconArrowBack
@@ -116,7 +128,7 @@ const ModalLockTokens = (props: Props) => {
                 style={{ marginRight: '12px' }}
               />
             )}
-            <div>{isLockAmountOpen ? 'Lock Omen Token' : 'Omen Guild Membership'}</div>
+            <HeaderText>{isLockAmountOpen ? 'Lock Omen Token' : 'Omen Guild Membership'}</HeaderText>
           </NavLeft>
           <IconClose
             hoverEffect={true}
@@ -159,8 +171,8 @@ const ModalLockTokens = (props: Props) => {
             />
           )}
           {isLockAmountOpen && <Divider />}
-          <DataRow>
-            <LightDataItem>Vote Weight</LightDataItem>
+          <DataRow style={{ marginTop: !isLockAmountOpen ? '12px' : '' }}>
+            <LightDataItem>{isLockAmountOpen && 'Your '}Vote Weight</LightDataItem>
             <DarkDataItem>
               {!totalLocked.isZero() && !userLocked.isZero() ? divBN(userLocked, totalLocked) * 100 : '0.00'}%
             </DarkDataItem>
