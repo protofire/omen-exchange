@@ -41,7 +41,7 @@ const IdleDisabledCSS = css`
   }
 `
 const SuccessCSS = css`
-  border: 1px solid ${props => props.theme.colors.green}; !important;
+  border: 1px solid ${props => props.theme.colors.green} !important;
   color: ${props => props.theme.colors.green} !important;
   opacity: 1 !important;
 `

@@ -142,7 +142,8 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [confirmations, setConfirmations] = useState(0)
   const [message, setMessage] = useState('')
   const [currencySelected, setCurrencySelected] = useState<ExchangeCurrency>(ExchangeCurrency.Dai)
-  const [allowanceState, setAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
+  const [omenAllowanceState, setOmenAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
+  const [daiAllowanceState, setDaiAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
   const [omenAllowance, setOmenWalletAllowance] = useState<BigNumber>(Zero)
   const [daiAllowance, setDaiAllowance] = useState<BigNumber>(Zero)
 
@@ -165,32 +166,37 @@ export const ModalDepositWithdraw = (props: Props) => {
   }
 
   const approve = async () => {
-    setAllowanceState(ButtonStates.working)
     try {
       if (exchangeType === ExchangeType.deposit) {
         if (currencySelected === ExchangeCurrency.Omen) {
+          setOmenAllowanceState(ButtonStates.working)
           const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenToken.address)
 
           await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS)
+          setOmenAllowanceState(ButtonStates.finished)
         } else {
+          setDaiAllowanceState(ButtonStates.working)
           const collateralService = new ERC20Service(context.rawWeb3Context.library, account, DAI.address)
 
           await collateralService.approveUnlimited(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
+          setDaiAllowanceState(ButtonStates.finished)
         }
       }
 
-      setAllowanceState(ButtonStates.finished)
       await fetchAllowance()
     } catch (e) {
-      setAllowanceState(ButtonStates.idle)
+      if (currencySelected === ExchangeCurrency.Omen) setOmenAllowanceState(ButtonStates.idle)
+      else setDaiAllowanceState(ButtonStates.idle)
     }
   }
   const omenWalletAllowance =
-    omenAllowance.isZero() && exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Omen
+    (omenAllowance.isZero() && exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Omen) ||
+    (!omenAllowance.isZero() && omenAllowanceState === ButtonStates.finished)
       ? true
       : false
   const daiWalletAllowance =
-    daiAllowance.isZero() && exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Dai
+    (exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Dai && daiAllowance.isZero()) ||
+    (!daiAllowance.isZero() && daiAllowanceState === ButtonStates.finished)
       ? true
       : false
 
@@ -472,15 +478,21 @@ export const ModalDepositWithdraw = (props: Props) => {
           <BottomButtons>
             {(currencySelected === ExchangeCurrency.Dai ? daiWalletAllowance : omenWalletAllowance) && (
               <ApproveButton
-                disabled={allowanceState !== ButtonStates.idle}
+                disabled={
+                  currencySelected === ExchangeCurrency.Dai
+                    ? daiAllowanceState !== ButtonStates.idle
+                    : omenAllowanceState !== ButtonStates.idle
+                }
                 extraText
                 onClick={approve}
-                state={allowanceState}
+                state={currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState}
               >
-                {allowanceState === ButtonStates.idle &&
-                  `Approve ${currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}`}
-                {allowanceState === ButtonStates.working && 'Approving'}
-                {allowanceState === ButtonStates.finished && 'Approved'}
+                {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
+                  ButtonStates.idle && `Approve ${currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}`}
+                {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
+                  ButtonStates.working && 'Approving'}
+                {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
+                  ButtonStates.finished && 'Approved'}
               </ApproveButton>
             )}
 
