@@ -38,6 +38,7 @@ export const ModalAirdrop = (props: Props) => {
 
   const onClose = () => {
     localStorage.setItem('airdrop', 'displayed')
+    setIsTransactionModalOpen(false)
     setCheckAddress(false)
     setIsOpen(false)
   }
@@ -51,21 +52,16 @@ export const ModalAirdrop = (props: Props) => {
       setMessage(`Claim ${formatBigNumber(amount, STANDARD_DECIMALS)} OMN`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
-
-      // await cpk.claimAirdrop({ account, setTxHash, setTxState })
+      await cpk.claimAirdrop({ account, setTxHash, setTxState })
     } catch (e) {
       setIsTransactionModalOpen(false)
     }
   }
 
-  if (checkAddress) {
-    return <ModalCheckAddressWrapper isOpen={checkAddress} onBack={() => setCheckAddress(false)} onClose={onClose} />
-  }
-
   return (
     <>
       <Modal
-        isOpen={isOpen && !isTransactionModalOpen}
+        isOpen={isOpen && !isTransactionModalOpen && !checkAddress}
         onRequestClose={onClose}
         shouldCloseOnOverlayClick={true}
         style={theme.fluidHeightModal}
@@ -84,12 +80,15 @@ export const ModalAirdrop = (props: Props) => {
         icon={<IconOmen size={24} style={{ marginLeft: '10px' }} />}
         isOpen={isTransactionModalOpen}
         message={message}
-        onClose={() => {
-          setIsTransactionModalOpen(false)
-          onClose()
-        }}
+        onClose={onClose}
         txHash={txHash}
         txState={txState}
+      />
+      <ModalCheckAddressWrapper
+        claim={claim}
+        isOpen={checkAddress && !isTransactionModalOpen}
+        onBack={() => setCheckAddress(false)}
+        onClose={onClose}
       />
     </>
   )

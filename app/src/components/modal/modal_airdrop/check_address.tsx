@@ -3,8 +3,7 @@ import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../hooks'
-import { Airdrop } from '../../../services/airdrop'
+import { useAirdropService, useConnectedWeb3Context } from '../../../hooks'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { FormLabel, Textfield } from '../../common'
@@ -26,23 +25,32 @@ const RecipientLabelWrapper = styled.div`
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   isOpen: boolean
+  claim?: (account: string, amount: BigNumber) => Promise<void>
   onClose: () => void
   onBack?: () => void
   theme?: any
 }
 
 export const ModalCheckAddress = (props: Props) => {
-  const { isOpen, onBack, onClose, theme } = props
+  const { claim, isOpen, onBack, onClose, theme } = props
 
-  const { library, networkId, relay } = useConnectedWeb3Context()
+  const airdrop = useAirdropService()
 
   const [adddress, setAddress] = useState('')
   const [amount, setAmount] = useState(new BigNumber('0'))
 
-  const updateAddress = (e: any) => {
-    const value = e.target.value
-    setAddress(value)
-    setAmount(Airdrop.getClaimAmount(value, networkId, relay, library))
+  const updateAddress = async (e: any) => {
+    const newAddress = e.target.value
+    setAddress(newAddress)
+
+    const newAmount = await airdrop.getClaimAmount(newAddress)
+    setAmount(newAmount)
+  }
+
+  const submitClaim = () => {
+    if (claim && adddress) {
+      claim(adddress, amount)
+    }
   }
 
   React.useEffect(() => {
@@ -64,7 +72,7 @@ export const ModalCheckAddress = (props: Props) => {
           <FormLabel>Recipient</FormLabel>
         </RecipientLabelWrapper>
         <Textfield onChange={updateAddress} placeholder="Wallet Address" value={adddress} />
-        <ClaimButton buttonType={ButtonType.primaryAlternative} disabled={amount.isZero()}>
+        <ClaimButton buttonType={ButtonType.primaryAlternative} disabled={amount.isZero()} onClick={submitClaim}>
           Claim OMN
         </ClaimButton>
       </ContentWrapper>

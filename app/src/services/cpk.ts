@@ -38,7 +38,7 @@ import {
 } from '../util/tools'
 import { ExchangeCurrency, MarketData, Question, Token, TransactionStep } from '../util/types'
 
-import { Airdrop } from './airdrop'
+import { AirdropService } from './airdrop'
 import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
 import { ERC20Service } from './erc20'
@@ -1567,14 +1567,22 @@ class CPKService {
     const txOptions: TxOptions = {}
     await this.getGas(txOptions)
 
-    const airdropAddress = networkId === networkIds.XDAI ? XDAI_AIDROP_ADDRESS : MAINNET_AIRDROP_ADDRESS
+    const airdrop = new AirdropService(networkId, this.provider)
 
-    transactions.push({
-      to: airdropAddress,
-      data: Airdrop.encodeClaimAirdrop(account, networkId, this.cpk.relay, this.provider),
-    })
+    if (this.cpk.relay) {
+      transactions.push({
+        to: airdrop.contract.address,
+        data: AirdropService.encodeClaimAirdrop(account, networkId, this.provider),
+      })
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+    }
 
-    return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+    // save gas with a non-cpk tx if not using the relay
+    const txObject = await airdrop.claimAidrop(account)
+    setTxState && setTxState(TransactionStep.transactionSubmitted)
+    setTxHash && setTxHash(txObject.hash)
+    await this.waitForTransaction(txObject)
+    setTxState && setTxState(TransactionStep.transactionConfirmed)
   }
 }
 

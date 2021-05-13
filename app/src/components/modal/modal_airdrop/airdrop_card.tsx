@@ -3,8 +3,7 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import { useConnectedWeb3Context } from '../../../hooks'
-import { Airdrop } from '../../../services/airdrop'
+import { useAirdropService, useConnectedWeb3Context } from '../../../hooks'
 import { formatBigNumber } from '../../../util/tools'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -89,12 +88,17 @@ const AirdropCard = (props: Props) => {
 
   const { account, library, networkId, relay } = useConnectedWeb3Context()
 
+  const airdrop = useAirdropService()
+
   const [amount, setAmount] = useState(new BigNumber('0'))
 
   useEffect(() => {
-    const newAmount = Airdrop.getClaimAmount(account, networkId, relay, library)
-    setAmount(newAmount)
-  }, [account, library, networkId, relay])
+    const getClaimAmount = async () => {
+      const newAmount = await airdrop.getClaimAmount(account)
+      setAmount(newAmount)
+    }
+    getClaimAmount()
+  }, [airdrop, account, library, networkId, relay])
 
   const submitClaim = () => {
     if (claim && account) {
@@ -102,8 +106,7 @@ const AirdropCard = (props: Props) => {
     }
   }
 
-  const claimIsDisabled = false
-  // const claimIsDisabled = displayAmount ? displayAmount.isZero() : amount.isZero()
+  const claimIsDisabled = displayAmount ? displayAmount.isZero() : amount.isZero()
 
   return (
     <>
