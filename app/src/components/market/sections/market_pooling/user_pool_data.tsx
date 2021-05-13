@@ -15,15 +15,10 @@ const UserDataTitleValue = styled(TitleValue)`
   justify-content: space-between;
   padding: 0px;
   margin-bottom: 12px;
-  margin-left: auto;
+
   width: 253px;
-  height: 16px;
 
   flex: 0 calc(50% - 16px);
-
-  &:nth-child(odd) {
-    margin-right: 32px;
-  }
 
   @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
     flex: 0 50%;
@@ -50,7 +45,7 @@ const UserDataWrapper = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
-  height: 76px;
+  min-height: 76px;
   margin-bottom: 12px;
   @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
     flex-wrap: nowrap;
@@ -76,6 +71,7 @@ const ColumnWrapper = styled.div`
 
 const PoolOverview = styled.div`
   margin-top: 24px;
+  margin-right: auto;
   font-family: Roboto;
   font-style: normal;
   font-weight: 500;
@@ -83,6 +79,21 @@ const PoolOverview = styled.div`
   line-height: 16px;
   display: flex;
   align-items: center;
+  flex-direction: row;
+`
+
+const LiquidityRewards = styled.div`
+  margin-top: 24px;
+  margin-right: auto;
+  margin-left: 48px;
+  font-family: Roboto;
+  font-style: normal;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
 `
 
 const Border = styled.div`
@@ -136,23 +147,22 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
     displayUserEarnings = compoundService.calculateCTokenToBaseExchange(baseCollateral, userEarnings)
     displayTotalEarnings = compoundService.calculateCTokenToBaseExchange(baseCollateral, totalEarnings)
   }
+
   {
     console.log('total user liquidity' + totalUserLiquidity)
   }
-  if (currentApr)
+  if (!currentApr)
     return (
       <>
-        <Border />
+        {/* <Border /> */}
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <PoolOverview>Pool Overview</PoolOverview>
-          {currentApr > 0 && (
-            <PoolOverview style={{ marginLeft: 'auto', width: '253px' }}>Liquidity Rewards</PoolOverview>
-          )}
+          <LiquidityRewards>Liquidity Rewards</LiquidityRewards>
         </div>
 
-        <UserDataWrapper>
+        <UserDataWrapper style={{ border: '2px solid red' }}>
           <ColumnWrapper>
-            <UserDataColumn>
+            <UserDataColumn style={{ border: '2px solid red' }}>
               <UserDataTitleValue
                 title="Your Liquidity"
                 value={`${formatNumber(
@@ -191,9 +201,9 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
     )
   else
     return (
-      <UserDataWrapper>
-        <ColumnWrapper>
-          <UserDataColumn>
+      <>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div style={{ justifyContent: 'space-between' }}>
             <UserDataTitleValue
               state={currentApr > 0 ? ValueStates.success : undefined}
               title="Current APY"
@@ -215,8 +225,31 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
               title="Total Rewards"
               value={`${formatNumber(totalRewards.toString())} OMN`}
             />
-          </UserDataColumn>
-        </ColumnWrapper>
-      </UserDataWrapper>
+          </div>
+          <div>
+            <UserDataTitleValue
+              state={currentApr > 0 ? ValueStates.success : undefined}
+              title="Current APY"
+              value={`${formatNumber(currentApr.toString())}%`}
+            />
+            <UserDataTitleValue
+              state={remainingRewards > 0 ? ValueStates.success : undefined}
+              title="Rewards left"
+              value={`${formatNumber(remainingRewards.toString())} OMN`}
+            />
+
+            <UserDataTitleValue
+              state={earnedRewards > 0 ? ValueStates.success : undefined}
+              title="Your Rewards"
+              value={`${formatNumber(earnedRewards.toString())} OMN`}
+            />
+            <UserDataTitleValue
+              state={totalRewards > 0 ? ValueStates.success : undefined}
+              title="Total Rewards"
+              value={`${formatNumber(totalRewards.toString())} OMN`}
+            />
+          </div>
+        </div>
+      </>
     )
 }
