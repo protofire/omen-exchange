@@ -1444,7 +1444,8 @@ class CPKService {
     try {
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
-      const OmenGuild = new OmenGuildService(this.provider)
+      const network = await this.provider.getNetwork()
+      const OmenGuild = new OmenGuildService(this.provider, network.chainId)
       const transactions: Transaction[] = [
         {
           to: 'sdfsdfsdf',

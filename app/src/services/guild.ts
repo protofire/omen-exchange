@@ -603,7 +603,7 @@ const GuildAbi = [
 class OmenGuildService {
   user: ethers.providers.JsonRpcSigner
   network: number
-  provider: Web3Provider
+  provider: any
 
   constructor(provider: Web3Provider, network: number) {
     const signer = provider.getSigner()
@@ -621,6 +621,9 @@ class OmenGuildService {
     return guildInterface.functions.lockTokens.encode([amount])
   }
 
+  lockTokens = async (amount: BigNumber) => {
+    return await this.OmenGuildContract.lockTokens(amount)
+  }
   tokensLocked = async () => {
     const address = await this.user.getAddress()
 

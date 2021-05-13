@@ -72,16 +72,19 @@ const Divider = styled.div`
 `
 
 const ModalLockTokens = (props: Props) => {
-  const { formattedOmenBalance, isOpen, omenBalance, onClose, theme } = props
+  const { context, formattedOmenBalance, isOpen, omenBalance, onClose, theme } = props
+  const { library: provider, networkId } = context
+  console.log(networkId)
   const [isLockAmountOpen, setIsLockAmountOpen] = useState<boolean>(false)
   const [displayLockAmount, setDisplayLockAmount] = useState<BigNumber>(Zero)
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [totalLocked, setTotalLocked] = useState<BigNumber>(Zero)
   const [userLocked, setUserLocked] = useState<BigNumber>(Zero)
   const [timestamp, setTimestamp] = useState<number>(0)
+  const omen = new OmenGuildService(provider, networkId)
+
   useEffect(() => {
     const milan = async () => {
-      const omen = new OmenGuildService(props.context)
       const locked = await omen.tokensLocked()
       const total = await omen.totalLocked()
 
@@ -92,8 +95,9 @@ const ModalLockTokens = (props: Props) => {
     milan()
   }, [])
 
-  const lockMofo = () => {
+  const lockMofo = async (amount: BigNumber) => {
     console.log('here')
+    await omen.lockTokens(amount)
   }
   console.log(isLockAmountOpen)
   return (
@@ -174,7 +178,7 @@ const ModalLockTokens = (props: Props) => {
 
           <ButtonsLockUnlock
             buttonType={ButtonType.primaryAlternative}
-            onClick={() => (isLockAmountOpen ? lockMofo() : setIsLockAmountOpen(true))}
+            onClick={() => (isLockAmountOpen ? lockMofo(displayLockAmount) : setIsLockAmountOpen(true))}
           >
             Lock OMN
           </ButtonsLockUnlock>
