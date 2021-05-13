@@ -162,7 +162,7 @@ const ModalLockTokens = (props: Props) => {
           <DataRow>
             <LightDataItem>Vote Weight</LightDataItem>
             <DarkDataItem>
-              {!totalLocked.isZero() && !userLocked.isZero() ? divBN(totalLocked, userLocked) * 100 : '0.00'}%
+              {!totalLocked.isZero() && !userLocked.isZero() ? divBN(userLocked, totalLocked) * 100 : '0.00'}%
             </DarkDataItem>
           </DataRow>
           <DataRow>

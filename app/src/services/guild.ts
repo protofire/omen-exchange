@@ -604,16 +604,20 @@ class OmenGuildService {
   user: ethers.providers.JsonRpcSigner
   network: number
   provider: any
+  omenGuildAddress: string
 
   constructor(provider: Web3Provider, network: number) {
     const signer = provider.getSigner()
     this.user = signer
     this.network = network
     this.provider = provider
+    this.omenGuildAddress = getContractAddress(network, 'omenGuildProxy')
   }
   get OmenGuildContract(): Contract {
-    const guildContractAddress = getContractAddress(this.network, 'omenGuildProxy')
-    return new ethers.Contract(guildContractAddress, GuildAbi, this.provider).connect(this.user)
+    return new ethers.Contract(this.omenGuildAddress, GuildAbi, this.provider).connect(this.user)
+  }
+  get OmenGuildAddress(): string {
+    return this.omenGuildAddress
   }
 
   static encodeLockTokens = (amount: BigNumber) => {
@@ -624,6 +628,7 @@ class OmenGuildService {
   lockTokens = async (amount: BigNumber) => {
     return await this.OmenGuildContract.lockTokens(amount)
   }
+
   tokensLocked = async () => {
     const address = await this.user.getAddress()
 

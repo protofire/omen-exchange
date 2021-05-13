@@ -1440,7 +1440,7 @@ class CPKService {
       throw e
     }
   }
-  lockToken = async (amount: BigNumber) => {
+  lockTokens = async (amount: BigNumber) => {
     try {
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas
@@ -1448,7 +1448,7 @@ class CPKService {
       const OmenGuild = new OmenGuildService(this.provider, network.chainId)
       const transactions: Transaction[] = [
         {
-          to: 'sdfsdfsdf',
+          to: OmenGuild.omenGuildAddress,
           data: OmenGuildService.encodeLockTokens(amount),
         },
       ]
