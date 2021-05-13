@@ -67,8 +67,12 @@ const DepositWithdrawButton = styled(Button)`
 `
 const ApproveButton = styled(ButtonStateful)`
   flex: 1;
-  border-color: ${props => props.theme.buttonSecondary.borderColorHover};
+  border-color: ${props => props.theme.buttonSecondary.color};
+
   margin-right: 16px;
+  &:hover {
+    background-color: ${props => props.theme.colors.primaryLight};
+  }
 `
 
 const ExchangeDataItem = styled.div`

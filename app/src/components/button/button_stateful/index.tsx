@@ -57,11 +57,12 @@ const Wrapper = styled.button<ButtonStatefulProps>`
       : DisabledCSS};
 `
 
-const Text = styled.span<{ hide: boolean }>`
+const Text = styled.span<{ hide: boolean; state: ButtonStates }>`
   display: ${props => (props.hide ? 'none' : 'flex')};
   position: relative;
   user-select: none;
   z-index: 1;
+  ${props => props.state === ButtonStates.idle && 'font-weight:500'};
 `
 
 const SVGWrapper = styled.span<{ marginLeft?: boolean }>`
@@ -96,7 +97,9 @@ export const ButtonStateful: React.FC<ButtonStatefulProps> = (props: ButtonState
       state={state}
       {...restProps}
     >
-      <Text hide={state !== ButtonStates.idle && !extraText}>{children}</Text>
+      <Text hide={state !== ButtonStates.idle && !extraText} state={state}>
+        {children}
+      </Text>
       {state === ButtonStates.working && (
         <SVGWrapper marginLeft={extraText}>
           <Spinner alt="" src={SpinnerSVG} />
