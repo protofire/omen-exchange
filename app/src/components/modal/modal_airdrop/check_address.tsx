@@ -3,7 +3,7 @@ import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { useAirdropService, useConnectedWeb3Context } from '../../../hooks'
+import { useAirdropService } from '../../../hooks'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { FormLabel, Textfield } from '../../common'

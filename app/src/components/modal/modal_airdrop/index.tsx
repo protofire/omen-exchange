@@ -4,7 +4,7 @@ import Modal from 'react-modal'
 import { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import { useConnectedCPKContext } from '../../../hooks'
+import { useConnectedBalanceContext, useConnectedCPKContext } from '../../../hooks'
 import { formatBigNumber } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { IconClose, IconOmen } from '../../common/icons'
@@ -23,6 +23,7 @@ export const ModalAirdrop = (props: Props) => {
   const { theme } = props
 
   const cpk = useConnectedCPKContext()
+  const { fetchBalances } = useConnectedBalanceContext()
 
   const initialIsOpenState = localStorage.getItem('airdrop')
   const [isOpen, setIsOpen] = useState(true) // useState(!initialIsOpenState)
@@ -53,6 +54,7 @@ export const ModalAirdrop = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
       await cpk.claimAirdrop({ account, setTxHash, setTxState })
+      await fetchBalances()
     } catch (e) {
       setIsTransactionModalOpen(false)
     }

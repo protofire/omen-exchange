@@ -6,11 +6,9 @@ import moment from 'moment'
 import {
   GEN_TOKEN_ADDDRESS_TESTING,
   GEN_XDAI_ADDRESS_TESTING,
-  MAINNET_AIRDROP_ADDRESS,
   OMNI_BRIDGE_XDAI_ADDRESS,
   RELAY_ADDRESS,
   RELAY_FEE,
-  XDAI_AIDROP_ADDRESS,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
 } from '../common/constants'
 import { Transaction, verifyProxyAddress } from '../util/cpk'
@@ -1569,7 +1567,7 @@ class CPKService {
 
     const airdrop = new AirdropService(networkId, this.provider)
 
-    if (this.cpk.relay) {
+    if (this.cpk.relay && airdrop.contract) {
       transactions.push({
         to: airdrop.contract.address,
         data: AirdropService.encodeClaimAirdrop(account, networkId, this.provider),

@@ -1,9 +1,8 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber, getAddress } from 'ethers/utils'
 
-import { MAINNET_AIRDROP_ADDRESS, RINKEBY_AIRDROP_ADDRESS, XDAI_AIDROP_ADDRESS } from '../../common/constants'
 import { calcRelayProxyAddress } from '../../util/cpk'
-import { networkIds } from '../../util/networks'
+import { getAirdropAddress, networkIds } from '../../util/networks'
 import { isAddress } from '../../util/tools'
 
 import { airdropAbi } from './abi'
@@ -26,23 +25,17 @@ const xdaiProofs = (xdaiData as unknown) as Proofs
 const mainnetProofs = (mainnetData as unknown) as Proofs
 
 class AirdropService {
-  contract: Contract
+  contract?: Contract
   provider: any
 
   constructor(networkId: number, provider: any) {
     const signer: Wallet = provider.getSigner()
     this.provider = provider
 
-    // TODO: this needs to go into a mapping somewhere
-    const contractAddress =
-      networkId === networkIds.XDAI
-        ? XDAI_AIDROP_ADDRESS
-        : networkId === networkIds.MAINNET
-        ? MAINNET_AIRDROP_ADDRESS
-        : networkId === networkIds.RINKEBY
-        ? RINKEBY_AIRDROP_ADDRESS
-        : ''
-    this.contract = new ethers.Contract(contractAddress, airdropAbi, provider).connect(signer)
+    const contractAddress = getAirdropAddress(networkId)
+    if (contractAddress) {
+      this.contract = new ethers.Contract(contractAddress, airdropAbi, provider).connect(signer)
+    }
   }
 
   static getClaim = (address: Maybe<string>, networkId: number, provider: any) => {
@@ -68,7 +61,7 @@ class AirdropService {
   getClaimAmount = async (address: Maybe<string>) => {
     const network = await this.provider.getNetwork()
     const claim = AirdropService.getClaim(address, network.chainId, this.provider)
-    if (claim) {
+    if (claim && this.contract) {
       const claimed = await this.contract.isClaimed(claim.index)
       if (!claimed) {
         return new BigNumber(claim.amount)
@@ -88,7 +81,7 @@ class AirdropService {
   claimAidrop = async (address: string) => {
     const network = await this.provider.getNetwork()
     const claim = AirdropService.getClaim(address, network.chainId, this.provider)
-    if (claim) {
+    if (claim && this.contract) {
       return this.contract.claim(claim.index, address, claim.amount, claim.proof)
     }
   }
