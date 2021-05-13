@@ -12,20 +12,17 @@ const UserDataTitleValue = styled(TitleValue)`
   display: flex;
   flex-direction: row;
   align-items: center;
+  justify-content: space-between;
   padding: 0px;
-
-  position: static;
+  margin-bottom: 12px;
+  margin-left: auto;
   width: 253px;
   height: 16px;
-  left: 0px;
-  top: 0px;
+
   flex: 0 calc(50% - 16px);
 
   &:nth-child(odd) {
     margin-right: 32px;
-  }
-  &:nth-child(-n + 6) {
-    margin-bottom: 12px;
   }
 
   @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
@@ -52,36 +49,9 @@ const UserDataTitleValue = styled(TitleValue)`
 const UserDataWrapper = styled.div`
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
-  margin: 0 -25px;
-  <<<<<<<headpadding: 24px;
-  =======padding: 20px 24px;
-
-  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
-    flex-wrap: nowrap;
-    flex-direction: column;
-  }
-`
-// ^^
-//border-top: ${({ theme }) => theme.borders.borderLineDisabled};
-
-const ContentsLeft = styled.div`
   align-items: center;
-  display: flex;
-  margin: auto auto auto 0;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin: auto auto 0 0;
-  }
-`
-
-const TestDiv = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  margin: 0 -25px;
-  padding: 20px 20px 5px 24px;
-  >>>>>>>5c05eb5ac9dfcc038c134e01699a52660e4e73ddborder-top: ${({ theme }) => theme.borders.borderLineDisabled};
+  height: 76px;
+  margin-bottom: 12px;
   @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
     flex-wrap: nowrap;
     flex-direction: column;
@@ -102,15 +72,10 @@ const ColumnWrapper = styled.div`
   flex-direction: row;
   align-items: flex-start;
   padding: 0px;
-
-  position: static;
-  width: 538px;
-  height: 44px;
-  left: 0px;
-  top: 32px;
 `
 
 const PoolOverview = styled.div`
+  margin-top: 24px;
   font-family: Roboto;
   font-style: normal;
   font-weight: 500;
@@ -119,6 +84,16 @@ const PoolOverview = styled.div`
   display: flex;
   align-items: center;
 `
+
+const Border = styled.div`
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 10%;
+  bottom: 0%;
+  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
+`
+
 interface Props {
   totalUserLiquidity: BigNumber
   collateral: Token
@@ -163,65 +138,73 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
     console.log('total user liquidity' + totalUserLiquidity)
   }
   return (
-    <UserDataWrapper>
+    <>
+      <Border />
       <PoolOverview>Pool Overview</PoolOverview>
-      <ColumnWrapper>
-        <UserDataColumn>
-          <UserDataTitleValue
-            title="Your Liquidity"
-            value={`${formatNumber(
-              formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals),
-            )} ${baseCollateral.symbol}`}
-          />
-          <UserDataTitleValue
-            title="Total Liquidity"
-            value={`${formatNumber(
-              formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals),
-            )}`}
-          />
-        </UserDataColumn>
-        <UserDataColumn>
-          <UserDataTitleValue
-            state={userEarnings.gt(0) ? ValueStates.success : undefined}
-            title="Your Earnings"
-            value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatNumber(
-              formatBigNumber(displayUserEarnings, baseCollateral.decimals, baseCollateral.decimals),
-            )} ${baseCollateral.symbol}`}
-          />
-          <UserDataTitleValue
-            state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
-            title="Total Earnings"
-            value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
-              formatBigNumber(displayTotalEarnings, baseCollateral.decimals, baseCollateral.decimals),
-            )} ${baseCollateral.symbol}`}
-          />
-        </UserDataColumn>
-      </ColumnWrapper>
-      {currentApr > 0 && (
-        <UserDataColumn>
-          <UserDataTitleValue
-            state={currentApr > 0 ? ValueStates.success : undefined}
-            title="Current APY"
-            value={`${formatNumber(currentApr.toString())}%`}
-          />
-          <UserDataTitleValue
-            state={remainingRewards > 0 ? ValueStates.success : undefined}
-            title="Rewards left"
-            value={`${formatNumber(remainingRewards.toString())} OMN`}
-          />
 
-          <UserDataTitleValue
-            state={earnedRewards > 0 ? ValueStates.success : undefined}
-            title="Your Rewards"
-            value={`${formatNumber(earnedRewards.toString())} OMN`}
-          />
-          <UserDataTitleValue
-            state={totalRewards > 0 ? ValueStates.success : undefined}
-            title="Total Rewards"
-            value={`${formatNumber(totalRewards.toString())} OMN`}
-          />
-        </UserDataColumn>
-      )}
-    </UserDataWrapper>
+      <UserDataWrapper>
+        <ColumnWrapper>
+          <UserDataColumn>
+            <UserDataTitleValue
+              title="Your Liquidity"
+              value={`${formatNumber(
+                formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals),
+              )} ${baseCollateral.symbol}`}
+            />
+
+            <UserDataTitleValue
+              title="Total Liquidity"
+              value={`${formatNumber(
+                formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals),
+              )}`}
+            />
+          </UserDataColumn>
+        </ColumnWrapper>
+        <ColumnWrapper style={{ marginLeft: 'auto' }}>
+          <UserDataColumn>
+            <UserDataTitleValue
+              state={userEarnings.gt(0) ? ValueStates.success : undefined}
+              title="Your Earnings"
+              value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatNumber(
+                formatBigNumber(displayUserEarnings, baseCollateral.decimals, baseCollateral.decimals),
+              )} ${baseCollateral.symbol}`}
+            />
+            <UserDataTitleValue
+              state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
+              title="Total Earnings"
+              value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
+                formatBigNumber(displayTotalEarnings, baseCollateral.decimals, baseCollateral.decimals),
+              )} ${baseCollateral.symbol}`}
+            />
+          </UserDataColumn>
+        </ColumnWrapper>
+
+        {currentApr > 0 && (
+          <UserDataColumn>
+            <UserDataTitleValue
+              state={currentApr > 0 ? ValueStates.success : undefined}
+              title="Current APY"
+              value={`${formatNumber(currentApr.toString())}%`}
+            />
+            <UserDataTitleValue
+              state={remainingRewards > 0 ? ValueStates.success : undefined}
+              title="Rewards left"
+              value={`${formatNumber(remainingRewards.toString())} OMN`}
+            />
+
+            <UserDataTitleValue
+              state={earnedRewards > 0 ? ValueStates.success : undefined}
+              title="Your Rewards"
+              value={`${formatNumber(earnedRewards.toString())} OMN`}
+            />
+            <UserDataTitleValue
+              state={totalRewards > 0 ? ValueStates.success : undefined}
+              title="Total Rewards"
+              value={`${formatNumber(totalRewards.toString())} OMN`}
+            />
+          </UserDataColumn>
+        )}
+      </UserDataWrapper>
+    </>
   )
 }
