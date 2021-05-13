@@ -178,6 +178,10 @@ const ModalLockTokens = (props: Props) => {
 
           <ButtonsLockUnlock
             buttonType={ButtonType.primaryAlternative}
+            disabled={
+              (displayLockAmount.isZero() || omenBalance.isZero() || displayLockAmount.gt(omenBalance)) &&
+              isLockAmountOpen
+            }
             onClick={() => (isLockAmountOpen ? lockMofo(displayLockAmount) : setIsLockAmountOpen(true))}
           >
             Lock OMN
