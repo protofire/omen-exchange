@@ -601,22 +601,19 @@ const GuildAbi = [
 ]
 
 class OmenGuildService {
-  user: any
-
+  user: ethers.providers.JsonRpcSigner
+  network: number
   provider: Web3Provider
 
-  constructor(provider: Web3Provider) {
+  constructor(provider: Web3Provider, network: number) {
     const signer = provider.getSigner()
     this.user = signer
+    this.network = network
     this.provider = provider
   }
-  getContract = (address: string): Contract => {
-    return new ethers.Contract(address, GuildAbi, this.provider).connect(this.user)
-  }
-  getNetwork = async () => {
-    const network = await this.provider.getNetwork()
-    const networkId = network.chainId
-    return networkId
+  get OmenGuildContract(): Contract {
+    const guildContractAddress = getContractAddress(this.network, 'omenGuildProxy')
+    return new ethers.Contract(guildContractAddress, GuildAbi, this.provider).connect(this.user)
   }
 
   static encodeLockTokens = (amount: BigNumber) => {
@@ -627,16 +624,16 @@ class OmenGuildService {
   tokensLocked = async () => {
     const address = await this.user.getAddress()
 
-    return this.getContract().tokensLocked(address)
+    return this.OmenGuildContract.tokensLocked(address)
   }
   totalLocked = async () => {
-    return this.getContract.totalLocked()
+    return this.OmenGuildContract.totalLocked()
   }
   omenTokenAddress = async () => {
-    return this.getContract.token()
+    return this.OmenGuildContract.token()
   }
   tokenVault = async () => {
-    return this.getContract.tokenVault()
+    return this.OmenGuildContract.tokenVault()
   }
 }
 export { OmenGuildService }
