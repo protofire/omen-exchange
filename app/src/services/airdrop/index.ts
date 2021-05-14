@@ -28,12 +28,12 @@ class AirdropService {
   contract?: Contract
   provider: any
 
-  constructor(networkId: number, provider: any) {
+  constructor(networkId: number, provider: any, signerAddress: Maybe<string>) {
     const signer: Wallet = provider.getSigner()
     this.provider = provider
 
     const contractAddress = getAirdropAddress(networkId)
-    if (contractAddress) {
+    if (contractAddress && signerAddress) {
       this.contract = new ethers.Contract(contractAddress, airdropAbi, provider).connect(signer)
     }
   }
@@ -44,15 +44,16 @@ class AirdropService {
     const lowerCaseAddress = address && address.toLowerCase()
     const claimAddress = lowerCaseAddress && isAddress(lowerCaseAddress) && getAddress(lowerCaseAddress)
     if (claimAddress) {
-      if (provider.relay) {
-        const proxyAddress = calcRelayProxyAddress(claimAddress, provider)
-        if (proxyAddress) {
-          claim = xdaiProofs.claims[proxyAddress]
-        }
-      } else if (networkId === networkIds.MAINNET || networkId === networkIds.RINKEBY) {
+      if (networkId === networkIds.MAINNET || networkId === networkIds.RINKEBY) {
         claim = mainnetProofs.claims[claimAddress]
       } else if (networkId === networkIds.XDAI) {
-        claim = xdaiProofs.claims[claimAddress]
+        const proxyAddress = calcRelayProxyAddress(claimAddress, provider)
+        const proxyClaim = proxyAddress && xdaiProofs.claims[proxyAddress]
+        if (proxyClaim) {
+          claim = proxyClaim
+        } else {
+          claim = xdaiProofs.claims[claimAddress]
+        }
       }
     }
     return claim

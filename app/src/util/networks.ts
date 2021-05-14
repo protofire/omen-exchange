@@ -284,6 +284,7 @@ const networks: { [K in NetworkId]: Network } = {
     targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
     blockExplorer: 'blockscout',
     blockExplorerURL: 'https://blockscout.com/poa/xdai',
+    airdropAddress: '0x00aC027Def8227b60866b41e48Da30d23b656138',
   },
 }
 

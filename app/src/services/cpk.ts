@@ -1561,11 +1561,13 @@ class CPKService {
   claimAirdrop = async ({ account, setTxHash, setTxState }: CPKClaimAirdropParams) => {
     const network = await this.provider.getNetwork()
     const networkId = network.chainId
+    const signer = this.provider.getSigner()
+    const address = await signer.getAddress()
     const transactions: Transaction[] = []
     const txOptions: TxOptions = {}
     await this.getGas(txOptions)
 
-    const airdrop = new AirdropService(networkId, this.provider)
+    const airdrop = new AirdropService(networkId, this.provider, address)
 
     if (this.cpk.relay && airdrop.contract) {
       transactions.push({

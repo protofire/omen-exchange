@@ -33,9 +33,7 @@ export const ModalAirdrop = (props: Props) => {
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
   const [message, setMessage] = useState('')
 
-  React.useEffect(() => {
-    Modal.setAppElement('#root')
-  }, [])
+  Modal.setAppElement('#root')
 
   const onClose = () => {
     localStorage.setItem('airdrop', 'displayed')

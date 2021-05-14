@@ -5,14 +5,16 @@ import { AirdropService } from '../services'
 import { useConnectedWeb3Context } from './connectedWeb3'
 
 export const useAirdropService = (): AirdropService => {
-  const { library: provider, networkId } = useConnectedWeb3Context()
+  const { account, library: provider, networkId } = useConnectedWeb3Context()
 
-  const [airdrop, setAirdrop] = useState<AirdropService>(new AirdropService(networkId, provider))
+  const [airdrop, setAirdrop] = useState<AirdropService>(new AirdropService(networkId, provider, account))
 
   useEffect(() => {
-    setAirdrop(new AirdropService(networkId, provider))
+    if (account) {
+      setAirdrop(new AirdropService(networkId, provider, account))
+    }
     // eslint-disable-next-line
-  }, [networkId])
+  }, [networkId, account])
 
   return airdrop
 }

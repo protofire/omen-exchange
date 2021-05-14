@@ -97,7 +97,9 @@ const AirdropCard = (props: Props) => {
       const newAmount = await airdrop.getClaimAmount(account)
       setAmount(newAmount)
     }
-    getClaimAmount()
+    if (account) {
+      getClaimAmount()
+    }
   }, [airdrop, account, library, networkId, relay])
 
   const submitClaim = () => {
