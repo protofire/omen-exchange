@@ -69,7 +69,9 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
         context.setConnector('Safe')
       }
     } else if (active && connector && connector in connectors) {
-      context.setConnector(connector)
+      if (context.connectorName !== connector) {
+        context.setConnector(connector)
+      }
     } else if (error) {
       logger.log(error.message)
       localStorage.removeItem('CONNECTOR')
