@@ -7,7 +7,7 @@ import styled, { withTheme } from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext } from '../../../hooks'
 import { OmenGuildService } from '../../../services'
-import { divBN, formatBigNumber, formatHistoryDate } from '../../../util/tools'
+import { divBN, formatBigNumber, formatLockDate } from '../../../util/tools'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { TextfieldCustomPlaceholder } from '../../common'
@@ -100,7 +100,10 @@ const ModalLockTokens = (props: Props) => {
   const omen = new OmenGuildService(provider, networkId)
 
   useEffect(() => {
-    getTokenLockInfo()
+    ;(async () => {
+      await getTokenLockInfo()
+    })()
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkId, account])
 
@@ -213,7 +216,7 @@ const ModalLockTokens = (props: Props) => {
           <DataRow>
             <LightDataItem>Unlock Date</LightDataItem>
             <DarkDataItem>
-              {formatHistoryDate(timestamp)}
+              {formatLockDate(timestamp * 1000)}
               <IconAlertInverted size="16" style={{ marginLeft: '8px', verticalAlign: 'text-bottom' }} />
             </DarkDataItem>
           </DataRow>

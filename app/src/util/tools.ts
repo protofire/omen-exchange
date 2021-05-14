@@ -66,6 +66,11 @@ export const formatDate = (date: Date, utcAdd = true): string => {
     .tz('UTC')
     .format(`YYYY-MM-DD - HH:mm${utcAdd ? ' [UTC]' : ''}`)
 }
+export const formatLockDate = (date: number) => {
+  return moment(date)
+    .tz('UTC')
+    .format(`MMMM Do, YYYY - HH:mm UTC`)
+}
 
 export const checkRpcStatus = async (customUrl: string, setStatus: any, network: any) => {
   try {

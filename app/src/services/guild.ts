@@ -44,8 +44,8 @@ const GuildAbi = [
     type: 'function',
   },
   {
-    inputs: [{ internalType: 'uint256', name: 'snapshotId', type: 'uint256' }],
-    name: 'totalLockedAt',
+    inputs: [],
+    name: 'totalLocked',
     outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
     type: 'function',
