@@ -26,7 +26,7 @@ export const ModalAirdrop = (props: Props) => {
   const { fetchBalances } = useConnectedBalanceContext()
 
   const initialIsOpenState = localStorage.getItem('airdrop')
-  const [isOpen, setIsOpen] = useState(true) // useState(!initialIsOpenState)
+  const [isOpen, setIsOpen] = useState(!initialIsOpenState)
   const [checkAddress, setCheckAddress] = useState(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txHash, setTxHash] = useState('')

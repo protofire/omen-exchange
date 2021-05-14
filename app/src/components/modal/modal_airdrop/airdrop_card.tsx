@@ -67,7 +67,11 @@ const BottomSectionHeading = styled.div`
 
 const BottomSectionSubheading = styled.div`
   color: ${props => props.theme.colors.textColorLighter};
-  font-size: 12;
+  font-size: 12px;
+`
+
+const BottomSectionDescription = styled.div`
+  color: ${props => props.theme.colors.textColorLighter};
 `
 
 const AirdropButton = styled(Button)`
@@ -134,14 +138,14 @@ const AirdropCard = (props: Props) => {
             {displayButtons ? (
               <BottomSectionTextWrapper>
                 <BottomSectionHeading>Claim OMN token</BottomSectionHeading>
-                <BottomSectionSubheading>Check address for claimable OMN</BottomSectionSubheading>
+                <BottomSectionSubheading>check address for claimable OMN</BottomSectionSubheading>
               </BottomSectionTextWrapper>
             ) : (
               <BottomSectionTextWrapper>
-                <BottomSectionSubheading>
+                <BottomSectionDescription>
                   Enter an address to trigger a OMN claim. If the address has any claimable OMN it will be sent to them
                   on submission.
-                </BottomSectionSubheading>
+                </BottomSectionDescription>
               </BottomSectionTextWrapper>
             )}
           </BottomSectionTextWrapper>

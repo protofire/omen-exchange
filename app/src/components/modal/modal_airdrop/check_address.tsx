@@ -14,13 +14,36 @@ import { AirdropCardWrapper } from './airdrop_card'
 
 const ClaimButton = styled(Button)`
   width: 100%;
-  margin-top: 24px;
 `
 
-const RecipientLabelWrapper = styled.div`
+const RecipientWrapper = styled.div`
   width: 100%;
-  margin-top: 24px;
+  margin: 24px 0px;
+`
+
+const RecipientLabel = styled(FormLabel)`
+  display: inline-block;
   margin-bottom: 12px;
+`
+
+const AddressField = styled(Textfield)<{ error: boolean }>`
+  border-color: ${props => (props.error ? props.theme.colors.alert : props.theme.textfield.borderColor)};
+  &:hover {
+    border-color: ${props => (props.error ? props.theme.colors.alert : props.theme.textfield.borderColorOnHover)};
+  }
+
+  &:active,
+  &:focus {
+    border-color: ${props => (props.error ? props.theme.colors.alert : props.theme.textfield.borderColorActive)};
+  }
+`
+
+const ErrorMessage = styled.div`
+  color: ${props => props.theme.colors.alert};
+  margin-top: 12px;
+  font-size: ${props => props.theme.fonts.defaultSize};
+  line-height: 16px;
+  letter-spacing: 0.2px;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -36,26 +59,30 @@ export const ModalCheckAddress = (props: Props) => {
 
   const airdrop = useAirdropService()
 
-  const [adddress, setAddress] = useState('')
+  const [address, setAddress] = useState('')
   const [amount, setAmount] = useState(new BigNumber('0'))
+  const [loading, setLoading] = useState(false)
 
   const updateAddress = async (e: any) => {
     const newAddress = e.target.value
     setAddress(newAddress)
-
+    setLoading(true)
     const newAmount = await airdrop.getClaimAmount(newAddress)
     setAmount(newAmount)
+    setLoading(false)
   }
 
   const submitClaim = () => {
-    if (claim && adddress) {
-      claim(adddress, amount)
+    if (claim && address) {
+      claim(address, amount)
     }
   }
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
   }, [])
+
+  const error = !loading && address !== '' && amount.isZero()
 
   return (
     <Modal isOpen={isOpen} onRequestClose={onClose} shouldCloseOnOverlayClick={true} style={theme.fluidHeightModal}>
@@ -68,10 +95,11 @@ export const ModalCheckAddress = (props: Props) => {
           <IconClose hoverEffect={true} onClick={onClose} />
         </ModalNavigation>
         <AirdropCardWrapper displayAmount={amount} displayButtons={false} />
-        <RecipientLabelWrapper>
-          <FormLabel>Recipient</FormLabel>
-        </RecipientLabelWrapper>
-        <Textfield onChange={updateAddress} placeholder="Wallet Address" value={adddress} />
+        <RecipientWrapper>
+          <RecipientLabel>Recipient</RecipientLabel>
+          <AddressField error={error} onChange={updateAddress} placeholder="Wallet Address" value={address} />
+          {error && <ErrorMessage>Address has no available claim</ErrorMessage>}
+        </RecipientWrapper>
         <ClaimButton buttonType={ButtonType.primaryAlternative} disabled={amount.isZero()} onClick={submitClaim}>
           Claim OMN
         </ClaimButton>
