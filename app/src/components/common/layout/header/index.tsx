@@ -193,8 +193,8 @@ const OmenIconWrapper = styled.div`
 
 const HeaderContainer: React.FC = (props: any) => {
   const context = useConnectedWeb3Context()
-  console.log(context)
-  const { library: provider, relay, toggleRelay } = context
+
+  const { relay, toggleRelay } = context
   const { account, active, connectorName, error, networkId } = context.rawWeb3Context
 
   const { history, ...restProps } = props

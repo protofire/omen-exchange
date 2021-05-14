@@ -10,11 +10,10 @@ import { OmenGuildService } from '../../../services'
 import { divBN, formatBigNumber, formatHistoryDate } from '../../../util/tools'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
-import { Spinner, TextfieldCustomPlaceholder } from '../../common'
+import { TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInput, BigNumberInputReturn } from '../../common/form/big_number_input'
-import { IconArrowBack, IconArrowRight, IconArrowRightLong, IconClose } from '../../common/icons'
+import { IconArrowBack, IconArrowRightLong, IconClose } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
-import { InlineLoading } from '../../loading/inline_loading'
 import { ContentWrapper, ModalNavigation } from '../common_styled'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -90,7 +89,7 @@ const ModalLockTokens = (props: Props) => {
   const { context, formattedOmenBalance, isOpen, omenBalance, onClose, theme } = props
   const { account, library: provider, networkId } = context
   const cpk = useConnectedCPKContext()
-  console.log(context)
+
   const [isLockAmountOpen, setIsLockAmountOpen] = useState<boolean>(false)
   const [displayLockAmount, setDisplayLockAmount] = useState<BigNumber>(Zero)
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
@@ -102,6 +101,7 @@ const ModalLockTokens = (props: Props) => {
 
   useEffect(() => {
     getTokenLockInfo()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [networkId, account])
 
   const getTokenLockInfo = async () => {
@@ -116,19 +116,18 @@ const ModalLockTokens = (props: Props) => {
       setUserLocked(locked.amount)
       setTimestamp(locked.timestamp.toNumber())
     } catch (e) {
-      console.log(e)
+      console.error(`Error while trying to fetch locked token info:  `, e.message)
     }
   }
-  const lockMofo = async (amount: BigNumber) => {
-    console.log('here')
-    await omen.lockTokens(amount)
+  const lockTokens = async (amount: BigNumber) => {
+    if (!cpk) return
+    await cpk.lockTokens(amount)
   }
   const unlockTokens = async () => {
     if (!cpk) return
     await cpk.unlockTokens(userLocked)
-    console.log('here')
   }
-  console.log(isLockAmountOpen)
+
   return (
     <Modal isOpen={isOpen} style={theme.fluidHeightModal}>
       <ContentWrapper>
@@ -238,7 +237,7 @@ const ModalLockTokens = (props: Props) => {
               (displayLockAmount.isZero() || omenBalance.isZero() || displayLockAmount.gt(omenBalance)) &&
               isLockAmountOpen
             }
-            onClick={() => (isLockAmountOpen ? lockMofo(displayLockAmount) : setIsLockAmountOpen(true))}
+            onClick={() => (isLockAmountOpen ? lockTokens(displayLockAmount) : setIsLockAmountOpen(true))}
           >
             Lock OMN
           </ButtonsLockUnlock>

@@ -142,7 +142,7 @@ export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
         .toNumber() / scale
     )
   } catch {
-    return 0
+    return 999999999999999
   }
 }
 
