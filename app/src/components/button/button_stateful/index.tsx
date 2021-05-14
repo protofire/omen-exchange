@@ -25,7 +25,7 @@ const DisabledCSS = css`
   &[disabled],
   &[disabled]:hover {
     background-color: ${props => props.theme.buttonPrimaryLine.backgroundColor};
-    border-color: ${props => props.theme.buttonPrimaryLine.borderColor};
+    border-color: ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
     color: ${props => props.theme.buttonPrimaryLine.color};
     opacity: 1;
   }
