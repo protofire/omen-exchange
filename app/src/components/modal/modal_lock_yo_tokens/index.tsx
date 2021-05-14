@@ -12,7 +12,7 @@ import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInput, BigNumberInputReturn } from '../../common/form/big_number_input'
-import { IconArrowBack, IconArrowRightLong, IconClose } from '../../common/icons'
+import { IconArrowBack, IconArrowRightLong, IconClose, IconOmen } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
 import { ContentWrapper, ModalNavigation } from '../common_styled'
 
@@ -42,6 +42,7 @@ const HeaderText = styled.div`
 const DataRow = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
   line-height: ${props => props.theme.fonts.defaultLineHeight};
 `
@@ -160,11 +161,16 @@ const ModalLockTokens = (props: Props) => {
           <ConditionalWrapper hideWrapper={!isLockAmountOpen}>
             <DataRow>
               <LightDataItem>Omen Account</LightDataItem>
-              <DarkDataItem> {formattedOmenBalance} OMN</DarkDataItem>
+              <DarkDataItem>
+                {formattedOmenBalance} OMN{isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
+              </DarkDataItem>
             </DataRow>
             <DataRow>
               <LightDataItem>Locked in Guild</LightDataItem>
-              <DarkDataItem>{formatBigNumber(userLocked, 18, 2)} OMN</DarkDataItem>
+              <DarkDataItem>
+                {formatBigNumber(userLocked, 18, 2)} OMN
+                {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
+              </DarkDataItem>
             </DataRow>
           </ConditionalWrapper>
           {isLockAmountOpen && (
@@ -213,13 +219,15 @@ const ModalLockTokens = (props: Props) => {
               )}
             </DarkDataItem>
           </DataRow>
-          <DataRow>
-            <LightDataItem>Unlock Date</LightDataItem>
-            <DarkDataItem>
-              {formatLockDate(timestamp * 1000)}
-              <IconAlertInverted size="16" style={{ marginLeft: '8px', verticalAlign: 'text-bottom' }} />
-            </DarkDataItem>
-          </DataRow>
+          {timestamp !== 0 && (
+            <DataRow>
+              <LightDataItem>Unlock Date</LightDataItem>
+              <DarkDataItem>
+                {formatLockDate(timestamp * 1000)}
+                <IconAlertInverted size="16" style={{ marginLeft: '8px', verticalAlign: 'text-bottom' }} />
+              </DarkDataItem>
+            </DataRow>
+          )}
         </ModalMain>
         <ButtonSection>
           {!isLockAmountOpen && (
