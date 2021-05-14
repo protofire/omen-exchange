@@ -1847,20 +1847,21 @@ class CPKService {
         const stakingService = new StakingService(this.provider, this.cpk.address, campaignAddress)
         const rewardTokens = await stakingService.getRewardTokens()
         const claimableRewards = await stakingService.getClaimableRewards(this.cpk.address)
+        const accruedFees = await stakingService.getAccruedFees(sharesToBurn)
 
         for (let i = 0; i < rewardTokens.length; i++) {
-          const erc20Service = new ERC20Service(this.provider, this.cpk.address, rewardTokens[i])
-          const unclaimedRewards = bigNumberify(await erc20Service.getCollateral(this.cpk.address))
+          const rewardErc20Service = new ERC20Service(this.provider, this.cpk.address, rewardTokens[i])
+          const unclaimedRewards = bigNumberify(await rewardErc20Service.getCollateral(this.cpk.address))
           const totalRewardsAmount = claimableRewards[i].add(unclaimedRewards)
 
-          const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(
+          const hasEnoughRewardAllowance = await rewardErc20Service.hasEnoughAllowance(
             this.cpk.address,
             account,
             totalRewardsAmount,
           )
 
           // Approve unlimited if not already done
-          if (!hasEnoughAllowance) {
+          if (!hasEnoughRewardAllowance) {
             transactions.push({
               to: rewardTokens[i],
               data: ERC20Service.encodeApproveUnlimited(account),
@@ -1873,6 +1874,24 @@ class CPKService {
             data: ERC20Service.encodeTransfer(account, totalRewardsAmount),
           })
         }
+
+        const feeErc20Service = new ERC20Service(this.provider, this.cpk.address, collateralAddress)
+
+        const hasEnoughFeeAllowance = await feeErc20Service.hasEnoughAllowance(this.cpk.address, account, accruedFees)
+
+        // Approve unlimited if not already done
+        if (!hasEnoughFeeAllowance) {
+          transactions.push({
+            to: collateralAddress,
+            data: ERC20Service.encodeApproveUnlimited(account),
+          })
+        }
+
+        // Transfer fees from cpk to EOA
+        transactions.push({
+          to: collateralAddress,
+          data: ERC20Service.encodeTransfer(account, accruedFees),
+        })
       }
 
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
