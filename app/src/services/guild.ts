@@ -613,10 +613,10 @@ class OmenGuildService {
     this.provider = provider
     this.omenGuildAddress = getContractAddress(network, 'omenGuildProxy')
   }
-  get OmenGuildContract(): Contract {
+  get getOmenGuildContract(): Contract {
     return new ethers.Contract(this.omenGuildAddress, GuildAbi, this.provider).connect(this.user)
   }
-  get OmenGuildAddress(): string {
+  get getOmenGuildAddress(): string {
     return this.omenGuildAddress
   }
 
@@ -624,24 +624,31 @@ class OmenGuildService {
     const guildInterface = new utils.Interface(GuildAbi)
     return guildInterface.functions.lockTokens.encode([amount])
   }
+  static encodeUnlockTokens = (amount: BigNumber) => {
+    const guildInterface = new utils.Interface(GuildAbi)
+    return guildInterface.functions.releaseTokens.encode([amount])
+  }
 
   lockTokens = async (amount: BigNumber) => {
-    return await this.OmenGuildContract.lockTokens(amount)
+    return await this.getOmenGuildContract.lockTokens(amount)
   }
 
   tokensLocked = async () => {
     const address = await this.user.getAddress()
 
-    return this.OmenGuildContract.tokensLocked(address)
+    return this.getOmenGuildContract.tokensLocked(address)
   }
   totalLocked = async () => {
-    return this.OmenGuildContract.totalLocked()
+    return this.getOmenGuildContract.totalLocked()
   }
   omenTokenAddress = async () => {
-    return this.OmenGuildContract.token()
+    return this.getOmenGuildContract.token()
   }
   tokenVault = async () => {
-    return this.OmenGuildContract.tokenVault()
+    return this.getOmenGuildContract.tokenVault()
+  }
+  lockTime = async () => {
+    return this.getOmenGuildContract.lockTime()
   }
 }
 export { OmenGuildService }

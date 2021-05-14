@@ -134,12 +134,16 @@ export const convertLocalToUTC = (date: Date): Date => {
 }
 
 export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
-  return (
-    a
-      .mul(scale)
-      .div(b)
-      .toNumber() / scale
-  )
+  try {
+    return (
+      a
+        .mul(scale)
+        .div(b)
+        .toNumber() / scale
+    )
+  } catch {
+    return 0
+  }
 }
 
 export const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {

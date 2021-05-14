@@ -5,16 +5,16 @@ import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import { useConnectedWeb3Context } from '../../../hooks'
+import { useConnectedCPKContext } from '../../../hooks'
 import { OmenGuildService } from '../../../services'
-import { divBN, formatBigNumber, formatHistoryDate, formatTimestampToDate } from '../../../util/tools'
-import { ExchangeCurrency, ExchangeType } from '../../../util/types'
+import { divBN, formatBigNumber, formatHistoryDate } from '../../../util/tools'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
-import { TextfieldCustomPlaceholder } from '../../common'
+import { Spinner, TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInput, BigNumberInputReturn } from '../../common/form/big_number_input'
-import { IconArrowBack, IconClose } from '../../common/icons'
+import { IconArrowBack, IconArrowRight, IconArrowRightLong, IconClose } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
+import { InlineLoading } from '../../loading/inline_loading'
 import { ContentWrapper, ModalNavigation } from '../common_styled'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -82,34 +82,51 @@ const Divider = styled.div`
   border-top: ${props => props.theme.borders.borderLineDisabled};
   margin: 32px 0;
 `
+const PercentageText = styled.span<{ lightColor?: boolean }>`
+  ${props => props.lightColor && `color:${props.theme.colors.textColorLighter}`};
+`
 
 const ModalLockTokens = (props: Props) => {
   const { context, formattedOmenBalance, isOpen, omenBalance, onClose, theme } = props
-  const { library: provider, networkId } = context
-  console.log(networkId)
+  const { account, library: provider, networkId } = context
+  const cpk = useConnectedCPKContext()
+  console.log(context)
   const [isLockAmountOpen, setIsLockAmountOpen] = useState<boolean>(false)
   const [displayLockAmount, setDisplayLockAmount] = useState<BigNumber>(Zero)
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [totalLocked, setTotalLocked] = useState<BigNumber>(Zero)
   const [userLocked, setUserLocked] = useState<BigNumber>(Zero)
   const [timestamp, setTimestamp] = useState<number>(0)
+  const [isUnlockAvailable, setIsUnlockAvailable] = useState<boolean>(false)
   const omen = new OmenGuildService(provider, networkId)
 
   useEffect(() => {
-    const milan = async () => {
+    getTokenLockInfo()
+  }, [networkId, account])
+
+  const getTokenLockInfo = async () => {
+    try {
       const locked = await omen.tokensLocked()
       const total = await omen.totalLocked()
+      const lockTime = await omen.lockTime()
+      const nowInSeconds: number = Math.floor(Date.now() / 1000)
+      setIsUnlockAvailable(nowInSeconds + lockTime.toNumber() - locked.timestamp.toNumber() > 0)
 
       setTotalLocked(total)
       setUserLocked(locked.amount)
       setTimestamp(locked.timestamp.toNumber())
+    } catch (e) {
+      console.log(e)
     }
-    milan()
-  }, [])
-
+  }
   const lockMofo = async (amount: BigNumber) => {
     console.log('here')
     await omen.lockTokens(amount)
+  }
+  const unlockTokens = async () => {
+    if (!cpk) return
+    await cpk.unlockTokens(userLocked)
+    console.log('here')
   }
   console.log(isLockAmountOpen)
   return (
@@ -174,7 +191,24 @@ const ModalLockTokens = (props: Props) => {
           <DataRow style={{ marginTop: !isLockAmountOpen ? '12px' : '' }}>
             <LightDataItem>{isLockAmountOpen && 'Your '}Vote Weight</LightDataItem>
             <DarkDataItem>
-              {!totalLocked.isZero() && !userLocked.isZero() ? divBN(userLocked, totalLocked) * 100 : '0.00'}%
+              <PercentageText lightColor={!displayLockAmount.isZero()}>
+                {!totalLocked.isZero() && !userLocked.isZero()
+                  ? (divBN(userLocked, totalLocked) * 100).toFixed(2)
+                  : '0.00'}
+                %
+              </PercentageText>
+
+              {!displayLockAmount.isZero() && (
+                <>
+                  <IconArrowRightLong
+                    color={theme.colors.textColorDark}
+                    height={8}
+                    style={{ margin: '0 10px' }}
+                    width={11}
+                  />
+                  {(divBN(userLocked.add(displayLockAmount), totalLocked) * 100).toFixed(2)}%
+                </>
+              )}
             </DarkDataItem>
           </DataRow>
           <DataRow>
@@ -186,7 +220,17 @@ const ModalLockTokens = (props: Props) => {
           </DataRow>
         </ModalMain>
         <ButtonSection>
-          {!isLockAmountOpen && <ButtonsLockUnlock buttonType={ButtonType.primaryLine}>Unlock Omen</ButtonsLockUnlock>}
+          {!isLockAmountOpen && (
+            <ButtonsLockUnlock
+              buttonType={ButtonType.primaryLine}
+              disabled={isUnlockAvailable}
+              onClick={() => {
+                unlockTokens()
+              }}
+            >
+              Unlock Omen
+            </ButtonsLockUnlock>
+          )}
 
           <ButtonsLockUnlock
             buttonType={ButtonType.primaryAlternative}

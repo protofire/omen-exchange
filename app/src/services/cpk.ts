@@ -1458,6 +1458,24 @@ class CPKService {
       throw e
     }
   }
+  unlockTokens = async (amount: BigNumber) => {
+    try {
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas
+      const network = await this.provider.getNetwork()
+      const OmenGuild = new OmenGuildService(this.provider, network.chainId)
+      const transactions: Transaction[] = [
+        {
+          to: OmenGuild.omenGuildAddress,
+          data: OmenGuildService.encodeUnlockTokens(amount),
+        },
+      ]
+      return this.execTransactions(transactions)
+    } catch (e) {
+      logger.error(`Error while trying to unlock Omen tokens : `, e.message)
+      throw e
+    }
+  }
 
   sendMainnetTokenToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
     try {
