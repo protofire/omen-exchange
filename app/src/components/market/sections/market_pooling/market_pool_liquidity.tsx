@@ -54,6 +54,7 @@ import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
+import { IconOmen } from '../../../common/icons'
 import { ModalTransactionWrapper } from '../../../modal'
 import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
@@ -135,6 +136,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [amountToRemoveDisplay, setAmountToRemoveDisplay] = useState<string>('')
   const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
+  const [icon, setIcon] = useState<boolean>(false)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(
     getInitialCollateral(context.networkId, collateral, relay),
   )
@@ -542,7 +544,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         throw new Error('Please connect to your wallet to perform this action.')
       }
 
-      setMessage(`Claiming OMN rewards...`)
+      const stakingService = new StakingService(provider, cpk.address, liquidityMiningCampaign.id)
+      const claimableRewards = await stakingService.getClaimableRewards(cpk.address)
+
+      setMessage(
+        `Claiming ${formatNumber(
+          formatBigNumber(
+            claimableRewards[0],
+            getToken(networkId, 'omn').decimals,
+            getToken(networkId, 'omn').decimals,
+          ),
+        )} OMN`,
+      )
+      setIcon(true)
 
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
@@ -556,9 +570,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       await fetchBalances()
       await fetchStakingData()
 
+      setIcon(false)
       setMessage(`Successfully claimed OMN rewards`)
       setIsTransactionProcessing(false)
     } catch (err) {
+      setIcon(false)
       setTxState(TransactionStep.error)
       setMessage(`Error trying to claim OMN rewards.`)
       logger.error(`${message} - ${err.message}`)
@@ -1047,6 +1063,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       <ModalTransactionWrapper
         confirmations={0}
         confirmationsRequired={0}
+        icon={icon && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
         isOpen={isTransactionModalOpen}
         message={message}
         onClose={() => setIsTransactionModalOpen(false)}
