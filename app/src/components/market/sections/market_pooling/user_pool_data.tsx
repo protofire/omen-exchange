@@ -128,12 +128,12 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
         <Border />
         <MarketInfoHeader>
           <PoolOverview>Pool Overview</PoolOverview>
-          {currentApr == 0 && <LiquidityRewards>Liquidity Rewards</LiquidityRewards>}
+          {currentApr > 0 && <LiquidityRewards>Liquidity Rewards</LiquidityRewards>}
         </MarketInfoHeader>
       </HeaderWrapper>
 
       <SpaceBetween>
-        <FlexBoxColumnOrRow currentApr={false}>
+        <FlexBoxColumnOrRow currentApr={currentApr > 0}>
           <UserDataWrapper>
             <UserDataTitleValue
               title={currentApr > 0 ? 'Total Liquidity' : 'Your Liquidity'}
