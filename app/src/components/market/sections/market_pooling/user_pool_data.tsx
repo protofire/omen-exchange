@@ -14,69 +14,26 @@ const UserDataTitleValue = styled(TitleValue)`
   align-items: center;
   justify-content: space-between;
   padding: 0px;
-  margin-bottom: 12px;
-
-  width: 253px;
-
-  flex: 0 calc(50% - 16px);
-
-  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
-    flex: 0 50%;
-
-    margin-right: 0 !important;
-    margin-bottom: 0 !important;
-
-    &:not(:first-child) {
-      margin-top: 12px;
-    }
-    &:nth-child(2) {
-      order: 2;
-    }
-    &:nth-child(3) {
-      order: 1;
-    }
-    &:nth-child(4) {
-      order: 3;
-    }
+  margin-bottom: ${props => props.theme.textfield.paddingVertical};
+  width: auto;
+  
   }
-`
-
-const UserDataWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  min-height: 76px;
-  margin-bottom: 12px;
-  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
-    flex-wrap: nowrap;
-    flex-direction: column;
-  }
-`
-
-const ColumnWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  padding: 0px;
 `
 
 const PoolOverview = styled.div`
-  margin-top: 24px;
+  margin-top: 20px;
   margin-right: auto;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 16px;
+  font-weight: ${props => props.theme.textfield.fontWeight}
+  line-height: ${props => props.theme.fonts.defaultLineHeight}
   display: flex;
-  align-items: center;
   flex-direction: row;
+  border: 2px solid red;
 `
 
 const LiquidityRewards = styled.div`
   margin-top: 24px;
   margin-right: auto;
-  margin-left: 48px;
+  margin-left: 51px;
   font-family: Roboto;
   font-style: normal;
   font-weight: 500;
@@ -91,17 +48,38 @@ const Border = styled.div`
   position: absolute;
   left: 0px;
   right: 0px;
-  top: 10%;
-  bottom: 0%;
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
 `
 
 const FlexBoxColumnOrRow = styled.div<{ currentApr?: boolean }>`
   display: flex;
-  width: 100%;
+  width: ${props => (!props.currentApr ? '100%' : '50%')}
   flex-direction: ${props => (!props.currentApr ? 'row' : 'column')};
   justify-content: space-between;
 `
+
+const MarketInfoHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 16px;
+  justify-content: space-between;
+`
+
+const UserDataWrapper = styled.div<{ currentApr?: boolean }>`
+  width: 100%;
+`
+
+const LpRewardsWrapper = styled.div`
+  width: 50%;
+  margin-left: 32px;
+`
+const SpaceBetween = styled.div`
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+`
+
+const HeaderWrapper = styled.div``
 
 interface Props {
   totalUserLiquidity: BigNumber
@@ -146,30 +124,40 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
 
   return (
     <>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <FlexBoxColumnOrRow currentApr={true}>
-          <div>
+      <HeaderWrapper>
+        <Border />
+        <MarketInfoHeader>
+          <PoolOverview>Pool Overview</PoolOverview>
+          {currentApr == 0 && <LiquidityRewards>Liquidity Rewards</LiquidityRewards>}
+        </MarketInfoHeader>
+      </HeaderWrapper>
+
+      <SpaceBetween>
+        <FlexBoxColumnOrRow currentApr={false}>
+          <UserDataWrapper>
             <UserDataTitleValue
-              title="Total Liquidity"
+              title={currentApr > 0 ? 'Total Liquidity' : 'Your Liquidity'}
               value={`${formatNumber(
                 formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals),
               )}`}
             />
             <UserDataTitleValue
               state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
-              title="Total Earnings"
+              title={currentApr > 0 ? 'Total Earnings' : 'Total Liquidity'}
               value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
                 formatBigNumber(displayTotalEarnings, baseCollateral.decimals, baseCollateral.decimals),
               )} ${baseCollateral.symbol}`}
             />
+          </UserDataWrapper>
+          <UserDataWrapper style={currentApr > 0 ? { marginLeft: '0px' } : { marginLeft: '32px' }}>
             <UserDataTitleValue
-              title="Your Liquidity"
+              state={displayTotalEarnings.gt(0) && !(currentApr > 0) ? ValueStates.success : undefined}
+              title={currentApr > 0 ? 'Your Liquidity' : 'Total Earnings'}
               value={`${formatNumber(
                 formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals),
               )} ${baseCollateral.symbol}`}
             />
-          </div>
-          <div>
+
             <UserDataTitleValue
               state={userEarnings.gt(0) ? ValueStates.success : undefined}
               title="Your Earnings"
@@ -177,10 +165,10 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
                 formatBigNumber(displayUserEarnings, baseCollateral.decimals, baseCollateral.decimals),
               )} ${baseCollateral.symbol}`}
             />
-          </div>
+          </UserDataWrapper>
         </FlexBoxColumnOrRow>
-        {currentApr == 0 && (
-          <div>
+        {currentApr > 0 && (
+          <LpRewardsWrapper>
             <UserDataTitleValue
               state={totalRewards > 0 ? ValueStates.success : undefined}
               title="Total Rewards"
@@ -202,9 +190,9 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
               title="Your Rewards"
               value={`${formatNumber(earnedRewards.toString())} OMN`}
             />
-          </div>
+          </LpRewardsWrapper>
         )}
-      </div>
+      </SpaceBetween>
     </>
   )
 }
