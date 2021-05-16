@@ -11,13 +11,8 @@ import { ValueStates } from '../../common/transaction_details_row'
 const UserDataTitleValue = styled(TitleValue)`
   display: flex;
   flex-direction: row;
-  align-items: center;
   justify-content: space-between;
-  padding: 0px;
   margin-bottom: ${props => props.theme.textfield.paddingVertical};
-  width: auto;
-  
-  }
 `
 
 const PoolOverview = styled.div`
@@ -25,23 +20,15 @@ const PoolOverview = styled.div`
   margin-right: auto;
   font-weight: ${props => props.theme.textfield.fontWeight}
   line-height: ${props => props.theme.fonts.defaultLineHeight}
-  display: flex;
-  flex-direction: row;
-  border: 2px solid red;
+ 
 `
 
 const LiquidityRewards = styled.div`
-  margin-top: 24px;
+  margin-top: 20px;
   margin-right: auto;
   margin-left: 51px;
-  font-family: Roboto;
-  font-style: normal;
-  font-weight: 500;
-  font-size: 14px;
-  line-height: 16px;
-  display: flex;
-  align-items: center;
-  flex-direction: row;
+  font-weight: ${props => props.theme.textfield.fontWeight}
+  line-height: ${props => props.theme.fonts.defaultLineHeight}
 `
 
 const Border = styled.div`
@@ -60,7 +47,6 @@ const FlexBoxColumnOrRow = styled.div<{ currentApr?: boolean }>`
 
 const MarketInfoHeader = styled.div`
   display: flex;
-  flex-direction: row;
   margin-bottom: 16px;
   justify-content: space-between;
 `
@@ -138,14 +124,22 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
             <UserDataTitleValue
               title={currentApr > 0 ? 'Total Liquidity' : 'Your Liquidity'}
               value={`${formatNumber(
-                formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals),
+                formatBigNumber(
+                  currentApr > 0 ? displayPoolTokens : displayUserLiquidity,
+                  baseCollateral.decimals,
+                  baseCollateral.decimals,
+                ),
               )}`}
             />
             <UserDataTitleValue
               state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
               title={currentApr > 0 ? 'Total Earnings' : 'Total Liquidity'}
               value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
-                formatBigNumber(displayTotalEarnings, baseCollateral.decimals, baseCollateral.decimals),
+                formatBigNumber(
+                  currentApr > 0 ? displayTotalEarnings : displayPoolTokens,
+                  baseCollateral.decimals,
+                  baseCollateral.decimals,
+                ),
               )} ${baseCollateral.symbol}`}
             />
           </UserDataWrapper>
@@ -154,7 +148,11 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
               state={displayTotalEarnings.gt(0) && !(currentApr > 0) ? ValueStates.success : undefined}
               title={currentApr > 0 ? 'Your Liquidity' : 'Total Earnings'}
               value={`${formatNumber(
-                formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals),
+                formatBigNumber(
+                  currentApr > 0 ? displayUserLiquidity : displayTotalEarnings,
+                  baseCollateral.decimals,
+                  baseCollateral.decimals,
+                ),
               )} ${baseCollateral.symbol}`}
             />
 
