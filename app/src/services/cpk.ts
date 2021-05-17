@@ -1458,9 +1458,9 @@ class CPKService {
 
         return transactionHash
       } else {
-        const transaction: Transaction = await OmenGuild.lockTokens(amount)
+        const transaction = await OmenGuild.lockTokens(amount)
         console.log(transaction)
-        return transaction
+        return transaction.hash
       }
     } catch (e) {
       logger.error(`Error while trying to lock Omen tokens : `, e.message)

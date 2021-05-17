@@ -7,7 +7,7 @@ import styled, { withTheme } from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext } from '../../../hooks'
 import { OmenGuildService } from '../../../services'
-import { divBN, formatBigNumber, formatLockDate } from '../../../util/tools'
+import { divBN, formatBigNumber, formatLockDate, waitForConfirmations } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -102,9 +102,10 @@ const ModalLockTokens = (props: Props) => {
   const [isUnlockDisabled, setIsUnlockDisabled] = useState<boolean>(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [transactionMessage, setTransactionMessage] = useState<string>('')
-  const [txHash, setTxHash] = useState('')
+  const [txHash, setTxHash] = useState<any>('')
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txNetId, setTxNetId] = useState()
+  const [confirmations, setConfirmations] = useState(0)
   const omen = new OmenGuildService(provider, networkId)
 
   useEffect(() => {
@@ -140,7 +141,8 @@ const ModalLockTokens = (props: Props) => {
       setIsTransactionModalOpen(true)
       const transaction = await cpk.lockTokens(amount)
       setTxNetId(provider.network.chainId)
-      console.log(transaction)
+      setTxHash(transaction)
+      await waitForConfirmations(transaction, provider, setConfirmations, setTxState)
       // setTxHash(transaction)
     } catch (e) {
       setTxState(TransactionStep.error)
@@ -288,7 +290,7 @@ const ModalLockTokens = (props: Props) => {
         </ContentWrapper>
       </Modal>
       <ModalTransactionWrapper
-        confirmations={0}
+        confirmations={confirmations}
         confirmationsRequired={0}
         icon={<IconOmen size={24} style={{ marginLeft: '10px' }} />}
         isOpen={isTransactionModalOpen}
