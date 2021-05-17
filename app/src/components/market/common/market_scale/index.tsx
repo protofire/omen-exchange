@@ -19,6 +19,7 @@ import {
   AdditionalSharesType,
   BalanceItem,
   CompoundTokenType,
+  INVALID_ANSWER_ID,
   LiquidityObject,
   LiquidityType,
   MarketDetailsTab,
@@ -634,10 +635,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'Bonded',
     },
     {
-      title:
-        currentAnswer && collateral
-          ? `${formatBigNumber(new BigNumber(currentAnswer), STANDARD_DECIMALS)} ${unit}`
-          : '-',
+      title: currentAnswer
+        ? currentAnswer === INVALID_ANSWER_ID
+          ? 'Invalid'
+          : `${formatBigNumber(new BigNumber(currentAnswer), STANDARD_DECIMALS)} ${unit}`
+        : '-',
       subtitle: isBonded ? 'Pending Outcome' : 'Final Outcome',
     },
   ]
