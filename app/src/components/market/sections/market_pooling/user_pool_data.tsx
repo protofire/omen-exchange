@@ -26,7 +26,7 @@ const PoolOverview = styled.div`
 const LiquidityRewards = styled.div`
   margin-top: 24px;
   margin-right: auto;
-  margin-left: 52px;
+  margin-left: 53px;
   font-weight: ${props => props.theme.textfield.fontWeight}
   line-height: ${props => props.theme.fonts.defaultLineHeight}
 `
