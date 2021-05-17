@@ -97,7 +97,7 @@ const ModalLockTokens = (props: Props) => {
   const [totalLocked, setTotalLocked] = useState<BigNumber>(Zero)
   const [userLocked, setUserLocked] = useState<BigNumber>(Zero)
   const [timestamp, setTimestamp] = useState<number>(0)
-  const [isUnlockAvailable, setIsUnlockAvailable] = useState<boolean>(false)
+  const [isUnlockDisabled, setIsUnlockDisabled] = useState<boolean>(false)
   const omen = new OmenGuildService(provider, networkId)
 
   useEffect(() => {
@@ -112,9 +112,9 @@ const ModalLockTokens = (props: Props) => {
     try {
       const locked = await omen.tokensLocked()
       const total = await omen.totalLocked()
-      const lockTime = await omen.lockTime()
       const nowInSeconds: number = Math.floor(Date.now() / 1000)
-      setIsUnlockAvailable(nowInSeconds + lockTime.toNumber() - locked.timestamp.toNumber() > 0)
+
+      setIsUnlockDisabled(locked.timestamp.toNumber() - nowInSeconds > 0)
 
       setTotalLocked(total)
       setUserLocked(locked.amount)
@@ -233,7 +233,7 @@ const ModalLockTokens = (props: Props) => {
           {!isLockAmountOpen && (
             <ButtonsLockUnlock
               buttonType={ButtonType.primaryLine}
-              disabled={isUnlockAvailable}
+              disabled={isUnlockDisabled}
               onClick={() => {
                 unlockTokens()
               }}
