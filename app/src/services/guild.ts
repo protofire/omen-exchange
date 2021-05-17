@@ -92,6 +92,10 @@ class OmenGuildService {
     return await this.getOmenGuildContract.lockTokens(amount)
   }
 
+  unlockTokens = async (amount: BigNumber) => {
+    return await this.getOmenGuildContract.releaseTokens(amount)
+  }
+
   tokensLocked = async () => {
     const address = await this.user.getAddress()
 

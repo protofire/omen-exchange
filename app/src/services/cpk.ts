@@ -1454,9 +1454,12 @@ class CPKService {
             data: OmenGuildService.encodeLockTokens(amount),
           },
         ]
-        return this.execTransactions(transactions)
+        const { transactionHash } = await this.execTransactions(transactions, txOptions)
+
+        return transactionHash
       } else {
-        const transaction = await OmenGuild.lockTokens(amount)
+        const transaction: Transaction = await OmenGuild.lockTokens(amount)
+        console.log(transaction)
         return transaction
       }
     } catch (e) {
@@ -1466,17 +1469,27 @@ class CPKService {
   }
   unlockTokens = async (amount: BigNumber) => {
     try {
-      const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
       const network = await this.provider.getNetwork()
       const OmenGuild = new OmenGuildService(this.provider, network.chainId)
-      const transactions: Transaction[] = [
-        {
-          to: OmenGuild.omenGuildAddress,
-          data: OmenGuildService.encodeUnlockTokens(amount),
-        },
-      ]
-      return this.execTransactions(transactions)
+      if (this.cpk.relay) {
+        const txOptions: TxOptions = {}
+        txOptions.gas = defaultGas
+
+        const transactions: Transaction[] = [
+          {
+            to: OmenGuild.omenGuildAddress,
+            data: OmenGuildService.encodeUnlockTokens(amount),
+          },
+        ]
+
+        const { transactionHash } = await this.execTransactions(transactions, txOptions)
+
+        return transactionHash
+      } else {
+        const transaction: Transaction = await OmenGuild.unlockTokens(amount)
+
+        return transaction
+      }
     } catch (e) {
       logger.error(`Error while trying to unlock Omen tokens : `, e.message)
       throw e

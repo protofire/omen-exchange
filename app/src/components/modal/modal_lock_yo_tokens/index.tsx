@@ -8,6 +8,7 @@ import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext } from '../../../hooks'
 import { OmenGuildService } from '../../../services'
 import { divBN, formatBigNumber, formatLockDate } from '../../../util/tools'
+import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { TextfieldCustomPlaceholder } from '../../common'
@@ -15,6 +16,7 @@ import { BigNumberInput, BigNumberInputReturn } from '../../common/form/big_numb
 import { IconArrowBack, IconArrowRightLong, IconClose, IconOmen } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
 import { ContentWrapper, ModalNavigation } from '../common_styled'
+import { ModalTransactionWrapper } from '../modal_transaction'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   isOpen: boolean
@@ -98,6 +100,11 @@ const ModalLockTokens = (props: Props) => {
   const [userLocked, setUserLocked] = useState<BigNumber>(Zero)
   const [timestamp, setTimestamp] = useState<number>(0)
   const [isUnlockDisabled, setIsUnlockDisabled] = useState<boolean>(false)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [transactionMessage, setTransactionMessage] = useState<string>('')
+  const [txHash, setTxHash] = useState('')
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txNetId, setTxNetId] = useState()
   const omen = new OmenGuildService(provider, networkId)
 
   useEffect(() => {
@@ -114,7 +121,8 @@ const ModalLockTokens = (props: Props) => {
       const total = await omen.totalLocked()
       const nowInSeconds: number = Math.floor(Date.now() / 1000)
 
-      setIsUnlockDisabled(locked.timestamp.toNumber() - nowInSeconds > 0)
+      if (locked.timestamp.toNumber() === 0) setIsUnlockDisabled(true)
+      else setIsUnlockDisabled(locked.timestamp.toNumber() - nowInSeconds > 0)
 
       setTotalLocked(total)
       setUserLocked(locked.amount)
@@ -125,136 +133,175 @@ const ModalLockTokens = (props: Props) => {
   }
   const lockTokens = async (amount: BigNumber) => {
     if (!cpk) return
-    await cpk.lockTokens(amount)
+    setTxState(TransactionStep.waitingConfirmation)
+    try {
+      setTransactionMessage(`Lock ${formatBigNumber(amount, STANDARD_DECIMALS, 2)} OMN`)
+
+      setIsTransactionModalOpen(true)
+      const transaction = await cpk.lockTokens(amount)
+      setTxNetId(provider.network.chainId)
+      console.log(transaction)
+      // setTxHash(transaction)
+    } catch (e) {
+      setTxState(TransactionStep.error)
+      console.log(e)
+    }
   }
   const unlockTokens = async () => {
     if (!cpk) return
-    await cpk.unlockTokens(userLocked)
+    setTxState(TransactionStep.waitingConfirmation)
+    try {
+      setTransactionMessage(`Unlock ${formatBigNumber(userLocked, STANDARD_DECIMALS, 2)} OMN`)
+
+      setIsTransactionModalOpen(true)
+      const hash = await cpk.unlockTokens(userLocked)
+      setTxNetId(provider.network.chainId)
+      // setTxHash(hash)
+    } catch (e) {
+      setTxState(TransactionStep.error)
+      console.log(e)
+    }
   }
 
   return (
-    <Modal isOpen={isOpen} style={theme.fluidHeightModal}>
-      <ContentWrapper>
-        <ModalNavigation style={{ padding: '0', marginBottom: isLockAmountOpen ? '32px' : '24px' }}>
-          <NavLeft>
-            {isLockAmountOpen && (
-              <IconArrowBack
-                hoverEffect={true}
-                onClick={() => {
-                  setIsLockAmountOpen(false)
-                  setDisplayLockAmount(new BigNumber(0))
-                  setAmountToDisplay('')
-                }}
-                style={{ marginRight: '12px' }}
-              />
-            )}
-            <HeaderText>{isLockAmountOpen ? 'Lock Omen Token' : 'Omen Guild Membership'}</HeaderText>
-          </NavLeft>
-          <IconClose
-            hoverEffect={true}
-            onClick={() => {
-              onClose()
-            }}
-          />
-        </ModalNavigation>
-        <ModalMain>
-          <ConditionalWrapper hideWrapper={!isLockAmountOpen}>
-            <DataRow>
-              <LightDataItem>Omen Account</LightDataItem>
-              <DarkDataItem>
-                {formattedOmenBalance} OMN{isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
-              </DarkDataItem>
-            </DataRow>
-            <DataRow>
-              <LightDataItem>Locked in Guild</LightDataItem>
-              <DarkDataItem>
-                {formatBigNumber(userLocked, 18, 2)} OMN
-                {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
-              </DarkDataItem>
-            </DataRow>
-          </ConditionalWrapper>
-          {isLockAmountOpen && (
-            <TextfieldCustomPlaceholder
-              formField={
-                <BigNumberInput
-                  decimals={STANDARD_DECIMALS}
-                  name="amount"
-                  onChange={(e: BigNumberInputReturn) => {
-                    setDisplayLockAmount(e.value)
+    <>
+      <Modal isOpen={isOpen && !isTransactionModalOpen} style={theme.fluidHeightModal}>
+        <ContentWrapper>
+          <ModalNavigation style={{ padding: '0', marginBottom: isLockAmountOpen ? '32px' : '24px' }}>
+            <NavLeft>
+              {isLockAmountOpen && (
+                <IconArrowBack
+                  hoverEffect={true}
+                  onClick={() => {
+                    setIsLockAmountOpen(false)
+                    setDisplayLockAmount(new BigNumber(0))
                     setAmountToDisplay('')
                   }}
-                  value={displayLockAmount}
-                  valueToDisplay={amountToDisplay}
+                  style={{ marginRight: '12px' }}
                 />
-              }
-              onClickMaxButton={() => {
-                setDisplayLockAmount(omenBalance)
-                setAmountToDisplay(formatBigNumber(omenBalance, STANDARD_DECIMALS, 2))
-              }}
-              shouldDisplayMaxButton={true}
-              symbol={'OMN'}
-            />
-          )}
-          {isLockAmountOpen && <Divider />}
-          <DataRow style={{ marginTop: !isLockAmountOpen ? '12px' : '' }}>
-            <LightDataItem>{isLockAmountOpen && 'Your '}Vote Weight</LightDataItem>
-            <DarkDataItem>
-              <PercentageText lightColor={!displayLockAmount.isZero()}>
-                {!totalLocked.isZero() && !userLocked.isZero()
-                  ? (divBN(userLocked, totalLocked) * 100).toFixed(2)
-                  : '0.00'}
-                %
-              </PercentageText>
-
-              {!displayLockAmount.isZero() && (
-                <>
-                  <IconArrowRightLong
-                    color={theme.colors.textColorDark}
-                    height={8}
-                    style={{ margin: '0 10px' }}
-                    width={11}
-                  />
-                  {(divBN(userLocked.add(displayLockAmount), totalLocked) * 100).toFixed(2)}%
-                </>
               )}
-            </DarkDataItem>
-          </DataRow>
-          {timestamp !== 0 && (
-            <DataRow>
-              <LightDataItem>Unlock Date</LightDataItem>
+              <HeaderText>{isLockAmountOpen ? 'Lock Omen Token' : 'Omen Guild Membership'}</HeaderText>
+            </NavLeft>
+            <IconClose
+              hoverEffect={true}
+              onClick={() => {
+                onClose()
+              }}
+            />
+          </ModalNavigation>
+          <ModalMain>
+            <ConditionalWrapper hideWrapper={!isLockAmountOpen}>
+              <DataRow>
+                <LightDataItem>Omen Account</LightDataItem>
+                <DarkDataItem>
+                  {formattedOmenBalance} OMN{isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
+                </DarkDataItem>
+              </DataRow>
+              <DataRow>
+                <LightDataItem>Locked in Guild</LightDataItem>
+                <DarkDataItem>
+                  {formatBigNumber(userLocked, 18, 2)} OMN
+                  {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
+                </DarkDataItem>
+              </DataRow>
+            </ConditionalWrapper>
+            {isLockAmountOpen && (
+              <TextfieldCustomPlaceholder
+                formField={
+                  <BigNumberInput
+                    decimals={STANDARD_DECIMALS}
+                    name="amount"
+                    onChange={(e: BigNumberInputReturn) => {
+                      setDisplayLockAmount(e.value)
+                      setAmountToDisplay('')
+                    }}
+                    value={displayLockAmount}
+                    valueToDisplay={amountToDisplay}
+                  />
+                }
+                onClickMaxButton={() => {
+                  setDisplayLockAmount(omenBalance)
+                  setAmountToDisplay(formatBigNumber(omenBalance, STANDARD_DECIMALS, 2))
+                }}
+                shouldDisplayMaxButton={true}
+                symbol={'OMN'}
+              />
+            )}
+            {isLockAmountOpen && <Divider />}
+            <DataRow style={{ marginTop: !isLockAmountOpen ? '12px' : '' }}>
+              <LightDataItem>{isLockAmountOpen && 'Your '}Vote Weight</LightDataItem>
               <DarkDataItem>
-                {formatLockDate(timestamp * 1000)}
-                <IconAlertInverted size="16" style={{ marginLeft: '8px', verticalAlign: 'text-bottom' }} />
+                <PercentageText lightColor={!displayLockAmount.isZero()}>
+                  {!totalLocked.isZero() && !userLocked.isZero()
+                    ? (divBN(userLocked, totalLocked) * 100).toFixed(2)
+                    : '0.00'}
+                  %
+                </PercentageText>
+
+                {!displayLockAmount.isZero() && (
+                  <>
+                    <IconArrowRightLong
+                      color={theme.colors.textColorDark}
+                      height={8}
+                      style={{ margin: '0 10px' }}
+                      width={11}
+                    />
+                    {(divBN(userLocked.add(displayLockAmount), totalLocked) * 100).toFixed(2)}%
+                  </>
+                )}
               </DarkDataItem>
             </DataRow>
-          )}
-        </ModalMain>
-        <ButtonSection>
-          {!isLockAmountOpen && (
-            <ButtonsLockUnlock
-              buttonType={ButtonType.primaryLine}
-              disabled={isUnlockDisabled}
-              onClick={() => {
-                unlockTokens()
-              }}
-            >
-              Unlock Omen
-            </ButtonsLockUnlock>
-          )}
+            {timestamp !== 0 && (
+              <DataRow>
+                <LightDataItem>Unlock Date</LightDataItem>
+                <DarkDataItem>
+                  {formatLockDate(timestamp * 1000)}
+                  <IconAlertInverted size="16" style={{ marginLeft: '8px', verticalAlign: 'text-bottom' }} />
+                </DarkDataItem>
+              </DataRow>
+            )}
+          </ModalMain>
+          <ButtonSection>
+            {!isLockAmountOpen && (
+              <ButtonsLockUnlock
+                buttonType={ButtonType.primaryLine}
+                disabled={isUnlockDisabled}
+                onClick={() => {
+                  unlockTokens()
+                }}
+              >
+                Unlock Omen
+              </ButtonsLockUnlock>
+            )}
 
-          <ButtonsLockUnlock
-            buttonType={ButtonType.primaryAlternative}
-            disabled={
-              (displayLockAmount.isZero() || omenBalance.isZero() || displayLockAmount.gt(omenBalance)) &&
-              isLockAmountOpen
-            }
-            onClick={() => (isLockAmountOpen ? lockTokens(displayLockAmount) : setIsLockAmountOpen(true))}
-          >
-            Lock OMN
-          </ButtonsLockUnlock>
-        </ButtonSection>
-      </ContentWrapper>
-    </Modal>
+            <ButtonsLockUnlock
+              buttonType={ButtonType.primaryAlternative}
+              disabled={
+                (displayLockAmount.isZero() || omenBalance.isZero() || displayLockAmount.gt(omenBalance)) &&
+                isLockAmountOpen
+              }
+              onClick={() => (isLockAmountOpen ? lockTokens(displayLockAmount) : setIsLockAmountOpen(true))}
+            >
+              Lock OMN
+            </ButtonsLockUnlock>
+          </ButtonSection>
+        </ContentWrapper>
+      </Modal>
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        icon={<IconOmen size={24} style={{ marginLeft: '10px' }} />}
+        isOpen={isTransactionModalOpen}
+        message={transactionMessage}
+        netId={txNetId}
+        onClose={() => {
+          setIsTransactionModalOpen(false)
+          onClose()
+        }}
+        txHash={txHash}
+        txState={txState}
+      />
+    </>
   )
 }
 
