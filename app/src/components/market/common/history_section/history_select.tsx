@@ -165,7 +165,7 @@ export const History_select: React.FC<Props> = ({
               const safe = new SafeService(safeAddress, context.library)
               const result = await safe.getOwners()
               owner = result[0].toString()
-            } catch (e) {
+            } catch {
               owner = item.user.id
             }
             if (item.fpmmType === 'Liquidity') {
