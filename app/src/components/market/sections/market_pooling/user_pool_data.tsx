@@ -16,7 +16,7 @@ const UserDataTitleValue = styled(TitleValue)`
 `
 
 const PoolOverview = styled.div`
-  margin-top: 20px;
+  margin-top: 24px;
   margin-right: auto;
   font-weight: ${props => props.theme.textfield.fontWeight}
   line-height: ${props => props.theme.fonts.defaultLineHeight}
@@ -24,7 +24,7 @@ const PoolOverview = styled.div`
 `
 
 const LiquidityRewards = styled.div`
-  margin-top: 20px;
+  margin-top: 24px;
   margin-right: auto;
   margin-left: 51px;
   font-weight: ${props => props.theme.textfield.fontWeight}
