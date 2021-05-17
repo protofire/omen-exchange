@@ -452,6 +452,15 @@ export const ModalDepositWithdraw = (props: Props) => {
                     <IconInfo hasCircle style={{ marginLeft: '8px' }} />
                   </div>
                 </div>
+                <ReactTooltip
+                  className="customMarketTooltip"
+                  data-multiline={true}
+                  effect="solid"
+                  id="feeInfo"
+                  offset={{ top: -5, left: 0 }}
+                  place="top"
+                  type="light"
+                />
 
                 <span>
                   {currencySelected === ExchangeCurrency.Dai
@@ -509,15 +518,6 @@ export const ModalDepositWithdraw = (props: Props) => {
             </DepositWithdrawButton>
           </BottomButtons>
         </ContentWrapper>
-        <ReactTooltip
-          className="customMarketTooltip"
-          data-multiline={true}
-          effect="solid"
-          id="feeInfo"
-          offset={{ top: -5, left: 0 }}
-          place="top"
-          type="light"
-        />
       </Modal>
       <ModalClaimWrapper
         isOpen={isClaimModalOpen && !isTransactionModalOpen}
