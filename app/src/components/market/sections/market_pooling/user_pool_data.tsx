@@ -132,7 +132,6 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
               )}`}
             />
             <UserDataTitleValue
-              state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
               title={currentApr > 0 ? 'Total Earnings' : 'Total Liquidity'}
               value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
                 formatBigNumber(
@@ -145,7 +144,6 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
           </UserDataWrapper>
           <UserDataWrapper style={currentApr > 0 ? { marginLeft: '0px' } : { marginLeft: '32px' }}>
             <UserDataTitleValue
-              state={displayTotalEarnings.gt(0) && !(currentApr > 0) ? ValueStates.success : undefined}
               title={currentApr > 0 ? 'Your Liquidity' : 'Total Earnings'}
               value={`${formatNumber(
                 formatBigNumber(
@@ -167,21 +165,9 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
         </FlexBoxColumnOrRow>
         {currentApr > 0 && (
           <LpRewardsWrapper>
-            <UserDataTitleValue
-              state={totalRewards > 0 ? ValueStates.success : undefined}
-              title="Total Rewards"
-              value={`${formatNumber(totalRewards.toString())} OMN`}
-            />
-            <UserDataTitleValue
-              state={remainingRewards > 0 ? ValueStates.success : undefined}
-              title="Rewards left"
-              value={`${formatNumber(remainingRewards.toString())} OMN`}
-            />
-            <UserDataTitleValue
-              state={currentApr > 0 ? ValueStates.success : undefined}
-              title="Current APY"
-              value={`${formatNumber(currentApr.toString())}%`}
-            />
+            <UserDataTitleValue title="Total Rewards" value={`${formatNumber(totalRewards.toString())} OMN`} />
+            <UserDataTitleValue title="Rewards left" value={`${formatNumber(remainingRewards.toString())} OMN`} />
+            <UserDataTitleValue title="Current APY" value={`${formatNumber(currentApr.toString())}%`} />
 
             <UserDataTitleValue
               state={earnedRewards > 0 ? ValueStates.success : undefined}
