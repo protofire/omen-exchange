@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber, bigNumberify } from 'ethers/utils'
+import { BigNumber, Interface, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
@@ -10,7 +10,9 @@ import {
   HistoryType,
   useGraphFpmmTransactionsFromQuestion,
 } from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
+import { realitioAbi } from '../../../../services/realitio'
 import { SafeService } from '../../../../services/safe'
+import { getContractAddress } from '../../../../util/networks'
 import { calcPrice, calcSellAmountInCollateral, formatBigNumber, formatTimestampToDate } from '../../../../util/tools'
 import { HistoricData, Period } from '../../../../util/types'
 import { ButtonRound, ButtonSelectable } from '../../../button'
@@ -148,9 +150,17 @@ export const History_select: React.FC<Props> = ({
       if (fpmmTransactions) {
         const response: any[] = await Promise.all(
           fpmmTransactions.map(async item => {
-            const safe = new SafeService(item.user.id, context.library)
             let owner: string
             try {
+              const marketMakerFactory = getContractAddress(context.networkId, 'marketMakerFactory')
+              let safeAddress = item.user.id
+              if (item.user.id === marketMakerFactory.toLowerCase()) {
+                const receipt = await context.library.getTransactionReceipt(item.transactionHash)
+                const log = receipt?.logs && receipt?.logs[0]
+                const event = log && new Interface(realitioAbi).parseLog(log)
+                safeAddress = event?.values.user
+              }
+              const safe = new SafeService(safeAddress, context.library)
               const result = await safe.getOwners()
               owner = result[0].toString()
             } catch {
