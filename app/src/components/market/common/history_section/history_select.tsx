@@ -154,16 +154,18 @@ export const History_select: React.FC<Props> = ({
             try {
               const marketMakerFactory = getContractAddress(context.networkId, 'marketMakerFactory')
               let safeAddress = item.user.id
-              if (item.user.id === marketMakerFactory.toLowerCase()) {
+              if (safeAddress === marketMakerFactory.toLowerCase()) {
                 const receipt = await context.library.getTransactionReceipt(item.transactionHash)
-                const log = receipt?.logs && receipt?.logs[0]
-                const event = log && new Interface(realitioAbi).parseLog(log)
-                safeAddress = event?.values.user
+                const iface = new Interface(realitioAbi)
+                const event = receipt?.logs?.map(log => iface.parseLog(log)).find(log => log)
+                if (event) {
+                  safeAddress = event?.values.user
+                }
               }
               const safe = new SafeService(safeAddress, context.library)
               const result = await safe.getOwners()
               owner = result[0].toString()
-            } catch {
+            } catch (e) {
               owner = item.user.id
             }
             if (item.fpmmType === 'Liquidity') {
