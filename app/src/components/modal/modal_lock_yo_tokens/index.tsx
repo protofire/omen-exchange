@@ -2,6 +2,7 @@ import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
 import Modal from 'react-modal'
+import ReactTooltip from 'react-tooltip'
 import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
@@ -59,6 +60,7 @@ const LightDataItem = styled.div`
   color: ${props => props.theme.textfield.placeholderColor};
 `
 const DarkDataItem = styled.div`
+  display: flex;
   color: ${props => props.theme.colors.textColorDark};
   font-weight: ${props => props.theme.textfield.fontWeight};
 `
@@ -99,7 +101,7 @@ const ModalLockTokens = (props: Props) => {
   const [totalLocked, setTotalLocked] = useState<BigNumber>(Zero)
   const [userLocked, setUserLocked] = useState<BigNumber>(Zero)
   const [timestamp, setTimestamp] = useState<number>(0)
-  const [isUnlockDisabled, setIsUnlockDisabled] = useState<boolean>(false)
+  const [unlockTimeLeft, setUnlockTimeLeft] = useState<number>(0)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [transactionMessage, setTransactionMessage] = useState<string>('')
   const [txHash, setTxHash] = useState<any>('')
@@ -107,7 +109,7 @@ const ModalLockTokens = (props: Props) => {
   const [txNetId, setTxNetId] = useState()
   const [confirmations, setConfirmations] = useState(0)
   const omen = new OmenGuildService(provider, networkId)
-
+  console.log(unlockTimeLeft)
   useEffect(() => {
     ;(async () => {
       await getTokenLockInfo()
@@ -122,8 +124,8 @@ const ModalLockTokens = (props: Props) => {
       const total = await omen.totalLocked()
       const nowInSeconds: number = Math.floor(Date.now() / 1000)
 
-      if (locked.timestamp.toNumber() === 0) setIsUnlockDisabled(true)
-      else setIsUnlockDisabled(locked.timestamp.toNumber() - nowInSeconds > 0)
+      if (locked.timestamp.toNumber() === 0) setUnlockTimeLeft(0)
+      else setUnlockTimeLeft(locked.timestamp.toNumber() - nowInSeconds)
 
       setTotalLocked(total)
       setUserLocked(locked.amount)
@@ -254,20 +256,37 @@ const ModalLockTokens = (props: Props) => {
               </DarkDataItem>
             </DataRow>
             {timestamp !== 0 && (
-              <DataRow>
-                <LightDataItem>Unlock Date</LightDataItem>
-                <DarkDataItem>
-                  {formatLockDate(timestamp * 1000)}
-                  <IconAlertInverted size="16" style={{ marginLeft: '8px', verticalAlign: 'text-bottom' }} />
-                </DarkDataItem>
-              </DataRow>
+              <>
+                <DataRow>
+                  <LightDataItem>Unlock Date</LightDataItem>
+                  <DarkDataItem>
+                    {formatLockDate(timestamp * 1000)}
+                    <div
+                      data-arrow-color="transparent"
+                      data-for="unlockDate"
+                      data-tip={`${(5265716 / 86400).toFixed(0)} Days`}
+                    >
+                      <IconAlertInverted size="16" style={{ marginLeft: '8px', verticalAlign: 'text-bottom' }} />
+                    </div>
+                  </DarkDataItem>
+                </DataRow>
+                <ReactTooltip
+                  className="customMarketTooltip"
+                  data-multiline={true}
+                  effect="solid"
+                  id="unlockDate"
+                  offset={{ top: -70, left: 20 }}
+                  place="top"
+                  type="light"
+                />
+              </>
             )}
           </ModalMain>
           <ButtonSection>
             {!isLockAmountOpen && (
               <ButtonsLockUnlock
                 buttonType={ButtonType.primaryLine}
-                disabled={isUnlockDisabled}
+                disabled={unlockTimeLeft >= 0}
                 onClick={() => {
                   unlockTokens()
                 }}
