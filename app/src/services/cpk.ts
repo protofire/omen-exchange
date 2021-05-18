@@ -1563,26 +1563,12 @@ class CPKService {
     const networkId = network.chainId
     const signer = this.provider.getSigner()
     const address = await signer.getAddress()
-    const transactions: Transaction[] = []
     const txOptions: TxOptions = {}
     await this.getGas(txOptions)
 
     const airdrop = new AirdropService(networkId, this.provider, address)
-
-    if (this.cpk.relay && airdrop.contract) {
-      transactions.push({
-        to: airdrop.contract.address,
-        data: AirdropService.encodeClaimAirdrop(account, networkId, this.provider),
-      })
-      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
-    }
-
-    // save gas with a non-cpk tx if not using the relay
-    const txObject = await airdrop.claimAidrop(account)
-    setTxState && setTxState(TransactionStep.transactionSubmitted)
-    setTxHash && setTxHash(txObject.hash)
-    await this.waitForTransaction(txObject)
-    setTxState && setTxState(TransactionStep.transactionConfirmed)
+    const transactions: Transaction[] = await airdrop.encodeClaims(account)
+    return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
   }
 }
 

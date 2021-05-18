@@ -1,90 +1,94 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber, getAddress } from 'ethers/utils'
 
-import { calcRelayProxyAddress } from '../../util/cpk'
-import { getAirdropAddress, networkIds } from '../../util/networks'
+import { Transaction, calcRelayProxyAddress } from '../../util/cpk'
+import { getAirdrops, networkIds } from '../../util/networks'
 import { isAddress } from '../../util/tools'
 
 import { airdropAbi } from './abi'
-import mainnetData from './mainnetProofs.json'
-import xdaiData from './xdaiProofs.json'
-
-interface Claim {
-  index: number
-  amount: string
-  proof: [string]
-}
-
-interface Proofs {
-  claims: {
-    [K in string]?: Claim
-  }
-}
-
-const xdaiProofs = (xdaiData as unknown) as Proofs
-const mainnetProofs = (mainnetData as unknown) as Proofs
 
 class AirdropService {
-  contract?: Contract
+  airdrops?: Contract[]
   provider: any
 
   constructor(networkId: number, provider: any, signerAddress: Maybe<string>) {
     const signer: Wallet = provider.getSigner()
     this.provider = provider
 
-    const contractAddress = getAirdropAddress(networkId)
-    if (contractAddress && signerAddress) {
-      this.contract = new ethers.Contract(contractAddress, airdropAbi, provider).connect(signer)
+    const airdrops = getAirdrops(networkId)
+    if (airdrops && airdrops.length && signerAddress) {
+      this.airdrops = airdrops.map(airdrop => new ethers.Contract(airdrop, airdropAbi, provider).connect(signer))
     }
   }
 
-  static getClaim = (address: Maybe<string>, networkId: number, provider: any) => {
-    let claim
+  static getClaim = async (airdrop: string, address: Maybe<string>, networkId: number, provider: any) => {
     // handle / format address
     const lowerCaseAddress = address && address.toLowerCase()
     const claimAddress = lowerCaseAddress && isAddress(lowerCaseAddress) && getAddress(lowerCaseAddress)
+    // eslint-disable-next-line
+    const proofs = require(`./${airdrop}.json`)
     if (claimAddress) {
-      if (networkId === networkIds.MAINNET || networkId === networkIds.RINKEBY) {
-        claim = mainnetProofs.claims[claimAddress]
-      } else if (networkId === networkIds.XDAI) {
+      if (networkId === networkIds.XDAI) {
         const proxyAddress = calcRelayProxyAddress(claimAddress, provider)
-        const proxyClaim = proxyAddress && xdaiProofs.claims[proxyAddress]
+        const proxyClaim = proxyAddress && proofs.claims[proxyAddress]
         if (proxyClaim) {
-          claim = proxyClaim
-        } else {
-          claim = xdaiProofs.claims[claimAddress]
+          return proxyClaim
         }
       }
+      return proofs.claims[claimAddress]
     }
-    return claim
+  }
+
+  getClaims = async (address: Maybe<string>) => {
+    if (this.airdrops) {
+      const network = await this.provider.getNetwork()
+      const claims = await Promise.all(
+        this.airdrops.map(async airdrop => {
+          const claim = await AirdropService.getClaim(airdrop.address, address, network.chainId, this.provider)
+          if (claim) {
+            const claimed = await airdrop.isClaimed(claim.index)
+            if (!claimed) {
+              return { ...claim, airdrop: airdrop.address }
+            }
+          }
+        }),
+      )
+      return claims.filter(claim => claim)
+    }
   }
 
   getClaimAmount = async (address: Maybe<string>) => {
-    const network = await this.provider.getNetwork()
-    const claim = AirdropService.getClaim(address, network.chainId, this.provider)
-    if (claim && this.contract) {
-      const claimed = await this.contract.isClaimed(claim.index)
-      if (!claimed) {
-        return new BigNumber(claim.amount)
+    const amount = new BigNumber('0')
+    if (this.airdrops) {
+      // get claims across all airdrops
+      const claims = await this.getClaims(address)
+      // aggregate claim amounts
+      return claims?.reduce((totalAmount, claim) => {
+        if (claim) {
+          return totalAmount.add(new BigNumber(claim.amount))
+        }
+        return totalAmount
+      }, amount)
+    }
+    return amount
+  }
+
+  encodeClaims = async (address: string): Promise<Transaction[]> => {
+    const transactions: Transaction[] = []
+    if (this.airdrops) {
+      const claims = await this.getClaims(address)
+      if (claims) {
+        return claims?.map(claim => {
+          const airdropInterface = new utils.Interface(airdropAbi)
+          const data = airdropInterface.functions.claim.encode([claim.index, address, claim.amount, claim.proof])
+          return {
+            to: claim.airdrop,
+            data,
+          }
+        })
       }
     }
-    return new BigNumber('0')
-  }
-
-  static encodeClaimAirdrop = (address: string, networkId: number, provider: any): string | undefined => {
-    const claim = AirdropService.getClaim(address, networkId, provider)
-    if (claim) {
-      const airdropInterface = new utils.Interface(airdropAbi)
-      return airdropInterface.functions.claim.encode([claim.index, address, claim.amount, claim.proof])
-    }
-  }
-
-  claimAidrop = async (address: string) => {
-    const network = await this.provider.getNetwork()
-    const claim = AirdropService.getClaim(address, network.chainId, this.provider)
-    if (claim && this.contract) {
-      return this.contract.claim(claim.index, address, claim.amount, claim.proof)
-    }
+    return transactions
   }
 }
 
