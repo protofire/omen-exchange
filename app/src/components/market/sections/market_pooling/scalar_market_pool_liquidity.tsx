@@ -724,8 +724,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   let sellNoteDepositedTokensTotal = depositedTokensTotal
   let displayUserEarnings = userEarnings
   let displayPoolTokens = poolTokens
-  let displayFundingBalance = userStakedTokens ? userStakedTokens : fundingBalance
-  let displaySharesBalance = userStakedTokens ? formatBigNumber(userStakedTokens, STANDARD_DECIMALS) : sharesBalance
+  let displayFundingBalance = userStakedTokens && userStakedTokens.gt(0) ? userStakedTokens : fundingBalance
+  let displaySharesBalance =
+    userStakedTokens && userStakedTokens.gt(0) ? formatBigNumber(userStakedTokens, STANDARD_DECIMALS) : sharesBalance
   // Set display values if the collateral is cToken type
   if (compoundService && collateralSymbol in CompoundTokenType) {
     displayPoolTokens = compoundService.calculateCTokenToBaseExchange(baseCollateral, poolTokens)
