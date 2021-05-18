@@ -176,15 +176,16 @@ export const ModalDepositWithdraw = (props: Props) => {
   const approve = async () => {
     try {
       if (exchangeType === ExchangeType.deposit) {
-        if (currencySelected === ExchangeCurrency.Dai) {
+        const { address } = getToken(networkIds.MAINNET, newcurrencySelected)
+        if (newcurrencySelected === 'dai') {
           setDaiAllowanceState(ButtonStates.working)
-          const collateralService = new ERC20Service(context.rawWeb3Context.library, account, DAI.address)
+          const collateralService = new ERC20Service(context.rawWeb3Context.library, account, address)
 
           await collateralService.approveUnlimited(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
           setDaiAllowanceState(ButtonStates.finished)
         } else {
           setOmenAllowanceState(ButtonStates.working)
-          const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenToken.address)
+          const collateralService = new ERC20Service(context.rawWeb3Context.library, account, address)
 
           await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS)
           setOmenAllowanceState(ButtonStates.finished)
@@ -372,53 +373,7 @@ export const ModalDepositWithdraw = (props: Props) => {
             <BalanceSection>
               <WalletText>Wallet</WalletText>
 
-              <BalanceItems>
-                {bridgeItems}
-                {/*<BalanceItem*/}
-                {/*  hover*/}
-                {/*  onClick={() => {*/}
-                {/*    setCurrencySelected(ExchangeCurrency.Dai)*/}
-                {/*  }}*/}
-                {/*>*/}
-                {/*  <BalanceItemSide>*/}
-                {/*    <RadioInput*/}
-                {/*      checked={currencySelected === ExchangeCurrency.Dai}*/}
-                {/*      name={'Dai'}*/}
-                {/*      outcomeIndex={-1}*/}
-                {/*      readOnly*/}
-                {/*    />*/}
-                {/*    <DaiIcon size="24px" style={{ marginLeft: '12px', marginRight: '12px' }} />*/}
-                {/*    <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Dai}>Dai</BalanceItemTitle>*/}
-                {/*  </BalanceItemSide>*/}
-                {/*  <BalanceItemSide>*/}
-                {/*    <BalanceItemBalance>*/}
-                {/*      {exchangeType === ExchangeType.deposit ? formattedDaiBalance : formattedxDaiBalance} DAI*/}
-                {/*    </BalanceItemBalance>*/}
-                {/*  </BalanceItemSide>*/}
-                {/*</BalanceItem>*/}
-                {/*<BalanceItem*/}
-                {/*  hover*/}
-                {/*  onClick={() => {*/}
-                {/*    setCurrencySelected(ExchangeCurrency.Omen)*/}
-                {/*  }}*/}
-                {/*>*/}
-                {/*  <BalanceItemSide>*/}
-                {/*    <RadioInput*/}
-                {/*      checked={currencySelected === ExchangeCurrency.Omen}*/}
-                {/*      name={'Dai'}*/}
-                {/*      outcomeIndex={-2}*/}
-                {/*      readOnly*/}
-                {/*    />*/}
-                {/*    <IconOmen size={24} style={{ marginLeft: '12px', marginRight: '12px' }} />*/}
-                {/*    <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Omen}>Omen</BalanceItemTitle>*/}
-                {/*  </BalanceItemSide>*/}
-                {/*  <BalanceItemSide>*/}
-                {/*    <BalanceItemBalance>*/}
-                {/*      {exchangeType === ExchangeType.deposit ? formattedOmenBalance : formattedxOmenBalance} OMN*/}
-                {/*    </BalanceItemBalance>*/}
-                {/*  </BalanceItemSide>*/}
-                {/*</BalanceItem>*/}
-              </BalanceItems>
+              <BalanceItems>{bridgeItems}</BalanceItems>
             </BalanceSection>
           </ModalCard>
           <TextfieldCustomPlaceholder
@@ -535,7 +490,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                 state={currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState}
               >
                 {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
-                  ButtonStates.idle && `Approve ${currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}`}
+                  ButtonStates.idle && `Approve ${newcurrencySelected.toUpperCase()}`}
                 {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
                   ButtonStates.working && 'Approving'}
                 {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
@@ -567,11 +522,11 @@ export const ModalDepositWithdraw = (props: Props) => {
       <ModalTransactionWrapper
         confirmations={confirmations}
         icon={
-          currencySelected === ExchangeCurrency.Dai ? (
-            <DaiIcon size={'24'} style={{ marginLeft: '10px' }} />
-          ) : (
-            <IconOmen size={24} style={{ marginLeft: '10px' }} />
-          )
+          <Image
+            size={'24'}
+            src={getImageUrl(getToken(networkIds.MAINNET, newcurrencySelected).address)}
+            style={{ marginLeft: '10px' }}
+          />
         }
         isOpen={isTransactionModalOpen && !isClaimModalOpen}
         message={message}
