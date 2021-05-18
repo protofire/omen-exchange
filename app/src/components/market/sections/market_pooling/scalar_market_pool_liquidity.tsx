@@ -338,7 +338,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
-      setMessage(`Error trying to deposit and stake funds.`)
+      setMessage(`Error trying to deposit funds.`)
       logger.error(`${message} - ${err.message}`)
       setIsTransactionProcessing(false)
     }
@@ -445,7 +445,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
-      setMessage(`Error trying to unstaked and withdraw funds.`)
+      setMessage(`Error trying to withdraw funds.`)
       logger.error(`${message} - ${err.message}`)
       setIsTransactionProcessing(false)
     }
