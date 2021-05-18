@@ -7,13 +7,13 @@ const Wrapper = styled.div`
   height: 100%;
 `
 
-const Image = styled.img`
+export const Image = styled.img<{ size: string }>`
   align-items: center;
   display: flex;
   height: 100%;
   margin-right: 8px;
-  height: 22px;
-  width: 22px;
+  height: ${props => `${props.size}px`};
+  width: ${props => `${props.size}px`};
 `
 
 const Text = styled.div`
@@ -26,15 +26,16 @@ const Text = styled.div`
 interface Props extends HTMLAttributes<HTMLDivElement> {
   image?: any
   text: string
+  imgSize?: string
 }
 
 export const TokenItem: React.FC<Props> = props => {
-  const { image, text } = props
+  const { image, imgSize = '22', text } = props
   const [showImage, setShowImage] = useState(true)
 
   return (
     <Wrapper>
-      {!!image && showImage && <Image onError={() => setShowImage(false)} src={image} />}
+      {!!image && showImage && <Image onError={() => setShowImage(false)} size={imgSize} src={image} />}
       <Text>{text}</Text>
     </Wrapper>
   )

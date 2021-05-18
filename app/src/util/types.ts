@@ -4,6 +4,8 @@ import { BigNumber } from 'ethers/utils'
 
 import { Outcome } from '../components/market/sections/market_create/steps/outcomes'
 
+import { bridgeTokensList } from './networks'
+
 export enum Status {
   Ready = 'Ready',
   Loading = 'Loading',
@@ -323,6 +325,8 @@ export enum Ternary {
   False,
   Unknown,
 }
+
+type BridgeType = typeof bridgeTokensList
 
 export type HistoricDataPoint = {
   block: Block

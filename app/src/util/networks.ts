@@ -476,6 +476,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     order: 9,
   },
 }
+export const bridgeTokensList: KnownToken[] = ['omn', 'dai']
 
 const validNetworkId = (networkId: number): networkId is NetworkId => {
   return networks[networkId as NetworkId] !== undefined

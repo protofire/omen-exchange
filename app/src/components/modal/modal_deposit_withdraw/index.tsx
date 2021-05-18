@@ -1,3 +1,4 @@
+import { capitalizeFirstLetter } from 'apollo-client/util/capitalizeFirstLetter'
 import { Zero } from 'ethers/constants'
 import { BigNumber, parseEther } from 'ethers/utils'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
@@ -12,7 +13,8 @@ import {
 } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service, XdaiService } from '../../../services'
-import { getToken, networkIds } from '../../../util/networks'
+import { bridgeTokensList, getToken, networkIds } from '../../../util/networks'
+import { getImageUrl } from '../../../util/token'
 import { formatBigNumber, formatNumber, waitForConfirmations } from '../../../util/tools'
 import { ExchangeCurrency, ExchangeType, TransactionStep } from '../../../util/types'
 import { Button, ButtonStateful } from '../../button'
@@ -24,6 +26,7 @@ import { IconArrowBack, IconClose, IconOmen } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
 import { DaiIcon } from '../../common/icons/currencies'
 import { IconInfo } from '../../common/tooltip/img/IconInfo'
+import { Image, TokenItem } from '../../market/common/token_item'
 import {
   BalanceItem,
   BalanceItemBalance,
@@ -136,6 +139,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const cpk = useConnectedCPKContext()
   const omenToken = getToken(1, 'omn')
 
+  const [newcurrencySelected, setNewCurrencySelected] = useState<KnownToken>('dai')
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
@@ -172,18 +176,18 @@ export const ModalDepositWithdraw = (props: Props) => {
   const approve = async () => {
     try {
       if (exchangeType === ExchangeType.deposit) {
-        if (currencySelected === ExchangeCurrency.Omen) {
-          setOmenAllowanceState(ButtonStates.working)
-          const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenToken.address)
-
-          await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS)
-          setOmenAllowanceState(ButtonStates.finished)
-        } else {
+        if (currencySelected === ExchangeCurrency.Dai) {
           setDaiAllowanceState(ButtonStates.working)
           const collateralService = new ERC20Service(context.rawWeb3Context.library, account, DAI.address)
 
           await collateralService.approveUnlimited(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
           setDaiAllowanceState(ButtonStates.finished)
+        } else {
+          setOmenAllowanceState(ButtonStates.working)
+          const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenToken.address)
+
+          await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS)
+          setOmenAllowanceState(ButtonStates.finished)
         }
       }
 
@@ -196,13 +200,10 @@ export const ModalDepositWithdraw = (props: Props) => {
   const omenWalletAllowance =
     (omenAllowance.isZero() && exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Omen) ||
     (!omenAllowance.isZero() && omenAllowanceState === ButtonStates.finished)
-      ? true
-      : false
+
   const daiWalletAllowance =
     (exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Dai && daiAllowance.isZero()) ||
     (!daiAllowance.isZero() && daiAllowanceState === ButtonStates.finished)
-      ? true
-      : false
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
@@ -227,14 +228,14 @@ export const ModalDepositWithdraw = (props: Props) => {
       ? xDaiBalance
       : xOmenBalance
 
-  const minDaiExchange = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
-  const minOmenExchange = exchangeType === ExchangeType.deposit ? parseEther('1') : parseEther('1')
+  const minDaiBridgeExchange = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
+  const minOmniBridgeExchange = exchangeType === ExchangeType.deposit ? parseEther('1') : parseEther('1')
   const isDepositWithdrawDisabled =
     displayFundAmount.isZero() ||
     !wallet ||
     displayFundAmount.gt(wallet) ||
     displayFundAmount.isZero() ||
-    displayFundAmount.lt(currencySelected === ExchangeCurrency.Dai ? minDaiExchange : minOmenExchange) ||
+    displayFundAmount.lt(currencySelected === ExchangeCurrency.Dai ? minDaiBridgeExchange : minOmniBridgeExchange) ||
     (currencySelected === ExchangeCurrency.Omen &&
       exchangeType === ExchangeType.deposit &&
       displayFundAmount.gt(omenAllowance)) ||
@@ -307,6 +308,32 @@ export const ModalDepositWithdraw = (props: Props) => {
       setIsClaimModalOpen(true)
     }
   }
+  const bridgeItems = bridgeTokensList.map((item, index) => {
+    return (
+      <BalanceItem
+        hover
+        key={index}
+        onClick={() => {
+          setNewCurrencySelected(item)
+        }}
+      >
+        <BalanceItemSide>
+          <RadioInput checked={newcurrencySelected === item} name={'Dai'} outcomeIndex={-1} readOnly />
+          <Image
+            size={'24'}
+            src={getImageUrl(getToken(1, item).address)}
+            style={{ marginLeft: '12px', marginRight: '12px' }}
+          />
+          <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Dai}>{item}</BalanceItemTitle>
+        </BalanceItemSide>
+        <BalanceItemSide>
+          <BalanceItemBalance>
+            {exchangeType === ExchangeType.deposit ? formattedDaiBalance : formattedxDaiBalance} {item.toUpperCase()}
+          </BalanceItemBalance>
+        </BalanceItemSide>
+      </BalanceItem>
+    )
+  })
 
   return (
     <>
@@ -344,6 +371,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           <ModalCard style={{ marginBottom: '20px', marginTop: '10px' }}>
             <BalanceSection>
               <WalletText>Wallet</WalletText>
+              {bridgeItems}
               <BalanceItems>
                 <BalanceItem
                   hover
@@ -433,8 +461,8 @@ export const ModalDepositWithdraw = (props: Props) => {
                 <span>Min amount</span>
                 <span>
                   {currencySelected === ExchangeCurrency.Dai
-                    ? `${formatBigNumber(minDaiExchange, STANDARD_DECIMALS, 2)} DAI`
-                    : `${formatBigNumber(minOmenExchange, omenToken.decimals, 2)} OMN`}
+                    ? `${formatBigNumber(minDaiBridgeExchange, STANDARD_DECIMALS, 2)} DAI`
+                    : `${formatBigNumber(minOmniBridgeExchange, omenToken.decimals, 2)} OMN`}
                 </span>
               </ExchangeDataItem>
               <ExchangeDataItem style={{ marginTop: '12px' }}>
