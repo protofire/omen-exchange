@@ -66,6 +66,11 @@ const BottomButtonWrapper = styled(ButtonContainer)`
   padding: 20px 24px 0;
 `
 
+const BottomButtonRight = styled.div`
+  display: flex;
+  align-items: center;
+`
+
 const WarningMessageStyled = styled(WarningMessage)`
   margin-bottom: 0;
   margin-bottom: 24px;
@@ -454,6 +459,42 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     }
   }
 
+  const claim = async () => {
+    try {
+      if (!cpk) {
+        return
+      }
+      if (!liquidityMiningCampaign) {
+        throw new Error('No liquidity mining campaign')
+      }
+      if (!account) {
+        throw new Error('Please connect to your wallet to perform this action.')
+      }
+
+      setMessage(`Claiming OMN rewards...`)
+
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
+
+      await cpk.claimRewardTokens(liquidityMiningCampaign.id, setTxHash, setTxState)
+
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
+      await fetchCollateralBalance()
+      await fetchBalances()
+      await fetchStakingData()
+
+      setMessage(`Successfully claimed OMN rewards`)
+      setIsTransactionProcessing(false)
+    } catch (err) {
+      setTxState(TransactionStep.error)
+      setMessage(`Error trying to claim OMN rewards.`)
+      logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
+    }
+  }
+
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
   useEffect(() => {
@@ -465,7 +506,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     }
   }, [liquidityMiningCampaigns, marketMakerAddress])
 
-  const fetchStakingData = useCallback(async () => {
+  const fetchStakingData = async () => {
     if (!liquidityMiningCampaign) {
       throw new Error('No liquidity mining campaign')
     }
@@ -492,7 +533,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     setRemainingRewards(remainingRewards)
     setRewardApr(rewardApr)
     setTotalRewards(totalRewards)
-  }, [cpk, liquidityMiningCampaign, networkId, provider])
+  }
 
   useEffect(() => {
     cpk && liquidityMiningCampaign && fetchStakingData()
@@ -801,16 +842,28 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
           Cancel
         </Button>
-        {activeTab === Tabs.deposit && (
-          <Button buttonType={ButtonType.primaryAlternative} disabled={disableDepositButton} onClick={deposit}>
-            Deposit
-          </Button>
-        )}
-        {activeTab === Tabs.withdraw && (
-          <Button buttonType={ButtonType.primaryAlternative} disabled={disableWithdrawButton} onClick={withdraw}>
-            Withdraw
-          </Button>
-        )}
+        <BottomButtonRight>
+          {liquidityMiningCampaign && (
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              disabled={!(userStakedTokens && userStakedTokens.gt(0) && earnedRewards > 0)}
+              onClick={() => claim()}
+              style={{ marginRight: 12 }}
+            >
+              Claim Rewards
+            </Button>
+          )}
+          {activeTab === Tabs.deposit && (
+            <Button buttonType={ButtonType.primaryAlternative} disabled={disableDepositButton} onClick={deposit}>
+              Deposit
+            </Button>
+          )}
+          {activeTab === Tabs.withdraw && (
+            <Button buttonType={ButtonType.primaryAlternative} disabled={disableWithdrawButton} onClick={withdraw}>
+              Withdraw
+            </Button>
+          )}
+        </BottomButtonRight>
       </BottomButtonWrapper>
       <ModalTransactionWrapper
         confirmations={0}

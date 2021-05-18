@@ -1651,7 +1651,11 @@ class CPKService {
     }
   }
 
-  claimRewardTokens = async (campaignAddress: string) => {
+  claimRewardTokens = async (
+    campaignAddress: string,
+    setTxHash: (arg0: string) => void,
+    setTxState: (step: TransactionStep) => void,
+  ) => {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
@@ -1702,8 +1706,7 @@ class CPKService {
         }
       }
 
-      const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      return txObject.hash
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (e) {
       logger.error('Failed to claim reward tokens', e.message)
       throw e
