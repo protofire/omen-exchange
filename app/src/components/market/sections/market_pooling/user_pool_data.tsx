@@ -9,6 +9,7 @@ import { TitleValue } from '../../../common'
 import { ValueStates } from '../../common/transaction_details_row'
 
 const UserDataTitleValue = styled(TitleValue)`
+  color: ${props => props.theme.textfield.color};
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -46,6 +47,7 @@ const FlexBoxColumnOrRow = styled.div<{ currentApr?: boolean }>`
 `
 
 const MarketInfoHeader = styled.div`
+  color: ${props => props.theme.header.color}
   display: flex;
   margin-bottom: 16px;
   justify-content: space-between;
@@ -165,9 +167,9 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
         </FlexBoxColumnOrRow>
         {currentApr > 0 && (
           <LpRewardsWrapper>
+            <UserDataTitleValue title="Current APY" value={`${formatNumber(currentApr.toString())}%`} />
             <UserDataTitleValue title="Total Rewards" value={`${formatNumber(totalRewards.toString())} OMN`} />
             <UserDataTitleValue title="Rewards left" value={`${formatNumber(remainingRewards.toString())} OMN`} />
-            <UserDataTitleValue title="Current APY" value={`${formatNumber(currentApr.toString())}%`} />
 
             <UserDataTitleValue
               state={earnedRewards > 0 ? ValueStates.success : undefined}
