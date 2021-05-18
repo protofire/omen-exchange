@@ -1847,7 +1847,6 @@ class CPKService {
         const stakingService = new StakingService(this.provider, this.cpk.address, campaignAddress)
         const rewardTokens = await stakingService.getRewardTokens()
         const claimableRewards = await stakingService.getClaimableRewards(this.cpk.address)
-        const accruedFees = await stakingService.getAccruedFees(sharesToBurn)
 
         for (let i = 0; i < rewardTokens.length; i++) {
           const rewardErc20Service = new ERC20Service(this.provider, this.cpk.address, rewardTokens[i])
@@ -1874,24 +1873,6 @@ class CPKService {
             data: ERC20Service.encodeTransfer(account, totalRewardsAmount),
           })
         }
-
-        const feeErc20Service = new ERC20Service(this.provider, this.cpk.address, collateralAddress)
-
-        const hasEnoughFeeAllowance = await feeErc20Service.hasEnoughAllowance(this.cpk.address, account, accruedFees)
-
-        // Approve unlimited if not already done
-        if (!hasEnoughFeeAllowance) {
-          transactions.push({
-            to: collateralAddress,
-            data: ERC20Service.encodeApproveUnlimited(account),
-          })
-        }
-
-        // Transfer fees from cpk to EOA
-        transactions.push({
-          to: collateralAddress,
-          data: ERC20Service.encodeTransfer(account, accruedFees),
-        })
       }
 
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
