@@ -744,8 +744,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                   />
                 }
                 onClickMaxButton={() => {
-                  setAmountToRemove(fundingBalance)
-                  setAmountToRemoveDisplay(formatBigNumber(fundingBalance, collateral.decimals, 5))
+                  setAmountToRemove(userStakedTokens && userStakedTokens.gt(0) ? userStakedTokens : fundingBalance)
+                  setAmountToRemoveDisplay(formatBigNumber(displayFundingBalance, baseCollateral.decimals, 5))
                 }}
                 shouldDisplayMaxButton
                 symbol="Shares"

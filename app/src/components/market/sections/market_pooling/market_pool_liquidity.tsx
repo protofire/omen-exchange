@@ -927,7 +927,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   />
                 }
                 onClickMaxButton={() => {
-                  setAmountToRemove(fundingBalance)
+                  setAmountToRemove(userStakedTokens && userStakedTokens.gt(0) ? userStakedTokens : fundingBalance)
                   setAmountToRemoveDisplay(formatBigNumber(displayFundingBalance, baseCollateral.decimals, 5))
                 }}
                 shouldDisplayMaxButton
