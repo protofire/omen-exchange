@@ -25,11 +25,7 @@ import { StakingService } from '../../../../services/staking'
 import { getLogger } from '../../../../util/logger'
 import {
   getNativeAsset,
-<<<<<<< HEAD
   getOMNToken,
-=======
-  getNativeCompoundAsset,
->>>>>>> ca9bcb1e (Replace omn token retrieval mechanism)
   getToken,
   getWrapToken,
   pseudoNativeAssetAddress,
@@ -660,8 +656,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   let displayTotalPoolShares = totalPoolShares
   let displaySharesAfterAddingFunding = sharesAfterAddingFunding
   let displaySharesAfterRemovingFunding = sharesAfterRemovingFunding
-  let displayFundingBalance = userStakedTokens ? userStakedTokens : fundingBalance
-  let displaySharesBalance = userStakedTokens ? formatBigNumber(userStakedTokens, STANDARD_DECIMALS) : sharesBalance
+  let displayFundingBalance = userStakedTokens && userStakedTokens.gt(0) ? userStakedTokens : fundingBalance
+  let displaySharesBalance =
+    userStakedTokens && userStakedTokens.gt(0) ? formatBigNumber(userStakedTokens, STANDARD_DECIMALS) : sharesBalance
   let sellNoteUserEarnings = userEarnings
   let sellNoteDepositedTokens = depositedTokens
   let sellNoteDepositedTokensTotal = depositedTokensTotal
