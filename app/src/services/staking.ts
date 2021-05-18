@@ -252,10 +252,6 @@ class StakingService {
     return await this.contract.claimableRewards(address)
   }
 
-  getAccruedFees = async (amount: BigNumber): Promise<BigNumber> => {
-    return await this.contract.getAccruedFees(amount)
-  }
-
   static encodeStakePoolTokens = (amount: BigNumber): string => {
     const stakingInterface = new utils.Interface(abi)
     return stakingInterface.functions.stake.encode([amount])
