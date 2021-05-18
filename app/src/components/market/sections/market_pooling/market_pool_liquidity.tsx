@@ -54,6 +54,7 @@ import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
+import { IconOmen } from '../../../common/icons'
 import { ModalTransactionWrapper } from '../../../modal'
 import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
@@ -85,6 +86,11 @@ const BottomButtonWrapper = styled(ButtonContainer)`
   justify-content: space-between;
   margin: 0 -24px;
   padding: 20px 24px 0;
+`
+
+const BottomButtonRight = styled.div`
+  display: flex;
+  align-items: center;
 `
 
 const WarningMessageStyled = styled(WarningMessage)`
@@ -130,6 +136,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [amountToRemoveDisplay, setAmountToRemoveDisplay] = useState<string>('')
   const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
+  const [icon, setIcon] = useState<boolean>(false)
   const [displayCollateral, setDisplayCollateral] = useState<Token>(
     getInitialCollateral(context.networkId, collateral, relay),
   )
@@ -522,6 +529,56 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       unstakeClaimAndRemoveFunding()
     } else {
       removeFunding()
+    }
+  }
+
+  const claim = async () => {
+    try {
+      if (!cpk) {
+        return
+      }
+      if (!liquidityMiningCampaign) {
+        throw new Error('No liquidity mining campaign')
+      }
+      if (!account) {
+        throw new Error('Please connect to your wallet to perform this action.')
+      }
+
+      const stakingService = new StakingService(provider, cpk.address, liquidityMiningCampaign.id)
+      const claimableRewards = await stakingService.getClaimableRewards(cpk.address)
+
+      setMessage(
+        `Claiming ${formatNumber(
+          formatBigNumber(
+            claimableRewards[0],
+            getToken(networkId, 'omn').decimals,
+            getToken(networkId, 'omn').decimals,
+          ),
+        )} OMN`,
+      )
+      setIcon(true)
+
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
+
+      await cpk.claimRewardTokens(liquidityMiningCampaign.id, setTxHash, setTxState)
+
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
+      await fetchCollateralBalance()
+      await fetchBalances()
+      await fetchStakingData()
+
+      setIcon(false)
+      setMessage(`Successfully claimed OMN rewards`)
+      setIsTransactionProcessing(false)
+    } catch (err) {
+      setIcon(false)
+      setTxState(TransactionStep.error)
+      setMessage(`Error trying to claim OMN rewards.`)
+      logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
     }
   }
 
@@ -982,20 +1039,33 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
           Back
         </Button>
-        {activeTab === Tabs.deposit && (
-          <Button buttonType={ButtonType.secondaryLine} disabled={disableDepositButton} onClick={() => deposit()}>
-            Deposit
-          </Button>
-        )}
-        {activeTab === Tabs.withdraw && (
-          <Button buttonType={ButtonType.secondaryLine} disabled={disableWithdrawButton} onClick={() => withdraw()}>
-            Withdraw
-          </Button>
-        )}
+        <BottomButtonRight>
+          {liquidityMiningCampaign && (
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              disabled={!(userStakedTokens && userStakedTokens.gt(0) && earnedRewards > 0)}
+              onClick={() => claim()}
+              style={{ marginRight: 12 }}
+            >
+              Claim Rewards
+            </Button>
+          )}
+          {activeTab === Tabs.deposit && (
+            <Button buttonType={ButtonType.secondaryLine} disabled={disableDepositButton} onClick={() => deposit()}>
+              Deposit
+            </Button>
+          )}
+          {activeTab === Tabs.withdraw && (
+            <Button buttonType={ButtonType.secondaryLine} disabled={disableWithdrawButton} onClick={() => withdraw()}>
+              Withdraw
+            </Button>
+          )}
+        </BottomButtonRight>
       </BottomButtonWrapper>
       <ModalTransactionWrapper
         confirmations={0}
         confirmationsRequired={0}
+        icon={icon && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
         isOpen={isTransactionModalOpen}
         message={message}
         onClose={() => setIsTransactionModalOpen(false)}
