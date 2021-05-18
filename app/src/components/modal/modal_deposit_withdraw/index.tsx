@@ -371,52 +371,53 @@ export const ModalDepositWithdraw = (props: Props) => {
           <ModalCard style={{ marginBottom: '20px', marginTop: '10px' }}>
             <BalanceSection>
               <WalletText>Wallet</WalletText>
-              {bridgeItems}
+
               <BalanceItems>
-                <BalanceItem
-                  hover
-                  onClick={() => {
-                    setCurrencySelected(ExchangeCurrency.Dai)
-                  }}
-                >
-                  <BalanceItemSide>
-                    <RadioInput
-                      checked={currencySelected === ExchangeCurrency.Dai}
-                      name={'Dai'}
-                      outcomeIndex={-1}
-                      readOnly
-                    />
-                    <DaiIcon size="24px" style={{ marginLeft: '12px', marginRight: '12px' }} />
-                    <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Dai}>Dai</BalanceItemTitle>
-                  </BalanceItemSide>
-                  <BalanceItemSide>
-                    <BalanceItemBalance>
-                      {exchangeType === ExchangeType.deposit ? formattedDaiBalance : formattedxDaiBalance} DAI
-                    </BalanceItemBalance>
-                  </BalanceItemSide>
-                </BalanceItem>
-                <BalanceItem
-                  hover
-                  onClick={() => {
-                    setCurrencySelected(ExchangeCurrency.Omen)
-                  }}
-                >
-                  <BalanceItemSide>
-                    <RadioInput
-                      checked={currencySelected === ExchangeCurrency.Omen}
-                      name={'Dai'}
-                      outcomeIndex={-2}
-                      readOnly
-                    />
-                    <IconOmen size={24} style={{ marginLeft: '12px', marginRight: '12px' }} />
-                    <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Omen}>Omen</BalanceItemTitle>
-                  </BalanceItemSide>
-                  <BalanceItemSide>
-                    <BalanceItemBalance>
-                      {exchangeType === ExchangeType.deposit ? formattedOmenBalance : formattedxOmenBalance} OMN
-                    </BalanceItemBalance>
-                  </BalanceItemSide>
-                </BalanceItem>
+                {bridgeItems}
+                {/*<BalanceItem*/}
+                {/*  hover*/}
+                {/*  onClick={() => {*/}
+                {/*    setCurrencySelected(ExchangeCurrency.Dai)*/}
+                {/*  }}*/}
+                {/*>*/}
+                {/*  <BalanceItemSide>*/}
+                {/*    <RadioInput*/}
+                {/*      checked={currencySelected === ExchangeCurrency.Dai}*/}
+                {/*      name={'Dai'}*/}
+                {/*      outcomeIndex={-1}*/}
+                {/*      readOnly*/}
+                {/*    />*/}
+                {/*    <DaiIcon size="24px" style={{ marginLeft: '12px', marginRight: '12px' }} />*/}
+                {/*    <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Dai}>Dai</BalanceItemTitle>*/}
+                {/*  </BalanceItemSide>*/}
+                {/*  <BalanceItemSide>*/}
+                {/*    <BalanceItemBalance>*/}
+                {/*      {exchangeType === ExchangeType.deposit ? formattedDaiBalance : formattedxDaiBalance} DAI*/}
+                {/*    </BalanceItemBalance>*/}
+                {/*  </BalanceItemSide>*/}
+                {/*</BalanceItem>*/}
+                {/*<BalanceItem*/}
+                {/*  hover*/}
+                {/*  onClick={() => {*/}
+                {/*    setCurrencySelected(ExchangeCurrency.Omen)*/}
+                {/*  }}*/}
+                {/*>*/}
+                {/*  <BalanceItemSide>*/}
+                {/*    <RadioInput*/}
+                {/*      checked={currencySelected === ExchangeCurrency.Omen}*/}
+                {/*      name={'Dai'}*/}
+                {/*      outcomeIndex={-2}*/}
+                {/*      readOnly*/}
+                {/*    />*/}
+                {/*    <IconOmen size={24} style={{ marginLeft: '12px', marginRight: '12px' }} />*/}
+                {/*    <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Omen}>Omen</BalanceItemTitle>*/}
+                {/*  </BalanceItemSide>*/}
+                {/*  <BalanceItemSide>*/}
+                {/*    <BalanceItemBalance>*/}
+                {/*      {exchangeType === ExchangeType.deposit ? formattedOmenBalance : formattedxOmenBalance} OMN*/}
+                {/*    </BalanceItemBalance>*/}
+                {/*  </BalanceItemSide>*/}
+                {/*</BalanceItem>*/}
               </BalanceItems>
             </BalanceSection>
           </ModalCard>
@@ -446,11 +447,9 @@ export const ModalDepositWithdraw = (props: Props) => {
               setAmountToDisplay(formatBigNumber(maxBalance, STANDARD_DECIMALS, 5))
             }}
             shouldDisplayMaxButton={true}
-            symbol={currencySelected === ExchangeCurrency.Dai ? 'DAI' : 'OMN'}
+            symbol={newcurrencySelected.toUpperCase()}
           />
-          {exchangeType === ExchangeType.withdraw &&
-          currencySelected === ExchangeCurrency.Omen &&
-          xDaiBalance?.isZero() ? (
+          {exchangeType === ExchangeType.withdraw && newcurrencySelected !== 'dai' && xDaiBalance?.isZero() ? (
             <InputInfo>
               <IconAlertInverted />
               <div style={{ marginLeft: '12px' }}>Fund your Omen Account with Dai to proceed with the withdrawal.</div>
@@ -460,9 +459,13 @@ export const ModalDepositWithdraw = (props: Props) => {
               <ExchangeDataItem style={{ marginTop: '32px' }}>
                 <span>Min amount</span>
                 <span>
-                  {currencySelected === ExchangeCurrency.Dai
+                  {newcurrencySelected === 'dai'
                     ? `${formatBigNumber(minDaiBridgeExchange, STANDARD_DECIMALS, 2)} DAI`
-                    : `${formatBigNumber(minOmniBridgeExchange, omenToken.decimals, 2)} OMN`}
+                    : `${formatBigNumber(
+                        minOmniBridgeExchange,
+                        STANDARD_DECIMALS,
+                        2,
+                      )} ${newcurrencySelected.toUpperCase()}`}
                 </span>
               </ExchangeDataItem>
               <ExchangeDataItem style={{ marginTop: '12px' }}>
@@ -472,9 +475,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                     data-arrow-color="transparent"
                     data-for="feeInfo"
                     data-tip={`Bridge Fee ${
-                      currencySelected === ExchangeCurrency.Omen && exchangeType === ExchangeType.withdraw
-                        ? '0.10%'
-                        : '0.00%'
+                      newcurrencySelected !== 'dai' && exchangeType === ExchangeType.withdraw ? '0.10%' : '0.00%'
                     }`}
                   >
                     <IconInfo hasCircle style={{ marginLeft: '8px' }} />
@@ -491,26 +492,31 @@ export const ModalDepositWithdraw = (props: Props) => {
                 />
 
                 <span>
-                  {currencySelected === ExchangeCurrency.Dai
+                  {newcurrencySelected === 'dai'
                     ? '0.00 DAI'
                     : exchangeType === ExchangeType.withdraw
-                    ? `${formatNumber(formatBigNumber(displayFundAmount.div(1000), omenToken.decimals, 3), 2)} OMN`
-                    : '0.00 OMN'}
+                    ? `${formatNumber(
+                        formatBigNumber(displayFundAmount.div(1000), omenToken.decimals, 3),
+                        2,
+                      )} ${newcurrencySelected.toUpperCase()}`
+                    : `0.00 ${newcurrencySelected.toUpperCase()}`}
                 </span>
               </ExchangeDataItem>
               <Divider />
               <ExchangeDataItem>
                 <span>Total</span>
                 <span>
-                  {currencySelected === ExchangeCurrency.Omen && exchangeType === ExchangeType.withdraw
+                  {newcurrencySelected !== 'dai' && exchangeType === ExchangeType.withdraw
                     ? `${formatBigNumber(
                         displayFundAmount.sub(displayFundAmount.div(1000)),
                         omenToken.decimals,
                         3,
-                      )} OMN`
-                    : `${formatBigNumber(displayFundAmount, STANDARD_DECIMALS, 2)} ${
-                        currencySelected === ExchangeCurrency.Omen ? 'OMN' : 'DAI'
-                      }`}
+                      )} ${newcurrencySelected.toUpperCase()}`
+                    : `${formatBigNumber(
+                        displayFundAmount,
+                        STANDARD_DECIMALS,
+                        2,
+                      )} ${newcurrencySelected.toUpperCase()}`}
                 </span>
               </ExchangeDataItem>
             </>
