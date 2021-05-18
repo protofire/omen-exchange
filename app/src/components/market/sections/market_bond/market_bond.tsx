@@ -143,9 +143,9 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
             : props.isScalar
-            ? `${formatNumber(formatBigNumber(bondOutcomeSelected, nativeAsset.decimals))} ${getUnit(
-                props.marketMakerData.question.title,
-              )}`
+            ? `${formatNumber(
+                formatBigNumber(bondOutcomeSelected, nativeAsset.decimals, nativeAsset.decimals),
+              )} ${getUnit(props.marketMakerData.question.title)}`
             : marketMakerData.question.outcomes[outcomeIndex]
         }`,
       )
