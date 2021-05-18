@@ -131,7 +131,7 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
                   baseCollateral.decimals,
                   baseCollateral.decimals,
                 ),
-              )}`}
+              )} ${baseCollateral.symbol}`}
             />
             <UserDataTitleValue
               title={currentApr > 0 ? 'Total Earnings' : 'Total Liquidity'}
@@ -151,14 +151,13 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
               title={currentApr > 0 ? 'Your Liquidity' : 'Total Earnings'}
               value={`${
                 currentApr == 0 && displayTotalEarnings.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''
-              }
-                  ${formatNumber(
-                    formatBigNumber(
-                      currentApr > 0 ? displayUserLiquidity : displayTotalEarnings,
-                      baseCollateral.decimals,
-                      baseCollateral.decimals,
-                    ),
-                  )} ${baseCollateral.symbol}`}
+              }${formatNumber(
+                formatBigNumber(
+                  currentApr > 0 ? displayUserLiquidity : displayTotalEarnings,
+                  baseCollateral.decimals,
+                  baseCollateral.decimals,
+                ),
+              )} ${baseCollateral.symbol}`}
             />
 
             <UserDataTitleValue
