@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
@@ -135,7 +135,9 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
             />
             <UserDataTitleValue
               title={currentApr > 0 ? 'Total Earnings' : 'Total Liquidity'}
-              value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
+              value={`${
+                currentApr > 0 && displayTotalEarnings.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''
+              }${formatNumber(
                 formatBigNumber(
                   currentApr > 0 ? displayTotalEarnings : displayPoolTokens,
                   baseCollateral.decimals,
@@ -147,19 +149,22 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
           <UserDataWrapper style={currentApr > 0 ? { marginLeft: '0px' } : { marginLeft: '32px' }}>
             <UserDataTitleValue
               title={currentApr > 0 ? 'Your Liquidity' : 'Total Earnings'}
-              value={`${formatNumber(
-                formatBigNumber(
-                  currentApr > 0 ? displayUserLiquidity : displayTotalEarnings,
-                  baseCollateral.decimals,
-                  baseCollateral.decimals,
-                ),
-              )} ${baseCollateral.symbol}`}
+              value={`${
+                currentApr == 0 && displayTotalEarnings.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''
+              }
+                  ${formatNumber(
+                    formatBigNumber(
+                      currentApr > 0 ? displayUserLiquidity : displayTotalEarnings,
+                      baseCollateral.decimals,
+                      baseCollateral.decimals,
+                    ),
+                  )} ${baseCollateral.symbol}`}
             />
 
             <UserDataTitleValue
               state={userEarnings.gt(0) ? ValueStates.success : undefined}
               title="Your Earnings"
-              value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatNumber(
+              value={`${displayUserEarnings.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''}${formatNumber(
                 formatBigNumber(displayUserEarnings, baseCollateral.decimals, baseCollateral.decimals),
               )} ${baseCollateral.symbol}`}
             />
