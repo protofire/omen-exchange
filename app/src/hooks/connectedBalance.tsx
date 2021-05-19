@@ -59,31 +59,22 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
 
   // mainnet balances
   const { refetch, tokens } = useTokens(context.rawWeb3Context, true, true)
+  //xDai balances
+  const { refetch: fetchXdaiTokens, tokens: xDaiTokens } = useTokens(context, true, true)
+
   const nativeBalance = new BigNumber(
     tokens.filter(token => token.symbol === getNativeAsset(context.rawWeb3Context.networkId).symbol)[0]?.balance || '',
   )
+  //mainnet balances
   const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
   const omenBalance = new BigNumber(tokens.filter(token => token.symbol === 'OMN')[0]?.balance || '')
-
+  console.log(xDaiTokens)
   // relay balances
   const nativeAsset = getNativeAsset(context.networkId)
 
-  // xdai
-  const { collateralBalance: xDaiCollateral, fetchCollateralBalance: fetchxDaiBalance } = useCollateralBalance(
-    nativeAsset,
-    context,
-  )
-  const xDaiBalance = xDaiCollateral || Zero
-
-  // omn
-  const omenToken = getToken(100, 'omn')
-  const {
-    collateralBalance: xOmenCollateral,
-    errorMessage,
-    fetchCollateralBalance: fetchxOmenBalance,
-  } = useCollateralBalance(omenToken, context)
-
-  const xOmenBalance = errorMessage ? Zero : xOmenCollateral || Zero
+  // xdai token balance
+  const xDaiBalance = new BigNumber(xDaiTokens.filter(token => token.symbol === 'xDAI')[0]?.balance || '')
+  const xOmenBalance = new BigNumber(xDaiTokens.filter(token => token.symbol === 'OMN')[0]?.balance || '')
 
   const fetchUnclaimedAssets = async () => {
     const aggregator = (array: any) => {
@@ -113,13 +104,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
 
   const fetchBalances = async () => {
     try {
-      await Promise.all([
-        fetchUnclaimedAssets(),
-        fetchxDaiBalance(),
-        fetchxOmenBalance(),
-        refetch(),
-        fetchxOmenBalance(),
-      ])
+      await Promise.all([fetchUnclaimedAssets(), refetch(), fetchXdaiTokens()])
     } catch (e) {
       logger.log(e.message)
     }
@@ -151,7 +136,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     formattedOmenBalance: formatNumber(formatBigNumber(omenBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 2),
     omenBalance,
     xOmenBalance,
-    formattedxOmenBalance: formatBigNumber(xOmenBalance, omenToken.decimals, 2),
+    formattedxOmenBalance: formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 2),
   }
 
   return <ConnectedBalanceContext.Provider value={value}>{props.children}</ConnectedBalanceContext.Provider>
