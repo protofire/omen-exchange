@@ -16,6 +16,10 @@ const MainScrollStyled = styled.div`
     overflow: auto;
     overflow-x: hidden;
   }
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.lg}) {
+    padding: 10px 15px 0px 0px;
+  }
 `
 
 const MainScrollInner = styled.div`

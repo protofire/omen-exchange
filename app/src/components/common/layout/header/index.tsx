@@ -17,20 +17,20 @@ import { IconAdd, IconClose, IconOmen } from '../../icons'
 import { IconSettings } from '../../icons/IconSettings'
 
 export const HeaderWrapper = styled.div`
+  display: flex;
+
   align-items: flex-end;
   background: ${props => props.theme.header.backgroundColor};
-  display: flex;
+
   flex-grow: 0;
   flex-shrink: 0;
-  height: 45px;
+  height: auto;
   justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 5;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    height: ${props => props.theme.header.height};
-  }
+  height: auto;
+  margin: 13px 0px;
 `
 
 export const HeaderInner = styled.div`
@@ -48,12 +48,21 @@ export const HeaderInner = styled.div`
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     padding: 0 ${props => props.theme.paddings.mainPadding};
   }
+  @media (max-width: ${props => props.theme.themeBreakPoints.lg}) {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 `
 
 export const LogoWrapper = styled.div<{ disabled?: boolean }>`
   max-width: 90px;
   min-width: fit-content;
   ${props => (props.disabled ? 'pointer-events:none;' : '')};
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    margin-bottom: 10px;
+  }
 `
 
 const ButtonCreateDesktop = styled(ButtonRound)`
@@ -66,7 +75,6 @@ const ButtonCreateDesktop = styled(ButtonRound)`
 
 const ButtonCreateMobile = styled(ButtonCircle)`
   display: flex;
-  margin-left: auto;
 
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     display: none;
@@ -97,14 +105,19 @@ export const ButtonSettings = styled(ButtonRound)`
     padding: 0;
   }
 `
+const MediaQueryWrapper = styled.span``
 
 export const ContentsLeft = styled.div`
   align-items: center;
   display: flex;
-  margin: auto auto auto 0;
+  margin: auto auto 0 0;
+  justify-content: center;
 
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin: auto auto 0 0;
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    flex-direction: column;
+  }
+  @media (max-width: ${props => props.theme.themeBreakPoints.lg}) {
+    margin-bottom: 10px;
   }
 `
 
@@ -117,6 +130,10 @@ export const ContentsRight = styled.div`
   @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
     margin: auto 0 0 auto;
     flex-wrap: unset;
+  }
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    flex-direction: row;
+    justify-content: center;
   }
 `
 
@@ -178,8 +195,14 @@ const MarketAndGovernanceNav = styled.div<{ disabled?: boolean }>`
   font-size: ${props => props.theme.fonts.defaultSize};
   text-align: center;
   padding: ${props => props.theme.textfield.paddingVertical} ${props => props.theme.textfield.paddingHorizontal};
+  margin-left: 48px;
+  white-space: nowrap;
   &:hover {
     color: ${props => (!props.disabled ? props.theme.colors.primary : '')};
+  }
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    margin: 5px;
   }
 `
 const OmenIconWrapper = styled.div`
@@ -268,109 +291,113 @@ const HeaderContainer: React.FC = (props: any) => {
   return (
     <HeaderWrapper {...restProps}>
       <HeaderInner>
-        <ContentsLeft>
-          <LogoWrapper disabled={!hasRouter} onClick={() => props.history && props.history.push('/')}>
-            <Logo />
-          </LogoWrapper>
-          <MarketAndGovernanceNav
-            disabled={marketPage}
-            onClick={() => {
-              setMarketPage(!marketPage)
-            }}
-            style={{ marginLeft: '48px' }}
-          >
-            Markets
-          </MarketAndGovernanceNav>
-          <MarketAndGovernanceNav
-            disabled={!marketPage}
-            onClick={() => {
-              setMarketPage(!marketPage)
-            }}
-          >
-            Governance
-          </MarketAndGovernanceNav>
-        </ContentsLeft>
-        <ContentsRight>
-          {isMarketCreatePage ? (
-            <>
-              <ButtonCreateDesktop {...exitButtonProps}>
-                <CloseIconWrapper>
-                  <IconClose />
-                </CloseIconWrapper>
-
-                <span>Exit</span>
-              </ButtonCreateDesktop>
-              <ButtonCreateMobile {...exitButtonProps}>
-                <IconClose />
-              </ButtonCreateMobile>
-            </>
-          ) : (
-            <>
-              <ButtonCreateDesktop {...createButtonProps}>Create Market</ButtonCreateDesktop>
-              <ButtonCreateMobile {...createButtonProps}>
-                <IconAdd />
-              </ButtonCreateMobile>
-            </>
-          )}
-
-          {((networkId === networkIds.MAINNET && context.rawWeb3Context.connectorName !== 'Safe') || relay) && (
-            <HeaderDropdown
-              currentItem={networkDropdownItems.length + 1}
-              disableDirty
-              dropdownPosition={DropdownPosition.center}
-              items={networkDropdownItems}
-              minWidth={false}
-              placeholder={networkPlacholder}
-            />
-          )}
-
-          <HeaderButton>
-            {relay
-              ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
-              : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
-            <OmenIconWrapper>
-              <IconOmen size={24} />
-            </OmenIconWrapper>
-          </HeaderButton>
-
-          {!account && (
-            <ButtonConnectWalletStyled
-              disabled={disableConnectButton || !hasRouter}
-              modalState={isConnectWalletModalOpen}
+        <MediaQueryWrapper>
+          <ContentsLeft>
+            <LogoWrapper disabled={!hasRouter} onClick={() => props.history && props.history.push('/')}>
+              <Logo />
+            </LogoWrapper>
+            <MarketAndGovernanceNav
+              disabled={marketPage}
               onClick={() => {
-                setConnectWalletModalState(true)
-              }}
-            />
-          )}
-          {disableConnectButton && <ReactTooltip id="connectButtonTooltip" />}
-
-          {account && (
-            <HeaderButton
-              onClick={() => {
-                setYourConnectionModalState(true)
+                setMarketPage(!marketPage)
               }}
             >
+              Markets
+            </MarketAndGovernanceNav>
+            <MarketAndGovernanceNav
+              disabled={!marketPage}
+              onClick={() => {
+                setMarketPage(!marketPage)
+              }}
+            >
+              Governance
+            </MarketAndGovernanceNav>
+          </ContentsLeft>
+        </MediaQueryWrapper>
+        <MediaQueryWrapper>
+          <ContentsRight>
+            {isMarketCreatePage ? (
               <>
-                <DepositedBalance>
-                  {relay
-                    ? `${formattedxDaiBalance} DAI`
-                    : context.rawWeb3Context.networkId === networkIds.XDAI
-                    ? `${formattedNativeBalance} xDAI`
-                    : `${formattedNativeBalance} ETH`}
-                </DepositedBalance>
-                <HeaderButtonDivider />
+                <ButtonCreateDesktop {...exitButtonProps}>
+                  <CloseIconWrapper>
+                    <IconClose />
+                  </CloseIconWrapper>
+
+                  <span>Exit</span>
+                </ButtonCreateDesktop>
+                <ButtonCreateMobile {...exitButtonProps}>
+                  <IconClose />
+                </ButtonCreateMobile>
               </>
-              <Network claim={false} />
+            ) : (
+              <>
+                <ButtonCreateDesktop {...createButtonProps}>Create Market</ButtonCreateDesktop>
+                <ButtonCreateMobile {...createButtonProps}>
+                  <IconAdd />
+                </ButtonCreateMobile>
+              </>
+            )}
+
+            {((networkId === networkIds.MAINNET && context.rawWeb3Context.connectorName !== 'Safe') || relay) && (
+              <HeaderDropdown
+                currentItem={networkDropdownItems.length + 1}
+                disableDirty
+                dropdownPosition={DropdownPosition.center}
+                items={networkDropdownItems}
+                minWidth={false}
+                placeholder={networkPlacholder}
+              />
+            )}
+
+            <HeaderButton>
+              {relay
+                ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
+                : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
+              <OmenIconWrapper>
+                <IconOmen size={24} />
+              </OmenIconWrapper>
             </HeaderButton>
-          )}
-          <ButtonSettings
-            disabled={!hasRouter}
-            {...exitButtonProps}
-            onClick={() => history && history.push('/settings')}
-          >
-            <IconSettings />
-          </ButtonSettings>
-        </ContentsRight>
+
+            {!account && (
+              <ButtonConnectWalletStyled
+                disabled={disableConnectButton || !hasRouter}
+                modalState={isConnectWalletModalOpen}
+                onClick={() => {
+                  setConnectWalletModalState(true)
+                }}
+              />
+            )}
+            {disableConnectButton && <ReactTooltip id="connectButtonTooltip" />}
+
+            {account && (
+              <HeaderButton
+                onClick={() => {
+                  setYourConnectionModalState(true)
+                }}
+              >
+                <>
+                  <DepositedBalance>
+                    {relay
+                      ? `${formattedxDaiBalance} DAI`
+                      : context.rawWeb3Context.networkId === networkIds.XDAI
+                      ? `${formattedNativeBalance} xDAI`
+                      : `${formattedNativeBalance} ETH`}
+                  </DepositedBalance>
+                  <HeaderButtonDivider />
+                </>
+                <Network claim={false} />
+              </HeaderButton>
+            )}
+            <ButtonSettings
+              disabled={!hasRouter}
+              {...exitButtonProps}
+              onClick={() => history && history.push('/settings')}
+            >
+              <IconSettings />
+            </ButtonSettings>
+          </ContentsRight>
+        </MediaQueryWrapper>
+
         <ModalYourConnectionWrapper
           changeWallet={() => {
             setYourConnectionModalState(false)
