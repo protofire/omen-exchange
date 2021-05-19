@@ -1,4 +1,3 @@
-import { capitalizeFirstLetter } from 'apollo-client/util/capitalizeFirstLetter'
 import { Zero } from 'ethers/constants'
 import { BigNumber, parseEther } from 'ethers/utils'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
@@ -13,20 +12,19 @@ import {
 } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service, XdaiService } from '../../../services'
-import { bridgeTokensList, getToken, networkIds, pseudoNativeAssetAddress } from '../../../util/networks'
+import { bridgeTokensList, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
 import { formatBigNumber, formatNumber, waitForConfirmations } from '../../../util/tools'
-import { ExchangeCurrency, ExchangeType, TransactionStep } from '../../../util/types'
+import { ExchangeCurrency, ExchangeType, Token, TransactionStep } from '../../../util/types'
 import { Button, ButtonStateful } from '../../button'
 import { ButtonStates } from '../../button/button_stateful'
 import { ButtonType } from '../../button/button_styling_types'
 import { BigNumberInput, RadioInput, TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInputReturn } from '../../common/form/big_number_input'
-import { IconArrowBack, IconClose, IconOmen } from '../../common/icons'
+import { IconArrowBack, IconClose } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
-import { DaiIcon } from '../../common/icons/currencies'
 import { IconInfo } from '../../common/tooltip/img/IconInfo'
-import { Image, TokenItem } from '../../market/common/token_item'
+import { Image } from '../../market/common/token_item'
 import {
   BalanceItem,
   BalanceItemBalance,
@@ -115,6 +113,8 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   unclaimedAmount: BigNumber
   formattedxOmenBalance: string
   omenBalance: BigNumber
+  mainnetTokens: Token[]
+  xDaiTokens: Token[]
 }
 
 export const ModalDepositWithdraw = (props: Props) => {
@@ -127,17 +127,20 @@ export const ModalDepositWithdraw = (props: Props) => {
     formattedxDaiBalance,
     formattedxOmenBalance,
     isOpen,
+    mainnetTokens,
     omenBalance,
     onBack,
     onClose,
     theme,
     unclaimedAmount,
     xDaiBalance,
+    xDaiTokens,
     xOmenBalance,
   } = props
+  console.log(xDaiTokens)
+  console.log(mainnetTokens)
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
-  const omenToken = getToken(1, 'omn')
 
   const [newcurrencySelected, setNewCurrencySelected] = useState<KnownToken>('dai')
   const { address, decimals, symbol } = getToken(networkIds.MAINNET, newcurrencySelected)
@@ -155,7 +158,9 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [daiAllowanceState, setDaiAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
   const [omenAllowance, setOmenWalletAllowance] = useState<BigNumber>(Zero)
   const [daiAllowance, setDaiAllowance] = useState<BigNumber>(Zero)
-  const [allowanceData, setAllowanceData] = useState<{ [x: string]: BigNumber }[]>()
+  const [allowanceData, setAllowanceData] = useState(
+    bridgeTokensList.reduce((a, c) => Object.assign(a, c), Object.create(null)),
+  )
 
   const { account, relay } = context.rawWeb3Context
 
@@ -172,28 +177,21 @@ export const ModalDepositWithdraw = (props: Props) => {
           let allowance: BigNumber = Zero
           const allowanceAddress = token === 'dai' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS
           if (account) {
-            console.log(token)
-            console.log(data)
-            const collateralService = new ERC20Service(context.rawWeb3Context.library, account, data.address)
-            allowance = await collateralService.allowance(account, allowanceAddress)
-            console.log(formatBigNumber(allowance, 18, 2))
+            try {
+              const collateralService = new ERC20Service(context.rawWeb3Context.library, account, data.address)
+              allowance = await collateralService.allowance(account, allowanceAddress)
+            } catch {
+              return { [token]: allowance }
+            }
           }
           return { [token]: allowance }
         }),
       )
-      setAllowanceData(tokenAllowanceData.reduce((a, c) => Object.assign(a, c), Object.create(null)))
-      console.log(tokenAllowanceData.reduce((a, c) => Object.assign(a, c), Object.create(null)))
+      const object = tokenAllowanceData.reduce((a, c) => Object.assign(a, c), Object.create(null))
+
+      setAllowanceData(object)
     }
   }
-
-  //omni allowance
-  // const omenCollalteralService = new ERC20Service(context.rawWeb3Context.library, account, omenToken.address)
-  // const omenAllowance = await omenCollalteralService.allowance(account, OMNI_BRIDGE_MAINNET_ADDRESS)
-  // //dai allowance
-  // const daiCollateralService = new ERC20Service(context.rawWeb3Context.library, account, DAI.address)
-  // const daiAllowance = await daiCollateralService.allowance(account, DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
-  // setDaiAllowance(daiAllowance)
-  // setOmenWalletAllowance(omenAllowance)
 
   const approve = async () => {
     try {
@@ -252,16 +250,14 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   const minDaiBridgeExchange = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
   const minOmniBridgeExchange = exchangeType === ExchangeType.deposit ? parseEther('1') : parseEther('1')
+
   const isDepositWithdrawDisabled =
-    displayFundAmount.isZero() ||
     !wallet ||
     displayFundAmount.gt(wallet) ||
     displayFundAmount.isZero() ||
     displayFundAmount.lt(currencySelected === ExchangeCurrency.Dai ? minDaiBridgeExchange : minOmniBridgeExchange) ||
-    (currencySelected === ExchangeCurrency.Omen &&
-      exchangeType === ExchangeType.deposit &&
-      displayFundAmount.gt(omenAllowance)) ||
-    (currencySelected === ExchangeCurrency.Omen && exchangeType === ExchangeType.withdraw && xDaiBalance?.isZero())
+    displayFundAmount.gt(allowanceData[newcurrencySelected]) ||
+    (newcurrencySelected !== 'dai' && exchangeType === ExchangeType.withdraw && xDaiBalance?.isZero())
 
   const depositWithdraw = async () => {
     if (!cpk) {
@@ -328,6 +324,13 @@ export const ModalDepositWithdraw = (props: Props) => {
   }
   const bridgeItems = bridgeTokensList.map((item, index) => {
     const { address, symbol } = getToken(networkIds.MAINNET, item)
+    console.log(symbol)
+    console.log(xDaiTokens)
+    const token =
+      exchangeType === ExchangeType.deposit
+        ? mainnetTokens.find(token => token.symbol === symbol)
+        : xDaiTokens.find(token => token.symbol === (symbol === 'DAI' ? 'xDAI' : symbol))
+    console.log(token?.balance)
     return (
       <BalanceItem
         hover
@@ -343,7 +346,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         </BalanceItemSide>
         <BalanceItemSide>
           <BalanceItemBalance>
-            {exchangeType === ExchangeType.deposit ? formattedDaiBalance : formattedxDaiBalance}
+            {token?.balance && formatBigNumber(new BigNumber(token?.balance), decimals, 2)}
             {symbol}
           </BalanceItemBalance>
         </BalanceItemSide>

@@ -209,10 +209,12 @@ const HeaderContainer: React.FC = (props: any) => {
     formattedOmenBalance,
     formattedxDaiBalance,
     formattedxOmenBalance,
+    mainnetTokens,
     omenBalance,
     unclaimedDaiAmount,
     unclaimedOmenAmount,
     xDaiBalance,
+    xDaiTokens,
     xOmenBalance,
   } = useConnectedBalanceContext()
 
@@ -413,6 +415,7 @@ const HeaderContainer: React.FC = (props: any) => {
           formattedxDaiBalance={formattedxDaiBalance}
           formattedxOmenBalance={formattedxOmenBalance}
           isOpen={isDepositWithdrawModalOpen}
+          mainnetTokens={mainnetTokens}
           omenBalance={omenBalance}
           onBack={() => {
             setDepositWithdrawModalState(false)
@@ -421,6 +424,7 @@ const HeaderContainer: React.FC = (props: any) => {
           onClose={() => setDepositWithdrawModalState(false)}
           unclaimedAmount={unclaimedDaiAmount}
           xDaiBalance={xDaiBalance}
+          xDaiTokens={xDaiTokens}
           xOmenBalance={xOmenBalance}
         />
       </HeaderInner>

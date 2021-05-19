@@ -8,6 +8,7 @@ import { XdaiService } from '../services'
 import { getLogger } from '../util/logger'
 import { getNativeAsset, getToken, networkIds } from '../util/networks'
 import { formatBigNumber, formatNumber } from '../util/tools'
+import { Token } from '../util/types'
 
 const logger = getLogger('Hooks::ConnectedBalance')
 
@@ -24,6 +25,8 @@ export interface ConnectedBalanceContext {
   formattedxOmenBalance: string
   formattedOmenBalance: string
   omenBalance: BigNumber
+  mainnetTokens: Token[]
+  xDaiTokens: Token[]
   fetchBalances: () => Promise<void>
 }
 
@@ -137,6 +140,8 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     omenBalance,
     xOmenBalance,
     formattedxOmenBalance: formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 2),
+    mainnetTokens,
+    xDaiTokens,
   }
 
   return <ConnectedBalanceContext.Provider value={value}>{props.children}</ConnectedBalanceContext.Provider>
