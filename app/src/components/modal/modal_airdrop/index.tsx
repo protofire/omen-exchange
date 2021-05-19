@@ -67,7 +67,7 @@ export const ModalAirdrop = (props: Props) => {
         style={theme.fluidHeightModal}
       >
         <ContentWrapper>
-          <ModalNavigation>
+          <ModalNavigation style={{ marginBottom: 0 }}>
             <ModalNavigationLeft></ModalNavigationLeft>
             <IconClose hoverEffect={true} onClick={onClose} />
           </ModalNavigation>

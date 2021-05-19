@@ -2,7 +2,7 @@
 import React from 'react'
 
 export default () => (
-  <div style={{ marginBottom: 24 }}>
+  <div style={{ marginBottom: 8 }}>
     <svg width="349" height="354" viewBox="0 0 349 354" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="186" cy="177" r="91" fill="#1565C0" fillOpacity="0.05" />
       <path

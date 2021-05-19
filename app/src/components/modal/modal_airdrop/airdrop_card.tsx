@@ -67,7 +67,7 @@ const BottomSectionHeading = styled.div`
 
 const BottomSectionSubheading = styled.div`
   color: ${props => props.theme.colors.textColorLighter};
-  font-size: 12px;
+  font-size: 14px;
 `
 
 const BottomSectionDescription = styled.div`
@@ -76,7 +76,6 @@ const BottomSectionDescription = styled.div`
 
 const AirdropButton = styled(Button)`
   width: 75px;
-  height: 40px;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -128,7 +127,7 @@ const AirdropCard = (props: Props) => {
             </TopSectionDetails>
           </TopSectionLeft>
           {displayButtons && (
-            <AirdropButton buttonType={ButtonType.primary} disabled={claimIsDisabled} onClick={submitClaim}>
+            <AirdropButton buttonType={ButtonType.primaryAlternative} disabled={claimIsDisabled} onClick={submitClaim}>
               Claim
             </AirdropButton>
           )}

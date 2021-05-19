@@ -24,18 +24,18 @@ class AirdropService {
   static getClaim = async (airdrop: string, address: Maybe<string>, networkId: number, provider: any) => {
     // handle / format address
     const lowerCaseAddress = address && address.toLowerCase()
-    const claimAddress = lowerCaseAddress && isAddress(lowerCaseAddress) && getAddress(lowerCaseAddress)
+    const recipient = lowerCaseAddress && isAddress(lowerCaseAddress) && getAddress(lowerCaseAddress)
     // eslint-disable-next-line
     const proofs = require(`./${airdrop}.json`)
-    if (claimAddress) {
+    if (recipient) {
       if (networkId === networkIds.XDAI) {
-        const proxyAddress = calcRelayProxyAddress(claimAddress, provider)
+        const proxyAddress = calcRelayProxyAddress(recipient, provider)
         const proxyClaim = proxyAddress && proofs.claims[proxyAddress]
         if (proxyClaim) {
-          return proxyClaim
+          return { ...proxyClaim, recipient: proxyAddress }
         }
       }
-      return proofs.claims[claimAddress]
+      return { ...proofs.claims[recipient], recipient }
     }
   }
 
@@ -45,7 +45,7 @@ class AirdropService {
       const claims = await Promise.all(
         this.airdrops.map(async airdrop => {
           const claim = await AirdropService.getClaim(airdrop.address, address, network.chainId, this.provider)
-          if (claim) {
+          if (claim && claim.amount) {
             const claimed = await airdrop.isClaimed(claim.index)
             if (!claimed) {
               return { ...claim, airdrop: airdrop.address }
@@ -80,7 +80,12 @@ class AirdropService {
       if (claims) {
         return claims?.map(claim => {
           const airdropInterface = new utils.Interface(airdropAbi)
-          const data = airdropInterface.functions.claim.encode([claim.index, address, claim.amount, claim.proof])
+          const data = airdropInterface.functions.claim.encode([
+            claim.index,
+            claim.recipient,
+            claim.amount,
+            claim.proof,
+          ])
           return {
             to: claim.airdrop,
             data,
