@@ -1,10 +1,15 @@
 import { BigNumber } from 'ethers/utils'
-import React, { HTMLAttributes, useState } from 'react'
+import React, { HTMLAttributes, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import { useConnectedBalanceContext, useConnectedCPKContext } from '../../../hooks'
+import {
+  useAirdropService,
+  useConnectedBalanceContext,
+  useConnectedCPKContext,
+  useConnectedWeb3Context,
+} from '../../../hooks'
 import { formatBigNumber } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { IconClose, IconOmen } from '../../common/icons'
@@ -23,10 +28,12 @@ export const ModalAirdrop = (props: Props) => {
   const { theme } = props
 
   const cpk = useConnectedCPKContext()
+  const { account, networkId, relay } = useConnectedWeb3Context()
   const { fetchBalances } = useConnectedBalanceContext()
 
   const initialIsOpenState = localStorage.getItem('airdrop')
   const [isOpen, setIsOpen] = useState(!initialIsOpenState)
+  const [amount, setAmount] = useState(new BigNumber('0'))
   const [checkAddress, setCheckAddress] = useState(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txHash, setTxHash] = useState('')
@@ -34,6 +41,18 @@ export const ModalAirdrop = (props: Props) => {
   const [message, setMessage] = useState('')
 
   Modal.setAppElement('#root')
+
+  const airdrop = useAirdropService()
+
+  useEffect(() => {
+    const getClaimAmount = async () => {
+      const newAmount = await airdrop.getClaimAmount(account)
+      setAmount(newAmount)
+    }
+    if (account) {
+      getClaimAmount()
+    }
+  }, [airdrop, account, relay, networkId])
 
   const onClose = () => {
     localStorage.setItem('airdrop', 'displayed')
@@ -61,7 +80,7 @@ export const ModalAirdrop = (props: Props) => {
   return (
     <>
       <Modal
-        isOpen={isOpen && !isTransactionModalOpen && !checkAddress}
+        isOpen={isOpen && !amount.isZero() && !isTransactionModalOpen && !checkAddress}
         onRequestClose={onClose}
         shouldCloseOnOverlayClick={true}
         style={theme.fluidHeightModal}

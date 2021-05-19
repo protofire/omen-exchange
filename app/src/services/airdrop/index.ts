@@ -46,10 +46,13 @@ class AirdropService {
         this.airdrops.map(async airdrop => {
           const claim = await AirdropService.getClaim(airdrop.address, address, network.chainId, this.provider)
           if (claim && claim.amount) {
-            const claimed = await airdrop.isClaimed(claim.index)
-            if (!claimed) {
-              return { ...claim, airdrop: airdrop.address }
-            }
+            try {
+              const claimed = await airdrop.isClaimed(claim.index)
+              if (!claimed) {
+                return { ...claim, airdrop: airdrop.address }
+              }
+              // eslint-disable-next-line
+            } catch {}
           }
         }),
       )
