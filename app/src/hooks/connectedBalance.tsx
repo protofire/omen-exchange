@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 
 import { STANDARD_DECIMALS } from '../common/constants'
-import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../hooks'
+import { useConnectedWeb3Context, useTokens } from '../hooks'
 import { XdaiService } from '../services'
 import { getLogger } from '../util/logger'
 import { getNativeAsset, getToken, networkIds } from '../util/networks'
@@ -58,17 +58,17 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const [unclaimedOmenAmount, setUnclaimedOmenAmount] = useState<BigNumber>(Zero)
 
   // mainnet balances
-  const { refetch, tokens } = useTokens(context.rawWeb3Context, true, true)
+  const { refetch, tokens: mainnetTokens } = useTokens(context.rawWeb3Context, true, true)
   //xDai balances
   const { refetch: fetchXdaiTokens, tokens: xDaiTokens } = useTokens(context, true, true)
 
   const nativeBalance = new BigNumber(
-    tokens.filter(token => token.symbol === getNativeAsset(context.rawWeb3Context.networkId).symbol)[0]?.balance || '',
+    mainnetTokens.filter(token => token.symbol === getNativeAsset(networkId).symbol)[0]?.balance || '',
   )
   //mainnet balances
-  const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
-  const omenBalance = new BigNumber(tokens.filter(token => token.symbol === 'OMN')[0]?.balance || '')
-  console.log(xDaiTokens)
+  const daiBalance = new BigNumber(mainnetTokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
+  const omenBalance = new BigNumber(mainnetTokens.filter(token => token.symbol === 'OMN')[0]?.balance || '')
+
   // relay balances
   const nativeAsset = getNativeAsset(context.networkId)
 

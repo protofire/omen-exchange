@@ -13,7 +13,7 @@ import {
 } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service, XdaiService } from '../../../services'
-import { bridgeTokensList, getToken, networkIds } from '../../../util/networks'
+import { bridgeTokensList, getToken, networkIds, pseudoNativeAssetAddress } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
 import { formatBigNumber, formatNumber, waitForConfirmations } from '../../../util/tools'
 import { ExchangeCurrency, ExchangeType, TransactionStep } from '../../../util/types'
@@ -155,6 +155,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [daiAllowanceState, setDaiAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
   const [omenAllowance, setOmenWalletAllowance] = useState<BigNumber>(Zero)
   const [daiAllowance, setDaiAllowance] = useState<BigNumber>(Zero)
+  const [allowanceData, setAllowanceData] = useState<{ [x: string]: BigNumber }[]>()
 
   const { account, relay } = context.rawWeb3Context
 
@@ -165,14 +166,34 @@ export const ModalDepositWithdraw = (props: Props) => {
       context.rawWeb3Context.networkId === networkIds.MAINNET &&
       exchangeType === ExchangeType.deposit
     ) {
-      const omenCollalteralService = new ERC20Service(context.rawWeb3Context.library, account, omenToken.address)
-      const omenAllowance = await omenCollalteralService.allowance(account, OMNI_BRIDGE_MAINNET_ADDRESS)
-      const daiCollateralService = new ERC20Service(context.rawWeb3Context.library, account, DAI.address)
-      const daiAllowance = await daiCollateralService.allowance(account, DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
-      setDaiAllowance(daiAllowance)
-      setOmenWalletAllowance(omenAllowance)
+      const tokenAllowanceData = await Promise.all(
+        bridgeTokensList.map(async token => {
+          const data = getToken(networkIds.MAINNET, token)
+          let allowance: BigNumber = Zero
+          const allowanceAddress = token === 'dai' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS
+          if (account) {
+            console.log(token)
+            console.log(data)
+            const collateralService = new ERC20Service(context.rawWeb3Context.library, account, data.address)
+            allowance = await collateralService.allowance(account, allowanceAddress)
+            console.log(formatBigNumber(allowance, 18, 2))
+          }
+          return { [token]: allowance }
+        }),
+      )
+      setAllowanceData(tokenAllowanceData.reduce((a, c) => Object.assign(a, c), Object.create(null)))
+      console.log(tokenAllowanceData.reduce((a, c) => Object.assign(a, c), Object.create(null)))
     }
   }
+
+  //omni allowance
+  // const omenCollalteralService = new ERC20Service(context.rawWeb3Context.library, account, omenToken.address)
+  // const omenAllowance = await omenCollalteralService.allowance(account, OMNI_BRIDGE_MAINNET_ADDRESS)
+  // //dai allowance
+  // const daiCollateralService = new ERC20Service(context.rawWeb3Context.library, account, DAI.address)
+  // const daiAllowance = await daiCollateralService.allowance(account, DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
+  // setDaiAllowance(daiAllowance)
+  // setOmenWalletAllowance(omenAllowance)
 
   const approve = async () => {
     try {
