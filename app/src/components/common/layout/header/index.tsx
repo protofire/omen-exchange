@@ -18,19 +18,22 @@ import { IconSettings } from '../../icons/IconSettings'
 
 export const HeaderWrapper = styled.div`
   display: flex;
-
   align-items: flex-end;
   background: ${props => props.theme.header.backgroundColor};
-
   flex-grow: 0;
   flex-shrink: 0;
-  height: auto;
+  min-height: 45px;
   justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 5;
-  height: auto;
-  margin: 13px 0px;
+  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+    min-height: ${props => props.theme.header.height};
+  }
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.lg}) {
+    margin-top: 10px;
+  }
 `
 
 export const HeaderInner = styled.div`
