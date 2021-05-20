@@ -87,11 +87,11 @@ export const ModalAirdrop = (props: Props) => {
       >
         <ContentWrapper>
           <ModalNavigation style={{ marginBottom: 0 }}>
-            <ModalNavigationLeft></ModalNavigationLeft>
+            <ModalNavigationLeft />
             <IconClose hoverEffect={true} onClick={onClose} />
           </ModalNavigation>
           <Graphic />
-          <AirdropCardWrapper claim={claim} onCheckAddress={() => setCheckAddress(true)} />
+          <AirdropCardWrapper claim={claim} displayAmount={amount} onCheckAddress={() => setCheckAddress(true)} />
         </ContentWrapper>
       </Modal>
       <ModalTransactionWrapper

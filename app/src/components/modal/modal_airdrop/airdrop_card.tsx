@@ -35,7 +35,7 @@ const TopSectionDetails = styled.div`
 
 const TopSectionHeading = styled.div`
   color: ${props => props.theme.colors.textColorDark};
-  font-weight: 500;
+  font-weight: ${props => props.theme.textfield.fontWeight};
 `
 
 interface Subheading {
@@ -44,7 +44,7 @@ interface Subheading {
 
 const TopSectionSubHeading = styled.div<Subheading>`
   color: ${props => (props.green ? props.theme.colors.green : props.theme.colors.textColorLighter)};
-  font-weight: 500;
+  font-weight: ${props => props.theme.textfield.fontWeight};
 `
 
 const BottomSection = styled(BalanceSection as any)`
@@ -62,12 +62,12 @@ const BottomSectionTextWrapper = styled.div`
 
 const BottomSectionHeading = styled.div`
   color: ${props => props.theme.colors.textColorDark};
-  font-weight: 500;
+  font-weight: ${props => props.theme.textfield.fontWeight};
 `
 
 const BottomSectionSubheading = styled.div`
   color: ${props => props.theme.colors.textColorLighter};
-  font-size: 14px;
+  font-size: ${props => props.theme.fonts.defaultSize};
 `
 
 const BottomSectionDescription = styled.div`
@@ -100,14 +100,14 @@ const AirdropCard = (props: Props) => {
       const newAmount = await airdrop.getClaimAmount(account)
       setAmount(newAmount)
     }
-    if (account) {
+    if (account && !displayAmount) {
       getClaimAmount()
     }
-  }, [airdrop, account, library, networkId, relay])
+  }, [airdrop, account, library, networkId, relay, displayAmount])
 
   const submitClaim = () => {
     if (claim && account) {
-      claim(account, amount)
+      claim(account, displayAmount || amount)
     }
   }
 
