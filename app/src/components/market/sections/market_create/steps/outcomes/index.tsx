@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { ButtonCircle } from '../../../../../button'
@@ -180,9 +181,22 @@ const Outcomes = (props: Props) => {
           <OutcomesTBody>{outcomesToRender}</OutcomesTBody>
         </OutcomesTable>
         {canAddOutcome && (
-          <CustomButtonCircleAdd data-testid="new-outcome-button" onClick={addNewOutcome} title="Add new outcome">
-            <IconAdd />
-          </CustomButtonCircleAdd>
+          <div>
+            <div data-arrow-color="transparent" data-for="feeInfo" data-tip="Add new outcome">
+              <CustomButtonCircleAdd data-testid="new-outcome-button" onClick={addNewOutcome} title="Add new outcome">
+                <IconAdd />
+              </CustomButtonCircleAdd>
+            </div>
+            <ReactTooltip
+              className="customMarketTooltip"
+              data-multiline={true}
+              effect="solid"
+              id="feeInfo"
+              offset={{ top: -5, left: 250 }}
+              place="top"
+              type="light"
+            />
+          </div>
         )}
       </OutcomesTableWrapper>
       {manualProbabilitiesAndNoOutcomes && (
