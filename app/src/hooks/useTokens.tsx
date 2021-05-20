@@ -2,13 +2,8 @@ import { useQuery } from '@apollo/react-hooks'
 import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
-import walletconnect from 'web3-react/dist/connectors/walletconnect'
 
-import {
-  DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
-  OMNI_BRIDGE_MAINNET_ADDRESS,
-  XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
-} from '../common/constants'
+import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../common/constants'
 import { ERC20Service } from '../services'
 import { getLogger } from '../util/logger'
 import { getNativeAsset, getOmenTCRListId, getTokensByNetwork, pseudoNativeAssetAddress } from '../util/networks'
@@ -54,7 +49,7 @@ export const useTokens = (
   addNativeAsset?: boolean,
   addBalances?: boolean,
   relay?: boolean,
-  addBridgeAllowances?: boolean,
+  addBridgeAllowance?: boolean,
 ) => {
   const defaultTokens = getTokensByNetwork(context.networkId)
   if (addNativeAsset) {
@@ -116,7 +111,7 @@ export const useTokens = (
             }),
           )
         }
-        if (addBridgeAllowances) {
+        if (addBridgeAllowance) {
           const { account, library: provider } = context
           // fetch token allowances
           tokenData = await Promise.all(

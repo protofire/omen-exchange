@@ -202,7 +202,6 @@ const HeaderContainer: React.FC = (props: any) => {
   const disableConnectButton = isConnectWalletModalOpen
 
   const {
-    allowanceData,
     daiBalance,
     fetchBalances,
     formattedDaiBalance,
@@ -408,7 +407,6 @@ const HeaderContainer: React.FC = (props: any) => {
           onClose={() => setConnectWalletModalState(false)}
         />
         <ModalDepositWithdrawWrapper
-          allowanceData={allowanceData}
           daiBalance={daiBalance}
           exchangeType={depositWithdrawType}
           fetchBalances={fetchBalances}
