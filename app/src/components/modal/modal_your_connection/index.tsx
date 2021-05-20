@@ -386,6 +386,9 @@ export const ModalYourConnection = (props: Props) => {
                     <AccountInfoWallet>{context.rawWeb3Context.connectorName}</AccountInfoWallet>
                   </AccountInfo>
                 </TopCardHeaderLeft>
+                <IconSettingsWrapper>
+                  <IconSettings hoverEffect={true} onClick={() => setIsSettingsModalOpen(!isSettingsModalOpen)} />
+                </IconSettingsWrapper>
                 <ChangeWalletButton buttonType={ButtonType.secondaryLine} onClick={changeWallet}>
                   Change
                 </ChangeWalletButton>
