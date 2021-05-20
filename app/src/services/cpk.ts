@@ -896,6 +896,26 @@ class CPKService {
         ),
       })
 
+      const stakingRewardsFactoryAddress = getContractAddress(networkId, 'stakingRewardsFactory')
+      const omnTokenAddress = getToken(networkId, 'omn').address
+      // TODO: Lengthen time from execution to account for transaction execution time
+      const startingTimestamp = Math.floor(new Date().getTime() / 1000 + 120)
+      const endingTimestamp = Math.floor((marketData.resolution?.getTime() || 1) / 1000 - DAY_IN_SECONDS)
+
+      // Step 6: Create staking distribution contract
+      transactions.push({
+        to: stakingRewardsFactoryAddress || '',
+        data: StakingFactoryService.encodeCreateDistribution(
+          [omnTokenAddress],
+          predictedMarketMakerAddress,
+          [new BigNumber(0)],
+          startingTimestamp,
+          endingTimestamp,
+          false,
+          MaxUint256,
+        ),
+      })
+
       const transaction = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
 
       return {
