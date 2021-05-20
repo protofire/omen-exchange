@@ -1440,7 +1440,7 @@ class CPKService {
     }
   }
 
-  sendMainnetTokenToBridge = async (amount: BigNumber, symbol?: string, address: string) => {
+  sendMainnetTokenToBridge = async (amount: BigNumber, address: string, symbol?: string) => {
     try {
       if (this.cpk.relay) {
         const xDaiService = new XdaiService(this.provider)
@@ -1453,11 +1453,7 @@ class CPKService {
         // verify proxy address before deposit
         await verifyProxyAddress(sender, receiver, this.cpk)
 
-        const transaction = await contract.relayTokens(
-          symbol === 'DAI' && !address ? sender : address,
-          receiver,
-          amount,
-        )
+        const transaction = await contract.relayTokens(symbol === 'DAI' ? sender : address, receiver, amount)
         return transaction.hash
       } else {
         const xDaiService = new XdaiService(this.provider)
@@ -1471,7 +1467,7 @@ class CPKService {
     }
   }
 
-  sendXdaiChainTokenToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
+  sendXdaiChainTokenToBridge = async (amount: BigNumber, address: string, symbol?: string) => {
     try {
       if (this.cpk.relay) {
         const transactions: Transaction[] = []
@@ -1482,7 +1478,7 @@ class CPKService {
         const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
 
         // relay to signer address on mainnet
-        if (currency === ExchangeCurrency.Dai) {
+        if (symbol === 'DAI') {
           transactions.push({
             to: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
             data: XdaiService.encodeRelayTokens(to),
@@ -1492,7 +1488,7 @@ class CPKService {
           return hash
         } else {
           transactions.push({
-            to: GEN_XDAI_ADDRESS_TESTING,
+            to: address,
             data: XdaiService.encodeTokenBridgeTransfer(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
           })
           const { transactionHash } = await this.execTransactions(transactions, txOptions)

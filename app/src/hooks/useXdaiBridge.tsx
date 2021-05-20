@@ -62,7 +62,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
         }
         setTransactionStep(TransactionStep.waitingConfirmation)
 
-        const transaction = await cpk.sendXdaiChainTokenToBridge(amount)
+        const transaction = await cpk.sendXdaiChainTokenToBridge(amount, address, symbol)
 
         setTransactionHash(transaction)
         setTransactionStep(TransactionStep.transactionSubmitted)

@@ -275,8 +275,8 @@ export const ModalDepositWithdraw = (props: Props) => {
 
       const hash =
         exchangeType === ExchangeType.deposit
-          ? await cpk.sendMainnetTokenToBridge(displayFundAmount, symbol, address)
-          : await cpk.sendXdaiChainTokenToBridge(displayFundAmount, currencySelected)
+          ? await cpk.sendMainnetTokenToBridge(displayFundAmount, address, symbol)
+          : await cpk.sendXdaiChainTokenToBridge(displayFundAmount, address, symbol)
 
       const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
 
@@ -285,7 +285,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
       await waitForConfirmations(hash, provider, setConfirmations, setTxState)
 
-      if (exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Omen) {
+      if (exchangeType === ExchangeType.deposit && symbol !== 'DAI') {
         await XdaiService.waitForBridgeMessageStatus(hash, context.library)
       }
 
