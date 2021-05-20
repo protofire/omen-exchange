@@ -479,8 +479,8 @@ export const ModalDepositWithdraw = (props: Props) => {
 
           <BottomButtons>
             {exchangeType === ExchangeType.deposit &&
-              currentToken.allowance === undefined &&
-              currentToken.allowance.isZero() && (
+              currentToken &&
+              new BigNumber(currentToken.allowance ? currentToken.allowance : '0').isZero() && (
                 <ApproveButton
                   disabled={
                     currencySelected === ExchangeCurrency.Dai
