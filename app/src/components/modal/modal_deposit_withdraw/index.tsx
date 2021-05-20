@@ -142,6 +142,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   const [newcurrencySelected, setNewCurrencySelected] = useState<KnownToken>('dai')
   const { address, decimals, symbol } = getToken(networkIds.MAINNET, newcurrencySelected)
+  const currentToken = mainnetTokens.find(element => element.symbol === symbol)
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
@@ -159,6 +160,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   // const [allowanceData, setAllowanceData] = useState(
   //   bridgeTokensList.reduce((a, c) => Object.assign(a, c), Object.create(null)),
   // )
+  console.log(currentToken)
   console.log(mainnetTokens)
   const { account, relay } = context.rawWeb3Context
 
@@ -476,25 +478,27 @@ export const ModalDepositWithdraw = (props: Props) => {
           )}
 
           <BottomButtons>
-            {exchangeType === ExchangeType.deposit && (
-              <ApproveButton
-                disabled={
-                  currencySelected === ExchangeCurrency.Dai
-                    ? daiAllowanceState !== ButtonStates.idle
-                    : omenAllowanceState !== ButtonStates.idle
-                }
-                extraText
-                onClick={approve}
-                state={currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState}
-              >
-                {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
-                  ButtonStates.idle && `Approve ${newcurrencySelected.toUpperCase()}`}
-                {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
-                  ButtonStates.working && 'Approving'}
-                {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
-                  ButtonStates.finished && 'Approved'}
-              </ApproveButton>
-            )}
+            {exchangeType === ExchangeType.deposit &&
+              currentToken.allowance === undefined &&
+              currentToken.allowance.isZero() && (
+                <ApproveButton
+                  disabled={
+                    currencySelected === ExchangeCurrency.Dai
+                      ? daiAllowanceState !== ButtonStates.idle
+                      : omenAllowanceState !== ButtonStates.idle
+                  }
+                  extraText
+                  onClick={approve}
+                  state={currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState}
+                >
+                  {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
+                    ButtonStates.idle && `Approve ${newcurrencySelected.toUpperCase()}`}
+                  {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
+                    ButtonStates.working && 'Approving'}
+                  {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
+                    ButtonStates.finished && 'Approved'}
+                </ApproveButton>
+              )}
 
             <DepositWithdrawButton
               buttonType={ButtonType.primaryAlternative}

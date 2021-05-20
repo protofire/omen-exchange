@@ -140,6 +140,7 @@ export interface Token {
   image?: string
   volume?: string
   balance?: string
+  allowance?: BigNumber
 }
 
 export interface QuestionLog {
