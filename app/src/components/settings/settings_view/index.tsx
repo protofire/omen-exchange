@@ -30,23 +30,10 @@ const TextLighter = styled.p`
   line-height: 14.06px;
   margin: 0;
 `
-const ButtonContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  width: 364px;
-  padding: 0px;
-  margin-top: 24px;
-  height: 100%;
-`
+
 const SetAndSaveButton = styled(ButtonRound)`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
+flex: 1
   padding: 12px 17px;
-  width: 174px;
-  height: ${props => props.theme.buttonRound.height};
 `
 
 const FiltersControls = styled.div<{ disabled?: boolean }>`
@@ -95,11 +82,10 @@ const StatusBadge = styled.div<{ status: boolean }>`
 `
 
 const Input = styled.input`
+  border: 2px solid red;
   margin: 12px 0px;
   ${TextfieldCSS};
   padding: 12px 20px;
-  width: 320px;
-  height: ${props => props.theme.textfield.height};
 `
 
 const ImageWrap = styled.div`
@@ -121,8 +107,8 @@ const RPCTextWrapper = styled.span`
 
 const SettingsButtonWrapper = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
+  margin-top: auto;
+  width: 100%;
 `
 
 interface Props {
@@ -263,40 +249,38 @@ export const SettingsViewContainer = (props: Props) => {
         )}
       </ModalCard>
 
-      <ButtonContainer style={{ minHeight: isDropDownActive ? '186.2px' : '302px' }}>
-        <SettingsButtonWrapper>
-          <SetAndSaveButton
-            onClick={() => {
-              setCurrent(0)
-              urlObject && setUrl(urlObject[0].rpcUrl)
-            }}
-            style={{ marginRight: '8px' }}
-          >
-            Set to Default
-          </SetAndSaveButton>
-          <SetAndSaveButton
-            disabled={
-              url.length === 0 || !isValidUrl || (network !== -1 && getInfuraUrl(network) === url) || !onlineStatus
-            }
-            onClick={async () => {
-              if (!(await checkRpcStatus(url, setOnlineStatus, network))) return
+      <SettingsButtonWrapper>
+        <SetAndSaveButton
+          onClick={() => {
+            setCurrent(0)
+            urlObject && setUrl(urlObject[0].rpcUrl)
+          }}
+          style={{ marginRight: '8px' }}
+        >
+          Set to Default
+        </SetAndSaveButton>
+        <SetAndSaveButton
+          disabled={
+            url.length === 0 || !isValidUrl || (network !== -1 && getInfuraUrl(network) === url) || !onlineStatus
+          }
+          onClick={async () => {
+            if (!(await checkRpcStatus(url, setOnlineStatus, network))) return
 
-              localStorage.setItem(
-                'rpcAddress',
-                JSON.stringify({
-                  url: url,
-                  network: network,
-                  index: current,
-                }),
-              )
-              window.location.reload()
-            }}
-            style={{ marginLeft: '8px' }}
-          >
-            Save
-          </SetAndSaveButton>
-        </SettingsButtonWrapper>
-      </ButtonContainer>
+            localStorage.setItem(
+              'rpcAddress',
+              JSON.stringify({
+                url: url,
+                network: network,
+                index: current,
+              }),
+            )
+            window.location.reload()
+          }}
+          style={{ marginLeft: '8px' }}
+        >
+          Save
+        </SetAndSaveButton>
+      </SettingsButtonWrapper>
     </>
   )
 }

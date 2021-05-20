@@ -377,7 +377,6 @@ const theme = {
   },
   fixedHeightModal: {
     content: {
-      minHeight: '510px',
       width: '420px',
       padding: '28px',
       borderRadius: '8px',

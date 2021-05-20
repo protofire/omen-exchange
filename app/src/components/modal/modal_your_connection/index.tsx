@@ -346,7 +346,10 @@ export const ModalYourConnection = (props: Props) => {
           setIsSettingsModalOpen(false)
         }}
         shouldCloseOnOverlayClick={true}
-        style={theme.fixedHeightModal}
+        style={{
+          ...theme.fluidHeightModal,
+          content: { ...theme.fluidHeightModal.content, height: '510px' },
+        }}
       >
         {isSettingsModalOpen ? (
           <ContentWrapper>
