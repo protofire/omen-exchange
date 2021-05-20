@@ -124,10 +124,6 @@ export const ModalDepositWithdraw = (props: Props) => {
     daiBalance,
     exchangeType,
     fetchBalances,
-    formattedDaiBalance,
-    formattedOmenBalance,
-    formattedxDaiBalance,
-    formattedxOmenBalance,
     isOpen,
     mainnetTokens,
     omenBalance,
@@ -139,8 +135,8 @@ export const ModalDepositWithdraw = (props: Props) => {
     xDaiTokens,
     xOmenBalance,
   } = props
-  console.log(xDaiTokens)
-  console.log(mainnetTokens)
+  console.log(allowanceData)
+
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
 
@@ -163,7 +159,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   // const [allowanceData, setAllowanceData] = useState(
   //   bridgeTokensList.reduce((a, c) => Object.assign(a, c), Object.create(null)),
   // )
-
+  console.log(mainnetTokens)
   const { account, relay } = context.rawWeb3Context
 
   // const fetchAllowance = async () => {
@@ -220,13 +216,13 @@ export const ModalDepositWithdraw = (props: Props) => {
       else setDaiAllowanceState(ButtonStates.idle)
     }
   }
-  const omenWalletAllowance =
-    (omenAllowance.isZero() && exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Omen) ||
-    (!omenAllowance.isZero() && omenAllowanceState === ButtonStates.finished)
-
-  const daiWalletAllowance =
-    (exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Dai && daiAllowance.isZero()) ||
-    (!daiAllowance.isZero() && daiAllowanceState === ButtonStates.finished)
+  // const omenWalletAllowance =
+  //   (omenAllowance.isZero() && exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Omen) ||
+  //   (!omenAllowance.isZero() && omenAllowanceState === ButtonStates.finished)
+  //
+  // const daiWalletAllowance =
+  //   (exchangeType === ExchangeType.deposit && currencySelected === ExchangeCurrency.Dai && daiAllowance.isZero()) ||
+  //   (!daiAllowance.isZero() && daiAllowanceState === ButtonStates.finished)
 
   React.useEffect(() => {
     Modal.setAppElement('#root')

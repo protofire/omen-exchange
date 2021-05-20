@@ -19,7 +19,6 @@ import {
 } from '../common/constants'
 import { getInfuraUrl, networkIds } from '../util/networks'
 import { waitABit } from '../util/tools'
-import { ExchangeCurrency } from '../util/types'
 
 import { ERC20Service } from './erc20'
 

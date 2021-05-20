@@ -4,8 +4,6 @@ import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
 import {
-  GEN_TOKEN_ADDDRESS_TESTING,
-  GEN_XDAI_ADDRESS_TESTING,
   OMNI_BRIDGE_XDAI_ADDRESS,
   RELAY_ADDRESS,
   RELAY_FEE,
@@ -34,7 +32,7 @@ import {
   signaturesFormatted,
   waitABit,
 } from '../util/tools'
-import { ExchangeCurrency, MarketData, Question, Token, TransactionStep } from '../util/types'
+import { MarketData, Question, Token, TransactionStep } from '../util/types'
 
 import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
