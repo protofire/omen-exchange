@@ -4,6 +4,7 @@ import { BigNumber, bigNumberify, defaultAbiCoder, keccak256 } from 'ethers/util
 import moment from 'moment'
 
 import {
+  DAY_IN_SECONDS,
   GEN_TOKEN_ADDDRESS_TESTING,
   GEN_XDAI_ADDRESS_TESTING,
   OMNI_BRIDGE_XDAI_ADDRESS,
@@ -633,9 +634,8 @@ class CPKService {
       const stakingRewardsFactoryAddress = getContractAddress(networkId, 'stakingRewardsFactory')
       const omnTokenAddress = getToken(networkId, 'omn').address
       // TODO: Lengthen time from execution to account for transaction execution time
-      const startingTimestamp = new Date().getTime() / 1000 + 120
-      const oneDay = 86400
-      const endingTimestamp = (marketData.resolution?.getTime() || 1) / 1000 - oneDay
+      const startingTimestamp = Math.floor(new Date().getTime() / 1000 + 120)
+      const endingTimestamp = Math.floor((marketData.resolution?.getTime() || 1) / 1000 - DAY_IN_SECONDS)
 
       // Step 6: Create staking distribution contract
       transactions.push({
