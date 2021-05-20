@@ -1,8 +1,7 @@
-import { Contract, ethers, utils, Wallet } from 'ethers'
-import { MaxUint256 } from 'ethers/constants'
+import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
+
 import { getLogger } from '../util/logger'
-import { INVALID_ANSWER_ID } from '../util/types'
 
 const logger = getLogger('Services::StakingFactory')
 
@@ -73,11 +72,11 @@ class StakingFactoryService {
   static encodeCreateDistribution = (
     rewardTokenAddresses: string[],
     stakableTokenAddress: string,
-    rewardAmounts: BigNumber[] = [new BigNumber(0)],
+    rewardAmounts: BigNumber[],
     startingTimestamp: number,
     endingTimestamp: number,
-    locked: boolean = false,
-    stakingCap: BigNumber = MaxUint256,
+    locked: boolean,
+    stakingCap: BigNumber,
   ) => {
     const stakingFactoryInterface = new utils.Interface(abi)
     return stakingFactoryInterface.functions.createDistribution.encode([
@@ -91,3 +90,5 @@ class StakingFactoryService {
     ])
   }
 }
+
+export { StakingFactoryService }
