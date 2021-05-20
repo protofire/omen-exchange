@@ -82,7 +82,6 @@ const StatusBadge = styled.div<{ status: boolean }>`
 `
 
 const Input = styled.input`
-  border: 2px solid red;
   margin: 12px 0px;
   ${TextfieldCSS};
   padding: 12px 20px;
