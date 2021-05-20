@@ -137,33 +137,29 @@ class XdaiService {
     this.abi = abi
   }
 
-  generateErc20ContractInstance = async (currency?: ExchangeCurrency) => {
+  generateErc20ContractInstance = async (address: string) => {
     const signer = this.provider.getSigner()
     const account = await signer.getAddress()
 
-    const erc20 = new ERC20Service(
-      this.provider,
-      account,
-      currency === ExchangeCurrency.Omen ? GEN_TOKEN_ADDDRESS_TESTING : DEFAULT_TOKEN_ADDRESS,
-    )
+    const erc20 = new ERC20Service(this.provider, account, address ? address : DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
 
     return erc20.getContract
   }
 
-  generateXdaiBridgeContractInstance = (currency?: ExchangeCurrency) => {
+  generateXdaiBridgeContractInstance = (symbol?: string) => {
     const signer = this.provider.relay ? this.provider.signer.signer : this.provider.signer
 
     return new ethers.Contract(
-      currency === ExchangeCurrency.Omen ? OMNI_BRIDGE_MAINNET_ADDRESS : DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
+      symbol === 'DAI' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS,
       this.abi,
       signer,
     )
   }
 
-  generateSendTransaction = async (amount: BigNumber, contract: Contract, currency?: ExchangeCurrency) => {
+  generateSendTransaction = async (amount: BigNumber, contract: Contract, symbol?: string) => {
     try {
       const transaction = await contract.transfer(
-        currency === ExchangeCurrency.Omen ? OMNI_BRIDGE_MAINNET_ADDRESS : DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
+        symbol === 'DAI' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS,
         amount,
       )
       return transaction

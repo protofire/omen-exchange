@@ -83,7 +83,7 @@ export const BalanceItem = styled.div<{ hover?: boolean }>`
   justify-content: space-between;
   width: 100%;
 
-  &:nth-of-type(2) {
+  &:not(:first-child){
     margin-top: 12px;
   }
 

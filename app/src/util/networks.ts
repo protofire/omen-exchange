@@ -476,7 +476,8 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     order: 9,
   },
 }
-export const bridgeTokensList: KnownToken[] = ['omn', 'dai']
+//when adding new bridge currency ensure that it's present in known tokens and that it has both mainnet and xDai address added
+export const bridgeTokensList: KnownToken[] = ['dai', 'omn', 'cdai']
 
 const validNetworkId = (networkId: number): networkId is NetworkId => {
   return networks[networkId as NetworkId] !== undefined

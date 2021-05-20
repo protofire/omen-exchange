@@ -2,11 +2,11 @@ import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 
-import { STANDARD_DECIMALS } from '../common/constants'
+import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS, STANDARD_DECIMALS } from '../common/constants'
 import { useConnectedWeb3Context, useTokens } from '../hooks'
-import { XdaiService } from '../services'
+import { ERC20Service, XdaiService } from '../services'
 import { getLogger } from '../util/logger'
-import { getNativeAsset, getToken, networkIds } from '../util/networks'
+import { bridgeTokensList, getNativeAsset, getToken, networkIds } from '../util/networks'
 import { formatBigNumber, formatNumber } from '../util/tools'
 import { Token } from '../util/types'
 
@@ -28,6 +28,7 @@ export interface ConnectedBalanceContext {
   mainnetTokens: Token[]
   xDaiTokens: Token[]
   fetchBalances: () => Promise<void>
+  allowanceData: any
 }
 
 const ConnectedBalanceContext = React.createContext<Maybe<ConnectedBalanceContext>>(null)
@@ -59,6 +60,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
 
   const [unclaimedDaiAmount, setUnclaimedDaiAmount] = useState<BigNumber>(Zero)
   const [unclaimedOmenAmount, setUnclaimedOmenAmount] = useState<BigNumber>(Zero)
+  const [allowanceData, setAllowanceData] = useState()
 
   // mainnet balances
   const { refetch, tokens: mainnetTokens } = useTokens(context.rawWeb3Context, true, true)
@@ -78,6 +80,28 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   // xdai token balance
   const xDaiBalance = new BigNumber(xDaiTokens.filter(token => token.symbol === 'xDAI')[0]?.balance || '')
   const xOmenBalance = new BigNumber(xDaiTokens.filter(token => token.symbol === 'OMN')[0]?.balance || '')
+
+  const fetchAllowanceData = async () => {
+    const tokenAllowanceData = await Promise.all(
+      bridgeTokensList.map(async token => {
+        const data = getToken(networkIds.MAINNET, token)
+        let allowance: BigNumber = Zero
+        const allowanceAddress = token === 'dai' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS
+        if (account) {
+          try {
+            const collateralService = new ERC20Service(context.rawWeb3Context.library, account, data.address)
+            allowance = await collateralService.allowance(account, allowanceAddress)
+          } catch {
+            console.log('here')
+            return { [token]: allowance }
+          }
+        }
+        return { [token]: allowance }
+      }),
+    )
+    console.log(tokenAllowanceData)
+    setAllowanceData(tokenAllowanceData.reduce((a, c) => Object.assign(a, c), Object.create(null)))
+  }
 
   const fetchUnclaimedAssets = async () => {
     const aggregator = (array: any) => {
@@ -107,13 +131,14 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
 
   const fetchBalances = async () => {
     try {
-      await Promise.all([fetchUnclaimedAssets(), refetch(), fetchXdaiTokens()])
+      await Promise.all([fetchUnclaimedAssets(), refetch(), fetchXdaiTokens(), fetchAllowanceData()])
     } catch (e) {
       logger.log(e.message)
     }
   }
 
   useEffect(() => {
+    fetchAllowanceData()
     if (relay) {
       fetchBalances()
     } else {
@@ -122,6 +147,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, networkId])
+  console.log(allowanceData)
 
   const value = {
     unclaimedDaiAmount,
@@ -142,6 +168,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     formattedxOmenBalance: formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 2),
     mainnetTokens,
     xDaiTokens,
+    allowanceData,
   }
 
   return <ConnectedBalanceContext.Provider value={value}>{props.children}</ConnectedBalanceContext.Provider>

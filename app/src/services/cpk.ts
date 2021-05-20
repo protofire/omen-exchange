@@ -1440,11 +1440,11 @@ class CPKService {
     }
   }
 
-  sendMainnetTokenToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
+  sendMainnetTokenToBridge = async (amount: BigNumber, symbol?: string, address: string) => {
     try {
       if (this.cpk.relay) {
         const xDaiService = new XdaiService(this.provider)
-        const contract = await xDaiService.generateXdaiBridgeContractInstance(currency)
+        const contract = await xDaiService.generateXdaiBridgeContractInstance(symbol)
 
         const sender = await this.cpk.ethLibAdapter.signer.signer.getAddress()
 
@@ -1454,15 +1454,15 @@ class CPKService {
         await verifyProxyAddress(sender, receiver, this.cpk)
 
         const transaction = await contract.relayTokens(
-          currency === ExchangeCurrency.Omen ? GEN_TOKEN_ADDDRESS_TESTING : sender,
+          symbol === 'DAI' && !address ? sender : address,
           receiver,
           amount,
         )
         return transaction.hash
       } else {
         const xDaiService = new XdaiService(this.provider)
-        const contract = await xDaiService.generateErc20ContractInstance(currency)
-        const transaction = await xDaiService.generateSendTransaction(amount, contract, currency)
+        const contract = await xDaiService.generateErc20ContractInstance(address)
+        const transaction = await xDaiService.generateSendTransaction(amount, contract, symbol)
         return transaction
       }
     } catch (e) {

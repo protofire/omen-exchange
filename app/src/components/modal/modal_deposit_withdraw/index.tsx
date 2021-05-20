@@ -115,10 +115,12 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   omenBalance: BigNumber
   mainnetTokens: Token[]
   xDaiTokens: Token[]
+  allowanceData: any
 }
 
 export const ModalDepositWithdraw = (props: Props) => {
   const {
+    allowanceData,
     daiBalance,
     exchangeType,
     fetchBalances,
@@ -158,40 +160,41 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [daiAllowanceState, setDaiAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
   const [omenAllowance, setOmenWalletAllowance] = useState<BigNumber>(Zero)
   const [daiAllowance, setDaiAllowance] = useState<BigNumber>(Zero)
-  const [allowanceData, setAllowanceData] = useState(
-    bridgeTokensList.reduce((a, c) => Object.assign(a, c), Object.create(null)),
-  )
+  // const [allowanceData, setAllowanceData] = useState(
+  //   bridgeTokensList.reduce((a, c) => Object.assign(a, c), Object.create(null)),
+  // )
 
   const { account, relay } = context.rawWeb3Context
 
-  const fetchAllowance = async () => {
-    if (
-      context.relay &&
-      account &&
-      context.rawWeb3Context.networkId === networkIds.MAINNET &&
-      exchangeType === ExchangeType.deposit
-    ) {
-      const tokenAllowanceData = await Promise.all(
-        bridgeTokensList.map(async token => {
-          const data = getToken(networkIds.MAINNET, token)
-          let allowance: BigNumber = Zero
-          const allowanceAddress = token === 'dai' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS
-          if (account) {
-            try {
-              const collateralService = new ERC20Service(context.rawWeb3Context.library, account, data.address)
-              allowance = await collateralService.allowance(account, allowanceAddress)
-            } catch {
-              return { [token]: allowance }
-            }
-          }
-          return { [token]: allowance }
-        }),
-      )
-      const object = tokenAllowanceData.reduce((a, c) => Object.assign(a, c), Object.create(null))
-
-      setAllowanceData(object)
-    }
-  }
+  // const fetchAllowance = async () => {
+  //   if (
+  //     context.relay &&
+  //     account &&
+  //     context.rawWeb3Context.networkId === networkIds.MAINNET &&
+  //     exchangeType === ExchangeType.deposit
+  //   ) {
+  //     const tokenAllowanceData = await Promise.all(
+  //       bridgeTokensList.map(async token => {
+  //         const data = getToken(networkIds.MAINNET, token)
+  //         let allowance: BigNumber = Zero
+  //         const allowanceAddress = token === 'dai' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS
+  //         if (account) {
+  //           try {
+  //             const collateralService = new ERC20Service(context.rawWeb3Context.library, account, data.address)
+  //             allowance = await collateralService.allowance(account, allowanceAddress)
+  //           } catch {
+  //             console.log('here')
+  //             return { [token]: allowance }
+  //           }
+  //         }
+  //         return { [token]: allowance }
+  //       }),
+  //     )
+  //     const object = tokenAllowanceData.reduce((a, c) => Object.assign(a, c), Object.create(null))
+  //     console.log(object)
+  //     setAllowanceData(object)
+  //   }
+  // }
 
   const approve = async () => {
     try {
@@ -211,7 +214,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         }
       }
 
-      await fetchAllowance()
+      // await fetchAllowance()
     } catch (e) {
       if (currencySelected === ExchangeCurrency.Omen) setOmenAllowanceState(ButtonStates.idle)
       else setDaiAllowanceState(ButtonStates.idle)
@@ -230,7 +233,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   }, [])
 
   useEffect(() => {
-    fetchAllowance()
+    // fetchAllowance()
     setDisplayFundAmount(Zero)
     setAmountToDisplay(' ')
 
@@ -272,7 +275,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
       const hash =
         exchangeType === ExchangeType.deposit
-          ? await cpk.sendMainnetTokenToBridge(displayFundAmount, currencySelected)
+          ? await cpk.sendMainnetTokenToBridge(displayFundAmount, symbol, address)
           : await cpk.sendXdaiChainTokenToBridge(displayFundAmount, currencySelected)
 
       const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
@@ -323,14 +326,13 @@ export const ModalDepositWithdraw = (props: Props) => {
     }
   }
   const bridgeItems = bridgeTokensList.map((item, index) => {
-    const { address, symbol } = getToken(networkIds.MAINNET, item)
-    console.log(symbol)
-    console.log(xDaiTokens)
+    const { address, decimals, symbol } = getToken(networkIds.MAINNET, item)
+
     const token =
       exchangeType === ExchangeType.deposit
         ? mainnetTokens.find(token => token.symbol === symbol)
         : xDaiTokens.find(token => token.symbol === (symbol === 'DAI' ? 'xDAI' : symbol))
-    console.log(token?.balance)
+
     return (
       <BalanceItem
         hover
@@ -346,8 +348,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         </BalanceItemSide>
         <BalanceItemSide>
           <BalanceItemBalance>
-            {token?.balance && formatBigNumber(new BigNumber(token?.balance), decimals, 2)}
-            {symbol}
+            {token?.balance ? formatBigNumber(new BigNumber(token?.balance), decimals, 2) : '0.00'} {symbol}
           </BalanceItemBalance>
         </BalanceItemSide>
       </BalanceItem>
@@ -479,7 +480,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           )}
 
           <BottomButtons>
-            {(currencySelected === ExchangeCurrency.Dai ? daiWalletAllowance : omenWalletAllowance) && (
+            {exchangeType === ExchangeType.deposit && (
               <ApproveButton
                 disabled={
                   currencySelected === ExchangeCurrency.Dai
