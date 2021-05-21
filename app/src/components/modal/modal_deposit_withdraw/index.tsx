@@ -107,31 +107,29 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   formattedDaiBalance: string
   formattedxDaiBalance: string
   formattedOmenBalance: string
-  daiBalance: BigNumber
+
   xDaiBalance: Maybe<BigNumber>
-  xOmenBalance: BigNumber
+
   unclaimedAmount: BigNumber
   formattedxOmenBalance: string
-  omenBalance: BigNumber
+
   mainnetTokens: Token[]
   xDaiTokens: Token[]
 }
 
 export const ModalDepositWithdraw = (props: Props) => {
   const {
-    daiBalance,
     exchangeType,
     fetchBalances,
     isOpen,
     mainnetTokens,
-    omenBalance,
+
     onBack,
     onClose,
     theme,
     unclaimedAmount,
     xDaiBalance,
     xDaiTokens,
-    xOmenBalance,
   } = props
 
   const context = useConnectedWeb3Context()
@@ -139,11 +137,10 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   const [newcurrencySelected, setNewCurrencySelected] = useState<KnownToken>('dai')
   const { address, decimals, symbol } = getToken(
-    exchangeType === ExchangeType.deposit && newcurrencySelected === 'dai' ? networkIds.MAINNET : networkIds.XDAI,
+    exchangeType === ExchangeType.deposit ? networkIds.MAINNET : networkIds.XDAI,
     newcurrencySelected,
   )
-  console.log(mainnetTokens)
-  console.log(xDaiTokens)
+
   const currentTokenMainnet = mainnetTokens.find(element => element.symbol === symbol)
 
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
@@ -158,7 +155,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [currencySelected, setCurrencySelected] = useState<ExchangeCurrency>(ExchangeCurrency.Dai)
   const [omenAllowanceState, setOmenAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
   const [daiAllowanceState, setDaiAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
-  console.log(currentTokenMainnet && currentTokenMainnet.balance)
+
   const { account, relay } = context.rawWeb3Context
 
   const findCurrentTokenBasedOnAction = (exchange: ExchangeType, symbol: string): Token | undefined => {
@@ -206,7 +203,6 @@ export const ModalDepositWithdraw = (props: Props) => {
   const DAI = getToken(1, 'dai')
 
   const wallet = new BigNumber(currentToken ? currentToken : '0')
-  console.log(formatBigNumber(wallet ? wallet : Zero, 18, 2))
 
   const minDaiBridgeExchange = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
   const minOmniBridgeExchange = exchangeType === ExchangeType.deposit ? parseEther('1') : parseEther('1')
@@ -364,16 +360,8 @@ export const ModalDepositWithdraw = (props: Props) => {
               />
             }
             onClickMaxButton={() => {
-              const maxBalance =
-                (exchangeType === ExchangeType.deposit
-                  ? currencySelected === ExchangeCurrency.Dai
-                    ? daiBalance
-                    : omenBalance
-                  : currencySelected === ExchangeCurrency.Dai
-                  ? xDaiBalance
-                  : xOmenBalance) || Zero
-              setDisplayFundAmount(maxBalance)
-              setAmountToDisplay(formatBigNumber(maxBalance, STANDARD_DECIMALS, 5))
+              setDisplayFundAmount(wallet)
+              setAmountToDisplay(formatBigNumber(wallet, STANDARD_DECIMALS, 5))
             }}
             shouldDisplayMaxButton={true}
             symbol={symbol}
