@@ -138,8 +138,14 @@ export const ModalDepositWithdraw = (props: Props) => {
   const cpk = useConnectedCPKContext()
 
   const [newcurrencySelected, setNewCurrencySelected] = useState<KnownToken>('dai')
-  const { address, decimals, symbol } = getToken(networkIds.MAINNET, newcurrencySelected)
-  const currentToken = mainnetTokens.find(element => element.symbol === symbol)
+  const { address, decimals, symbol } = getToken(
+    exchangeType === ExchangeType.deposit && newcurrencySelected === 'dai' ? networkIds.MAINNET : networkIds.XDAI,
+    newcurrencySelected,
+  )
+  console.log(mainnetTokens)
+  console.log(xDaiTokens)
+  const currentTokenMainnet = mainnetTokens.find(element => element.symbol === symbol)
+
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
@@ -152,9 +158,14 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [currencySelected, setCurrencySelected] = useState<ExchangeCurrency>(ExchangeCurrency.Dai)
   const [omenAllowanceState, setOmenAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
   const [daiAllowanceState, setDaiAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
-
+  console.log(currentTokenMainnet && currentTokenMainnet.balance)
   const { account, relay } = context.rawWeb3Context
 
+  const findCurrentTokenBasedOnAction = (exchange: ExchangeType, symbol: string): Token | undefined => {
+    if (exchange === ExchangeType.deposit) return mainnetTokens.find(token => token.symbol === symbol)
+    else return xDaiTokens.find(token => token.symbol === (symbol === 'DAI' ? 'xDAI' : symbol))
+  }
+  const currentToken = findCurrentTokenBasedOnAction(exchangeType, symbol)?.balance
   const approve = async () => {
     try {
       if (exchangeType === ExchangeType.deposit) {
@@ -194,25 +205,20 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   const DAI = getToken(1, 'dai')
 
-  const wallet =
-    exchangeType === ExchangeType.deposit
-      ? currencySelected === ExchangeCurrency.Dai
-        ? daiBalance
-        : omenBalance
-      : currencySelected === ExchangeCurrency.Dai
-      ? xDaiBalance
-      : xOmenBalance
+  const wallet = new BigNumber(currentToken ? currentToken : '0')
+  console.log(formatBigNumber(wallet ? wallet : Zero, 18, 2))
 
   const minDaiBridgeExchange = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
   const minOmniBridgeExchange = exchangeType === ExchangeType.deposit ? parseEther('1') : parseEther('1')
-
   const isDepositWithdrawDisabled =
     !wallet ||
     displayFundAmount.gt(wallet) ||
     displayFundAmount.isZero() ||
-    displayFundAmount.lt(currencySelected === ExchangeCurrency.Dai ? minDaiBridgeExchange : minOmniBridgeExchange) ||
-    displayFundAmount.gt(new BigNumber(currentToken && currentToken.allowance ? currentToken.allowance : '0')) ||
-    (newcurrencySelected !== 'dai' && exchangeType === ExchangeType.withdraw && xDaiBalance?.isZero())
+    displayFundAmount.lt(newcurrencySelected === 'dai' ? minDaiBridgeExchange : minOmniBridgeExchange) ||
+    (currentTokenMainnet &&
+      currentTokenMainnet.allowance &&
+      displayFundAmount.gt(new BigNumber(currentTokenMainnet.allowance))) ||
+    (exchangeType === ExchangeType.withdraw && xDaiBalance?.isZero())
 
   const depositWithdraw = async () => {
     if (!cpk) {
@@ -280,10 +286,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const bridgeItems = bridgeTokensList.map((item, index) => {
     const { address, decimals, symbol } = getToken(networkIds.MAINNET, item)
 
-    const token =
-      exchangeType === ExchangeType.deposit
-        ? mainnetTokens.find(token => token.symbol === symbol)
-        : xDaiTokens.find(token => token.symbol === (symbol === 'DAI' ? 'xDAI' : symbol))
+    const token = findCurrentTokenBasedOnAction(exchangeType, symbol)
 
     return (
       <BalanceItem
@@ -296,7 +299,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         <BalanceItemSide>
           <RadioInput checked={newcurrencySelected === item} name={item} outcomeIndex={-1} readOnly />
           <Image size={'24'} src={getImageUrl(address)} style={{ marginLeft: '12px', marginRight: '12px' }} />
-          <BalanceItemTitle notSelected={currencySelected !== ExchangeCurrency.Dai}>{item}</BalanceItemTitle>
+          <BalanceItemTitle notSelected={newcurrencySelected !== item}>{item}</BalanceItemTitle>
         </BalanceItemSide>
         <BalanceItemSide>
           <BalanceItemBalance>
@@ -433,8 +436,8 @@ export const ModalDepositWithdraw = (props: Props) => {
 
           <BottomButtons>
             {exchangeType === ExchangeType.deposit &&
-              currentToken &&
-              new BigNumber(currentToken.allowance ? currentToken.allowance : '0').isZero() && (
+              currentTokenMainnet &&
+              new BigNumber(currentTokenMainnet.allowance ? currentTokenMainnet.allowance : '0').isZero() && (
                 <ApproveButton
                   disabled={
                     currencySelected === ExchangeCurrency.Dai
