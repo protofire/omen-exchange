@@ -84,7 +84,7 @@ export const BalanceItem = styled.div<{ hover?: boolean }>`
   width: 100%;
 
   &:not(:first-child){
-    margin-top: 12px;
+    margin-top: 14px;
   }
 
   &:hover {
