@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
+import { Helmet } from 'react-helmet'
 import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import { useWeb3Context } from 'web3-react'
 
-import { DISCLAIMER_TEXT } from '../../common/constants'
+import { DISCLAIMER_TEXT, DOCUMENT_TITLE } from '../../common/constants'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
 import { Disclaimer } from '../common/disclaimer'
 import { Footer } from '../common/layout/footer'
@@ -31,6 +32,9 @@ export const Main: React.FC = () => {
         <MainWrapper>
           <Header />
           <ModalAirdropWrapper />
+          <Helmet>
+            <title>{DOCUMENT_TITLE}</title>
+          </Helmet>
           <MainScroll>
             {context.error && <WrongNetworkMessage />}
             {!context.error && (
