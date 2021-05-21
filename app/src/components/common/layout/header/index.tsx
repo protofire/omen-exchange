@@ -187,9 +187,51 @@ const OmenIconWrapper = styled.div`
 `
 
 const HeaderContainer: React.FC = (props: any) => {
-  const context = useConnectedWeb3Context()
-  const { relay, toggleRelay } = context
-  const { account, active, connectorName, error, networkId } = context.rawWeb3Context
+  let context: any
+  let account: any
+  let active: any
+  let connectorName: any
+  let error: any
+  let networkId: any
+  let relay: any
+  let toggleRelay: any
+  let provider: any
+
+  let daiBalance: any
+  let fetchBalances: any
+  let formattedDaiBalance: any
+  let formattedNativeBalance: any
+  let formattedOmenBalance: any
+  let formattedxDaiBalance: any
+  let formattedxOmenBalance: any
+  let omenBalance: any
+  let unclaimedDaiAmount: any
+  let unclaimedOmenAmount: any
+  let xDaiBalance: any
+  let xOmenBalance: any
+
+  if (props.web3context) {
+    context = props.context.rawWeb3Context
+    account = props.rawWeb3Context.account
+    networkId = props.rawWeb3Context.networkId
+    provider = props.props.rawWeb3Context.library
+    active = props.rawWeb3Context.active
+    connectorName = props.rawWeb3Context.connectorName
+    error = props.rawWeb3Context.error
+    relay = props.rawWeb3Context.relay
+    console.log(relay)
+    toggleRelay = props.rawWeb3Context.toggleRelay
+    daiBalance = props.web3context.daiBalance
+    fetchBalances = props.web3context.fetchBalances
+    formattedDaiBalance = props.web3context.formattedDaiBalance
+    formattedNativeBalance = props.web3context.formattedNativeBalance
+    formattedOmenBalance = props.web3context.formattedOmenBalance
+    formattedxDaiBalance = props.web3context.formattedxDaibalance
+    omenBalance = props.rawWeb3context.omenBalance
+    unclaimedDaiAmount = props.web3context.unclaimedDaiAmount
+    xDaiBalance = props.rawWeb3context.xDaiBalance
+    xOmenBalance = props.rawWeb3context.xOmenBalance
+  }
 
   const { history, ...restProps } = props
   const [isConnectWalletModalOpen, setConnectWalletModalState] = useState(false)
@@ -200,21 +242,6 @@ const HeaderContainer: React.FC = (props: any) => {
 
   const hasRouter = props.history !== undefined
   const disableConnectButton = isConnectWalletModalOpen
-
-  const {
-    daiBalance,
-    fetchBalances,
-    formattedDaiBalance,
-    formattedNativeBalance,
-    formattedOmenBalance,
-    formattedxDaiBalance,
-    formattedxOmenBalance,
-    omenBalance,
-    unclaimedDaiAmount,
-    unclaimedOmenAmount,
-    xDaiBalance,
-    xOmenBalance,
-  } = useConnectedBalanceContext()
 
   const networkPlacholder = (
     <DropdownWrapper>
