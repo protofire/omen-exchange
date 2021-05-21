@@ -123,7 +123,6 @@ export const ModalDepositWithdraw = (props: Props) => {
     fetchBalances,
     isOpen,
     mainnetTokens,
-
     onBack,
     onClose,
     theme,
@@ -135,10 +134,11 @@ export const ModalDepositWithdraw = (props: Props) => {
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
 
-  const [newcurrencySelected, setNewCurrencySelected] = useState<KnownToken>('dai')
+  const [currencySelected, setCurrencySelected] = useState<KnownToken>('dai')
+
   const { address, decimals, symbol } = getToken(
     exchangeType === ExchangeType.deposit ? networkIds.MAINNET : networkIds.XDAI,
-    newcurrencySelected,
+    currencySelected,
   )
 
   const currentTokenMainnet = mainnetTokens.find(element => element.symbol === symbol)
@@ -175,7 +175,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     try {
       setInitiatedAllowanceState(ButtonStates.working)
       if (exchangeType === ExchangeType.deposit) {
-        if (newcurrencySelected === 'dai') {
+        if (currencySelected === 'dai') {
           const collateralService = new ERC20Service(context.rawWeb3Context.library, account, address)
 
           await collateralService.approveUnlimited(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
@@ -202,9 +202,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     setAmountToDisplay(' ')
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, relay, exchangeType, newcurrencySelected])
-
-  const DAI = getToken(1, 'dai')
+  }, [account, relay, exchangeType, currencySelected])
 
   const wallet = new BigNumber(currentToken ? currentToken : '0')
 
@@ -214,7 +212,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     !wallet ||
     displayFundAmount.gt(wallet) ||
     displayFundAmount.isZero() ||
-    displayFundAmount.lt(newcurrencySelected === 'dai' ? minDaiBridgeExchange : minOmniBridgeExchange) ||
+    displayFundAmount.lt(currencySelected === 'dai' ? minDaiBridgeExchange : minOmniBridgeExchange) ||
     (currentTokenMainnet &&
       currentTokenMainnet.allowance &&
       displayFundAmount.gt(new BigNumber(currentTokenMainnet.allowance))) ||
@@ -264,6 +262,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     }
 
     try {
+      const DAI = getToken(1, 'dai')
       setMessage(`Claim ${formatBigNumber(unclaimedAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`)
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
@@ -294,13 +293,13 @@ export const ModalDepositWithdraw = (props: Props) => {
         hover
         key={index}
         onClick={() => {
-          setNewCurrencySelected(item)
+          setCurrencySelected(item)
         }}
       >
         <BalanceItemSide>
-          <RadioInput checked={newcurrencySelected === item} name={item} outcomeIndex={-1} readOnly />
+          <RadioInput checked={currencySelected === item} name={item} outcomeIndex={-1} readOnly />
           <Image size={'24'} src={getImageUrl(address)} style={{ marginLeft: '12px', marginRight: '12px' }} />
-          <BalanceItemTitle notSelected={newcurrencySelected !== item}>{item}</BalanceItemTitle>
+          <BalanceItemTitle notSelected={currencySelected !== item}>{item}</BalanceItemTitle>
         </BalanceItemSide>
         <BalanceItemSide>
           <BalanceItemBalance>
@@ -370,7 +369,7 @@ export const ModalDepositWithdraw = (props: Props) => {
             shouldDisplayMaxButton={true}
             symbol={symbol}
           />
-          {exchangeType === ExchangeType.withdraw && newcurrencySelected !== 'dai' && xDaiBalance?.isZero() ? (
+          {exchangeType === ExchangeType.withdraw && currencySelected !== 'dai' && xDaiBalance?.isZero() ? (
             <InputInfo>
               <IconAlertInverted />
               <div style={{ marginLeft: '12px' }}>Fund your Omen Account with Dai to proceed with the withdrawal.</div>
@@ -380,7 +379,7 @@ export const ModalDepositWithdraw = (props: Props) => {
               <ExchangeDataItem style={{ marginTop: '32px' }}>
                 <span>Min amount</span>
                 <span>
-                  {newcurrencySelected === 'dai'
+                  {currencySelected === 'dai'
                     ? `${formatBigNumber(minDaiBridgeExchange, STANDARD_DECIMALS, 2)} DAI`
                     : `${formatBigNumber(minOmniBridgeExchange, STANDARD_DECIMALS, 2)} ${symbol}`}
                 </span>
@@ -392,7 +391,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                     data-arrow-color="transparent"
                     data-for="feeInfo"
                     data-tip={`Bridge Fee ${
-                      newcurrencySelected !== 'dai' && exchangeType === ExchangeType.withdraw ? '0.10%' : '0.00%'
+                      currencySelected !== 'dai' && exchangeType === ExchangeType.withdraw ? '0.10%' : '0.00%'
                     }`}
                   >
                     <IconInfo hasCircle style={{ marginLeft: '8px' }} />
@@ -409,7 +408,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                 />
 
                 <span>
-                  {exchangeType === ExchangeType.withdraw && newcurrencySelected !== 'dai'
+                  {exchangeType === ExchangeType.withdraw && currencySelected !== 'dai'
                     ? `${formatNumber(formatBigNumber(displayFundAmount.div(1000), decimals, 3), 2)} ${symbol}`
                     : `0.00 ${symbol}`}
                 </span>
@@ -418,7 +417,7 @@ export const ModalDepositWithdraw = (props: Props) => {
               <ExchangeDataItem>
                 <span>Total</span>
                 <span>
-                  {newcurrencySelected !== 'dai' && exchangeType === ExchangeType.withdraw
+                  {currencySelected !== 'dai' && exchangeType === ExchangeType.withdraw
                     ? `${formatBigNumber(displayFundAmount.sub(displayFundAmount.div(1000)), decimals, 3)} ${symbol}`
                     : `${formatBigNumber(displayFundAmount, decimals, 2)} ${symbol}`}
                 </span>
@@ -434,7 +433,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                 onClick={approve}
                 state={initiatedAllowanceState}
               >
-                {initiatedAllowanceState === ButtonStates.idle && `Approve ${newcurrencySelected.toUpperCase()}`}
+                {initiatedAllowanceState === ButtonStates.idle && `Approve ${currencySelected.toUpperCase()}`}
                 {initiatedAllowanceState === ButtonStates.working && 'Approving'}
                 {initiatedAllowanceState === ButtonStates.finished && 'Approved'}
               </ApproveButton>
