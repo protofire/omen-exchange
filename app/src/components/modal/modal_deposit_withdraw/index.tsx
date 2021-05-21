@@ -15,7 +15,7 @@ import { ERC20Service, XdaiService } from '../../../services'
 import { bridgeTokensList, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
 import { formatBigNumber, formatNumber, waitForConfirmations } from '../../../util/tools'
-import { ExchangeCurrency, ExchangeType, Token, TransactionStep } from '../../../util/types'
+import { ExchangeType, Token, TransactionStep } from '../../../util/types'
 import { Button, ButtonStateful } from '../../button'
 import { ButtonStates } from '../../button/button_stateful'
 import { ButtonType } from '../../button/button_styling_types'
@@ -152,9 +152,8 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [txNetId, setTxNetId] = useState()
   const [confirmations, setConfirmations] = useState(0)
   const [message, setMessage] = useState('')
-  const [currencySelected, setCurrencySelected] = useState<ExchangeCurrency>(ExchangeCurrency.Dai)
-  const [omenAllowanceState, setOmenAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
-  const [daiAllowanceState, setDaiAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
+
+  const [initiatedAllowanceState, setInitiatedAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
 
   const { account, relay } = context.rawWeb3Context
 
@@ -163,28 +162,33 @@ export const ModalDepositWithdraw = (props: Props) => {
     else return xDaiTokens.find(token => token.symbol === (symbol === 'DAI' ? 'xDAI' : symbol))
   }
   const currentToken = findCurrentTokenBasedOnAction(exchangeType, symbol)?.balance
+
+  const isApprovalVisible =
+    (exchangeType === ExchangeType.deposit &&
+      currentTokenMainnet &&
+      new BigNumber(currentTokenMainnet.allowance ? currentTokenMainnet.allowance : '0').isZero()) ||
+    (initiatedAllowanceState === ButtonStates.finished &&
+      currentTokenMainnet &&
+      !new BigNumber(currentTokenMainnet.allowance ? currentTokenMainnet.allowance : '0').isZero())
+
   const approve = async () => {
     try {
+      setInitiatedAllowanceState(ButtonStates.working)
       if (exchangeType === ExchangeType.deposit) {
         if (newcurrencySelected === 'dai') {
-          setDaiAllowanceState(ButtonStates.working)
           const collateralService = new ERC20Service(context.rawWeb3Context.library, account, address)
 
           await collateralService.approveUnlimited(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
-          setDaiAllowanceState(ButtonStates.finished)
         } else {
-          setOmenAllowanceState(ButtonStates.working)
           const collateralService = new ERC20Service(context.rawWeb3Context.library, account, address)
 
           await collateralService.approveUnlimited(OMNI_BRIDGE_MAINNET_ADDRESS)
-          setOmenAllowanceState(ButtonStates.finished)
         }
       }
-
-      // await fetchAllowance()
-    } catch (e) {
-      if (currencySelected === ExchangeCurrency.Omen) setOmenAllowanceState(ButtonStates.idle)
-      else setDaiAllowanceState(ButtonStates.idle)
+      await fetchBalances()
+      setInitiatedAllowanceState(ButtonStates.finished)
+    } catch {
+      setInitiatedAllowanceState(ButtonStates.idle)
     }
   }
 
@@ -193,7 +197,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   }, [])
 
   useEffect(() => {
-    // fetchAllowance()
+    setInitiatedAllowanceState(ButtonStates.idle)
     setDisplayFundAmount(Zero)
     setAmountToDisplay(' ')
 
@@ -279,6 +283,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       setIsClaimModalOpen(true)
     }
   }
+
   const bridgeItems = bridgeTokensList.map((item, index) => {
     const { address, decimals, symbol } = getToken(networkIds.MAINNET, item)
 
@@ -342,7 +347,6 @@ export const ModalDepositWithdraw = (props: Props) => {
           <ModalCard style={{ marginBottom: '20px', marginTop: '10px' }}>
             <BalanceSection>
               <WalletText>Wallet</WalletText>
-
               <BalanceItems>{bridgeItems}</BalanceItems>
             </BalanceSection>
           </ModalCard>
@@ -423,27 +427,18 @@ export const ModalDepositWithdraw = (props: Props) => {
           )}
 
           <BottomButtons>
-            {exchangeType === ExchangeType.deposit &&
-              currentTokenMainnet &&
-              new BigNumber(currentTokenMainnet.allowance ? currentTokenMainnet.allowance : '0').isZero() && (
-                <ApproveButton
-                  disabled={
-                    currencySelected === ExchangeCurrency.Dai
-                      ? daiAllowanceState !== ButtonStates.idle
-                      : omenAllowanceState !== ButtonStates.idle
-                  }
-                  extraText
-                  onClick={approve}
-                  state={currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState}
-                >
-                  {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
-                    ButtonStates.idle && `Approve ${newcurrencySelected.toUpperCase()}`}
-                  {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
-                    ButtonStates.working && 'Approving'}
-                  {(currencySelected === ExchangeCurrency.Dai ? daiAllowanceState : omenAllowanceState) ===
-                    ButtonStates.finished && 'Approved'}
-                </ApproveButton>
-              )}
+            {isApprovalVisible && (
+              <ApproveButton
+                disabled={initiatedAllowanceState !== ButtonStates.idle}
+                extraText
+                onClick={approve}
+                state={initiatedAllowanceState}
+              >
+                {initiatedAllowanceState === ButtonStates.idle && `Approve ${newcurrencySelected.toUpperCase()}`}
+                {initiatedAllowanceState === ButtonStates.working && 'Approving'}
+                {initiatedAllowanceState === ButtonStates.finished && 'Approved'}
+              </ApproveButton>
+            )}
 
             <DepositWithdrawButton
               buttonType={ButtonType.primaryAlternative}
