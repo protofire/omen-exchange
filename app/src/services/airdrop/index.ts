@@ -10,18 +10,25 @@ import { airdropAbi } from './abi'
 class AirdropService {
   airdrops?: Contract[]
   provider: any
+  relay: boolean
 
-  constructor(networkId: number, provider: any, signerAddress: Maybe<string>) {
+  constructor(networkId: number, provider: any, signerAddress: Maybe<string>, relay: boolean) {
     const signer: Wallet = provider.getSigner()
     this.provider = provider
-
+    this.relay = relay
     const airdrops = getAirdrops(networkId)
     if (airdrops && airdrops.length && signerAddress) {
       this.airdrops = airdrops.map(airdrop => new ethers.Contract(airdrop, airdropAbi, provider).connect(signer))
     }
   }
 
-  static getClaim = async (airdrop: string, address: Maybe<string>, networkId: number, provider: any) => {
+  static getClaim = async (
+    airdrop: string,
+    address: Maybe<string>,
+    networkId: number,
+    provider: any,
+    relay: boolean,
+  ) => {
     // handle / format address
     const lowerCaseAddress = address && address.toLowerCase()
     const recipient = lowerCaseAddress && isAddress(lowerCaseAddress) && getAddress(lowerCaseAddress)
@@ -31,11 +38,14 @@ class AirdropService {
       if (networkId === networkIds.XDAI) {
         const proxyAddress = calcRelayProxyAddress(recipient, provider)
         const proxyClaim = proxyAddress && proofs.claims[proxyAddress]
-        if (proxyClaim) {
+        if (proxyClaim && relay) {
           return { ...proxyClaim, recipient: proxyAddress }
         }
       }
-      return { ...proofs.claims[recipient], recipient }
+      const claim = proofs.claims[recipient]
+      if (claim) {
+        return { ...claim, recipient }
+      }
     }
   }
 
@@ -44,7 +54,13 @@ class AirdropService {
       const network = await this.provider.getNetwork()
       const claims = await Promise.all(
         this.airdrops.map(async airdrop => {
-          const claim = await AirdropService.getClaim(airdrop.address, address, network.chainId, this.provider)
+          const claim = await AirdropService.getClaim(
+            airdrop.address,
+            address,
+            network.chainId,
+            this.provider,
+            this.relay,
+          )
           if (claim && claim.amount) {
             try {
               const claimed = await airdrop.isClaimed(claim.index)

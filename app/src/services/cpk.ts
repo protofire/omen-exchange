@@ -1566,7 +1566,7 @@ class CPKService {
     const txOptions: TxOptions = {}
     await this.getGas(txOptions)
 
-    const airdrop = new AirdropService(networkId, this.provider, address)
+    const airdrop = new AirdropService(networkId, this.provider, address, this.cpk.relay)
     const transactions: Transaction[] = await airdrop.encodeClaims(account)
     return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
   }

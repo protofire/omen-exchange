@@ -45,14 +45,20 @@ export const ModalAirdrop = (props: Props) => {
   const airdrop = useAirdropService()
 
   useEffect(() => {
+    let active = true
     const getClaimAmount = async () => {
       const newAmount = await airdrop.getClaimAmount(account)
-      setAmount(newAmount)
+      if (active) {
+        setAmount(newAmount)
+      }
     }
     if (account) {
       getClaimAmount()
     }
-  }, [airdrop, account, relay, networkId])
+    return () => {
+      active = false
+    }
+  }, [airdrop, airdrop.relay, account, relay, networkId])
 
   const onClose = () => {
     localStorage.setItem('airdrop', 'displayed')
