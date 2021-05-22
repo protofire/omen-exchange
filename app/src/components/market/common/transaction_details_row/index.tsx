@@ -1,4 +1,5 @@
 import React, { DOMAttributes } from 'react'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { IconInfo } from '../../../common/tooltip/img/IconInfo'
@@ -61,15 +62,27 @@ export const TransactionDetailsRow: React.FC<Props> = props => {
       <Title>
         {title}
         {tooltip ? (
-          <Circle
-            data-delay-hide={tooltip ? '500' : ''}
-            data-effect={tooltip ? 'solid' : ''}
-            data-for={tooltip ? 'walletBalanceTooltip' : ''}
-            data-multiline={tooltip ? 'true' : ''}
-            data-tip={tooltip ? tooltip : null}
-          >
-            <IconInfo />
-          </Circle>
+          <div>
+            <div data-arrow-color="transparent" data-for="fee" data-tip="A 2% fee goes to liquidity providers.">
+              <Circle
+                data-delay-hide={tooltip ? '500' : ''}
+                data-effect={tooltip ? 'solid' : ''}
+                data-for={tooltip ? 'walletBalanceTooltip' : ''}
+                data-multiline={tooltip ? 'true' : ''}
+              >
+                <IconInfo />
+              </Circle>
+            </div>
+            <ReactTooltip
+              className="customMarketTooltip"
+              data-multiline={true}
+              effect="solid"
+              id="fee"
+              offset={{ top: 0, left: -1 }}
+              place="top"
+              type="light"
+            />
+          </div>
         ) : null}
       </Title>
       <Value emphasizeValue={emphasizeValue} state={state}>

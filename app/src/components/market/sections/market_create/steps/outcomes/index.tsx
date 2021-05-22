@@ -183,7 +183,7 @@ const Outcomes = (props: Props) => {
         {canAddOutcome && (
           <div>
             <div data-arrow-color="transparent" data-for="newOutcome" data-tip="Add new outcome">
-              <CustomButtonCircleAdd data-testid="new-outcome-button" onClick={addNewOutcome} title="Add new outcome">
+              <CustomButtonCircleAdd data-testid="new-outcome-button" onClick={addNewOutcome}>
                 <IconAdd />
               </CustomButtonCircleAdd>
             </div>
@@ -192,7 +192,7 @@ const Outcomes = (props: Props) => {
               data-multiline={true}
               effect="solid"
               id="newOutcome"
-              offset={{ top: -1, left: 250 }}
+              offset={{ top: 0, left: 250 }}
               place="top"
               type="light"
             />
