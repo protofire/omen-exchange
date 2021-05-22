@@ -182,7 +182,7 @@ const Outcomes = (props: Props) => {
         </OutcomesTable>
         {canAddOutcome && (
           <div>
-            <div data-arrow-color="transparent" data-for="feeInfo" data-tip="Add new outcome">
+            <div data-arrow-color="transparent" data-for="newOutcome" data-tip="Add new outcome">
               <CustomButtonCircleAdd data-testid="new-outcome-button" onClick={addNewOutcome} title="Add new outcome">
                 <IconAdd />
               </CustomButtonCircleAdd>
@@ -191,8 +191,8 @@ const Outcomes = (props: Props) => {
               className="customMarketTooltip"
               data-multiline={true}
               effect="solid"
-              id="feeInfo"
-              offset={{ top: -5, left: 250 }}
+              id="newOutcome"
+              offset={{ top: -1, left: 250 }}
               place="top"
               type="light"
             />
