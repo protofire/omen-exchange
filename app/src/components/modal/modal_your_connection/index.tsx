@@ -350,15 +350,18 @@ export const ModalYourConnection = (props: Props) => {
                       : `${formattedDaiBalance} DAI`}
                   </BalanceItemBalance>
                 </BalanceItem>
-                {(networkId === networkIds.MAINNET || relay) && (
-                  <BalanceItem>
-                    <BalanceItemSide>
-                      <IconOmen size={24} />
-                      <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
-                    </BalanceItemSide>
-                    <BalanceItemBalance>{formattedOmenBalance} OMN</BalanceItemBalance>
-                  </BalanceItem>
-                )}
+
+                <BalanceItem>
+                  <BalanceItemSide>
+                    <IconOmen size={24} />
+                    <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
+                  </BalanceItemSide>
+                  <BalanceItemBalance>
+                    {networkId === networkIds.XDAI && !relay
+                      ? `${formattedxOmenBalance} OMN`
+                      : `${formattedOmenBalance} OMN`}
+                  </BalanceItemBalance>
+                </BalanceItem>
               </BalanceItems>
             </BalanceSection>
           </ModalCard>
