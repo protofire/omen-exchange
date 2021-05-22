@@ -1,14 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit'
 import React, { useEffect, useState } from 'react'
+import Modal from 'react-modal'
 import { Provider } from 'react-redux'
 import { ThemeProvider } from 'styled-components'
 import Web3Provider from 'web3-react'
 
 import 'react-datepicker/dist/react-datepicker.css'
 import 'sanitize.css'
-
-import { HeaderNoRouter } from './components/common/layout/header'
+import { IconArrowBack, IconClose } from './components/common/icons/'
 import { Main } from './components/main'
+import { ContentWrapper, ModalTitle } from './components/modal/common_styled' // here
+import { ConnectionModalNavigation, SettingsModalWrapper } from './components/modal/modal_your_connection'
 import SettingsViewContainer from './components/settings/settings_view'
 import { ApolloProviderWrapper } from './contexts/Apollo'
 import { ConnectedBalance, ConnectedWeb3 } from './hooks'
@@ -39,8 +41,31 @@ const App: React.FC = () => {
       <Web3Provider connectors={connectors} libraryName="ethers.js">
         {!status ? (
           <>
-            <HeaderNoRouter />
-            <SettingsViewContainer networkId={networkId} />
+            <Modal
+              isOpen={true}
+              style={{
+                ...theme.fluidHeightModal.content,
+              }}
+            >
+              <ContentWrapper>
+                <ConnectionModalNavigation>
+                  <ModalTitle>
+                    <IconArrowBack hoverEffect={true} onClick={() => alert('Please set your network!')} />
+                    <span style={{ marginLeft: '15px' }}>Settings</span>
+                  </ModalTitle>
+
+                  <IconClose
+                    hoverEffect={true}
+                    onClick={() => {
+                      alert('Please set your network!')
+                    }}
+                  />
+                </ConnectionModalNavigation>
+                <SettingsModalWrapper>
+                  <SettingsViewContainer networkId={networkId} />
+                </SettingsModalWrapper>
+              </ContentWrapper>
+            </Modal>
           </>
         ) : (
           <ConnectedWeb3 setStatus={setStatus}>

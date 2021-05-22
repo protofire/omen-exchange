@@ -168,7 +168,7 @@ const SvgWrap = styled.div`
   padding-right: 22px;
 `
 
-const ConnectionModalNavigation = styled(ModalNavigation as any)`
+export const ConnectionModalNavigation = styled(ModalNavigation as any)`
   padding: 0;
   margin-bottom: 16px;
 `
@@ -181,7 +181,7 @@ const IconSettingsWrapper = styled.div`
   margin-right: 18.66px;
 `
 
-const SettingsModalWrapper = styled.div`
+export const SettingsModalWrapper = styled.div`
   align-items: center;
   display: flex;
   flex-direction: column;
