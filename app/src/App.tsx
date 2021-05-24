@@ -23,7 +23,8 @@ import { checkRpcStatus, getNetworkFromChain } from './util/tools'
 
 const store = configureStore({ reducer: balanceReducer })
 
-const App: React.FC = () => {
+const App: React.FC = (props: any) => {
+  const { ...restProps } = props
   const windowObj: any = window
 
   const ethereum = windowObj.ethereum
@@ -41,7 +42,14 @@ const App: React.FC = () => {
       <Web3Provider connectors={connectors} libraryName="ethers.js">
         {!status ? (
           <>
-            <Modal isOpen={true}>
+            <Modal
+              isOpen={true}
+              style={{
+                ...theme.fluidHeightModal,
+                content: { ...theme.fluidHeightModal.content, height: '510px' },
+              }}
+              {...restProps}
+            >
               <ContentWrapper>
                 <ConnectionModalNavigation>
                   <ModalTitle>
