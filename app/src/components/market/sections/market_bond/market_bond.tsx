@@ -136,6 +136,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
 
       await fetchGraphMarketMakerData()
       setBondOutcomeDisplay('0')
+      setBondOutcomeSelected(Zero)
       setMessage(
         `Successfully bonded ${formatNumber(
           formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals, nativeAsset.decimals),
