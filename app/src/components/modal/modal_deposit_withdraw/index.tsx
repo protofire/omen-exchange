@@ -462,7 +462,15 @@ export const ModalDepositWithdraw = (props: Props) => {
       />
       <ModalTransactionWrapper
         confirmations={confirmations}
-        icon={<Image size={'24'} src={getImageUrl(address)} style={{ marginLeft: '10px' }} />}
+        icon={
+          <Image
+            size={'24'}
+            src={getImageUrl(
+              currentTokenMainnet && currentTokenMainnet.address ? currentTokenMainnet.address : address,
+            )}
+            style={{ marginLeft: '10px' }}
+          />
+        }
         isOpen={isTransactionModalOpen && !isClaimModalOpen}
         message={message}
         netId={txNetId}
