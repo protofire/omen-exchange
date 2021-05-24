@@ -397,6 +397,8 @@ const HeaderContainer: React.FC = (props: any) => {
           }}
           unclaimedDaiAmount={unclaimedDaiAmount}
           unclaimedOmenAmount={unclaimedOmenAmount}
+          xDaiBalance={xDaiBalance}
+          xOmenBalance={xOmenBalance}
         />
         <ModalConnectWalletWrapper
           isOpen={isConnectWalletModalOpen}
