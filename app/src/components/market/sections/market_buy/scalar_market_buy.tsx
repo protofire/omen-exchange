@@ -165,8 +165,8 @@ export const ScalarMarketBuy = (props: Props) => {
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
   const showUpgrade =
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+    (!isUpdated && displayCollateral.address === pseudoNativeAssetAddress) ||
+    (upgradeFinished && displayCollateral.address === pseudoNativeAssetAddress)
 
   const upgradeProxy = async () => {
     if (!cpk) {
@@ -270,7 +270,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const total = `${sharesTotal} Shares`
 
   const showSetAllowance =
-    collateral.address !== pseudoNativeAssetAddress &&
+    displayCollateral.address !== pseudoNativeAssetAddress &&
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 

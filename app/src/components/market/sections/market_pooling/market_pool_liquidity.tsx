@@ -388,8 +388,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const showUpgrade =
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+    (!isUpdated && displayCollateral.address === pseudoNativeAssetAddress) ||
+    (upgradeFinished && displayCollateral.address === pseudoNativeAssetAddress)
 
   const upgradeProxy = async () => {
     if (!cpk) {
