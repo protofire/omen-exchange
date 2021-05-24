@@ -226,6 +226,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           useBaseToken = true
         }
       }
+
+      const inputCollateral =
+        collateral.symbol !== displayCollateral.symbol && collateral.symbol === nativeAsset.symbol
+          ? displayCollateral
+          : collateral
+
       const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals)
       setTweet('')
       setStatus(Status.Loading)
@@ -233,9 +239,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
+
       await cpk.buyOutcomes({
         amount: inputAmount,
-        collateral,
+        collateral: inputCollateral,
         compoundService,
         marketMaker,
         outcomeIndex,
@@ -326,12 +333,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     (status !== Status.Ready && status !== Status.Error) ||
     amount?.isZero() ||
     (!cpk?.isSafeApp &&
-      collateral.address !== pseudoNativeAssetAddress &&
       displayCollateral.address !== pseudoNativeAssetAddress &&
       hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount ||
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress)
+    (!isUpdated && displayCollateral.address === pseudoNativeAssetAddress)
 
   let currencyFilters =
     collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress

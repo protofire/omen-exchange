@@ -274,10 +274,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
+      const inputCollateral =
+        collateral.symbol !== displayCollateral.symbol && collateral.symbol === nativeAsset.symbol
+          ? displayCollateral
+          : collateral
+
       await cpk.addFunding({
         amount: amountToFundNormalized || Zero,
         compoundService,
-        collateral,
+        collateral: inputCollateral,
         marketMaker,
         setTxHash,
         setTxState,
@@ -334,6 +339,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           useBaseToken = true
         }
       }
+
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
         collateralAddress,
@@ -388,7 +394,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const disableDepositButton =
     !amountToFund ||
     amountToFund?.isZero() ||
-    (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
+    (!cpk?.isSafeApp &&
+      displayCollateral.address !== pseudoNativeAssetAddress &&
+      hasEnoughAllowance !== Ternary.True) ||
     collateralAmountError !== null ||
     currentDate > resolutionDate ||
     isNegativeAmountToFund
@@ -451,11 +459,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   }
 
   const setDisplayCollateralAmountToFund = (value: BigNumber) => {
-    if (collateral.address === displayCollateral.address) {
-      setAmountToFund(value)
-    } else if (compoundService) {
+    if (compoundService) {
       const baseAmount = compoundService.calculateBaseToCTokenExchange(displayCollateral, value)
       setAmountToFund(baseAmount)
+    } else {
+      setAmountToFund(value)
     }
     setAmountToFundNormalized(value)
   }
