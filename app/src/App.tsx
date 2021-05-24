@@ -41,12 +41,7 @@ const App: React.FC = () => {
       <Web3Provider connectors={connectors} libraryName="ethers.js">
         {!status ? (
           <>
-            <Modal
-              isOpen={true}
-              style={{
-                ...theme.fluidHeightModal.content,
-              }}
-            >
+            <Modal isOpen={true}>
               <ContentWrapper>
                 <ConnectionModalNavigation>
                   <ModalTitle>

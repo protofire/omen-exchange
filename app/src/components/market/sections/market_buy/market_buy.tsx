@@ -269,7 +269,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const showSetAllowance =
-    collateral.address !== pseudoNativeAssetAddress &&
+    displayCollateral.address !== pseudoNativeAssetAddress &&
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 

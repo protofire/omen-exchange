@@ -35,6 +35,7 @@ export const ModalTitle = styled.p`
 
 export const ModalCard = styled.div`
   width: 100%;
+
   display: flex;
   flex-direction: column;
   align-items: center;
