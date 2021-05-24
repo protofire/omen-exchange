@@ -9,7 +9,7 @@ interface Props {
 const SvgStyle = styled.svg`
   &:hover {
     circle {
-      stroke: ${props => props.theme.dropdown.buttonBorderColorHover} !important;
+      stroke: ${props => props.theme.dropdown.buttonBorderColorHover};
     }
     path {
       fill: ${props => props.theme.dropdown.buttonColorHover};
