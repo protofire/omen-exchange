@@ -69,7 +69,7 @@ export const BalanceItemTitle = styled.p<{ notSelected?: boolean }>`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => (props.notSelected ? props.theme.colors.textColorLighter : props.theme.colors.textColorDark)};
   margin: 0;
-  text-transform: capitalize;
+  text-transform: uppercase;
 `
 
 export const BalanceItemBalance = styled.p`
