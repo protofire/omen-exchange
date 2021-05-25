@@ -1,9 +1,10 @@
-import { Zero } from 'ethers/constants'
+import { MaxUint256, Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, bigNumberify, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
 import {
+  DAY_IN_SECONDS,
   GEN_TOKEN_ADDDRESS_TESTING,
   GEN_XDAI_ADDRESS_TESTING,
   OMNI_BRIDGE_XDAI_ADDRESS,
@@ -47,6 +48,7 @@ import { OvmService } from './ovm'
 import { RealitioService } from './realitio'
 import { SafeService } from './safe'
 import { StakingService } from './staking'
+import { StakingFactoryService } from './staking_factory'
 import { UnwrapTokenService } from './unwrap_token'
 import { XdaiService } from './xdai'
 
@@ -629,6 +631,26 @@ class CPKService {
         ),
       })
 
+      const stakingRewardsFactoryAddress = getContractAddress(networkId, 'stakingRewardsFactory')
+      const omnTokenAddress = getToken(networkId, 'omn').address
+      // TODO: Lengthen time from execution to account for transaction execution time
+      const startingTimestamp = Math.floor(new Date().getTime() / 1000 + 120)
+      const endingTimestamp = Math.floor((marketData.resolution?.getTime() || 1) / 1000 - DAY_IN_SECONDS)
+
+      // Step 6: Create staking distribution contract
+      transactions.push({
+        to: stakingRewardsFactoryAddress || '',
+        data: StakingFactoryService.encodeCreateDistribution(
+          [omnTokenAddress],
+          predictedMarketMakerAddress,
+          [new BigNumber(0)],
+          startingTimestamp,
+          endingTimestamp,
+          false,
+          MaxUint256,
+        ),
+      })
+
       const transaction = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       return {
         transaction,
@@ -871,6 +893,26 @@ class CPKService {
           spread,
           minCollateralAmount,
           distributionHint,
+        ),
+      })
+
+      const stakingRewardsFactoryAddress = getContractAddress(networkId, 'stakingRewardsFactory')
+      const omnTokenAddress = getToken(networkId, 'omn').address
+      // TODO: Lengthen time from execution to account for transaction execution time
+      const startingTimestamp = Math.floor(new Date().getTime() / 1000 + 120)
+      const endingTimestamp = Math.floor((marketData.resolution?.getTime() || 1) / 1000 - DAY_IN_SECONDS)
+
+      // Step 6: Create staking distribution contract
+      transactions.push({
+        to: stakingRewardsFactoryAddress || '',
+        data: StakingFactoryService.encodeCreateDistribution(
+          [omnTokenAddress],
+          predictedMarketMakerAddress,
+          [new BigNumber(0)],
+          startingTimestamp,
+          endingTimestamp,
+          false,
+          MaxUint256,
         ),
       })
 
