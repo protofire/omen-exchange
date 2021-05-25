@@ -1,3 +1,4 @@
+import { useInterval } from '@react-corekit/use-interval'
 import { configureStore } from '@reduxjs/toolkit'
 import React, { useEffect, useState } from 'react'
 import Modal from 'react-modal'
@@ -31,45 +32,52 @@ const App: React.FC = (props: any) => {
   const networkId = ethereum && ethereum.chainId
   const [status, setStatus] = useState(true)
   const network = getNetworkFromChain(networkId)
+  console.log('STATUS: ' + status)
+  useInterval(() => {
+    if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
+    if (network && network == -1) {
+      setTimeout(9000)
+      network !== -1 && checkRpcStatus(getInfuraUrl(network), setStatus, network)
+    }
+  }, parseInt('15000', 10))
 
   useEffect(() => {
     if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ethereum])
-
+  console.log('NETWORK_ID: ', network)
   return (
     <ThemeProvider theme={theme}>
       <Web3Provider connectors={connectors} libraryName="ethers.js">
         {!status ? (
-          <>
-            <Modal
-              isOpen={true}
-              style={{
-                ...theme.fluidHeightModal,
-                content: { ...theme.fluidHeightModal.content, height: '510px' },
-              }}
-              {...restProps}
-            >
-              <ContentWrapper>
-                <ConnectionModalNavigation>
-                  <ModalTitle>
-                    <IconArrowBack hoverEffect={true} onClick={() => alert('Please set your network!')} />
-                    <span style={{ marginLeft: '15px' }}>Settings</span>
-                  </ModalTitle>
+          <Modal
+            isOpen={true}
+            style={{
+              ...theme.fluidHeightModal,
+              content: { ...theme.fluidHeightModal.content, height: '510px' },
+            }}
+            {...restProps}
+          >
+            <ContentWrapper>
+              <ConnectionModalNavigation>
+                <ModalTitle>
+                  <IconArrowBack hoverEffect={true} onClick={() => alert('Please set your RPC endpoint')} />
+                  <span style={{ marginLeft: '15px' }}>Settings</span>
+                </ModalTitle>
 
-                  <IconClose
-                    hoverEffect={true}
-                    onClick={() => {
-                      alert('Please set your network!')
-                    }}
-                  />
-                </ConnectionModalNavigation>
-                <SettingsModalWrapper>
-                  <SettingsViewContainer networkId={networkId} />
-                </SettingsModalWrapper>
-              </ContentWrapper>
-            </Modal>
-          </>
+                <IconClose
+                  hoverEffect={true}
+                  onClick={() => {
+                    alert('Please set your RPC endpoint')
+                  }}
+                />
+              </ConnectionModalNavigation>
+              <SettingsModalWrapper>
+                <SettingsViewContainer networkId={networkId} />
+              </SettingsModalWrapper>
+            </ContentWrapper>
+          </Modal>
         ) : (
           <ConnectedWeb3 setStatus={setStatus}>
             <ApolloProviderWrapper>
