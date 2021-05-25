@@ -583,7 +583,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address)
+  const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address.toLowerCase())
 
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
@@ -605,8 +605,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
 
     const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
-
-    console.log(liquidityMiningCampaign.id)
 
     const omnToken = getToken(networkId, 'omn')
 
