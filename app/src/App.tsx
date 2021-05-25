@@ -1,4 +1,3 @@
-import { useInterval } from '@react-corekit/use-interval'
 import { configureStore } from '@reduxjs/toolkit'
 import React, { useEffect, useState } from 'react'
 import Modal from 'react-modal'
@@ -32,21 +31,13 @@ const App: React.FC = (props: any) => {
   const networkId = ethereum && ethereum.chainId
   const [status, setStatus] = useState(true)
   const network = getNetworkFromChain(networkId)
-  console.log('STATUS: ' + status)
-  useInterval(() => {
-    if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
-    if (network && network == -1) {
-      setTimeout(9000)
-      network !== -1 && checkRpcStatus(getInfuraUrl(network), setStatus, network)
-    }
-  }, parseInt('15000', 10))
 
   useEffect(() => {
     if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ethereum])
-  console.log('NETWORK_ID: ', network)
+
   return (
     <ThemeProvider theme={theme}>
       <Web3Provider connectors={connectors} libraryName="ethers.js">
