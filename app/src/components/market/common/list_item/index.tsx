@@ -10,6 +10,7 @@ import {
   useSymbol,
 } from '../../../../hooks'
 import { GraphResponseLiquidityMiningCampaign } from '../../../../hooks/useGraphLiquidityMiningCampaigns'
+import { useTokenPrice } from '../../../../hooks/useTokenPrice'
 import { ERC20Service } from '../../../../services'
 import { StakingService } from '../../../../services/staking'
 import { getLogger } from '../../../../util/logger'
@@ -162,6 +163,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     setToken()
   }, [account, collateralToken, collateralVolume, provider, context.networkId, token])
 
+  const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address.toLowerCase())
+
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
   useEffect(() => {
@@ -181,12 +184,13 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
       const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
 
+      const omnToken = getToken(networkId, 'omn')
+
       const { rewardApr } = await stakingService.getStakingData(
         getToken(networkId, 'omn'),
         cpk?.address || '',
         1, // Assume pool token value is 1 DAI
-        // TODO: Replace hardcoded price param
-        1,
+        Number(formatBigNumber(tokenPrice, omnToken.decimals, omnToken.decimals)),
         Number(liquidityMiningCampaign.endsAt),
         liquidityMiningCampaign.rewardAmounts[0],
         Number(liquidityMiningCampaign.duration),
