@@ -30,7 +30,7 @@ export const useTokenPrice = (address: string) => {
   })
 
   useEffect(() => {
-    if (data) {
+    if (data && data.tokenPrice) {
       setTokenPrice(bigNumberify(data.tokenPrice))
     }
   }, [data])
