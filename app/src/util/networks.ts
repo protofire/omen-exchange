@@ -66,6 +66,7 @@ interface Network {
     klerosTCR: string
     dxTCR: string
     omenVerifiedMarkets: string
+    stakingRewardsFactory: string
   }
   cpk?: CPKAddresses
   relayProxyFactoryAddress?: string
@@ -122,6 +123,7 @@ export const networks: { [K in NetworkId]: Network } = {
       klerosTCR: '0xebcf3bca271b26ae4b162ba560e243055af0e679',
       dxTCR: '0x93DB90445B76329e9ed96ECd74e76D8fbf2590d8',
       omenVerifiedMarkets: '0xb72103eE8819F2480c25d306eEAb7c3382fBA612',
+      stakingRewardsFactory: '0x0000000000000000000000000000000000000000',
     },
     cpk: {
       masterCopyAddress: '0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F',
@@ -168,6 +170,7 @@ export const networks: { [K in NetworkId]: Network } = {
       klerosTCR: '0x0000000000000000000000000000000000000000',
       dxTCR: '0x03165DF66d9448E45c2f5137486af3E7e752a352',
       omenVerifiedMarkets: '0x3b29096b7ab49428923d902cEC3dFEaa49993234',
+      stakingRewardsFactory: '0x264f2e08859736D96B546d1EF206C9D4dDDef05a',
     },
     cpk: {
       masterCopyAddress: '0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F',
@@ -214,6 +217,7 @@ export const networks: { [K in NetworkId]: Network } = {
       klerosTCR: '0x0000000000000000000000000000000000000000',
       dxTCR: '0x5486a9050f2aC6f535a72526e37738A060508361',
       omenVerifiedMarkets: '0x0000000000000000000000000000000000000000',
+      stakingRewardsFactory: '0x0000000000000000000000000000000000000000',
     },
     cpk: {
       masterCopyAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
@@ -263,6 +267,7 @@ export const networks: { [K in NetworkId]: Network } = {
       klerosTCR: '0x0000000000000000000000000000000000000000',
       dxTCR: '0x85E001DfFF16F388Bc32Cd18009ceDF8F9b62C9E',
       omenVerifiedMarkets: '0x0000000000000000000000000000000000000000',
+      stakingRewardsFactory: '0x0000000000000000000000000000000000000000',
     },
     cpk: {
       masterCopyAddress: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
