@@ -334,6 +334,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     addresses: {
       [networkIds.MAINNET]: '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
       [networkIds.XDAI]: '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599',
+      [networkIds.RINKEBY]: '0x0A08ECa47C56C305F4FeB4fa062AEcd5807BeBb8',
     },
     order: 22,
   },
