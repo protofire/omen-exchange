@@ -7,10 +7,11 @@ import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext } from '../../../hooks'
-import { OmenGuildService } from '../../../services'
+import { ERC20Service, OmenGuildService } from '../../../services'
 import { divBN, formatBigNumber, formatLockDate, waitForConfirmations } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
+import { ButtonStateful } from '../../button/button_stateful'
 import { ButtonType } from '../../button/button_styling_types'
 import { TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInput, BigNumberInputReturn } from '../../common/form/big_number_input'
@@ -107,12 +108,14 @@ const ModalLockTokens = (props: Props) => {
   const [txHash, setTxHash] = useState<any>('')
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txNetId, setTxNetId] = useState()
+  const [omenAllowance, setOmenAllowance] = useState<BigNumber>(Zero)
   const [confirmations, setConfirmations] = useState(0)
   const omen = new OmenGuildService(provider, networkId)
   console.log(unlockTimeLeft)
   useEffect(() => {
     ;(async () => {
       await getTokenLockInfo()
+      await fetchAllowance()
     })()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -132,6 +135,18 @@ const ModalLockTokens = (props: Props) => {
       setTimestamp(locked.timestamp.toNumber())
     } catch (e) {
       console.error(`Error while trying to fetch locked token info:  `, e.message)
+    }
+  }
+  const fetchAllowance = async () => {
+    try {
+      const allowanceAddress = await omen.tokenVault()
+      const omenAddress = await omen.omenTokenAddress()
+
+      const collateralService = new ERC20Service(provider, account, omenAddress)
+      const allowance = await collateralService.allowance(account, allowanceAddress)
+      setOmenAllowance(allowance)
+    } catch (e) {
+      console.log(e)
     }
   }
   const lockTokens = async (amount: BigNumber) => {
@@ -294,11 +309,15 @@ const ModalLockTokens = (props: Props) => {
                 Unlock Omen
               </ButtonsLockUnlock>
             )}
-
+            {(omenAllowance.isZero() && displayLockAmount.gt(omenAllowance)) || !isLockAmountOpen ? (
+              <ButtonStateful>Milan</ButtonStateful>
+            ) : (
+              <div>Gero</div>
+            )}
             <ButtonsLockUnlock
               buttonType={ButtonType.primaryAlternative}
               disabled={
-                (displayLockAmount.isZero() || omenBalance.isZero() || displayLockAmount.gt(omenBalance)) &&
+                (displayLockAmount.isZero() || omenBalance.isZero() || displayLockAmount.gte(omenBalance)) &&
                 isLockAmountOpen
               }
               onClick={() => (isLockAmountOpen ? lockTokens(displayLockAmount) : setIsLockAmountOpen(true))}
