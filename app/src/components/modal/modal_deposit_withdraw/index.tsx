@@ -38,7 +38,6 @@ import {
   ModalNavigationLeft,
   ModalTitle,
 } from '../common_styled'
-import { ModalClaimWrapper } from '../modal_claim'
 import { ModalTransactionWrapper } from '../modal_transaction'
 
 const InputInfo = styled.div`
@@ -110,7 +109,6 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 
   xDaiBalance: Maybe<BigNumber>
 
-  unclaimedAmount: BigNumber
   formattedxOmenBalance: string
 
   mainnetTokens: Token[]
@@ -126,7 +124,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     onBack,
     onClose,
     theme,
-    unclaimedAmount,
+
     xDaiBalance,
     xDaiTokens,
   } = props
@@ -146,7 +144,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [isClaimModalOpen, setIsClaimModalOpen] = useState<boolean>(false)
+
   const [txHash, setTxHash] = useState('')
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
   const [txNetId, setTxNetId] = useState()
@@ -248,38 +246,12 @@ export const ModalDepositWithdraw = (props: Props) => {
       await fetchBalances()
 
       setIsTransactionModalOpen(false)
+
       onBack()
       setDisplayFundAmount(new BigNumber(0))
       setAmountToDisplay('')
     } catch (e) {
       setIsTransactionModalOpen(false)
-    }
-  }
-
-  const claim = async () => {
-    if (!cpk) {
-      return
-    }
-
-    try {
-      const DAI = getToken(1, 'dai')
-      setMessage(`Claim ${formatBigNumber(unclaimedAmount || new BigNumber(0), DAI.decimals)} ${DAI.symbol}`)
-      setTxState(TransactionStep.waitingConfirmation)
-      setConfirmations(0)
-      setIsTransactionModalOpen(true)
-      setIsClaimModalOpen(false)
-
-      const transaction = await cpk.claimAllTokens()
-
-      const provider = context.rawWeb3Context.library
-      setTxNetId(provider.network.chainId)
-      setTxHash(transaction.hash)
-      await waitForConfirmations(transaction.hash, provider, setConfirmations, setTxState, 1)
-      setTxState(TransactionStep.transactionConfirmed)
-      await fetchBalances()
-    } catch (e) {
-      setIsTransactionModalOpen(false)
-      setIsClaimModalOpen(true)
     }
   }
 
@@ -313,7 +285,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   return (
     <>
       <Modal
-        isOpen={isOpen && !isTransactionModalOpen && !isClaimModalOpen}
+        isOpen={isOpen && !isTransactionModalOpen}
         onRequestClose={onClose}
         shouldCloseOnOverlayClick={true}
         style={{
@@ -449,17 +421,6 @@ export const ModalDepositWithdraw = (props: Props) => {
           </BottomButtons>
         </ContentWrapper>
       </Modal>
-      <ModalClaimWrapper
-        isOpen={isClaimModalOpen && !isTransactionModalOpen}
-        message={`Claim ${formatBigNumber(unclaimedAmount, STANDARD_DECIMALS)} DAI`}
-        onClick={() => {
-          claim()
-        }}
-        onClose={() => {
-          setIsClaimModalOpen(false)
-          onClose()
-        }}
-      />
       <ModalTransactionWrapper
         confirmations={confirmations}
         icon={
@@ -471,7 +432,7 @@ export const ModalDepositWithdraw = (props: Props) => {
             style={{ marginLeft: '10px' }}
           />
         }
-        isOpen={isTransactionModalOpen && !isClaimModalOpen}
+        isOpen={isTransactionModalOpen}
         message={message}
         netId={txNetId}
         onClose={() => {

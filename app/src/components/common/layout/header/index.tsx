@@ -419,7 +419,6 @@ const HeaderContainer: React.FC = (props: any) => {
             setYourConnectionModalState(true)
           }}
           onClose={() => setDepositWithdrawModalState(false)}
-          unclaimedAmount={unclaimedDaiAmount}
           xDaiBalance={xDaiBalance}
           xDaiTokens={xDaiTokens}
         />
