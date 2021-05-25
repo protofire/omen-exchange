@@ -256,7 +256,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   }
 
   const bridgeItems = bridgeTokensList.map((item, index) => {
-    const { address, decimals, symbol } = getToken(networkIds.MAINNET, item)
+    const { address, decimals, name, symbol } = getToken(networkIds.MAINNET, item)
 
     const token = findCurrentTokenBasedOnAction(exchangeType, symbol)
 
@@ -271,7 +271,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         <BalanceItemSide>
           <RadioInput checked={currencySelected === item} name={item} outcomeIndex={-1} readOnly />
           <Image size={'24'} src={getImageUrl(address)} style={{ marginLeft: '12px', marginRight: '12px' }} />
-          <BalanceItemTitle notSelected={currencySelected !== item}>{item}</BalanceItemTitle>
+          <BalanceItemTitle notSelected={currencySelected !== item}>{name ? name : symbol}</BalanceItemTitle>
         </BalanceItemSide>
         <BalanceItemSide>
           <BalanceItemBalance>

@@ -90,6 +90,7 @@ interface KnownTokenData {
   }
   order: number
   disabled?: boolean
+  name?: string
 }
 
 export const pseudoNativeAssetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
@@ -330,6 +331,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   },
   omn: {
     symbol: 'OMN',
+    name: 'Omen',
     decimals: 18,
     addresses: {
       [networkIds.MAINNET]: '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
@@ -512,6 +514,7 @@ export const getToken = (networkId: number, tokenId: KnownToken): Token => {
     address,
     decimals: token.decimals,
     symbol: token.symbol,
+    name: token.name ? token.name : '',
     image: getImageUrl(address),
   }
 }
