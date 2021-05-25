@@ -9,16 +9,23 @@ import { useConnectedWeb3Context } from './connectedWeb3'
  * Returns an instance of CPKService. While the instance is being (asynchronously) created, the returned value is null.
  */
 
-export const useConnectedCPKContext = (): Maybe<CPKService> => {
+export const useRawCpk = (context: any) => {
   const [cpk, setCpk] = useState<Maybe<CPKService>>(null)
-  const { account, library, networkId, relay } = useConnectedWeb3Context()
-
   useEffect(() => {
-    if (account && library) {
-      createCPK(library, relay)
-        .then(cpk => new CPKService(cpk, library))
-        .then(setCpk)
+    if (context) {
+      const { account, library, relay } = context
+      if (account && library) {
+        createCPK(library, relay)
+          .then(cpk => new CPKService(cpk, library))
+          .then(setCpk)
+      }
     }
-  }, [account, library, networkId, relay])
+  }, [context])
+  return cpk
+}
+
+export const useConnectedCPKContext = (): Maybe<CPKService> => {
+  const context = useConnectedWeb3Context()
+  const cpk = useRawCpk(context)
   return cpk
 }

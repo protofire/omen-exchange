@@ -6,7 +6,9 @@ import connectors from '../util/connectors'
 import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
+import { getNetworkFromChain } from '../util/tools'
 
+import { useRawCpk } from './connectedCpk'
 import { useSafeApp } from './useSafeApp'
 
 const logger = getLogger('Hooks::ConnectedWeb3')
@@ -43,14 +45,26 @@ interface Props {
  * `useConnectedWeb3Context` safely to get web3 stuff without having to null check it.
  */
 export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
+  const [connection, setConnection] = useState<ConnectedWeb3Context | null>(null)
   const [networkId, setNetworkId] = useState<number | null>(null)
   const safeAppInfo = useSafeApp()
   const context = useWeb3Context()
 
   const { account, active, error, library } = context
+  const cpk = useRawCpk(connection)
+
   const rpcAddress: string | null = localStorage.getItem('rpcAddress')
 
-  const initialRelayState = localStorage.getItem('relay') === 'false' ? false : true
+  const windowObj: any = window
+  const ethereum = windowObj.ethereum
+  const network = ethereum && ethereum.chainId
+  const injectedNetworkId = getNetworkFromChain(network)
+
+  const initialRelayState =
+    localStorage.getItem('relay') === 'false' || (injectedNetworkId !== -1 && injectedNetworkId !== networkIds.MAINNET)
+      ? false
+      : true
+
   const [relay, setRelay] = useState(initialRelayState)
   const toggleRelay = () => {
     localStorage.setItem('relay', String(!relay))
@@ -58,22 +72,44 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   }
 
   useEffect(() => {
+    if (networkId) {
+      const { address, isRelay, netId, provider } = getRelayProvider(
+        relay && context.connectorName !== 'Safe',
+        networkId,
+        library,
+        account,
+      )
+
+      const value = {
+        account: address || null,
+        library: provider,
+        networkId: netId,
+        rawWeb3Context: context,
+        relay: isRelay,
+        toggleRelay,
+      }
+
+      setConnection(value)
+    }
+    // eslint-disable-next-line
+  }, [relay, networkId, context, networkId, library, account])
+
+  useEffect(() => {
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
-
-    if (safeAppInfo) {
+    if (error) {
+      logger.log(error.message)
+      localStorage.removeItem('CONNECTOR')
+      context.setConnector('Infura')
+    } else if (safeAppInfo) {
       if (context.connectorName !== 'Safe') {
         localStorage.removeItem('CONNECTOR')
         const netId = (networkIds as any)[safeAppInfo.network.toUpperCase()]
         connectors.Safe.init(safeAppInfo.safeAddress, netId)
         context.setConnector('Safe')
       }
-    } else if (active && connector && connector in connectors) {
+    } else if (connector && connector in connectors) {
       context.setConnector(connector)
-    } else if (error) {
-      logger.log(error.message)
-      localStorage.removeItem('CONNECTOR')
-      context.setConnector('Infura')
     } else {
       context.setConnector('Infura')
     }
@@ -115,26 +151,16 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     }
   }, [context, library, active, error, networkId, safeAppInfo, rpcAddress])
 
-  if (!networkId || !library) {
+  if (!networkId || !library || !connection || (connection.account && !cpk)) {
     props.setStatus(true)
     return null
   }
 
-  const { address, isRelay, netId, provider } = getRelayProvider(
-    relay && context.connectorName !== 'Safe',
-    networkId,
-    library,
-    account,
-  )
-
   const value = {
-    account: address || null,
-    library: provider,
-    networkId: netId,
-    rawWeb3Context: context,
-    relay: isRelay,
-    toggleRelay,
+    ...connection,
+    cpk,
   }
+
   props.setStatus(true)
   return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
 }
