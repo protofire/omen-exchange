@@ -11,7 +11,7 @@ import { ERC20Service, OmenGuildService } from '../../../services'
 import { divBN, formatBigNumber, formatLockDate, waitForConfirmations } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
-import { ButtonStateful } from '../../button/button_stateful'
+import { ButtonStateful, ButtonStates } from '../../button/button_stateful'
 import { ButtonType } from '../../button/button_styling_types'
 import { TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInput, BigNumberInputReturn } from '../../common/form/big_number_input'
@@ -62,6 +62,7 @@ const LightDataItem = styled.div`
 `
 const DarkDataItem = styled.div`
   display: flex;
+  align-items: center;
   color: ${props => props.theme.colors.textColorDark};
   font-weight: ${props => props.theme.textfield.fontWeight};
 `
@@ -73,7 +74,10 @@ const ButtonSection = styled.div`
   margin-top: 28px;
 `
 const ButtonsLockUnlock = styled(Button)`
-  width: 100%;
+  flex: 1;
+`
+const ApproveButton = styled(ButtonStateful)`
+  flex: 1;
 `
 const ConditionalWrapper = styled.div<{ hideWrapper: boolean }>`
   ${props => props.hideWrapper && 'display:contents'};
@@ -109,13 +113,20 @@ const ModalLockTokens = (props: Props) => {
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txNetId, setTxNetId] = useState()
   const [omenAllowance, setOmenAllowance] = useState<BigNumber>(Zero)
+  const [allowanceState, setAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
   const [confirmations, setConfirmations] = useState(0)
   const omen = new OmenGuildService(provider, networkId)
+
+  const isApproveVisible =
+    (omenAllowance.isZero() && isLockAmountOpen) ||
+    (allowanceState === ButtonStates.finished && !omenAllowance.isZero())
   console.log(unlockTimeLeft)
   useEffect(() => {
     ;(async () => {
+      console.log('here')
       await getTokenLockInfo()
       await fetchAllowance()
+      console.log('here')
     })()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -147,6 +158,20 @@ const ModalLockTokens = (props: Props) => {
       setOmenAllowance(allowance)
     } catch (e) {
       console.log(e)
+    }
+  }
+  const approve = async () => {
+    try {
+      setAllowanceState(ButtonStates.working)
+      const allowanceAddress = await omen.tokenVault()
+      const omenAddress = await omen.omenTokenAddress()
+
+      const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenAddress)
+
+      await collateralService.approveUnlimited(allowanceAddress)
+      setAllowanceState(ButtonStates.finished)
+    } catch {
+      setAllowanceState(ButtonStates.idle)
     }
   }
   const lockTokens = async (amount: BigNumber) => {
@@ -309,10 +334,17 @@ const ModalLockTokens = (props: Props) => {
                 Unlock Omen
               </ButtonsLockUnlock>
             )}
-            {(omenAllowance.isZero() && displayLockAmount.gt(omenAllowance)) || !isLockAmountOpen ? (
-              <ButtonStateful>Milan</ButtonStateful>
-            ) : (
-              <div>Gero</div>
+            {isApproveVisible && (
+              <ApproveButton
+                disabled={allowanceState !== ButtonStates.idle}
+                extraText
+                onClick={approve}
+                state={allowanceState}
+              >
+                {allowanceState === ButtonStates.idle && `Approve OMN`}
+                {allowanceState === ButtonStates.working && 'Approving'}
+                {allowanceState === ButtonStates.finished && 'Approved'}
+              </ApproveButton>
             )}
             <ButtonsLockUnlock
               buttonType={ButtonType.primaryAlternative}
