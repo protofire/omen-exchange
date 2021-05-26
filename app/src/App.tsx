@@ -1,3 +1,4 @@
+import { useInterval } from '@react-corekit/use-interval'
 import { configureStore } from '@reduxjs/toolkit'
 import React, { useEffect, useState } from 'react'
 import Modal from 'react-modal'
@@ -25,12 +26,22 @@ const store = configureStore({ reducer: balanceReducer })
 
 const App: React.FC = (props: any) => {
   const { ...restProps } = props
+
   const windowObj: any = window
 
-  const ethereum = windowObj.ethereum
-  const networkId = ethereum && ethereum.chainId
   const [status, setStatus] = useState(true)
-  const network = getNetworkFromChain(networkId)
+  const [networkStat, setNetworkState] = useState('')
+
+  setTimeout(() => {
+    const ethereum = windowObj.ethereum
+    const networkId = ethereum && ethereum.chainId
+    const network = getNetworkFromChain(networkId)
+    setNetworkState(network)
+  }, 1000)
+
+  useInterval(() => {
+    if (network && network == -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
+  }, parseInt('15000', 10))
 
   useEffect(() => {
     if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
