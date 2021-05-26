@@ -1491,8 +1491,8 @@ class CPKService {
             data: XdaiService.encodeRelayTokens(to),
             value: amount.toString(),
           })
-          const { hash } = await this.cpk.execTransactions(transactions, txOptions, setTxHash, setTxState)
-          return hash
+          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+          return transactionHash
         } else {
           transactions.push({
             to: address,
