@@ -276,7 +276,9 @@ export const ModalDepositWithdraw = (props: Props) => {
         <BalanceItemSide>
           <RadioInput checked={currencySelected === item} name={item} outcomeIndex={-1} readOnly />
           <Image size={'24'} src={getImageUrl(address)} style={{ marginLeft: '12px', marginRight: '12px' }} />
-          <BalanceItemTitle notSelected={currencySelected !== item}>{name ? name : symbol}</BalanceItemTitle>
+          <BalanceItemTitle notSelected={currencySelected !== item}>
+            {name ? name : symbol.toLowerCase()}
+          </BalanceItemTitle>
         </BalanceItemSide>
         <BalanceItemSide>
           <BalanceItemBalance>
