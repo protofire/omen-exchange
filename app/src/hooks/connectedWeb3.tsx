@@ -8,6 +8,7 @@ import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
 import { getNetworkFromChain } from '../util/tools'
 
+import { useRawBalance } from './connectedBalance'
 import { useRawCpk } from './connectedCpk'
 import { useSafeApp } from './useSafeApp'
 
@@ -51,8 +52,10 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   const context = useWeb3Context()
 
   const { account, active, error, library } = context
-  const cpk = useRawCpk(connection)
 
+  const cpk = useRawCpk(connection)
+  const balances = useRawBalance(connection)
+  console.log(balances)
   const rpcAddress: string | null = localStorage.getItem('rpcAddress')
 
   const windowObj: any = window
