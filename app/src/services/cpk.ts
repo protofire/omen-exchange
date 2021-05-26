@@ -153,6 +153,10 @@ interface TxOptions {
   value?: BigNumber
   gas?: number
 }
+interface TxState {
+  setTxHash?: (arg0: string) => void
+  setTxState?: (step: TransactionStep) => void
+}
 
 const fallbackMultisigTransactionReceipt: TransactionReceipt = {
   byzantium: true,
@@ -1465,7 +1469,12 @@ class CPKService {
     }
   }
 
-  sendXdaiChainTokenToBridge = async (amount: BigNumber, address: string, symbol?: string) => {
+  sendXdaiChainTokenToBridge = async (
+    amount: BigNumber,
+    address: string,
+    { setTxHash, setTxState }: TxState,
+    symbol?: string,
+  ) => {
     try {
       if (this.cpk.relay) {
         const transactions: Transaction[] = []
@@ -1482,14 +1491,14 @@ class CPKService {
             data: XdaiService.encodeRelayTokens(to),
             value: amount.toString(),
           })
-          const { hash } = await this.cpk.execTransactions(transactions, txOptions)
+          const { hash } = await this.cpk.execTransactions(transactions, txOptions, setTxHash, setTxState)
           return hash
         } else {
           transactions.push({
             to: address,
             data: XdaiService.encodeTokenBridgeTransfer(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
           })
-          const { transactionHash } = await this.execTransactions(transactions, txOptions)
+          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
 
           return transactionHash
         }

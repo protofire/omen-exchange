@@ -230,7 +230,15 @@ export const ModalDepositWithdraw = (props: Props) => {
       const hash =
         exchangeType === ExchangeType.deposit
           ? await cpk.sendMainnetTokenToBridge(displayFundAmount, address, symbol)
-          : await cpk.sendXdaiChainTokenToBridge(displayFundAmount, address, symbol)
+          : await cpk.sendXdaiChainTokenToBridge(
+              displayFundAmount,
+              address,
+              {
+                setTxState,
+                setTxHash,
+              },
+              symbol,
+            )
 
       const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
 
@@ -242,16 +250,14 @@ export const ModalDepositWithdraw = (props: Props) => {
       if (exchangeType === ExchangeType.deposit && symbol !== 'DAI') {
         await XdaiService.waitForBridgeMessageStatus(hash, context.library)
       }
-
+      setTxState(TransactionStep.transactionConfirmed)
       await fetchBalances()
-
-      setIsTransactionModalOpen(false)
 
       onBack()
       setDisplayFundAmount(new BigNumber(0))
       setAmountToDisplay('')
     } catch (e) {
-      setIsTransactionModalOpen(false)
+      setTxState(TransactionStep.error)
     }
   }
 

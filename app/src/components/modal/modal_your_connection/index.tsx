@@ -233,7 +233,7 @@ export const ModalYourConnection = (props: Props) => {
       setTxState(TransactionStep.transactionConfirmed)
       await fetchBalances()
     } catch (e) {
-      setIsTransactionModalOpen(false)
+      setTxState(TransactionStep.error)
     }
   }
 
