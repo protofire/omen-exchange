@@ -253,7 +253,6 @@ export const ModalDepositWithdraw = (props: Props) => {
       setTxState(TransactionStep.transactionConfirmed)
       await fetchBalances()
 
-      onBack()
       setDisplayFundAmount(new BigNumber(0))
       setAmountToDisplay('')
     } catch (e) {
