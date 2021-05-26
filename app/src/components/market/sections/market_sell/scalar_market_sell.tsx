@@ -1,6 +1,7 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
@@ -115,6 +116,8 @@ export const ScalarMarketSell = (props: Props) => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
+
+  const history = useHistory()
 
   let displayBalances = balances
   if (
@@ -486,7 +489,13 @@ export const ScalarMarketSell = (props: Props) => {
         />
       )}
       <StyledButtonContainer>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => {
+            switchMarketTab(MarketDetailsTab.swap)
+            history.replace(`/${marketMakerAddress}`)
+          }}
+        >
           Cancel
         </Button>
         <Button buttonType={ButtonType.primaryAlternative} disabled={isSellButtonDisabled} onClick={finish}>

@@ -1,7 +1,7 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { RouteComponentProps, withRouter } from 'react-router-dom'
+import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
@@ -104,6 +104,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
+
+  const history = useHistory()
 
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
   const collateralSymbol = collateral.symbol.toLowerCase()
@@ -473,7 +475,13 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <StyledButtonContainer borderTop={true} marginTop={isNegativeAmountShares}>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => {
+            switchMarketTab(MarketDetailsTab.swap)
+            history.replace(`/${marketMakerAddress}`)
+          }}
+        >
           Cancel
         </Button>
         <Button buttonType={ButtonType.secondaryLine} disabled={isSellButtonDisabled} onClick={() => finish()}>

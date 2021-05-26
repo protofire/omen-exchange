@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useHistory } from 'react-router-dom'
 
 import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
@@ -15,7 +16,16 @@ interface Props {
 }
 
 const MarketSellContainer: React.FC<Props> = (props: Props) => {
-  const { isScalar } = props
+  const {
+    isScalar,
+    marketMakerData: { address },
+  } = props
+
+  const history = useHistory()
+
+  useEffect(() => {
+    return history.replace(`/${address}/sell`)
+  }, [])
 
   if (isScalar) return <ScalarMarketSell {...props} />
   return <MarketSell {...props} />

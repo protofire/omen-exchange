@@ -1,4 +1,6 @@
-import React from 'react'
+/* eslint-disable no-console */
+import React, { useEffect } from 'react'
+import { useHistory } from 'react-router'
 
 import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
@@ -14,10 +16,24 @@ interface Props {
 }
 
 const MarketBuyContainer: React.FC<Props> = (props: Props) => {
-  const { isScalar } = props
+  const {
+    isScalar,
+    marketMakerData: { address },
+  } = props
 
-  if (isScalar) return <ScalarMarketBuy {...props} />
-  return <MarketBuy {...props} />
+  const history = useHistory()
+
+  // const displayLinkBuy = () => {
+  //   return history.replace(`/${address}/buy`)
+  // }
+
+  useEffect(() => {
+    // displayLinkBuy()
+    return history.replace(`/${address}/buy`)
+  }, [])
+
+  // Refactored that line with Milan
+  return <>{isScalar ? <ScalarMarketBuy {...props} /> : <MarketBuy {...props} />}</>
 }
 
 export { MarketBuyContainer }

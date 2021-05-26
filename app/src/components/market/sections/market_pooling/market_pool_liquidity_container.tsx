@@ -1,4 +1,5 @@
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useHistory } from 'react-router-dom'
 
 import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
@@ -14,10 +15,18 @@ interface Props {
 }
 
 const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
-  const { isScalar } = props
+  const {
+    isScalar,
+    marketMakerData: { address },
+  } = props
 
-  if (isScalar) return <ScalarMarketPoolLiquidity {...props} />
-  return <MarketPoolLiquidity {...props} />
+  const history = useHistory()
+
+  useEffect(() => {
+    history.replace(`/${address}/pool`)
+  }, [])
+
+  return <>{isScalar ? <ScalarMarketPoolLiquidity {...props} /> : <MarketPoolLiquidity {...props} />}</>
 }
 
 export { MarketPoolLiquidityContainer }
