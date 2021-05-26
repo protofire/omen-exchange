@@ -192,7 +192,7 @@ const Outcomes = (props: Props) => {
               data-multiline={true}
               effect="solid"
               id="newOutcome"
-              offset={{ top: 0, left: 250 }}
+              offset={{ top: 0, left: 214 }}
               place="top"
               type="light"
             />

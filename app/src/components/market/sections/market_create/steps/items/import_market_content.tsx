@@ -1,5 +1,4 @@
 import React, { ChangeEvent, HTMLAttributes, useEffect, useMemo, useState } from 'react'
-import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { useAsyncDerivedValue, useContracts, useMarketMakerData } from '../../../../../../hooks'

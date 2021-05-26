@@ -68,11 +68,10 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   title: string
   value: any
   invertedColors?: boolean
-  html?: boolean
 }
 
 export const TitleValue: React.FC<Props> = (props: Props) => {
-  const { html, invertedColors, state = ValueStates.normal, title, value, tooltip, date, ...restProps } = props
+  const { invertedColors, state = ValueStates.normal, title, value, tooltip, date, ...restProps } = props
 
   const now = moment()
   const localResolution = moment(date).local()
