@@ -289,11 +289,11 @@ export const ScalarMarketBuy = (props: Props) => {
     (status !== Status.Ready && status !== Status.Error) ||
     amount.isZero() ||
     (!cpk?.isSafeApp &&
-      collateral.address !== pseudoNativeAssetAddress &&
       displayCollateral.address !== pseudoNativeAssetAddress &&
       hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
-    isNegativeAmount
+    isNegativeAmount ||
+    (!isUpdated && displayCollateral.address === pseudoNativeAssetAddress)
 
   const finish = async () => {
     const outcomeIndex = positionIndex
@@ -311,6 +311,11 @@ export const ScalarMarketBuy = (props: Props) => {
           inputAmount = compoundService.calculateCTokenToBaseExchange(baseCollateral, amount)
         }
       }
+      const inputCollateral =
+        collateral.symbol !== displayCollateral.symbol && collateral.symbol === nativeAsset.symbol
+          ? displayCollateral
+          : collateral
+
       const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals)
       setTweet('')
       setStatus(Status.Loading)
@@ -320,7 +325,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
       await cpk.buyOutcomes({
         amount: inputAmount,
-        collateral,
+        collateral: inputCollateral,
         compoundService,
         outcomeIndex,
         marketMaker,
