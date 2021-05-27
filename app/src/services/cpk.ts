@@ -1518,7 +1518,8 @@ class CPKService {
       const xDaiService = new XdaiService(this.provider)
       const daiData = await xDaiService.fetchXdaiTransactionData()
       const omenData = await xDaiService.fetchOmniTransactionData()
-
+      console.log(daiData)
+      console.log(omenData)
       return daiData.concat(omenData)
     } catch (e) {
       logger.error('Error fetching xDai subgraph data', e.message)
@@ -1535,6 +1536,7 @@ class CPKService {
       const messages = []
       const signatures = []
       const addresses = []
+      console.log(transactions)
 
       for (let i = 0; i < transactions.length; i++) {
         addresses.push(transactions[i].address)
@@ -1545,11 +1547,11 @@ class CPKService {
 
         signatures.push(signature)
       }
-
+      console.log('other side')
       const txObject = await xDaiService.claim(addresses, messages, signatures)
       return txObject
     } catch (e) {
-      logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)
+      logger.error(`Error trying to claim tokens from xDai bridge`, e.message)
       throw e
     }
   }

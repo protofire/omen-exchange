@@ -64,6 +64,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const { refetch, tokens: mainnetTokens } = useTokens(context.rawWeb3Context, true, true, false, true)
 
   //xDai balances
+  console.log(context.account)
   const { refetch: fetchXdaiTokens, tokens: xDaiTokens } = useTokens(context, true, true)
 
   const nativeBalance = new BigNumber(
