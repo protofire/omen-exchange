@@ -6,6 +6,8 @@ import { Provider } from 'react-redux'
 import { ThemeProvider } from 'styled-components'
 import Web3Provider from 'web3-react'
 
+import { FETCH_RPC_INTERVAL } from '../src/common/constants'
+
 import 'react-datepicker/dist/react-datepicker.css'
 import 'sanitize.css'
 import { IconArrowBack, IconClose } from './components/common/icons/'
@@ -36,17 +38,14 @@ const App: React.FC = (props: any) => {
 
   useInterval(() => {
     if (status == false) {
-     
       setTimeout(() => {
         if (status == false) setSettingsView(true)
       }, 2500)
     }
-  }, parseInt('2500', 10))
+  }, FETCH_RPC_INTERVAL)
 
   useEffect(() => {
-    if (network && network !== -1) {
-      checkRpcStatus(getInfuraUrl(network), setStatus, network)
-    }
+    if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ethereum])
 
@@ -65,14 +64,14 @@ const App: React.FC = (props: any) => {
             <ContentWrapper>
               <ConnectionModalNavigation>
                 <ModalTitle>
-                  <IconArrowBack hoverEffect={true} onClick={() => alert('Please set your RPC endpoint')} />
+                  <IconArrowBack hoverEffect={true} onClick={() => alert('Please set your RPC endpoint!')} />
                   <span style={{ marginLeft: '15px' }}>Settings</span>
                 </ModalTitle>
 
                 <IconClose
                   hoverEffect={true}
                   onClick={() => {
-                    alert('Please set your RPC endpoint')
+                    alert('Please set your RPC endpoint!')
                   }}
                 />
               </ConnectionModalNavigation>
