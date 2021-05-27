@@ -28,6 +28,7 @@ import {
 import {
   calcDistributionHint,
   clampBigNumber,
+  formatBigNumber,
   getBaseToken,
   getBaseTokenForCToken,
   isCToken,
@@ -1440,28 +1441,35 @@ class CPKService {
       throw e
     }
   }
-  lockTokens = async (amount: BigNumber) => {
+  lockTokens = async (amount: BigNumber, setTxState: any, setTxHash: any) => {
     try {
       const network = await this.provider.getNetwork()
       const OmenGuild = new OmenGuildService(this.provider, network.chainId)
-      if (this.cpk.relay) {
-        const txOptions: TxOptions = {}
-        txOptions.gas = defaultGas
+      console.log(OmenGuild)
+      //if (this.cpk.relay) {
+      const txOptions: TxOptions = {}
+      txOptions.gas = defaultGas * 10
+      const format = amount.toHexString()
 
-        const transactions: Transaction[] = [
-          {
-            to: OmenGuild.omenGuildAddress,
-            data: OmenGuildService.encodeLockTokens(amount),
-          },
-        ]
-        const { transactionHash } = await this.execTransactions(transactions, txOptions)
-
-        return transactionHash
-      } else {
-        const transaction = await OmenGuild.lockTokens(amount)
-        console.log(transaction)
-        return transaction.hash
-      }
+      console.log(format)
+      const transactions: Transaction[] = [
+        {
+          to: OmenGuild.omenGuildAddress,
+          data: OmenGuildService.encodeLockTokens(format),
+        },
+      ]
+      console.log(this.cpk.address)
+      console.log(transactions)
+      console.log(txOptions)
+      const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+      console.log('made it')
+      return transactionHash
+      // } else {
+      //   console.log('jere')
+      //   const transaction = await OmenGuild.lockTokens(amount)
+      //   console.log(transaction)
+      //   return transaction.hash
+      // }
     } catch (e) {
       logger.error(`Error while trying to lock Omen tokens : `, e.message)
       throw e

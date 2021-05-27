@@ -79,7 +79,7 @@ class OmenGuildService {
     return this.omenGuildAddress
   }
 
-  static encodeLockTokens = (amount: BigNumber) => {
+  static encodeLockTokens = (amount: any) => {
     const guildInterface = new utils.Interface(GuildAbi)
     return guildInterface.functions.lockTokens.encode([amount])
   }

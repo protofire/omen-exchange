@@ -122,6 +122,7 @@ const ModalLockTokens = (props: Props) => {
     (allowanceState === ButtonStates.finished && !omenAllowance.isZero())
   console.log(unlockTimeLeft)
   useEffect(() => {
+    setAllowanceState(ButtonStates.idle)
     ;(async () => {
       console.log('here')
       await getTokenLockInfo()
@@ -169,6 +170,7 @@ const ModalLockTokens = (props: Props) => {
       const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenAddress)
 
       await collateralService.approveUnlimited(allowanceAddress)
+      await fetchAllowance()
       setAllowanceState(ButtonStates.finished)
     } catch {
       setAllowanceState(ButtonStates.idle)
@@ -181,11 +183,12 @@ const ModalLockTokens = (props: Props) => {
       setTransactionMessage(`Lock ${formatBigNumber(amount, STANDARD_DECIMALS, 2)} OMN`)
 
       setIsTransactionModalOpen(true)
-      const transaction = await cpk.lockTokens(amount)
+
+      const transaction = await cpk.lockTokens(amount, setTxHash, setTxState)
       setTxNetId(provider.network.chainId)
       setTxHash(transaction)
-      await waitForConfirmations(transaction, provider, setConfirmations, setTxState)
-      // setTxHash(transaction)
+
+      setIsTransactionModalOpen(false)
     } catch (e) {
       setTxState(TransactionStep.error)
       console.log(e)
@@ -334,7 +337,7 @@ const ModalLockTokens = (props: Props) => {
                 Unlock Omen
               </ButtonsLockUnlock>
             )}
-            {isApproveVisible && (
+            {isApproveVisible && isLockAmountOpen && (
               <ApproveButton
                 disabled={allowanceState !== ButtonStates.idle}
                 extraText
@@ -349,7 +352,10 @@ const ModalLockTokens = (props: Props) => {
             <ButtonsLockUnlock
               buttonType={ButtonType.primaryAlternative}
               disabled={
-                (displayLockAmount.isZero() || omenBalance.isZero() || displayLockAmount.gte(omenBalance)) &&
+                (displayLockAmount.isZero() ||
+                  omenBalance.isZero() ||
+                  displayLockAmount.gte(omenBalance) ||
+                  displayLockAmount.gt(omenAllowance)) &&
                 isLockAmountOpen
               }
               onClick={() => (isLockAmountOpen ? lockTokens(displayLockAmount) : setIsLockAmountOpen(true))}
@@ -360,7 +366,7 @@ const ModalLockTokens = (props: Props) => {
         </ContentWrapper>
       </Modal>
       <ModalTransactionWrapper
-        confirmations={confirmations}
+        confirmations={0}
         confirmationsRequired={0}
         icon={<IconOmen size={24} style={{ marginLeft: '10px' }} />}
         isOpen={isTransactionModalOpen}
