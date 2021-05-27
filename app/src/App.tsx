@@ -36,10 +36,9 @@ const App: React.FC = (props: any) => {
 
   useInterval(() => {
     if (status == false) {
-      //if status pings false we check for false positive by settings 2.5 second time out and asking again, is status false?
+     
       setTimeout(() => {
         if (status == false) setSettingsView(true)
-        //if status is still false after time out we can safely assume user is disconnected and set state accordingly.
       }, 2500)
     }
   }, parseInt('2500', 10))
