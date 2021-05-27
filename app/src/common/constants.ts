@@ -100,7 +100,7 @@ export const TWITTER_SITE = '@Omen_eth'
 export const DISCLAIMER_TEXT = ''
 
 export const FETCH_DETAILS_INTERVAL = parseInt('15000', 10)
-export const FETCH_RPC_INTERVAL = parseInt('2500', 10)
+export const FETCH_RPC_INTERVAL = parseInt('5000', 10)
 export const SHOW_FOOTER = true
 export const IMPORT_QUESTION_ID_KEY = 'importQuestionId'
 
