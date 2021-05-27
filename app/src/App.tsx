@@ -37,7 +37,6 @@ const App: React.FC = (props: any) => {
   const [settingsView, setSettingsView] = useState(false)
 
   useInterval(() => {
-    console.log(status)
     if (status == false) {
       setTimeout(() => {
         if (status == false) setSettingsView(true)
