@@ -26,33 +26,35 @@ const store = configureStore({ reducer: balanceReducer })
 
 const App: React.FC = (props: any) => {
   const { ...restProps } = props
-
   const windowObj: any = window
 
+  const ethereum = windowObj.ethereum
+  const networkId = ethereum && ethereum.chainId
   const [status, setStatus] = useState(true)
-  const [networkStat, setNetworkState] = useState('')
-
-  setTimeout(() => {
-    const ethereum = windowObj.ethereum
-    const networkId = ethereum && ethereum.chainId
-    const network = getNetworkFromChain(networkId)
-    setNetworkState(network)
-  }, 1000)
+  const network = getNetworkFromChain(networkId)
+  const [settingsView, setSettingsView] = useState(false)
 
   useInterval(() => {
-    if (network && network == -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
-  }, parseInt('15000', 10))
+    if (status == false) {
+      //if status pings false we check for false positive by settings 2.5 second time out and asking again, is status false?
+      setTimeout(() => {
+        if (status == false) setSettingsView(true)
+        //if status is still false after time out we can safely assume user is disconnected and set state accordingly.
+      }, 2500)
+    }
+  }, parseInt('2500', 10))
 
   useEffect(() => {
-    if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
-
+    if (network && network !== -1) {
+      checkRpcStatus(getInfuraUrl(network), setStatus, network)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ethereum])
 
   return (
     <ThemeProvider theme={theme}>
       <Web3Provider connectors={connectors} libraryName="ethers.js">
-        {!status ? (
+        {settingsView ? (
           <Modal
             isOpen={true}
             style={{
