@@ -665,17 +665,17 @@ class CPKService {
         generateAddress(toBuffer(stakingRewardsFactoryAddress), toBuffer(nonce)),
       )
 
-      // // Step 7: Approve staking contract to spend pool tokens
-      // transactions.push({
-      //   to: predictedMarketMakerAddress,
-      //   data: ERC20Service.encodeApproveUnlimited(predictedStakingContractAddress),
-      // })
+      // Step 7: Approve staking contract to spend pool tokens
+      transactions.push({
+        to: predictedMarketMakerAddress,
+        data: ERC20Service.encodeApproveUnlimited(predictedStakingContractAddress),
+      })
 
-      // // Step 8: Stake pool tokens
-      // transactions.push({
-      //   to: predictedStakingContractAddress,
-      //   data: StakingService.encodeStakePoolTokens(minCollateralAmount),
-      // })
+      // Step 8: Stake pool tokens
+      transactions.push({
+        to: predictedStakingContractAddress,
+        data: StakingService.encodeStakePoolTokens(minCollateralAmount),
+      })
 
       const transaction = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       return {
