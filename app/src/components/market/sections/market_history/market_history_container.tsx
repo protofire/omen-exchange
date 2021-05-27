@@ -17,12 +17,8 @@ const MarketHistoryContainer: React.FC<Props> = (props: Props) => {
 
   const history = useHistory()
 
-  const showLinkHistory = () => {
-    return history.replace(`/${address}/history`)
-  }
-
   useEffect(() => {
-    showLinkHistory()
+    return history.replace(`/${address}/history`)
   }, [])
 
   return <MarketHistory marketMakerData={marketMakerData} />

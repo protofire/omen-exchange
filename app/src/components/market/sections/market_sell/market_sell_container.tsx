@@ -27,8 +27,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
     return history.replace(`/${address}/sell`)
   }, [])
 
-  if (isScalar) return <ScalarMarketSell {...props} />
-  return <MarketSell {...props} />
+  return <> {isScalar ? <ScalarMarketSell {...props} /> : <MarketSell {...props} />}</>
 }
 
 export { MarketSellContainer }

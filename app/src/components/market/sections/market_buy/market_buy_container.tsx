@@ -23,16 +23,10 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
 
   const history = useHistory()
 
-  // const displayLinkBuy = () => {
-  //   return history.replace(`/${address}/buy`)
-  // }
-
   useEffect(() => {
-    // displayLinkBuy()
     return history.replace(`/${address}/buy`)
   }, [])
 
-  // Refactored that line with Milan
   return <>{isScalar ? <ScalarMarketBuy {...props} /> : <MarketBuy {...props} />}</>
 }
 

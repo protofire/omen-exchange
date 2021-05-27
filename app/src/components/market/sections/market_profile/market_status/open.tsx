@@ -294,6 +294,10 @@ const Wrapper = (props: Props) => {
     // eslint-disable-next-line
   }, [isQuestionFinalized, isFinalizing])
 
+  useEffect(() => {
+    if (currentTab === MarketDetailsTab.swap) return history.replace(`/${marketMakerAddress}`)
+  }, [currentTab])
+
   return (
     <>
       <TopCard>
