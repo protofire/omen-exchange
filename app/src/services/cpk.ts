@@ -1,7 +1,9 @@
+import { bufferToHex, generateAddress, toBuffer } from 'ethereumjs-util'
 import { MaxUint256, Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, bigNumberify, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
+import Web3 from 'web3'
 
 import {
   DAY_IN_SECONDS,
@@ -633,8 +635,7 @@ class CPKService {
 
       const stakingRewardsFactoryAddress = getContractAddress(networkId, 'stakingRewardsFactory')
       const omnTokenAddress = getToken(networkId, 'omn').address
-      // TODO: Lengthen time from execution to account for transaction execution time
-      const startingTimestamp = Math.floor(new Date().getTime() / 1000 + 120)
+      const startingTimestamp = Math.floor(new Date().getTime() / 1000)
       const endingTimestamp = Math.floor((marketData.resolution?.getTime() || 1) / 1000 - DAY_IN_SECONDS)
 
       // Step 6: Create staking distribution contract
@@ -650,6 +651,20 @@ class CPKService {
           MaxUint256,
         ),
       })
+
+      let nonce
+
+      try {
+        const web3 = new Web3(Web3.givenProvider)
+        nonce = await web3.eth.getTransactionCount(stakingRewardsFactoryAddress)
+      } catch (e) {
+        throw new Error(e)
+      }
+
+      const predictedStakingContractAddress = bufferToHex(
+        generateAddress(toBuffer(stakingRewardsFactoryAddress), toBuffer(nonce)),
+      )
+      console.log(predictedStakingContractAddress)
 
       const transaction = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       return {
