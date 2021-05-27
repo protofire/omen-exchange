@@ -207,14 +207,14 @@ const HeaderContainer: React.FC = (props: any) => {
     formattedDaiBalance,
     formattedNativeBalance,
     formattedOmenBalance,
-    formattedxDaiBalance,
     formattedxOmenBalance,
+    nativeBalance,
     omenBalance,
     unclaimedDaiAmount,
     unclaimedOmenAmount,
-    xDaiBalance,
     xOmenBalance,
-  } = useConnectedBalanceContext()
+    // @ts-expect-error ignore
+  } = context.balances // useConnectedBalanceContext()
 
   const networkPlacholder = (
     <DropdownWrapper>
@@ -353,7 +353,7 @@ const HeaderContainer: React.FC = (props: any) => {
               <>
                 <DepositedBalance>
                   {relay
-                    ? `${formattedxDaiBalance} DAI`
+                    ? `${formattedNativeBalance} DAI`
                     : context.rawWeb3Context.networkId === networkIds.XDAI
                     ? `${formattedNativeBalance} xDAI`
                     : `${formattedNativeBalance} ETH`}
@@ -381,9 +381,9 @@ const HeaderContainer: React.FC = (props: any) => {
           formattedDaiBalance={formattedDaiBalance}
           formattedNativeBalance={formattedNativeBalance}
           formattedOmenBalance={formattedOmenBalance}
-          formattedxDaiBalance={formattedxDaiBalance}
           formattedxOmenBalance={formattedxOmenBalance}
           isOpen={isYourConnectionModalOpen && !isDepositWithdrawModalOpen}
+          nativeBalance={nativeBalance}
           onClose={() => setYourConnectionModalState(false)}
           openDepositModal={() => {
             setYourConnectionModalState(false)
@@ -397,7 +397,6 @@ const HeaderContainer: React.FC = (props: any) => {
           }}
           unclaimedDaiAmount={unclaimedDaiAmount}
           unclaimedOmenAmount={unclaimedOmenAmount}
-          xDaiBalance={xDaiBalance}
           xOmenBalance={xOmenBalance}
         />
         <ModalConnectWalletWrapper
@@ -409,10 +408,11 @@ const HeaderContainer: React.FC = (props: any) => {
           exchangeType={depositWithdrawType}
           fetchBalances={fetchBalances}
           formattedDaiBalance={formattedDaiBalance}
+          formattedNativeBalance={formattedNativeBalance}
           formattedOmenBalance={formattedOmenBalance}
-          formattedxDaiBalance={formattedxDaiBalance}
           formattedxOmenBalance={formattedxOmenBalance}
           isOpen={isDepositWithdrawModalOpen}
+          nativeBalance={nativeBalance}
           omenBalance={omenBalance}
           onBack={() => {
             setDepositWithdrawModalState(false)
@@ -420,7 +420,6 @@ const HeaderContainer: React.FC = (props: any) => {
           }}
           onClose={() => setDepositWithdrawModalState(false)}
           unclaimedAmount={unclaimedDaiAmount}
-          xDaiBalance={xDaiBalance}
           xOmenBalance={xOmenBalance}
         />
       </HeaderInner>

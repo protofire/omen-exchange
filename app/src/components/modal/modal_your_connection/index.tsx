@@ -158,10 +158,9 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   formattedNativeBalance: string
   formattedDaiBalance: string
   formattedOmenBalance: string
-  formattedxDaiBalance: string
   formattedxOmenBalance: string
   xOmenBalance: BigNumber
-  xDaiBalance: BigNumber
+  nativeBalance: BigNumber
 }
 
 export const ModalYourConnection = (props: Props) => {
@@ -171,16 +170,15 @@ export const ModalYourConnection = (props: Props) => {
     formattedDaiBalance,
     formattedNativeBalance,
     formattedOmenBalance,
-    formattedxDaiBalance,
     formattedxOmenBalance,
     isOpen,
+    nativeBalance,
     onClose,
     openDepositModal,
     openWithdrawModal,
     theme,
     unclaimedDaiAmount,
     unclaimedOmenAmount,
-    xDaiBalance,
     xOmenBalance,
   } = props
 
@@ -377,7 +375,7 @@ export const ModalYourConnection = (props: Props) => {
                         <DaiIcon size="24px" />
                         <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
                       </BalanceItemSide>
-                      <BalanceItemBalance>{formattedxDaiBalance} DAI</BalanceItemBalance>
+                      <BalanceItemBalance>{formattedNativeBalance} DAI</BalanceItemBalance>
                     </BalanceItem>
                     <BalanceItem>
                       <BalanceItemSide>
@@ -394,7 +392,7 @@ export const ModalYourConnection = (props: Props) => {
                   </DepositWithdrawButton>
                   <DepositWithdrawButton
                     buttonType={ButtonType.secondaryLine}
-                    disabled={xOmenBalance.isZero() && xDaiBalance.isZero()}
+                    disabled={xOmenBalance.isZero() && nativeBalance.isZero()}
                     onClick={openWithdrawModal}
                   >
                     Withdraw

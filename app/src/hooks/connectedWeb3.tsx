@@ -55,7 +55,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
 
   const cpk = useRawCpk(connection)
   const balances = useRawBalance(connection)
-  console.log(balances)
+
   const rpcAddress: string | null = localStorage.getItem('rpcAddress')
 
   const windowObj: any = window
@@ -154,7 +154,13 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     }
   }, [context, library, active, error, networkId, safeAppInfo, rpcAddress])
 
-  if (!networkId || !library || !connection || (connection.account && !cpk)) {
+  if (
+    !networkId ||
+    !library ||
+    !connection ||
+    (connection.account && !cpk) ||
+    (connection.account && !balances.fetched)
+  ) {
     props.setStatus(true)
     return null
   }
@@ -162,6 +168,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   const value = {
     ...connection,
     cpk,
+    balances,
   }
 
   props.setStatus(true)

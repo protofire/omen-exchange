@@ -103,11 +103,11 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   onClose: () => void
   theme?: any
   fetchBalances: () => void
+  formattedNativeBalance: string
   formattedDaiBalance: string
-  formattedxDaiBalance: string
   formattedOmenBalance: string
   daiBalance: BigNumber
-  xDaiBalance: Maybe<BigNumber>
+  nativeBalance: BigNumber
   xOmenBalance: BigNumber
   unclaimedAmount: BigNumber
   formattedxOmenBalance: string
@@ -120,16 +120,16 @@ export const ModalDepositWithdraw = (props: Props) => {
     exchangeType,
     fetchBalances,
     formattedDaiBalance,
+    formattedNativeBalance,
     formattedOmenBalance,
-    formattedxDaiBalance,
     formattedxOmenBalance,
     isOpen,
+    nativeBalance,
     omenBalance,
     onBack,
     onClose,
     theme,
     unclaimedAmount,
-    xDaiBalance,
     xOmenBalance,
   } = props
   const context = useConnectedWeb3Context()
@@ -224,7 +224,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         ? daiBalance
         : omenBalance
       : currencySelected === ExchangeCurrency.Dai
-      ? xDaiBalance
+      ? nativeBalance
       : xOmenBalance
 
   const minDaiExchange = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
@@ -238,7 +238,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     (currencySelected === ExchangeCurrency.Omen &&
       exchangeType === ExchangeType.deposit &&
       displayFundAmount.gt(omenAllowance)) ||
-    (currencySelected === ExchangeCurrency.Omen && exchangeType === ExchangeType.withdraw && xDaiBalance?.isZero())
+    (currencySelected === ExchangeCurrency.Omen && exchangeType === ExchangeType.withdraw && nativeBalance?.isZero())
 
   const depositWithdraw = async () => {
     if (!cpk) {
@@ -363,7 +363,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                   </BalanceItemSide>
                   <BalanceItemSide>
                     <BalanceItemBalance>
-                      {exchangeType === ExchangeType.deposit ? formattedDaiBalance : formattedxDaiBalance} DAI
+                      {exchangeType === ExchangeType.deposit ? formattedDaiBalance : formattedNativeBalance} DAI
                     </BalanceItemBalance>
                   </BalanceItemSide>
                 </BalanceItem>
@@ -412,7 +412,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                     ? daiBalance
                     : omenBalance
                   : currencySelected === ExchangeCurrency.Dai
-                  ? xDaiBalance
+                  ? nativeBalance
                   : xOmenBalance) || Zero
               setDisplayFundAmount(maxBalance)
               setAmountToDisplay(formatBigNumber(maxBalance, STANDARD_DECIMALS, 5))
@@ -422,7 +422,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           />
           {exchangeType === ExchangeType.withdraw &&
           currencySelected === ExchangeCurrency.Omen &&
-          xDaiBalance?.isZero() ? (
+          nativeBalance?.isZero() ? (
             <InputInfo>
               <IconAlertInverted />
               <div style={{ marginLeft: '12px' }}>Fund your Omen Account with Dai to proceed with the withdrawal.</div>

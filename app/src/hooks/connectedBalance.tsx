@@ -20,10 +20,11 @@ export interface ConnectedBalanceContext {
   daiBalance: BigNumber
   formattedDaiBalance: string
   xOmenBalance: BigNumber
-  xDaiBalance: BigNumber
-  formattedxDaiBalance: string
+  // xDaiBalance: BigNumber
+  // formattedxDaiBalance: string
   formattedxOmenBalance: string
   formattedOmenBalance: string
+  fetched: boolean
   omenBalance: BigNumber
   fetchBalances: () => Promise<void>
 }
@@ -59,61 +60,42 @@ export const useRawBalance = (props: any) => {
   const [omenBalance, setOmenBalance] = useState<BigNumber>(Zero)
 
   const [xOmenBalance, setxOmenBalance] = useState<BigNumber>(Zero)
-  // mainnet balances
-  // const { refetch, tokens } = useTokens(context.rawWeb3Context, true, true)
-  // const nativeBalance = new BigNumber(
-  //   tokens.filter(token => token.symbol === getNativeAsset(context.rawWeb3Context.networkId).symbol)[0]?.balance || '',
-  // )
-  // const daiBalance = new BigNumber(tokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
-  // const omenBalance = new BigNumber(tokens.filter(token => token.symbol === 'OMN')[0]?.balance || '')
-
-  // relay balances
-  // const nativeAsset = getNativeAsset(context.networkId)
-
-  // xdai
-  // const { collateralBalance: xDaiCollateral, fetchCollateralBalance: fetchxDaiBalance } = useCollateralBalance(
-  //   nativeAsset,
-  //   context,
-  // )
-  // const xDaiBalance = Zero
-
-  // omn
-  // const omenToken = getToken(100, 'omn')
-  // const {
-  //   collateralBalance: xOmenCollateral,
-  //   errorMessage,
-  //   fetchCollateralBalance: fetchxOmenBalance,
-  // } = useCollateralBalance(omenToken, context)
-
-  // const xOmenBalance = errorMessage ? Zero : xOmenCollateral || Zero
-  // const xOmenBalance = Zero
 
   const fetchTokenBalances = async () => {
     if (context) {
-      // mainnet balances
-      const daiCollateralBalance = await fetchBalance(
-        getToken(context.rawWeb3Context.networkId, 'dai'),
-        context.rawWeb3Context,
-      )
-      setDaiBalance(daiCollateralBalance)
+      const requests = []
 
-      const omnCollateralBalance = await fetchBalance(
-        getToken(context.rawWeb3Context.networkId, 'omn'),
-        context.rawWeb3Context,
-      )
-      setOmenBalance(omnCollateralBalance)
-
-      const nativeCollateralBalance = await fetchBalance(
-        getNativeAsset(context.rawWeb3Context.networkId),
-        context.rawWeb3Context,
-      )
-      setNativeBalance(nativeCollateralBalance)
-
-      // xdai balances
-      if (context.relay) {
-        const xOmenCollateralBalance = await fetchBalance(getToken(context.networkId, 'omn'), context)
-        setxOmenBalance(xOmenCollateralBalance)
+      if (context.rawWeb3Context.networkId !== networkIds.XDAI) {
+        requests.push(async () => {
+          const daiCollateralBalance = await fetchBalance(
+            getToken(context.rawWeb3Context.networkId, 'dai'),
+            context.rawWeb3Context,
+          )
+          setDaiBalance(daiCollateralBalance)
+        })
       }
+
+      requests.push(async () => {
+        const omnCollateralBalance = await fetchBalance(
+          getToken(context.rawWeb3Context.networkId, 'omn'),
+          context.rawWeb3Context,
+        )
+        setOmenBalance(omnCollateralBalance)
+      })
+
+      requests.push(async () => {
+        const nativeCollateralBalance = await fetchBalance(getNativeAsset(context.networkId), context)
+        setNativeBalance(nativeCollateralBalance)
+      })
+
+      if (context.relay) {
+        requests.push(async () => {
+          const xOmenCollateralBalance = await fetchBalance(getToken(context.networkId, 'omn'), context)
+          setxOmenBalance(xOmenCollateralBalance)
+        })
+      }
+
+      await Promise.all(requests.map(request => request()))
     }
   }
 
@@ -148,16 +130,15 @@ export const useRawBalance = (props: any) => {
 
   const fetchBalances = async () => {
     try {
-      await Promise.all([fetchUnclaimedAssets(), fetchTokenBalances()])
+      await Promise.all([fetchTokenBalances(), fetchUnclaimedAssets()])
+      setFetched(true)
     } catch (e) {
       logger.log(e.message)
     }
   }
 
   useEffect(() => {
-    console.log('useEffect', context)
     if (context) {
-      console.log('called')
       fetchBalances()
     } else {
       setUnclaimedDaiAmount(Zero)
@@ -176,13 +157,12 @@ export const useRawBalance = (props: any) => {
     ),
     daiBalance,
     formattedDaiBalance: formatNumber(formatBigNumber(daiBalance, STANDARD_DECIMALS, STANDARD_DECIMALS)),
-    xDaiBalance,
-    formattedxDaiBalance: formatBigNumber(xDaiBalance, 18, 2),
     fetchBalances,
     formattedOmenBalance: formatNumber(formatBigNumber(omenBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 2),
+    fetched,
     omenBalance,
     xOmenBalance,
-    formattedxOmenBalance: formatBigNumber(xOmenBalance, omenToken.decimals, 2),
+    formattedxOmenBalance: formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 2),
   }
   return value
 }
