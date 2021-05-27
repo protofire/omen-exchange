@@ -1,5 +1,5 @@
 import { bufferToHex, generateAddress, toBuffer } from 'ethereumjs-util'
-import { MaxUint256, Zero } from 'ethers/constants'
+import { AddressZero, MaxUint256, Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, bigNumberify, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
@@ -634,48 +634,51 @@ class CPKService {
       })
 
       const stakingRewardsFactoryAddress = getContractAddress(networkId, 'stakingRewardsFactory')
-      const omnTokenAddress = getToken(networkId, 'omn').address
-      const startingTimestamp = Math.floor(new Date().getTime() / 1000)
-      const endingTimestamp = Math.floor((marketData.resolution?.getTime() || 1) / 1000 - DAY_IN_SECONDS)
 
-      // Step 6: Create staking distribution contract
-      transactions.push({
-        to: stakingRewardsFactoryAddress || '',
-        data: StakingFactoryService.encodeCreateDistribution(
-          [omnTokenAddress],
-          predictedMarketMakerAddress,
-          [new BigNumber(0)],
-          startingTimestamp,
-          endingTimestamp,
-          false,
-          MaxUint256,
-        ),
-      })
+      if (stakingRewardsFactoryAddress !== AddressZero) {
+        const omnTokenAddress = getToken(networkId, 'omn').address
+        const startingTimestamp = Math.floor(new Date().getTime() / 1000)
+        const endingTimestamp = Math.floor((marketData.resolution?.getTime() || 1) / 1000 - DAY_IN_SECONDS)
 
-      let nonce
+        // Step 6: Create staking distribution contract
+        transactions.push({
+          to: stakingRewardsFactoryAddress || '',
+          data: StakingFactoryService.encodeCreateDistribution(
+            [omnTokenAddress],
+            predictedMarketMakerAddress,
+            [new BigNumber(0)],
+            startingTimestamp,
+            endingTimestamp,
+            false,
+            MaxUint256,
+          ),
+        })
 
-      try {
-        const web3 = new Web3(Web3.givenProvider)
-        nonce = await web3.eth.getTransactionCount(stakingRewardsFactoryAddress)
-      } catch (e) {
-        throw new Error(e)
+        let nonce
+
+        try {
+          const web3 = new Web3(Web3.givenProvider)
+          nonce = await web3.eth.getTransactionCount(stakingRewardsFactoryAddress)
+        } catch (e) {
+          throw new Error(e)
+        }
+
+        const predictedStakingContractAddress = bufferToHex(
+          generateAddress(toBuffer(stakingRewardsFactoryAddress), toBuffer(nonce)),
+        )
+
+        // Step 7: Approve staking contract to spend pool tokens
+        transactions.push({
+          to: predictedMarketMakerAddress,
+          data: ERC20Service.encodeApproveUnlimited(predictedStakingContractAddress),
+        })
+
+        // Step 8: Stake pool tokens
+        transactions.push({
+          to: predictedStakingContractAddress,
+          data: StakingService.encodeStakePoolTokens(minCollateralAmount),
+        })
       }
-
-      const predictedStakingContractAddress = bufferToHex(
-        generateAddress(toBuffer(stakingRewardsFactoryAddress), toBuffer(nonce)),
-      )
-
-      // Step 7: Approve staking contract to spend pool tokens
-      transactions.push({
-        to: predictedMarketMakerAddress,
-        data: ERC20Service.encodeApproveUnlimited(predictedStakingContractAddress),
-      })
-
-      // Step 8: Stake pool tokens
-      transactions.push({
-        to: predictedStakingContractAddress,
-        data: StakingService.encodeStakePoolTokens(minCollateralAmount),
-      })
 
       const transaction = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       return {
