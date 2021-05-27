@@ -393,6 +393,16 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     },
     order: 15,
   },
+  wbtc: {
+    symbol: 'WBTC',
+    name: 'Wrapped Bitcoin',
+    decimals: 8,
+    addresses: {
+      [networkIds.MAINNET]: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+      [networkIds.XDAI]: '0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252',
+    },
+    order: 14,
+  },
   dai: {
     symbol: 'DAI',
     decimals: 18,
@@ -421,10 +431,12 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   },
   weth: {
     symbol: 'WETH',
+    name: 'Wrapped Ether',
     decimals: 18,
     addresses: {
       [networkIds.MAINNET]: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
       [networkIds.RINKEBY]: '0xc778417e063141139fce010982780140aa0cd5ab',
+      [networkIds.XDAI]: '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1',
     },
     order: 3,
   },
@@ -481,7 +493,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   },
 }
 //when adding new bridge currency ensure that it's present in known tokens and that it has both mainnet and xDai address added
-export const bridgeTokensList: KnownToken[] = ['dai', 'omn']
+export const bridgeTokensList: KnownToken[] = ['dai', 'omn', 'weth', 'wbtc']
 
 const validNetworkId = (networkId: number): networkId is NetworkId => {
   return networks[networkId as NetworkId] !== undefined
