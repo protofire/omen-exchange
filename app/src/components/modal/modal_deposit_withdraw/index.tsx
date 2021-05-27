@@ -224,7 +224,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     try {
       setMessage(`${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), decimals)} ${symbol}`)
       setTxState(TransactionStep.waitingConfirmation)
-      setConfirmations(9)
+      setConfirmations(0)
       setIsTransactionModalOpen(true)
 
       const hash =
@@ -245,7 +245,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       setTxNetId(provider.network.chainId)
       setTxHash(hash)
 
-      await waitForConfirmations(hash, provider, setConfirmations, setTxState)
+      await waitForConfirmations(hash, provider, setConfirmations, setTxState, 13)
 
       if (exchangeType === ExchangeType.deposit && symbol !== 'DAI') {
         await XdaiService.waitForBridgeMessageStatus(hash, context.library)
@@ -431,6 +431,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       </Modal>
       <ModalTransactionWrapper
         confirmations={confirmations}
+        confirmationsRequired={13}
         icon={
           <Image
             size={'24'}

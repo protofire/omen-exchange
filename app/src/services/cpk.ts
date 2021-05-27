@@ -3,10 +3,7 @@ import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
-import {
-  OMNI_BRIDGE_XDAI_ADDRESS,
-  XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
-} from '../common/constants'
+import { OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
 import { Transaction, verifyProxyAddress } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
@@ -1527,8 +1524,7 @@ class CPKService {
       const xDaiService = new XdaiService(this.provider)
       const daiData = await xDaiService.fetchXdaiTransactionData()
       const omenData = await xDaiService.fetchOmniTransactionData()
-      console.log(daiData)
-      console.log(omenData)
+
       return daiData.concat(omenData)
     } catch (e) {
       logger.error('Error fetching xDai subgraph data', e.message)
@@ -1545,18 +1541,18 @@ class CPKService {
       const messages = []
       const signatures = []
       const addresses = []
-      console.log(transactions)
 
       for (let i = 0; i < transactions.length; i++) {
         addresses.push(transactions[i].address)
 
         const message = transactions[i].message
         messages.push(message.content)
+
         const signature = signaturesFormatted(message.signatures)
 
         signatures.push(signature)
       }
-      console.log('other side')
+
       const txObject = await xDaiService.claim(addresses, messages, signatures)
       return txObject
     } catch (e) {
