@@ -530,7 +530,7 @@ export const formatNumber = (number: string, decimals = 2): string => {
     return '<0.01'
   }
 
-  return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
+  return `${formattedSubstring}${decimals && decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
 }
 
 export const formatHistoryDate = (dateData: number | string): string => {

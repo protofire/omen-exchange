@@ -302,7 +302,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     }
     displayTradedShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, tradedShares)
   }
-  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
+  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 2, 5)}`
 
   const feeFormatted = `${formatNumber(
     formatBigNumber(displayFeePaid.mul(-1), displayCollateral.decimals, displayCollateral.decimals),
