@@ -1,6 +1,6 @@
 import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
-import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
+import { Route, RouteComponentProps, BrowserRouter as Router, Switch, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useCompoundService, useConnectedCPKContext, useGraphMarketUserTxData } from '../../../../../hooks'
@@ -311,6 +311,15 @@ const Wrapper = (props: Props) => {
           marketMakerData={marketMakerData}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
+        {/* Not sure this is the correct way to go but trying out the routing - Francesco */}
+        <Router>
+          <Switch>
+            <Route component={MarketBuyContainer} path={`/${marketMakerAddress}/buy`} />
+            <Route component={MarketPoolLiquidityContainer} path={`/${marketMakerAddress}/pool`} />
+            <Route component={MarketVerifyContainer} path={`/${marketMakerAddress}/verify`} />
+            <Route component={MarketHistoryContainer} path={`/${marketMakerAddress}/history`} />
+          </Switch>
+        </Router>
         {currentTab === MarketDetailsTab.swap && (
           <>
             {isScalar ? (
