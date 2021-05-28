@@ -181,22 +181,27 @@ const Outcomes = (props: Props) => {
           <OutcomesTBody>{outcomesToRender}</OutcomesTBody>
         </OutcomesTable>
         {canAddOutcome && (
-          <div>
-            <div data-arrow-color="transparent" data-for="newOutcome" data-tip="Add new outcome">
-              <CustomButtonCircleAdd data-testid="new-outcome-button" onClick={addNewOutcome}>
-                <IconAdd />
-              </CustomButtonCircleAdd>
-            </div>
+          <>
+            <CustomButtonCircleAdd
+              data-arrow-color="transparent"
+              data-for="newOutcome"
+              data-testid="new-outcome-button"
+              data-tip="Add new outcome"
+              onClick={addNewOutcome}
+            >
+              <IconAdd />
+            </CustomButtonCircleAdd>
+
             <ReactTooltip
               className="customMarketTooltip"
               data-multiline={true}
               effect="solid"
               id="newOutcome"
-              offset={{ top: 0, left: 214 }}
+              offset={{ top: 0, left: 0 }}
               place="top"
               type="light"
             />
-          </div>
+          </>
         )}
       </OutcomesTableWrapper>
       {manualProbabilitiesAndNoOutcomes && (

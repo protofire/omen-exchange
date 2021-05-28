@@ -87,37 +87,31 @@ export const TitleValue: React.FC<Props> = (props: Props) => {
   const formatting = `MMMM Do YYYY - HH:mm:ss [${abbr}]`
 
   return (
-    <div>
-      <div
-        data-for="closingDate"
-        data-tip={tooltip ? localResolution.format(formatting) + '<br />' + endsMessage : null}
-      >
-        <Wrapper {...restProps}>
-          <Title invertedColors={invertedColors}>{title}</Title>
-          <Value
-            className={tooltip ? 'tooltip' : ''}
-            data-delay-hide={tooltip ? '500' : ''}
-            data-effect={tooltip ? 'solid' : ''}
-            data-for={tooltip ? 'walletBalanceTooltip' : ''}
-            data-multiline={tooltip ? 'true' : ''}
-            data-tip={tooltip ? localResolution.format(formatting) + '<br />' + endsMessage : null}
-            invertedColors={invertedColors}
-            state={state}
-          >
-            {value}
-          </Value>
-        </Wrapper>
-      </div>
-
-      <ReactTooltip
-        className="customMarketTooltip"
-        effect="solid"
-        html={true}
-        id="closingDate"
-        offset={{ top: 0, left: -7.5 }}
-        place="top"
-        type="light"
-      />
+    <div data-for="closingDate" data-tip={tooltip ? localResolution.format(formatting) + '<br />' + endsMessage : null}>
+      <Wrapper {...restProps}>
+        <Title invertedColors={invertedColors}>{title}</Title>
+        <Value
+          className={tooltip ? 'tooltip' : ''}
+          data-delay-hide={tooltip ? '500' : ''}
+          data-effect={tooltip ? 'solid' : ''}
+          data-for={tooltip ? 'walletBalanceTooltip' : ''}
+          data-multiline={tooltip ? 'true' : ''}
+          data-tip={tooltip ? localResolution.format(formatting) + '<br />' + endsMessage : null}
+          invertedColors={invertedColors}
+          state={state}
+        >
+          {value}
+        </Value>
+        <ReactTooltip
+          className="customMarketTooltip"
+          effect="solid"
+          html={true}
+          id="closingDate"
+          offset={{ top: 0, left: -7.5 }}
+          place="top"
+          type="light"
+        />
+      </Wrapper>
     </div>
   )
 }
