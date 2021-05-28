@@ -302,7 +302,24 @@ export const waitForConfirmations = async (
 }
 
 export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string => {
-  return Number(formatUnits(value, decimals)).toFixed(precision)
+  const fixedInt = parseFloat(
+    value
+      .toString()
+      .split(',')
+      .join(''),
+  ).toFixed(decimals)
+  const splitFixedInt = fixedInt.split('.')[0]
+  const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+  if (value.toString.length < 1) {
+    return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
+  }
+
+  if (Number(value) < 0.01 && Number(value) > 0) {
+    return '<0.01'
+  }
+  return `${Number(formatUnits(formattedSubstring, decimals)).toFixed(precision)}${
+    decimals > 0 ? '.' + fixedInt.split('.')[1] : ''
+  }`
 }
 
 export const isContract = async (provider: any, address: string): Promise<boolean> => {
