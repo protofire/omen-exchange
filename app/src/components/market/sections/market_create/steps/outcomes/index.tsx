@@ -138,12 +138,21 @@ const Outcomes = (props: Props) => {
             <PercentWrapper>%</PercentWrapper>
           </OutcomeItemWrapper>
           <CustomButtonCircle
+            data-for="removeOutcome"
+            data-tip={`Remove outcome ${index + 1}`}
             disabled={disabled || !canRemove}
             onClick={() => {
               removeOutcome(index)
             }}
-            title={`Remove outcome ${index + 1}`}
           >
+            <ReactTooltip
+              className="customMarketTooltip"
+              effect="solid"
+              id="removeOutcome"
+              offset={{ top: 0, left: -7.5 }}
+              place="top"
+              type="light"
+            />
             <IconRemove />
           </CustomButtonCircle>
         </RowWrapper>
