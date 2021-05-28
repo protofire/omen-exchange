@@ -296,6 +296,8 @@ const Wrapper = (props: Props) => {
 
   useEffect(() => {
     if (currentTab === MarketDetailsTab.swap) return history.replace(`/${marketMakerAddress}`)
+    if (currentTab === MarketDetailsTab.finalize) return history.replace(`/${marketMakerAddress}/finalize`)
+    if (currentTab === MarketDetailsTab.setOutcome) return history.replace(`/${marketMakerAddress}/set_outcome`)
   }, [currentTab])
 
   return (
