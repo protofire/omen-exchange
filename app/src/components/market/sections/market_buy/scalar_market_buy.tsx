@@ -149,7 +149,7 @@ export const ScalarMarketBuy = (props: Props) => {
     activeTab === Tabs.short ? setPositionIndex(0) : setPositionIndex(1)
   }, [activeTab, Tabs.short])
 
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, displayCollateral.decimals, 5), 5)
+  const walletBalance = formatBigNumber(collateralBalance, displayCollateral.decimals, 5, 5)
 
   const unlockCollateral = async () => {
     if (!cpk) {
@@ -245,7 +245,7 @@ export const ScalarMarketBuy = (props: Props) => {
     }
     displayTradedShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, tradedShares)
   }
-  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
+  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5, 5)}`
 
   const feeFormatted = `${formatNumber(
     formatBigNumber(displayFeePaid.mul(-1), displayCollateral.decimals, displayCollateral.decimals),

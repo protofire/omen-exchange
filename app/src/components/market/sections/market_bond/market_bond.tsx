@@ -8,7 +8,7 @@ import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset } from '../../../../util/networks'
-import { formatBigNumber, formatNumber, getUnit, numberToByte32 } from '../../../../util/tools'
+import { formatBigNumber, getUnit, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
   MarketDetailsTab,
@@ -202,7 +202,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <CurrenciesWrapper>
               <AssetBalance
                 asset={nativeAsset}
-                value={`${formatNumber(formatBigNumber(nativeAssetBalance, nativeAsset.decimals, 3), 3)}`}
+                value={`${(formatBigNumber(nativeAssetBalance, nativeAsset.decimals, 3), 3)}`}
               />
             </CurrenciesWrapper>
 
@@ -248,21 +248,19 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Bond Amount"
-              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals))} ${symbol}`}
+              value={`${formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals)} ${symbol}`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Profit"
-              value={`${formatNumber(
-                formatBigNumber(currentAnswerBond || new BigNumber(0), STANDARD_DECIMALS),
-              )} ${symbol}`}
+              value={`${formatBigNumber(currentAnswerBond || new BigNumber(0), STANDARD_DECIMALS)} ${symbol}`}
             />
 
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Loss"
-              value={`${formatNumber(formatBigNumber(bondNativeAssetAmount, STANDARD_DECIMALS))} ${symbol}`}
+              value={`${formatBigNumber(bondNativeAssetAmount, STANDARD_DECIMALS)} ${symbol}`}
             />
           </TransactionDetailsCard>
         </div>

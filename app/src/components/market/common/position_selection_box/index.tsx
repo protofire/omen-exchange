@@ -77,9 +77,7 @@ export const PositionSelectionBox = (props: Props) => {
           />
           <PositionSelectionTitle>{balance.outcomeName}</PositionSelectionTitle>
         </PositionSelectionLeft>
-        <PositionSelectionAmount>
-          {formatNumber(formatBigNumber(balance.shares, decimals))} Shares
-        </PositionSelectionAmount>
+        <PositionSelectionAmount>{formatBigNumber(balance.shares, decimals)} Shares</PositionSelectionAmount>
       </PositionSelectionBoxItem>
     )
   }

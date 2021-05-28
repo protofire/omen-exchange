@@ -301,15 +301,8 @@ export const waitForConfirmations = async (
   }
 }
 
-export const formatBigNumber = (
-  value: BigNumber | string,
-  decimals: number,
-  precision = 2,
-  convertToString?: boolean,
-): string => {
-  if (convertToString) return formatNumber(Number(formatUnits(value, decimals)).toFixed(precision))
-
-  return Number(formatUnits(value, decimals)).toFixed(precision)
+export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2, x?: number): string => {
+  return formatNumber(Number(formatUnits(value, decimals)).toFixed(precision), x)
 }
 
 export const isContract = async (provider: any, address: string): Promise<boolean> => {

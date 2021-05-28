@@ -85,12 +85,10 @@ export const PositionTable = (props: Props) => {
   let displayShortPayout = shortPayout
   const shortShares = balances[0].shares
   const longShares = balances[1].shares
-  let shortSharesFormatted = formatNumber(
-    formatBigNumber(shortShares || new BigNumber(0), collateral.decimals, collateral.decimals),
-  )
-  let longSharesFormatted = formatNumber(
-    formatBigNumber(longShares || new BigNumber(0), collateral.decimals, collateral.decimals),
-  )
+  let shortSharesFormatted = formatBigNumber(shortShares || new BigNumber(0), collateral.decimals, collateral.decimals)
+
+  let longSharesFormatted = formatBigNumber(longShares || new BigNumber(0), collateral.decimals, collateral.decimals)
+
   let displayLongProfitLoss = longProfitLoss
   let displayShortProfitLoss = shortProfitLoss
 
@@ -155,11 +153,11 @@ export const PositionTable = (props: Props) => {
     }
     if (shortShares && shortShares.gt(0)) {
       const shortSharesBN = compoundService.calculateCTokenToBaseExchange(baseCollateral, shortShares)
-      shortSharesFormatted = formatNumber(formatBigNumber(shortSharesBN || new BigNumber(0), baseCollateral.decimals))
+      shortSharesFormatted = formatBigNumber(shortSharesBN || new BigNumber(0), baseCollateral.decimals)
     }
     if (longShares && longShares.gt(0)) {
       const longSharesBN = compoundService.calculateCTokenToBaseExchange(baseCollateral, longShares)
-      longSharesFormatted = formatNumber(formatBigNumber(longSharesBN || new BigNumber(0), baseCollateral.decimals))
+      longSharesFormatted = formatBigNumber(longSharesBN || new BigNumber(0), baseCollateral.decimals)
     }
     if (longProfitLoss) {
       displayLongProfitLoss = getProfitLossInBase(longProfitLoss)

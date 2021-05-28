@@ -312,7 +312,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     displayBaseCost || Zero,
     displayCollateral.decimals,
     displayCollateral.decimals,
-    true,
   )} ${displayCollateral.symbol}`
 
   const potentialProfitFormatted = `${formatNumber(
