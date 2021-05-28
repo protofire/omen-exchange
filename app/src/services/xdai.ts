@@ -5,8 +5,6 @@ import { BigNumber } from 'ethers/utils'
 import {
   DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   DEFAULT_TOKEN_ADDRESS,
-  GEN_TOKEN_ADDDRESS_TESTING,
-  GEN_XDAI_ADDRESS_TESTING,
   MULTI_CLAIM_ADDRESS,
   OMNI_BRIDGE_MAINNET_ADDRESS,
   OMNI_BRIDGE_VALIDATORS,
@@ -17,7 +15,7 @@ import {
   XDAI_HOME_BRIDGE,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
 } from '../common/constants'
-import { getInfuraUrl, networkIds } from '../util/networks'
+import { getInfuraUrl, knownTokens, networkIds } from '../util/networks'
 import { waitABit } from '../util/tools'
 
 import { ERC20Service } from './erc20'
@@ -231,7 +229,7 @@ class XdaiService {
 
   fetchCrossChainBalance = async (chain: number) => {
     try {
-      this.fetchOmniTransactionData()
+      await this.fetchOmniTransactionData('omn')
       let userAddress
       if (this.provider.relay && chain === networkIds.MAINNET) {
         userAddress = await this.provider.signer.signer.getAddress()
@@ -329,8 +327,12 @@ class XdaiService {
       console.error(e)
     }
   }
-  fetchOmniTransactionData = async () => {
+  fetchOmniTransactionData = async (token: KnownToken) => {
     try {
+      const { addresses } = knownTokens[token]
+      const mainnetAddress = addresses[1]
+      const xDaiAddress = addresses[100]
+
       const query = `
 query getRequests($address: String,$token:String) {
     userRequests(first:1000,where:{user: $address,token:$token}) {
@@ -364,8 +366,8 @@ query getRequests($address: String,$token:String) {
         : await this.provider.getSigner().getAddress()
       const mainnetAccount = await this.provider.getSigner().getAddress()
 
-      const requestsVariables = { address: mainnetAccount, token: GEN_XDAI_ADDRESS_TESTING }
-      const executionsVariables = { address: relayerOrMainnetAccount, token: GEN_TOKEN_ADDDRESS_TESTING }
+      const requestsVariables = { address: mainnetAccount, token: xDaiAddress }
+      const executionsVariables = { address: relayerOrMainnetAccount, token: mainnetAddress }
       const xDaiRequests = await axios.post(OMNI_HOME_BRIDGE, { query, variables: requestsVariables })
 
       const xDaiExecutions = await axios.post(OMNI_FOREIGN_BRIDGE, {

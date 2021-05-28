@@ -1523,7 +1523,7 @@ class CPKService {
     try {
       const xDaiService = new XdaiService(this.provider)
       const daiData = await xDaiService.fetchXdaiTransactionData()
-      const omenData = await xDaiService.fetchOmniTransactionData()
+      const omenData = await xDaiService.fetchOmniTransactionData('omn')
 
       return daiData.concat(omenData)
     } catch (e) {

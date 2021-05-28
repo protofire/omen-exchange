@@ -1,5 +1,6 @@
+import { ethers } from 'ethers'
 import { Zero } from 'ethers/constants'
-import { BigNumber, parseEther } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import ReactTooltip from 'react-tooltip'
@@ -165,7 +166,8 @@ export const ModalDepositWithdraw = (props: Props) => {
     (exchangeType === ExchangeType.deposit &&
       currentTokenMainnet &&
       new BigNumber(currentTokenMainnet.allowance ? currentTokenMainnet.allowance : '0').isZero()) ||
-    (initiatedAllowanceState === ButtonStates.finished &&
+    (exchangeType === ExchangeType.deposit &&
+      initiatedAllowanceState === ButtonStates.finished &&
       currentTokenMainnet &&
       !new BigNumber(currentTokenMainnet.allowance ? currentTokenMainnet.allowance : '0').isZero())
 
@@ -204,14 +206,22 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   const wallet = new BigNumber(currentToken ? currentToken : '0')
 
-  const minDaiBridgeExchange = exchangeType === ExchangeType.deposit ? parseEther('5') : parseEther('10')
-  const minOmniBridgeExchange = exchangeType === ExchangeType.deposit ? parseEther('1') : parseEther('1')
+  const minDaiBridgeExchange =
+    exchangeType === ExchangeType.deposit
+      ? ethers.utils.parseUnits('5', decimals)
+      : ethers.utils.parseUnits('10', decimals)
+  const minOmniBridgeExchange =
+    exchangeType === ExchangeType.deposit
+      ? ethers.utils.parseUnits('1', decimals)
+      : ethers.utils.parseUnits('1', decimals)
+
   const isDepositWithdrawDisabled =
     !wallet ||
     displayFundAmount.gt(wallet) ||
     displayFundAmount.isZero() ||
     displayFundAmount.lt(currencySelected === 'dai' ? minDaiBridgeExchange : minOmniBridgeExchange) ||
-    (currentTokenMainnet &&
+    (exchangeType === ExchangeType.deposit &&
+      currentTokenMainnet &&
       currentTokenMainnet.allowance &&
       displayFundAmount.gt(new BigNumber(currentTokenMainnet.allowance))) ||
     (exchangeType === ExchangeType.withdraw && xDaiBalance?.isZero())
@@ -332,7 +342,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput
-                decimals={STANDARD_DECIMALS}
+                decimals={decimals}
                 name="amount"
                 onChange={(e: BigNumberInputReturn) => {
                   setDisplayFundAmount(e.value)
@@ -360,8 +370,8 @@ export const ModalDepositWithdraw = (props: Props) => {
                 <span>Min amount</span>
                 <span>
                   {currencySelected === 'dai'
-                    ? `${formatBigNumber(minDaiBridgeExchange, STANDARD_DECIMALS, 2)} DAI`
-                    : `${formatBigNumber(minOmniBridgeExchange, STANDARD_DECIMALS, 2)} ${symbol}`}
+                    ? `${formatBigNumber(minDaiBridgeExchange, decimals, 2)} DAI`
+                    : `${formatBigNumber(minOmniBridgeExchange, decimals, 2)} ${symbol}`}
                 </span>
               </ExchangeDataItem>
               <ExchangeDataItem style={{ marginTop: '12px' }}>
@@ -396,9 +406,14 @@ export const ModalDepositWithdraw = (props: Props) => {
               <Divider />
               <ExchangeDataItem>
                 <span>Total</span>
+
                 <span>
                   {currencySelected !== 'dai' && exchangeType === ExchangeType.withdraw
-                    ? `${formatBigNumber(displayFundAmount.sub(displayFundAmount.div(1000)), decimals, 3)} ${symbol}`
+                    ? `${formatBigNumber(
+                        displayFundAmount.sub(displayFundAmount.div(1000)),
+                        STANDARD_DECIMALS,
+                        3,
+                      )} ${symbol}`
                     : `${formatBigNumber(displayFundAmount, decimals, 2)} ${symbol}`}
                 </span>
               </ExchangeDataItem>

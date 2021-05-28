@@ -446,6 +446,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     addresses: {
       [networkIds.MAINNET]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
       [networkIds.RINKEBY]: '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b',
+      [networkIds.XDAI]: '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83',
     },
     order: 4,
   },
@@ -493,7 +494,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   },
 }
 //when adding new bridge currency ensure that it's present in known tokens and that it has both mainnet and xDai address added
-export const bridgeTokensList: KnownToken[] = ['dai', 'omn', 'weth', 'wbtc']
+export const bridgeTokensList: KnownToken[] = ['dai', 'omn', 'usdc', 'weth', 'wbtc']
 
 const validNetworkId = (networkId: number): networkId is NetworkId => {
   return networks[networkId as NetworkId] !== undefined

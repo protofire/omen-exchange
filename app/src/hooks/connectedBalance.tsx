@@ -88,7 +88,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
       const xDaiService = new XdaiService(context.library)
       const daiTransactions = await xDaiService.fetchXdaiTransactionData()
 
-      const omenTransactions = await xDaiService.fetchOmniTransactionData()
+      const omenTransactions = await xDaiService.fetchOmniTransactionData('omn')
 
       if (daiTransactions && daiTransactions.length) {
         const aggregatedDai = aggregator(daiTransactions)
