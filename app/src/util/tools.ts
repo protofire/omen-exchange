@@ -301,25 +301,15 @@ export const waitForConfirmations = async (
   }
 }
 
-export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string => {
-  const fixedInt = parseFloat(
-    value
-      .toString()
-      .split(',')
-      .join(''),
-  ).toFixed(decimals)
-  const splitFixedInt = fixedInt.split('.')[0]
-  const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
-  if (value.toString.length < 1) {
-    return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
-  }
+export const formatBigNumber = (
+  value: BigNumber | string,
+  decimals: number,
+  precision = 2,
+  convertToString?: boolean,
+): string => {
+  if (convertToString) return formatNumber(Number(formatUnits(value, decimals)).toFixed(precision))
 
-  if (Number(value) < 0.01 && Number(value) > 0) {
-    return '<0.01'
-  }
-  return `${Number(formatUnits(formattedSubstring, decimals)).toFixed(precision)}${
-    decimals > 0 ? '.' + fixedInt.split('.')[1] : ''
-  }`
+  return Number(formatUnits(value, decimals)).toFixed(precision)
 }
 
 export const isContract = async (provider: any, address: string): Promise<boolean> => {
