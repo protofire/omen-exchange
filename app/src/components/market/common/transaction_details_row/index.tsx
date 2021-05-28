@@ -62,13 +62,8 @@ export const TransactionDetailsRow: React.FC<Props> = props => {
       <Title>
         {title}
         {tooltip ? (
-          <div data-arrow-color="transparent" data-for="fee" data-tip="A 2% fee goes to liquidity providers.">
-            <Circle
-              data-delay-hide={tooltip ? '500' : ''}
-              data-effect={tooltip ? 'solid' : ''}
-              data-for={tooltip ? 'walletBalanceTooltip' : ''}
-              data-multiline={tooltip ? 'true' : ''}
-            >
+          <>
+            <Circle data-arrow-color="transparent" data-for="fee" data-tip="A 2% fee goes to liquidity providers.">
               <IconInfo />
             </Circle>
 
@@ -81,7 +76,7 @@ export const TransactionDetailsRow: React.FC<Props> = props => {
               place="top"
               type="light"
             />
-          </div>
+          </>
         ) : null}
       </Title>
       <Value emphasizeValue={emphasizeValue} state={state}>

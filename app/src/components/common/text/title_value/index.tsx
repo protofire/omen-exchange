@@ -90,16 +90,7 @@ export const TitleValue: React.FC<Props> = (props: Props) => {
     <div data-for="closingDate" data-tip={tooltip ? localResolution.format(formatting) + '<br />' + endsMessage : null}>
       <Wrapper {...restProps}>
         <Title invertedColors={invertedColors}>{title}</Title>
-        <Value
-          className={tooltip ? 'tooltip' : ''}
-          data-delay-hide={tooltip ? '500' : ''}
-          data-effect={tooltip ? 'solid' : ''}
-          data-for={tooltip ? 'walletBalanceTooltip' : ''}
-          data-multiline={tooltip ? 'true' : ''}
-          data-tip={tooltip ? localResolution.format(formatting) + '<br />' + endsMessage : null}
-          invertedColors={invertedColors}
-          state={state}
-        >
+        <Value invertedColors={invertedColors} state={state}>
           {value}
         </Value>
         <ReactTooltip
