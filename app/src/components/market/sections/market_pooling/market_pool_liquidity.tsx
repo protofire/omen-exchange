@@ -232,7 +232,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { fetchFundingBalance, fundingBalance: maybeFundingBalance } = useFundingBalance(marketMakerAddress, context)
   const fundingBalance = maybeFundingBalance || Zero
 
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, displayCollateral.decimals, 5), 5)
+  const walletBalance = formatBigNumber(collateralBalance, displayCollateral.decimals, 5)
   const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
 
   const totalUserShareAmounts = calcRemoveFundingSendAmounts(
@@ -710,10 +710,17 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 emphasizeValue={userEarnings.gt(0)}
                 state={ValueStates.success}
                 title="Earned"
-                value={`${formatNumber(
-                  formatBigNumber(sellNoteUserEarnings, displayCollateral.decimals, displayCollateral.decimals),
-                )} ${displayTotalSymbol}`}
+                value={
+                  sellNoteUserEarnings.lt(0.01)
+                    ? new BigNumber(0)
+                    : `${formatBigNumber(
+                        sellNoteUserEarnings,
+                        displayCollateral.decimals,
+                        displayCollateral.decimals,
+                      )} ${displayTotalSymbol}`
+                }
               />
+              {console.log(sellNoteUserEarnings)}
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"

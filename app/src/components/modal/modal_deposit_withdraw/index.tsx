@@ -466,7 +466,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                   {currencySelected === ExchangeCurrency.Dai
                     ? '0.00 DAI'
                     : exchangeType === ExchangeType.withdraw
-                    ? `${formatNumber(formatBigNumber(displayFundAmount.div(1000), omenToken.decimals, 3), 2)} OMN`
+                    ? `${formatBigNumber(displayFundAmount.div(1000), omenToken.decimals, 3)} OMN`
                     : '0.00 OMN'}
                 </span>
               </ExchangeDataItem>

@@ -302,7 +302,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     }
     displayTradedShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, tradedShares)
   }
-  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 2, 5)}`
+  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
 
   const feeFormatted = `${formatNumber(
     formatBigNumber(displayFeePaid.mul(-1), displayCollateral.decimals, displayCollateral.decimals),
@@ -314,13 +314,13 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     displayCollateral.decimals,
   )} ${displayCollateral.symbol}`
 
-  const potentialProfitFormatted = `${formatNumber(
-    formatBigNumber(displayPotentialProfit, displayCollateral.decimals, displayCollateral.decimals),
-  )} ${displayCollateral.symbol}`
+  const potentialProfitFormatted = `
+    ${formatBigNumber(displayPotentialProfit, displayCollateral.decimals, displayCollateral.decimals)} ${
+    displayCollateral.symbol
+  }`
 
-  const sharesTotal = formatNumber(
-    formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals),
-  )
+  const sharesTotal = formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals)
+
   const total = `${sharesTotal} Shares`
 
   const amountError = isTransactionProcessing

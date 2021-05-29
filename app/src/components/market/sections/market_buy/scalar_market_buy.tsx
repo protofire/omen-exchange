@@ -149,7 +149,7 @@ export const ScalarMarketBuy = (props: Props) => {
     activeTab === Tabs.short ? setPositionIndex(0) : setPositionIndex(1)
   }, [activeTab, Tabs.short])
 
-  const walletBalance = formatBigNumber(collateralBalance, displayCollateral.decimals, 5, 5)
+  const walletBalance = formatBigNumber(collateralBalance, 5, 5)
 
   const unlockCollateral = async () => {
     if (!cpk) {

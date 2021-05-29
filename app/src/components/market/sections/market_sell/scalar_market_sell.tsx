@@ -415,7 +415,7 @@ export const ScalarMarketSell = (props: Props) => {
           <TransactionDetailsCard>
             <TransactionDetailsRow
               title={'Sell Amount'}
-              value={`${formatNumber(formatBigNumber(displayAmountShares || Zero, baseCollateral.decimals))} Shares`}
+              value={`${formatBigNumber(displayAmountShares || Zero, baseCollateral.decimals)} Shares`}
             />
             <TransactionDetailsRow
               emphasizeValue={potentialValue ? potentialValue.gt(0) : false}

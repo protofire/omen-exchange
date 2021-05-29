@@ -301,8 +301,8 @@ export const waitForConfirmations = async (
   }
 }
 
-export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2, x?: number): string => {
-  return formatNumber(Number(formatUnits(value, decimals)).toFixed(precision), x)
+export function formatBigNumber(value: BigNumber, decimals: number, precision = 2): string {
+  return formatNumber(Number(formatUnits(value, decimals)).toFixed(precision))
 }
 
 export const isContract = async (provider: any, address: string): Promise<boolean> => {
@@ -530,7 +530,7 @@ export const formatNumber = (number: string, decimals = 2): string => {
     return '<0.01'
   }
 
-  return `${formattedSubstring}${decimals && decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
+  return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
 }
 
 export const formatHistoryDate = (dateData: number | string): string => {

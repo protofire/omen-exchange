@@ -83,26 +83,30 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
     <UserData>
       <UserDataTitleValue
         title="Your Liquidity"
-        value={`${formatNumber(
-          formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals),
-        )} ${baseCollateral.symbol}`}
+        value={`${formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals)} ${
+          baseCollateral.symbol
+        }`}
       />
       <UserDataTitleValue
         title="Total Pool Tokens"
-        value={`${formatNumber(formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals))}`}
+        value={`${formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals)}`}
       />
       <UserDataTitleValue
         state={userEarnings.gt(0) ? ValueStates.success : undefined}
         title="Your Earnings"
-        value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatNumber(
-          formatBigNumber(displayUserEarnings, baseCollateral.decimals, baseCollateral.decimals),
+        value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatBigNumber(
+          displayUserEarnings,
+          baseCollateral.decimals,
+          baseCollateral.decimals,
         )} ${baseCollateral.symbol}`}
       />
       <UserDataTitleValue
         state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
         title="Total Earnings"
-        value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
-          formatBigNumber(displayTotalEarnings, baseCollateral.decimals, baseCollateral.decimals),
+        value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatBigNumber(
+          displayTotalEarnings,
+          baseCollateral.decimals,
+          baseCollateral.decimals,
         )} ${baseCollateral.symbol}`}
       />
     </UserData>
