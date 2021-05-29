@@ -61,6 +61,13 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
 
+    if (!networkId || !library) {
+      props.setStatus(false)
+    }
+
+    if (networkId || library) {
+      props.setStatus(true)
+    }
     if (safeAppInfo) {
       if (context.connectorName !== 'Safe') {
         localStorage.removeItem('CONNECTOR')
@@ -113,10 +120,9 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     return () => {
       isSubscribed = false
     }
-  }, [context, library, active, error, networkId, safeAppInfo, rpcAddress])
+  }, [context, library, active, error, networkId, safeAppInfo, rpcAddress, props])
 
   if (!networkId || !library) {
-    props.setStatus(false)
     return null
   }
 
@@ -135,7 +141,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     relay: isRelay,
     toggleRelay,
   }
-  props.setStatus(true)
+
   return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
 }
 
