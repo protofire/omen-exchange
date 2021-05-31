@@ -235,7 +235,7 @@ export const SettingsViewContainer = (props: Props) => {
         {isDropDownActive && (
           <TopCardHeader borderTop={true} style={{ paddingBottom: '10px' }}>
             <Row>
-              <Column style={{ border: '2px solid red' }}>
+              <Column>
                 <RPCTextWrapper>Custom RPC URL</RPCTextWrapper>
                 <Input
                   onChange={event => {
