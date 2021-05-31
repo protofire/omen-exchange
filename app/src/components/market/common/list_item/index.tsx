@@ -163,7 +163,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     setToken()
   }, [account, collateralToken, collateralVolume, provider, context.networkId, token])
 
-  const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address.toLowerCase())
+  const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address)
 
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
@@ -190,7 +190,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         getToken(networkId, 'omn'),
         cpk?.address || '',
         1, // Assume pool token value is 1 DAI
-        Number(formatBigNumber(tokenPrice, omnToken.decimals, omnToken.decimals)),
+        tokenPrice,
         Number(liquidityMiningCampaign.endsAt),
         liquidityMiningCampaign.rewardAmounts[0],
         Number(liquidityMiningCampaign.duration),

@@ -601,7 +601,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       omnToken,
       cpk.address,
       1, // Assume pool token value is 1 DAI
-      Number(formatBigNumber(tokenPrice, omnToken.decimals, omnToken.decimals)),
+      tokenPrice,
       Number(liquidityMiningCampaign.endsAt),
       liquidityMiningCampaign.rewardAmounts[0],
       Number(liquidityMiningCampaign.duration),

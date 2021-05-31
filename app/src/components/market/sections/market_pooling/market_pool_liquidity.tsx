@@ -583,7 +583,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address.toLowerCase())
+  const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address)
 
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
@@ -612,7 +612,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       omnToken,
       cpk.address,
       1, // Assume pool token value is 1 DAI
-      Number(formatBigNumber(tokenPrice, omnToken.decimals, omnToken.decimals)),
+      tokenPrice,
       Number(liquidityMiningCampaign.endsAt),
       liquidityMiningCampaign.rewardAmounts[0],
       Number(liquidityMiningCampaign.duration),

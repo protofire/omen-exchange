@@ -17,21 +17,23 @@ const query = gql`
 `
 
 type GraphResponse = {
-  tokenPrice: string
+  token: {
+    usdPerToken: string
+  }
 }
 
 export const useTokenPrice = (address: string) => {
-  const [tokenPrice, setTokenPrice] = useState(new BigNumber(0))
+  const [tokenPrice, setTokenPrice] = useState(0)
 
   const { data: data, error: error, loading: loading } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
     skip: false,
-    variables: { id: address },
+    variables: { id: address.toLowerCase() },
   })
 
   useEffect(() => {
-    if (data && data.tokenPrice) {
-      setTokenPrice(bigNumberify(data.tokenPrice))
+    if (data && data.token.usdPerToken) {
+      setTokenPrice(Number(data.token.usdPerToken))
     }
   }, [data])
 
