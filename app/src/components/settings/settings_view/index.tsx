@@ -85,6 +85,7 @@ const Input = styled.input`
   margin: 12px 0px;
   ${TextfieldCSS};
   padding: 12px 20px;
+  width: 100%;
 `
 
 const ImageWrap = styled.div`
