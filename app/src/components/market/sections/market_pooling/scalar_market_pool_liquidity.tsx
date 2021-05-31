@@ -691,9 +691,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 emphasizeValue={displayPoolTokens.gt(0)}
                 state={(displayPoolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Pool Tokens"
-                value={`${formatNumber(
-                  formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals),
-                )}`}
+                value={`${formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals)}`}
               />
             </TransactionDetailsCard>
           )}
@@ -703,15 +701,19 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 emphasizeValue={userEarnings.gt(0)}
                 state={ValueStates.success}
                 title="Earned"
-                value={`${formatNumber(
-                  formatBigNumber(sellNoteUserEarnings, displayCollateral.decimals, displayCollateral.decimals),
+                value={`${formatBigNumber(
+                  sellNoteUserEarnings,
+                  displayCollateral.decimals,
+                  displayCollateral.decimals,
                 )} ${displayTotalSymbol}`}
               />
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"
-                value={`${formatNumber(
-                  formatBigNumber(sellNoteDepositedTokens, displayCollateral.decimals, displayCollateral.decimals),
+                value={`${formatBigNumber(
+                  sellNoteDepositedTokens,
+                  displayCollateral.decimals,
+                  displayCollateral.decimals,
                 )} ${displayTotalSymbol}`}
               />
               <TransactionDetailsLine />
@@ -719,8 +721,10 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 emphasizeValue={depositedTokensTotal.gt(0)}
                 state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Total"
-                value={`${formatNumber(
-                  formatBigNumber(sellNoteDepositedTokensTotal, displayCollateral.decimals, displayCollateral.decimals),
+                value={`${formatBigNumber(
+                  sellNoteDepositedTokensTotal,
+                  displayCollateral.decimals,
+                  displayCollateral.decimals,
                 )} ${displayTotalSymbol}`}
               />
               {collateral.address === pseudoNativeAssetAddress ? (
