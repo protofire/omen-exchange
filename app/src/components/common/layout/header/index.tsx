@@ -202,6 +202,7 @@ const HeaderContainer: React.FC = (props: any) => {
   const disableConnectButton = isConnectWalletModalOpen
 
   const {
+    arrayOfClaimableTokenBalances,
     fetchBalances,
     formattedDaiBalance,
     formattedNativeBalance,
@@ -373,6 +374,7 @@ const HeaderContainer: React.FC = (props: any) => {
           </ButtonSettings>
         </ContentsRight>
         <ModalYourConnectionWrapper
+          arrayOfClaimableBalances={arrayOfClaimableTokenBalances}
           changeWallet={() => {
             setYourConnectionModalState(false)
             logout()

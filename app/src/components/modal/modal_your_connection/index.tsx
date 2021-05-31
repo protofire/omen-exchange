@@ -5,16 +5,19 @@ import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
-import { getToken, networkIds } from '../../../util/networks'
+import { bridgeTokensList, getToken, networkIds } from '../../../util/networks'
+import { getImageUrl } from '../../../util/token'
 import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
-import { TransactionStep } from '../../../util/types'
+import { KnownTokenValue, TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
+import { RadioInput } from '../../common/form/radio_input'
 import { IconClose, IconMetaMask, IconOmen, IconWalletConnect } from '../../common/icons'
 import { IconChevronDown } from '../../common/icons/IconChevronDown'
 import { IconChevronUp } from '../../common/icons/IconChevronUp'
 import { IconJazz } from '../../common/icons/IconJazz'
 import { DaiIcon } from '../../common/icons/currencies'
+import { Image } from '../../market/common/token_item'
 import {
   BalanceItem,
   BalanceItemBalance,
@@ -162,10 +165,12 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   formattedxOmenBalance: string
   xOmenBalance: BigNumber
   xDaiBalance: BigNumber
+  arrayOfClaimableBalances: KnownTokenValue[]
 }
 
 export const ModalYourConnection = (props: Props) => {
   const {
+    arrayOfClaimableBalances,
     changeWallet,
     fetchBalances,
     formattedDaiBalance,
@@ -239,6 +244,23 @@ export const ModalYourConnection = (props: Props) => {
 
   const DAI = getToken(1, 'dai')
 
+  const claimableItems = arrayOfClaimableBalances.map((item, index) => {
+    const { token, value } = item
+    const { address, decimals, name } = getToken(networkIds.MAINNET, token)
+
+    return (
+      <BalanceItem key={index + token}>
+        <BalanceItemSide>
+          <Image size={'24'} src={getImageUrl(address)} />
+          <BalanceItemTitle style={{ marginLeft: '4px' }}>{name ? name : token}</BalanceItemTitle>
+        </BalanceItemSide>
+        <BalanceItemBalance>
+          {formatBigNumber(value, decimals, 2)} {token.toUpperCase()}
+        </BalanceItemBalance>
+      </BalanceItem>
+    )
+  })
+
   React.useEffect(() => {
     Modal.setAppElement('#root')
   }, [])
@@ -310,7 +332,7 @@ export const ModalYourConnection = (props: Props) => {
               </BalanceItems>
             </BalanceSection>
           </ModalCard>
-          {relay && (!unclaimedDaiAmount.isZero() || !unclaimedOmenAmount.isZero()) && (
+          {relay && arrayOfClaimableBalances.length !== 0 && (
             <ModalCard>
               <BalanceSection borderBottom={displayClaim} style={{ flexDirection: 'row' }}>
                 <ClaimLeftSvg
@@ -320,12 +342,9 @@ export const ModalYourConnection = (props: Props) => {
                 >
                   <ClaimLeft>
                     <StrongText>Claimable Assets</StrongText>
+
                     <BalanceItemBalance as="div">
-                      {!unclaimedDaiAmount.isZero() && !unclaimedOmenAmount.isZero()
-                        ? 'DAI, OMEN'
-                        : unclaimedDaiAmount.isZero()
-                        ? 'OMN'
-                        : 'DAI'}
+                      {arrayOfClaimableBalances.map(e => e.token.toUpperCase()).join(', ')}
                     </BalanceItemBalance>
                   </ClaimLeft>
                   <SvgWrap>
@@ -338,32 +357,7 @@ export const ModalYourConnection = (props: Props) => {
                 </ClaimButton>
               </BalanceSection>
 
-              {displayClaim && (
-                <BalanceSection>
-                  {!unclaimedDaiAmount.isZero() && (
-                    <BalanceItem>
-                      <BalanceItemSide>
-                        <DaiIcon size="24px" />
-                        <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
-                      </BalanceItemSide>
-                      <BalanceItemBalance>
-                        {formatBigNumber(unclaimedDaiAmount, STANDARD_DECIMALS, 2)} DAI
-                      </BalanceItemBalance>
-                    </BalanceItem>
-                  )}
-                  {!unclaimedOmenAmount.isZero() && (
-                    <BalanceItem>
-                      <BalanceItemSide>
-                        <IconOmen size={24} />
-                        <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
-                      </BalanceItemSide>
-                      <BalanceItemBalance>
-                        {formatBigNumber(unclaimedOmenAmount, STANDARD_DECIMALS, 2)} OMN
-                      </BalanceItemBalance>
-                    </BalanceItem>
-                  )}
-                </BalanceSection>
-              )}
+              {displayClaim && <BalanceSection>{claimableItems}</BalanceSection>}
             </ModalCard>
           )}
           {relay && (
