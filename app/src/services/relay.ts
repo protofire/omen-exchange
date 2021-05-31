@@ -1,5 +1,7 @@
 import axios from 'axios'
+import { BigNumber } from 'ethers/utils'
 
+import { MAX_RELAY_FEE } from '../common/constants'
 import { Transaction } from '../util/cpk'
 
 interface CreateProxyAndExecParams {
@@ -34,9 +36,10 @@ interface ExecTransactionParams {
 }
 
 class RelayService {
+  url = 'https://omen-xdai-relay.vercel.app'
+
   request = async (payload: any) => {
-    const url = 'https://omen-xdai-relay.vercel.app/'
-    const response = await axios(url, {
+    const response = await axios(this.url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json;charset=utf-8',
@@ -46,6 +49,24 @@ class RelayService {
     if (response.status !== 200) {
       throw new Error(response.data.message)
     } else {
+      return response.data
+    }
+  }
+
+  getInfo = async () => {
+    const response = await axios(`${this.url}/info`, {
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+    })
+    if (response.status !== 200) {
+      throw new Error(response.data.message)
+    } else {
+      const data = response.data
+      // max fee safe guard
+      if (new BigNumber(data.fee).gt(MAX_RELAY_FEE)) {
+        throw new Error('Relay fee is too high')
+      }
       return response.data
     }
   }
