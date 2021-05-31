@@ -14,6 +14,7 @@ export const Image = styled.img<{ size: string }>`
   margin-right: 8px;
   height: ${props => `${props.size}px`};
   width: ${props => `${props.size}px`};
+  border-radius: 50%;
 `
 
 const Text = styled.div`

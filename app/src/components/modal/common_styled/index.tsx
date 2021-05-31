@@ -46,7 +46,7 @@ export const ModalCard = styled.div`
 `
 
 export const BalanceSection = styled.div<{ borderBottom?: boolean }>`
-  padding: 16px 20px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;

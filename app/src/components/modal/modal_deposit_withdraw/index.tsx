@@ -65,6 +65,7 @@ const WalletText = styled.div`
 
 const DepositWithdrawButton = styled(Button)`
   flex: 1;
+  margin-top: 24px;
 `
 const ApproveButton = styled(ButtonStateful)`
   flex: 1;
@@ -308,7 +309,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         shouldCloseOnOverlayClick={true}
         style={{
           ...theme.fluidHeightModal,
-          content: { ...theme.fluidHeightModal.content, height: '510px' },
+          content: { ...theme.fluidHeightModal.content, minHeight: '510px' },
         }}
       >
         <ContentWrapper>
@@ -366,7 +367,7 @@ export const ModalDepositWithdraw = (props: Props) => {
             </InputInfo>
           ) : (
             <>
-              <ExchangeDataItem style={{ marginTop: '32px' }}>
+              <ExchangeDataItem style={{ marginTop: '24px' }}>
                 <span>Min amount</span>
                 <span>
                   {currencySelected === 'dai'
