@@ -7,6 +7,7 @@ import { OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../c
 import { Transaction, verifyProxyAddress } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
+  bridgeTokensList,
   getBySafeTx,
   getContractAddress,
   getNativeAsset,
@@ -1522,10 +1523,19 @@ class CPKService {
   fetchLatestUnclaimedTransactions = async () => {
     try {
       const xDaiService = new XdaiService(this.provider)
+      const arrayOfTransactions = []
       const daiData = await xDaiService.fetchXdaiTransactionData()
-      const omenData = await xDaiService.fetchOmniTransactionData('omn')
+      arrayOfTransactions.push(...daiData)
 
-      return daiData.concat(omenData)
+      for (const token of bridgeTokensList) {
+        if (token !== 'dai') {
+          const currentToken = await xDaiService.fetchOmniTransactionData(token)
+
+          if (currentToken.length !== 0) arrayOfTransactions.push(...currentToken)
+        }
+      }
+
+      return arrayOfTransactions
     } catch (e) {
       logger.error('Error fetching xDai subgraph data', e.message)
       throw e

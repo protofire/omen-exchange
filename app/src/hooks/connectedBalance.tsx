@@ -6,7 +6,7 @@ import { STANDARD_DECIMALS } from '../common/constants'
 import { useConnectedWeb3Context, useTokens } from '../hooks'
 import { XdaiService } from '../services'
 import { getLogger } from '../util/logger'
-import { getNativeAsset, networkIds } from '../util/networks'
+import { bridgeTokensList, getNativeAsset, networkIds } from '../util/networks'
 import { formatBigNumber, formatNumber } from '../util/tools'
 import { KnownTokenValue, Token } from '../util/types'
 
@@ -87,19 +87,18 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
       const xDaiService = new XdaiService(context.library)
       const daiTransactions = await xDaiService.fetchXdaiTransactionData()
 
-      const omenTransactions = await xDaiService.fetchOmniTransactionData('omn')
-
       if (daiTransactions && daiTransactions.length) {
         const aggregatedDai: BigNumber = aggregator(daiTransactions)
         arrayOfBalances.push({ token: 'dai', value: aggregatedDai })
-      } else {
-        console.log('here was zero')
       }
-      if (omenTransactions && omenTransactions.length) {
-        const aggregatedOmen: BigNumber = aggregator(omenTransactions)
-        arrayOfBalances.push({ token: 'omn', value: aggregatedOmen })
-      } else {
-        console.log('here was zero')
+      for (const token of bridgeTokensList) {
+        if (token !== 'dai') {
+          const transactions = await xDaiService.fetchOmniTransactionData(token)
+          if (transactions.length !== 0) {
+            const aggregated: BigNumber = aggregator(transactions)
+            arrayOfBalances.push({ token: token, value: aggregated })
+          }
+        }
       }
     }
     setArrayOfClaimableTokenBalances(arrayOfBalances)
