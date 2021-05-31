@@ -211,8 +211,7 @@ const HeaderContainer: React.FC = (props: any) => {
     formattedxOmenBalance,
     mainnetTokens,
     omenBalance,
-    unclaimedDaiAmount,
-    unclaimedOmenAmount,
+
     xDaiBalance,
     xDaiTokens,
     xOmenBalance,
@@ -398,8 +397,6 @@ const HeaderContainer: React.FC = (props: any) => {
             setDepositWithdrawType(ExchangeType.withdraw)
             setDepositWithdrawModalState(true)
           }}
-          unclaimedDaiAmount={unclaimedDaiAmount}
-          unclaimedOmenAmount={unclaimedOmenAmount}
           xDaiBalance={xDaiBalance}
           xOmenBalance={xOmenBalance}
         />

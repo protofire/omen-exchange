@@ -3,15 +3,13 @@ import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
-import { bridgeTokensList, getToken, networkIds } from '../../../util/networks'
+import { getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
 import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
 import { KnownTokenValue, TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
-import { RadioInput } from '../../common/form/radio_input'
 import { IconClose, IconMetaMask, IconOmen, IconWalletConnect } from '../../common/icons'
 import { IconChevronDown } from '../../common/icons/IconChevronDown'
 import { IconChevronUp } from '../../common/icons/IconChevronUp'
@@ -155,8 +153,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   openDepositModal: () => void
   openWithdrawModal: () => void
   theme?: any
-  unclaimedDaiAmount: BigNumber
-  unclaimedOmenAmount: BigNumber
+
   fetchBalances: () => void
   formattedNativeBalance: string
   formattedDaiBalance: string
@@ -183,8 +180,7 @@ export const ModalYourConnection = (props: Props) => {
     openDepositModal,
     openWithdrawModal,
     theme,
-    unclaimedDaiAmount,
-    unclaimedOmenAmount,
+
     xDaiBalance,
     xOmenBalance,
   } = props
@@ -203,8 +199,6 @@ export const ModalYourConnection = (props: Props) => {
   const [message, setMessage] = useState('')
   const [displayClaim, setDisplayClaim] = useState<boolean>(false)
 
-  const omenToken = getToken(100, 'omn')
-
   const claim = async () => {
     if (!cpk) {
       return
@@ -212,17 +206,16 @@ export const ModalYourConnection = (props: Props) => {
 
     try {
       setMessage(
-        `Claim ${
-          !unclaimedDaiAmount.isZero() && !unclaimedOmenAmount.isZero()
-            ? `${formatBigNumber(unclaimedDaiAmount || new BigNumber(0), DAI.decimals, 2)} ${
-                DAI.symbol
-              }, ${formatBigNumber(unclaimedOmenAmount || new BigNumber(0), omenToken.decimals, 2)} ${
-                omenToken.symbol
-              } `
-            : unclaimedDaiAmount.isZero()
-            ? `${formatBigNumber(unclaimedOmenAmount || new BigNumber(0), omenToken.decimals, 2)} ${omenToken.symbol}`
-            : `${formatBigNumber(unclaimedDaiAmount || new BigNumber(0), DAI.decimals, 2)} ${DAI.symbol}`
-        }   `,
+        `Claim ${arrayOfClaimableBalances
+          .map(
+            e =>
+              `${formatBigNumber(
+                e.value,
+                getToken(networkIds.MAINNET, e.token).decimals,
+                2,
+              )}${' '}${e.token.toUpperCase()}`,
+          )
+          .join(', ')}`,
       )
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)

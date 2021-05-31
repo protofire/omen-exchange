@@ -13,8 +13,6 @@ import { KnownTokenValue, Token } from '../util/types'
 const logger = getLogger('Hooks::ConnectedBalance')
 
 export interface ConnectedBalanceContext {
-  unclaimedDaiAmount: BigNumber
-  unclaimedOmenAmount: BigNumber
   nativeBalance: BigNumber
   formattedNativeBalance: string
   daiBalance: BigNumber
@@ -58,8 +56,6 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   const { relay } = context
   const { account, networkId } = context.rawWeb3Context
 
-  const [unclaimedDaiAmount, setUnclaimedDaiAmount] = useState<BigNumber>(Zero)
-  const [unclaimedOmenAmount, setUnclaimedOmenAmount] = useState<BigNumber>(Zero)
   const [arrayOfClaimableTokenBalances, setArrayOfClaimableTokenBalances] = useState<KnownTokenValue[]>([])
 
   // mainnet balances
@@ -96,17 +92,14 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
       if (daiTransactions && daiTransactions.length) {
         const aggregatedDai: BigNumber = aggregator(daiTransactions)
         arrayOfBalances.push({ token: 'dai', value: aggregatedDai })
-        setUnclaimedDaiAmount(aggregatedDai)
       } else {
-        setUnclaimedDaiAmount(Zero)
+        console.log('here was zero')
       }
       if (omenTransactions && omenTransactions.length) {
         const aggregatedOmen: BigNumber = aggregator(omenTransactions)
         arrayOfBalances.push({ token: 'omn', value: aggregatedOmen })
-
-        setUnclaimedOmenAmount(aggregatedOmen)
       } else {
-        setUnclaimedOmenAmount(Zero)
+        console.log('here was zero')
       }
     }
     setArrayOfClaimableTokenBalances(arrayOfBalances)
@@ -124,15 +117,12 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     if (relay) {
       fetchBalances()
     } else {
-      setUnclaimedDaiAmount(Zero)
-      setUnclaimedOmenAmount(Zero)
+      setArrayOfClaimableTokenBalances([])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, networkId])
 
   const value = {
-    unclaimedDaiAmount,
-    unclaimedOmenAmount,
     nativeBalance,
     formattedNativeBalance: formatNumber(
       formatBigNumber(nativeBalance, STANDARD_DECIMALS, STANDARD_DECIMALS),

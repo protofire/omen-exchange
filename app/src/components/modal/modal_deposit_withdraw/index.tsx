@@ -354,7 +354,7 @@ export const ModalDepositWithdraw = (props: Props) => {
             }
             onClickMaxButton={() => {
               setDisplayFundAmount(wallet)
-              setAmountToDisplay(formatBigNumber(wallet, STANDARD_DECIMALS, 5))
+              setAmountToDisplay(formatBigNumber(wallet, decimals, 5))
             }}
             shouldDisplayMaxButton={true}
             symbol={symbol}
