@@ -10,7 +10,9 @@ import { IconBlockscout, IconCloudflare, IconInfura } from '../../common/icons'
 import { IconXdai } from '../../common/icons/IconXdai'
 import { ModalCard } from '../../modal/common_styled'
 
-const Column = styled.div``
+const Column = styled.div`
+  width: 100%;
+`
 
 const Row = styled.div`
   width: 100%;
@@ -32,7 +34,7 @@ const TextLighter = styled.p`
 `
 
 const SetAndSaveButton = styled(ButtonRound)`
-flex: 1
+  flex: 1;
   padding: 12px 17px;
 `
 
@@ -102,7 +104,6 @@ const TopCardHeader = styled.div<{ borderTop?: boolean }>`
 `
 
 const RPCTextWrapper = styled.span`
-  width: 100%;
   line-height: ${props => props.theme.fonts.defaultLineHeight};
 `
 
@@ -234,7 +235,7 @@ export const SettingsViewContainer = (props: Props) => {
         {isDropDownActive && (
           <TopCardHeader borderTop={true} style={{ paddingBottom: '10px' }}>
             <Row>
-              <Column>
+              <Column style={{ border: '2px solid red' }}>
                 <RPCTextWrapper>Custom RPC URL</RPCTextWrapper>
                 <Input
                   onChange={event => {
