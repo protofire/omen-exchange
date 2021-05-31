@@ -1,14 +1,20 @@
+import { useInterval } from '@react-corekit/use-interval'
 import { configureStore } from '@reduxjs/toolkit'
 import React, { useEffect, useState } from 'react'
+import Modal from 'react-modal'
 import { Provider } from 'react-redux'
 import { ThemeProvider } from 'styled-components'
 import Web3Provider from 'web3-react'
 
+import { FETCH_RPC_INTERVAL } from '../src/common/constants'
+
 import 'react-datepicker/dist/react-datepicker.css'
 import 'sanitize.css'
-
-import { HeaderNoRouter } from './components/common/layout/header'
+import { IconArrowBack, IconClose } from './components/common/icons/'
 import { Main } from './components/main'
+import { ContentWrapper, ModalTitle } from './components/modal/common_styled' // here
+import { ConnectionModalNavigation, SettingsModalWrapper } from './components/modal/modal_your_connection'
+import SettingsViewContainer from './components/settings/settings_view'
 import { ApolloProviderWrapper } from './contexts/Apollo'
 import { ConnectedBalance, ConnectedWeb3 } from './hooks'
 import balanceReducer from './store/reducer'
@@ -20,13 +26,23 @@ import { checkRpcStatus, getNetworkFromChain } from './util/tools'
 
 const store = configureStore({ reducer: balanceReducer })
 
-const App: React.FC = () => {
+const App: React.FC = (props: any) => {
+  const { ...restProps } = props
   const windowObj: any = window
 
   const ethereum = windowObj.ethereum
   const networkId = ethereum && ethereum.chainId
   const [status, setStatus] = useState(true)
   const network = getNetworkFromChain(networkId)
+  const [settingsView, setSettingsView] = useState(false)
+
+  useInterval(() => {
+    if (status == false) {
+      setTimeout(() => {
+        if (status == false) setSettingsView(true)
+      }, 5000)
+    }
+  }, FETCH_RPC_INTERVAL)
 
   useEffect(() => {
     if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
@@ -36,10 +52,34 @@ const App: React.FC = () => {
   return (
     <ThemeProvider theme={theme}>
       <Web3Provider connectors={connectors} libraryName="ethers.js">
-        {!status ? (
-          <>
-            <HeaderNoRouter />
-          </>
+        {settingsView ? (
+          <Modal
+            isOpen={true}
+            style={{
+              ...theme.fluidHeightModal,
+              content: { ...theme.fluidHeightModal.content, height: '510px' },
+            }}
+            {...restProps}
+          >
+            <ContentWrapper>
+              <ConnectionModalNavigation>
+                <ModalTitle>
+                  <IconArrowBack hoverEffect={true} onClick={() => alert('Please set your RPC endpoint!')} />
+                  <span style={{ marginLeft: '15px' }}>Settings</span>
+                </ModalTitle>
+
+                <IconClose
+                  hoverEffect={true}
+                  onClick={() => {
+                    alert('Please set your RPC endpoint!')
+                  }}
+                />
+              </ConnectionModalNavigation>
+              <SettingsModalWrapper>
+                <SettingsViewContainer networkId={networkId} />
+              </SettingsModalWrapper>
+            </ContentWrapper>
+          </Modal>
         ) : (
           <ConnectedWeb3 setStatus={setStatus}>
             <ApolloProviderWrapper>

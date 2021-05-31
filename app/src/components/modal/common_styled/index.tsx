@@ -6,6 +6,7 @@ export const ContentWrapper = styled.div`
   flex-direction: column;
   justify-content: flex-start;
   width: 100%;
+  height: 100%;
 `
 
 export const ModalNavigation = styled.div`
@@ -23,16 +24,18 @@ export const ModalNavigationLeft = styled.div`
 `
 
 export const ModalTitle = styled.p`
-  font-size: 16px;
+  font-size: ${props => props.theme.switchNetworkModal.primaryFontSize};
   color: ${props => props.theme.colors.textColorDark};
-  font-weight: 500;
+  font-weight: ${props => props.theme.textfield.fontWeight};
   margin: 0;
   line-height: 19px;
   letter-spacing: 0.2px;
+  margin-top: 2px;
 `
 
 export const ModalCard = styled.div`
   width: 100%;
+
   display: flex;
   flex-direction: column;
   align-items: center;

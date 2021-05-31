@@ -3,13 +3,11 @@ import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, STANDARD_DECIMALS } from '../../../common/constants'
 import SettingsViewContainer from '../../../components/settings/settings_view'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
-import { ERC20Service } from '../../../services'
 import { getToken, networkIds } from '../../../util/networks'
 import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
-import { TransactionStep, WalletState } from '../../../util/types'
+import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconArrowBack, IconClose, IconMetaMask, IconOmen, IconSettings, IconWalletConnect } from '../../common/icons'
@@ -74,7 +72,7 @@ const AccountInfo = styled.div`
   margin-left: 12px;
 `
 const StrongText = styled.div`
-  font-weight: 500;
+  font-weight: ${props => props.theme.textfield.fontweight};
   font-size: ${props => props.theme.fonts.defaultSize};
   line-height: 14.06px;
   color: ${props => props.theme.textfield.color};
@@ -104,18 +102,26 @@ const AccountInfoAddress = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorDark};
   margin: 0;
+  line-height: ${props => props.theme.fonts.defaultLineHeight}
+  letter-spacing: 0.2px;
+  
 `
 
 const AccountInfoWallet = styled.p`
   font-size: 12px;
   color: ${props => props.theme.colors.textColorLighter};
   margin: 0;
+  line-height: 14px;
+  margin: 4px 0px;
 `
 
 const CardHeaderText = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorLighter};
   margin: 0;
+  line-height: ${props => props.theme.fonts.defaultLineHeight};
+  letter-spacing: 0.2px;
+  white-space: nowrap;
 `
 
 const ClaimButton = styled(Button)`
@@ -137,30 +143,12 @@ const DepositWithdrawButton = styled(Button)`
   width: calc(50% - 8px);
 `
 
-const EnableDai = styled.div`
-  width: 100%;
-  padding: 24px 20px 20px 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`
-
-const EnableDaiText = styled.p`
-  font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => props.theme.colors.textColorLighter};
-  text-align: center;
-  margin: 16px 0;
-`
-
-const EnableDaiButton = styled(Button)`
-  width: 100%;
-`
 const SvgWrap = styled.div`
   align-self: center;
   padding-right: 22px;
 `
 
-const ConnectionModalNavigation = styled(ModalNavigation as any)`
+export const ConnectionModalNavigation = styled(ModalNavigation as any)`
   padding: 0;
   margin-bottom: 16px;
 `
@@ -168,10 +156,18 @@ const ConnectionModalNavigation = styled(ModalNavigation as any)`
 const IconSettingsWrapper = styled.div`
   display: flex;
   align-items: center;
-  margin-left: 65px;
-  width: 40px;
-  height: 40px;
-  padding: 8px;
+  justify-content: center;
+  margin-left: auto;
+  margin-right: 18.66px;
+`
+
+export const SettingsModalWrapper = styled.div`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  width: 100%;
+  height: 100%;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -189,6 +185,8 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   formattedOmenBalance: string
   formattedxDaiBalance: string
   formattedxOmenBalance: string
+  xOmenBalance: BigNumber
+  xDaiBalance: BigNumber
 }
 
 export const ModalYourConnection = (props: Props) => {
@@ -207,13 +205,15 @@ export const ModalYourConnection = (props: Props) => {
     theme,
     unclaimedDaiAmount,
     unclaimedOmenAmount,
+    xDaiBalance,
+    xOmenBalance,
   } = props
 
   const context = useConnectedWeb3Context()
   const owner = context.rawWeb3Context.account
   const cpk = useConnectedCPKContext()
 
-  const { account, networkId, relay } = context
+  const { networkId, relay } = context
 
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false)
@@ -221,7 +221,6 @@ export const ModalYourConnection = (props: Props) => {
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
   const [txNetId, setTxNetId] = useState()
   const [confirmations, setConfirmations] = useState(0)
-  const [allowance, setAllowance] = useState<BigNumber>(new BigNumber(0))
   const [message, setMessage] = useState('')
   const [displayClaim, setDisplayClaim] = useState<boolean>(false)
 
@@ -266,43 +265,6 @@ export const ModalYourConnection = (props: Props) => {
 
   const DAI = getToken(1, 'dai')
 
-  const fetchAllowance = async () => {
-    if (relay && owner && context.rawWeb3Context.networkId === networkIds.MAINNET) {
-      const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, DAI.address)
-      const allowance = await collateralService.allowance(owner, DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS)
-      setAllowance(allowance)
-    }
-  }
-
-  const approve = async () => {
-    if (!relay) {
-      return
-    }
-    try {
-      setMessage(`Enable ${DAI.symbol}`)
-      setTxState(TransactionStep.waitingConfirmation)
-      setConfirmations(0)
-      setIsTransactionModalOpen(true)
-      const provider = context.rawWeb3Context.library
-      const collateralService = new ERC20Service(context.rawWeb3Context.library, owner, DAI.address)
-      const { transactionHash } = await collateralService.approveUnlimited(DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, true)
-      if (transactionHash) {
-        setTxNetId(provider.network.chainId)
-        setTxHash(transactionHash)
-        await waitForConfirmations(transactionHash, provider, setConfirmations, setTxState, 1)
-        setTxState(TransactionStep.transactionConfirmed)
-        await fetchAllowance()
-      }
-    } catch (e) {
-      setIsTransactionModalOpen(false)
-    }
-  }
-
-  React.useEffect(() => {
-    fetchAllowance()
-    // eslint-disable-next-line
-  }, [relay, account])
-
   React.useEffect(() => {
     Modal.setAppElement('#root')
   }, [])
@@ -316,7 +278,6 @@ export const ModalYourConnection = (props: Props) => {
       <></>
     )
 
-  const walletState = allowance.isZero() ? WalletState.enable : WalletState.ready
   const windowObj: any = window
   const ethereum = windowObj.ethereum
   const chainId = ethereum && ethereum.chainId
@@ -330,7 +291,10 @@ export const ModalYourConnection = (props: Props) => {
           setIsSettingsModalOpen(false)
         }}
         shouldCloseOnOverlayClick={true}
-        style={theme.fixedHeightModal}
+        style={{
+          ...theme.fluidHeightModal,
+          content: { ...theme.fluidHeightModal.content, height: '510px' },
+        }}
       >
         {isSettingsModalOpen ? (
           <ContentWrapper>
@@ -348,8 +312,9 @@ export const ModalYourConnection = (props: Props) => {
                 }}
               />
             </ConnectionModalNavigation>
-
-            <SettingsViewContainer networkId={chainId} {...props} />
+            <SettingsModalWrapper>
+              <SettingsViewContainer networkId={chainId} {...props} />
+            </SettingsModalWrapper>
           </ContentWrapper>
         ) : (
           <ContentWrapper>
@@ -390,15 +355,18 @@ export const ModalYourConnection = (props: Props) => {
                         : `${formattedDaiBalance} DAI`}
                     </BalanceItemBalance>
                   </BalanceItem>
-                  {(networkId === networkIds.MAINNET || relay) && (
-                    <BalanceItem>
-                      <BalanceItemSide>
-                        <IconOmen size={24} />
-                        <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
-                      </BalanceItemSide>
-                      <BalanceItemBalance>{formattedOmenBalance} OMN</BalanceItemBalance>
-                    </BalanceItem>
-                  )}
+
+                  <BalanceItem>
+                    <BalanceItemSide>
+                      <IconOmen size={24} />
+                      <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
+                    </BalanceItemSide>
+                    <BalanceItemBalance>
+                      {networkId === networkIds.XDAI && !relay
+                        ? `${formattedxOmenBalance} OMN`
+                        : `${formattedOmenBalance} OMN`}
+                    </BalanceItemBalance>
+                  </BalanceItem>
                 </BalanceItems>
               </BalanceSection>
             </ModalCard>
@@ -429,121 +397,50 @@ export const ModalYourConnection = (props: Props) => {
                     Claim
                   </ClaimButton>
                 </BalanceSection>
+              </ModalCard>
+            )}
 
-                {displayClaim && (
+            {relay && (
+              <ModalCard>
+                <>
                   <BalanceSection>
-                    {!unclaimedDaiAmount.isZero() && (
+                    <CardHeaderText>Omen Account</CardHeaderText>
+                    <BalanceItems style={{ marginTop: '14px' }}>
                       <BalanceItem>
                         <BalanceItemSide>
                           <DaiIcon size="24px" />
                           <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
                         </BalanceItemSide>
-                        <BalanceItemBalance>
-                          {formatBigNumber(unclaimedDaiAmount, STANDARD_DECIMALS, 2)} DAI
-                        </BalanceItemBalance>
+                        <BalanceItemBalance>{formattedxDaiBalance} DAI</BalanceItemBalance>
                       </BalanceItem>
-                    )}
-                    {!unclaimedOmenAmount.isZero() && (
                       <BalanceItem>
                         <BalanceItemSide>
                           <IconOmen size={24} />
                           <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
                         </BalanceItemSide>
-                        <BalanceItemBalance>
-                          {formatBigNumber(unclaimedOmenAmount, STANDARD_DECIMALS, 2)} OMN
-                        </BalanceItemBalance>
+                        <BalanceItemBalance>{formattedxOmenBalance} OMN</BalanceItemBalance>
                       </BalanceItem>
-                    )}
+                    </BalanceItems>
                   </BalanceSection>
-                )}
-              </ModalCard>
-            )}
-            {relay && (
-              <ModalCard>
-                {walletState === WalletState.ready ? (
-                  <>
-                    <BalanceSection>
-                      <CardHeaderText>Omen Account</CardHeaderText>
-                      <BalanceItems style={{ marginTop: '14px' }}>
-                        <BalanceItem>
-                          <BalanceItemSide>
-                            <DaiIcon size="24px" />
-                            <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
-                          </BalanceItemSide>
-                          <BalanceItemBalance>{formattedxDaiBalance} DAI</BalanceItemBalance>
-                        </BalanceItem>
-                        <BalanceItem>
-                          <BalanceItemSide>
-                            <IconOmen size={24} />
-                            <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
-                          </BalanceItemSide>
-                          <BalanceItemBalance>{formattedxOmenBalance} OMN</BalanceItemBalance>
-                        </BalanceItem>
-                      </BalanceItems>
-                    </BalanceSection>
-                    <DepositWithdrawButtons>
-                      <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositModal}>
-                        Deposit
-                      </DepositWithdrawButton>
-                      <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openWithdrawModal}>
-                        Withdraw
-                      </DepositWithdrawButton>
-                    </DepositWithdrawButtons>
-                  </>
-                ) : (
-                  <EnableDai>
-                    <DaiIcon size="38px" />
-                    <EnableDaiText>
-                      To Deposit or Withdraw Dai to your Omen Account, you need to enable it first.
-                    </EnableDaiText>
-                    <EnableDaiButton buttonType={ButtonType.primary} onClick={approve}>
-                      Enable
-                    </EnableDaiButton>
-                  </EnableDai>
-                )}
-              </ModalCard>
-            )}{' '}
-            {relay && (
-              <ModalCard>
-                {walletState === WalletState.ready ? (
-                  <>
-                    <BalanceSection>
-                      <CardHeaderText>Omen Account</CardHeaderText>
-                      <BalanceItems style={{ marginTop: '14px' }}>
-                        <BalanceItem>
-                          <BalanceItemSide>
-                            <DaiIcon size="24px" />
-                            <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
-                          </BalanceItemSide>
-                          <BalanceItemBalance>{formattedxDaiBalance} DAI</BalanceItemBalance>
-                        </BalanceItem>
-                      </BalanceItems>
-                    </BalanceSection>
-                    <DepositWithdrawButtons>
-                      <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositModal}>
-                        Deposit
-                      </DepositWithdrawButton>
-                      <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openWithdrawModal}>
-                        Withdraw
-                      </DepositWithdrawButton>
-                    </DepositWithdrawButtons>
-                  </>
-                ) : (
-                  <EnableDai>
-                    <DaiIcon size="38px" />
-                    <EnableDaiText>
-                      To Deposit or Withdraw Dai to your Omen Account, you need to enable it first.
-                    </EnableDaiText>
-                    <EnableDaiButton buttonType={ButtonType.primary} onClick={approve}>
-                      Enable
-                    </EnableDaiButton>
-                  </EnableDai>
-                )}
+                  <DepositWithdrawButtons>
+                    <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositModal}>
+                      Deposit
+                    </DepositWithdrawButton>
+                    <DepositWithdrawButton
+                      buttonType={ButtonType.secondaryLine}
+                      disabled={xOmenBalance.isZero() && xDaiBalance.isZero()}
+                      onClick={openWithdrawModal}
+                    >
+                      Withdraw
+                    </DepositWithdrawButton>
+                  </DepositWithdrawButtons>
+                </>
               </ModalCard>
             )}
           </ContentWrapper>
         )}
       </Modal>
+
       <ModalTransactionWrapper
         confirmations={confirmations}
         confirmationsRequired={1}

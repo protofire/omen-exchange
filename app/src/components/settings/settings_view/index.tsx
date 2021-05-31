@@ -10,18 +10,6 @@ import { IconBlockscout, IconCloudflare, IconInfura } from '../../common/icons'
 import { IconXdai } from '../../common/icons/IconXdai'
 import { ModalCard } from '../../modal/common_styled'
 
-const CardBody = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: flex-end;
-  overflow: hidden;
-  padding: 0px;
-  width: 364px;
-  height: 302px;
-  margin: 24px 0px -70px;
-`
-
 const Column = styled.div``
 
 const Row = styled.div`
@@ -33,7 +21,7 @@ const Row = styled.div`
 
 const StatusSection = styled(Row as any)`
   justify-content: flex-start;
-  margin-top: 6px;
+  margin-top: 5px;
 `
 
 const TextLighter = styled.p`
@@ -42,19 +30,10 @@ const TextLighter = styled.p`
   line-height: 14.06px;
   margin: 0;
 `
-const ButtonContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
-  width: 364px;
-  padding: 0px;
-  margin: 0px;
-`
+
 const SetAndSaveButton = styled(ButtonRound)`
-  letter-spacing: 0.4px;
-  width: 174px;
-  height: 40px;
+flex: 1
+  padding: 12px 17px;
 `
 
 const FiltersControls = styled.div<{ disabled?: boolean }>`
@@ -103,9 +82,9 @@ const StatusBadge = styled.div<{ status: boolean }>`
 `
 
 const Input = styled.input`
-  margin-top: 20px;
-
+  margin: 12px 0px;
   ${TextfieldCSS};
+  padding: 12px 20px;
 `
 
 const ImageWrap = styled.div`
@@ -116,10 +95,20 @@ const TopCardHeader = styled.div<{ borderTop?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-
-  padding: 16px;
+  padding: ${props => props.theme.cards.paddingVertical};
   width: 100%;
   border-top: ${props => (props.borderTop ? props.theme.borders.borderLineDisabled : '')};
+`
+
+const RPCTextWrapper = styled.span`
+  width: 100%;
+  line-height: ${props => props.theme.fonts.defaultLineHeight};
+`
+
+const SettingsButtonWrapper = styled.div`
+  display: flex;
+  margin-top: auto;
+  width: 100%;
 `
 
 interface Props {
@@ -187,6 +176,8 @@ export const SettingsViewContainer = (props: Props) => {
     }
   })
 
+  const isDropDownActive = current === dropdownItems.length - 1
+
   useEffect(() => {
     if (url.length === 0 && current !== dropdownItems.length - 1 && urlObject) {
       setUrl(urlObject[current].rpcUrl)
@@ -221,9 +212,10 @@ export const SettingsViewContainer = (props: Props) => {
         <TopCardHeader>
           <Row>
             <Column>
-              RPC Endpoint
+              <RPCTextWrapper>RPC Endpoint</RPCTextWrapper>
               <StatusSection>
                 <StatusBadge status={onlineStatus} />
+
                 <TextLighter>Status: {onlineStatus ? 'OK' : 'Unavailable'}</TextLighter>
               </StatusSection>
             </Column>
@@ -238,15 +230,15 @@ export const SettingsViewContainer = (props: Props) => {
           </Row>
         </TopCardHeader>
 
-        {current === dropdownItems.length - 1 && (
-          <TopCardHeader borderTop={true}>
+        {isDropDownActive && (
+          <TopCardHeader borderTop={true} style={{ paddingBottom: '10px' }}>
             <Row>
               <Column>
-                Custom RPC URL
+                <RPCTextWrapper>Custom RPC URL</RPCTextWrapper>
                 <Input
                   onChange={event => {
                     setUrl(event.target.value)
-                    if (current === dropdownItems.length - 1) setCustomUrl(event.target.value)
+                    if (isDropDownActive) setCustomUrl(event.target.value)
                   }}
                   placeholder={'Paste your RPC URL'}
                   value={customUrl}
@@ -257,42 +249,38 @@ export const SettingsViewContainer = (props: Props) => {
         )}
       </ModalCard>
 
-      <CardBody
-        style={{
-          height: current === dropdownItems.length - 1 ? '188px' : '302px',
-        }}
-      >
-        <ButtonContainer>
-          <SetAndSaveButton
-            onClick={() => {
-              setCurrent(0)
-              urlObject && setUrl(urlObject[0].rpcUrl)
-            }}
-          >
-            Set to Default
-          </SetAndSaveButton>
-          <SetAndSaveButton
-            disabled={
-              url.length === 0 || !isValidUrl || (network !== -1 && getInfuraUrl(network) === url) || !onlineStatus
-            }
-            onClick={async () => {
-              if (!(await checkRpcStatus(url, setOnlineStatus, network))) return
+      <SettingsButtonWrapper>
+        <SetAndSaveButton
+          onClick={() => {
+            setCurrent(0)
+            urlObject && setUrl(urlObject[0].rpcUrl)
+          }}
+          style={{ marginRight: '8px' }}
+        >
+          Set to Default
+        </SetAndSaveButton>
+        <SetAndSaveButton
+          disabled={
+            url.length === 0 || !isValidUrl || (network !== -1 && getInfuraUrl(network) === url) || !onlineStatus
+          }
+          onClick={async () => {
+            if (!(await checkRpcStatus(url, setOnlineStatus, network))) return
 
-              localStorage.setItem(
-                'rpcAddress',
-                JSON.stringify({
-                  url: url,
-                  network: network,
-                  index: current,
-                }),
-              )
-              window.location.reload()
-            }}
-          >
-            Save
-          </SetAndSaveButton>
-        </ButtonContainer>
-      </CardBody>
+            localStorage.setItem(
+              'rpcAddress',
+              JSON.stringify({
+                url: url,
+                network: network,
+                index: current,
+              }),
+            )
+            window.location.reload()
+          }}
+          style={{ marginLeft: '8px' }}
+        >
+          Save
+        </SetAndSaveButton>
+      </SettingsButtonWrapper>
     </>
   )
 }
