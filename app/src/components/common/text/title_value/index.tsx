@@ -18,7 +18,7 @@ const Title = styled.h2<{ vertical: boolean | undefined }>`
   font-size: 14px;
   font-weight: 400;
   line-height: 1.2;
-  margin: 0 5px 0 0;
+  margin: 0px;
   white-space: nowrap;
 `
 
