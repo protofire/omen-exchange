@@ -229,7 +229,6 @@ class XdaiService {
 
   fetchCrossChainBalance = async (chain: number) => {
     try {
-      await this.fetchOmniTransactionData('omn')
       let userAddress
       if (this.provider.relay && chain === networkIds.MAINNET) {
         userAddress = await this.provider.signer.signer.getAddress()

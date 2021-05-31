@@ -443,6 +443,11 @@ export type MarketCondition = {
   scalarLow: Maybe<BigNumber>
 }
 
+export type KnownTokenValue = {
+  token: KnownToken
+  value: BigNumber
+}
+
 export enum MarketDetailsTab {
   swap = 'SWAP',
   pool = 'POOL',

@@ -8,7 +8,7 @@ import { XdaiService } from '../services'
 import { getLogger } from '../util/logger'
 import { getNativeAsset, networkIds } from '../util/networks'
 import { formatBigNumber, formatNumber } from '../util/tools'
-import { Token } from '../util/types'
+import { KnownTokenValue, Token } from '../util/types'
 
 const logger = getLogger('Hooks::ConnectedBalance')
 
@@ -27,6 +27,7 @@ export interface ConnectedBalanceContext {
   omenBalance: BigNumber
   mainnetTokens: Token[]
   xDaiTokens: Token[]
+  arrayOfClaimableTokenBalances: KnownTokenValue[]
   fetchBalances: () => Promise<void>
 }
 
@@ -59,6 +60,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
 
   const [unclaimedDaiAmount, setUnclaimedDaiAmount] = useState<BigNumber>(Zero)
   const [unclaimedOmenAmount, setUnclaimedOmenAmount] = useState<BigNumber>(Zero)
+  const [arrayOfClaimableTokenBalances, setArrayOfClaimableTokenBalances] = useState<KnownTokenValue[]>([])
 
   // mainnet balances
   const { refetch, tokens: mainnetTokens } = useTokens(context.rawWeb3Context, true, true, false, true)
@@ -84,6 +86,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     const aggregator = (array: any) => {
       return array.reduce((prev: BigNumber, { value }: any) => prev.add(value), Zero)
     }
+    const arrayOfBalances: KnownTokenValue[] = []
     if (account && networkId === networkIds.MAINNET) {
       const xDaiService = new XdaiService(context.library)
       const daiTransactions = await xDaiService.fetchXdaiTransactionData()
@@ -91,19 +94,22 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
       const omenTransactions = await xDaiService.fetchOmniTransactionData('omn')
 
       if (daiTransactions && daiTransactions.length) {
-        const aggregatedDai = aggregator(daiTransactions)
+        const aggregatedDai: BigNumber = aggregator(daiTransactions)
+        arrayOfBalances.push({ token: 'dai', value: aggregatedDai })
         setUnclaimedDaiAmount(aggregatedDai)
       } else {
         setUnclaimedDaiAmount(Zero)
       }
       if (omenTransactions && omenTransactions.length) {
-        const aggregatedOmen = aggregator(omenTransactions)
+        const aggregatedOmen: BigNumber = aggregator(omenTransactions)
+        arrayOfBalances.push({ token: 'omn', value: aggregatedOmen })
 
         setUnclaimedOmenAmount(aggregatedOmen)
       } else {
         setUnclaimedOmenAmount(Zero)
       }
     }
+    setArrayOfClaimableTokenBalances(arrayOfBalances)
   }
 
   const fetchBalances = async () => {
@@ -143,6 +149,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     formattedxOmenBalance: formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 2),
     mainnetTokens,
     xDaiTokens,
+    arrayOfClaimableTokenBalances,
   }
 
   return <ConnectedBalanceContext.Provider value={value}>{props.children}</ConnectedBalanceContext.Provider>
