@@ -698,9 +698,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 emphasizeValue={displayPoolTokens.gt(0)}
                 state={(displayPoolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Pool Tokens"
-                value={`${formatNumber(
-                  formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals),
-                )}`}
+                value={`${formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals)}`}
               />
             </TransactionDetailsCard>
           )}
@@ -710,22 +708,20 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 emphasizeValue={userEarnings.gt(0)}
                 state={ValueStates.success}
                 title="Earned"
-                value={
-                  sellNoteUserEarnings.lt(0.01)
-                    ? new BigNumber(0)
-                    : `${formatBigNumber(
-                        sellNoteUserEarnings,
-                        displayCollateral.decimals,
-                        displayCollateral.decimals,
-                      )} ${displayTotalSymbol}`
-                }
+                value={`${formatBigNumber(
+                  sellNoteUserEarnings,
+                  displayCollateral.decimals,
+                  displayCollateral.decimals,
+                )} ${displayTotalSymbol}`}
               />
               {console.log(sellNoteUserEarnings)}
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"
-                value={`${formatNumber(
-                  formatBigNumber(sellNoteDepositedTokens, displayCollateral.decimals, displayCollateral.decimals),
+                value={`${formatBigNumber(
+                  sellNoteDepositedTokens,
+                  displayCollateral.decimals,
+                  displayCollateral.decimals,
                 )} ${displayTotalSymbol}`}
               />
               <TransactionDetailsLine />
@@ -733,8 +729,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 emphasizeValue={sellNoteDepositedTokensTotal.gt(0)}
                 state={(sellNoteDepositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Total"
-                value={`${formatNumber(
-                  formatBigNumber(sellNoteDepositedTokensTotal, displayCollateral.decimals, displayCollateral.decimals),
+                value={`${formatBigNumber(
+                  sellNoteDepositedTokensTotal,
+                  displayCollateral.decimals,
+                  displayCollateral.decimals,
                 )} ${displayTotalSymbol}`}
               />
               {!relay && collateral.address === pseudoNativeAssetAddress ? (

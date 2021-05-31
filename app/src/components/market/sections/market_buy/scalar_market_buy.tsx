@@ -247,25 +247,31 @@ export const ScalarMarketBuy = (props: Props) => {
   }
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
 
-  const feeFormatted = `${formatNumber(
-    formatBigNumber(displayFeePaid.mul(-1), displayCollateral.decimals, displayCollateral.decimals),
+  const feeFormatted = `${formatBigNumber(
+    displayFeePaid.mul(-1),
+    displayCollateral.decimals,
+    displayCollateral.decimals,
   )}
   ${displayCollateral.symbol}`
-  const baseCostFormatted = `${formatNumber(
-    formatBigNumber(displayBaseCost || Zero, displayCollateral.decimals, displayCollateral.decimals),
+  const baseCostFormatted = `${formatBigNumber(
+    displayBaseCost || Zero,
+    displayCollateral.decimals,
+    displayCollateral.decimals,
   )}
   ${displayCollateral.symbol}`
-  const potentialProfitFormatted = `${formatNumber(
-    formatBigNumber(displayPotentialProfit, displayCollateral.decimals, displayCollateral.decimals),
+  const potentialProfitFormatted = `${formatBigNumber(
+    displayPotentialProfit,
+    displayCollateral.decimals,
+    displayCollateral.decimals,
   )} ${displayCollateral.symbol}`
 
-  const potentialLossFormatted = `${formatNumber(
-    formatBigNumber(displayPotentialLoss, displayCollateral.decimals, displayCollateral.decimals),
+  const potentialLossFormatted = `${formatBigNumber(
+    displayPotentialLoss,
+    displayCollateral.decimals,
+    displayCollateral.decimals,
   )} ${displayCollateral.symbol}`
 
-  const sharesTotal = formatNumber(
-    formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals),
-  )
+  const sharesTotal = formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals)
 
   const total = `${sharesTotal} Shares`
 

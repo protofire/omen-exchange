@@ -541,9 +541,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 title={'Pool Tokens'}
-                value={formatNumber(
-                  formatBigNumber(funding, userInputCollateral.decimals, userInputCollateral.decimals),
-                )}
+                value={formatBigNumber(funding, userInputCollateral.decimals, userInputCollateral.decimals)}
               />
             </TransactionDetailsCard>
           </div>

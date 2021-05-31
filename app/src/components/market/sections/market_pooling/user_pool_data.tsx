@@ -1,4 +1,5 @@
-import { BigNumber } from 'ethers/utils'
+import { Zero } from 'ethers/constants'
+import { BigNumber, parseUnits } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
@@ -94,7 +95,7 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
       <UserDataTitleValue
         state={userEarnings.gt(0) ? ValueStates.success : undefined}
         title="Your Earnings"
-        value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatBigNumber(
+        value={`${displayUserEarnings.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''}${formatBigNumber(
           displayUserEarnings,
           baseCollateral.decimals,
           baseCollateral.decimals,
@@ -103,7 +104,7 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
       <UserDataTitleValue
         state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
         title="Total Earnings"
-        value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatBigNumber(
+        value={`${displayTotalEarnings.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''}${formatBigNumber(
           displayTotalEarnings,
           baseCollateral.decimals,
           baseCollateral.decimals,
