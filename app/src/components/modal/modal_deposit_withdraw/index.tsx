@@ -65,7 +65,6 @@ const WalletText = styled.div`
 
 const DepositWithdrawButton = styled(Button)`
   flex: 1;
-  margin-top: 24px;
 `
 const ApproveButton = styled(ButtonStateful)`
   flex: 1;
@@ -90,6 +89,7 @@ const BottomButtons = styled.div`
   display: flex;
   margin-top: auto;
   width: 100%;
+  margin-top: 24px;
 `
 
 const Divider = styled.div`
