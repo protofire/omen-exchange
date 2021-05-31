@@ -385,7 +385,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                       currencySelected !== 'dai' && exchangeType === ExchangeType.withdraw ? '0.10%' : '0.00%'
                     }`}
                   >
-                    <IconInfo hasCircle style={{ marginLeft: '8px' }} />
+                    <IconInfo hasCircle style={{ marginLeft: '8px', verticalAlign: 'bottom' }} />
                   </div>
                 </div>
                 <ReactTooltip
