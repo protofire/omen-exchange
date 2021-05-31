@@ -581,6 +581,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setLiquidityMiningCampaign(marketLiquidityMiningCampaign)
     }
   }, [liquidityMiningCampaigns, marketMakerAddress])
+  console.log(liquidityMiningCampaign)
 
   const fetchStakingData = async () => {
     if (!liquidityMiningCampaign) {

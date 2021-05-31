@@ -592,6 +592,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setLiquidityMiningCampaign(marketLiquidityMiningCampaign)
     }
   }, [liquidityMiningCampaigns, marketMakerAddress, cpk, cpk?.address])
+  console.log(liquidityMiningCampaign)
 
   const fetchStakingData = async () => {
     if (!liquidityMiningCampaign) {
