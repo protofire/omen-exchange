@@ -113,11 +113,9 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
   }
 
   useEffect(() => {
-    if (relay) {
-      fetchBalances()
-    } else {
-      setArrayOfClaimableTokenBalances([])
-    }
+    setArrayOfClaimableTokenBalances([])
+    if (relay) fetchBalances()
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, networkId])
 
