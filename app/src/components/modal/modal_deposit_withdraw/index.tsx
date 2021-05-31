@@ -207,14 +207,8 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   const wallet = new BigNumber(currentToken ? currentToken : '0')
 
-  const minDaiBridgeExchange =
-    exchangeType === ExchangeType.deposit
-      ? ethers.utils.parseUnits('5', decimals)
-      : ethers.utils.parseUnits('10', decimals)
-  const minOmniBridgeExchange =
-    exchangeType === ExchangeType.deposit
-      ? ethers.utils.parseUnits('1', decimals)
-      : ethers.utils.parseUnits('1', decimals)
+  const minDaiBridgeExchange = exchangeType === ExchangeType.deposit ? Zero : ethers.utils.parseUnits('10', decimals)
+  const minOmniBridgeExchange = Zero
 
   const isDepositWithdrawDisabled =
     !wallet ||
