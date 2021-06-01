@@ -14,9 +14,10 @@ import {
   useSymbol,
 } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
-import { ERC20Service } from '../../../../../services'
+import { ERC20Service, RealitioService } from '../../../../../services'
 import { CompoundService } from '../../../../../services/compound_service'
 import { getLogger } from '../../../../../util/logger'
+import { getContractAddress } from '../../../../../util/networks'
 import { formatBigNumber, getBaseToken, getUnit, isCToken, isDust } from '../../../../../util/tools'
 import {
   CompoundTokenType,
@@ -178,6 +179,8 @@ const Wrapper = (props: Props) => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
+  const [realitioWithdraw, setRealitioWithdraw] = useState(false)
+  const [realitioBalance, setRealitioBalance] = useState(Zero)
 
   const [displayEarnedCollateral, setDisplayEarnedCollateral] = useState<BigNumber>(new BigNumber(0))
 
@@ -277,6 +280,27 @@ const Wrapper = (props: Props) => {
       isSubscribed = false
     }
   }, [provider, account, marketMakerAddress, marketMaker])
+
+  useEffect(() => {
+    if (!cpk) {
+      return
+    }
+    const getRealitioBalance = async () => {
+      // Check if user has reality balance to redeem
+      const realitioService = new RealitioService(
+        getContractAddress(networkId, 'realitio'),
+        getContractAddress(networkId, 'realitioScalarAdapter'),
+        provider,
+        cpk.address,
+      )
+
+      const balance = await realitioService.getBalanceOf(cpk.address)
+
+      setRealitioWithdraw(balance.gt(Zero))
+      setRealitioBalance(balance)
+    }
+    getRealitioBalance()
+  }, [cpk, networkId, provider])
 
   const redeem = async () => {
     try {
@@ -424,6 +448,9 @@ const Wrapper = (props: Props) => {
       redeemString = `${formatBigNumber(earnedCollateral, collateralToken.decimals)} ${symbol}`
     }
   }
+  if (realitioWithdraw) {
+    redeemString = `${formatBigNumber(realitioBalance, collateralToken.decimals)} ${symbol}`
+  }
 
   return (
     <>
@@ -502,11 +529,15 @@ const Wrapper = (props: Props) => {
                     <Button
                       buttonType={ButtonType.primary}
                       disabled={status === Status.Loading}
-                      onClick={isConditionResolved && hasWinningOutcomes ? () => redeem() : resolveCondition}
+                      onClick={
+                        (isConditionResolved && hasWinningOutcomes) || realitioWithdraw
+                          ? () => redeem()
+                          : resolveCondition
+                      }
                     >
                       {(!isConditionResolved && hasWinningOutcomes) || (!isConditionResolved && !hasWinningOutcomes)
                         ? 'Resolve Condition'
-                        : isConditionResolved && hasWinningOutcomes
+                        : (isConditionResolved && hasWinningOutcomes) || realitioWithdraw
                         ? 'Redeem'
                         : ''}
                     </Button>
