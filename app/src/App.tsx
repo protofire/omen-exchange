@@ -10,7 +10,6 @@ import { FETCH_RPC_INTERVAL } from '../src/common/constants'
 
 import 'react-datepicker/dist/react-datepicker.css'
 import 'sanitize.css'
-import { IconArrowBack, IconClose } from './components/common/icons/'
 import { Main } from './components/main'
 import { ContentWrapper, ModalTitle } from './components/modal/common_styled' // here
 import { ConnectionModalNavigation, SettingsModalWrapper } from './components/modal/modal_your_connection'
@@ -64,16 +63,8 @@ const App: React.FC = (props: any) => {
             <ContentWrapper>
               <ConnectionModalNavigation>
                 <ModalTitle>
-                  <IconArrowBack hoverEffect={true} onClick={() => alert('Please set your RPC endpoint!')} />
                   <span style={{ marginLeft: '15px' }}>Settings</span>
                 </ModalTitle>
-
-                <IconClose
-                  hoverEffect={true}
-                  onClick={() => {
-                    alert('Please set your RPC endpoint!')
-                  }}
-                />
               </ConnectionModalNavigation>
               <SettingsModalWrapper>
                 <SettingsViewContainer networkId={networkId} />
