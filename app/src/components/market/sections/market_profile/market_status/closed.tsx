@@ -355,6 +355,10 @@ const Wrapper = (props: Props) => {
     setCurrentTab(newTab)
   }
 
+  useEffect(() => {
+    if (currentTab === MarketDetailsTab.swap) return history.replace(`/${marketMakerAddress}/finalize`)
+  }, [currentTab])
+
   const { fetchData: fetchGraphMarketUserTxData } = useGraphMarketUserTxData(
     marketMakerAddress,
     cpk?.address.toLowerCase(),
@@ -441,13 +445,6 @@ const Wrapper = (props: Props) => {
           marketMakerData={marketMakerData}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
-        {/* Missing the component to be added to the route */}
-        {/* <Router>
-          <Switch>
-            <Route component={} path={`/${marketMakerAddress}/finalize`} />
-            <Route component={} path={`/${marketMakerAddress}/set_outcome`} />
-          </Switch>
-        </Router> */}
         {currentTab === MarketDetailsTab.swap && (
           <>
             {isScalar ? (

@@ -296,8 +296,6 @@ const Wrapper = (props: Props) => {
 
   useEffect(() => {
     if (currentTab === MarketDetailsTab.swap) return history.replace(`/${marketMakerAddress}`)
-    if (currentTab === MarketDetailsTab.finalize) return history.replace(`/${marketMakerAddress}/finalize`)
-    if (currentTab === MarketDetailsTab.setOutcome) return history.replace(`/${marketMakerAddress}/set_outcome`)
   }, [currentTab])
 
   return (
@@ -311,7 +309,6 @@ const Wrapper = (props: Props) => {
           marketMakerData={marketMakerData}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
-        {/* Not sure this is the correct way to go but trying out the routing - Francesco */}
         <Router>
           <Switch>
             <Route component={MarketBuyContainer} path={`/${marketMakerAddress}/buy`} />
