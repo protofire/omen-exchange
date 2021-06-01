@@ -105,31 +105,13 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   onClose: () => void
   theme?: any
   fetchBalances: () => void
-  formattedDaiBalance: string
-  formattedxDaiBalance: string
-  formattedOmenBalance: string
-
   xDaiBalance: Maybe<BigNumber>
-
-  formattedxOmenBalance: string
-
   mainnetTokens: Token[]
   xDaiTokens: Token[]
 }
 
 export const ModalDepositWithdraw = (props: Props) => {
-  const {
-    exchangeType,
-    fetchBalances,
-    isOpen,
-    mainnetTokens,
-    onBack,
-    onClose,
-    theme,
-
-    xDaiBalance,
-    xDaiTokens,
-  } = props
+  const { exchangeType, fetchBalances, isOpen, mainnetTokens, onBack, onClose, theme, xDaiBalance, xDaiTokens } = props
 
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
@@ -291,7 +273,10 @@ export const ModalDepositWithdraw = (props: Props) => {
         </BalanceItemSide>
         <BalanceItemSide>
           <BalanceItemBalance>
-            {token?.balance ? formatBigNumber(new BigNumber(token?.balance), decimals, 2) : '0.00'} {symbol}
+            {token?.balance
+              ? formatBigNumber(new BigNumber(token?.balance), decimals, symbol === 'DAI' ? 2 : 3)
+              : '0.00'}{' '}
+            {symbol}
           </BalanceItemBalance>
         </BalanceItemSide>
       </BalanceItem>

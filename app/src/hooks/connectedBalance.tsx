@@ -16,12 +16,9 @@ export interface ConnectedBalanceContext {
   nativeBalance: BigNumber
   formattedNativeBalance: string
   daiBalance: BigNumber
-  formattedDaiBalance: string
   xOmenBalance: BigNumber
   xDaiBalance: BigNumber
   formattedxDaiBalance: string
-  formattedxOmenBalance: string
-  formattedOmenBalance: string
   omenBalance: BigNumber
   mainnetTokens: Token[]
   xDaiTokens: Token[]
@@ -126,14 +123,11 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
       !relay && networkId === networkIds.XDAI ? 2 : 3,
     ),
     daiBalance,
-    formattedDaiBalance: formatNumber(formatBigNumber(daiBalance, STANDARD_DECIMALS, STANDARD_DECIMALS)),
     xDaiBalance,
     formattedxDaiBalance: formatBigNumber(xDaiBalance, nativeAsset.decimals, 2),
     fetchBalances,
-    formattedOmenBalance: formatNumber(formatBigNumber(omenBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 2),
     omenBalance,
     xOmenBalance,
-    formattedxOmenBalance: formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 2),
     mainnetTokens,
     xDaiTokens,
     arrayOfClaimableTokenBalances,

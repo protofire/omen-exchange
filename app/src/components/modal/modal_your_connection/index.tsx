@@ -4,17 +4,16 @@ import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
-import { getToken, networkIds } from '../../../util/networks'
+import { NetworkId, bridgeTokensList, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
 import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
-import { KnownTokenValue, TransactionStep } from '../../../util/types'
+import { KnownTokenValue, Token, TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
-import { IconClose, IconMetaMask, IconOmen, IconWalletConnect } from '../../common/icons'
+import { IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
 import { IconChevronDown } from '../../common/icons/IconChevronDown'
 import { IconChevronUp } from '../../common/icons/IconChevronUp'
 import { IconJazz } from '../../common/icons/IconJazz'
-import { DaiIcon } from '../../common/icons/currencies'
 import { Image } from '../../market/common/token_item'
 import {
   BalanceItem,
@@ -153,16 +152,12 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   openDepositModal: () => void
   openWithdrawModal: () => void
   theme?: any
-
   fetchBalances: () => void
-  formattedNativeBalance: string
-  formattedDaiBalance: string
-  formattedOmenBalance: string
-  formattedxDaiBalance: string
-  formattedxOmenBalance: string
   xOmenBalance: BigNumber
   xDaiBalance: BigNumber
   arrayOfClaimableBalances: KnownTokenValue[]
+  xDaiTokens: any
+  mainnetTokens: any
 }
 
 export const ModalYourConnection = (props: Props) => {
@@ -170,18 +165,14 @@ export const ModalYourConnection = (props: Props) => {
     arrayOfClaimableBalances,
     changeWallet,
     fetchBalances,
-    formattedDaiBalance,
-    formattedNativeBalance,
-    formattedOmenBalance,
-    formattedxDaiBalance,
-    formattedxOmenBalance,
     isOpen,
+    mainnetTokens,
     onClose,
     openDepositModal,
     openWithdrawModal,
     theme,
-
     xDaiBalance,
+    xDaiTokens,
     xOmenBalance,
   } = props
 
@@ -189,7 +180,7 @@ export const ModalYourConnection = (props: Props) => {
   const owner = context.rawWeb3Context.account
   const cpk = useConnectedCPKContext()
 
-  const { networkId, relay } = context
+  const { relay } = context
 
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txHash, setTxHash] = useState('')
@@ -253,6 +244,27 @@ export const ModalYourConnection = (props: Props) => {
       </BalanceItem>
     )
   })
+  const tokenBalances = (forNetwork: NetworkId) => {
+    return bridgeTokensList.map((token, index) => {
+      const { address, decimals, name, symbol } = getToken(networkIds.MAINNET, token)
+      let balance
+      if (forNetwork === networkIds.MAINNET)
+        balance = new BigNumber(mainnetTokens.filter((token: Token) => token.symbol === symbol)[0]?.balance || '')
+      else balance = new BigNumber(xDaiTokens.filter((token: Token) => token.symbol === symbol)[0]?.balance || '')
+
+      return (
+        <BalanceItem key={index + address}>
+          <BalanceItemSide>
+            <Image size={'24'} src={getImageUrl(address)} />
+            <BalanceItemTitle style={{ marginLeft: '12px' }}>{name ? name : symbol}</BalanceItemTitle>
+          </BalanceItemSide>
+          <BalanceItemBalance>
+            {formatBigNumber(balance, decimals, symbol === 'DAI' ? 2 : 3)} {symbol}
+          </BalanceItemBalance>
+        </BalanceItem>
+      )
+    })
+  }
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
@@ -298,31 +310,7 @@ export const ModalYourConnection = (props: Props) => {
             </TopCardHeader>
             <BalanceSection>
               <CardHeaderText>Wallet</CardHeaderText>
-              <BalanceItems style={{ marginTop: '14px' }}>
-                <BalanceItem>
-                  <BalanceItemSide>
-                    <DaiIcon size="24px" />
-                    <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
-                  </BalanceItemSide>
-                  <BalanceItemBalance>
-                    {networkId === networkIds.XDAI && !relay
-                      ? `${formattedNativeBalance} xDAI`
-                      : `${formattedDaiBalance} DAI`}
-                  </BalanceItemBalance>
-                </BalanceItem>
-
-                <BalanceItem>
-                  <BalanceItemSide>
-                    <IconOmen size={24} />
-                    <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
-                  </BalanceItemSide>
-                  <BalanceItemBalance>
-                    {networkId === networkIds.XDAI && !relay
-                      ? `${formattedxOmenBalance} OMN`
-                      : `${formattedOmenBalance} OMN`}
-                  </BalanceItemBalance>
-                </BalanceItem>
-              </BalanceItems>
+              <BalanceItems style={{ marginTop: '14px' }}>{tokenBalances(networkIds.MAINNET)}</BalanceItems>
             </BalanceSection>
           </ModalCard>
           {relay && arrayOfClaimableBalances.length !== 0 && (
@@ -358,22 +346,7 @@ export const ModalYourConnection = (props: Props) => {
               <>
                 <BalanceSection>
                   <CardHeaderText>Omen Account</CardHeaderText>
-                  <BalanceItems style={{ marginTop: '14px' }}>
-                    <BalanceItem>
-                      <BalanceItemSide>
-                        <DaiIcon size="24px" />
-                        <BalanceItemTitle style={{ marginLeft: '12px' }}>Dai</BalanceItemTitle>
-                      </BalanceItemSide>
-                      <BalanceItemBalance>{formattedxDaiBalance} DAI</BalanceItemBalance>
-                    </BalanceItem>
-                    <BalanceItem>
-                      <BalanceItemSide>
-                        <IconOmen size={24} />
-                        <BalanceItemTitle style={{ marginLeft: '12px' }}>Omen</BalanceItemTitle>
-                      </BalanceItemSide>
-                      <BalanceItemBalance>{formattedxOmenBalance} OMN</BalanceItemBalance>
-                    </BalanceItem>
-                  </BalanceItems>
+                  <BalanceItems style={{ marginTop: '14px' }}>{tokenBalances(networkIds.XDAI)}</BalanceItems>
                 </BalanceSection>
                 <DepositWithdrawButtons>
                   <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositModal}>
