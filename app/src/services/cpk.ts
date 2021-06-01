@@ -121,6 +121,7 @@ interface CPKRedeemParams {
   oracle: OracleService
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
+  realitioWithdraw: boolean
   setTxHash: (arg0: string) => void
   setTxState: (step: TransactionStep) => void
 }
@@ -1244,6 +1245,7 @@ class CPKService {
     numOutcomes,
     oracle,
     question,
+    realitioWithdraw = false,
     setTxHash,
     setTxState,
   }: CPKRedeemParams): Promise<TransactionReceipt> => {
@@ -1320,6 +1322,14 @@ class CPKService {
             data: ERC20Service.encodeTransfer(account, earnings),
           })
         }
+      }
+
+      // If user has realitio balance, withdraw
+      if (realitioWithdraw) {
+        transactions.push({
+          to: getContractAddress(networkId, 'realitio'),
+          data: RealitioService.encodeWithdraw(),
+        })
       }
 
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)

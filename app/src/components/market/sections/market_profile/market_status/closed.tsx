@@ -327,6 +327,7 @@ const Wrapper = (props: Props) => {
         collateralToken,
         marketMaker,
         conditionalTokens,
+        realitioWithdraw,
         setTxHash,
         setTxState,
       })

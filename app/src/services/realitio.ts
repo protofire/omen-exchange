@@ -368,7 +368,7 @@ class RealitioService {
     return resolveConditionInterface.functions.resolve.encode(args)
   }
 
-  static withdraw = () => {
+  static encodeWithdraw = () => {
     const withdrawInterface = new utils.Interface(realitioAbi)
     return withdrawInterface.functions.withdraw.encode([])
   }
