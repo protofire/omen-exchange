@@ -19,6 +19,7 @@ const realitioAbi = [
   'function isFinalized(bytes32 question_id) view public returns (bool)',
   'function resultFor(bytes32 question_id) external view returns (bytes32)',
   'function submitAnswer(bytes32 question_id, bytes32 answer, uint256 max_previous)',
+  'function withdraw()',
 ]
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
@@ -365,6 +366,11 @@ class RealitioService {
 
     const resolveConditionInterface = new utils.Interface(realitioScalarAdapterAbi)
     return resolveConditionInterface.functions.resolve.encode(args)
+  }
+
+  static withdraw = () => {
+    const withdrawInterface = new utils.Interface(realitioAbi)
+    return withdrawInterface.functions.withdraw.encode([])
   }
 }
 
