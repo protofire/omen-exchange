@@ -5,7 +5,7 @@ import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 
 import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
-import { useConnectedBalanceContext, useConnectedWeb3Context } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../hooks'
 import { networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { ExchangeType } from '../../../../util/types'
@@ -213,8 +213,7 @@ const HeaderContainer: React.FC = (props: any) => {
     unclaimedDaiAmount,
     unclaimedOmenAmount,
     xOmenBalance,
-    // @ts-expect-error ignore
-  } = context.balances // useConnectedBalanceContext()
+  } = context.balances
 
   const networkPlacholder = (
     <DropdownWrapper>

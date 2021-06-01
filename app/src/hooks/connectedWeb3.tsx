@@ -2,13 +2,14 @@ import { providers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
+import { CPKService } from '../services'
 import connectors from '../util/connectors'
 import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
 import { getNetworkFromChain } from '../util/tools'
 
-import { useRawBalance } from './connectedBalance'
+import { ConnectedBalanceContext, useRawBalance } from './connectedBalance'
 import { useRawCpk } from './connectedCpk'
 import { useSafeApp } from './useSafeApp'
 
@@ -20,6 +21,8 @@ export interface ConnectedWeb3Context {
   networkId: number
   rawWeb3Context: any
   relay: boolean
+  cpk: Maybe<CPKService>
+  balances: ConnectedBalanceContext
   toggleRelay: () => void
 }
 
@@ -89,13 +92,15 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
         networkId: netId,
         rawWeb3Context: context,
         relay: isRelay,
+        cpk,
+        balances,
         toggleRelay,
       }
 
       setConnection(value)
     }
     // eslint-disable-next-line
-  }, [relay, networkId, context, networkId, library, account])
+  }, [relay, networkId, context, library, account])
 
   useEffect(() => {
     let isSubscribed = true

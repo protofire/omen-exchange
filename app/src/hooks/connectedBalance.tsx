@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 
 import { STANDARD_DECIMALS } from '../common/constants'
-import { useCollateralBalance, useConnectedWeb3Context, useTokens } from '../hooks'
+import { useConnectedWeb3Context } from '../hooks'
 import { fetchBalance } from '../hooks/useCollateralBalance'
 import { XdaiService } from '../services'
 import { getLogger } from '../util/logger'
@@ -20,13 +20,15 @@ export interface ConnectedBalanceContext {
   daiBalance: BigNumber
   formattedDaiBalance: string
   xOmenBalance: BigNumber
-  // xDaiBalance: BigNumber
-  // formattedxDaiBalance: string
   formattedxOmenBalance: string
   formattedOmenBalance: string
   fetched: boolean
   omenBalance: BigNumber
   fetchBalances: () => Promise<void>
+}
+
+interface StateParam {
+  active: boolean
 }
 
 const ConnectedBalanceContext = React.createContext<Maybe<ConnectedBalanceContext>>(null)
@@ -61,9 +63,15 @@ export const useRawBalance = (props: any) => {
 
   const [xOmenBalance, setxOmenBalance] = useState<BigNumber>(Zero)
 
-  const fetchTokenBalances = async () => {
+  const fetchTokenBalances = async (state?: StateParam) => {
     if (context) {
       const requests = []
+
+      const active = (fn: () => void) => {
+        if (!state || state.active) {
+          fn()
+        }
+      }
 
       if (context.rawWeb3Context.networkId !== networkIds.XDAI) {
         requests.push(async () => {
@@ -71,7 +79,7 @@ export const useRawBalance = (props: any) => {
             getToken(context.rawWeb3Context.networkId, 'dai'),
             context.rawWeb3Context,
           )
-          setDaiBalance(daiCollateralBalance)
+          active(() => setDaiBalance(daiCollateralBalance))
         })
       }
 
@@ -80,18 +88,18 @@ export const useRawBalance = (props: any) => {
           getToken(context.rawWeb3Context.networkId, 'omn'),
           context.rawWeb3Context,
         )
-        setOmenBalance(omnCollateralBalance)
+        active(() => setOmenBalance(omnCollateralBalance))
       })
 
       requests.push(async () => {
         const nativeCollateralBalance = await fetchBalance(getNativeAsset(context.networkId), context)
-        setNativeBalance(nativeCollateralBalance)
+        active(() => setNativeBalance(nativeCollateralBalance))
       })
 
-      if (context.relay) {
+      if (context.rawWeb3Context.networkId === networkIds.XDAI) {
         requests.push(async () => {
           const xOmenCollateralBalance = await fetchBalance(getToken(context.networkId, 'omn'), context)
-          setxOmenBalance(xOmenCollateralBalance)
+          active(() => setxOmenBalance(xOmenCollateralBalance))
         })
       }
 
@@ -128,9 +136,9 @@ export const useRawBalance = (props: any) => {
     }
   }
 
-  const fetchBalances = async () => {
+  const fetchBalances = async (state?: StateParam) => {
     try {
-      await Promise.all([fetchTokenBalances(), fetchUnclaimedAssets()])
+      await Promise.all([fetchTokenBalances(state), fetchUnclaimedAssets()])
       setFetched(true)
     } catch (e) {
       logger.log(e.message)
@@ -138,16 +146,20 @@ export const useRawBalance = (props: any) => {
   }
 
   useEffect(() => {
+    const state = { active: true }
     if (context) {
-      fetchBalances()
+      fetchBalances(state)
     } else {
       setUnclaimedDaiAmount(Zero)
       setUnclaimedOmenAmount(Zero)
     }
+    return () => {
+      state.active = false
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [context])
+  }, [context?.account, context?.networkId, context?.relay, context?.library, context?.rawWeb3Context.networkId])
 
-  const value = {
+  return {
     unclaimedDaiAmount,
     unclaimedOmenAmount,
     nativeBalance,
@@ -164,7 +176,6 @@ export const useRawBalance = (props: any) => {
     xOmenBalance,
     formattedxOmenBalance: formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 2),
   }
-  return value
 }
 
 /**

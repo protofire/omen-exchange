@@ -10,7 +10,6 @@ import {
   useAsyncDerivedValue,
   useCollateralBalance,
   useCompoundService,
-  useConnectedBalanceContext,
   useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
@@ -77,7 +76,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
-  const { fetchBalances } = useConnectedBalanceContext()
+  const { fetchBalances } = context.balances
 
   const { library: provider, networkId, relay } = context
   const signer = useMemo(() => provider.getSigner(), [provider])

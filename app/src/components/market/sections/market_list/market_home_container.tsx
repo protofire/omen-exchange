@@ -230,7 +230,6 @@ const MarketHomeContainer: React.FC = () => {
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
   const [categories, setCategories] = useState<RemoteData<CategoryDataItem[]>>(RemoteData.notAsked())
 
-  // @ts-expect-error ignore
   const cpkAddress = context.cpk?.address
 
   const PAGE_SIZE = 12
