@@ -255,6 +255,9 @@ export const ModalDepositWithdraw = (props: Props) => {
       if (exchangeType === ExchangeType.deposit && symbol !== 'DAI') {
         await XdaiService.waitForBridgeMessageStatus(hash, context.library)
       }
+      if (exchangeType === ExchangeType.withdraw && symbol !== 'DAI') {
+        await XdaiService.waitForClaimSignature(hash, context.library)
+      }
       setTxState(TransactionStep.transactionConfirmed)
       await fetchBalances()
       setIsTransactionModalOpen(false)

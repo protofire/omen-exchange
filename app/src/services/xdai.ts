@@ -222,6 +222,32 @@ class XdaiService {
     }
   }
 
+  static waitForClaimSignature = async (hash: string, provider: any) => {
+    const transaction = await provider.getTransactionReceipt(hash)
+    const log = transaction.logs[transaction.logs.length - 2]
+    const messageId = log.topics[log.topics.length - 1]
+    const variables = { messageId }
+    const query = `
+      query Messages($messageId: String) {
+        messages(where: { msgId: $messageId }) {
+          signatures
+        }
+      }`
+
+    let signatures
+    while (!signatures) {
+      const response = await axios.post(OMNI_HOME_BRIDGE, { query, variables })
+      const messages = response.data.data.messages
+      if (messages.length) {
+        const message = messages[0]
+        if (message.signatures && message.signatures.length) {
+          signatures = message.signatures
+        }
+      }
+      await waitABit()
+    }
+  }
+
   encodeClaimDaiTokens = (message: string, signatures: string): string => {
     const transferFromInterface = new utils.Interface(abi)
     return transferFromInterface.functions.executeSignatures.encode([message, signatures])
@@ -333,29 +359,29 @@ class XdaiService {
       const xDaiAddress = addresses[100]
 
       const query = `
-query getRequests($address: String,$token:String) {
-    userRequests(first:1000,where:{user: $address,token:$token}) {
-       id
-        recipient
-        timestamp
-        amount
-        txHash
-        messageId
-        encodedData
-        message{
-          msgId
-           msgData
-          signatures
-          txHash
-        }
-    }
-}`
+        query getRequests($address: String,$token:String) {
+         userRequests(first:1000,where:{user: $address,token:$token}) {
+            id
+            recipient
+            timestamp
+            amount
+            txHash
+            messageId
+            encodedData
+            message {
+              msgId
+              msgData
+              signatures
+              txHash
+            }
+          }
+        }`
 
       const queryForeign = `
         query GetTransactions($address: String!,$token:String) {
           executions(first:1000,where:{user: $address,token:$token}) {
-          id
-          messageId
+            id
+            messageId
           }
         }
         `
@@ -380,6 +406,14 @@ query getRequests($address: String,$token:String) {
       let results = userRequests.filter(
         ({ messageId: id1 }: any) => !executions.some(({ messageId: id2 }: any) => id2 === id1),
       )
+
+      // double check if txs have been executed
+      const bridge = new ethers.Contract(OMNI_CLAIM_ADDRESS, omniBridgeAbi, this.provider.signer.signer)
+      const executed = await Promise.all(
+        results.map(async ({ messageId }: any) => await bridge.messageCallStatus(messageId)),
+      )
+      // filter out executed claims
+      results = results.filter((_: any, index: number) => !executed[index])
 
       results = results.map((item: any) => {
         return {
