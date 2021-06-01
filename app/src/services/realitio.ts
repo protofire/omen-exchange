@@ -22,6 +22,25 @@ const realitioAbi = [
 ]
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
+  {
+    constant: true,
+    inputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'balanceOf',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
 ]
 const realitioScalarAdapterAbi = [
   'function announceConditionQuestionId(bytes32 questionId, uint256 low, uint256 high)',
@@ -221,6 +240,11 @@ class RealitioService {
       logger.error(`There was an error querying the result for question with id '${questionId}'`, err.message)
       throw err
     }
+  }
+
+  getBalanceOf = async (address: string): Promise<BigNumber> => {
+    const result = await this.constantContract.balanceOf(address)
+    return result
   }
 
   submitAnswer = async (questionId: string, answer: string, amount: BigNumber): Promise<TransactionResult> => {
