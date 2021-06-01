@@ -19,6 +19,7 @@ import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken } from '../../../../util/networks'
 import {
+  BigNumberToString,
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
   formatBigNumber,
@@ -272,9 +273,8 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       return compoundService.calculateCTokenToBaseExchange(baseCollateral, ns)
     })
   }
-  const selectedOutcomeBalance = formatNumber(
-    formatBigNumber(balanceItem.shares, baseCollateral.decimals, baseCollateral.decimals),
-  )
+  const selectedOutcomeBalance = formatBigNumber(balanceItem.shares, baseCollateral.decimals, baseCollateral.decimals)
+
   let displaySelectedOutcomeBalance = selectedOutcomeBalance
   let displaySelectedOutcomeBalanceValue = balanceItem.shares
   if (collateralSymbol in CompoundTokenType && compoundService) {
@@ -282,9 +282,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       baseCollateral,
       balanceItem.shares,
     )
-    displaySelectedOutcomeBalance = formatNumber(
-      formatBigNumber(displaySelectedOutcomeBalanceValue, baseCollateral.decimals),
-    )
+    displaySelectedOutcomeBalance = formatBigNumber(displaySelectedOutcomeBalanceValue, baseCollateral.decimals)
   }
 
   const amountError = isTransactionProcessing
@@ -393,11 +391,14 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             }
             onClickMaxButton={() => {
               setAmountSharesFromInput(displaySelectedOutcomeBalanceValue)
-              setAmountSharesToDisplay(formatBigNumber(displaySelectedOutcomeBalanceValue, baseCollateral.decimals, 5))
+              setAmountSharesToDisplay(
+                BigNumberToString(displaySelectedOutcomeBalanceValue, baseCollateral.decimals, baseCollateral.decimals),
+              )
             }}
             shouldDisplayMaxButton
             symbol={'Shares'}
           />
+
           {amountError && <GenericError>{amountError}</GenericError>}
         </div>
         <div>
@@ -409,8 +410,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               title={'Profit'}
               value={
                 potentialValueNormalized
-                  ? `${formatNumber(
-                      formatBigNumber(potentialValueNormalized, displayCollateral.decimals, displayCollateral.decimals),
+                  ? `${formatBigNumber(
+                      potentialValueNormalized,
+                      displayCollateral.decimals,
+                      displayCollateral.decimals,
                     )} 
                   ${symbol}`
                   : '0.00'
@@ -420,13 +423,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               title={'Trading Fee'}
               value={`${
                 costFeeNormalized
-                  ? formatNumber(
-                      formatBigNumber(
-                        costFeeNormalized.mul(-1),
-                        displayCollateral.decimals,
-                        displayCollateral.decimals,
-                      ),
-                    )
+                  ? formatBigNumber(costFeeNormalized.mul(-1), displayCollateral.decimals, displayCollateral.decimals)
                   : '0.00'
               } ${symbol}`}
             />
@@ -444,13 +441,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
               title={'Total'}
               value={`${
                 normalizedTradedCollateral
-                  ? formatNumber(
-                      formatBigNumber(
-                        normalizedTradedCollateral,
-                        displayCollateral.decimals,
-                        displayCollateral.decimals,
-                      ),
-                    )
+                  ? formatBigNumber(normalizedTradedCollateral, displayCollateral.decimals, displayCollateral.decimals)
                   : '0.00'
               } ${displayTotalSymbol}`}
             />

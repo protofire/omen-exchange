@@ -305,6 +305,12 @@ export function formatBigNumber(value: BigNumber, decimals: number, precision = 
   return formatNumber(Number(formatUnits(value, decimals)).toFixed(precision))
 }
 
+export function BigNumberToString(value: BigNumber, decimals: number, precision = 2): string {
+  return Number(formatUnits(value, decimals))
+    .toFixed(precision)
+    .toString()
+}
+
 export const isContract = async (provider: any, address: string): Promise<boolean> => {
   const code = await provider.getCode(address)
   return code && code !== '0x'
