@@ -1,5 +1,6 @@
 import { BigNumber } from 'ethers/utils'
-import React from 'react'
+import React, { useEffect } from 'react'
+import { useHistory } from 'react-router-dom'
 
 import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
@@ -14,6 +15,16 @@ interface Props {
 }
 
 const MarketBondContainer: React.FC<Props> = (props: Props) => {
+  const {
+    marketMakerData: { address },
+  } = props
+
+  const history = useHistory()
+
+  useEffect(() => {
+    history.replace(`/${address}/set_outcome`)
+  })
+
   return <MarketBond {...props} />
 }
 
