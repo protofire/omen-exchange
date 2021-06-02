@@ -613,7 +613,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
   useEffect(() => {
     cpk && liquidityMiningCampaign && fetchStakingData()
-  }, [cpk?.address, liquidityMiningCampaign, cpk, fetchStakingData])
+  }, [cpk?.address, liquidityMiningCampaign, cpk])
 
   const unlockCollateral = async () => {
     if (!cpk) {
