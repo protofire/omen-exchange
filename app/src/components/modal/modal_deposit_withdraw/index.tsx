@@ -6,11 +6,7 @@ import Modal from 'react-modal'
 import ReactTooltip from 'react-tooltip'
 import styled, { withTheme } from 'styled-components'
 
-import {
-  DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
-  OMNI_BRIDGE_MAINNET_ADDRESS,
-  STANDARD_DECIMALS,
-} from '../../../common/constants'
+import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service, XdaiService } from '../../../services'
 import { bridgeTokensList, getToken, networkIds } from '../../../util/networks'
@@ -174,7 +170,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       setInitiatedAllowanceState(ButtonStates.idle)
     }
   }
-  console.log(displayFundAmount.isZero())
+
   React.useEffect(() => {
     Modal.setAppElement('#root')
   }, [])
