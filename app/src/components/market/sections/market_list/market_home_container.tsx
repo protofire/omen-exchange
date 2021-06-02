@@ -122,8 +122,13 @@ const MarketHomeContainer: React.FC = () => {
   const sortRoute = location.pathname.split('/')[1]
   let sortDirection: 'desc' | 'asc' = 'desc'
 
+  // the logic shall be less complex
+  // that should all be done in the open.tsx
+
   const currencyFilter = location.pathname.includes('currency')
   let currencyRoute = location.pathname.split('/currency/')[1]
+
+  // same as if if () {}
   if (currencyRoute) currencyRoute = currencyRoute.split('/')[0]
 
   const arbitratorFilter = location.pathname.includes('arbitrator')

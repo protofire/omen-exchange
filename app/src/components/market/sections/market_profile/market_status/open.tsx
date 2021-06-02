@@ -1,6 +1,6 @@
 import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
-import { Route, RouteComponentProps, BrowserRouter as Router, Switch, useHistory, withRouter } from 'react-router-dom'
+import { RouteComponentProps, useHistory, useLocation, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useCompoundService, useConnectedCPKContext, useGraphMarketUserTxData } from '../../../../../hooks'
@@ -83,6 +83,7 @@ const Wrapper = (props: Props) => {
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
+  const location = useLocation()
   const context = useConnectedWeb3Context()
   const cpk = useConnectedCPKContext()
 
@@ -108,9 +109,20 @@ const Wrapper = (props: Props) => {
   const nativeAsset = getNativeAsset(networkId)
   const initialBondAmount =
     networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
+
+  // try with and without a useEffect
+  useEffect(() => {
+    if (location.pathname.includes('buy')) setCurrentTab(MarketDetailsTab.buy)
+    if (location.pathname.includes('sell')) setCurrentTab(MarketDetailsTab.sell)
+    if (location.pathname.includes('pool')) setCurrentTab(MarketDetailsTab.pool)
+    if (location.pathname.includes('verify')) setCurrentTab(MarketDetailsTab.verify)
+    if (location.pathname.includes('history')) setCurrentTab(MarketDetailsTab.history)
+  }, [])
+
   const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
     question.currentAnswerBond ? new BigNumber(question.currentAnswerBond).mul(2) : initialBondAmount,
   )
+
   useEffect(() => {
     if (question.currentAnswerBond && !new BigNumber(question.currentAnswerBond).mul(2).eq(bondNativeAssetAmount)) {
       setBondNativeAssetAmount(new BigNumber(question.currentAnswerBond).mul(2))
@@ -309,14 +321,6 @@ const Wrapper = (props: Props) => {
           marketMakerData={marketMakerData}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
-        <Router>
-          <Switch>
-            <Route component={MarketBuyContainer} path={`/${marketMakerAddress}/buy`} />
-            <Route component={MarketPoolLiquidityContainer} path={`/${marketMakerAddress}/pool`} />
-            <Route component={MarketVerifyContainer} path={`/${marketMakerAddress}/verify`} />
-            <Route component={MarketHistoryContainer} path={`/${marketMakerAddress}/history`} />
-          </Switch>
-        </Router>
         {currentTab === MarketDetailsTab.swap && (
           <>
             {isScalar ? (
