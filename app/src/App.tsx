@@ -41,12 +41,25 @@ const App: React.FC = (props: any) => {
         if (status == false) setSettingsView(true)
       }, 5000)
     }
+    if (status == false && getNetworkFromChain(ethereum.chainId) == 100) {
+      setTimeout(() => {
+        localStorage.setItem(
+          'rpcAddress',
+          JSON.stringify({
+            url: 'https://rpc.xdaichain.com/',
+            network: 100,
+            index: 0,
+          }),
+        )
+        windowObj.location.reload(true)
+      }, 1000)
+    }
   }, FETCH_RPC_INTERVAL)
 
   useEffect(() => {
     if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ethereum])
+  }, [ethereum, ethereum.chainId])
 
   return (
     <ThemeProvider theme={theme}>
