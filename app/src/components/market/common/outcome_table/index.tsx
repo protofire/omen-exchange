@@ -1,4 +1,5 @@
 import xBig from 'big.js'
+import Big from 'big.js'
 import { BigNumber } from 'ethers/utils'
 import React, { useCallback } from 'react'
 import styled from 'styled-components'

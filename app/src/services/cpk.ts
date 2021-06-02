@@ -7,8 +7,6 @@ import {
   GEN_TOKEN_ADDDRESS_TESTING,
   GEN_XDAI_ADDRESS_TESTING,
   OMNI_BRIDGE_XDAI_ADDRESS,
-  RELAY_ADDRESS,
-  RELAY_FEE,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
 } from '../common/constants'
 import { Transaction, verifyProxyAddress } from '../util/cpk'
@@ -46,6 +44,7 @@ import { MarketMakerFactoryService } from './market_maker_factory'
 import { OracleService } from './oracle'
 import { OvmService } from './ovm'
 import { RealitioService } from './realitio'
+import { RelayService } from './relay'
 import { SafeService } from './safe'
 import { UnwrapTokenService } from './unwrap_token'
 import { XdaiService } from './xdai'
@@ -176,11 +175,13 @@ class CPKService {
   cpk: any
   provider: Web3Provider
   safe: SafeService
+  relayService: RelayService
 
   constructor(cpk: any, provider: Web3Provider) {
     this.cpk = cpk
     this.provider = provider
     this.safe = new SafeService(cpk.address, provider)
+    this.relayService = new RelayService()
   }
 
   get address(): string {
@@ -250,10 +251,10 @@ class CPKService {
     setTxState?: (step: TransactionStep) => void,
   ) => {
     if (this.cpk.relay) {
-      // pay tx fee
+      const { address, fee } = await this.relayService.getInfo()
       transactions.push({
-        to: RELAY_ADDRESS,
-        value: RELAY_FEE,
+        to: address,
+        value: fee,
       })
     }
 
@@ -273,6 +274,14 @@ class CPKService {
     }
   }
 
+  subRelayFee = async (amount: BigNumber) => {
+    if (this.cpk.relay) {
+      const { fee } = await this.relayService.getInfo()
+      return amount.sub(fee)
+    }
+    return amount
+  }
+
   buyOutcomes = async ({
     amount,
     collateral,
@@ -284,6 +293,7 @@ class CPKService {
     useBaseToken = false,
   }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
+      console.log('here')
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
       const network = await this.provider.getNetwork()
@@ -294,7 +304,7 @@ class CPKService {
       const txOptions: TxOptions = {}
       await this.getGas(txOptions)
 
-      const buyAmount = this.cpk.relay ? amount.sub(RELAY_FEE) : amount
+      const buyAmount = await this.subRelayFee(amount)
 
       let collateralAddress
       let collateralSymbol = ''
@@ -446,8 +456,9 @@ class CPKService {
       const txOptions: TxOptions = {}
       await this.getGas(txOptions)
 
+      const fundingAmount = await this.subRelayFee(marketData.funding)
+
       let collateral
-      const fundingAmount = this.cpk.relay ? marketData.funding.sub(RELAY_FEE) : marketData.funding
       if (marketData.collateral.address === pseudoNativeAssetAddress && !useCompoundReserve) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateral = getWrapToken(networkId)
@@ -673,9 +684,9 @@ class CPKService {
       const txOptions: TxOptions = {}
       await this.getGas(txOptions)
 
-      let collateral
+      const fundingAmount = await this.subRelayFee(marketData.funding)
 
-      const fundingAmount = this.cpk.relay ? marketData.funding.sub(RELAY_FEE) : marketData.funding
+      let collateral
 
       if (marketData.collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
@@ -986,14 +997,13 @@ class CPKService {
 
       const txOptions: TxOptions = {}
       await this.getGas(txOptions)
+      const fundingAmount = await this.subRelayFee(amount)
 
       let collateralSymbol = ''
       let userInputCollateralSymbol: KnownToken
       let userInputCollateral: Token = collateral
 
       let collateralAddress
-
-      const fundingAmount = this.cpk.relay ? amount.sub(RELAY_FEE) : amount
 
       if (collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
@@ -1444,20 +1454,32 @@ class CPKService {
   lockTokens = async (amount: BigNumber, setTxState: any, setTxHash: any) => {
     try {
       const network = await this.provider.getNetwork()
+      const signer = this.provider.getSigner()
+      const account = await signer.getAddress()
       const OmenGuild = new OmenGuildService(this.provider, network.chainId)
-      console.log(OmenGuild)
+      const omenTokenAddress = await OmenGuild.omenTokenAddress()
+      const allowanceAddress = await OmenGuild.tokenVault()
+      const transactions: Transaction[] = []
+      console.log(account)
       //if (this.cpk.relay) {
       const txOptions: TxOptions = {}
       txOptions.gas = defaultGas * 10
       const format = amount.toHexString()
 
-      console.log(format)
-      const transactions: Transaction[] = [
-        {
-          to: OmenGuild.omenGuildAddress,
-          data: OmenGuildService.encodeLockTokens(format),
-        },
-      ]
+      transactions.push({
+        to: omenTokenAddress,
+        data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
+      })
+      transactions.push({
+        to: omenTokenAddress,
+        data: ERC20Service.encodeApproveUnlimited(allowanceAddress),
+      })
+      console.log(await OmenGuild.omenTokenAddress())
+      // transactions.push({
+      //   to: OmenGuild.omenGuildAddress,
+      //   data: OmenGuildService.encodeLockTokens(format),
+      // })
+
       console.log(this.cpk.address)
       console.log(transactions)
       console.log(txOptions)
