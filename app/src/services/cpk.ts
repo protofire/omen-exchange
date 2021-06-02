@@ -3,7 +3,6 @@ import { AddressZero, MaxUint256, Zero } from 'ethers/constants'
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, bigNumberify, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
-import Web3 from 'web3'
 
 import {
   DAY_IN_SECONDS,
@@ -654,14 +653,8 @@ class CPKService {
           ),
         })
 
-        let nonce
-
-        try {
-          const web3 = new Web3(Web3.givenProvider)
-          nonce = await web3.eth.getTransactionCount(stakingRewardsFactoryAddress)
-        } catch (e) {
-          throw new Error(e)
-        }
+        const nonce = await this.provider.getTransactionCount(stakingRewardsFactoryAddress)
+        console.log(nonce)
 
         const predictedStakingContractAddress = bufferToHex(
           generateAddress(toBuffer(stakingRewardsFactoryAddress), toBuffer(nonce)),
