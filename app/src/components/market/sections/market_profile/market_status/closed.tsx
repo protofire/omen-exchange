@@ -2,7 +2,7 @@ import Big from 'big.js'
 import { MaxUint256, Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
+import { RouteComponentProps, useHistory, useLocation, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../../common/constants'
@@ -169,6 +169,7 @@ const Wrapper = (props: Props) => {
   } = marketMakerData
 
   const history = useHistory()
+  const location = useLocation()
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
@@ -197,6 +198,10 @@ const Wrapper = (props: Props) => {
       getResult()
     }
   }, [marketCollateralToken.address, account, marketCollateralToken.symbol, provider])
+
+  useEffect(() => {
+    if (location.pathname.includes('finalize')) setCurrentTab(MarketDetailsTab.finalize)
+  }, [])
 
   useEffect(() => {
     const getDisplayEarnedCollateral = async () => {

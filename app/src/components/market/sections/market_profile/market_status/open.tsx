@@ -116,6 +116,8 @@ const Wrapper = (props: Props) => {
     if (location.pathname.includes('pool')) setCurrentTab(MarketDetailsTab.pool)
     if (location.pathname.includes('verify')) setCurrentTab(MarketDetailsTab.verify)
     if (location.pathname.includes('history')) setCurrentTab(MarketDetailsTab.history)
+    if (location.pathname.includes('set_outcome')) setCurrentTab(MarketDetailsTab.setOutcome)
+    if (location.pathname.includes('finalize')) setCurrentTab(MarketDetailsTab.finalize)
   }, [])
 
   const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
@@ -145,7 +147,6 @@ const Wrapper = (props: Props) => {
       setDisplayCollateral(collateral)
     }
   }
-
   useEffect(() => {
     const timeDifference = new Date(question.resolution).getTime() - new Date().getTime()
     const maxTimeDifference = 86400000
