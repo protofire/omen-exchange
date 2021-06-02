@@ -350,7 +350,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                 <span>
                   {currencySelected === 'dai'
                     ? `${formatBigNumber(minDaiBridgeExchange, decimals, 2)} DAI`
-                    : `${formatBigNumber(minOmniBridgeExchange, decimals, 2)} ${symbol}`}
+                    : `${formatBigNumber(minOmniBridgeExchange, decimals, 3)} ${symbol}`}
                 </span>
               </ExchangeDataItem>
               <ExchangeDataItem style={{ marginTop: '12px' }}>
@@ -378,7 +378,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
                 <span>
                   {exchangeType === ExchangeType.withdraw && currencySelected !== 'dai'
-                    ? `${formatNumber(formatBigNumber(displayFundAmount.div(1000), decimals, 22), 2)} ${symbol}`
+                    ? `${formatNumber(formatBigNumber(displayFundAmount.div(1000), decimals, 22), 3)} ${symbol}`
                     : `0.00 ${symbol}`}
                 </span>
               </ExchangeDataItem>
