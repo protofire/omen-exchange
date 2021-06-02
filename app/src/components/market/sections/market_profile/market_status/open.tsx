@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useCompoundService, useConnectedCPKContext, useGraphMarketUserTxData } from '../../../../../hooks'
+import { useCompoundService, useGraphMarketUserTxData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { getNativeAsset, getToken, networkIds } from '../../../../../util/networks'
@@ -84,7 +84,7 @@ const Wrapper = (props: Props) => {
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
   const context = useConnectedWeb3Context()
-  const cpk = useConnectedCPKContext()
+  const cpk = context.cpk
 
   const {
     address: marketMakerAddress,

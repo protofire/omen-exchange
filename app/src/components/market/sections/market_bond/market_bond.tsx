@@ -5,7 +5,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { useConnectedCPKContext, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, getUnit, numberToByte32 } from '../../../../util/tools'
@@ -55,9 +55,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   } = marketMakerData
 
   const context = useConnectedWeb3Context()
-  const { account, library: provider, networkId, relay } = context
-
-  const cpk = useConnectedCPKContext()
+  const { account, cpk, library: provider, networkId, relay } = context
 
   const nativeAsset = getNativeAsset(networkId, relay)
   const { symbol } = nativeAsset

@@ -7,7 +7,6 @@ import { knownTokens, networkIds } from '../util/networks'
 import { formatBigNumber } from '../util/tools'
 import { TransactionStep } from '../util/types'
 
-import { useConnectedCPKContext } from './connectedCpk'
 import { useConnectedWeb3Context } from './connectedWeb3'
 
 interface Prop {
@@ -27,7 +26,7 @@ interface Prop {
 
 export const useXdaiBridge = (amount?: BigNumber): Prop => {
   const [transactionStep, setTransactionStep] = useState<TransactionStep>(TransactionStep.idle)
-  const { account, library: provider, networkId, relay } = useConnectedWeb3Context()
+  const { account, cpk, library: provider, networkId, relay } = useConnectedWeb3Context()
   const [xDaiBalance, setXdaiBalance] = useState<BigNumber>(Zero)
   const [daiBalance, setDaiBalance] = useState<BigNumber>(Zero)
   const [numberOfConfirmations, setNumberOfConfirmations] = useState<any>(0)
@@ -35,7 +34,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
   const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
   const [claimState, setClaimState] = useState<boolean>(false)
   const [transactionHash, setTransactionHash] = useState<string>('')
-  const cpk = useConnectedCPKContext()
+
   const { decimals } = knownTokens['dai']
 
   const transferFunction = async () => {

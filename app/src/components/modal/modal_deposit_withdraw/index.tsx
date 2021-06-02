@@ -10,7 +10,7 @@ import {
   OMNI_BRIDGE_MAINNET_ADDRESS,
   STANDARD_DECIMALS,
 } from '../../../common/constants'
-import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
+import { useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service, XdaiService } from '../../../services'
 import { getToken, networkIds } from '../../../util/networks'
 import { formatBigNumber, formatNumber, waitForConfirmations } from '../../../util/tools'
@@ -133,7 +133,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     xOmenBalance,
   } = props
   const context = useConnectedWeb3Context()
-  const cpk = useConnectedCPKContext()
+  const cpk = context.cpk
   const omenToken = getToken(1, 'omn')
 
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))

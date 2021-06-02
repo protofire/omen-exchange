@@ -4,7 +4,7 @@ import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
+import { useConnectedWeb3Context } from '../../../hooks'
 import { getToken, networkIds } from '../../../util/networks'
 import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
@@ -184,9 +184,8 @@ export const ModalYourConnection = (props: Props) => {
 
   const context = useConnectedWeb3Context()
   const owner = context.rawWeb3Context.account
-  const cpk = useConnectedCPKContext()
 
-  const { networkId, relay } = context
+  const { cpk, networkId, relay } = context
 
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txHash, setTxHash] = useState('')

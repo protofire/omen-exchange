@@ -11,7 +11,6 @@ import {
   useAsyncDerivedValue,
   useCollateralBalance,
   useCompoundService,
-  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
@@ -78,10 +77,9 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const cpk = useConnectedCPKContext()
   const { fetchBalances } = context.balances
 
-  const { library: provider, networkId, relay } = context
+  const { cpk, library: provider, networkId, relay } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)

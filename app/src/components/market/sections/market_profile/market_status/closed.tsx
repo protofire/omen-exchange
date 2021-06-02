@@ -6,7 +6,7 @@ import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../../common/constants'
-import { useConnectedCPKContext, useContracts, useGraphMarketUserTxData, useSymbol } from '../../../../../hooks'
+import { useContracts, useGraphMarketUserTxData, useSymbol } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service } from '../../../../../services'
 import { CompoundService } from '../../../../../services/compound_service'
@@ -141,10 +141,9 @@ const calcUserWinningsData = (
 
 const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const cpk = useConnectedCPKContext()
   const { fetchBalances } = context.balances
 
-  const { account, library: provider, networkId } = context
+  const { account, cpk, library: provider, networkId } = context
   const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
 
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props

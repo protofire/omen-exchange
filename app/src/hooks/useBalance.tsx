@@ -1,18 +1,18 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { STANDARD_DECIMALS } from '../common/constants'
-import { useConnectedWeb3Context } from '../hooks'
-import { fetchBalance } from '../hooks/useCollateralBalance'
 import { XdaiService } from '../services'
 import { getLogger } from '../util/logger'
 import { getNativeAsset, getToken, networkIds } from '../util/networks'
 import { formatBigNumber, formatNumber } from '../util/tools'
 
+import { fetchBalance } from './useCollateralBalance'
+
 const logger = getLogger('Hooks::ConnectedBalance')
 
-export interface ConnectedBalanceContext {
+export interface ConnectedBalance {
   unclaimedDaiAmount: BigNumber
   unclaimedOmenAmount: BigNumber
   nativeBalance: BigNumber
@@ -31,26 +31,7 @@ interface StateParam {
   active: boolean
 }
 
-const ConnectedBalanceContext = React.createContext<Maybe<ConnectedBalanceContext>>(null)
-
-/**
- * This hook can only be used by components under the `ConnectedWeb3` component. Otherwise it will throw.
- */
-export const useConnectedBalanceContext = () => {
-  const context = React.useContext(ConnectedBalanceContext)
-
-  if (!context) {
-    throw new Error('Component rendered outside the provider tree')
-  }
-
-  return context
-}
-
-interface Props {
-  children?: React.ReactNode
-}
-
-export const useRawBalance = (props: any) => {
+export const useBalance = (props: any) => {
   const context = props
 
   const [unclaimedDaiAmount, setUnclaimedDaiAmount] = useState<BigNumber>(Zero)
@@ -68,6 +49,7 @@ export const useRawBalance = (props: any) => {
       const requests = []
 
       const active = (fn: () => void) => {
+        // race condition prevention
         if (!state || state.active) {
           fn()
         }
@@ -176,15 +158,4 @@ export const useRawBalance = (props: any) => {
     xOmenBalance,
     formattedxOmenBalance: formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 2),
   }
-}
-
-/**
- * Component used to render components that depend on Web3 being available. These components can then
- * `useConnectedWeb3Context` safely to get web3 stuff without having to null check it.
- */
-export const ConnectedBalance: React.FC<Props> = (props: Props) => {
-  const context = useConnectedWeb3Context()
-  const balances = useRawBalance(context)
-
-  return <ConnectedBalanceContext.Provider value={balances}>{props.children}</ConnectedBalanceContext.Provider>
 }

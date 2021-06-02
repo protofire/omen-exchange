@@ -9,8 +9,8 @@ import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
 import { getNetworkFromChain } from '../util/tools'
 
-import { ConnectedBalanceContext, useRawBalance } from './connectedBalance'
-import { useRawCpk } from './connectedCpk'
+import { ConnectedBalance, useBalance } from './useBalance'
+import { useCpk } from './useCpk'
 import { useSafeApp } from './useSafeApp'
 
 const logger = getLogger('Hooks::ConnectedWeb3')
@@ -22,7 +22,7 @@ export interface ConnectedWeb3Context {
   rawWeb3Context: any
   relay: boolean
   cpk: Maybe<CPKService>
-  balances: ConnectedBalanceContext
+  balances: ConnectedBalance
   toggleRelay: () => void
 }
 
@@ -56,8 +56,8 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
 
   const { account, active, error, library } = context
 
-  const cpk = useRawCpk(connection)
-  const balances = useRawBalance(connection)
+  const cpk = useCpk(connection)
+  const balances = useBalance(connection)
 
   const rpcAddress: string | null = localStorage.getItem('rpcAddress')
 
