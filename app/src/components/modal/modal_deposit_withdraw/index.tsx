@@ -174,7 +174,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       setInitiatedAllowanceState(ButtonStates.idle)
     }
   }
-
+  console.log(displayFundAmount.isZero())
   React.useEffect(() => {
     Modal.setAppElement('#root')
   }, [])
@@ -382,7 +382,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
                 <span>
                   {exchangeType === ExchangeType.withdraw && currencySelected !== 'dai'
-                    ? `${formatNumber(formatBigNumber(displayFundAmount.div(1000), decimals, 3), 2)} ${symbol}`
+                    ? `${formatNumber(formatBigNumber(displayFundAmount.div(1000), decimals, 22), 2)} ${symbol}`
                     : `0.00 ${symbol}`}
                 </span>
               </ExchangeDataItem>
@@ -392,9 +392,8 @@ export const ModalDepositWithdraw = (props: Props) => {
 
                 <span>
                   {currencySelected !== 'dai' && exchangeType === ExchangeType.withdraw
-                    ? `${formatBigNumber(
-                        displayFundAmount.sub(displayFundAmount.div(1000)),
-                        STANDARD_DECIMALS,
+                    ? `${formatNumber(
+                        formatBigNumber(displayFundAmount.sub(displayFundAmount.div(1000)), decimals, 22),
                         3,
                       )} ${symbol}`
                     : `${formatBigNumber(displayFundAmount, decimals, 2)} ${symbol}`}
