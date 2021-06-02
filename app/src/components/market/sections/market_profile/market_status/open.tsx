@@ -110,7 +110,6 @@ const Wrapper = (props: Props) => {
   const initialBondAmount =
     networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
 
-  // try with and without a useEffect
   useEffect(() => {
     if (location.pathname.includes('buy')) setCurrentTab(MarketDetailsTab.buy)
     if (location.pathname.includes('sell')) setCurrentTab(MarketDetailsTab.sell)
@@ -146,6 +145,7 @@ const Wrapper = (props: Props) => {
       setDisplayCollateral(collateral)
     }
   }
+
   useEffect(() => {
     const timeDifference = new Date(question.resolution).getTime() - new Date().getTime()
     const maxTimeDifference = 86400000
