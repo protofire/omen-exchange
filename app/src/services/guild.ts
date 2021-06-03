@@ -96,16 +96,14 @@ class OmenGuildService {
     return await this.getOmenGuildContract.releaseTokens(amount)
   }
 
-  tokensLocked = async () => {
-    const address = await this.user.getAddress()
-
+  tokensLocked = async (address: string) => {
     return this.getOmenGuildContract.tokensLocked(address)
   }
   totalLocked = async () => {
     return this.getOmenGuildContract.totalLocked()
   }
   omenTokenAddress = async () => {
-    return this.getOmenGuildContract.token()
+    return await this.getOmenGuildContract.token()
   }
   tokenVault = async () => {
     return this.getOmenGuildContract.tokenVault()

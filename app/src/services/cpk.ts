@@ -1434,64 +1434,56 @@ class CPKService {
       throw err
     }
   }
-  approveCpk = async (addressToApprove: string, tokenAddress: string) => {
-    try {
-      const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
 
-      const transactions: Transaction[] = [
-        {
-          to: tokenAddress,
-          data: ERC20Service.encodeApproveUnlimited(OMNI_BRIDGE_XDAI_ADDRESS),
-        },
-      ]
-      return this.execTransactions(transactions)
-    } catch (e) {
-      logger.error(`Error while approving ERC20 Token to CPK address : `, e.message)
-      throw e
-    }
-  }
   lockTokens = async (amount: BigNumber, setTxState: any, setTxHash: any) => {
     try {
-      const network = await this.provider.getNetwork()
-      const signer = this.provider.getSigner()
-      const account = await signer.getAddress()
-      const OmenGuild = new OmenGuildService(this.provider, network.chainId)
-      const omenTokenAddress = await OmenGuild.omenTokenAddress()
-      const allowanceAddress = await OmenGuild.tokenVault()
-      const transactions: Transaction[] = []
-      console.log(account)
-      //if (this.cpk.relay) {
-      const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas * 10
-      const format = amount.toHexString()
+      const { chainId } = await this.provider.getNetwork()
+      const OmenGuild = new OmenGuildService(this.provider, chainId)
 
-      transactions.push({
-        to: omenTokenAddress,
-        data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
-      })
-      transactions.push({
-        to: omenTokenAddress,
-        data: ERC20Service.encodeApproveUnlimited(allowanceAddress),
-      })
-      console.log(await OmenGuild.omenTokenAddress())
-      // transactions.push({
-      //   to: OmenGuild.omenGuildAddress,
-      //   data: OmenGuildService.encodeLockTokens(format),
-      // })
+      if (chainId !== networkIds.MAINNET) {
+        const signer = this.provider.getSigner()
+        const account = await signer.getAddress()
 
-      console.log(this.cpk.address)
-      console.log(transactions)
-      console.log(txOptions)
-      const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
-      console.log('made it')
-      return transactionHash
-      // } else {
-      //   console.log('jere')
-      //   const transaction = await OmenGuild.lockTokens(amount)
-      //   console.log(transaction)
-      //   return transaction.hash
-      // }
+        const omenTokenAddress = await OmenGuild.omenTokenAddress()
+        const allowanceAddress = await OmenGuild.tokenVault()
+        const collateralService = new ERC20Service(this.provider, account, omenTokenAddress)
+        const transactions: Transaction[] = []
+
+        const txOptions: TxOptions = {}
+
+        const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
+          this.cpk.address,
+          allowanceAddress,
+          amount,
+        )
+
+        if (!hasCPKEnoughAlowance) {
+          console.log('fucking allowance again fucksing tisjfhdskjhf')
+          // Step 1:  Approve unlimited amount to be transferred to the market maker)
+          transactions.push({
+            to: omenTokenAddress,
+            data: ERC20Service.encodeApproveUnlimited(allowanceAddress),
+          })
+        }
+
+        transactions.push({
+          to: omenTokenAddress,
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
+        })
+        //
+        console.log(await OmenGuild.omenTokenAddress())
+        transactions.push({
+          to: OmenGuild.omenGuildAddress,
+          data: OmenGuildService.encodeLockTokens(amount),
+        })
+        console.log(transactions)
+        const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+        return transactionHash
+      } else {
+        const transaction = await OmenGuild.lockTokens(amount)
+
+        return transaction.hash
+      }
     } catch (e) {
       logger.error(`Error while trying to lock Omen tokens : `, e.message)
       throw e

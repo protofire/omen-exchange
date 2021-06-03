@@ -1,12 +1,12 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { HTMLAttributes, useEffect, useState } from 'react'
+import React, { HTMLAttributes, useEffect, useMemo, useState } from 'react'
 import Modal from 'react-modal'
 import ReactTooltip from 'react-tooltip'
 import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import { useConnectedCPKContext } from '../../../hooks'
+import { useConnectedCPKContext, useCpkAllowance } from '../../../hooks'
 import { ERC20Service, OmenGuildService } from '../../../services'
 import { divBN, formatBigNumber, formatLockDate, waitForConfirmations } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
@@ -99,6 +99,8 @@ const ModalLockTokens = (props: Props) => {
   const { context, formattedOmenBalance, isOpen, omenBalance, onClose, theme } = props
   const { account, library: provider, networkId } = context
   const cpk = useConnectedCPKContext()
+  const omen = new OmenGuildService(provider, networkId)
+  const signer = useMemo(() => provider.getSigner(), [provider])
 
   const [isLockAmountOpen, setIsLockAmountOpen] = useState<boolean>(false)
   const [displayLockAmount, setDisplayLockAmount] = useState<BigNumber>(Zero)
@@ -114,64 +116,72 @@ const ModalLockTokens = (props: Props) => {
   const [txNetId, setTxNetId] = useState()
   const [omenAllowance, setOmenAllowance] = useState<BigNumber>(Zero)
   const [allowanceState, setAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
+
   const [confirmations, setConfirmations] = useState(0)
-  const omen = new OmenGuildService(provider, networkId)
 
   const isApproveVisible =
     (omenAllowance.isZero() && isLockAmountOpen) ||
     (allowanceState === ButtonStates.finished && !omenAllowance.isZero())
-  console.log(unlockTimeLeft)
+
   useEffect(() => {
     setAllowanceState(ButtonStates.idle)
     ;(async () => {
-      console.log('here')
       await getTokenLockInfo()
       await fetchAllowance()
-      console.log('here')
     })()
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [networkId, account])
+  }, [networkId, account, cpk])
 
   const getTokenLockInfo = async () => {
     try {
-      const locked = await omen.tokensLocked()
-      const total = await omen.totalLocked()
-      const nowInSeconds: number = Math.floor(Date.now() / 1000)
+      if (cpk?.address) {
+        const address = cpk.address
+        const locked = await omen.tokensLocked(address)
+        const total = await omen.totalLocked()
+        console.log(formatBigNumber(total, 18, 2))
+        const nowInSeconds: number = Math.floor(Date.now() / 1000)
 
-      if (locked.timestamp.toNumber() === 0) setUnlockTimeLeft(0)
-      else setUnlockTimeLeft(locked.timestamp.toNumber() - nowInSeconds)
+        if (locked.timestamp.toNumber() === 0) setUnlockTimeLeft(0)
+        else setUnlockTimeLeft(locked.timestamp.toNumber() - nowInSeconds)
 
-      setTotalLocked(total)
-      setUserLocked(locked.amount)
-      setTimestamp(locked.timestamp.toNumber())
+        setTotalLocked(total)
+        setUserLocked(locked.amount)
+        setTimestamp(locked.timestamp.toNumber())
+      }
+      console.log('cok?')
     } catch (e) {
       console.error(`Error while trying to fetch locked token info:  `, e.message)
     }
   }
   const fetchAllowance = async () => {
     try {
-      const allowanceAddress = await omen.tokenVault()
-      const omenAddress = await omen.omenTokenAddress()
+      if (cpk) {
+        console.log(cpk?.address)
+        const allowanceAddress = await omen.tokenVault()
+        const omenAddress = await omen.omenTokenAddress()
 
-      const collateralService = new ERC20Service(provider, account, omenAddress)
-      const allowance = await collateralService.allowance(account, allowanceAddress)
-      setOmenAllowance(allowance)
+        const collateralService = new ERC20Service(provider, account, omenAddress)
+        const allowance = await collateralService.allowance(account, cpk?.address)
+        setOmenAllowance(allowance)
+      }
     } catch (e) {
       console.log(e)
     }
   }
   const approve = async () => {
     try {
-      setAllowanceState(ButtonStates.working)
-      const allowanceAddress = await omen.tokenVault()
-      const omenAddress = await omen.omenTokenAddress()
+      if (cpk?.address) {
+        setAllowanceState(ButtonStates.working)
+        // const allowanceAddress = await omen.tokenVault()
+        const omenAddress = await omen.omenTokenAddress()
+        console.log(cpk.address)
+        const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenAddress)
 
-      const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenAddress)
-
-      await collateralService.approveUnlimited(allowanceAddress)
-      await fetchAllowance()
-      setAllowanceState(ButtonStates.finished)
+        await collateralService.approveUnlimited(cpk.address)
+        await fetchAllowance()
+        setAllowanceState(ButtonStates.finished)
+      }
     } catch {
       setAllowanceState(ButtonStates.idle)
     }
@@ -275,6 +285,13 @@ const ModalLockTokens = (props: Props) => {
               />
             )}
             {isLockAmountOpen && <Divider />}
+            <Button
+              onClick={() => {
+                getTokenLockInfo(), fetchAllowance()
+              }}
+            >
+              Fetch balances
+            </Button>
             <DataRow style={{ marginTop: !isLockAmountOpen ? '12px' : '' }}>
               <LightDataItem>{isLockAmountOpen && 'Your '}Vote Weight</LightDataItem>
               <DarkDataItem>
