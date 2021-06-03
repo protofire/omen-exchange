@@ -36,23 +36,12 @@ const App: React.FC = (props: any) => {
   const [settingsView, setSettingsView] = useState(false)
 
   useInterval(() => {
+    console.log(status)
+    console.log(getNetworkFromChain(ethereum.chainId))
     if (status == false) {
       setTimeout(() => {
         if (status == false) setSettingsView(true)
       }, 5000)
-    }
-    if (status == false && getNetworkFromChain(ethereum.chainId) == 100) {
-      setTimeout(() => {
-        localStorage.setItem(
-          'rpcAddress',
-          JSON.stringify({
-            url: 'https://rpc.xdaichain.com/',
-            network: 100,
-            index: 0,
-          }),
-        )
-        windowObj.location.reload(true)
-      }, 1000)
     }
   }, FETCH_RPC_INTERVAL)
 
