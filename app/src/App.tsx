@@ -36,8 +36,6 @@ const App: React.FC = (props: any) => {
   const [settingsView, setSettingsView] = useState(false)
 
   useInterval(() => {
-    console.log(status)
-    console.log(getNetworkFromChain(ethereum.chainId))
     if (status == false) {
       setTimeout(() => {
         if (status == false) setSettingsView(true)
