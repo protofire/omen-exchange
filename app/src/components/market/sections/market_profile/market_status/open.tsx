@@ -118,6 +118,7 @@ const Wrapper = (props: Props) => {
     if (location.pathname.includes('history')) setCurrentTab(MarketDetailsTab.history)
     if (location.pathname.includes('set_outcome')) setCurrentTab(MarketDetailsTab.setOutcome)
     if (location.pathname.includes('finalize')) setCurrentTab(MarketDetailsTab.finalize)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
@@ -309,6 +310,7 @@ const Wrapper = (props: Props) => {
 
   useEffect(() => {
     if (currentTab === MarketDetailsTab.swap) return history.replace(`/${marketMakerAddress}`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTab])
 
   return (

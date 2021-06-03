@@ -25,6 +25,7 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     return history.replace(`/${address}/buy`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return <>{isScalar ? <ScalarMarketBuy {...props} /> : <MarketBuy {...props} />}</>

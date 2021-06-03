@@ -20,6 +20,7 @@ const MarketVerifyContainer: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     history.replace(`/${marketMakerData.address}/verify`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (

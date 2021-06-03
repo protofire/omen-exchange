@@ -19,6 +19,7 @@ const MarketHistoryContainer: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     return history.replace(`/${address}/history`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return <MarketHistory marketMakerData={marketMakerData} />

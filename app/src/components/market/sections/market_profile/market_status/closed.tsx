@@ -201,6 +201,7 @@ const Wrapper = (props: Props) => {
 
   useEffect(() => {
     if (location.pathname.includes('finalize')) setCurrentTab(MarketDetailsTab.finalize)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -362,6 +363,7 @@ const Wrapper = (props: Props) => {
 
   useEffect(() => {
     if (currentTab === MarketDetailsTab.swap) return history.replace(`/${marketMakerAddress}/finalize`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTab])
 
   const { fetchData: fetchGraphMarketUserTxData } = useGraphMarketUserTxData(

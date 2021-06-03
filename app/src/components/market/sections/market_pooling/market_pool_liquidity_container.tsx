@@ -24,6 +24,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     history.replace(`/${address}/pool`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return <>{isScalar ? <ScalarMarketPoolLiquidity {...props} /> : <MarketPoolLiquidity {...props} />}</>
