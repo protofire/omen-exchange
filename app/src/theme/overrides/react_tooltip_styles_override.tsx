@@ -73,7 +73,7 @@ export const ReactTooltipStylesOverride = css`
   }
 
   .scalarValueTooltip {
-    ${DefaultTooltip}
+    ${DefaultTooltip};
     padding: 5px 8px !important;
     font-weight: 500 !important;
   }
