@@ -475,13 +475,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <StyledButtonContainer borderTop={true} marginTop={isNegativeAmountShares}>
-        <Button
-          buttonType={ButtonType.secondaryLine}
-          onClick={() => {
-            switchMarketTab(MarketDetailsTab.swap)
-            history.replace(`/${marketMakerAddress}`)
-          }}
-        >
+        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
           Cancel
         </Button>
         <Button buttonType={ButtonType.secondaryLine} disabled={isSellButtonDisabled} onClick={() => finish()}>

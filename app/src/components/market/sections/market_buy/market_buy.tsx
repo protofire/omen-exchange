@@ -56,8 +56,6 @@ import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WarningMessage } from '../../common/warning_message'
 
-/* eslint-disable no-console */
-
 const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;
   margin-bottom: 0;
