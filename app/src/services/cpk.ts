@@ -19,7 +19,6 @@ import {
   getToken,
   getTokenFromAddress,
   getWrapToken,
-  networkIds,
   pseudoNativeAssetAddress,
   waitForBlockToSync,
 } from '../util/networks'
@@ -265,9 +264,7 @@ class CPKService {
   }
 
   getGas = async (txOptions: TxOptions): Promise<void> => {
-    const network = await this.provider.getNetwork()
-    const networkId = network.chainId
-    if (networkId === networkIds.XDAI || this.isSafeApp) {
+    if (this.isSafeApp) {
       txOptions.gas = defaultGas
     }
   }
@@ -1400,9 +1397,6 @@ class CPKService {
 
   proxyIsUpToDate = async (): Promise<boolean> => {
     const network = await this.provider.getNetwork()
-    if (network.chainId === networkIds.XDAI || this.isSafeApp) {
-      return true
-    }
     const deployed = await this.cpk.isProxyDeployed()
     if (deployed) {
       const implementation = await this.safe.getMasterCopy()
