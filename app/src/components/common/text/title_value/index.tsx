@@ -79,7 +79,7 @@ export const TitleValue: React.FC<Props> = (props: Props) => {
   //create message for when the market ends
   const endDate = date
   const endsText = moment(endDate).fromNow()
-  const endsMessage = moment(endDate).isAfter(now) ? `Ends ${endsText}` : `Ended ${endsText}`
+  const endsMessage = moment(endDate).isAfter(now) ? `, ends ${endsText}` : `ended ${endsText}`
 
   //create message for local time
   const tzName = moment.tz.guess()
@@ -87,7 +87,7 @@ export const TitleValue: React.FC<Props> = (props: Props) => {
   const formatting = `MMMM Do YYYY - HH:mm:ss [${abbr}]`
 
   return (
-    <div data-for="closingDate" data-tip={tooltip ? localResolution.format(formatting) + '<br />' + endsMessage : null}>
+    <div data-for="closingDate" data-tip={tooltip ? localResolution.format(formatting) + endsMessage : null}>
       <Wrapper {...restProps}>
         <Title invertedColors={invertedColors}>{title}</Title>
         <Value invertedColors={invertedColors} state={state}>
@@ -96,7 +96,6 @@ export const TitleValue: React.FC<Props> = (props: Props) => {
         <ReactTooltip
           className="customMarketTooltip"
           effect="solid"
-          html={true}
           id="closingDate"
           offset={{ top: 0, left: -7.5 }}
           place="top"
