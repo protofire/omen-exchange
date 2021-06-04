@@ -279,7 +279,6 @@ export const isAddress = (address: string): boolean => {
   }
   return true
 }
-// export const
 
 export const waitForConfirmations = async (
   hash: string,

@@ -144,7 +144,8 @@ export const ModalDepositWithdraw = (props: Props) => {
   const isApprovalVisible =
     (exchangeType === ExchangeType.deposit &&
       currentTokenMainnet &&
-      new BigNumber(currentTokenMainnet.allowance ? currentTokenMainnet.allowance : '0').isZero()) ||
+      new BigNumber(currentTokenMainnet.allowance ? currentTokenMainnet.allowance : '0').isZero() &&
+      displayFundAmount.gte(currentTokenMainnet.allowance || Zero)) ||
     (exchangeType === ExchangeType.deposit &&
       initiatedAllowanceState === ButtonStates.finished &&
       currentTokenMainnet &&
