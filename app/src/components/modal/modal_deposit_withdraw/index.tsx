@@ -9,7 +9,7 @@ import styled, { withTheme } from 'styled-components'
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../../../common/constants'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service, XdaiService } from '../../../services'
-import { bridgeTokensList, getToken, networkIds } from '../../../util/networks'
+import { bridgeTokensList, getNativeAsset, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
 import { formatBigNumber, formatNumber, waitForConfirmations } from '../../../util/tools'
 import { ExchangeType, Token, TransactionStep } from '../../../util/types'
@@ -114,13 +114,6 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   const [currencySelected, setCurrencySelected] = useState<KnownToken>('dai')
 
-  const { address, decimals, symbol } = getToken(
-    exchangeType === ExchangeType.deposit ? networkIds.MAINNET : networkIds.XDAI,
-    currencySelected,
-  )
-
-  const currentTokenMainnet = mainnetTokens.find(element => element.symbol === symbol)
-
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
@@ -137,9 +130,17 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   const findCurrentTokenBasedOnAction = (exchange: ExchangeType, symbol: string): Token | undefined => {
     if (exchange === ExchangeType.deposit) return mainnetTokens.find(token => token.symbol === symbol)
-    else return xDaiTokens.find(token => token.symbol === (symbol === 'DAI' ? 'xDAI' : symbol))
+    else if (exchange === ExchangeType.withdraw && symbol === 'DAI') {
+      const nativeAsset = getNativeAsset(networkIds.XDAI)
+
+      return { ...nativeAsset, balance: xDaiBalance ? xDaiBalance.toString() : '0' }
+    } else return xDaiTokens.find(token => token.symbol === (symbol === 'DAI' ? 'xDAI' : symbol))
   }
-  const currentToken = findCurrentTokenBasedOnAction(exchangeType, symbol)?.balance
+  const { address, balance, decimals, symbol }: any = findCurrentTokenBasedOnAction(
+    exchangeType,
+    currencySelected.toUpperCase(),
+  )
+  const currentTokenMainnet = mainnetTokens.find(element => element.symbol === symbol)
 
   const isApprovalVisible =
     (exchangeType === ExchangeType.deposit &&
@@ -184,7 +185,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, relay, exchangeType, currencySelected])
 
-  const wallet = new BigNumber(currentToken ? currentToken : '0')
+  const wallet = new BigNumber(balance ? balance : '0')
 
   const minDaiBridgeExchange = exchangeType === ExchangeType.deposit ? Zero : ethers.utils.parseUnits('10', decimals)
   const minOmniBridgeExchange = Zero

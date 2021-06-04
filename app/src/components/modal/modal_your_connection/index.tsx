@@ -250,7 +250,9 @@ export const ModalYourConnection = (props: Props) => {
       let balance
       if (forNetwork === networkIds.MAINNET)
         balance = new BigNumber(mainnetTokens.filter((token: Token) => token.symbol === symbol)[0]?.balance || '')
-      else balance = new BigNumber(xDaiTokens.filter((token: Token) => token.symbol === symbol)[0]?.balance || '')
+      else if (forNetwork === networkIds.XDAI && symbol === 'DAI') {
+        balance = new BigNumber(xDaiBalance)
+      } else balance = new BigNumber(xDaiTokens.filter((token: Token) => token.symbol === symbol)[0]?.balance || '')
 
       return (
         <BalanceItem key={index + address}>
