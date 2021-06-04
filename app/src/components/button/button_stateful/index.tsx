@@ -25,7 +25,7 @@ const DisabledCSS = css`
   &[disabled],
   &[disabled]:hover {
     background-color: ${props => props.theme.buttonPrimaryLine.backgroundColor};
-    border-color: ${props => props.theme.buttonPrimaryLine.borderColor};
+    border-color: ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
     color: ${props => props.theme.buttonPrimaryLine.color};
     opacity: 1;
   }
@@ -40,29 +40,37 @@ const IdleDisabledCSS = css`
     opacity: 0.5;
   }
 `
-
-const Wrapper = styled.button<ButtonStatefulProps>`
-  ${ButtonCSS}
-  position: relative;
-  ${props => (props.state === ButtonStates.idle ? IdleDisabledCSS : DisabledCSS)};
+const SuccessCSS = css`
+  border: 1px solid ${props => props.theme.colors.green} !important;
+  color: ${props => props.theme.colors.green} !important;
+  opacity: 1 !important;
 `
 
-const Text = styled.span<{ hide: boolean }>`
-  opacity: ${props => (props.hide ? '0' : '1')};
+const Wrapper = styled.button<ButtonStatefulProps>`
+  ${ButtonCSS};
+  position: relative;
+  ${props =>
+    props.state === ButtonStates.idle
+      ? IdleDisabledCSS
+      : props.state === ButtonStates.finished && props.extraText
+      ? SuccessCSS
+      : DisabledCSS};
+`
+
+const Text = styled.span<{ hide: boolean; state: ButtonStates }>`
+  display: ${props => (props.hide ? 'none' : 'flex')};
   position: relative;
   user-select: none;
   z-index: 1;
+  ${props => props.state === ButtonStates.idle && 'font-weight:500'};
 `
 
-const SVGWrapper = styled.span`
+const SVGWrapper = styled.span<{ marginLeft?: boolean }>`
   align-items: center;
   display: flex;
   height: 100%;
   justify-content: center;
-  left: 0;
-  position: absolute;
-  top: 0;
-  width: 100%;
+  margin-left: ${props => (props.marginLeft ? '10px' : '')};
   z-index: 5;
 `
 
@@ -74,26 +82,30 @@ const Check = styled.img``
 
 interface ButtonStatefulProps extends ButtonProps {
   state?: ButtonStates
+  extraText?: boolean
 }
 
 export const ButtonStateful: React.FC<ButtonStatefulProps> = (props: ButtonStatefulProps) => {
-  const { children, disabled, onClick, state = ButtonStates.idle, ...restProps } = props
+  const { extraText = false, children, disabled, onClick, state = ButtonStates.idle, ...restProps } = props
 
   return (
     <Wrapper
       buttonType={state === ButtonStates.idle ? ButtonType.primary : ButtonType.primaryLine}
       disabled={disabled || state === ButtonStates.working}
+      extraText={extraText}
       onClick={onClick}
       state={state}
       {...restProps}
     >
-      <Text hide={state !== ButtonStates.idle}>{children}</Text>
+      <Text hide={state !== ButtonStates.idle && !extraText} state={state}>
+        {children}
+      </Text>
       {state === ButtonStates.working && (
-        <SVGWrapper>
+        <SVGWrapper marginLeft={extraText}>
           <Spinner alt="" src={SpinnerSVG} />
         </SVGWrapper>
       )}
-      {state === ButtonStates.finished && (
+      {state === ButtonStates.finished && !extraText && (
         <SVGWrapper>
           <Check alt="" src={CheckSVG} />
         </SVGWrapper>

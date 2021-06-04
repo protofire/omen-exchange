@@ -7,8 +7,6 @@ import {
   GEN_TOKEN_ADDDRESS_TESTING,
   GEN_XDAI_ADDRESS_TESTING,
   OMNI_BRIDGE_XDAI_ADDRESS,
-  RELAY_ADDRESS,
-  RELAY_FEE,
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
 } from '../common/constants'
 import { Transaction, verifyProxyAddress } from '../util/cpk'
@@ -44,6 +42,7 @@ import { MarketMakerFactoryService } from './market_maker_factory'
 import { OracleService } from './oracle'
 import { OvmService } from './ovm'
 import { RealitioService } from './realitio'
+import { RelayService } from './relay'
 import { SafeService } from './safe'
 import { UnwrapTokenService } from './unwrap_token'
 import { XdaiService } from './xdai'
@@ -175,11 +174,13 @@ class CPKService {
   cpk: any
   provider: Web3Provider
   safe: SafeService
+  relayService: RelayService
 
   constructor(cpk: any, provider: Web3Provider) {
     this.cpk = cpk
     this.provider = provider
     this.safe = new SafeService(cpk.address, provider)
+    this.relayService = new RelayService()
   }
 
   get address(): string {
@@ -249,10 +250,10 @@ class CPKService {
     setTxState?: (step: TransactionStep) => void,
   ) => {
     if (this.cpk.relay) {
-      // pay tx fee
+      const { address, fee } = await this.relayService.getInfo()
       transactions.push({
-        to: RELAY_ADDRESS,
-        value: RELAY_FEE,
+        to: address,
+        value: fee,
       })
     }
 
@@ -270,6 +271,14 @@ class CPKService {
     if (networkId === networkIds.XDAI || this.isSafeApp) {
       txOptions.gas = defaultGas
     }
+  }
+
+  subRelayFee = async (amount: BigNumber) => {
+    if (this.cpk.relay) {
+      const { fee } = await this.relayService.getInfo()
+      return amount.sub(fee)
+    }
+    return amount
   }
 
   buyOutcomes = async ({
@@ -293,7 +302,7 @@ class CPKService {
       const txOptions: TxOptions = {}
       await this.getGas(txOptions)
 
-      const buyAmount = this.cpk.relay ? amount.sub(RELAY_FEE) : amount
+      const buyAmount = await this.subRelayFee(amount)
 
       let collateralAddress
       let collateralSymbol = ''
@@ -445,8 +454,9 @@ class CPKService {
       const txOptions: TxOptions = {}
       await this.getGas(txOptions)
 
+      const fundingAmount = await this.subRelayFee(marketData.funding)
+
       let collateral
-      const fundingAmount = this.cpk.relay ? marketData.funding.sub(RELAY_FEE) : marketData.funding
       if (marketData.collateral.address === pseudoNativeAssetAddress && !useCompoundReserve) {
         // ultimately WETH will be the collateral if we fund with native ether
         collateral = getWrapToken(networkId)
@@ -672,9 +682,9 @@ class CPKService {
       const txOptions: TxOptions = {}
       await this.getGas(txOptions)
 
-      let collateral
+      const fundingAmount = await this.subRelayFee(marketData.funding)
 
-      const fundingAmount = this.cpk.relay ? marketData.funding.sub(RELAY_FEE) : marketData.funding
+      let collateral
 
       if (marketData.collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether
@@ -985,14 +995,13 @@ class CPKService {
 
       const txOptions: TxOptions = {}
       await this.getGas(txOptions)
+      const fundingAmount = await this.subRelayFee(amount)
 
       let collateralSymbol = ''
       let userInputCollateralSymbol: KnownToken
       let userInputCollateral: Token = collateral
 
       let collateralAddress
-
-      const fundingAmount = this.cpk.relay ? amount.sub(RELAY_FEE) : amount
 
       if (collateral.address === pseudoNativeAssetAddress) {
         // ultimately WETH will be the collateral if we fund with native ether

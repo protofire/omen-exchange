@@ -2,12 +2,16 @@ import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
 const FormErrorWrapper = styled.div`
-  color: ${props => props.theme.colors.error};
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.2;
-  margin: 0 0 10px;
-  text-align: left;
+  color: ${props => props.theme.colors.alert};
+  font-family: ${props => props.theme.fonts.fontFamily};
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1.5px;
+  align-items: center;
+  letter-spacing: 0.2px;
+  margin-top: 10px;
+  white-space: nowrap;
+  margin-bottom: -20px;
 
   &:last-child {
     margin-bottom: 0;
