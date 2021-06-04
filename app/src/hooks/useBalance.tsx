@@ -147,7 +147,7 @@ export const useBalance = (props: any) => {
     nativeBalance,
     formattedNativeBalance: formatNumber(
       formatBigNumber(nativeBalance, STANDARD_DECIMALS, STANDARD_DECIMALS),
-      context && context.relay && context.networkId === networkIds.XDAI ? 2 : 3,
+      context && context.networkId === networkIds.XDAI ? 2 : 3,
     ),
     daiBalance,
     formattedDaiBalance: formatNumber(formatBigNumber(daiBalance, STANDARD_DECIMALS, STANDARD_DECIMALS)),
