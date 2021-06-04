@@ -129,8 +129,13 @@ export const ModalDepositWithdraw = (props: Props) => {
   const { account, relay } = context.rawWeb3Context
 
   const findCurrentTokenBasedOnAction = (exchange: ExchangeType, symbol: string): Token | undefined => {
-    if (exchange === ExchangeType.deposit) return mainnetTokens.find(token => token.symbol === symbol)
-    else if (exchange === ExchangeType.withdraw && symbol === 'DAI') {
+    if (exchange === ExchangeType.deposit) {
+      return (
+        mainnetTokens.find(
+          token => token.symbol === (context.networkId === networkIds.XDAI && symbol === 'DAI' ? 'xDAI' : symbol),
+        ) || mainnetTokens.find(token => token.symbol === symbol)
+      )
+    } else if (exchange === ExchangeType.withdraw && symbol === 'DAI') {
       const nativeAsset = getNativeAsset(networkIds.XDAI)
 
       return { ...nativeAsset, balance: xDaiBalance ? xDaiBalance.toString() : '0' }
