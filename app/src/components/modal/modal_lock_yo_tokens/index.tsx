@@ -1,14 +1,15 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { HTMLAttributes, useEffect, useMemo, useState } from 'react'
+import React, { HTMLAttributes, useEffect, useState } from 'react'
 import Modal from 'react-modal'
 import ReactTooltip from 'react-tooltip'
 import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import { useConnectedCPKContext, useCpkAllowance } from '../../../hooks'
+import { useConnectedCPKContext } from '../../../hooks'
 import { ERC20Service, OmenGuildService } from '../../../services'
-import { divBN, formatBigNumber, formatLockDate, waitForConfirmations } from '../../../util/tools'
+import { networkIds } from '../../../util/networks'
+import { divBN, formatBigNumber, formatLockDate } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonStateful, ButtonStates } from '../../button/button_stateful'
@@ -100,7 +101,6 @@ const ModalLockTokens = (props: Props) => {
   const { account, library: provider, networkId } = context
   const cpk = useConnectedCPKContext()
   const omen = new OmenGuildService(provider, networkId)
-  const signer = useMemo(() => provider.getSigner(), [provider])
 
   const [isLockAmountOpen, setIsLockAmountOpen] = useState<boolean>(false)
   const [displayLockAmount, setDisplayLockAmount] = useState<BigNumber>(Zero)
@@ -116,8 +116,6 @@ const ModalLockTokens = (props: Props) => {
   const [txNetId, setTxNetId] = useState()
   const [omenAllowance, setOmenAllowance] = useState<BigNumber>(Zero)
   const [allowanceState, setAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
-
-  const [confirmations, setConfirmations] = useState(0)
 
   const isApproveVisible =
     (omenAllowance.isZero() && isLockAmountOpen) ||
@@ -136,10 +134,16 @@ const ModalLockTokens = (props: Props) => {
   const getTokenLockInfo = async () => {
     try {
       if (cpk?.address) {
-        const address = cpk.address
+        let address
+        if (context.networkId === networkIds.MAINNET && !context.relay) {
+          address = await omen.tokenVault()
+        } else {
+          address = cpk.address
+        }
+
         const locked = await omen.tokensLocked(address)
         const total = await omen.totalLocked()
-        console.log(formatBigNumber(total, 18, 2))
+
         const nowInSeconds: number = Math.floor(Date.now() / 1000)
 
         if (locked.timestamp.toNumber() === 0) setUnlockTimeLeft(0)
@@ -149,7 +153,6 @@ const ModalLockTokens = (props: Props) => {
         setUserLocked(locked.amount)
         setTimestamp(locked.timestamp.toNumber())
       }
-      console.log('cok?')
     } catch (e) {
       console.error(`Error while trying to fetch locked token info:  `, e.message)
     }
@@ -157,28 +160,39 @@ const ModalLockTokens = (props: Props) => {
   const fetchAllowance = async () => {
     try {
       if (cpk) {
-        console.log(cpk?.address)
-        const allowanceAddress = await omen.tokenVault()
+        let allowanceAddress
+        if (context.networkId === networkIds.MAINNET && !context.relay) {
+          allowanceAddress = await omen.tokenVault()
+        } else {
+          allowanceAddress = cpk.address
+        }
+
         const omenAddress = await omen.omenTokenAddress()
 
         const collateralService = new ERC20Service(provider, account, omenAddress)
-        const allowance = await collateralService.allowance(account, cpk?.address)
+        const allowance = await collateralService.allowance(account, allowanceAddress)
         setOmenAllowance(allowance)
       }
     } catch (e) {
-      console.log(e)
+      console.error(`Error while fetching allowance:  `, e.message)
     }
   }
   const approve = async () => {
     try {
       if (cpk?.address) {
         setAllowanceState(ButtonStates.working)
-        // const allowanceAddress = await omen.tokenVault()
+        let allowanceAddress
+
+        if (context.networkId === networkIds.MAINNET && !context.relay) {
+          allowanceAddress = await omen.tokenVault()
+        } else {
+          allowanceAddress = cpk.address
+        }
         const omenAddress = await omen.omenTokenAddress()
-        console.log(cpk.address)
+
         const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenAddress)
 
-        await collateralService.approveUnlimited(cpk.address)
+        await collateralService.approveUnlimited(allowanceAddress)
         await fetchAllowance()
         setAllowanceState(ButtonStates.finished)
       }
@@ -201,7 +215,6 @@ const ModalLockTokens = (props: Props) => {
       setIsTransactionModalOpen(false)
     } catch (e) {
       setTxState(TransactionStep.error)
-      console.log(e)
     }
   }
   const unlockTokens = async () => {
@@ -213,10 +226,9 @@ const ModalLockTokens = (props: Props) => {
       setIsTransactionModalOpen(true)
       const hash = await cpk.unlockTokens(userLocked)
       setTxNetId(provider.network.chainId)
-      // setTxHash(hash)
+      setTxHash(hash)
     } catch (e) {
       setTxState(TransactionStep.error)
-      console.log(e)
     }
   }
 
@@ -285,13 +297,7 @@ const ModalLockTokens = (props: Props) => {
               />
             )}
             {isLockAmountOpen && <Divider />}
-            <Button
-              onClick={() => {
-                getTokenLockInfo(), fetchAllowance()
-              }}
-            >
-              Fetch balances
-            </Button>
+
             <DataRow style={{ marginTop: !isLockAmountOpen ? '12px' : '' }}>
               <LightDataItem>{isLockAmountOpen && 'Your '}Vote Weight</LightDataItem>
               <DarkDataItem>
@@ -347,9 +353,7 @@ const ModalLockTokens = (props: Props) => {
               <ButtonsLockUnlock
                 buttonType={ButtonType.primaryLine}
                 disabled={unlockTimeLeft >= 0}
-                onClick={() => {
-                  unlockTokens()
-                }}
+                onClick={unlockTokens}
               >
                 Unlock Omen
               </ButtonsLockUnlock>

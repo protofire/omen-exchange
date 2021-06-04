@@ -26,7 +26,6 @@ import {
 import {
   calcDistributionHint,
   clampBigNumber,
-  formatBigNumber,
   getBaseToken,
   getBaseTokenForCToken,
   isCToken,
@@ -293,7 +292,6 @@ class CPKService {
     useBaseToken = false,
   }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
-      console.log('here')
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
       const network = await this.provider.getNetwork()
@@ -1440,7 +1438,7 @@ class CPKService {
       const { chainId } = await this.provider.getNetwork()
       const OmenGuild = new OmenGuildService(this.provider, chainId)
 
-      if (chainId !== networkIds.MAINNET) {
+      if (chainId !== networkIds.MAINNET || this.cpk.relay) {
         const signer = this.provider.getSigner()
         const account = await signer.getAddress()
 
@@ -1458,25 +1456,23 @@ class CPKService {
         )
 
         if (!hasCPKEnoughAlowance) {
-          console.log('fucking allowance again fucksing tisjfhdskjhf')
-          // Step 1:  Approve unlimited amount to be transferred to the market maker)
+          // Step 1:  Approve unlimited amount to be transferred to the token vault if not approved already
           transactions.push({
             to: omenTokenAddress,
             data: ERC20Service.encodeApproveUnlimited(allowanceAddress),
           })
         }
-
+        // Step 2: Fund CPK
         transactions.push({
           to: omenTokenAddress,
           data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
         })
-        //
-        console.log(await OmenGuild.omenTokenAddress())
+        // Step 3: Lock Tokens in the guild
         transactions.push({
           to: OmenGuild.omenGuildAddress,
           data: OmenGuildService.encodeLockTokens(amount),
         })
-        console.log(transactions)
+
         const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
         return transactionHash
       } else {
