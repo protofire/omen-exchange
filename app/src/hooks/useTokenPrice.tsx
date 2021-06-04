@@ -41,6 +41,6 @@ export const useTokenPrice = (address: string) => {
 
   return {
     tokenPrice,
-    status: error ? Status.Error : loading ? Status.Loading : Status.Ready,
+    status: error ? Status.Error : loading ? Status.Loading : data ? Status.Ready : Status.Loading,
   }
 }
