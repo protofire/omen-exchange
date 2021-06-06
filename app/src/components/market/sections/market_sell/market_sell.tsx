@@ -19,7 +19,7 @@ import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken } from '../../../../util/networks'
 import {
-  BigNumberToString,
+  bigNumberToString,
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
   formatBigNumber,
@@ -392,7 +392,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             onClickMaxButton={() => {
               setAmountSharesFromInput(displaySelectedOutcomeBalanceValue)
               setAmountSharesToDisplay(
-                BigNumberToString(displaySelectedOutcomeBalanceValue, baseCollateral.decimals, 5),
+                bigNumberToString(displaySelectedOutcomeBalanceValue, baseCollateral.decimals, 5),
               )
             }}
             shouldDisplayMaxButton

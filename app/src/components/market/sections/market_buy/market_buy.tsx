@@ -24,6 +24,7 @@ import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
+  bigNumberToString,
   computeBalanceAfterTrade,
   formatBigNumber,
   formatNumber,
@@ -139,7 +140,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
-    setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals, collateral.decimals).includes('-'))
+    setIsNegativeAmount(bigNumberToString(amount || Zero, collateral.decimals, collateral.decimals).includes('-'))
   }, [amount, collateral.decimals])
 
   useEffect(() => {
@@ -232,7 +233,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           ? displayCollateral
           : collateral
 
-      const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals)
+      const sharesAmount = bigNumberToString(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals)
       setTweet('')
       setStatus(Status.Loading)
       setMessage(`Buying ${formatNumber(sharesAmount)} shares...`)
@@ -420,6 +421,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         href={DOCUMENT_VALIDITY_RULES}
         hyperlinkDescription={'invalid market'}
       />
+
       <GridTransactionDetails>
         <div>
           <CurrenciesWrapper>

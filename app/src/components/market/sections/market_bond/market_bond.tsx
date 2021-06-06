@@ -110,13 +110,11 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
             : props.isScalar
-            ? `${formatNumber(
-                formatBigNumber(bondOutcomeSelected, nativeAsset.decimals, nativeAsset.decimals),
-              )} ${getUnit(props.marketMakerData.question.title)}`
+            ? `${formatBigNumber(bondOutcomeSelected, nativeAsset.decimals, nativeAsset.decimals)} ${getUnit(
+                props.marketMakerData.question.title,
+              )}`
             : marketMakerData.question.outcomes[outcomeIndex]
-        } with ${formatNumber(
-          formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals, nativeAsset.decimals),
-        )} ${symbol}`,
+        } with ${formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals, nativeAsset.decimals)} ${symbol}`,
       )
 
       setTxState(TransactionStep.waitingConfirmation)
@@ -138,15 +136,17 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       setBondOutcomeDisplay('0')
       setBondOutcomeSelected(Zero)
       setMessage(
-        `Successfully bonded ${formatNumber(
-          formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals, nativeAsset.decimals),
+        `Successfully bonded ${formatBigNumber(
+          bondNativeAssetAmount,
+          nativeAsset.decimals,
+          nativeAsset.decimals,
         )} ${symbol} on ${
           outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
             : props.isScalar
-            ? `${formatNumber(
-                formatBigNumber(bondOutcomeSelected, nativeAsset.decimals, nativeAsset.decimals),
-              )} ${getUnit(props.marketMakerData.question.title)}`
+            ? `${formatBigNumber(bondOutcomeSelected, nativeAsset.decimals, nativeAsset.decimals)} ${getUnit(
+                props.marketMakerData.question.title,
+              )}`
             : marketMakerData.question.outcomes[outcomeIndex]
         }`,
       )
