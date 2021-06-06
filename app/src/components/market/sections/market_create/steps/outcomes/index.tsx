@@ -138,21 +138,11 @@ const Outcomes = (props: Props) => {
             <PercentWrapper>%</PercentWrapper>
           </OutcomeItemWrapper>
           <CustomButtonCircle
-            data-for="removeOutcome"
-            data-tip={`Remove outcome ${index + 1}`}
             disabled={disabled || !canRemove}
             onClick={() => {
               removeOutcome(index)
             }}
           >
-            <ReactTooltip
-              className="customMarketTooltip"
-              effect="solid"
-              id="removeOutcome"
-              offset={{ top: 0, left: -7.5 }}
-              place="top"
-              type="light"
-            />
             <IconRemove />
           </CustomButtonCircle>
         </RowWrapper>
@@ -191,25 +181,9 @@ const Outcomes = (props: Props) => {
         </OutcomesTable>
         {canAddOutcome && (
           <>
-            <CustomButtonCircleAdd
-              data-arrow-color="transparent"
-              data-for="newOutcome"
-              data-testid="new-outcome-button"
-              data-tip="Add new outcome"
-              onClick={addNewOutcome}
-            >
+            <CustomButtonCircleAdd onClick={addNewOutcome}>
               <IconAdd />
             </CustomButtonCircleAdd>
-
-            <ReactTooltip
-              className="customMarketTooltip"
-              data-multiline={true}
-              effect="solid"
-              id="newOutcome"
-              offset={{ top: 0, left: 0 }}
-              place="top"
-              type="light"
-            />
           </>
         )}
       </OutcomesTableWrapper>
