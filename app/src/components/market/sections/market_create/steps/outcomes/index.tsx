@@ -25,7 +25,7 @@ const CustomButtonCircle = styled(ButtonCircle)`
     border-color: ${props => props.theme.form.common.disabled.borderColor};
   }
 `
-//fix conflict
+//fix conflicts
 const NoteTitle = styled.span`
   color: ${props => props.theme.colors.textColorDark};
 `
