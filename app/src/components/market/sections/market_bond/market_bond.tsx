@@ -110,7 +110,6 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
             : props.isScalar
-
             ? `${formatBigNumber(bondOutcomeSelected, nativeAsset.decimals, nativeAsset.decimals)} ${getUnit(
                 props.marketMakerData.question.title,
               )}`
@@ -137,7 +136,6 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       setBondOutcomeDisplay('0')
       setBondOutcomeSelected(Zero)
       setMessage(
-
         `Successfully bonded ${formatBigNumber(
           bondNativeAssetAmount,
           nativeAsset.decimals,
@@ -146,7 +144,6 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
             : props.isScalar
-
             ? `${formatBigNumber(bondOutcomeSelected, nativeAsset.decimals, nativeAsset.decimals)} ${getUnit(
                 props.marketMakerData.question.title,
               )}`
