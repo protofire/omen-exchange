@@ -100,7 +100,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   onBack: () => void
   onClose: () => void
   theme?: any
-  fetchBalances: () => void
+  fetchBalances: () => Promise<void>
   xDaiBalance: Maybe<BigNumber>
   mainnetTokens: Token[]
   xDaiTokens: Token[]
