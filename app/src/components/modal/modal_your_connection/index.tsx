@@ -11,7 +11,7 @@ import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from
 import { KnownTokenValue, Token, TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
-import { IconArrowBack, IconClose, IconMetaMask, IconOmen, IconSettings, IconWalletConnect } from '../../common/icons'
+import { IconArrowBack, IconClose, IconMetaMask, IconSettings, IconWalletConnect } from '../../common/icons'
 import { IconChevronDown } from '../../common/icons/IconChevronDown'
 import { IconChevronUp } from '../../common/icons/IconChevronUp'
 import { IconJazz } from '../../common/icons/IconJazz'
