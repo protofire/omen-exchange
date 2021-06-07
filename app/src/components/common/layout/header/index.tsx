@@ -202,17 +202,14 @@ const HeaderContainer: React.FC = (props: any) => {
   const disableConnectButton = isConnectWalletModalOpen
 
   const {
-    daiBalance,
+    arrayOfClaimableTokenBalances,
     fetchBalances,
-    formattedDaiBalance,
     formattedNativeBalance,
-    formattedOmenBalance,
     formattedxDaiBalance,
-    formattedxOmenBalance,
+    mainnetTokens,
     omenBalance,
-    unclaimedDaiAmount,
-    unclaimedOmenAmount,
     xDaiBalance,
+    xDaiTokens,
     xOmenBalance,
   } = useConnectedBalanceContext()
 
@@ -372,18 +369,15 @@ const HeaderContainer: React.FC = (props: any) => {
           </ButtonSettings>
         </ContentsRight>
         <ModalYourConnectionWrapper
+          arrayOfClaimableBalances={arrayOfClaimableTokenBalances}
           changeWallet={() => {
             setYourConnectionModalState(false)
             logout()
             setConnectWalletModalState(true)
           }}
           fetchBalances={fetchBalances}
-          formattedDaiBalance={formattedDaiBalance}
-          formattedNativeBalance={formattedNativeBalance}
-          formattedOmenBalance={formattedOmenBalance}
-          formattedxDaiBalance={formattedxDaiBalance}
-          formattedxOmenBalance={formattedxOmenBalance}
           isOpen={isYourConnectionModalOpen && !isDepositWithdrawModalOpen}
+          mainnetTokens={mainnetTokens}
           onClose={() => setYourConnectionModalState(false)}
           openDepositModal={() => {
             setYourConnectionModalState(false)
@@ -395,9 +389,8 @@ const HeaderContainer: React.FC = (props: any) => {
             setDepositWithdrawType(ExchangeType.withdraw)
             setDepositWithdrawModalState(true)
           }}
-          unclaimedDaiAmount={unclaimedDaiAmount}
-          unclaimedOmenAmount={unclaimedOmenAmount}
           xDaiBalance={xDaiBalance}
+          xDaiTokens={xDaiTokens}
           xOmenBalance={xOmenBalance}
         />
         <ModalConnectWalletWrapper
@@ -405,23 +398,17 @@ const HeaderContainer: React.FC = (props: any) => {
           onClose={() => setConnectWalletModalState(false)}
         />
         <ModalDepositWithdrawWrapper
-          daiBalance={daiBalance}
           exchangeType={depositWithdrawType}
           fetchBalances={fetchBalances}
-          formattedDaiBalance={formattedDaiBalance}
-          formattedOmenBalance={formattedOmenBalance}
-          formattedxDaiBalance={formattedxDaiBalance}
-          formattedxOmenBalance={formattedxOmenBalance}
           isOpen={isDepositWithdrawModalOpen}
-          omenBalance={omenBalance}
+          mainnetTokens={mainnetTokens}
           onBack={() => {
             setDepositWithdrawModalState(false)
             setYourConnectionModalState(true)
           }}
           onClose={() => setDepositWithdrawModalState(false)}
-          unclaimedAmount={unclaimedDaiAmount}
           xDaiBalance={xDaiBalance}
-          xOmenBalance={xOmenBalance}
+          xDaiTokens={xDaiTokens}
         />
       </HeaderInner>
     </HeaderWrapper>
