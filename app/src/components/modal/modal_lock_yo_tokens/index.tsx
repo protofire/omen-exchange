@@ -319,32 +319,35 @@ const ModalLockTokens = (props: Props) => {
                 )}
               </DarkDataItem>
             </DataRow>
-            {timestamp !== 0 && (
-              <>
-                <DataRow>
-                  <LightDataItem>Unlock Date</LightDataItem>
-                  <DarkDataItem>
+
+            <DataRow>
+              <LightDataItem>Unlock Date</LightDataItem>
+              <DarkDataItem>
+                {timestamp !== 0 ? (
+                  <>
                     {formatLockDate(timestamp * 1000)}
                     <div
                       data-arrow-color="transparent"
                       data-for="unlockDate"
-                      data-tip={`${(5265716 / 86400).toFixed(0)} Days`}
+                      data-tip={`${(5265716 / 86400).toFixed(0)} Days remaining`}
                     >
                       <IconAlertInverted size="16" style={{ marginLeft: '8px', verticalAlign: 'text-bottom' }} />
                     </div>
-                  </DarkDataItem>
-                </DataRow>
-                <ReactTooltip
-                  className="customMarketTooltip"
-                  data-multiline={true}
-                  effect="solid"
-                  id="unlockDate"
-                  offset={{ top: -70, left: 20 }}
-                  place="top"
-                  type="light"
-                />
-              </>
-            )}
+                  </>
+                ) : (
+                  '-'
+                )}
+              </DarkDataItem>
+            </DataRow>
+            <ReactTooltip
+              className="customMarketTooltip"
+              data-multiline={true}
+              effect="solid"
+              id="unlockDate"
+              offset={{ top: -70, left: 20 }}
+              place="top"
+              type="light"
+            />
           </ModalMain>
           <ButtonSection>
             {!isLockAmountOpen && (
