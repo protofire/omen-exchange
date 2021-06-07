@@ -49,10 +49,6 @@ const UserData = styled.div`
   }
 `
 
-const Divider = styled.div`
-  width: 50%;
-`
-
 interface Props {
   totalUserLiquidity: BigNumber
   collateral: Token
@@ -82,36 +78,30 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
 
   return (
     <UserData>
-      <Divider style={{ marginRight: '32px' }}>
-        <UserDataTitleValue
-          title="Your Liquidity"
-          value={`${formatNumber(
-            formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals),
-          )} ${baseCollateral.symbol}`}
-        />
-        <UserDataTitleValue
-          state={userEarnings.gt(0) ? ValueStates.success : undefined}
-          title="Your Earnings"
-          value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatNumber(
-            formatBigNumber(displayUserEarnings, baseCollateral.decimals, baseCollateral.decimals),
-          )} ${baseCollateral.symbol}`}
-        />
-      </Divider>
-      <Divider style={{ marginRight: '0px' }}>
-        <UserDataTitleValue
-          title="Total Pool Tokens"
-          value={`${formatNumber(
-            formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals),
-          )}`}
-        />
-        <UserDataTitleValue
-          state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
-          title="Total Earnings"
-          value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
-            formatBigNumber(displayTotalEarnings, baseCollateral.decimals, baseCollateral.decimals),
-          )} ${baseCollateral.symbol}`}
-        />
-      </Divider>
+      <UserDataTitleValue
+        title="Your Liquidity"
+        value={`${formatNumber(
+          formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals),
+        )} ${baseCollateral.symbol}`}
+      />
+      <UserDataTitleValue
+        title="Total Pool Tokens"
+        value={`${formatNumber(formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals))}`}
+      />
+      <UserDataTitleValue
+        state={userEarnings.gt(0) ? ValueStates.success : undefined}
+        title="Your Earnings"
+        value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatNumber(
+          formatBigNumber(displayUserEarnings, baseCollateral.decimals, baseCollateral.decimals),
+        )} ${baseCollateral.symbol}`}
+      />
+      <UserDataTitleValue
+        state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
+        title="Total Earnings"
+        value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
+          formatBigNumber(displayTotalEarnings, baseCollateral.decimals, baseCollateral.decimals),
+        )} ${baseCollateral.symbol}`}
+      />
     </UserData>
   )
 }
