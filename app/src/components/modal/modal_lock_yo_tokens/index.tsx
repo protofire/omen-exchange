@@ -29,6 +29,8 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   onClose: () => void
   formattedOmenBalance: string
   omenBalance: BigNumber
+  setIsModalLockTokensOpen: any
+  fetchBalances: () => Promise<void>
 }
 const NavLeft = styled.div`
   display: flex;
@@ -98,7 +100,16 @@ const PercentageText = styled.span<{ lightColor?: boolean }>`
 `
 
 const ModalLockTokens = (props: Props) => {
-  const { context, formattedOmenBalance, isOpen, omenBalance, onClose, theme } = props
+  const {
+    context,
+    fetchBalances,
+    formattedOmenBalance,
+    isOpen,
+    omenBalance,
+    onClose,
+    setIsModalLockTokensOpen,
+    theme,
+  } = props
   const { account, library: provider, networkId } = context
   const cpk = useConnectedCPKContext()
   const omen = new OmenGuildService(provider, networkId)
@@ -214,8 +225,11 @@ const ModalLockTokens = (props: Props) => {
 
       setTxNetId(provider.network.chainId)
       setTxHash(transaction)
-
+      await getTokenLockInfo()
+      await fetchBalances()
       setIsTransactionModalOpen(false)
+      setIsLockAmountOpen(false)
+      setIsModalLockTokensOpen(true)
     } catch (e) {
       setTxState(TransactionStep.error)
     }

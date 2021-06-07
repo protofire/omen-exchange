@@ -380,10 +380,12 @@ const HeaderContainer: React.FC = (props: any) => {
         </ContentsRight>
         <ModalLockYoTokens
           context={context}
+          fetchBalances={fetchBalances}
           formattedOmenBalance={relay ? formattedxOmenBalance : formattedOmenBalance}
           isOpen={isModalLockTokensOpen}
           omenBalance={relay ? xOmenBalance : omenBalance}
           onClose={() => setModalLockTokensState(false)}
+          setIsModalLockTokensOpen={setModalLockTokensState}
         />
 
         <ModalYourConnectionWrapper
