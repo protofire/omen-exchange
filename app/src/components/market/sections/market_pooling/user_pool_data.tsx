@@ -11,6 +11,9 @@ import { ValueStates } from '../../common/transaction_details_row'
 const UserDataTitleValue = styled(TitleValue)`
   flex: 0 calc(50% - 16px);
 
+  &:nth-child(odd) {
+    margin-right: 32px;
+  }
   &:nth-child(-n + 2) {
     margin-bottom: 12px;
   }
@@ -39,7 +42,7 @@ const UserDataTitleValue = styled(TitleValue)`
 const UserData = styled.div`
   display: flex;
   flex-direction: row;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   margin: 0 -25px;
   padding: 20px 24px;
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
