@@ -184,7 +184,6 @@ const MarketAndGovernanceNav = styled.div<{ disabled?: boolean }>`
   }
 `
 const OmenIconWrapper = styled.div`
-  border: 2px solid red;
   margin-left: 12px;
 `
 
