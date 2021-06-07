@@ -62,7 +62,7 @@ const Text = styled.span<{ hide: boolean; state: ButtonStates }>`
   position: relative;
   user-select: none;
   z-index: 1;
-  ${props => props.state === ButtonStates.idle && 'font-weight:500'};
+  ${props => props.state === ButtonStates.idle && `font-weight:${props.theme.buttonSecondary.weight}`};
 `
 
 const SVGWrapper = styled.span<{ marginLeft?: boolean }>`
