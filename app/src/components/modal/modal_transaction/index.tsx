@@ -137,7 +137,7 @@ export const ModalTransaction = (props: Props) => {
             ? 'Transaction Confirmed'
             : txState === TransactionStep.error
             ? 'Transaction Failed'
-            : ''}
+            : 'WHAAAAT'}
         </ModalSubText>
         <ButtonContainer>
           {shareOnTwitter && (

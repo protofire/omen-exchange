@@ -259,9 +259,11 @@ class CPKService {
 
     const txObject = await this.cpk.execTransactions(transactions, txOptions)
     setTxState && setTxState(TransactionStep.transactionSubmitted)
+
     setTxHash && setTxHash(txObject.hash)
     const tx = await this.waitForTransaction(txObject)
     setTxState && setTxState(TransactionStep.transactionConfirmed)
+
     return tx
   }
 
@@ -1433,8 +1435,14 @@ class CPKService {
     }
   }
 
-  lockTokens = async (amount: BigNumber, setTxState: any, setTxHash: any) => {
+  lockTokens = async (
+    amount: BigNumber,
+    setTxState: (step: TransactionStep) => void,
+    setTxHash: (arg0: string) => void,
+  ) => {
     try {
+      // setTxHash: (arg0: string) => void
+      //     setTxState: (step: TransactionStep) => void
       const { chainId } = await this.provider.getNetwork()
       const OmenGuild = new OmenGuildService(this.provider, chainId)
 

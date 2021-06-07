@@ -16,8 +16,9 @@ import { ButtonStateful, ButtonStates } from '../../button/button_stateful'
 import { ButtonType } from '../../button/button_styling_types'
 import { TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInput, BigNumberInputReturn } from '../../common/form/big_number_input'
-import { IconArrowBack, IconArrowRightLong, IconClose, IconOmen } from '../../common/icons'
+import { IconArrowBack, IconClose, IconOmen } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
+import { ArrowIcon } from '../../market/common/new_value/img/ArrowIcon'
 import { ContentWrapper, ModalNavigation } from '../common_styled'
 import { ModalTransactionWrapper } from '../modal_transaction'
 
@@ -71,8 +72,8 @@ const ButtonSection = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
-  column-gap: 10px;
-  margin-top: 28px;
+  column-gap: 20px;
+  margin-top: 32px;
 `
 const ButtonsLockUnlock = styled(Button)`
   flex: 1;
@@ -202,13 +203,15 @@ const ModalLockTokens = (props: Props) => {
   }
   const lockTokens = async (amount: BigNumber) => {
     if (!cpk) return
-    setTxState(TransactionStep.waitingConfirmation)
+
     try {
+      setTxState(TransactionStep.waitingConfirmation)
       setTransactionMessage(`Lock ${formatBigNumber(amount, STANDARD_DECIMALS, 2)} OMN`)
 
       setIsTransactionModalOpen(true)
 
-      const transaction = await cpk.lockTokens(amount, setTxHash, setTxState)
+      const transaction = await cpk.lockTokens(amount, setTxState, setTxHash)
+
       setTxNetId(provider.network.chainId)
       setTxHash(transaction)
 
@@ -310,12 +313,7 @@ const ModalLockTokens = (props: Props) => {
 
                 {!displayLockAmount.isZero() && (
                   <>
-                    <IconArrowRightLong
-                      color={theme.colors.textColorDark}
-                      height={8}
-                      style={{ margin: '0 10px' }}
-                      width={11}
-                    />
+                    <ArrowIcon color={theme.colors.textColorDark} style={{ margin: '0 10px' }} />
                     {(divBN(userLocked.add(displayLockAmount), totalLocked) * 100).toFixed(2)}%
                   </>
                 )}
@@ -351,7 +349,7 @@ const ModalLockTokens = (props: Props) => {
           <ButtonSection>
             {!isLockAmountOpen && (
               <ButtonsLockUnlock
-                buttonType={ButtonType.primaryLine}
+                buttonType={ButtonType.primaryAlternative}
                 disabled={unlockTimeLeft >= 0}
                 onClick={unlockTokens}
               >
