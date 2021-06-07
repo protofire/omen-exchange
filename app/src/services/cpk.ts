@@ -3,15 +3,11 @@ import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
-import {
-  GEN_TOKEN_ADDDRESS_TESTING,
-  GEN_XDAI_ADDRESS_TESTING,
-  OMNI_BRIDGE_XDAI_ADDRESS,
-  XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
-} from '../common/constants'
+import { OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
 import { Transaction, verifyProxyAddress } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
+  bridgeTokensList,
   getBySafeTx,
   getContractAddress,
   getNativeAsset,
@@ -32,7 +28,7 @@ import {
   signaturesFormatted,
   waitABit,
 } from '../util/tools'
-import { ExchangeCurrency, MarketData, Question, Token, TransactionStep } from '../util/types'
+import { MarketData, Question, Token, TransactionStep } from '../util/types'
 
 import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
@@ -153,6 +149,10 @@ interface TransactionResult {
 interface TxOptions {
   value?: BigNumber
   gas?: number
+}
+interface TxState {
+  setTxHash?: (arg0: string) => void
+  setTxState?: (step: TransactionStep) => void
 }
 
 const fallbackMultisigTransactionReceipt: TransactionReceipt = {
@@ -1448,11 +1448,11 @@ class CPKService {
     }
   }
 
-  sendMainnetTokenToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
+  sendMainnetTokenToBridge = async (amount: BigNumber, address: string, symbol?: string) => {
     try {
       if (this.cpk.relay) {
         const xDaiService = new XdaiService(this.provider)
-        const contract = await xDaiService.generateXdaiBridgeContractInstance(currency)
+        const contract = await xDaiService.generateXdaiBridgeContractInstance(symbol)
 
         const sender = await this.cpk.ethLibAdapter.signer.signer.getAddress()
 
@@ -1461,16 +1461,12 @@ class CPKService {
         // verify proxy address before deposit
         await verifyProxyAddress(sender, receiver, this.cpk)
 
-        const transaction = await contract.relayTokens(
-          currency === ExchangeCurrency.Omen ? GEN_TOKEN_ADDDRESS_TESTING : sender,
-          receiver,
-          amount,
-        )
+        const transaction = await contract.relayTokens(symbol === 'DAI' ? sender : address, receiver, amount)
         return transaction.hash
       } else {
         const xDaiService = new XdaiService(this.provider)
-        const contract = await xDaiService.generateErc20ContractInstance(currency)
-        const transaction = await xDaiService.generateSendTransaction(amount, contract, currency)
+        const contract = await xDaiService.generateErc20ContractInstance(address)
+        const transaction = await xDaiService.generateSendTransaction(amount, contract, symbol)
         return transaction
       }
     } catch (e) {
@@ -1479,7 +1475,12 @@ class CPKService {
     }
   }
 
-  sendXdaiChainTokenToBridge = async (amount: BigNumber, currency?: ExchangeCurrency) => {
+  sendXdaiChainTokenToBridge = async (
+    amount: BigNumber,
+    address: string,
+    { setTxHash, setTxState }: TxState,
+    symbol?: string,
+  ) => {
     try {
       if (this.cpk.relay) {
         const transactions: Transaction[] = []
@@ -1490,20 +1491,20 @@ class CPKService {
         const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
 
         // relay to signer address on mainnet
-        if (currency === ExchangeCurrency.Dai) {
+        if (symbol === 'DAI') {
           transactions.push({
             to: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
             data: XdaiService.encodeRelayTokens(to),
             value: amount.toString(),
           })
-          const { hash } = await this.cpk.execTransactions(transactions, txOptions)
-          return hash
+          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+          return transactionHash
         } else {
           transactions.push({
-            to: GEN_XDAI_ADDRESS_TESTING,
+            to: address,
             data: XdaiService.encodeTokenBridgeTransfer(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
           })
-          const { transactionHash } = await this.execTransactions(transactions, txOptions)
+          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
 
           return transactionHash
         }
@@ -1521,10 +1522,19 @@ class CPKService {
   fetchLatestUnclaimedTransactions = async () => {
     try {
       const xDaiService = new XdaiService(this.provider)
+      const arrayOfTransactions = []
       const daiData = await xDaiService.fetchXdaiTransactionData()
-      const omenData = await xDaiService.fetchOmniTransactionData()
+      arrayOfTransactions.push(...daiData)
 
-      return daiData.concat(omenData)
+      for (const token of bridgeTokensList) {
+        if (token !== 'dai') {
+          const currentToken = await xDaiService.fetchOmniTransactionData(token)
+
+          if (currentToken.length !== 0) arrayOfTransactions.push(...currentToken)
+        }
+      }
+
+      return arrayOfTransactions
     } catch (e) {
       logger.error('Error fetching xDai subgraph data', e.message)
       throw e
@@ -1546,6 +1556,7 @@ class CPKService {
 
         const message = transactions[i].message
         messages.push(message.content)
+
         const signature = signaturesFormatted(message.signatures)
 
         signatures.push(signature)
@@ -1554,7 +1565,7 @@ class CPKService {
       const txObject = await xDaiService.claim(addresses, messages, signatures)
       return txObject
     } catch (e) {
-      logger.error(`Error trying to claim Dai tokens from xDai bridge`, e.message)
+      logger.error(`Error trying to claim tokens from xDai bridge`, e.message)
       throw e
     }
   }
