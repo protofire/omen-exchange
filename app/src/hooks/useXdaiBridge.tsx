@@ -3,7 +3,7 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
 import { XdaiService } from '../services'
-import { getToken, knownTokens, networkIds } from '../util/networks'
+import { getToken, networkIds } from '../util/networks'
 import { formatBigNumber } from '../util/tools'
 import { TransactionStep } from '../util/types'
 
