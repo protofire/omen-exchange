@@ -338,7 +338,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       }
       setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
 
-      const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
       let useBaseToken = false
       if (displayCollateral.address === pseudoNativeAssetAddress) {
@@ -348,12 +347,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           useBaseToken = true
         }
       }
+
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
-        collateralAddress,
+        collateral: marketMakerData.collateral,
         conditionId,
         conditionalTokens,
         compoundService,
