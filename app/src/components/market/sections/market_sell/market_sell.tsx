@@ -1,7 +1,7 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
@@ -104,8 +104,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
-
-  const history = useHistory()
 
   const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
   const collateralSymbol = collateral.symbol.toLowerCase()
