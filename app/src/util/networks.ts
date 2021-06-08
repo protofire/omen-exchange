@@ -91,6 +91,7 @@ interface KnownTokenData {
   }
   order: number
   disabled?: boolean
+  name?: string
 }
 
 export const pseudoNativeAssetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
@@ -333,11 +334,21 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   },
   omn: {
     symbol: 'OMN',
+    name: 'Omen',
     decimals: 18,
     addresses: {
       [networkIds.MAINNET]: '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
       [networkIds.XDAI]: '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599',
       [networkIds.RINKEBY]: '0x0A08ECa47C56C305F4FeB4fa062AEcd5807BeBb8',
+    },
+    order: 22,
+  },
+  stake: {
+    symbol: 'STAKE',
+    decimals: 18,
+    addresses: {
+      [networkIds.MAINNET]: '0x0Ae055097C6d159879521C384F1D2123D1f195e6',
+      [networkIds.XDAI]: '0xb7D311E2Eb55F2f68a9440da38e7989210b9A05e',
     },
     order: 22,
   },
@@ -394,6 +405,16 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     },
     order: 15,
   },
+  wbtc: {
+    symbol: 'WBTC',
+    name: 'Wrapped Bitcoin',
+    decimals: 8,
+    addresses: {
+      [networkIds.MAINNET]: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+      [networkIds.XDAI]: '0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252',
+    },
+    order: 14,
+  },
   dai: {
     symbol: 'DAI',
     decimals: 18,
@@ -421,19 +442,23 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   },
   weth: {
     symbol: 'WETH',
+    name: 'Wrapped Ether',
     decimals: 18,
     addresses: {
       [networkIds.MAINNET]: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
       [networkIds.RINKEBY]: '0xc778417e063141139fce010982780140aa0cd5ab',
+      [networkIds.XDAI]: '0x6A023CCd1ff6F2045C3309768eAd9E68F978f6e1',
     },
     order: 3,
   },
   usdc: {
     symbol: 'USDC',
+    name: 'USD Coin',
     decimals: 6,
     addresses: {
       [networkIds.MAINNET]: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
       [networkIds.RINKEBY]: '0x4DBCdF9B62e891a7cec5A2568C3F4FAF9E8Abe2b',
+      [networkIds.XDAI]: '0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83',
     },
     order: 4,
   },
@@ -480,6 +505,8 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     order: 9,
   },
 }
+//when adding new bridge currency ensure that it's present in known tokens and that it has both mainnet and xDai address added
+export const bridgeTokensList: KnownToken[] = ['dai', 'weth', 'wbtc']
 
 const validNetworkId = (networkId: number): networkId is NetworkId => {
   return networks[networkId as NetworkId] !== undefined
@@ -505,13 +532,14 @@ export const getToken = (networkId: number, tokenId: KnownToken): Token => {
   const address = token.addresses[networkId]
 
   if (!address) {
-    throw new Error(`Unsupported network id: '${networkId}'`)
+    throw new Error(`Unsupported address in network: '${networkId}'`)
   }
 
   return {
     address,
     decimals: token.decimals,
     symbol: token.symbol,
+    name: token.name ? token.name : '',
     image: getImageUrl(address),
   }
 }

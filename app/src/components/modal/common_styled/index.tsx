@@ -46,7 +46,7 @@ export const ModalCard = styled.div`
 `
 
 export const BalanceSection = styled.div<{ borderBottom?: boolean }>`
-  padding: 16px 20px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -69,6 +69,7 @@ export const BalanceItemTitle = styled.p<{ notSelected?: boolean }>`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => (props.notSelected ? props.theme.colors.textColorLighter : props.theme.colors.textColorDark)};
   margin: 0;
+  text-transform: capitalize;
 `
 
 export const BalanceItemBalance = styled.p`
@@ -82,8 +83,8 @@ export const BalanceItem = styled.div<{ hover?: boolean }>`
   justify-content: space-between;
   width: 100%;
 
-  &:nth-of-type(2) {
-    margin-top: 12px;
+  &:not(:first-child){
+    margin-top: 14px;
   }
 
   &:hover {

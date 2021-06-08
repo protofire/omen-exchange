@@ -167,6 +167,7 @@ const HeaderDropdown = styled(Dropdown)`
 `
 
 const MarketAndGovernanceNav = styled.div<{ disabled?: boolean }>`
+  display: none;
   background-color: ${props => (props.disabled ? props => props.theme.buttonSecondary.backgroundColor : 'transparent')};
   ${props => (props.disabled ? 'pointer-events:none;' : '')};
   border-radius: 32px;
@@ -202,17 +203,14 @@ const HeaderContainer: React.FC = (props: any) => {
   const disableConnectButton = isConnectWalletModalOpen
 
   const {
-    daiBalance,
+    arrayOfClaimableTokenBalances,
     fetchBalances,
-    formattedDaiBalance,
     formattedNativeBalance,
-    formattedOmenBalance,
     formattedxDaiBalance,
-    formattedxOmenBalance,
+    mainnetTokens,
     omenBalance,
-    unclaimedDaiAmount,
-    unclaimedOmenAmount,
     xDaiBalance,
+    xDaiTokens,
     xOmenBalance,
   } = useConnectedBalanceContext()
 
@@ -324,7 +322,7 @@ const HeaderContainer: React.FC = (props: any) => {
             />
           )}
 
-          <HeaderButton>
+          <HeaderButton style={{ display: 'none' }}>
             {relay
               ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
               : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
@@ -372,18 +370,15 @@ const HeaderContainer: React.FC = (props: any) => {
           </ButtonSettings>
         </ContentsRight>
         <ModalYourConnectionWrapper
+          arrayOfClaimableBalances={arrayOfClaimableTokenBalances}
           changeWallet={() => {
             setYourConnectionModalState(false)
             logout()
             setConnectWalletModalState(true)
           }}
           fetchBalances={fetchBalances}
-          formattedDaiBalance={formattedDaiBalance}
-          formattedNativeBalance={formattedNativeBalance}
-          formattedOmenBalance={formattedOmenBalance}
-          formattedxDaiBalance={formattedxDaiBalance}
-          formattedxOmenBalance={formattedxOmenBalance}
           isOpen={isYourConnectionModalOpen && !isDepositWithdrawModalOpen}
+          mainnetTokens={mainnetTokens}
           onClose={() => setYourConnectionModalState(false)}
           openDepositModal={() => {
             setYourConnectionModalState(false)
@@ -395,9 +390,8 @@ const HeaderContainer: React.FC = (props: any) => {
             setDepositWithdrawType(ExchangeType.withdraw)
             setDepositWithdrawModalState(true)
           }}
-          unclaimedDaiAmount={unclaimedDaiAmount}
-          unclaimedOmenAmount={unclaimedOmenAmount}
           xDaiBalance={xDaiBalance}
+          xDaiTokens={xDaiTokens}
           xOmenBalance={xOmenBalance}
         />
         <ModalConnectWalletWrapper
@@ -405,23 +399,17 @@ const HeaderContainer: React.FC = (props: any) => {
           onClose={() => setConnectWalletModalState(false)}
         />
         <ModalDepositWithdrawWrapper
-          daiBalance={daiBalance}
           exchangeType={depositWithdrawType}
           fetchBalances={fetchBalances}
-          formattedDaiBalance={formattedDaiBalance}
-          formattedOmenBalance={formattedOmenBalance}
-          formattedxDaiBalance={formattedxDaiBalance}
-          formattedxOmenBalance={formattedxOmenBalance}
           isOpen={isDepositWithdrawModalOpen}
-          omenBalance={omenBalance}
+          mainnetTokens={mainnetTokens}
           onBack={() => {
             setDepositWithdrawModalState(false)
             setYourConnectionModalState(true)
           }}
           onClose={() => setDepositWithdrawModalState(false)}
-          unclaimedAmount={unclaimedDaiAmount}
           xDaiBalance={xDaiBalance}
-          xOmenBalance={xOmenBalance}
+          xDaiTokens={xDaiTokens}
         />
       </HeaderInner>
     </HeaderWrapper>

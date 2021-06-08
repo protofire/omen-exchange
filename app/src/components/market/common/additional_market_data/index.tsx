@@ -75,6 +75,7 @@ const AdditionalMarketDataSectionWrapper = styled.a<{
   margin-left: ${props => (props.noMarginLeft ? '0px' : '14px')};
   margin-right: ${props => (props.hasMarginRight ? '14px' : '0px')};
   margin-bottom: 14px;
+  text-transform: capitalize;
   &:hover {
     p {
       color: ${props => (props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight)};
