@@ -88,7 +88,7 @@ class WalletConnectConnector extends Connectors.Connector {
 const WalletConnect = new WalletConnectConnector()
 
 const Infura = new NetworkOnlyConnector({
-  providerURL: infuraNetworkURL && infuraNetworkURLxDai,
+  providerURL: infuraNetworkURLxDai || infuraNetworkURL,
 })
 
 class AuthereumConnector extends Connectors.Connector {

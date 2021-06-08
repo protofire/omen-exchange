@@ -290,6 +290,7 @@ export const getChainSpecificAlternativeUrls = (networkId: any) => {
   if (!validNetworkId(networkId)) {
     return false
   }
+
   return networks[networkId].alternativeUrls
 }
 
