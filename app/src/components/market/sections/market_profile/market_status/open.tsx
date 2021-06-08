@@ -110,17 +110,6 @@ const Wrapper = (props: Props) => {
   const initialBondAmount =
     networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
 
-  useEffect(() => {
-    if (location.pathname.includes('buy')) setCurrentTab(MarketDetailsTab.buy)
-    if (location.pathname.includes('sell')) setCurrentTab(MarketDetailsTab.sell)
-    if (location.pathname.includes('pool')) setCurrentTab(MarketDetailsTab.pool)
-    if (location.pathname.includes('verify')) setCurrentTab(MarketDetailsTab.verify)
-    if (location.pathname.includes('history')) setCurrentTab(MarketDetailsTab.history)
-    if (location.pathname.includes('set_outcome')) setCurrentTab(MarketDetailsTab.setOutcome)
-    if (location.pathname.includes('finalize')) setCurrentTab(MarketDetailsTab.finalize)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
   const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
     question.currentAnswerBond ? new BigNumber(question.currentAnswerBond).mul(2) : initialBondAmount,
   )
@@ -309,7 +298,19 @@ const Wrapper = (props: Props) => {
   }, [isQuestionFinalized, isFinalizing])
 
   useEffect(() => {
+    if (location.pathname.includes('buy')) setCurrentTab(MarketDetailsTab.buy)
+    if (location.pathname.includes('sell')) setCurrentTab(MarketDetailsTab.sell)
+    if (location.pathname.includes('pool')) setCurrentTab(MarketDetailsTab.pool)
+    if (location.pathname.includes('verify')) setCurrentTab(MarketDetailsTab.verify)
+    if (location.pathname.includes('history')) setCurrentTab(MarketDetailsTab.history)
+    if (location.pathname.includes('set_outcome')) setCurrentTab(MarketDetailsTab.setOutcome)
+    if (location.pathname.includes('finalize')) setCurrentTab(MarketDetailsTab.finalize)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
     if (currentTab === MarketDetailsTab.swap) return history.replace(`/${marketMakerAddress}`)
+    return history.replace(`/${marketMakerAddress}/${currentTab.toLowerCase()}`)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTab])
 

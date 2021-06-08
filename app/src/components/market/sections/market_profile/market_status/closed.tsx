@@ -200,11 +200,6 @@ const Wrapper = (props: Props) => {
   }, [marketCollateralToken.address, account, marketCollateralToken.symbol, provider])
 
   useEffect(() => {
-    if (location.pathname.includes('finalize')) setCurrentTab(MarketDetailsTab.finalize)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
     const getDisplayEarnedCollateral = async () => {
       if (isCToken(marketCollateralToken.symbol)) {
         const compound = new CompoundService(
@@ -362,9 +357,19 @@ const Wrapper = (props: Props) => {
   }
 
   useEffect(() => {
+    history.replace(`/${marketMakerAddress}/${currentTab.toLowerCase()}`)
     if (currentTab === MarketDetailsTab.swap) return history.replace(`/${marketMakerAddress}/finalize`)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTab])
+
+  useEffect(() => {
+    if (location.pathname.includes('finalize')) setCurrentTab(MarketDetailsTab.finalize)
+    if (location.pathname.includes('pool')) setCurrentTab(MarketDetailsTab.pool)
+    if (location.pathname.includes('verify')) setCurrentTab(MarketDetailsTab.verify)
+    if (location.pathname.includes('history')) setCurrentTab(MarketDetailsTab.history)
+    if (location.pathname.includes('set_outcome')) setCurrentTab(MarketDetailsTab.setOutcome)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const { fetchData: fetchGraphMarketUserTxData } = useGraphMarketUserTxData(
     marketMakerAddress,

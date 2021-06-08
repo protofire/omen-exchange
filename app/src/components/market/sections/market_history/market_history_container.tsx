@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react'
-import { useHistory } from 'react-router'
+import React from 'react'
 
 import { MarketMakerData } from '../../../../util/types'
 
@@ -10,17 +9,7 @@ interface Props {
 }
 
 const MarketHistoryContainer: React.FC<Props> = (props: Props) => {
-  const {
-    marketMakerData,
-    marketMakerData: { address },
-  } = props
-
-  const history = useHistory()
-
-  useEffect(() => {
-    return history.replace(`/${address}/history`)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const { marketMakerData } = props
 
   return <MarketHistory marketMakerData={marketMakerData} />
 }
