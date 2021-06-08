@@ -113,6 +113,7 @@ interface CPKRedeemParams {
   numOutcomes: number
   earnedCollateral: BigNumber
   collateralToken: Token
+  realitio: RealitioService
   oracle: OracleService
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
@@ -1254,6 +1255,7 @@ class CPKService {
     numOutcomes,
     oracle,
     question,
+    realitio,
     realitioWithdraw = false,
     setTxHash,
     setTxState,
@@ -1272,6 +1274,14 @@ class CPKService {
         transactions.push({
           to: oracle.address,
           data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
+        })
+      }
+
+      const data = await realitio.encodeClaimWinnings(question.id, question.currentAnswer)
+      if (data) {
+        transactions.push({
+          to: realitio.contract.address,
+          data,
         })
       }
 
@@ -1375,6 +1385,15 @@ class CPKService {
           data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
         })
       }
+
+      const data = await realitio.encodeClaimWinnings(question.id, question.currentAnswer)
+      if (data) {
+        transactions.push({
+          to: realitio.contract.address,
+          data,
+        })
+      }
+
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error resolving the condition with question id '${question.id}'`, err.message)

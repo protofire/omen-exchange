@@ -282,25 +282,26 @@ const Wrapper = (props: Props) => {
   }, [provider, account, marketMakerAddress, marketMaker])
 
   useEffect(() => {
-    if (!cpk) {
+    if (!cpk || !account) {
       return
     }
+
     const getRealitioBalance = async () => {
       // Check if user has reality balance to redeem
       const realitioService = new RealitioService(
         getContractAddress(networkId, 'realitio'),
         getContractAddress(networkId, 'realitioScalarAdapter'),
         provider,
-        cpk.address,
+        account,
       )
 
-      const balance = await realitioService.getBalanceOf(cpk.address)
+      const balance = await realitioService.getBalanceOf(account)
 
       setRealitioWithdraw(balance.gt(Zero))
       setRealitioBalance(balance)
     }
     getRealitioBalance()
-  }, [cpk, networkId, provider])
+  }, [cpk, networkId, provider, account])
 
   const redeem = async () => {
     try {
@@ -324,6 +325,7 @@ const Wrapper = (props: Props) => {
         question,
         numOutcomes: balances.length,
         oracle,
+        realitio,
         collateralToken,
         marketMaker,
         conditionalTokens,
@@ -441,6 +443,7 @@ const Wrapper = (props: Props) => {
 
   const symbol = useSymbol(collateralToken)
   let redeemString = 'NaN'
+  let withdrawString = 'NaN'
   if (earnedCollateral) {
     if (isCToken(marketCollateralToken.symbol)) {
       const baseToken = getBaseToken(networkId, collateralToken.symbol)
@@ -450,7 +453,7 @@ const Wrapper = (props: Props) => {
     }
   }
   if (realitioWithdraw) {
-    redeemString = `${formatBigNumber(realitioBalance, collateralToken.decimals)} ${symbol}`
+    withdrawString = `${formatBigNumber(realitioBalance, collateralToken.decimals)} ${symbol}`
   }
 
   return (
@@ -501,18 +504,20 @@ const Wrapper = (props: Props) => {
               />
             )}
             <WhenConnected>
-              {hasWinningOutcomes && (
+              {(hasWinningOutcomes || realitioWithdraw) && (
                 <MarketResolutionMessageStyled
                   arbitrator={arbitrator}
                   collateralToken={collateralToken}
                   invalid={invalid}
+                  realitioWithdraw={realitioWithdraw}
                   redeemString={redeemString}
                   userWinningOutcomes={userWinningOutcomes}
                   userWinningShares={userWinningShares}
                   winningOutcomes={winningOutcomes}
+                  withdrawString={withdrawString}
                 ></MarketResolutionMessageStyled>
               )}
-              {isConditionResolved && !hasWinningOutcomes ? (
+              {isConditionResolved && !hasWinningOutcomes && !realitioWithdraw ? (
                 <StyledButtonContainer>
                   <Button
                     buttonType={ButtonType.secondaryLine}

@@ -1,6 +1,7 @@
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
 import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 import { Contract, Wallet, ethers, utils } from 'ethers'
+import { HashZero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 // eslint-disable-next-line import/named
 import { Moment } from 'moment'
@@ -15,11 +16,13 @@ const logger = getLogger('Services::Realitio')
 
 export const realitioAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public payable returns (bytes32)',
+  'event LogNewAnswer(bytes32 answer, bytes32 indexed question_id, bytes32 history_hash, address indexed user, uint256 bond, uint256 ts, bool is_commitment)',
   'event LogNewQuestion(bytes32 indexed question_id, address indexed user, uint256 template_id, string question, bytes32 indexed content_hash, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce, uint256 created)',
   'function isFinalized(bytes32 question_id) view public returns (bool)',
   'function resultFor(bytes32 question_id) external view returns (bytes32)',
   'function submitAnswer(bytes32 question_id, bytes32 answer, uint256 max_previous)',
   'function withdraw()',
+  'function claimWinnings(bytes32 question_id, bytes32[] history_hashes, address[] addrs, uint256[] bonds, bytes32[] answers)',
 ]
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
@@ -50,6 +53,17 @@ const realitioScalarAdapterAbi = [
 
 interface TransactionResult {
   hash: string
+}
+
+interface AnswerValues {
+  user: string
+  answer: string
+  bond: BigNumber
+  history_hash: string
+}
+
+interface AnswerEvent {
+  values: AnswerValues
 }
 
 function getQuestionArgs(
@@ -153,6 +167,53 @@ class RealitioService {
     await this.provider.waitForTransaction(transactionObject.hash)
 
     return questionId
+  }
+
+  getAnswers = async (questionId: string): Promise<AnswerEvent[]> => {
+    const filter: any = this.contract.filters.LogNewAnswer(null, questionId)
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
+    const logs = await this.provider.getLogs({
+      ...filter,
+      fromBlock: getEarliestBlockToCheck(networkId),
+      toBlock: 'latest',
+    })
+    const iface = new ethers.utils.Interface(realitioAbi)
+    // @ts-expect-error ignore
+    const events = logs.map(log => iface.parseLog(log))
+    return events
+  }
+
+  encodeClaimWinnings = async (questionId: string, currentAnswer: string) => {
+    const events = await this.getAnswers(questionId)
+
+    const filteredEvents = events.filter(({ values }) => values.answer === currentAnswer)
+
+    // processed last-to-first
+    filteredEvents.reverse()
+
+    if (filteredEvents.length > 0) {
+      // history_hashes Second-last-to-first, the hash of each history entry
+      const historyHashes = filteredEvents.map(({ values }, index) => {
+        // Final one should be empty
+        if (index === filteredEvents.length - 1) {
+          return HashZero
+        }
+        return values.history_hash
+      })
+
+      // Last-to-first, the address of each answerer or commitment sender
+      const addrs = filteredEvents.map(({ values }: AnswerEvent) => values.user)
+
+      // Last-to-first, the bond supplied with each answer or commitment
+      const bonds = filteredEvents.map(({ values }: AnswerEvent) => values.bond)
+
+      // Last-to-first, each answer supplied, or commitment ID if the answer was supplied with commit->reveal
+      const answers = filteredEvents.map(({ values }: AnswerEvent) => values.answer)
+
+      const iface = new utils.Interface(realitioAbi)
+      return iface.functions.claimWinnings.encode([questionId, historyHashes, addrs, bonds, answers])
+    }
   }
 
   getQuestion = async (questionId: string): Promise<Question> => {
