@@ -41,17 +41,6 @@ const App: React.FC = (props: any) => {
         if (status == false) setSettingsView(true)
       }, 2000)
     }
-    if (status == false && getNetworkFromChain(ethereum.chainId) == 100) {
-      localStorage.setItem(
-        'rpcAddress',
-        JSON.stringify({
-          url: networks[networkIds.XDAI].url,
-          network: networkIds.XDAI,
-          index: 0,
-        }),
-      )
-      windowObj.location.reload(true)
-    }
   }, FETCH_RPC_INTERVAL)
 
   useEffect(() => {
