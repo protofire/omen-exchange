@@ -93,7 +93,7 @@ interface CPKAddFundingParams {
 
 interface CPKRemoveFundingParams {
   amountToMerge: BigNumber
-  collateralAddress: string
+  collateral: Token
   compoundService?: CompoundService | null
   conditionId: string
   conditionalTokens: ConditionalTokenService
@@ -1100,7 +1100,7 @@ class CPKService {
 
   removeFunding = async ({
     amountToMerge,
-    collateralAddress,
+    collateral,
     compoundService,
     conditionId,
     conditionalTokens,
@@ -1126,7 +1126,7 @@ class CPKService {
       const mergePositionsTx = {
         to: conditionalTokens.address,
         data: ConditionalTokenService.encodeMergePositions(
-          collateralAddress,
+          collateral.address,
           conditionId,
           outcomesCount,
           amountToMerge,
@@ -1138,9 +1138,8 @@ class CPKService {
       const txOptions: TxOptions = {}
       await this.getGas(txOptions)
 
-      const collateralToken = getTokenFromAddress(networkId, collateralAddress)
-      const collateralSymbol = collateralToken.symbol.toLowerCase()
-      let userInputCollateral = collateralToken
+      const collateralSymbol = collateral.symbol.toLowerCase()
+      let userInputCollateral = collateral
       const totalAmountToSend = amountToMerge.add(earnings)
       // transfer to the user the merged collateral plus the earned fees
       if (useBaseToken || this.cpk.relay) {
@@ -1160,20 +1159,20 @@ class CPKService {
           // Approve cToken for the cpk contract
           transactions.push({
             to: userInputCollateral.address,
-            data: ERC20Service.encodeApproveUnlimited(collateralToken.address),
+            data: ERC20Service.encodeApproveUnlimited(collateral.address),
           })
           // redeeem underlying token from the ctoken token
           transactions.push({
-            to: collateralToken.address,
+            to: collateral.address,
             data: encodedRedeemFunction,
           })
         } else {
           // Pseudonative asset to base asset flow
-          const collateralToken = getTokenFromAddress(networkId, collateralAddress)
+          const collateralToken = getTokenFromAddress(networkId, collateral.address)
           const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, totalAmountToSend)
           // If use prefers to get paid in the base native asset then unwrap the asset
           transactions.push({
-            to: collateralAddress,
+            to: collateral.address,
             data: encodedWithdrawFunction,
           })
         }
@@ -1209,7 +1208,7 @@ class CPKService {
           }
         } else {
           transactions.push({
-            to: collateralAddress,
+            to: collateral.address,
             data: ERC20Service.encodeTransfer(account, totalAmountToSend),
           })
         }
