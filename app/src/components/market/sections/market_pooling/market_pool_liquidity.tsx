@@ -21,6 +21,7 @@ import {
   GraphResponseLiquidityMiningCampaign,
   useGraphLiquidityMiningCampaigns,
 } from '../../../../hooks/useGraphLiquidityMiningCampaigns'
+import { useTokenPrice } from '../../../../hooks/useTokenPrice'
 import { StakingService } from '../../../../services/staking'
 import { getLogger } from '../../../../util/logger'
 import {
@@ -582,6 +583,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
+  const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address)
+
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
   useEffect(() => {
@@ -603,14 +606,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
     const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
 
-    console.log(liquidityMiningCampaign.id)
+    const omnToken = getToken(networkId, 'omn')
 
     const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
-      getToken(networkId, 'omn'),
+      omnToken,
       cpk.address,
       1, // Assume pool token value is 1 DAI
-      // TODO: Replace hardcoded price param
-      1,
+      tokenPrice,
       Number(liquidityMiningCampaign.endsAt),
       liquidityMiningCampaign.rewardAmounts[0],
       Number(liquidityMiningCampaign.duration),
