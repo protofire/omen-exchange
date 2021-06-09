@@ -19,6 +19,7 @@ import {
   useSymbol,
 } from '../../../../hooks'
 import { GraphResponseLiquidityMiningCampaign } from '../../../../hooks/useGraphLiquidityMiningCampaigns'
+import { useTokenPrice } from '../../../../hooks/useTokenPrice'
 import { StakingService } from '../../../../services/staking'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getOMNToken, getWrapToken, pseudoNativeAssetAddress } from '../../../../util/networks'
@@ -495,6 +496,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     }
   }
 
+  const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address)
+
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
   useEffect(() => {
@@ -516,12 +519,13 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
     const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
 
+    const omnToken = getToken(networkId, 'omn')
+
     const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
-      getToken(networkId, 'omn'),
+      omnToken,
       cpk.address,
       1, // Assume pool token value is 1 DAI
-      // TODO: Replace hardcoded price param
-      1,
+      tokenPrice,
       Number(liquidityMiningCampaign.endsAt),
       liquidityMiningCampaign.rewardAmounts[0],
       Number(liquidityMiningCampaign.duration),
