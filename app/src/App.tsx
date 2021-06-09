@@ -36,8 +36,6 @@ const App: React.FC = (props: any) => {
   const [settingsView, setSettingsView] = useState(false)
 
   useInterval(() => {
-    console.log(status)
-    console.log(network)
     if (status == false) {
       setTimeout(() => {
         if (status == false) setSettingsView(true)
@@ -61,6 +59,14 @@ const App: React.FC = (props: any) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ethereum])
+
+  useEffect(() => {
+    window.onerror = function(errorMsg) {
+      if (errorMsg) {
+        windowObj.location.reload(true)
+      }
+    }
+  }, [network, windowObj.location])
 
   return (
     <ThemeProvider theme={theme}>

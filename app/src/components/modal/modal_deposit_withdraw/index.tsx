@@ -128,7 +128,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   const { account, relay } = context.rawWeb3Context
 
-  const findCurrentTokenBasedOnAction = (exchange: ExchangeType, symbol: string | undefined): Token | undefined => {
+  const findCurrentTokenBasedOnAction = (exchange: ExchangeType, symbol: string): Token | undefined => {
     if (exchange === ExchangeType.deposit) {
       return (
         mainnetTokens.find(
