@@ -58,6 +58,7 @@ const App: React.FC = (props: any) => {
 
   useEffect(() => {
     if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ethereum])
 

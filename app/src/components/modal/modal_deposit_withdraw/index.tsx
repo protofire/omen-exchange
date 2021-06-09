@@ -128,7 +128,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
   const { account, relay } = context.rawWeb3Context
 
-  const findCurrentTokenBasedOnAction = (exchange: ExchangeType, symbol: string): Token | undefined => {
+  const findCurrentTokenBasedOnAction = (exchange: ExchangeType, symbol: string | undefined): Token | undefined => {
     if (exchange === ExchangeType.deposit) {
       return (
         mainnetTokens.find(
@@ -145,6 +145,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     exchangeType,
     currencySelected.toUpperCase(),
   )
+
   const currentTokenMainnet = mainnetTokens.find(element => element.symbol === symbol)
 
   const isApprovalVisible =

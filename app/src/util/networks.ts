@@ -98,10 +98,10 @@ export const pseudoNativeAssetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeE
 export const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
     label: 'Mainnet',
-    url: `https://mainnet.infura.i/v3/${INFURA_PROJECT_ID}`,
+    url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
     alternativeUrls: [
       {
-        rpcUrl: `https://mainnet.infura.i/v3/${INFURA_PROJECT_ID}`,
+        rpcUrl: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
         name: 'Infura',
       },
       { rpcUrl: 'https://cloudflare-eth.com/', name: 'Cloudflare' },
