@@ -125,7 +125,7 @@ const MarketResolutionMessage = (props: Props) => {
     const space = index !== arr.length - 1 ? ' ' : ''
     if (word === 'withdrawString') {
       return (
-        <TextHighlight>
+        <TextHighlight key={index}>
           {withdrawString}
           {space}
         </TextHighlight>
@@ -133,7 +133,7 @@ const MarketResolutionMessage = (props: Props) => {
     }
     if (word === 'redeemString') {
       return (
-        <TextHighlight>
+        <TextHighlight key={index}>
           {redeemString}
           {space}
         </TextHighlight>
