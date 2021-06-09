@@ -1275,14 +1275,14 @@ class CPKService {
           to: oracle.address,
           data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
         })
-      }
 
-      const data = await realitio.encodeClaimWinnings(question.id, question.currentAnswer)
-      if (data) {
-        transactions.push({
-          to: realitio.contract.address,
-          data,
-        })
+        const data = await realitio.encodeClaimWinnings(question.id)
+        if (data) {
+          transactions.push({
+            to: realitio.contract.address,
+            data,
+          })
+        }
       }
 
       const conditionId = await marketMaker.getConditionId()
@@ -1318,7 +1318,7 @@ class CPKService {
       const wrapToken = getWrapToken(networkId)
       const nativeAsset = getNativeAsset(networkId)
 
-      if (token.address === wrapToken.address && earnings) {
+      if (token.address === wrapToken.address && !earnings.isZero()) {
         // unwrap token
         const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(token.symbol, earnings)
         transactions.push({
@@ -1329,7 +1329,7 @@ class CPKService {
       }
 
       // If we are signed in as a safe we don't need to transfer
-      if (!this.isSafeApp && earnings) {
+      if (!this.isSafeApp && !earnings.isZero()) {
         if (token.address === nativeAsset.address) {
           transactions.push({
             to: account,
@@ -1386,14 +1386,13 @@ class CPKService {
         })
       }
 
-      const data = await realitio.encodeClaimWinnings(question.id, question.currentAnswer)
+      const data = await realitio.encodeClaimWinnings(question.id)
       if (data) {
         transactions.push({
           to: realitio.contract.address,
           data,
         })
       }
-
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error resolving the condition with question id '${question.id}'`, err.message)
@@ -1403,24 +1402,19 @@ class CPKService {
 
   submitAnswer = async ({ amount, answer, question, realitio, setTxHash, setTxState }: CPKSubmitAnswerParams) => {
     try {
-      if (this.cpk.relay || this.isSafeApp) {
-        const transactions: Transaction[] = [
-          {
-            to: realitio.address,
-            data: RealitioService.encodeSubmitAnswer(question.id, answer),
-            value: amount.toString(),
-          },
-        ]
-        const txOptions: TxOptions = {}
-        await this.getGas(txOptions)
-        return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+      const txOptions: TxOptions = {}
+      if (!this.isSafeApp) {
+        txOptions.value = amount
       }
-      const txObject = await realitio.submitAnswer(question.id, answer, amount)
-      setTxState && setTxState(TransactionStep.transactionSubmitted)
-      setTxHash && setTxHash(txObject.hash)
-      const tx = await this.waitForTransaction(txObject)
-      setTxState && setTxState(TransactionStep.transactionConfirmed)
-      return tx
+      const transactions: Transaction[] = [
+        {
+          to: realitio.address,
+          data: RealitioService.encodeSubmitAnswer(question.id, answer),
+          value: amount.toString(),
+        },
+      ]
+      await this.getGas(txOptions)
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (error) {
       logger.error(`There was an error submitting answer '${question.id}'`, error.message)
       throw error

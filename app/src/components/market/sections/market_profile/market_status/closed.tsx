@@ -17,7 +17,7 @@ import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/con
 import { ERC20Service, RealitioService } from '../../../../../services'
 import { CompoundService } from '../../../../../services/compound_service'
 import { getLogger } from '../../../../../util/logger'
-import { getContractAddress } from '../../../../../util/networks'
+import { getContractAddress, getNativeAsset } from '../../../../../util/networks'
 import { formatBigNumber, getBaseToken, getUnit, isCToken, isDust } from '../../../../../util/tools'
 import {
   CompoundTokenType,
@@ -151,7 +151,7 @@ const Wrapper = (props: Props) => {
   const cpk = useConnectedCPKContext()
   const { fetchBalances } = useConnectedBalanceContext()
 
-  const { account, library: provider, networkId } = context
+  const { account, library: provider, networkId, relay } = context
   const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
 
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props
@@ -281,27 +281,29 @@ const Wrapper = (props: Props) => {
     }
   }, [provider, account, marketMakerAddress, marketMaker])
 
-  useEffect(() => {
+  const getRealitioBalance = async () => {
     if (!cpk || !account) {
       return
     }
 
-    const getRealitioBalance = async () => {
-      // Check if user has reality balance to redeem
-      const realitioService = new RealitioService(
-        getContractAddress(networkId, 'realitio'),
-        getContractAddress(networkId, 'realitioScalarAdapter'),
-        provider,
-        account,
-      )
+    // Check if user has reality balance to redeem
+    const realitioService = new RealitioService(
+      getContractAddress(networkId, 'realitio'),
+      getContractAddress(networkId, 'realitioScalarAdapter'),
+      provider,
+      account,
+    )
 
-      const balance = await realitioService.getBalanceOf(account)
+    const balance = await realitioService.getClaimableBond(question.id, cpk.address, question.currentAnswer)
 
-      setRealitioWithdraw(balance.gt(Zero))
-      setRealitioBalance(balance)
-    }
+    setRealitioWithdraw(balance.gt(Zero))
+    setRealitioBalance(balance)
+  }
+
+  useEffect(() => {
     getRealitioBalance()
-  }, [cpk, networkId, provider, account])
+    // eslint-disable-next-line
+  }, [cpk, networkId, provider, account, question, isConditionResolved])
 
   const redeem = async () => {
     try {
@@ -334,6 +336,7 @@ const Wrapper = (props: Props) => {
         setTxState,
       })
       await fetchBalances()
+      await getRealitioBalance()
 
       setStatus(Status.Ready)
       setMessage(`Payout successfully redeemed.`)
@@ -453,7 +456,8 @@ const Wrapper = (props: Props) => {
     }
   }
   if (realitioWithdraw) {
-    withdrawString = `${formatBigNumber(realitioBalance, collateralToken.decimals)} ${symbol}`
+    const nativeAsset = getNativeAsset(networkId, relay)
+    withdrawString = `${formatBigNumber(realitioBalance, nativeAsset.decimals)} ${nativeAsset.symbol}`
   }
 
   return (

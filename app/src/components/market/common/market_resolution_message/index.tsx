@@ -140,7 +140,7 @@ const MarketResolutionMessage = (props: Props) => {
       )
     }
     return (
-      <span key={word}>
+      <span key={index}>
         {word}
         {space}
       </span>
