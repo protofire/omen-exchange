@@ -17,20 +17,26 @@ import { IconAdd, IconClose, IconOmen } from '../../icons'
 import { IconSettings } from '../../icons/IconSettings'
 
 export const HeaderWrapper = styled.div`
-  align-items: flex-end;
+  align-items: center;
   background: ${props => props.theme.header.backgroundColor};
   display: flex;
   flex-grow: 0;
   flex-shrink: 0;
-  height: 45px;
+  height: 100px;
+  padding: 0 30px;
   justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 5;
+  border-bottom: 1px solid ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
 
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    height: ${props => props.theme.header.height};
-  }
+  // As per the new Design specification this is now obsolete, 
+  // shall we keep it or leave it with the same metrics as above? 
+  // (same for HeaderInner below) 
+  // @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+  //   height: 100px;
+  //   align-items: center;
+  // }
 `
 
 export const HeaderInner = styled.div`
@@ -41,13 +47,13 @@ export const HeaderInner = styled.div`
   justify-content: space-between;
   margin: 0 auto;
   max-width: 100%;
-  padding: 0 10px;
+  padding: 30px 10px;
   position: relative;
   width: ${props => props.theme.themeBreakPoints.xxl};
 
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    padding: 0 ${props => props.theme.paddings.mainPadding};
-  }
+  // @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
+  //   padding: 30px 10px;
+  // }
 `
 
 export const LogoWrapper = styled.div<{ disabled?: boolean }>`
