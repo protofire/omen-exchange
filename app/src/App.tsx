@@ -20,7 +20,7 @@ import balanceReducer from './store/reducer'
 import theme from './theme'
 import { GlobalStyle } from './theme/global_style'
 import connectors from './util/connectors'
-import { getInfuraUrl } from './util/networks'
+import { getInfuraUrl, networkIds, networks } from './util/networks'
 import { checkRpcStatus, getNetworkFromChain } from './util/tools'
 
 const store = configureStore({ reducer: balanceReducer })
@@ -36,10 +36,23 @@ const App: React.FC = (props: any) => {
   const [settingsView, setSettingsView] = useState(false)
 
   useInterval(() => {
+    console.log(status)
+    console.log(network)
     if (status == false) {
       setTimeout(() => {
         if (status == false) setSettingsView(true)
       }, 2000)
+    }
+
+    if (status == false && getNetworkFromChain(ethereum.chainId) == 100) {
+      localStorage.setItem(
+        'rpcAddress',
+        JSON.stringify({
+          url: networks[networkIds.XDAI].url || networkId.MAINNET,
+          network: networkIds.XDAI || networkIds.MAINNET,
+          index: 0,
+        }),
+      )
     }
   }, FETCH_RPC_INTERVAL)
 
