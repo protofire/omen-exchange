@@ -18,6 +18,7 @@ const Wrapper = styled.div`
 
 const Icon = styled.div`
   margin-right: 20px;
+  align-self: center;
 `
 
 const TextWrapper = styled.div``
