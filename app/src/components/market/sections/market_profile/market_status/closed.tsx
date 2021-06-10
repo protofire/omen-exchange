@@ -294,10 +294,11 @@ const Wrapper = (props: Props) => {
       account,
     )
 
-    const balance = await realitioService.getClaimableBond(question.id, cpk.address, question.currentAnswer)
-
-    setRealitioWithdraw(balance.gt(Zero))
-    setRealitioBalance(balance)
+    const claimable = await realitioService.getClaimableBond(question.id, cpk.address, question.currentAnswer)
+    const balance = await realitioService.getBalanceOf(cpk.address)
+    const total = claimable.add(balance)
+    setRealitioWithdraw(total.gt(Zero))
+    setRealitioBalance(total)
   }
 
   useEffect(() => {
@@ -307,10 +308,6 @@ const Wrapper = (props: Props) => {
 
   const redeem = async () => {
     try {
-      if (!earnedCollateral) {
-        return
-      }
-
       if (!cpk) {
         return
       }
@@ -323,15 +320,18 @@ const Wrapper = (props: Props) => {
       await cpk.redeemPositions({
         isConditionResolved,
         // Round down in case of precision error
-        earnedCollateral: earnedCollateral.mul(99999999).div(100000000),
+        earnedCollateral: earnedCollateral ? earnedCollateral.mul(99999999).div(100000000) : new BigNumber('0'),
         question,
         numOutcomes: balances.length,
         oracle,
         realitio,
+        isScalar,
+        scalarLow,
+        scalarHigh,
         collateralToken,
         marketMaker,
         conditionalTokens,
-        realitioWithdraw,
+        realitioBalance,
         setTxHash,
         setTxState,
       })
@@ -446,7 +446,7 @@ const Wrapper = (props: Props) => {
 
   const symbol = useSymbol(collateralToken)
   let redeemString = 'NaN'
-  let withdrawString = 'NaN'
+  let balanceString = ''
   if (earnedCollateral) {
     if (isCToken(marketCollateralToken.symbol)) {
       const baseToken = getBaseToken(networkId, collateralToken.symbol)
@@ -457,7 +457,7 @@ const Wrapper = (props: Props) => {
   }
   if (realitioWithdraw) {
     const nativeAsset = getNativeAsset(networkId, relay)
-    withdrawString = `${formatBigNumber(realitioBalance, nativeAsset.decimals)} ${nativeAsset.symbol}`
+    balanceString = `${formatBigNumber(realitioBalance, nativeAsset.decimals)} ${nativeAsset.symbol}`
   }
 
   return (
@@ -511,6 +511,7 @@ const Wrapper = (props: Props) => {
               {(hasWinningOutcomes || realitioWithdraw) && (
                 <MarketResolutionMessageStyled
                   arbitrator={arbitrator}
+                  balanceString={balanceString}
                   collateralToken={collateralToken}
                   invalid={invalid}
                   realitioWithdraw={realitioWithdraw}
@@ -518,7 +519,6 @@ const Wrapper = (props: Props) => {
                   userWinningOutcomes={userWinningOutcomes}
                   userWinningShares={userWinningShares}
                   winningOutcomes={winningOutcomes}
-                  withdrawString={withdrawString}
                 ></MarketResolutionMessageStyled>
               )}
               {isConditionResolved && !hasWinningOutcomes && !realitioWithdraw ? (
@@ -535,7 +535,9 @@ const Wrapper = (props: Props) => {
                 </StyledButtonContainer>
               ) : (
                 <>
-                  <BorderedButtonContainer borderTop={hasWinningOutcomes !== null && hasWinningOutcomes}>
+                  <BorderedButtonContainer
+                    borderTop={(hasWinningOutcomes !== null && hasWinningOutcomes) || realitioWithdraw}
+                  >
                     <Button
                       buttonType={ButtonType.primary}
                       disabled={status === Status.Loading}

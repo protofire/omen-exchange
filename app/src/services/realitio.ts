@@ -24,6 +24,7 @@ export const realitioAbi = [
   'function withdraw()',
   'function claimWinnings(bytes32 question_id, bytes32[] history_hashes, address[] addrs, uint256[] bonds, bytes32[] answers)',
   'function questions(bytes32 question_id) view public returns (bytes32 content_hash, address arbitrator, uint32 opening_ts, uint32 timeout, uint32 finalize_ts, bool is_pending_arbitration, uint256 bounty, bytes32 best_answer, bytes32 history_hash, uint256 bond)',
+  'event LogClaim(bytes32 indexed question_id, address indexed user, uint256 amount)',
 ]
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
@@ -186,13 +187,23 @@ class RealitioService {
     return events
   }
 
+  hasLogClaims = async (questionId: string) => {
+    const filter: any = this.contract.filters.LogClaim(questionId)
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
+    const logs = await this.provider.getLogs({
+      ...filter,
+      fromBlock: getEarliestBlockToCheck(networkId),
+      toBlock: 'latest',
+    })
+    return logs.length > 0
+  }
+
   getClaimableBond = async (questionId: string, account: string, currentAnswer: string): Promise<BigNumber> => {
-    // There is no direct way to check if a user already claimed a bond for this specific question
-    // Rough check - if claimWinnings was called for this question then balanceOf(account) should not be zero
     const question = await this.contract.questions(questionId)
-    const userBalance = await this.getBalanceOf(account)
-    if (question.history_hash === HashZero && userBalance.isZero()) {
-      return userBalance
+    // if claimWinnings was already called the claimable bond is already in the realitio balance mapping, ready to withdraw
+    if (question.history_hash === HashZero) {
+      return new BigNumber('0')
     }
 
     // Calc claimable bonds by matching claimWinnings internals: https://github.com/realitio/realitio-contracts/blob/master/truffle/contracts/Realitio.sol#L506
@@ -211,7 +222,6 @@ class RealitioService {
     for (let i = 0; i < events.length; i++) {
       const values = events[i].values
       queuedFunds = queuedFunds.add(lastBond)
-
       if (values.answer == currentAnswer) {
         if (payee === AddressZero) {
           payee = values.user
@@ -219,7 +229,7 @@ class RealitioService {
           const answerTakeoverFee = queuedFunds.gte(values.bond) ? values.bond : queuedFunds
           const payout = queuedFunds.sub(answerTakeoverFee)
 
-          updateBalance(values.user, payout)
+          updateBalance(payee, payout)
 
           payee = values.user
           queuedFunds = answerTakeoverFee
@@ -237,32 +247,35 @@ class RealitioService {
   }
 
   encodeClaimWinnings = async (questionId: string) => {
-    const events = await this.getAnswers(questionId)
+    if (!(await this.hasLogClaims(questionId))) {
+      const events = await this.getAnswers(questionId)
 
-    if (events.length > 0) {
-      // history_hashes Second-last-to-first, the hash of each history entry
-      // eslint-disable-next-line
-      const historyHashes = events.map((event, index) => {
-        // Final one should be empty
-        if (index === events.length - 1) {
-          return HashZero
-        }
-        // Get the history has of the previous answer
-        const next = events[index + 1]
-        return next.values.history_hash
-      })
+      if (events.length > 0) {
+        // history_hashes Second-last-to-first, the hash of each history entry
+        // eslint-disable-next-line
+        const historyHashes = events.map((event, index) => {
+          // Final one should be empty
+          if (index === events.length - 1) {
+            return HashZero
+          }
+          // Get the history has of the previous answer
+          const next = events[index + 1]
+          return next.values.history_hash
+        })
 
-      // Last-to-first, the address of each answerer or commitment sender
-      const addrs = events.map(({ values }: AnswerEvent) => values.user)
+        // Last-to-first, the address of each answerer or commitment sender
+        const addrs = events.map(({ values }: AnswerEvent) => values.user)
 
-      // Last-to-first, the bond supplied with each answer or commitment
-      const bonds = events.map(({ values }: AnswerEvent) => values.bond)
+        // Last-to-first, the bond supplied with each answer or commitment
+        const bonds = events.map(({ values }: AnswerEvent) => values.bond)
 
-      // Last-to-first, each answer supplied, or commitment ID if the answer was supplied with commit->reveal
-      const answers = events.map(({ values }: AnswerEvent) => values.answer)
+        // Last-to-first, each answer supplied, or commitment ID if the answer was supplied with commit->reveal
+        const answers = events.map(({ values }: AnswerEvent) => values.answer)
 
-      const iface = new utils.Interface(realitioAbi)
-      return iface.functions.claimWinnings.encode([questionId, historyHashes, addrs, bonds, answers])
+        const iface = new utils.Interface(realitioAbi)
+
+        return iface.functions.claimWinnings.encode([questionId, historyHashes, addrs, bonds, answers])
+      }
     }
   }
 

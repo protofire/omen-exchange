@@ -56,7 +56,7 @@ interface Props {
   userWinningShares: BigNumber
   userWinningOutcomes: number
   winningOutcomes: number
-  withdrawString: string
+  balanceString: string
   redeemString: string
   realitioWithdraw: boolean
 }
@@ -64,6 +64,7 @@ interface Props {
 const MarketResolutionMessage = (props: Props) => {
   const {
     arbitrator,
+    balanceString,
     collateralToken,
     invalid,
     realitioWithdraw,
@@ -71,7 +72,7 @@ const MarketResolutionMessage = (props: Props) => {
     userWinningOutcomes,
     userWinningShares,
     winningOutcomes,
-    withdrawString,
+
     ...restProps
   } = props
 
@@ -91,7 +92,7 @@ const MarketResolutionMessage = (props: Props) => {
     icon = <Invalid />
     infoText = `${
       arbitrator.name
-    } declared this market invalid. You can now redeem redeemString from your ${shares} Shares of ${
+    } declared this market invalid. You can now redeem replace_with_redeem_string from your ${shares} Shares of ${
       userWinningOutcomes === 1 ? `an outcome` : `${userWinningOutcomes} outcomes`
     }`
   }
@@ -99,39 +100,41 @@ const MarketResolutionMessage = (props: Props) => {
   if (lost) {
     infoTitle = 'Better luck next time!'
     icon = <Lost />
-    infoText = `You have bought ${shares} Shares of the loosing outcome which leads to a loss of redeemString`
+    infoText = `You have bought ${shares} Shares of the loosing outcome which leads to a loss of replace_with_redeem_string`
   }
 
   if (wonSingle) {
     infoTitle = 'Congratulations!'
     icon = <Won />
-    infoText = `You can now redeem redeemString from your ${shares} Shares of the winning outcome`
+    infoText = `You can now redeem replace_with_redeem_string from your ${shares} Shares of the winning outcome`
   }
 
   if (wonMultiple) {
     infoTitle = 'Congratulations!'
     icon = <Won />
-    infoText = `${arbitrator.name} declared ${winningOutcomes} outcomes as valid. You can now redeem redeemString from your ${shares} Shares of ${userWinningOutcomes}`
+    infoText = `${arbitrator.name} declared ${winningOutcomes} outcomes as valid. You can now redeem replace_with_redeem_string from your ${shares} Shares of ${userWinningOutcomes}`
   }
 
   if (realitioWithdraw) {
     infoTitle = 'Congratulations!'
     icon = <Won />
-    infoText += `${infoText ? ' and' : 'You can now redeem'} withdrawString from bonding on the correct outcome`
+    infoText += `${
+      infoText ? ' and' : 'You can now redeem'
+    } replace_with_balance_string from bonding on the correct outcome`
   }
 
   const arr = infoText.split(' ')
   const content = arr.map((word, index) => {
     const space = index !== arr.length - 1 ? ' ' : ''
-    if (word === 'withdrawString') {
+    if (word === 'replace_with_balance_string') {
       return (
         <TextHighlight key={index}>
-          {withdrawString}
+          {balanceString}
           {space}
         </TextHighlight>
       )
     }
-    if (word === 'redeemString') {
+    if (word === 'replace_with_redeem_string') {
       return (
         <TextHighlight key={index}>
           {redeemString}

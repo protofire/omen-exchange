@@ -108,6 +108,7 @@ interface CPKRemoveFundingParams {
 }
 
 interface CPKRedeemParams {
+  isScalar: boolean
   isConditionResolved: boolean
   question: Question
   numOutcomes: number
@@ -117,7 +118,9 @@ interface CPKRedeemParams {
   oracle: OracleService
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
-  realitioWithdraw: boolean
+  realitioBalance: BigNumber
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
   setTxHash: (arg0: string) => void
   setTxState: (step: TransactionStep) => void
 }
@@ -1250,12 +1253,15 @@ class CPKService {
     conditionalTokens,
     earnedCollateral,
     isConditionResolved,
+    isScalar,
     marketMaker,
     numOutcomes,
     oracle,
     question,
     realitio,
-    realitioWithdraw = false,
+    realitioBalance,
+    scalarHigh,
+    scalarLow,
     setTxHash,
     setTxState,
   }: CPKRedeemParams): Promise<TransactionReceipt> => {
@@ -1270,10 +1276,17 @@ class CPKService {
       await this.getGas(txOptions)
 
       if (!isConditionResolved) {
-        transactions.push({
-          to: oracle.address,
-          data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
-        })
+        if (isScalar && scalarLow && scalarHigh) {
+          transactions.push({
+            to: realitio.scalarContract.address,
+            data: RealitioService.encodeResolveCondition(question.id, question.raw, scalarLow, scalarHigh),
+          })
+        } else {
+          transactions.push({
+            to: oracle.address,
+            data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
+          })
+        }
 
         const data = await realitio.encodeClaimWinnings(question.id)
         if (data) {
@@ -1343,11 +1356,18 @@ class CPKService {
       }
 
       // If user has realitio balance, withdraw
-      if (realitioWithdraw) {
+      if (!realitioBalance.isZero()) {
         transactions.push({
           to: getContractAddress(networkId, 'realitio'),
           data: RealitioService.encodeWithdraw(),
         })
+
+        if (!this.isSafeApp) {
+          transactions.push({
+            to: account,
+            value: realitioBalance.toString(),
+          })
+        }
       }
 
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
@@ -1392,6 +1412,7 @@ class CPKService {
           data,
         })
       }
+
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error resolving the condition with question id '${question.id}'`, err.message)
