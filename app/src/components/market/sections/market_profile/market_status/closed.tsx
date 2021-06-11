@@ -541,16 +541,12 @@ const Wrapper = (props: Props) => {
                     <Button
                       buttonType={ButtonType.primary}
                       disabled={status === Status.Loading}
-                      onClick={
-                        (isConditionResolved && hasWinningOutcomes) || realitioWithdraw
-                          ? () => redeem()
-                          : resolveCondition
-                      }
+                      onClick={hasWinningOutcomes || realitioWithdraw ? redeem : resolveCondition}
                     >
-                      {(!isConditionResolved && hasWinningOutcomes) || (!isConditionResolved && !hasWinningOutcomes)
-                        ? 'Resolve Condition'
-                        : (isConditionResolved && hasWinningOutcomes) || realitioWithdraw
+                      {hasWinningOutcomes || realitioWithdraw
                         ? 'Redeem'
+                        : !isConditionResolved
+                        ? 'Resolve Condition'
                         : ''}
                     </Button>
                   </BorderedButtonContainer>
