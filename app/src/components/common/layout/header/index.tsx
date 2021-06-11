@@ -327,7 +327,7 @@ const HeaderContainer: React.FC = (props: any) => {
               ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
               : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
             <OmenIconWrapper>
-              <IconOmen size={24} />
+              <IconOmen id="header" size={24} />
             </OmenIconWrapper>
           </HeaderButton>
 
