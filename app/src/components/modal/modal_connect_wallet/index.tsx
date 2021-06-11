@@ -21,7 +21,7 @@ const HeaderText = styled.p`
   font-size: 16px;
   font-weight: 500;
   color: ${props => props.theme.colors.textColorDark};
-  margin-top: 10px;
+  margin-top: 16px;
   margin-bottom: 48px;
 `
 
