@@ -150,6 +150,7 @@ export const History_select: React.FC<Props> = ({
       if (fpmmTransactions) {
         const response: any[] = await Promise.all(
           fpmmTransactions.map(async item => {
+            console.log(item)
             let owner: string
             try {
               const marketMakerFactory = getContractAddress(context.networkId, 'marketMakerFactory')
@@ -181,7 +182,7 @@ export const History_select: React.FC<Props> = ({
                   outcomeArray.length,
                   block.blockNumber,
                 ),
-                additionalShares: item.additionalSharesCost,
+                additionalShares: item.additionalSharesCost ? item.additionalSharesCost : '0000000000000000000000',
                 collateralTokenAmount: new BigNumber(item.collateralTokenAmount),
                 user: owner,
               }
@@ -213,6 +214,10 @@ export const History_select: React.FC<Props> = ({
               const holdingsOfOtherOutcomes = balances.filter((item: BigNumber, index: number) => {
                 return index !== outcomeIndex
               })
+              console.log(item.additionalSharesCost)
+              console.log(firstItem)
+              console.log(holdingsOfOtherOutcomes)
+              console.log(marketFeeWithTwoDecimals)
 
               sharesValue = calcSellAmountInCollateral(
                 item.additionalSharesCost,
