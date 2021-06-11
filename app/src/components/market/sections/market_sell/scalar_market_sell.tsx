@@ -464,6 +464,7 @@ export const ScalarMarketSell = (props: Props) => {
                         displayCollateral.decimals,
                         displayCollateral.decimals,
                       ),
+                      10,
                     )
                   : '0.00'
               } ${displayTotalSymbol}`}

@@ -917,10 +917,11 @@ class CPKService {
         data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
       })
 
-      if (useBaseToken || this.cpk.relay) {
+      if (useBaseToken || (this.cpk.relay && collateralSymbol === 'wxdai')) {
         if (!compoundService) {
           // Pseudonative to base token conversion flow
           const collateralToken = getTokenFromAddress(networkId, collateralAddress)
+
           const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, amount)
           // If use prefers to get paid in the base native asset then unwrap the asset
           transactions.push({
@@ -943,7 +944,7 @@ class CPKService {
         }
       }
       // If we are signed in as a safe we don't need to transfer
-      if (!this.isSafeApp) {
+      if (!this.isSafeApp || this.cpk.relay) {
         // Step 4: Transfer funding to user
         if (!useBaseToken) {
           transactions.push({
