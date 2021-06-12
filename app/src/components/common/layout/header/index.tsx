@@ -48,8 +48,6 @@ export const LogoWrapper = styled.div<{ disabled?: boolean }>`
   max-width: 90px;
   min-width: fit-content;
   ${props => (props.disabled ? 'pointer-events:none;' : '')};
-  display: flex;
-  align-items: center;
 `
 
 const ButtonCreateDesktop = styled(ButtonRound)`
