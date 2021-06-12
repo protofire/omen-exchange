@@ -79,7 +79,7 @@ interface Props {
 
 export const AdvancedFilters = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { networkId, relay } = context
+  const { networkId } = context
 
   const arbitrators = getArbitratorsByNetwork(networkId)
 
@@ -179,34 +179,33 @@ export const AdvancedFilters = (props: Props) => {
 
   return (
     <Wrapper>
-      {!relay && (
-        <Column>
-          <TitleWrapper>
-            <Title>Currency</Title>
-            {currency && <ClearLabel onClick={() => onChangeCurrency(null)}>Clear</ClearLabel>}
-          </TitleWrapper>
+      <Column>
+        <TitleWrapper>
+          <Title>Currency</Title>
+          {currency && <ClearLabel onClick={() => onChangeCurrency(null)}>Clear</ClearLabel>}
+        </TitleWrapper>
 
-          <CurrencySelector
-            addAll
-            addNativeAsset
-            context={context}
-            currency={currency}
-            disabled={false}
-            filters={filter}
-            negativeFilter
-            onSelect={currency =>
-              onChangeCurrency(
-                currency
-                  ? currency.address.toLowerCase() === nativeAssetAddress
-                    ? wrapTokenAddress
-                    : currency.address
-                  : null,
-              )
-            }
-            placeholder={currency ? '' : 'All'}
-          />
-        </Column>
-      )}
+        <CurrencySelector
+          addAll
+          addNativeAsset
+          context={context}
+          currency={currency}
+          disabled={false}
+          filters={filter}
+          negativeFilter
+          onSelect={currency =>
+            onChangeCurrency(
+              currency
+                ? currency.address.toLowerCase() === nativeAssetAddress
+                  ? wrapTokenAddress
+                  : currency.address
+                : null,
+            )
+          }
+          placeholder={currency ? '' : 'All'}
+        />
+      </Column>
+
       {showQuestionType && (
         <Column>
           <TitleWrapper>
