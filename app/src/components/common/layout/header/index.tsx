@@ -312,14 +312,16 @@ const HeaderContainer: React.FC = (props: any) => {
             />
           )}
 
-          <HeaderButton style={{ display: 'none' }}>
-            {relay
-              ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
-              : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
-            <OmenIconWrapper>
-              <IconOmen id="header" size={24} />
-            </OmenIconWrapper>
-          </HeaderButton>
+          {account && (
+            <HeaderButton>
+              {relay
+                ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
+                : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
+              <OmenIconWrapper>
+                <IconOmen size={24} />
+              </OmenIconWrapper>
+            </HeaderButton>
+          )}
 
           {!account && (
             <ButtonConnectWalletStyled
