@@ -29,14 +29,6 @@ export const HeaderWrapper = styled.div`
   top: 0;
   z-index: 5;
   border-bottom: 1px solid ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
-
-  // As per the new Design specification this is now obsolete, 
-  // shall we keep it or leave it with the same metrics as above? 
-  // (same for HeaderInner below) 
-  // @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-  //   height: 100px;
-  //   align-items: center;
-  // }
 `
 
 export const HeaderInner = styled.div`
@@ -50,16 +42,14 @@ export const HeaderInner = styled.div`
   padding: 24px 0px;
   position: relative;
   width: ${props => props.theme.themeBreakPoints.xxl};
-
-  // @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-  //   padding: 30px 10px;
-  // }
 `
 
 export const LogoWrapper = styled.div<{ disabled?: boolean }>`
   max-width: 90px;
   min-width: fit-content;
   ${props => (props.disabled ? 'pointer-events:none;' : '')};
+  display: flex;
+  align-items: center;
 `
 
 const ButtonCreateDesktop = styled(ButtonRound)`
@@ -108,10 +98,6 @@ export const ContentsLeft = styled.div`
   align-items: center;
   display: flex;
   margin: auto auto auto 0;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin: auto auto 0 0;
-  }
 `
 
 export const ContentsRight = styled.div`
