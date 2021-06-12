@@ -214,12 +214,19 @@ export const History_select: React.FC<Props> = ({
                 return index !== outcomeIndex
               })
 
-              sharesValue = calcSellAmountInCollateral(
-                item.additionalSharesCost,
-                firstItem,
-                holdingsOfOtherOutcomes,
-                marketFeeWithTwoDecimals,
-              )
+              let sharesValue = new BigNumber(0)
+
+              if (typeof item.additionalSharesCost !== 'string' && item.additionalSharesCost.gt(0)) {
+                const sellAmount = calcSellAmountInCollateral(
+                  item.additionalSharesCost,
+                  firstItem,
+                  holdingsOfOtherOutcomes,
+                  marketFeeWithTwoDecimals,
+                )
+                if (sellAmount) {
+                  sharesValue = sellAmount
+                }
+              }
 
               if (
                 Number(item.additionalSharesCost) !== 0 &&
