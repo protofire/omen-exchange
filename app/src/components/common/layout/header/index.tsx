@@ -22,7 +22,7 @@ export const HeaderWrapper = styled.div`
   display: flex;
   flex-grow: 0;
   flex-shrink: 0;
-  height: 100px;
+  height: 88px;
   padding: 0 30px;
   justify-content: space-between;
   position: sticky;
@@ -47,7 +47,7 @@ export const HeaderInner = styled.div`
   justify-content: space-between;
   margin: 0 auto;
   max-width: 100%;
-  padding: 30px 10px;
+  padding: 24px 0px;
   position: relative;
   width: ${props => props.theme.themeBreakPoints.xxl};
 
