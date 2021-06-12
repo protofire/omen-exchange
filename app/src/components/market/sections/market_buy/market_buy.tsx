@@ -2,7 +2,7 @@ import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
+import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
@@ -136,7 +136,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
-  const history = useHistory()
 
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals, collateral.decimals).includes('-'))
@@ -514,7 +513,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           buttonType={ButtonType.secondaryLine}
           onClick={() => {
             switchMarketTab(MarketDetailsTab.swap)
-            history.replace(`/${marketMakerAddress}`)
           }}
         >
           Cancel
