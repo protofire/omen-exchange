@@ -1,18 +1,18 @@
 import React, { useState } from 'react'
 import { withRouter } from 'react-router'
-import { Link, matchPath } from 'react-router-dom'
+import { matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 
+import { Network } from '../..'
 import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedBalanceContext, useConnectedWeb3Context } from '../../../../hooks'
 import { networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { ExchangeType } from '../../../../util/types'
 import { ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
-import { Network } from '../../../common'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../form/dropdown'
 import { IconAdd, IconClose, IconOmen } from '../../icons'
 import { IconSettings } from '../../icons/IconSettings'
 
@@ -257,11 +257,18 @@ const HeaderContainer: React.FC = (props: any) => {
     onClick: () => history && history.push('/'),
   }
 
+  const logoClickHandler = (e: any): void => {
+    if (e.ctrlKey || e.metaKey) {
+      const newWindow = window.open('https://omen.eth.link/#/liquidity', '_blank', 'noopener,noreferrer')
+      if (newWindow) newWindow.opener = null
+    } else history && history.push('/')
+  }
+
   return (
     <HeaderWrapper {...restProps}>
       <HeaderInner>
         <ContentsLeft>
-          <LogoWrapper disabled={!hasRouter} onClick={() => history && history.push('/')}>
+          <LogoWrapper disabled={!hasRouter} onClick={() => logoClickHandler(event)}>
             <Logo />
           </LogoWrapper>
           <MarketAndGovernanceNav
