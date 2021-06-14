@@ -261,11 +261,9 @@ const HeaderContainer: React.FC = (props: any) => {
     <HeaderWrapper {...restProps}>
       <HeaderInner>
         <ContentsLeft>
-          <Link target="_blank" to="/liquidity">
-            <LogoWrapper disabled={!hasRouter}>
-              <Logo />
-            </LogoWrapper>
-          </Link>
+          <LogoWrapper disabled={!hasRouter} onClick={() => history && history.push('/')}>
+            <Logo />
+          </LogoWrapper>
           <MarketAndGovernanceNav
             disabled={marketPage}
             onClick={() => {
