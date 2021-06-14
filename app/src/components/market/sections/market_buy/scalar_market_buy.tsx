@@ -2,7 +2,6 @@ import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
 import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useHistory } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
@@ -141,8 +140,6 @@ export const ScalarMarketBuy = (props: Props) => {
     context,
   )
   const collateralBalance = maybeCollateralBalance || Zero
-
-  const history = useHistory()
 
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount, collateral.decimals, collateral.decimals).includes('-'))
@@ -517,7 +514,6 @@ export const ScalarMarketBuy = (props: Props) => {
           buttonType={ButtonType.secondaryLine}
           onClick={() => {
             switchMarketTab(MarketDetailsTab.swap)
-            history.replace(`/${marketMakerAddress}`)
           }}
         >
           Cancel
