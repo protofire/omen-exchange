@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { withRouter } from 'react-router'
-import { matchPath } from 'react-router-dom'
+import { Link, matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 
@@ -48,6 +48,10 @@ export const LogoWrapper = styled.div<{ disabled?: boolean }>`
   max-width: 90px;
   min-width: fit-content;
   ${props => (props.disabled ? 'pointer-events:none;' : '')};
+
+  &:hover {
+    cursor: pointer;
+  }
 `
 
 const ButtonCreateDesktop = styled(ButtonRound)`
@@ -257,9 +261,11 @@ const HeaderContainer: React.FC = (props: any) => {
     <HeaderWrapper {...restProps}>
       <HeaderInner>
         <ContentsLeft>
-          <LogoWrapper disabled={!hasRouter} onClick={() => props.history && props.history.push('/')}>
-            <Logo />
-          </LogoWrapper>
+          <Link target="_blank" to="/liquidity">
+            <LogoWrapper disabled={!hasRouter} onClick={() => props.history && props.history.push('/')}>
+              <Logo />
+            </LogoWrapper>
+          </Link>
           <MarketAndGovernanceNav
             disabled={marketPage}
             onClick={() => {
