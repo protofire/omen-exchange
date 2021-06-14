@@ -257,6 +257,7 @@ const Items = styled.div<{
 const SecondaryText = styled.div`
   color: ${props => props.theme.colors.textColor};
   text-align: right;
+  min-width: fit-content;
 `
 
 Items.defaultProps = {
