@@ -268,7 +268,7 @@ const HeaderContainer: React.FC = (props: any) => {
     <HeaderWrapper {...restProps}>
       <HeaderInner>
         <ContentsLeft>
-          <LogoWrapper disabled={!hasRouter} onClick={() => logoClickHandler(event)}>
+          <LogoWrapper disabled={!hasRouter} onClick={e => logoClickHandler(e)}>
             <Logo />
           </LogoWrapper>
           <MarketAndGovernanceNav
