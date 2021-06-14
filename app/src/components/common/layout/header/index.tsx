@@ -17,20 +17,18 @@ import { IconAdd, IconClose, IconOmen } from '../../icons'
 import { IconSettings } from '../../icons/IconSettings'
 
 export const HeaderWrapper = styled.div`
-  align-items: flex-end;
+  align-items: center;
   background: ${props => props.theme.header.backgroundColor};
   display: flex;
   flex-grow: 0;
   flex-shrink: 0;
-  height: 45px;
+  height: 88px;
+  padding: 0 30px;
   justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 5;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    height: ${props => props.theme.header.height};
-  }
+  border-bottom: 1px solid ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
 `
 
 export const HeaderInner = styled.div`
@@ -41,13 +39,9 @@ export const HeaderInner = styled.div`
   justify-content: space-between;
   margin: 0 auto;
   max-width: 100%;
-  padding: 0 10px;
+  padding: 24px 0px;
   position: relative;
   width: ${props => props.theme.themeBreakPoints.xxl};
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    padding: 0 ${props => props.theme.paddings.mainPadding};
-  }
 `
 
 export const LogoWrapper = styled.div<{ disabled?: boolean }>`
@@ -102,10 +96,6 @@ export const ContentsLeft = styled.div`
   align-items: center;
   display: flex;
   margin: auto auto auto 0;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin: auto auto 0 0;
-  }
 `
 
 export const ContentsRight = styled.div`
@@ -322,14 +312,16 @@ const HeaderContainer: React.FC = (props: any) => {
             />
           )}
 
-          <HeaderButton style={{ display: 'none' }}>
-            {relay
-              ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
-              : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
-            <OmenIconWrapper>
-              <IconOmen size={24} />
-            </OmenIconWrapper>
-          </HeaderButton>
+          {account && (
+            <HeaderButton>
+              {relay
+                ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
+                : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
+              <OmenIconWrapper>
+                <IconOmen size={24} />
+              </OmenIconWrapper>
+            </HeaderButton>
+          )}
 
           {!account && (
             <ButtonConnectWalletStyled

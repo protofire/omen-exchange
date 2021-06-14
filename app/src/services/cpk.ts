@@ -916,11 +916,12 @@ class CPKService {
         to: marketMaker.address,
         data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
       })
-
-      if (useBaseToken || this.cpk.relay) {
+      const wrapTokenAddress = getWrapToken(this.cpk.relay ? networkIds.XDAI : networkId).address
+      if (useBaseToken || (this.cpk.relay && collateralAddress === wrapTokenAddress)) {
         if (!compoundService) {
           // Pseudonative to base token conversion flow
           const collateralToken = getTokenFromAddress(networkId, collateralAddress)
+
           const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, amount)
           // If use prefers to get paid in the base native asset then unwrap the asset
           transactions.push({
@@ -1145,7 +1146,8 @@ class CPKService {
       let userInputCollateral = collateral
       const totalAmountToSend = amountToMerge.add(earnings)
       // transfer to the user the merged collateral plus the earned fees
-      if (useBaseToken || this.cpk.relay) {
+      const wrapTokenAddress = getWrapToken(this.cpk.relay ? networkIds.XDAI : networkId).address
+      if (useBaseToken || (this.cpk.relay && wrapTokenAddress === collateral.address)) {
         if (compoundService != null) {
           // cToken to base token flow
           if (collateralSymbol === 'ceth') {
@@ -1302,7 +1304,7 @@ class CPKService {
         earnings = compound.calculateCTokenToBaseExchange(token, earnedCollateral)
       }
 
-      const wrapToken = getWrapToken(networkId)
+      const wrapToken = getWrapToken(this.cpk.relay ? networkIds.XDAI : networkId)
       const nativeAsset = getNativeAsset(networkId)
 
       if (token.address === wrapToken.address && earnings) {
