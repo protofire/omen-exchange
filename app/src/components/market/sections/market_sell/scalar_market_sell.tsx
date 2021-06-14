@@ -486,7 +486,12 @@ export const ScalarMarketSell = (props: Props) => {
         />
       )}
       <StyledButtonContainer>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => {
+            switchMarketTab(MarketDetailsTab.swap)
+          }}
+        >
           Cancel
         </Button>
         <Button buttonType={ButtonType.primaryAlternative} disabled={isSellButtonDisabled} onClick={finish}>
