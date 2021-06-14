@@ -16,8 +16,7 @@ interface Props {
 const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   const { isScalar } = props
 
-  if (isScalar) return <ScalarMarketPoolLiquidity {...props} />
-  return <MarketPoolLiquidity {...props} />
+  return <>{isScalar ? <ScalarMarketPoolLiquidity {...props} /> : <MarketPoolLiquidity {...props} />}</>
 }
 
 export { MarketPoolLiquidityContainer }
