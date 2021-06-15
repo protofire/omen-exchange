@@ -2,7 +2,7 @@ import Big from 'big.js'
 import { MaxUint256, Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
-import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
+import { RouteComponentProps, useHistory, useLocation, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../../common/constants'
@@ -170,6 +170,7 @@ const Wrapper = (props: Props) => {
   } = marketMakerData
 
   const history = useHistory()
+  const location = useLocation()
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
@@ -384,6 +385,21 @@ const Wrapper = (props: Props) => {
   const switchMarketTab = (newTab: MarketDetailsTab) => {
     setCurrentTab(newTab)
   }
+
+  useEffect(() => {
+    history.replace(`/${marketMakerAddress}/${currentTab.toLowerCase()}`)
+    if (currentTab === MarketDetailsTab.swap) return history.replace(`/${marketMakerAddress}/finalize`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentTab])
+
+  useEffect(() => {
+    if (location.pathname.includes('finalize')) setCurrentTab(MarketDetailsTab.finalize)
+    if (location.pathname.includes('pool')) setCurrentTab(MarketDetailsTab.pool)
+    if (location.pathname.includes('verify')) setCurrentTab(MarketDetailsTab.verify)
+    if (location.pathname.includes('history')) setCurrentTab(MarketDetailsTab.history)
+    if (location.pathname.includes('set_outcome')) setCurrentTab(MarketDetailsTab.setOutcome)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const { fetchData: fetchGraphMarketUserTxData } = useGraphMarketUserTxData(
     marketMakerAddress,
