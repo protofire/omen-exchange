@@ -4,15 +4,15 @@ import { matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 
+import { Network } from '../..'
 import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedBalanceContext, useConnectedWeb3Context } from '../../../../hooks'
 import { networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { ExchangeType } from '../../../../util/types'
 import { ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
-import { Network } from '../../../common'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../form/dropdown'
 import { IconAdd, IconClose, IconOmen } from '../../icons'
 import { IconSettings } from '../../icons/IconSettings'
 
@@ -44,10 +44,14 @@ export const HeaderInner = styled.div`
   width: ${props => props.theme.themeBreakPoints.xxl};
 `
 
-export const LogoWrapper = styled.div<{ disabled?: boolean }>`
+export const LogoWrapper = styled.a<{ disabled?: boolean }>`
   max-width: 90px;
   min-width: fit-content;
   ${props => (props.disabled ? 'pointer-events:none;' : '')};
+
+  &:hover {
+    cursor: pointer;
+  }
 `
 
 const ButtonCreateDesktop = styled(ButtonRound)`
@@ -257,7 +261,7 @@ const HeaderContainer: React.FC = (props: any) => {
     <HeaderWrapper {...restProps}>
       <HeaderInner>
         <ContentsLeft>
-          <LogoWrapper disabled={!hasRouter} onClick={() => props.history && props.history.push('/')}>
+          <LogoWrapper disabled={!hasRouter} href={'/#/liquidity'}>
             <Logo />
           </LogoWrapper>
           <MarketAndGovernanceNav
