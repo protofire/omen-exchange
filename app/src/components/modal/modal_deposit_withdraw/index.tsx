@@ -141,11 +141,9 @@ export const ModalDepositWithdraw = (props: Props) => {
       return { ...nativeAsset, balance: xDaiBalance ? xDaiBalance.toString() : '0' }
     } else return xDaiTokens.find(token => token.symbol === (symbol === 'DAI' ? 'xDAI' : symbol))
   }
-  const { address, balance, decimals, symbol }: any = findCurrentTokenBasedOnAction(
-    exchangeType,
-    currencySelected.toUpperCase(),
-  )
-
+  const { address, balance, decimals, symbol } =
+    findCurrentTokenBasedOnAction(exchangeType, currencySelected.toUpperCase()) ||
+    getToken(context.relay ? networkIds.XDAI : context.networkId, 'dai')
   const currentTokenMainnet = mainnetTokens.find(element => element.symbol === symbol)
 
   const isApprovalVisible =

@@ -46,8 +46,8 @@ const App: React.FC = (props: any) => {
       localStorage.setItem(
         'rpcAddress',
         JSON.stringify({
-          url: networks[networkIds.XDAI].url || networkId.MAINNET,
-          network: networkIds.XDAI || networkIds.MAINNET,
+          url: networks[networkIds.XDAI].url,
+          network: networkIds.XDAI,
           index: 0,
         }),
       )
@@ -59,14 +59,6 @@ const App: React.FC = (props: any) => {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ethereum])
-
-  useEffect(() => {
-    window.onerror = function(errorMsg) {
-      if (errorMsg) {
-        windowObj.location.reload(true)
-      }
-    }
-  }, [network, windowObj.location])
 
   return (
     <ThemeProvider theme={theme}>
