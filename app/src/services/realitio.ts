@@ -471,7 +471,7 @@ class RealitioService {
       const transactionObject = await this.scalarContract.resolve(questionId, question, scalarLow, scalarHigh)
       setTxState && setTxState(TransactionStep.transactionSubmitted)
       setTxHash && setTxHash(transactionObject.hash)
-      const tx = this.provider.waitForTransaction(transactionObject.hash)
+      const tx = await this.provider.waitForTransaction(transactionObject.hash)
       setTxState && setTxState(TransactionStep.transactionConfirmed)
       return tx
     } catch (err) {
@@ -485,7 +485,7 @@ class RealitioService {
       const transactionObject = await this.contract.withdraw()
       setTxState && setTxState(TransactionStep.transactionSubmitted)
       setTxHash && setTxHash(transactionObject.hash)
-      const tx = this.provider.waitForTransaction(transactionObject.hash)
+      const tx = await this.provider.waitForTransaction(transactionObject.hash)
       setTxState && setTxState(TransactionStep.transactionConfirmed)
       return tx
     } catch (err) {
