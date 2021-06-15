@@ -426,11 +426,10 @@ const Wrapper = (props: Props) => {
   }, [currentTab])
 
   useEffect(() => {
-    if (location.pathname.includes('finalize')) setCurrentTab(MarketDetailsTab.finalize)
+    if (location.pathname.includes('finalize')) setCurrentTab(MarketDetailsTab.swap)
     if (location.pathname.includes('pool')) setCurrentTab(MarketDetailsTab.pool)
-    if (location.pathname.includes('verify')) setCurrentTab(MarketDetailsTab.verify)
     if (location.pathname.includes('history')) setCurrentTab(MarketDetailsTab.history)
-    if (location.pathname.includes('set_outcome')) setCurrentTab(MarketDetailsTab.setOutcome)
+    if (location.pathname.includes('set_outcome')) setCurrentTab(MarketDetailsTab.swap)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
