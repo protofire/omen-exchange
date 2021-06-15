@@ -44,7 +44,7 @@ export const HeaderInner = styled.div`
   width: ${props => props.theme.themeBreakPoints.xxl};
 `
 
-export const LogoWrapper = styled.div<{ disabled?: boolean }>`
+export const LogoWrapper = styled.a<{ disabled?: boolean }>`
   max-width: 90px;
   min-width: fit-content;
   ${props => (props.disabled ? 'pointer-events:none;' : '')};
@@ -257,18 +257,11 @@ const HeaderContainer: React.FC = (props: any) => {
     onClick: () => history && history.push('/'),
   }
 
-  const logoClickHandler = (e: any): void => {
-    if (e.ctrlKey || e.metaKey) {
-      const newWindow = window.open('https://omen.eth.link/#/liquidity', '_blank', 'noopener,noreferrer')
-      if (newWindow) newWindow.opener = null
-    } else history && history.push('/')
-  }
-
   return (
     <HeaderWrapper {...restProps}>
       <HeaderInner>
         <ContentsLeft>
-          <LogoWrapper disabled={!hasRouter} onClick={e => logoClickHandler(e)}>
+          <LogoWrapper disabled={!hasRouter} href={'/#/liquidity'}>
             <Logo />
           </LogoWrapper>
           <MarketAndGovernanceNav
