@@ -199,11 +199,11 @@ class RealitioService {
     return logs.length > 0
   }
 
-  getClaimableBond = async (questionId: string, account: string, currentAnswer: string): Promise<BigNumber> => {
+  getClaimableBonds = async (questionId: string, currentAnswer: string): Promise<{ [key: string]: BigNumber }> => {
     const question = await this.contract.questions(questionId)
-    // if claimWinnings was already called the claimable bond is already in the realitio balance mapping, ready to withdraw
+    // if claimWinnings was already called the claimable bonds are already in the realitio balance mapping, ready to withdraw
     if (question.history_hash === HashZero) {
-      return new BigNumber('0')
+      return {}
     }
 
     // Calc claimable bonds by matching claimWinnings internals: https://github.com/realitio/realitio-contracts/blob/master/truffle/contracts/Realitio.sol#L506
@@ -243,7 +243,7 @@ class RealitioService {
     const payout = queuedFunds.add(lastBond)
     updateBalance(payee, payout)
 
-    return balances[account] || new BigNumber(0)
+    return balances
   }
 
   encodeClaimWinnings = async (questionId: string) => {

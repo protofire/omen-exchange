@@ -180,8 +180,10 @@ const Wrapper = (props: Props) => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
-  const [realitioWithdraw, setRealitioWithdraw] = useState(false)
-  const [realitioBalance, setRealitioBalance] = useState(Zero)
+  const [userRealitioWithdraw, setUserRealitioWithdraw] = useState(false)
+  const [cpkRealitioWithdraw, setCpkRealitioWithdraw] = useState(false)
+  const [userRealitioBalance, setUserRealitioBalance] = useState(Zero)
+  const [cpkRealitioBalance, setCpkRealitioBalance] = useState(Zero)
 
   const [displayEarnedCollateral, setDisplayEarnedCollateral] = useState<BigNumber>(new BigNumber(0))
 
@@ -295,11 +297,21 @@ const Wrapper = (props: Props) => {
       account,
     )
 
-    const claimable = await realitioService.getClaimableBond(question.id, cpk.address, question.currentAnswer)
-    const balance = await realitioService.getBalanceOf(cpk.address)
-    const total = claimable.add(balance)
-    setRealitioWithdraw(total.gt(Zero))
-    setRealitioBalance(total)
+    const claimable = await realitioService.getClaimableBonds(question.id, question.currentAnswer)
+
+    if (account !== cpk.address) {
+      const userClaimable = claimable[account] || new BigNumber('0')
+      const userBalance = await realitioService.getBalanceOf(account)
+      const userTotal = userClaimable.add(userBalance)
+      setUserRealitioBalance(userTotal)
+      setUserRealitioWithdraw(userTotal.gt(Zero))
+    }
+
+    const cpkClaimable = claimable[cpk.address] || new BigNumber('0')
+    const cpkBalance = await realitioService.getBalanceOf(cpk.address)
+    const cpkTotal = cpkClaimable.add(cpkBalance)
+    setCpkRealitioWithdraw(cpkTotal.gt(Zero))
+    setCpkRealitioBalance(cpkTotal)
   }
 
   useEffect(() => {
@@ -318,24 +330,28 @@ const Wrapper = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
-      await cpk.redeemPositions({
-        isConditionResolved,
-        // Round down in case of precision error
-        earnedCollateral: earnedCollateral ? earnedCollateral.mul(99999999).div(100000000) : new BigNumber('0'),
-        question,
-        numOutcomes: balances.length,
-        oracle,
-        realitio,
-        isScalar,
-        scalarLow,
-        scalarHigh,
-        collateralToken,
-        marketMaker,
-        conditionalTokens,
-        realitioBalance,
-        setTxHash,
-        setTxState,
-      })
+      if (userRealitioWithdraw) {
+        console.log('redeem bond')
+      } else {
+        await cpk.redeemPositions({
+          isConditionResolved,
+          // Round down in case of precision error
+          earnedCollateral: earnedCollateral ? earnedCollateral.mul(99999999).div(100000000) : new BigNumber('0'),
+          question,
+          numOutcomes: balances.length,
+          oracle,
+          realitio,
+          isScalar,
+          scalarLow,
+          scalarHigh,
+          collateralToken,
+          marketMaker,
+          conditionalTokens,
+          realitioBalance: cpkRealitioBalance,
+          setTxHash,
+          setTxState,
+        })
+      }
       await fetchBalances()
       await getRealitioBalance()
 
@@ -471,9 +487,11 @@ const Wrapper = (props: Props) => {
       redeemString = `${formatBigNumber(earnedCollateral, collateralToken.decimals)} ${symbol}`
     }
   }
-  if (realitioWithdraw) {
-    const nativeAsset = getNativeAsset(networkId, relay)
-    balanceString = `${formatBigNumber(realitioBalance, nativeAsset.decimals)} ${nativeAsset.symbol}`
+  const nativeAsset = getNativeAsset(networkId, relay)
+  if (userRealitioWithdraw) {
+    balanceString = `${formatBigNumber(userRealitioBalance, nativeAsset.decimals)} ${nativeAsset.symbol}`
+  } else if (cpkRealitioWithdraw) {
+    balanceString = `${formatBigNumber(cpkRealitioBalance, nativeAsset.decimals)} ${nativeAsset.symbol}`
   }
 
   return (
@@ -524,20 +542,20 @@ const Wrapper = (props: Props) => {
               />
             )}
             <WhenConnected>
-              {(hasWinningOutcomes || realitioWithdraw) && (
+              {(hasWinningOutcomes || userRealitioWithdraw || cpkRealitioWithdraw) && (
                 <MarketResolutionMessageStyled
                   arbitrator={arbitrator}
                   balanceString={balanceString}
                   collateralToken={collateralToken}
                   invalid={invalid}
-                  realitioWithdraw={realitioWithdraw}
+                  realitioWithdraw={userRealitioWithdraw || cpkRealitioWithdraw}
                   redeemString={redeemString}
                   userWinningOutcomes={userWinningOutcomes}
                   userWinningShares={userWinningShares}
                   winningOutcomes={winningOutcomes}
                 ></MarketResolutionMessageStyled>
               )}
-              {isConditionResolved && !hasWinningOutcomes && !realitioWithdraw ? (
+              {isConditionResolved && !hasWinningOutcomes && !userRealitioWithdraw && !cpkRealitioWithdraw ? (
                 <StyledButtonContainer>
                   <Button
                     buttonType={ButtonType.secondaryLine}
@@ -552,14 +570,28 @@ const Wrapper = (props: Props) => {
               ) : (
                 <>
                   <BorderedButtonContainer
-                    borderTop={(hasWinningOutcomes !== null && hasWinningOutcomes) || realitioWithdraw}
+                    borderTop={
+                      (hasWinningOutcomes !== null && hasWinningOutcomes) || userRealitioWithdraw || cpkRealitioWithdraw
+                    }
                   >
                     <Button
                       buttonType={ButtonType.primary}
                       disabled={status === Status.Loading}
-                      onClick={hasWinningOutcomes || realitioWithdraw ? redeem : resolveCondition}
+                      onClick={
+                        userRealitioWithdraw
+                          ? !isConditionResolved
+                            ? resolveCondition
+                            : redeem
+                          : hasWinningOutcomes || cpkRealitioWithdraw
+                          ? redeem
+                          : resolveCondition
+                      }
                     >
-                      {hasWinningOutcomes || realitioWithdraw
+                      {userRealitioWithdraw
+                        ? !isConditionResolved
+                          ? 'Resolve Condition'
+                          : 'Redeem Bond'
+                        : hasWinningOutcomes || cpkRealitioWithdraw
                         ? 'Redeem'
                         : !isConditionResolved
                         ? 'Resolve Condition'
