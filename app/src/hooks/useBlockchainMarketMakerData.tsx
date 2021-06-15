@@ -136,20 +136,22 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       marketMakerFunding: marketMaker.getTotalSupply(),
       marketMakerUserFunding: cpk && cpk.address ? marketMaker.balanceOf(cpk.address) : new BigNumber(0),
       realitioAnswer: isQuestionFinalized ? contracts.realitio.getResultFor(graphMarketMakerData.question.id) : null,
-      totalEarnings: marketMaker.getCollectedFees(),
+      // TODO: Replace hardcoded value
+      totalEarnings: new BigNumber(0),
       totalPoolShares: marketMaker.poolSharesTotalSupply(),
       userPoolShares: cpk && cpk.address ? marketMaker.poolSharesBalanceOf(cpk.address) : new BigNumber(0),
     })
 
-    let userEarnings = new BigNumber(0)
+    const userEarnings = new BigNumber(0)
 
-    if (cpk && cpk.address && marketMakerFunding.gt(0)) {
-      try {
-        userEarnings = await marketMaker.getFeesWithdrawableBy(cpk.address)
-      } catch {
-        console.warn('Could not retrieve user earnings.')
-      }
-    }
+    // TODO: Uncomment and use proper condtional
+    // if (cpk && cpk.address && marketMakerFunding.gt(0)) {
+    //   try {
+    //     userEarnings = await marketMaker.getFeesWithdrawableBy(cpk.address)
+    //   } catch {
+    //     console.warn('Could not retrieve user earnings.')
+    //   }
+    // }
 
     const arbitrator = getArbitratorFromAddress(networkId, graphMarketMakerData.arbitratorAddress)
 
