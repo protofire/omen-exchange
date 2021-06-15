@@ -319,6 +319,27 @@ const Wrapper = (props: Props) => {
     // eslint-disable-next-line
   }, [cpk, networkId, provider, account, question, isConditionResolved])
 
+  const claimBond = async () => {
+    try {
+      setStatus(Status.Loading)
+      setMessage('Claiming bond...')
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
+
+      await realitio.withdraw(setTxHash, setTxState)
+      await fetchBalances()
+      await getRealitioBalance()
+
+      setStatus(Status.Ready)
+      setMessage(`Bond successfully claimed.`)
+    } catch (err) {
+      setStatus(Status.Error)
+      setTxState(TransactionStep.error)
+      setMessage(`Error trying to claim.`)
+      logger.error(`${message} -  ${err.message}`)
+    }
+  }
+
   const redeem = async () => {
     try {
       if (!cpk) {
@@ -330,28 +351,24 @@ const Wrapper = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
-      if (userRealitioWithdraw) {
-        console.log('redeem bond')
-      } else {
-        await cpk.redeemPositions({
-          isConditionResolved,
-          // Round down in case of precision error
-          earnedCollateral: earnedCollateral ? earnedCollateral.mul(99999999).div(100000000) : new BigNumber('0'),
-          question,
-          numOutcomes: balances.length,
-          oracle,
-          realitio,
-          isScalar,
-          scalarLow,
-          scalarHigh,
-          collateralToken,
-          marketMaker,
-          conditionalTokens,
-          realitioBalance: cpkRealitioBalance,
-          setTxHash,
-          setTxState,
-        })
-      }
+      await cpk.redeemPositions({
+        isConditionResolved,
+        // Round down in case of precision error
+        earnedCollateral: earnedCollateral ? earnedCollateral.mul(99999999).div(100000000) : new BigNumber('0'),
+        question,
+        numOutcomes: balances.length,
+        oracle,
+        realitio,
+        isScalar,
+        scalarLow,
+        scalarHigh,
+        collateralToken,
+        marketMaker,
+        conditionalTokens,
+        realitioBalance: cpkRealitioBalance,
+        setTxHash,
+        setTxState,
+      })
       await fetchBalances()
       await getRealitioBalance()
 
@@ -581,7 +598,7 @@ const Wrapper = (props: Props) => {
                         userRealitioWithdraw
                           ? !isConditionResolved
                             ? resolveCondition
-                            : redeem
+                            : claimBond
                           : hasWinningOutcomes || cpkRealitioWithdraw
                           ? redeem
                           : resolveCondition

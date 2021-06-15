@@ -480,6 +480,20 @@ class RealitioService {
     }
   }
 
+  withdraw = async (setTxHash?: (arg0: string) => void, setTxState?: (step: TransactionStep) => void) => {
+    try {
+      const transactionObject = await this.contract.withdraw()
+      setTxState && setTxState(TransactionStep.transactionSubmitted)
+      setTxHash && setTxHash(transactionObject.hash)
+      const tx = this.provider.waitForTransaction(transactionObject.hash)
+      setTxState && setTxState(TransactionStep.transactionConfirmed)
+      return tx
+    } catch (err) {
+      logger.error(`There was an error withdrawing`, err.message)
+      throw err
+    }
+  }
+
   static encodeResolveCondition = (
     questionId: string,
     question: string,
