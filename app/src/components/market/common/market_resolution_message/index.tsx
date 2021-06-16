@@ -18,6 +18,7 @@ const Wrapper = styled.div`
 
 const Icon = styled.div`
   margin-right: 20px;
+  align-self: center;
 `
 
 const TextWrapper = styled.div``
@@ -56,18 +57,23 @@ interface Props {
   userWinningShares: BigNumber
   userWinningOutcomes: number
   winningOutcomes: number
+  balanceString: string
   redeemString: string
+  realitioWithdraw: boolean
 }
 
 const MarketResolutionMessage = (props: Props) => {
   const {
     arbitrator,
+    balanceString,
     collateralToken,
     invalid,
+    realitioWithdraw,
     redeemString,
     userWinningOutcomes,
     userWinningShares,
     winningOutcomes,
+
     ...restProps
   } = props
 
@@ -76,7 +82,7 @@ const MarketResolutionMessage = (props: Props) => {
   const lost = !invalid && userWinningOutcomes === 0 && parseFloat(shares) > 0
   const wonSingle = !invalid && userWinningOutcomes === 1
   const wonMultiple = !invalid && userWinningOutcomes > 1
-  const participated = invalid || lost || wonSingle || wonMultiple
+  const participated = invalid || lost || wonSingle || wonMultiple || realitioWithdraw
 
   let infoText = ''
   let infoTitle = ''
@@ -85,39 +91,72 @@ const MarketResolutionMessage = (props: Props) => {
   if (invalid) {
     infoTitle = 'Market is invalid!'
     icon = <Invalid />
-    infoText = `${arbitrator.name} declared this market invalid. You own ${shares} Shares of ${
+    infoText = `${
+      arbitrator.name
+    } declared this market invalid. You can now redeem replace_with_redeem_string from your ${shares} Shares of ${
       userWinningOutcomes === 1 ? `an outcome` : `${userWinningOutcomes} outcomes`
-    }
-      which can be redeemed for `
+    }`
   }
 
   if (lost) {
     infoTitle = 'Better luck next time!'
     icon = <Lost />
-    infoText = `You have bought ${shares} Shares of the loosing outcome which leads to a loss of `
+    infoText = `You have bought ${shares} Shares of the loosing outcome which leads to a loss of replace_with_redeem_string`
   }
 
   if (wonSingle) {
     infoTitle = 'Congratulations!'
     icon = <Won />
-    infoText = `You have bought ${shares} Shares of the winning outcome which can be redeemed for `
+    infoText = `You can now redeem replace_with_redeem_string from your ${shares} Shares of the winning outcome`
   }
 
   if (wonMultiple) {
     infoTitle = 'Congratulations!'
     icon = <Won />
-    infoText = `${arbitrator.name} declared ${winningOutcomes} outcomes as valid. You have bought ${shares} Shares of ${userWinningOutcomes} of the
-  winning outcomes which can be redeemed for `
+    infoText = `${arbitrator.name} declared ${winningOutcomes} outcomes as valid. You can now redeem replace_with_redeem_string from your ${shares} Shares of ${userWinningOutcomes}`
   }
+
+  if (realitioWithdraw) {
+    infoTitle = 'Congratulations!'
+    icon = <Won />
+    infoText += `${
+      infoText ? ' and' : 'You can now redeem'
+    } replace_with_balance_string from bonding on the correct outcome`
+  }
+
+  const arr = infoText.split(' ')
+  const content = arr.map((word, index) => {
+    const space = index !== arr.length - 1 ? ' ' : ''
+    if (word === 'replace_with_balance_string') {
+      return (
+        <TextHighlight key={index}>
+          {balanceString}
+          {space}
+        </TextHighlight>
+      )
+    }
+    if (word === 'replace_with_redeem_string') {
+      return (
+        <TextHighlight key={index}>
+          {redeemString}
+          {space}
+        </TextHighlight>
+      )
+    }
+    return (
+      <span key={index}>
+        {word}
+        {space}
+      </span>
+    )
+  })
 
   return participated ? (
     <Wrapper {...restProps}>
       <Icon>{icon}</Icon>
       <TextWrapper>
         <Title isWinner={wonSingle || wonMultiple}>{infoTitle}</Title>
-        <Text>
-          {infoText} <TextHighlight>{redeemString}</TextHighlight>.
-        </Text>
+        <Text>{content}.</Text>
       </TextWrapper>
     </Wrapper>
   ) : null

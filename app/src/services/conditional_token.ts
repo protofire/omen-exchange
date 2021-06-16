@@ -116,7 +116,6 @@ class ConditionalTokenService {
 
   isConditionResolved = async (conditionId: string): Promise<boolean> => {
     const payoutDenominator: BigNumber = await this.contract.payoutDenominator(conditionId)
-
     return !payoutDenominator.isZero()
   }
 
