@@ -782,7 +782,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <BottomButtonWrapper borderTop>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => (history.length > 2 ? history.goBack() : history.replace('/liquidity'))}
+        >
           Back
         </Button>
         {activeTab === Tabs.deposit && (

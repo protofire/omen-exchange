@@ -14,9 +14,10 @@ import {
   useSymbol,
 } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
-import { ERC20Service } from '../../../../../services'
+import { ERC20Service, RealitioService } from '../../../../../services'
 import { CompoundService } from '../../../../../services/compound_service'
 import { getLogger } from '../../../../../util/logger'
+import { getContractAddress, getNativeAsset } from '../../../../../util/networks'
 import { formatBigNumber, getBaseToken, getUnit, isCToken, isDust } from '../../../../../util/tools'
 import {
   CompoundTokenType,
@@ -150,7 +151,7 @@ const Wrapper = (props: Props) => {
   const cpk = useConnectedCPKContext()
   const { fetchBalances } = useConnectedBalanceContext()
 
-  const { account, library: provider, networkId } = context
+  const { account, library: provider, networkId, relay } = context
   const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
 
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props
@@ -179,6 +180,10 @@ const Wrapper = (props: Props) => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
+  const [userRealitioWithdraw, setUserRealitioWithdraw] = useState(false)
+  const [cpkRealitioWithdraw, setCpkRealitioWithdraw] = useState(false)
+  const [userRealitioBalance, setUserRealitioBalance] = useState(Zero)
+  const [cpkRealitioBalance, setCpkRealitioBalance] = useState(Zero)
 
   const [displayEarnedCollateral, setDisplayEarnedCollateral] = useState<BigNumber>(new BigNumber(0))
 
@@ -279,12 +284,64 @@ const Wrapper = (props: Props) => {
     }
   }, [provider, account, marketMakerAddress, marketMaker])
 
+  const getRealitioBalance = async () => {
+    if (!cpk || !account) {
+      return
+    }
+
+    // Check if user has reality balance to redeem
+    const realitioService = new RealitioService(
+      getContractAddress(networkId, 'realitio'),
+      getContractAddress(networkId, 'realitioScalarAdapter'),
+      provider,
+      account,
+    )
+
+    const claimable = await realitioService.getClaimableBonds(question.id, question.currentAnswer)
+
+    if (account !== cpk.address) {
+      const userClaimable = claimable[account] || new BigNumber('0')
+      const userBalance = await realitioService.getBalanceOf(account)
+      const userTotal = userClaimable.add(userBalance)
+      setUserRealitioBalance(userTotal)
+      setUserRealitioWithdraw(userTotal.gt(Zero))
+    }
+
+    const cpkClaimable = claimable[cpk.address] || new BigNumber('0')
+    const cpkBalance = await realitioService.getBalanceOf(cpk.address)
+    const cpkTotal = cpkClaimable.add(cpkBalance)
+    setCpkRealitioWithdraw(cpkTotal.gt(Zero))
+    setCpkRealitioBalance(cpkTotal)
+  }
+
+  useEffect(() => {
+    getRealitioBalance()
+    // eslint-disable-next-line
+  }, [cpk, networkId, provider, account, question, isConditionResolved])
+
+  const claimBond = async () => {
+    try {
+      setStatus(Status.Loading)
+      setMessage('Claiming bond...')
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
+
+      await realitio.withdraw(setTxHash, setTxState)
+      await fetchBalances()
+      await getRealitioBalance()
+
+      setStatus(Status.Ready)
+      setMessage(`Bond successfully claimed.`)
+    } catch (err) {
+      setStatus(Status.Error)
+      setTxState(TransactionStep.error)
+      setMessage(`Error trying to claim.`)
+      logger.error(`${message} -  ${err.message}`)
+    }
+  }
+
   const redeem = async () => {
     try {
-      if (!earnedCollateral) {
-        return
-      }
-
       if (!cpk) {
         return
       }
@@ -297,17 +354,23 @@ const Wrapper = (props: Props) => {
       await cpk.redeemPositions({
         isConditionResolved,
         // Round down in case of precision error
-        earnedCollateral: earnedCollateral.mul(99999999).div(100000000),
+        earnedCollateral: earnedCollateral ? earnedCollateral.mul(99999999).div(100000000) : new BigNumber('0'),
         question,
         numOutcomes: balances.length,
         oracle,
+        realitio,
+        isScalar,
+        scalarLow,
+        scalarHigh,
         collateralToken,
         marketMaker,
         conditionalTokens,
+        realitioBalance: cpkRealitioBalance,
         setTxHash,
         setTxState,
       })
       await fetchBalances()
+      await getRealitioBalance()
 
       setStatus(Status.Ready)
       setMessage(`Payout successfully redeemed.`)
@@ -363,11 +426,10 @@ const Wrapper = (props: Props) => {
   }, [currentTab])
 
   useEffect(() => {
-    if (location.pathname.includes('finalize')) setCurrentTab(MarketDetailsTab.finalize)
+    if (location.pathname.includes('finalize')) setCurrentTab(MarketDetailsTab.swap)
     if (location.pathname.includes('pool')) setCurrentTab(MarketDetailsTab.pool)
-    if (location.pathname.includes('verify')) setCurrentTab(MarketDetailsTab.verify)
     if (location.pathname.includes('history')) setCurrentTab(MarketDetailsTab.history)
-    if (location.pathname.includes('set_outcome')) setCurrentTab(MarketDetailsTab.setOutcome)
+    if (location.pathname.includes('set_outcome')) setCurrentTab(MarketDetailsTab.swap)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -432,6 +494,7 @@ const Wrapper = (props: Props) => {
 
   const symbol = useSymbol(collateralToken)
   let redeemString = 'NaN'
+  let balanceString = ''
   if (earnedCollateral) {
     if (isCToken(marketCollateralToken.symbol)) {
       const baseToken = getBaseToken(networkId, collateralToken.symbol)
@@ -439,6 +502,12 @@ const Wrapper = (props: Props) => {
     } else {
       redeemString = `${formatBigNumber(earnedCollateral, collateralToken.decimals)} ${symbol}`
     }
+  }
+  const nativeAsset = getNativeAsset(networkId, relay)
+  if (userRealitioWithdraw) {
+    balanceString = `${formatBigNumber(userRealitioBalance, nativeAsset.decimals)} ${nativeAsset.symbol}`
+  } else if (cpkRealitioWithdraw) {
+    balanceString = `${formatBigNumber(cpkRealitioBalance, nativeAsset.decimals)} ${nativeAsset.symbol}`
   }
 
   return (
@@ -489,18 +558,20 @@ const Wrapper = (props: Props) => {
               />
             )}
             <WhenConnected>
-              {hasWinningOutcomes && (
+              {(hasWinningOutcomes || userRealitioWithdraw || cpkRealitioWithdraw) && (
                 <MarketResolutionMessageStyled
                   arbitrator={arbitrator}
+                  balanceString={balanceString}
                   collateralToken={collateralToken}
                   invalid={invalid}
+                  realitioWithdraw={userRealitioWithdraw || cpkRealitioWithdraw}
                   redeemString={redeemString}
                   userWinningOutcomes={userWinningOutcomes}
                   userWinningShares={userWinningShares}
                   winningOutcomes={winningOutcomes}
                 ></MarketResolutionMessageStyled>
               )}
-              {isConditionResolved && !hasWinningOutcomes ? (
+              {isConditionResolved && !hasWinningOutcomes && !userRealitioWithdraw && !cpkRealitioWithdraw ? (
                 <StyledButtonContainer>
                   <Button
                     buttonType={ButtonType.secondaryLine}
@@ -514,16 +585,32 @@ const Wrapper = (props: Props) => {
                 </StyledButtonContainer>
               ) : (
                 <>
-                  <BorderedButtonContainer borderTop={hasWinningOutcomes !== null && hasWinningOutcomes}>
+                  <BorderedButtonContainer
+                    borderTop={
+                      (hasWinningOutcomes !== null && hasWinningOutcomes) || userRealitioWithdraw || cpkRealitioWithdraw
+                    }
+                  >
                     <Button
                       buttonType={ButtonType.primary}
                       disabled={status === Status.Loading}
-                      onClick={isConditionResolved && hasWinningOutcomes ? () => redeem() : resolveCondition}
+                      onClick={
+                        userRealitioWithdraw
+                          ? !isConditionResolved
+                            ? resolveCondition
+                            : claimBond
+                          : hasWinningOutcomes || cpkRealitioWithdraw
+                          ? redeem
+                          : resolveCondition
+                      }
                     >
-                      {(!isConditionResolved && hasWinningOutcomes) || (!isConditionResolved && !hasWinningOutcomes)
-                        ? 'Resolve Condition'
-                        : isConditionResolved && hasWinningOutcomes
+                      {userRealitioWithdraw
+                        ? !isConditionResolved
+                          ? 'Resolve Condition'
+                          : 'Redeem Bond'
+                        : hasWinningOutcomes || cpkRealitioWithdraw
                         ? 'Redeem'
+                        : !isConditionResolved
+                        ? 'Resolve Condition'
                         : ''}
                     </Button>
                   </BorderedButtonContainer>

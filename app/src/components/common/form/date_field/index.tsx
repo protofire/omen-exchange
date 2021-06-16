@@ -3,6 +3,7 @@ import DatePicker from 'react-datepicker'
 import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 
+import { networkIds } from '../../../../util/networks'
 import { convertLocalToUTC, convertUTCToLocal } from '../../../../util/tools'
 import { CommonDisabledCSS } from '../common_styled'
 
@@ -13,6 +14,7 @@ interface Props {
   onChange: any
   placeholder?: string
   selected?: any
+  networkId?: number
 }
 
 interface CalendarPortalProps {
@@ -106,7 +108,7 @@ const CalendarPortal = (props: CalendarPortalProps) => {
 }
 
 export const DateField = (props: Props) => {
-  const { disabled, minDate, name, onChange, placeholder, selected, ...restProps } = props
+  const { disabled, minDate, name, networkId, onChange, placeholder, selected, ...restProps } = props
 
   const handleChange = (date: Maybe<Date>) => {
     onChange(date ? convertLocalToUTC(date) : date)
@@ -132,6 +134,7 @@ export const DateField = (props: Props) => {
         selected={convertUTCToLocal(selected)}
         showDisabledMonthNavigation
         showTimeSelect
+        timeIntervals={networkId === networkIds.RINKEBY ? 5 : 30}
       />
     </DateFieldWrapper>
   )
