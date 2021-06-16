@@ -773,8 +773,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         />
       )}
       <BottomButtonWrapper>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
-          Cancel
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => (history.length > 2 ? history.goBack() : history.replace('/liquidity'))}
+        >
+          Back
         </Button>
         {activeTab === Tabs.deposit && (
           <Button buttonType={ButtonType.primaryAlternative} disabled={disableDepositButton} onClick={addFunding}>
