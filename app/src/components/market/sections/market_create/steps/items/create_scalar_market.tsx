@@ -275,6 +275,7 @@ export const CreateScalarMarket = (props: Props) => {
                 disabled={false}
                 minDate={tomorrow}
                 name="resolution"
+                networkId={context.networkId}
                 onChange={handleDateChange}
                 selected={resolution}
               />

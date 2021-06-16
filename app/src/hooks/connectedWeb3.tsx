@@ -57,6 +57,11 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     setRelay(!relay)
   }
 
+  // debug particular address and network id
+  const url = new URL(window.location.href.replace('#', ''))
+  const debugAddress = url.searchParams.get('debugAddress')
+  const debugNetworkId = url.searchParams.get('debugNetworkId')
+
   useEffect(() => {
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
@@ -85,10 +90,6 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
       context.setConnector('Infura')
     }
 
-    // debug particular address and network id
-    const url = new URL(window.location.href.replace('#', ''))
-    const debugAddress = url.searchParams.get('debugAddress')
-    const debugNetworkId = url.searchParams.get('debugNetworkId')
     if (debugAddress) {
       connectors.Safe.init(debugAddress, debugNetworkId ? Number(debugNetworkId) : 1)
       context.setConnector('Safe')
@@ -120,18 +121,14 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     return () => {
       isSubscribed = false
     }
-  }, [context, library, active, error, networkId, safeAppInfo, rpcAddress, props])
+  }, [context, library, active, error, networkId, safeAppInfo, rpcAddress, debugAddress, debugNetworkId])
 
   if (!networkId || !library) {
     return null
   }
 
-  const { address, isRelay, netId, provider } = getRelayProvider(
-    relay && context.connectorName !== 'Safe',
-    networkId,
-    library,
-    account,
-  )
+  const enableRelay = context.connectorName !== 'Safe' || debugAddress !== ''
+  const { address, isRelay, netId, provider } = getRelayProvider(relay && enableRelay, networkId, library, account)
 
   const value = {
     account: address || null,

@@ -342,6 +342,7 @@ const AskQuestionStep = (props: Props) => {
                     disabled={!!loadedQuestionId}
                     minDate={tomorrow}
                     name="resolution"
+                    networkId={context.networkId}
                     onChange={handleDateChange}
                     placeholder="Select closing date"
                     selected={resolution}
