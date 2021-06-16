@@ -106,7 +106,6 @@ export const History_select: React.FC<Props> = ({
   const [stateData, setStateData] = useState<StateDataType[] | null>([])
 
   const outcomeArray: string[] = outcomes.length ? outcomes : ['Short', 'Long']
-  // within a useeffect compare const data with setDataHist if different then setLoading(false)
   const data =
     holdingSeries &&
     holdingSeries
@@ -118,10 +117,6 @@ export const History_select: React.FC<Props> = ({
         outcomeArray.forEach((k, i) => (outcomesPrices[k] = prices[i]))
         return { ...outcomesPrices, date: formatTimestampToDate(h.block.timestamp, value) }
       })
-  // eslint-disable-next-line no-console
-  console.log('DATA: ', data)
-  // eslint-disable-next-line no-console
-  console.log('HOLDING: ', holdingSeries)
   const [toggleSelect, setToggleSelect] = useState(true)
   const [type, setType] = useState<HistoryType>(HistoryType.All)
   const DropdownItems = [
