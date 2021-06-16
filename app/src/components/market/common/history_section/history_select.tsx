@@ -19,7 +19,7 @@ import { ButtonRound, ButtonSelectable } from '../../../button'
 import { Dropdown, DropdownPosition } from '../../../common/form/dropdown'
 import { commonWrapperCSS } from '../common_styled'
 import { HistoryChart } from '../history_chart'
-import { HistoryTable } from '../history_table'
+import { CustomInlineLoading, HistoryTable } from '../history_table'
 
 const DropdownMenu = styled(Dropdown)`
   margin-left: auto;
@@ -65,6 +65,10 @@ type Props = {
   isScalar?: Maybe<boolean>
 }
 
+type StateDataType = {
+  date: string
+}
+
 const ButtonSelectableStyled = styled(ButtonSelectable)<{ active?: boolean }>`
   color: ${props => (props.active ? props.theme.colors.primary : props.theme.colors.clickable)};
   font-weight: 500;
@@ -98,8 +102,11 @@ export const History_select: React.FC<Props> = ({
   const marketMaker = buildMarketMaker(marketMakerAddress)
   const [sharesData, setSharesData] = useState<FpmmTradeDataType[]>([])
   const [sharesDataLoader, setSharesDataLoader] = useState<boolean>(true)
+  const [chartLoading, setChartLoading] = useState<boolean>(false)
+  const [stateData, setStateData] = useState<StateDataType[] | null>([])
 
   const outcomeArray: string[] = outcomes.length ? outcomes : ['Short', 'Long']
+  // within a useeffect compare const data with setDataHist if different then setLoading(false)
   const data =
     holdingSeries &&
     holdingSeries
@@ -111,6 +118,10 @@ export const History_select: React.FC<Props> = ({
         outcomeArray.forEach((k, i) => (outcomesPrices[k] = prices[i]))
         return { ...outcomesPrices, date: formatTimestampToDate(h.block.timestamp, value) }
       })
+  // eslint-disable-next-line no-console
+  console.log('DATA: ', data)
+  // eslint-disable-next-line no-console
+  console.log('HOLDING: ', holdingSeries)
   const [toggleSelect, setToggleSelect] = useState(true)
   const [type, setType] = useState<HistoryType>(HistoryType.All)
   const DropdownItems = [
@@ -282,6 +293,12 @@ export const History_select: React.FC<Props> = ({
     refetch()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useEffect(() => {
+    if (stateData !== data) setChartLoading(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data])
+
   const loadNextPage = () => {
     const newPageIndex = pageIndex + pageSize
     setSharesDataLoader(true)
@@ -317,7 +334,15 @@ export const History_select: React.FC<Props> = ({
           <ButtonsWrapper>
             {options.map((item, index) => {
               return (
-                <ButtonSelectableStyled active={value === item} key={index} onClick={() => onChange(item)}>
+                <ButtonSelectableStyled
+                  active={value === item}
+                  key={index}
+                  onClick={() => {
+                    onChange(item)
+                    setChartLoading(true)
+                    setStateData(data)
+                  }}
+                >
                   {item}
                 </ButtonSelectableStyled>
               )
@@ -336,6 +361,8 @@ export const History_select: React.FC<Props> = ({
           sharesDataLoader={sharesDataLoader}
           status={status}
         />
+      ) : chartLoading ? (
+        <CustomInlineLoading message="Loading Graph" />
       ) : (
         <HistoryChart
           data={data}
