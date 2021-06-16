@@ -1,10 +1,18 @@
 import WalletConnectProvider from '@walletconnect/web3-provider'
 import AuthereumApi from 'authereum'
 import { ethers } from 'ethers'
+import { useState } from 'react'
 import { Connectors } from 'web3-react'
 
 import { INFURA_PROJECT_ID } from '../common/constants'
-import { getInfuraUrl, infuraNetworkURL, networkIds, supportedNetworkIds } from '../util/networks'
+import { getInfuraUrl, infuraNetworkURL, infuraNetworkURLxDai, networkIds, supportedNetworkIds } from '../util/networks'
+
+import { getNetworkFromChain, isRpcOnline } from './tools'
+
+const windowObj: any = window
+const ethereum = windowObj.ethereum
+const network = ethereum.networkVersion >> 0
+console.log('network from connectors.ts ', network)
 
 const { InjectedConnector, NetworkOnlyConnector } = Connectors
 
@@ -87,9 +95,17 @@ class WalletConnectConnector extends Connectors.Connector {
 
 const WalletConnect = new WalletConnectConnector()
 
-const Infura = new NetworkOnlyConnector({
-  providerURL: infuraNetworkURL,
-})
+const Infura = () => {
+  const [rpc, setRpc] = useState(infuraNetworkURL)
+  console.log('rpc from inside Infura', rpc)
+  isRpcOnline(infuraNetworkURL).then(status => (status ? setRpc(infuraNetworkURL) : setRpc(infuraNetworkURLxDai)))
+
+  const NetworkConnector = new NetworkOnlyConnector({
+    providerURL: rpc,
+  })
+
+  return NetworkConnector
+}
 
 class AuthereumConnector extends Connectors.Connector {
   authereum: any

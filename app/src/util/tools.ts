@@ -1,4 +1,5 @@
 import { newtonRaphson } from '@fvictorio/newton-raphson-method'
+import { useInterval } from '@react-corekit/use-interval'
 import axios from 'axios'
 import Big from 'big.js'
 import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
@@ -84,6 +85,25 @@ export const checkRpcStatus = async (customUrl: string, setStatus: any, network:
   } catch (e) {
     setStatus(false)
 
+    return false
+  }
+}
+
+export const isRpcOnline = async (customUrl: string): Promise<boolean> => {
+  try {
+    const response = await axios.post(customUrl, {
+      id: +new Date(),
+      jsonrpc: '2.0',
+      method: 'net_version',
+    })
+    if (response.data.error) {
+      console.log('RPC is bad!!')
+      return false
+    }
+    console.log('always returnin true bruhhh')
+    return true
+  } catch (e) {
+    console.log('always returnin false in the catch')
     return false
   }
 }
