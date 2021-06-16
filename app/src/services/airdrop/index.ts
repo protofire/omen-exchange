@@ -92,12 +92,11 @@ class AirdropService {
     return amount
   }
 
-  encodeClaims = async (address: string): Promise<Transaction[]> => {
-    const transactions: Transaction[] = []
+  encodeClaims = async (address: string): Promise<Transaction[] | undefined> => {
     if (this.airdrops) {
       const claims = await this.getClaims(address)
-      if (claims) {
-        return claims?.map(claim => {
+      if (claims && claims.length > 0) {
+        return claims.map(claim => {
           const airdropInterface = new utils.Interface(airdropAbi)
           const data = airdropInterface.functions.claim.encode([
             claim.index,
@@ -112,7 +111,6 @@ class AirdropService {
         })
       }
     }
-    return transactions
   }
 }
 
