@@ -94,7 +94,7 @@ interface CPKAddFundingParams {
 
 interface CPKRemoveFundingParams {
   amountToMerge: BigNumber
-  collateralAddress: string
+  collateral: Token
   compoundService?: CompoundService | null
   conditionId: string
   conditionalTokens: ConditionalTokenService
@@ -108,14 +108,19 @@ interface CPKRemoveFundingParams {
 }
 
 interface CPKRedeemParams {
+  isScalar: boolean
   isConditionResolved: boolean
   question: Question
   numOutcomes: number
   earnedCollateral: BigNumber
   collateralToken: Token
+  realitio: RealitioService
   oracle: OracleService
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
+  realitioBalance: BigNumber
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
   setTxHash: (arg0: string) => void
   setTxState: (step: TransactionStep) => void
 }
@@ -916,11 +921,12 @@ class CPKService {
         to: marketMaker.address,
         data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
       })
-
-      if (useBaseToken || this.cpk.relay) {
+      const wrapTokenAddress = getWrapToken(this.cpk.relay ? networkIds.XDAI : networkId).address
+      if (useBaseToken || (this.cpk.relay && collateralAddress === wrapTokenAddress)) {
         if (!compoundService) {
           // Pseudonative to base token conversion flow
           const collateralToken = getTokenFromAddress(networkId, collateralAddress)
+
           const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, amount)
           // If use prefers to get paid in the base native asset then unwrap the asset
           transactions.push({
@@ -1103,7 +1109,7 @@ class CPKService {
 
   removeFunding = async ({
     amountToMerge,
-    collateralAddress,
+    collateral,
     compoundService,
     conditionId,
     conditionalTokens,
@@ -1129,7 +1135,7 @@ class CPKService {
       const mergePositionsTx = {
         to: conditionalTokens.address,
         data: ConditionalTokenService.encodeMergePositions(
-          collateralAddress,
+          collateral.address,
           conditionId,
           outcomesCount,
           amountToMerge,
@@ -1141,12 +1147,12 @@ class CPKService {
       const txOptions: TxOptions = {}
       await this.getGas(txOptions)
 
-      const collateralToken = getTokenFromAddress(networkId, collateralAddress)
-      const collateralSymbol = collateralToken.symbol.toLowerCase()
-      let userInputCollateral = collateralToken
+      const collateralSymbol = collateral.symbol.toLowerCase()
+      let userInputCollateral = collateral
       const totalAmountToSend = amountToMerge.add(earnings)
       // transfer to the user the merged collateral plus the earned fees
-      if (useBaseToken || this.cpk.relay) {
+      const wrapTokenAddress = getWrapToken(this.cpk.relay ? networkIds.XDAI : networkId).address
+      if (useBaseToken || (this.cpk.relay && wrapTokenAddress === collateral.address)) {
         if (compoundService != null) {
           // cToken to base token flow
           if (collateralSymbol === 'ceth') {
@@ -1163,20 +1169,20 @@ class CPKService {
           // Approve cToken for the cpk contract
           transactions.push({
             to: userInputCollateral.address,
-            data: ERC20Service.encodeApproveUnlimited(collateralToken.address),
+            data: ERC20Service.encodeApproveUnlimited(collateral.address),
           })
           // redeeem underlying token from the ctoken token
           transactions.push({
-            to: collateralToken.address,
+            to: collateral.address,
             data: encodedRedeemFunction,
           })
         } else {
           // Pseudonative asset to base asset flow
-          const collateralToken = getTokenFromAddress(networkId, collateralAddress)
+          const collateralToken = getTokenFromAddress(networkId, collateral.address)
           const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, totalAmountToSend)
           // If use prefers to get paid in the base native asset then unwrap the asset
           transactions.push({
-            to: collateralAddress,
+            to: collateral.address,
             data: encodedWithdrawFunction,
           })
         }
@@ -1212,7 +1218,7 @@ class CPKService {
           }
         } else {
           transactions.push({
-            to: collateralAddress,
+            to: collateral.address,
             data: ERC20Service.encodeTransfer(account, totalAmountToSend),
           })
         }
@@ -1249,10 +1255,15 @@ class CPKService {
     conditionalTokens,
     earnedCollateral,
     isConditionResolved,
+    isScalar,
     marketMaker,
     numOutcomes,
     oracle,
     question,
+    realitio,
+    realitioBalance,
+    scalarHigh,
+    scalarLow,
     setTxHash,
     setTxState,
   }: CPKRedeemParams): Promise<TransactionReceipt> => {
@@ -1267,66 +1278,98 @@ class CPKService {
       await this.getGas(txOptions)
 
       if (!isConditionResolved) {
-        transactions.push({
-          to: oracle.address,
-          data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
-        })
+        if (isScalar && scalarLow && scalarHigh) {
+          transactions.push({
+            to: realitio.scalarContract.address,
+            data: RealitioService.encodeResolveCondition(question.id, question.raw, scalarLow, scalarHigh),
+          })
+        } else {
+          transactions.push({
+            to: oracle.address,
+            data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
+          })
+        }
+
+        const data = await realitio.encodeClaimWinnings(question.id)
+        if (data) {
+          transactions.push({
+            to: realitio.contract.address,
+            data,
+          })
+        }
       }
-
-      const conditionId = await marketMaker.getConditionId()
-
-      transactions.push({
-        to: conditionalTokens.address,
-        data: ConditionalTokenService.encodeRedeemPositions(collateralToken.address, conditionId, numOutcomes),
-      })
 
       let earnings = earnedCollateral
       let token = collateralToken
 
-      if (isCToken(collateralToken.symbol)) {
-        const compound = new CompoundService(collateralToken.address, collateralToken.symbol, this.provider, account)
-        await compound.init()
+      if (!earnings.isZero()) {
+        const conditionId = await marketMaker.getConditionId()
 
-        // Convert compound token to base token
-        const encodedRedeemFunction = CompoundService.encodeRedeemTokens(
-          collateralToken.symbol,
-          earnedCollateral.toString(),
-        )
-
-        // Redeeem underlying token
         transactions.push({
-          to: collateralToken.address,
-          data: encodedRedeemFunction,
+          to: conditionalTokens.address,
+          data: ConditionalTokenService.encodeRedeemPositions(collateralToken.address, conditionId, numOutcomes),
         })
 
-        token = getBaseToken(networkId, collateralToken.symbol)
-        earnings = compound.calculateCTokenToBaseExchange(token, earnedCollateral)
-      }
+        if (isCToken(collateralToken.symbol)) {
+          const compound = new CompoundService(collateralToken.address, collateralToken.symbol, this.provider, account)
+          await compound.init()
 
-      const wrapToken = getWrapToken(networkId)
-      const nativeAsset = getNativeAsset(networkId)
+          // Convert compound token to base token
+          const encodedRedeemFunction = CompoundService.encodeRedeemTokens(
+            collateralToken.symbol,
+            earnedCollateral.toString(),
+          )
 
-      if (token.address === wrapToken.address && earnings) {
-        // unwrap token
-        const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(token.symbol, earnings)
-        transactions.push({
-          to: token.address,
-          data: encodedWithdrawFunction,
-        })
-        token = nativeAsset
-      }
-
-      // If we are signed in as a safe we don't need to transfer
-      if (!this.isSafeApp && earnings) {
-        if (token.address === nativeAsset.address) {
+          // Redeeem underlying token
           transactions.push({
-            to: account,
-            value: earnings.toString(),
+            to: collateralToken.address,
+            data: encodedRedeemFunction,
           })
-        } else {
+
+          token = getBaseToken(networkId, collateralToken.symbol)
+          earnings = compound.calculateCTokenToBaseExchange(token, earnedCollateral)
+        }
+
+        const wrapToken = getWrapToken(this.cpk.relay ? networkIds.XDAI : networkId)
+        const nativeAsset = getNativeAsset(networkId)
+
+        if (token.address === wrapToken.address) {
+          // unwrap token
+          const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(token.symbol, earnings)
           transactions.push({
             to: token.address,
-            data: ERC20Service.encodeTransfer(account, earnings),
+            data: encodedWithdrawFunction,
+          })
+          token = nativeAsset
+        }
+
+        // If we are signed in as a safe we don't need to transfer
+        if (!this.isSafeApp) {
+          if (token.address === nativeAsset.address) {
+            transactions.push({
+              to: account,
+              value: earnings.toString(),
+            })
+          } else {
+            transactions.push({
+              to: token.address,
+              data: ERC20Service.encodeTransfer(account, earnings),
+            })
+          }
+        }
+      }
+
+      // If user has realitio balance, withdraw
+      if (!realitioBalance.isZero()) {
+        transactions.push({
+          to: getContractAddress(networkId, 'realitio'),
+          data: RealitioService.encodeWithdraw(),
+        })
+
+        if (!this.isSafeApp) {
+          transactions.push({
+            to: account,
+            value: realitioBalance.toString(),
           })
         }
       }
@@ -1365,6 +1408,15 @@ class CPKService {
           data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
         })
       }
+
+      const data = await realitio.encodeClaimWinnings(question.id)
+      if (data) {
+        transactions.push({
+          to: realitio.contract.address,
+          data,
+        })
+      }
+
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error resolving the condition with question id '${question.id}'`, err.message)
@@ -1374,24 +1426,19 @@ class CPKService {
 
   submitAnswer = async ({ amount, answer, question, realitio, setTxHash, setTxState }: CPKSubmitAnswerParams) => {
     try {
-      if (this.cpk.relay || this.isSafeApp) {
-        const transactions: Transaction[] = [
-          {
-            to: realitio.address,
-            data: RealitioService.encodeSubmitAnswer(question.id, answer),
-            value: amount.toString(),
-          },
-        ]
-        const txOptions: TxOptions = {}
-        await this.getGas(txOptions)
-        return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+      const txOptions: TxOptions = {}
+      if (!this.isSafeApp) {
+        txOptions.value = amount
       }
-      const txObject = await realitio.submitAnswer(question.id, answer, amount)
-      setTxState && setTxState(TransactionStep.transactionSubmitted)
-      setTxHash && setTxHash(txObject.hash)
-      const tx = await this.waitForTransaction(txObject)
-      setTxState && setTxState(TransactionStep.transactionConfirmed)
-      return tx
+      const transactions: Transaction[] = [
+        {
+          to: realitio.address,
+          data: RealitioService.encodeSubmitAnswer(question.id, answer),
+          value: amount.toString(),
+        },
+      ]
+      await this.getGas(txOptions)
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (error) {
       logger.error(`There was an error submitting answer '${question.id}'`, error.message)
       throw error

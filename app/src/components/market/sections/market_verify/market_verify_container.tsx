@@ -14,6 +14,7 @@ interface Props {
 
 const MarketVerifyContainer: React.FC<Props> = (props: Props) => {
   const { context, fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
+
   return (
     <MarketVerify
       context={context}
