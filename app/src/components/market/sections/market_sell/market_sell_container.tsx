@@ -17,8 +17,7 @@ interface Props {
 const MarketSellContainer: React.FC<Props> = (props: Props) => {
   const { isScalar } = props
 
-  if (isScalar) return <ScalarMarketSell {...props} />
-  return <MarketSell {...props} />
+  return <> {isScalar ? <ScalarMarketSell {...props} /> : <MarketSell {...props} />}</>
 }
 
 export { MarketSellContainer }

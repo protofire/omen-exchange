@@ -1,6 +1,6 @@
 import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
-import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
+import { RouteComponentProps, useHistory, useLocation, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useCompoundService, useGraphMarketUserTxData } from '../../../../../hooks'
@@ -83,6 +83,7 @@ const Wrapper = (props: Props) => {
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
+  const location = useLocation()
   const context = useConnectedWeb3Context()
   const cpk = context.cpk
 
@@ -108,9 +109,11 @@ const Wrapper = (props: Props) => {
   const nativeAsset = getNativeAsset(networkId)
   const initialBondAmount =
     networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
+
   const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
     question.currentAnswerBond ? new BigNumber(question.currentAnswerBond).mul(2) : initialBondAmount,
   )
+
   useEffect(() => {
     if (question.currentAnswerBond && !new BigNumber(question.currentAnswerBond).mul(2).eq(bondNativeAssetAmount)) {
       setBondNativeAssetAmount(new BigNumber(question.currentAnswerBond).mul(2))
@@ -293,6 +296,23 @@ const Wrapper = (props: Props) => {
     }
     // eslint-disable-next-line
   }, [isQuestionFinalized, isFinalizing])
+
+  useEffect(() => {
+    if (location.pathname.includes('buy')) setCurrentTab(MarketDetailsTab.buy)
+    if (location.pathname.includes('sell')) setCurrentTab(MarketDetailsTab.sell)
+    if (location.pathname.includes('pool')) setCurrentTab(MarketDetailsTab.pool)
+    if (location.pathname.includes('verify')) setCurrentTab(MarketDetailsTab.verify)
+    if (location.pathname.includes('history')) setCurrentTab(MarketDetailsTab.history)
+    if (location.pathname.includes('set_outcome')) setCurrentTab(MarketDetailsTab.setOutcome)
+    if (location.pathname.includes('finalize')) setCurrentTab(MarketDetailsTab.finalize)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (currentTab === MarketDetailsTab.swap) return history.replace(`/${marketMakerAddress}`)
+    return history.replace(`/${marketMakerAddress}/${currentTab.toLowerCase()}`)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentTab])
 
   return (
     <>

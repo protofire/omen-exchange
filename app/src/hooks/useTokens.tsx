@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
+import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../common/constants'
 import { ERC20Service } from '../services'
 import { getLogger } from '../util/logger'
 import { getNativeAsset, getOmenTCRListId, getTokensByNetwork, pseudoNativeAssetAddress } from '../util/networks'
@@ -48,6 +49,7 @@ export const useTokens = (
   addNativeAsset?: boolean,
   addBalances?: boolean,
   relay?: boolean,
+  addBridgeAllowance?: boolean,
 ) => {
   const defaultTokens = getTokensByNetwork(context.networkId)
   if (addNativeAsset) {
@@ -106,6 +108,27 @@ export const useTokens = (
                 }
               }
               return { ...token, balance: balance.toString() }
+            }),
+          )
+        }
+        if (addBridgeAllowance) {
+          const { account, library: provider } = context
+          // fetch token allowances
+          tokenData = await Promise.all(
+            tokenData.map(async token => {
+              let allowance = new BigNumber(0)
+              const allowanceAddress =
+                token.symbol === 'DAI' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS
+              if (account) {
+                try {
+                  const collateralService = new ERC20Service(provider, account, token.address)
+                  allowance = await collateralService.allowance(account, allowanceAddress)
+                } catch (e) {
+                  return { ...token, allowance: allowance.toString() }
+                }
+              }
+
+              return { ...token, allowance: allowance.toString() }
             }),
           )
         }

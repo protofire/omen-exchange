@@ -140,6 +140,8 @@ export interface Token {
   image?: string
   volume?: string
   balance?: string
+  name?: string
+  allowance?: string
 }
 
 export interface QuestionLog {
@@ -439,6 +441,11 @@ export type MarketCondition = {
   oracle: Maybe<string>
   scalarHigh: Maybe<BigNumber>
   scalarLow: Maybe<BigNumber>
+}
+
+export type KnownTokenValue = {
+  token: KnownToken
+  value: BigNumber
 }
 
 export enum MarketDetailsTab {
