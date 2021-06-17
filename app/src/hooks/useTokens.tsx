@@ -1,21 +1,23 @@
-import { useQuery } from '@apollo/react-hooks'
+import axios from 'axios'
 import { BigNumber } from 'ethers/utils'
-import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../common/constants'
 import { ERC20Service } from '../services'
-import { getLogger } from '../util/logger'
-import { getNativeAsset, getOmenTCRListId, getTokensByNetwork, pseudoNativeAssetAddress } from '../util/networks'
+import {
+  getGraphUris,
+  getNativeAsset,
+  getOmenTCRListId,
+  getTokensByNetwork,
+  pseudoNativeAssetAddress,
+} from '../util/networks'
 import { getImageUrl } from '../util/token'
 import { isObjectEqual } from '../util/tools'
 import { Token } from '../util/types'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 
-const logger = getLogger('useTokens')
-
-const query = gql`
+const query = `
   query GetTokenList($listId: String!) {
     tokenLists(where: { listId: $listId }) {
       id
@@ -51,25 +53,25 @@ export const useTokens = (
   relay?: boolean,
   addBridgeAllowance?: boolean,
 ) => {
-  const defaultTokens = getTokensByNetwork(context.networkId)
-  if (addNativeAsset) {
-    defaultTokens.unshift(getNativeAsset(context.networkId, relay))
+  let defaultTokens: Token[] = []
+  if (context) {
+    defaultTokens = getTokensByNetwork(context.networkId)
+    if (addNativeAsset) {
+      defaultTokens.unshift(getNativeAsset(context.networkId, relay))
+    }
   }
   const [tokens, setTokens] = useState<Token[]>(defaultTokens)
 
-  const omenTCRListId = getOmenTCRListId(context.networkId)
+  const fetchTokenDetails = async () => {
+    if (context) {
+      const omenTCRListId = getOmenTCRListId(context.networkId)
+      const { httpUri } = getGraphUris(context.networkId)
+      const variables = { listId: omenTCRListId.toString() }
+      const response = await axios.post(httpUri, { query, variables })
+      const data: GraphResponse = response.data.data
 
-  const { data, error, loading, refetch } = useQuery<GraphResponse>(query, {
-    notifyOnNetworkStatusChange: true,
-    skip: false,
-    variables: { listId: omenTCRListId.toString() },
-  })
-
-  useEffect(() => {
-    const fetchTokenDetails = async () => {
-      if (!error && !loading && data?.tokenLists) {
+      if (data?.tokenLists) {
         let tokenData = defaultTokens
-
         if (data.tokenLists.length) {
           const tokensWithImage: Token[] = data.tokenLists[0].tokens.map(token => ({
             ...token,
@@ -137,21 +139,12 @@ export const useTokens = (
         }
       }
     }
-    fetchTokenDetails()
-    // eslint-disable-next-line
-  }, [loading])
+  }
 
   useEffect(() => {
-    const reload = async () => {
-      try {
-        await refetch()
-      } catch (e) {
-        logger.log(e.message)
-      }
-    }
-    reload()
+    fetchTokenDetails()
     // eslint-disable-next-line
-  }, [context.library, context.networkId])
+  }, [context && context.library, context && context.networkId])
 
-  return { tokens, refetch }
+  return { tokens, refetch: fetchTokenDetails }
 }

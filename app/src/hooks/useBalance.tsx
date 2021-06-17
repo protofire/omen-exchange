@@ -3,159 +3,115 @@ import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
 import { STANDARD_DECIMALS } from '../common/constants'
+import { useTokens } from '../hooks'
 import { XdaiService } from '../services'
 import { getLogger } from '../util/logger'
-import { getNativeAsset, getToken, networkIds } from '../util/networks'
+import { bridgeTokensList, getNativeAsset, networkIds } from '../util/networks'
 import { formatBigNumber, formatNumber } from '../util/tools'
-
-import { fetchBalance } from './useCollateralBalance'
+import { KnownTokenValue, Token } from '../util/types'
 
 const logger = getLogger('Hooks::ConnectedBalance')
 
 export interface ConnectedBalance {
-  unclaimedDaiAmount: BigNumber
-  unclaimedOmenAmount: BigNumber
   nativeBalance: BigNumber
   formattedNativeBalance: string
   daiBalance: BigNumber
-  formattedDaiBalance: string
   xOmenBalance: BigNumber
-  formattedxOmenBalance: string
-  formattedOmenBalance: string
-  fetched: boolean
+  xDaiBalance: BigNumber
+  formattedxDaiBalance: string
   omenBalance: BigNumber
+  mainnetTokens: Token[]
+  xDaiTokens: Token[]
+  arrayOfClaimableTokenBalances: KnownTokenValue[]
   fetchBalances: () => Promise<void>
-}
-
-interface StateParam {
-  active: boolean
+  fetched: boolean
 }
 
 export const useBalance = (props: any) => {
   const context = props
 
-  const [unclaimedDaiAmount, setUnclaimedDaiAmount] = useState<BigNumber>(Zero)
-  const [unclaimedOmenAmount, setUnclaimedOmenAmount] = useState<BigNumber>(Zero)
-
+  const [arrayOfClaimableTokenBalances, setArrayOfClaimableTokenBalances] = useState<KnownTokenValue[]>([])
   const [fetched, setFetched] = useState(false)
-  const [nativeBalance, setNativeBalance] = useState<BigNumber>(Zero)
-  const [daiBalance, setDaiBalance] = useState<BigNumber>(Zero)
-  const [omenBalance, setOmenBalance] = useState<BigNumber>(Zero)
 
-  const [xOmenBalance, setxOmenBalance] = useState<BigNumber>(Zero)
+  // mainnet balances
+  const { refetch, tokens: mainnetTokens } = useTokens(context && context.rawWeb3Context, true, true, false, true)
 
-  const fetchTokenBalances = async (state?: StateParam) => {
-    if (context) {
-      const requests = []
+  // xDai balances
+  const { refetch: fetchXdaiTokens, tokens: xDaiTokens } = useTokens(context, true, true)
 
-      const active = (fn: () => void) => {
-        // race condition prevention
-        if (!state || state.active) {
-          fn()
-        }
-      }
+  const nativeBalance = context
+    ? new BigNumber(
+        mainnetTokens.filter(token => token.symbol === getNativeAsset(context.networkId).symbol)[0]?.balance || '',
+      )
+    : new BigNumber('0')
 
-      if (context.rawWeb3Context.networkId !== networkIds.XDAI) {
-        requests.push(async () => {
-          const daiCollateralBalance = await fetchBalance(
-            getToken(context.rawWeb3Context.networkId, 'dai'),
-            context.rawWeb3Context,
-          )
-          active(() => setDaiBalance(daiCollateralBalance))
-        })
-      }
+  // mainnet balances
+  const daiBalance = new BigNumber(mainnetTokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
+  const omenBalance = new BigNumber(mainnetTokens.filter(token => token.symbol === 'OMN')[0]?.balance || '')
 
-      requests.push(async () => {
-        const omnCollateralBalance = await fetchBalance(
-          getToken(context.rawWeb3Context.networkId, 'omn'),
-          context.rawWeb3Context,
-        )
-        active(() => setOmenBalance(omnCollateralBalance))
-      })
-
-      requests.push(async () => {
-        const nativeCollateralBalance = await fetchBalance(getNativeAsset(context.networkId), context)
-        active(() => setNativeBalance(nativeCollateralBalance))
-      })
-
-      if (context.rawWeb3Context.networkId === networkIds.XDAI) {
-        requests.push(async () => {
-          const xOmenCollateralBalance = await fetchBalance(getToken(context.networkId, 'omn'), context)
-          active(() => setxOmenBalance(xOmenCollateralBalance))
-        })
-      }
-
-      await Promise.all(requests.map(request => request()))
-    }
-  }
+  // xdai token balance
+  const xDaiBalance = new BigNumber(xDaiTokens.filter(token => token.symbol === 'xDAI')[0]?.balance || '')
+  const xOmenBalance = new BigNumber(xDaiTokens.filter(token => token.symbol === 'OMN')[0]?.balance || '')
 
   const fetchUnclaimedAssets = async () => {
-    if (context && context.relay) {
-      const { account, networkId } = context
-      const aggregator = (array: any) => {
-        return array.reduce((prev: BigNumber, { value }: any) => prev.add(value), Zero)
+    const aggregator = (array: any) => {
+      return array.reduce((prev: BigNumber, { value }: any) => prev.add(value), Zero)
+    }
+    const arrayOfBalances: KnownTokenValue[] = []
+    if (context && context.account && context.relay) {
+      const xDaiService = new XdaiService(context.library)
+      const daiTransactions = await xDaiService.fetchXdaiTransactionData()
+
+      if (daiTransactions && daiTransactions.length) {
+        const aggregatedDai: BigNumber = aggregator(daiTransactions)
+        arrayOfBalances.push({ token: 'dai', value: aggregatedDai })
       }
-      if (account && networkId === networkIds.MAINNET) {
-        const xDaiService = new XdaiService(context.library)
-        const daiTransactions = await xDaiService.fetchXdaiTransactionData()
-
-        const omenTransactions = await xDaiService.fetchOmniTransactionData()
-
-        if (daiTransactions && daiTransactions.length) {
-          const aggregatedDai = aggregator(daiTransactions)
-          setUnclaimedDaiAmount(aggregatedDai)
-        } else {
-          setUnclaimedDaiAmount(Zero)
-        }
-        if (omenTransactions && omenTransactions.length) {
-          const aggregatedOmen = aggregator(omenTransactions)
-
-          setUnclaimedOmenAmount(aggregatedOmen)
-        } else {
-          setUnclaimedOmenAmount(Zero)
+      for (const token of bridgeTokensList) {
+        if (token !== 'dai') {
+          const transactions = await xDaiService.fetchOmniTransactionData(token)
+          if (transactions.length !== 0) {
+            const aggregated: BigNumber = aggregator(transactions)
+            arrayOfBalances.push({ token: token, value: aggregated })
+          }
         }
       }
     }
+    setArrayOfClaimableTokenBalances(arrayOfBalances)
   }
 
-  const fetchBalances = async (state?: StateParam) => {
+  const fetchBalances = async () => {
     try {
-      await Promise.all([fetchTokenBalances(state), fetchUnclaimedAssets()])
-      setFetched(true)
+      await Promise.all([fetchUnclaimedAssets(), refetch(), fetchXdaiTokens()])
+      if (mainnetTokens.length > 0) {
+        setFetched(true)
+      }
     } catch (e) {
       logger.log(e.message)
     }
   }
 
   useEffect(() => {
-    const state = { active: true }
-    if (context) {
-      fetchBalances(state)
-    } else {
-      setUnclaimedDaiAmount(Zero)
-      setUnclaimedOmenAmount(Zero)
-    }
-    return () => {
-      state.active = false
-    }
+    setArrayOfClaimableTokenBalances([])
+    fetchBalances()
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [context?.account, context?.networkId, context?.relay, context?.library, context?.rawWeb3Context.networkId])
+  }, [context, context && context.account, context && context.networkId, mainnetTokens])
 
   return {
-    unclaimedDaiAmount,
-    unclaimedOmenAmount,
     nativeBalance,
     formattedNativeBalance: formatNumber(
       formatBigNumber(nativeBalance, STANDARD_DECIMALS, STANDARD_DECIMALS),
       context && context.networkId === networkIds.XDAI ? 2 : 3,
     ),
     daiBalance,
-    formattedDaiBalance: formatNumber(formatBigNumber(daiBalance, STANDARD_DECIMALS, STANDARD_DECIMALS)),
+    xDaiBalance,
+    formattedxDaiBalance: formatBigNumber(xDaiBalance, STANDARD_DECIMALS, 2),
     fetchBalances,
-    formattedOmenBalance: formatNumber(formatBigNumber(omenBalance, STANDARD_DECIMALS, STANDARD_DECIMALS), 2),
     fetched,
     omenBalance,
     xOmenBalance,
-    formattedxOmenBalance: formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 2),
+    mainnetTokens,
+    xDaiTokens,
+    arrayOfClaimableTokenBalances,
   }
 }

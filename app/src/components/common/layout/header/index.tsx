@@ -347,7 +347,7 @@ const HeaderContainer: React.FC = (props: any) => {
               <>
                 <DepositedBalance>
                   {relay
-                    ? `${formattedNativeBalance} DAI`
+                    ? `${formattedxDaiBalance} DAI`
                     : context.rawWeb3Context.networkId === networkIds.XDAI
                     ? `${formattedNativeBalance} xDAI`
                     : `${formattedNativeBalance} ETH`}
