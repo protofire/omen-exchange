@@ -5,9 +5,10 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { useConnectedCPKContext, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { useConnectedCPKContext, useConnectedWeb3Context, useContracts, useCpkProxy } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset } from '../../../../util/networks'
+import { RemoteData } from '../../../../util/remote_data'
 import { formatBigNumber, formatNumber, getUnit, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
@@ -26,6 +27,7 @@ import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
 import { OutcomeTable } from '../../common/outcome_table'
+import { SetAllowance } from '../../common/set_allowance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
@@ -75,6 +77,11 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
 
+  const [upgradeFinished, setUpgradeFinished] = useState(false)
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
+  const showUpgrade = !isUpdated || upgradeFinished
+
   useEffect(() => {
     const fetchBalance = async () => {
       try {
@@ -89,6 +96,15 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       fetchBalance()
     }
   }, [account, provider, bondNativeAssetAmount])
+
+  const upgradeProxy = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await updateProxy()
+    setUpgradeFinished(true)
+  }
 
   const bondOutcome = async (isInvalid?: boolean) => {
     if (!cpk) {
@@ -201,7 +217,15 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           showBondChange
         />
       )}
-
+      {showUpgrade && (
+        <SetAllowance
+          collateral={nativeAsset}
+          finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
+          loading={RemoteData.is.asking(proxyIsUpToDate)}
+          onUnlock={upgradeProxy}
+          style={{ marginTop: 20 }}
+        />
+      )}
       <GridTransactionDetails>
         <div>
           <>
@@ -287,7 +311,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             Set Invalid
           </Button>
         )}
-        <Button buttonType={ButtonType.primary} disabled={amountError} onClick={() => bondOutcome(false)}>
+        <Button buttonType={ButtonType.primary} disabled={amountError || !isUpdated} onClick={() => bondOutcome(false)}>
           Bond {symbol}
         </Button>
       </BottomButtonWrapper>
