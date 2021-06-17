@@ -21,7 +21,7 @@ import theme from './theme'
 import { GlobalStyle } from './theme/global_style'
 import connectors from './util/connectors'
 import { getInfuraUrl } from './util/networks'
-import { checkRpcStatus, getNetworkFromChain } from './util/tools'
+import { checkRpcStatus } from './util/tools'
 
 const store = configureStore({ reducer: balanceReducer })
 
@@ -38,8 +38,7 @@ const App: React.FC = (props: any) => {
 
   useInterval(() => {
     network = ethereum.networkVersion >> 0
-    console.log(status)
-    console.log(network)
+
     if (status == false) {
       setTimeout(() => {
         if (status == false) setSettingsView(true)
