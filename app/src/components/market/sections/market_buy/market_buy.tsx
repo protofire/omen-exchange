@@ -302,7 +302,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     }
     displayTradedShares = compoundService.calculateCTokenToBaseExchange(baseCollateral, tradedShares)
   }
-  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
+  const currentBalance = `${bigNumberToString(collateralBalance, collateral.decimals, 5)}`
 
   const feeFormatted = `${formatBigNumber(
     displayFeePaid.mul(-1),
@@ -427,7 +427,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             <CurrencySelector
               addBalances
               addNativeAsset
-              balance={formatBigNumber(maybeCollateralBalance || Zero, displayCollateral.decimals, 5)}
+              balance={bigNumberToString(maybeCollateralBalance || Zero, displayCollateral.decimals, 5)}
               context={context}
               currency={displayCollateral.address}
               disabled={currencySelectorIsDisabled}

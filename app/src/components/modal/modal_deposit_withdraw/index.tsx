@@ -11,7 +11,7 @@ import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service, XdaiService } from '../../../services'
 import { bridgeTokensList, getNativeAsset, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
-import { formatBigNumber, formatNumber, waitForConfirmations } from '../../../util/tools'
+import { bigNumberToString, formatBigNumber, formatNumber, waitForConfirmations } from '../../../util/tools'
 import { ExchangeType, Token, TransactionStep } from '../../../util/types'
 import { Button, ButtonStateful } from '../../button'
 import { ButtonStates } from '../../button/button_stateful'
@@ -276,7 +276,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         <BalanceItemSide>
           <BalanceItemBalance>
             {token?.balance
-              ? formatBigNumber(new BigNumber(token?.balance), decimals, symbol === 'DAI' ? 2 : 3)
+              ? bigNumberToString(new BigNumber(token?.balance), decimals, symbol === 'DAI' ? 2 : 3)
               : '0.00'}{' '}
             {symbol}
           </BalanceItemBalance>
