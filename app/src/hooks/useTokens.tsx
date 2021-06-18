@@ -1,14 +1,16 @@
+import { aggregate } from '@makerdao/multicall'
+import configs from '@makerdao/multicall/src/addresses.json'
 import axios from 'axios'
-import { BigNumber } from 'ethers/utils'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../common/constants'
-import { ERC20Service } from '../services'
 import {
   getGraphUris,
+  getInfuraUrl,
   getNativeAsset,
   getOmenTCRListId,
   getTokensByNetwork,
+  networkNames,
   pseudoNativeAssetAddress,
 } from '../util/networks'
 import { getImageUrl } from '../util/token'
@@ -69,8 +71,6 @@ export const useTokens = (
   const fetchTokenDetails = async (status?: Status) => {
     const active = !status || status.active
     if (context) {
-      const t0 = performance.now()
-      console.log(`network: ${context.networkId}: start`)
       const omenTCRListId = getOmenTCRListId(context.networkId)
       const { httpUri } = getGraphUris(context.networkId)
       const variables = { listId: omenTCRListId.toString() }
@@ -97,74 +97,73 @@ export const useTokens = (
           )
         }
 
-        if (addBalances) {
-          const { account, library: provider } = context
+        const { account } = context
 
-          // fetch token balances
-          tokenData = await Promise.all(
-            tokenData.map(async token => {
-              let balance = new BigNumber(0)
-              const allowance = new BigNumber(0)
-              if (account) {
-                if (token.address === pseudoNativeAssetAddress) {
-                  balance = await provider.getBalance(account)
-                } else {
-                  try {
-                    const collateralService = new ERC20Service(provider, account, token.address)
-                    // if (addBridgeAllowance) {
-                    //   const allowanceAddress =
-                    //     token.symbol === 'DAI' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS
-                    //   ;[balance, allowance] = await Promise.all([
-                    //     collateralService.getCollateral(account),
-                    //     collateralService.allowance(account, allowanceAddress),
-                    //   ])
-                    //   console.log(balance)
-                    // } else {
-                    //   balance = await collateralService.getCollateral(account)
-                    // }
-
-                    balance = await collateralService.getCollateral(account)
-                  } catch (e) {
-                    return { ...token, balance: balance.toString() }
-                  }
-                }
-              }
-              return { ...token, balance: balance.toString(), allowance: allowance.toString() }
-            }),
-          )
+        // setup multicall config
+        const network = (networkNames as any)[context.networkId]
+        const config = {
+          rpcUrl: getInfuraUrl(context.networkId),
+          multicallAddress: (configs as any)[network.toLowerCase()].multicall,
         }
-        if (addBridgeAllowance) {
-          const { account, library: provider } = context
-          // fetch token allowances
-          tokenData = await Promise.all(
-            tokenData.map(async token => {
-              let allowance = new BigNumber(0)
 
-              const allowanceAddress =
-                token.symbol === 'DAI' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS
-              if (active && account) {
-                try {
-                  const collateralService = new ERC20Service(provider, account, token.address)
-                  allowance = await collateralService.allowance(account, allowanceAddress)
-                  console.log('here', allowance.toString())
-                } catch (e) {
-                  return { ...token, allowance: allowance.toString() }
-                }
+        // aggregate call array
+        const calls = []
+
+        // helpers to access aggregate results
+        const getBalanceKey = (address: string) => `${address}-balance`
+        const getAllowanceKey = (address: string) => `${address}-allowance`
+
+        // iterate over tokens and add calls to aggregate array
+        for (let i = 0; i < tokenData.length; i++) {
+          const token = tokenData[i]
+          if (account) {
+            const balanceKey = getBalanceKey(token.address)
+            if (token.address === pseudoNativeAssetAddress) {
+              if (addBalances) {
+                // use getEthBalance helper in multicall contract
+                calls.push({
+                  target: config.multicallAddress,
+                  call: ['getEthBalance(address)(uint256)', account],
+                  returns: [[balanceKey]],
+                })
               }
-
-              return { ...token, allowance: allowance.toString() }
-            }),
-          )
+            } else {
+              if (addBalances) {
+                calls.push({
+                  target: token.address,
+                  call: ['balanceOf(address)(uint256)', account],
+                  returns: [[balanceKey]],
+                })
+              }
+              if (addBridgeAllowance) {
+                const allowanceAddress =
+                  token.symbol === 'DAI' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS
+                calls.push({
+                  target: token.address,
+                  call: ['allowance(address,address)(uint256)', account, allowanceAddress],
+                  returns: [[getAllowanceKey(token.address)]],
+                })
+              }
+            }
+          }
         }
+
+        if (calls.length) {
+          const response = await aggregate(calls, config)
+          tokenData = tokenData.map(token => {
+            const results = response.results.original
+            const balance = results[getBalanceKey(token.address)]
+            const allowance = results[getAllowanceKey(token.address)]
+            return { ...token, balance, allowance }
+          })
+        }
+
         if (!isObjectEqual(tokens, tokenData)) {
           if (active) {
             setTokens(tokenData)
           }
         }
       }
-
-      const t1 = performance.now()
-      console.log(`network: ${context.networkId}: Call to doSomething took ${t1 - t0} milliseconds.`)
     }
   }
 

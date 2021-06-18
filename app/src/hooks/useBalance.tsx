@@ -98,7 +98,7 @@ export const useBalance = (props: any) => {
       status.active = false
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [context, context && context.account, context && context.networkId, mainnetTokens])
+  }, [context])
 
   return {
     nativeBalance,
