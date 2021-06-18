@@ -631,16 +631,14 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'Predicted Outcome',
     },
     {
-      title: currentAnswerBond
-        ? `${formatNumber(formatBigNumber(currentAnswerBond, NativeDecimals))}  ${NativeSymbol}`
-        : '-',
+      title: currentAnswerBond ? `${formatBigNumber(currentAnswerBond, NativeDecimals)}  ${NativeSymbol}` : '-',
       subtitle: 'Bonded',
     },
     {
       title: currentAnswer
         ? currentAnswer === INVALID_ANSWER_ID
           ? 'Invalid'
-          : `${formatNumber(formatBigNumber(new BigNumber(currentAnswer), STANDARD_DECIMALS))} ${unit}`
+          : `${formatBigNumber(new BigNumber(currentAnswer), STANDARD_DECIMALS)} ${unit}`
         : '-',
       subtitle: isBonded ? 'Pending Outcome' : 'Final Outcome',
     },

@@ -27,6 +27,7 @@ import {
 } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
+  bigNumberToString,
   calcAddFundingSendAmounts,
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
@@ -232,8 +233,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { fetchFundingBalance, fundingBalance: maybeFundingBalance } = useFundingBalance(marketMakerAddress, context)
   const fundingBalance = maybeFundingBalance || Zero
 
-  const walletBalance = formatBigNumber(collateralBalance, displayCollateral.decimals, 5)
-  const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
+  const walletBalance = bigNumberToString(collateralBalance, displayCollateral.decimals, 5)
+  const sharesBalance = bigNumberToString(fundingBalance, collateral.decimals)
 
   const totalUserShareAmounts = calcRemoveFundingSendAmounts(
     fundingBalance,
@@ -330,7 +331,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           baseCollateral,
           depositedTokensTotal,
         )
-        fundsAmount = formatBigNumber(
+        fundsAmount = bigNumberToString(
           displayDepositedTokensTotal || Zero,
           displayCollateral.decimals,
           displayCollateral.decimals,
@@ -611,7 +612,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           </TabsGrid>
           {activeTab === Tabs.deposit && (
             <>
-              <CurrenciesWrapper>
+              <CurrenciesWrapper style={{ border: '2px solid red' }}>
                 <CurrencySelector
                   addBalances
                   addNativeAsset

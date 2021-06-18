@@ -118,10 +118,8 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
 
   const value = {
     nativeBalance,
-    formattedNativeBalance: formatNumber(
-      formatBigNumber(nativeBalance, STANDARD_DECIMALS, STANDARD_DECIMALS),
-      !relay && networkId === networkIds.XDAI ? 2 : 3,
-    ),
+    formattedNativeBalance: formatBigNumber(nativeBalance, STANDARD_DECIMALS, STANDARD_DECIMALS),
+
     daiBalance,
     xDaiBalance,
     formattedxDaiBalance: formatBigNumber(xDaiBalance, nativeAsset.decimals, 2),
