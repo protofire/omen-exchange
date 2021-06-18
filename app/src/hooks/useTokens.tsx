@@ -35,6 +35,10 @@ const query = `
   }
 `
 
+type Status = {
+  active: boolean
+}
+
 type GraphResponse = {
   tokenLists: [
     {
@@ -62,8 +66,11 @@ export const useTokens = (
   }
   const [tokens, setTokens] = useState<Token[]>(defaultTokens)
 
-  const fetchTokenDetails = async () => {
+  const fetchTokenDetails = async (status?: Status) => {
+    const active = !status || status.active
     if (context) {
+      const t0 = performance.now()
+      console.log(`network: ${context.networkId}: start`)
       const omenTCRListId = getOmenTCRListId(context.networkId)
       const { httpUri } = getGraphUris(context.networkId)
       const variables = { listId: omenTCRListId.toString() }
@@ -97,19 +104,32 @@ export const useTokens = (
           tokenData = await Promise.all(
             tokenData.map(async token => {
               let balance = new BigNumber(0)
+              const allowance = new BigNumber(0)
               if (account) {
                 if (token.address === pseudoNativeAssetAddress) {
                   balance = await provider.getBalance(account)
                 } else {
                   try {
                     const collateralService = new ERC20Service(provider, account, token.address)
+                    // if (addBridgeAllowance) {
+                    //   const allowanceAddress =
+                    //     token.symbol === 'DAI' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS
+                    //   ;[balance, allowance] = await Promise.all([
+                    //     collateralService.getCollateral(account),
+                    //     collateralService.allowance(account, allowanceAddress),
+                    //   ])
+                    //   console.log(balance)
+                    // } else {
+                    //   balance = await collateralService.getCollateral(account)
+                    // }
+
                     balance = await collateralService.getCollateral(account)
                   } catch (e) {
                     return { ...token, balance: balance.toString() }
                   }
                 }
               }
-              return { ...token, balance: balance.toString() }
+              return { ...token, balance: balance.toString(), allowance: allowance.toString() }
             }),
           )
         }
@@ -119,12 +139,14 @@ export const useTokens = (
           tokenData = await Promise.all(
             tokenData.map(async token => {
               let allowance = new BigNumber(0)
+
               const allowanceAddress =
                 token.symbol === 'DAI' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS
-              if (account) {
+              if (active && account) {
                 try {
                   const collateralService = new ERC20Service(provider, account, token.address)
                   allowance = await collateralService.allowance(account, allowanceAddress)
+                  console.log('here', allowance.toString())
                 } catch (e) {
                   return { ...token, allowance: allowance.toString() }
                 }
@@ -135,16 +157,16 @@ export const useTokens = (
           )
         }
         if (!isObjectEqual(tokens, tokenData)) {
-          setTokens(tokenData)
+          if (active) {
+            setTokens(tokenData)
+          }
         }
       }
+
+      const t1 = performance.now()
+      console.log(`network: ${context.networkId}: Call to doSomething took ${t1 - t0} milliseconds.`)
     }
   }
-
-  useEffect(() => {
-    fetchTokenDetails()
-    // eslint-disable-next-line
-  }, [context && context.library, context && context.networkId])
 
   return { tokens, refetch: fetchTokenDetails }
 }

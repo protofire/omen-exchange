@@ -27,11 +27,14 @@ export interface ConnectedBalance {
   fetched: boolean
 }
 
+type Status = {
+  active: boolean
+}
+
 export const useBalance = (props: any) => {
   const context = props
 
   const [arrayOfClaimableTokenBalances, setArrayOfClaimableTokenBalances] = useState<KnownTokenValue[]>([])
-  const [fetched, setFetched] = useState(false)
 
   // mainnet balances
   const { refetch, tokens: mainnetTokens } = useTokens(context && context.rawWeb3Context, true, true, false, true)
@@ -79,21 +82,21 @@ export const useBalance = (props: any) => {
     setArrayOfClaimableTokenBalances(arrayOfBalances)
   }
 
-  const fetchBalances = async () => {
+  const fetchBalances = async (status?: Status) => {
     try {
-      await Promise.all([fetchUnclaimedAssets(), refetch(), fetchXdaiTokens()])
-      if (mainnetTokens.length > 0) {
-        setFetched(true)
-      }
+      await Promise.all([fetchUnclaimedAssets(), refetch(status), fetchXdaiTokens(status)])
     } catch (e) {
       logger.log(e.message)
     }
   }
 
   useEffect(() => {
+    const status = { active: true }
     setArrayOfClaimableTokenBalances([])
-    fetchBalances()
-
+    fetchBalances(status)
+    return () => {
+      status.active = false
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [context, context && context.account, context && context.networkId, mainnetTokens])
 
@@ -107,7 +110,7 @@ export const useBalance = (props: any) => {
     xDaiBalance,
     formattedxDaiBalance: formatBigNumber(xDaiBalance, STANDARD_DECIMALS, 2),
     fetchBalances,
-    fetched,
+    fetched: mainnetTokens.length > 0 && xDaiTokens.length > 0,
     omenBalance,
     xOmenBalance,
     mainnetTokens,
