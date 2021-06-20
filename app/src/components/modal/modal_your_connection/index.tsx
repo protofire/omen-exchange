@@ -244,7 +244,7 @@ export const ModalYourConnection = (props: Props) => {
           <BalanceItemTitle style={{ marginLeft: '4px' }}>{name ? name : token}</BalanceItemTitle>
         </BalanceItemSide>
         <BalanceItemBalance>
-          {bigNumberToString(value, decimals, 2)} {token.toUpperCase()}
+          {formatBigNumber(value, decimals, 2)} {token.toUpperCase()}
         </BalanceItemBalance>
       </BalanceItem>
     )
@@ -266,7 +266,7 @@ export const ModalYourConnection = (props: Props) => {
             <BalanceItemTitle style={{ marginLeft: '12px' }}>{name ? name : symbol}</BalanceItemTitle>
           </BalanceItemSide>
           <BalanceItemBalance>
-            {bigNumberToString(balance, decimals, 3)} {symbol}
+            {bigNumberToString(balance, decimals, symbol === 'DAI' ? 2 : 3)} {symbol}
           </BalanceItemBalance>
         </BalanceItem>
       )
