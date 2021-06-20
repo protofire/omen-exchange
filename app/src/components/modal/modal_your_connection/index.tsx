@@ -6,7 +6,12 @@ import styled, { withTheme } from 'styled-components'
 import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
 import { NetworkId, bridgeTokensList, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
-import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
+import {
+  bigNumberToString,
+  formatBigNumber,
+  truncateStringInTheMiddle,
+  waitForConfirmations,
+} from '../../../util/tools'
 import { KnownTokenValue, Token, TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -239,7 +244,7 @@ export const ModalYourConnection = (props: Props) => {
           <BalanceItemTitle style={{ marginLeft: '4px' }}>{name ? name : token}</BalanceItemTitle>
         </BalanceItemSide>
         <BalanceItemBalance>
-          {formatBigNumber(value, decimals, 2)} {token.toUpperCase()}
+          {bigNumberToString(value, decimals, 2)} {token.toUpperCase()}
         </BalanceItemBalance>
       </BalanceItem>
     )
@@ -261,7 +266,7 @@ export const ModalYourConnection = (props: Props) => {
             <BalanceItemTitle style={{ marginLeft: '12px' }}>{name ? name : symbol}</BalanceItemTitle>
           </BalanceItemSide>
           <BalanceItemBalance>
-            {formatBigNumber(balance, decimals, symbol === 'DAI' ? 2 : 3)} {symbol}
+            {bigNumberToString(balance, decimals, 3)} {symbol}
           </BalanceItemBalance>
         </BalanceItem>
       )
