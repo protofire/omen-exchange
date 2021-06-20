@@ -15,7 +15,7 @@ const DefaultTooltip = css`
     letter-spacing: 0.1px;
     text-align: left;
     background-color: ${theme.colors.mainBodyBackground};
-    opacity: 1;
+    opacity: 1 !important;
     border-radius: ${theme.borders.commonBorderRadius};
     border: 1px solid ${theme.borders.tooltip};
   }
@@ -68,6 +68,7 @@ export const ReactTooltipStylesOverride = css`
   }
 
   .customMarketTooltip {
+    opacity: 1 !important;
     ${DefaultTooltip}
   }
 
