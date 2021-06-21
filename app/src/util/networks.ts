@@ -280,7 +280,7 @@ const networks: { [K in NetworkId]: Network } = {
       symbol: 'xDAI',
       decimals: 18,
     },
-    targetSafeImplementation: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
+    targetSafeImplementation: '0x9C75A217AEA76663a9A37687606f099945eb0742',
     blockExplorer: 'blockscout',
     blockExplorerURL: 'https://blockscout.com/poa/xdai',
   },
