@@ -9,8 +9,6 @@ import { DOCUMENT_FAQ, STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useCollateralBalance,
   useCompoundService,
-  useConnectedBalanceContext,
-  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
@@ -114,9 +112,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   } = marketMakerData
   const context = useConnectedWeb3Context()
   const history = useHistory()
-  const { account, library: provider, networkId, relay } = context
-  const cpk = useConnectedCPKContext()
-  const { fetchBalances } = useConnectedBalanceContext()
+  const { account, cpk, library: provider, networkId, relay } = context
+  const { fetchBalances } = context.balances
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
 

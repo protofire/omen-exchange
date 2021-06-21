@@ -1,9 +1,9 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import { STANDARD_DECIMALS } from '../common/constants'
-import { useConnectedWeb3Context, useTokens } from '../hooks'
+import { useTokens } from '../hooks'
 import { XdaiService } from '../services'
 import { getLogger } from '../util/logger'
 import { bridgeTokensList, getNativeAsset, networkIds } from '../util/networks'
@@ -12,7 +12,7 @@ import { KnownTokenValue, Token } from '../util/types'
 
 const logger = getLogger('Hooks::ConnectedBalance')
 
-export interface ConnectedBalanceContext {
+export interface ConnectedBalance {
   nativeBalance: BigNumber
   formattedNativeBalance: string
   daiBalance: BigNumber
@@ -24,52 +24,33 @@ export interface ConnectedBalanceContext {
   xDaiTokens: Token[]
   arrayOfClaimableTokenBalances: KnownTokenValue[]
   fetchBalances: () => Promise<void>
+  fetched: boolean
 }
 
-const ConnectedBalanceContext = React.createContext<Maybe<ConnectedBalanceContext>>(null)
-
-/**
- * This hook can only be used by components under the `ConnectedWeb3` component. Otherwise it will throw.
- */
-export const useConnectedBalanceContext = () => {
-  const context = React.useContext(ConnectedBalanceContext)
-
-  if (!context) {
-    throw new Error('Component rendered outside the provider tree')
-  }
-
-  return context
+type Status = {
+  active: boolean
 }
 
-interface Props {
-  children?: React.ReactNode
-}
-/**
- * Component used to render components that depend on Web3 being available. These components can then
- * `useConnectedWeb3Context` safely to get web3 stuff without having to null check it.
- */
-export const ConnectedBalance: React.FC<Props> = (props: Props) => {
-  const context = useConnectedWeb3Context()
-  const { relay } = context
-  const { account, networkId } = context.rawWeb3Context
+export const useBalance = (props: any) => {
+  const context = props
 
   const [arrayOfClaimableTokenBalances, setArrayOfClaimableTokenBalances] = useState<KnownTokenValue[]>([])
 
   // mainnet balances
-  const { refetch, tokens: mainnetTokens } = useTokens(context.rawWeb3Context, true, true, false, true)
+  const { refetch, tokens: mainnetTokens } = useTokens(context && context.rawWeb3Context, true, true, false, true)
 
-  //xDai balances
+  // xDai balances
   const { refetch: fetchXdaiTokens, tokens: xDaiTokens } = useTokens(context, true, true)
 
-  const nativeBalance = new BigNumber(
-    mainnetTokens.filter(token => token.symbol === getNativeAsset(networkId).symbol)[0]?.balance || '',
-  )
-  //mainnet balances
+  const nativeBalance = context
+    ? new BigNumber(
+        mainnetTokens.filter(token => token.symbol === getNativeAsset(context.networkId).symbol)[0]?.balance || '',
+      )
+    : new BigNumber('0')
+
+  // mainnet balances
   const daiBalance = new BigNumber(mainnetTokens.filter(token => token.symbol === 'DAI')[0]?.balance || '')
   const omenBalance = new BigNumber(mainnetTokens.filter(token => token.symbol === 'OMN')[0]?.balance || '')
-
-  // relay balances
-  const nativeAsset = getNativeAsset(context.networkId)
 
   // xdai token balance
   const xDaiBalance = new BigNumber(xDaiTokens.filter(token => token.symbol === 'xDAI')[0]?.balance || '')
@@ -80,7 +61,7 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
       return array.reduce((prev: BigNumber, { value }: any) => prev.add(value), Zero)
     }
     const arrayOfBalances: KnownTokenValue[] = []
-    if (account && networkId === networkIds.MAINNET) {
+    if (context && context.account && context.relay) {
       const xDaiService = new XdaiService(context.library)
       const daiTransactions = await xDaiService.fetchXdaiTransactionData()
 
@@ -101,35 +82,37 @@ export const ConnectedBalance: React.FC<Props> = (props: Props) => {
     setArrayOfClaimableTokenBalances(arrayOfBalances)
   }
 
-  const fetchBalances = async () => {
+  const fetchBalances = async (status?: Status) => {
     try {
-      await Promise.all([fetchUnclaimedAssets(), refetch(), fetchXdaiTokens()])
+      await Promise.all([fetchUnclaimedAssets(), refetch(status), fetchXdaiTokens(status)])
     } catch (e) {
       logger.log(e.message)
     }
   }
 
   useEffect(() => {
+    const status = { active: true }
     setArrayOfClaimableTokenBalances([])
-    if (relay) fetchBalances()
-
+    fetchBalances(status)
+    return () => {
+      status.active = false
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, networkId])
+  }, [context])
 
-  const value = {
+  return {
     nativeBalance,
     formattedNativeBalance: formatBigNumber(nativeBalance, STANDARD_DECIMALS, STANDARD_DECIMALS),
 
     daiBalance,
     xDaiBalance,
-    formattedxDaiBalance: formatBigNumber(xDaiBalance, nativeAsset.decimals, 2),
+    formattedxDaiBalance: formatBigNumber(xDaiBalance, STANDARD_DECIMALS, 2),
     fetchBalances,
+    fetched: mainnetTokens.length > 0 && xDaiTokens.length > 0,
     omenBalance,
     xOmenBalance,
     mainnetTokens,
     xDaiTokens,
     arrayOfClaimableTokenBalances,
   }
-
-  return <ConnectedBalanceContext.Provider value={value}>{props.children}</ConnectedBalanceContext.Provider>
 }

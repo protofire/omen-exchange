@@ -7,6 +7,20 @@ import { Token } from '../util/types'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 
+export const fetchBalance = async (collateral: Token, context: ConnectedWeb3Context) => {
+  const { account, library: provider } = context
+  let collateralBalance = new BigNumber(0)
+  if (account) {
+    if (collateral.address === pseudoNativeAssetAddress) {
+      collateralBalance = await provider.getBalance(account)
+    } else {
+      const collateralService = new ERC20Service(provider, account, collateral.address)
+      collateralBalance = await collateralService.getCollateral(account)
+    }
+  }
+  return collateralBalance
+}
+
 export const useCollateralBalance = (
   collateral: Token,
   context: ConnectedWeb3Context,
