@@ -7,7 +7,7 @@ import ReactTooltip from 'react-tooltip'
 import styled, { withTheme } from 'styled-components'
 
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../../../common/constants'
-import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
+import { useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service, XdaiService } from '../../../services'
 import { bridgeTokensList, getNativeAsset, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
@@ -110,7 +110,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const { exchangeType, fetchBalances, isOpen, mainnetTokens, onBack, onClose, theme, xDaiBalance, xDaiTokens } = props
 
   const context = useConnectedWeb3Context()
-  const cpk = useConnectedCPKContext()
+  const cpk = context.cpk
 
   const [currencySelected, setCurrencySelected] = useState<KnownToken>('dai')
 
