@@ -8,7 +8,6 @@ import { getArbitratorFromAddress } from '../util/networks'
 import { isScalarMarket, promiseProps } from '../util/tools'
 import { BalanceItem, MarketMakerData, Status, Token } from '../util/types'
 
-import { useConnectedCPKContext } from './connectedCpk'
 import { useConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
 import { GraphMarketMakerData } from './useGraphMarketMakerData'
@@ -85,9 +84,8 @@ const getERC20Token = async (provider: any, address: string): Promise<Token> => 
 
 export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMarketMakerData>, networkId: number) => {
   const context = useConnectedWeb3Context()
-  const cpk = useConnectedCPKContext()
 
-  const { library: provider } = context
+  const { cpk, library: provider } = context
   const contracts = useContracts(context)
   const [marketMakerData, setMarketMakerData] = useState<Maybe<MarketMakerData>>(null)
   const [status, setStatus] = useState<Status>(Status.Loading)

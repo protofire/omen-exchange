@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { ConnectedWeb3Context, useConnectedCPKContext } from '../../../../hooks'
+import { ConnectedWeb3Context } from '../../../../hooks'
 import { useKlerosCuration } from '../../../../hooks/useKlerosCuration'
 import { MarketDetailsTab, MarketMakerData, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
@@ -47,7 +47,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const history = useHistory()
-  const cpk = useConnectedCPKContext()
+  const cpk = context.cpk
 
   const selectSource = useCallback(
     (value: number) => {
