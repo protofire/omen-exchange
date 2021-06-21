@@ -3,8 +3,7 @@ import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import SettingsViewContainer from '../../../components/settings/settings_view'
-import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../hooks'
+import { useConnectedWeb3Context } from '../../../hooks'
 import { NetworkId, bridgeTokensList, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
 import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
@@ -16,6 +15,7 @@ import { IconChevronDown } from '../../common/icons/IconChevronDown'
 import { IconChevronUp } from '../../common/icons/IconChevronUp'
 import { IconJazz } from '../../common/icons/IconJazz'
 import { Image } from '../../market/common/token_item'
+import SettingsViewContainer from '../../settings/settings_view'
 import {
   BalanceItem,
   BalanceItemBalance,
@@ -204,9 +204,8 @@ export const ModalYourConnection = (props: Props) => {
 
   const context = useConnectedWeb3Context()
   const owner = context.rawWeb3Context.account
-  const cpk = useConnectedCPKContext()
 
-  const { relay } = context
+  const { cpk, relay } = context
 
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false)

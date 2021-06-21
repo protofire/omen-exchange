@@ -1,21 +1,25 @@
-import { useQuery } from '@apollo/react-hooks'
-import { BigNumber } from 'ethers/utils'
-import gql from 'graphql-tag'
-import { useEffect, useState } from 'react'
+import { aggregate } from '@makerdao/multicall'
+import configs from '@makerdao/multicall/src/addresses.json'
+import axios from 'axios'
+import { useState } from 'react'
 
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../common/constants'
-import { ERC20Service } from '../services'
-import { getLogger } from '../util/logger'
-import { getNativeAsset, getOmenTCRListId, getTokensByNetwork, pseudoNativeAssetAddress } from '../util/networks'
+import {
+  getGraphUris,
+  getInfuraUrl,
+  getNativeAsset,
+  getOmenTCRListId,
+  getTokensByNetwork,
+  networkNames,
+  pseudoNativeAssetAddress,
+} from '../util/networks'
 import { getImageUrl } from '../util/token'
 import { isObjectEqual } from '../util/tools'
 import { Token } from '../util/types'
 
 import { ConnectedWeb3Context } from './connectedWeb3'
 
-const logger = getLogger('useTokens')
-
-const query = gql`
+const query = `
   query GetTokenList($listId: String!) {
     tokenLists(where: { listId: $listId }) {
       id
@@ -32,6 +36,10 @@ const query = gql`
     }
   }
 `
+
+type Status = {
+  active: boolean
+}
 
 type GraphResponse = {
   tokenLists: [
@@ -51,25 +59,26 @@ export const useTokens = (
   relay?: boolean,
   addBridgeAllowance?: boolean,
 ) => {
-  const defaultTokens = getTokensByNetwork(context.networkId)
-  if (addNativeAsset) {
-    defaultTokens.unshift(getNativeAsset(context.networkId, relay))
+  let defaultTokens: Token[] = []
+  if (context) {
+    defaultTokens = getTokensByNetwork(context.networkId)
+    if (addNativeAsset) {
+      defaultTokens.unshift(getNativeAsset(context.networkId, relay))
+    }
   }
   const [tokens, setTokens] = useState<Token[]>(defaultTokens)
 
-  const omenTCRListId = getOmenTCRListId(context.networkId)
+  const fetchTokenDetails = async (status?: Status) => {
+    const active = !status || status.active
+    if (context) {
+      const omenTCRListId = getOmenTCRListId(context.networkId)
+      const { httpUri } = getGraphUris(context.networkId)
+      const variables = { listId: omenTCRListId.toString() }
+      const response = await axios.post(httpUri, { query, variables })
+      const data: GraphResponse = response.data.data
 
-  const { data, error, loading, refetch } = useQuery<GraphResponse>(query, {
-    notifyOnNetworkStatusChange: true,
-    skip: false,
-    variables: { listId: omenTCRListId.toString() },
-  })
-
-  useEffect(() => {
-    const fetchTokenDetails = async () => {
-      if (!error && !loading && data?.tokenLists) {
+      if (data?.tokenLists) {
         let tokenData = defaultTokens
-
         if (data.tokenLists.length) {
           const tokensWithImage: Token[] = data.tokenLists[0].tokens.map(token => ({
             ...token,
@@ -88,70 +97,75 @@ export const useTokens = (
           )
         }
 
-        if (addBalances) {
-          const { account, library: provider } = context
+        const { account } = context
 
-          // fetch token balances
-          tokenData = await Promise.all(
-            tokenData.map(async token => {
-              let balance = new BigNumber(0)
-              if (account) {
-                if (token.address === pseudoNativeAssetAddress) {
-                  balance = await provider.getBalance(account)
-                } else {
-                  try {
-                    const collateralService = new ERC20Service(provider, account, token.address)
-                    balance = await collateralService.getCollateral(account)
-                  } catch (e) {
-                    return { ...token, balance: balance.toString() }
-                  }
-                }
-              }
-              return { ...token, balance: balance.toString() }
-            }),
-          )
+        // setup multicall config
+        const network = (networkNames as any)[context.networkId]
+        const config = {
+          rpcUrl: getInfuraUrl(context.networkId),
+          multicallAddress: (configs as any)[network.toLowerCase()].multicall,
         }
-        if (addBridgeAllowance) {
-          const { account, library: provider } = context
-          // fetch token allowances
-          tokenData = await Promise.all(
-            tokenData.map(async token => {
-              let allowance = new BigNumber(0)
-              const allowanceAddress =
-                token.symbol === 'DAI' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS
-              if (account) {
-                try {
-                  const collateralService = new ERC20Service(provider, account, token.address)
-                  allowance = await collateralService.allowance(account, allowanceAddress)
-                } catch (e) {
-                  return { ...token, allowance: allowance.toString() }
-                }
-              }
 
-              return { ...token, allowance: allowance.toString() }
-            }),
-          )
+        // aggregate call array
+        const calls = []
+
+        // helpers to access aggregate results
+        const getBalanceKey = (address: string) => `${address}-balance`
+        const getAllowanceKey = (address: string) => `${address}-allowance`
+
+        // iterate over tokens and add calls to aggregate array
+        for (let i = 0; i < tokenData.length; i++) {
+          const token = tokenData[i]
+          if (account) {
+            const balanceKey = getBalanceKey(token.address)
+            if (token.address === pseudoNativeAssetAddress) {
+              if (addBalances) {
+                // use getEthBalance helper in multicall contract
+                calls.push({
+                  target: config.multicallAddress,
+                  call: ['getEthBalance(address)(uint256)', account],
+                  returns: [[balanceKey]],
+                })
+              }
+            } else {
+              if (addBalances) {
+                calls.push({
+                  target: token.address,
+                  call: ['balanceOf(address)(uint256)', account],
+                  returns: [[balanceKey]],
+                })
+              }
+              if (addBridgeAllowance) {
+                const allowanceAddress =
+                  token.symbol === 'DAI' ? DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS : OMNI_BRIDGE_MAINNET_ADDRESS
+                calls.push({
+                  target: token.address,
+                  call: ['allowance(address,address)(uint256)', account, allowanceAddress],
+                  returns: [[getAllowanceKey(token.address)]],
+                })
+              }
+            }
+          }
         }
+
+        if (calls.length) {
+          const response = await aggregate(calls, config)
+          tokenData = tokenData.map(token => {
+            const results = response.results.original
+            const balance = results[getBalanceKey(token.address)]
+            const allowance = results[getAllowanceKey(token.address)]
+            return { ...token, balance, allowance }
+          })
+        }
+
         if (!isObjectEqual(tokens, tokenData)) {
-          setTokens(tokenData)
+          if (active) {
+            setTokens(tokenData)
+          }
         }
       }
     }
-    fetchTokenDetails()
-    // eslint-disable-next-line
-  }, [loading])
+  }
 
-  useEffect(() => {
-    const reload = async () => {
-      try {
-        await refetch()
-      } catch (e) {
-        logger.log(e.message)
-      }
-    }
-    reload()
-    // eslint-disable-next-line
-  }, [context.library, context.networkId])
-
-  return { tokens, refetch }
+  return { tokens, refetch: fetchTokenDetails }
 }

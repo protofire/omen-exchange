@@ -15,7 +15,7 @@ import { ContentWrapper, ModalTitle } from './components/modal/common_styled' //
 import { ConnectionModalNavigation, SettingsModalWrapper } from './components/modal/modal_your_connection'
 import SettingsViewContainer from './components/settings/settings_view'
 import { ApolloProviderWrapper } from './contexts/Apollo'
-import { ConnectedBalance, ConnectedWeb3 } from './hooks'
+import { ConnectedWeb3 } from './hooks'
 import balanceReducer from './store/reducer'
 import theme from './theme'
 import { GlobalStyle } from './theme/global_style'
@@ -80,9 +80,7 @@ const App: React.FC = (props: any) => {
             <ApolloProviderWrapper>
               <Provider store={store}>
                 <GlobalStyle />
-                <ConnectedBalance>
-                  <Main />
-                </ConnectedBalance>
+                <Main />
               </Provider>
             </ApolloProviderWrapper>
           </ConnectedWeb3>
