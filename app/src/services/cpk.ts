@@ -25,6 +25,7 @@ import {
   getBaseToken,
   getBaseTokenForCToken,
   isCToken,
+  isContract,
   signaturesFormatted,
   waitABit,
 } from '../util/tools'
@@ -1466,6 +1467,11 @@ class CPKService {
       const network = await this.provider.getNetwork()
       await this.getGas(txOptions)
       const targetGnosisSafeImplementation = getTargetSafeImplementation(network.chainId)
+
+      if (!(await isContract(this.provider, targetGnosisSafeImplementation))) {
+        throw new Error('Target safe implementation does not exist')
+      }
+
       const transactions: Transaction[] = [
         {
           to: this.cpk.address,
@@ -1478,6 +1484,7 @@ class CPKService {
       throw err
     }
   }
+
   approveCpk = async (addressToApprove: string, tokenAddress: string) => {
     try {
       const txOptions: TxOptions = {}

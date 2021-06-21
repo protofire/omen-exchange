@@ -219,7 +219,6 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       )}
       {showUpgrade && (
         <SetAllowance
-          collateral={nativeAsset}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}

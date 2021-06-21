@@ -164,10 +164,6 @@ export const ScalarMarketBuy = (props: Props) => {
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
-  const showUpgrade =
-    (!isUpdated && displayCollateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && displayCollateral.address === pseudoNativeAssetAddress)
-
   const upgradeProxy = async () => {
     if (!cpk) {
       return
@@ -273,6 +269,8 @@ export const ScalarMarketBuy = (props: Props) => {
     displayCollateral.address !== pseudoNativeAssetAddress &&
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
+
+  const showUpgrade = !isUpdated || upgradeFinished
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 
@@ -502,7 +500,6 @@ export const ScalarMarketBuy = (props: Props) => {
       )}
       {showUpgrade && (
         <SetAllowance
-          collateral={nativeAsset}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}

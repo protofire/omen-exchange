@@ -21,7 +21,7 @@ import {
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
-import { getNativeAsset, networkIds, pseudoNativeAssetAddress } from '../../../../../../util/networks'
+import { networkIds, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, CompoundEnabledTokenType, Ternary, Token } from '../../../../../../util/types'
@@ -198,7 +198,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const cpk = useConnectedCPKContext()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
-  const { account, library: provider, networkId, relay } = context
+  const { account, library: provider, networkId } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
   const [isServiceChecked, setServiceCheck] = useState<boolean>(false)
   const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
@@ -339,9 +339,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
-  const showUpgrade =
-    (!isUpdated && userInputCollateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && userInputCollateral.address === pseudoNativeAssetAddress)
+  const showUpgrade = !isUpdated || upgradeFinished
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 
@@ -581,16 +579,14 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             loading={RemoteData.is.asking(allowance)}
             marginBottom
             onUnlock={unlockCollateral}
-            style={{ marginBottom: 20 }}
           />
         )}
         {showUpgrade && (
           <SetAllowance
-            collateral={getNativeAsset(networkId, relay)}
             finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
             loading={RemoteData.is.asking(proxyIsUpToDate)}
             onUnlock={upgradeProxy}
-            style={{ marginBottom: 20 }}
+            style={{ marginBottom: 20, marginTop: showSetAllowance ? 20 : 0 }}
           />
         )}
         <WarningMessage

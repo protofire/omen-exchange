@@ -233,9 +233,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
 
-  const showUpgrade =
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+  const showUpgrade = !isUpdated || upgradeFinished
 
   const upgradeProxy = async () => {
     if (!cpk) {
@@ -742,7 +740,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       )}
       {activeTab === Tabs.deposit && showUpgrade && (
         <SetAllowanceStyled
-          collateral={getNativeAsset(networkId, relay)}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}

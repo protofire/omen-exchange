@@ -228,6 +228,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     displayCollateral.address !== pseudoNativeAssetAddress &&
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
+
+  const showUpgrade = !isUpdated || upgradeFinished
+
   const depositedTokensTotal = depositedTokens.add(userEarnings)
   const { fetchFundingBalance, fundingBalance: maybeFundingBalance } = useFundingBalance(marketMakerAddress, context)
   const fundingBalance = maybeFundingBalance || Zero
@@ -392,10 +395,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
     setAllowanceFinished(true)
   }
-
-  const showUpgrade =
-    (!isUpdated && displayCollateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && displayCollateral.address === pseudoNativeAssetAddress)
 
   const upgradeProxy = async () => {
     if (!cpk) {
@@ -751,7 +750,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       )}
       {activeTab === Tabs.deposit && showUpgrade && (
         <SetAllowanceStyled
-          collateral={getNativeAsset(networkId, relay)}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}
