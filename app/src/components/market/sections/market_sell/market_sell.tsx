@@ -226,7 +226,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         )
       }
       setStatus(Status.Loading)
-      setMessage(`Selling ${formatNumber(displaySharesAmount)} shares...`)
+      setMessage(`Selling ${displaySharesAmount} shares...`)
 
       let useBaseToken = false
       if (collateral.address !== displayCollateral.address) {
@@ -250,7 +250,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       setDisplaySellShares(null)
       setAmountShares(null)
       setStatus(Status.Ready)
-      setMessage(`Successfully sold ${formatNumber(displaySharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
+      setMessage(`Successfully sold ${displaySharesAmount} ${balances[outcomeIndex].outcomeName} shares.`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
@@ -270,7 +270,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       return compoundService.calculateCTokenToBaseExchange(baseCollateral, ns)
     })
   }
-  const selectedOutcomeBalance = formatBigNumber(balanceItem.shares, baseCollateral.decimals, baseCollateral.decimals)
+  const selectedOutcomeBalance = bigNumberToString(balanceItem.shares, baseCollateral.decimals, 5)
 
   let displaySelectedOutcomeBalance = selectedOutcomeBalance
   let displaySelectedOutcomeBalanceValue = balanceItem.shares
@@ -279,7 +279,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       baseCollateral,
       balanceItem.shares,
     )
-    displaySelectedOutcomeBalance = formatBigNumber(displaySelectedOutcomeBalanceValue, baseCollateral.decimals)
+    displaySelectedOutcomeBalance = bigNumberToString(
+      displaySelectedOutcomeBalanceValue,
+      baseCollateral.decimals,
+      baseCollateral.decimals,
+    )
   }
 
   const amountError = isTransactionProcessing

@@ -332,9 +332,7 @@ export const OutcomeTable = (props: Props) => {
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Payout) ? null : (
-          <TDStyled textAlign={TableCellsAlign[4]}>
-            {withWinningOutcome && payouts ? formatNumber(formattedPayout) : '0.00'}
-          </TDStyled>
+          <TDStyled textAlign={TableCellsAlign[4]}>{withWinningOutcome && payouts ? formattedPayout : '0.00'}</TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Bonded) ? null : (
           <TDStyled

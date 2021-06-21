@@ -28,10 +28,10 @@ import { RemoteData } from '../../../../util/remote_data'
 import {
   bigMax,
   bigMin,
+  bigNumberToString,
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
   formatBigNumber,
-  formatNumber,
   getBaseTokenForCToken,
   getInitialCollateral,
   getUnit,
@@ -296,7 +296,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setAmountToFund(null)
       setAmountToFundDisplay('')
       setAmountToFundNormalized(null)
-      setMessage(`Successfully deposited ${formatNumber(fundsAmount)}  ${displayCollateral.symbol}`)
+      setMessage(`Successfully deposited ${fundsAmount}  ${displayCollateral.symbol}`)
     } catch (err) {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to deposit funds.`)
@@ -325,7 +325,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         fundsAmount = formatBigNumber(displayDepositedTokensTotal || Zero, displayCollateral.decimals)
       }
 
-      setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
+      setMessage(`Withdrawing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
 
       const conditionId = await marketMaker.getConditionId()
       let useBaseToken = false
@@ -361,7 +361,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
       setAmountToRemoveNormalized(null)
-      setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${displayCollateral.symbol}`)
+      setMessage(`Successfully withdrew ${fundsAmount} ${displayCollateral.symbol}`)
     } catch (err) {
       setTxState(TransactionStep.error)
       setMessage(`Error trying to withdraw funds.`)
@@ -645,7 +645,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           )}
           {activeTab === Tabs.withdraw && (
             <>
-              <TokenBalance text="Pool Tokens" value={formatNumber(displaySharesBalance)} />
+              <TokenBalance text="Pool Tokens" value={displaySharesBalance} />
 
               <TextfieldCustomPlaceholder
                 formField={
@@ -663,7 +663,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setAmountToRemove(fundingBalance)
-                  setAmountToRemoveDisplay(formatBigNumber(displayFundingBalance, baseCollateral.decimals, 5))
+                  setAmountToRemoveDisplay(bigNumberToString(displayFundingBalance, baseCollateral.decimals, 5))
                 }}
                 shouldDisplayMaxButton
                 symbol="Shares"

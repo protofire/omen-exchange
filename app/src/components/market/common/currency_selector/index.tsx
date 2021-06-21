@@ -3,7 +3,7 @@ import React, { useEffect } from 'react'
 import styled, { css } from 'styled-components'
 
 import { ConnectedWeb3Context, useTokens } from '../../../../hooks'
-import { bigNumberToString, formatBigNumber } from '../../../../util/tools'
+import { bigNumberToString } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import { Spinner } from '../../../common/spinner'

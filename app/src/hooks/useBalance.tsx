@@ -6,8 +6,8 @@ import { STANDARD_DECIMALS } from '../common/constants'
 import { useTokens } from '../hooks'
 import { XdaiService } from '../services'
 import { getLogger } from '../util/logger'
-import { bridgeTokensList, getNativeAsset, networkIds } from '../util/networks'
-import { formatBigNumber, formatNumber } from '../util/tools'
+import { bridgeTokensList, getNativeAsset } from '../util/networks'
+import { formatBigNumber } from '../util/tools'
 import { KnownTokenValue, Token } from '../util/types'
 
 const logger = getLogger('Hooks::ConnectedBalance')

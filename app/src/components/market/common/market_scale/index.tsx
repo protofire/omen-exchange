@@ -574,7 +574,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   ]
   let displayYourPayout = yourPayout.toString()
   let displayProfitLoss = profitLoss
-  let displayAddtionalShares = additionalShares
+  let displayAdditionalShares = additionalShares
   if (
     baseCollateral &&
     collateral &&
@@ -618,8 +618,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         baseCollateral,
         additionalSharesBNValue,
       )
-      const displayAddtionalSharesString = formatBigNumber(additionalSharesBaseBN, baseCollateral.decimals, 4)
-      displayAddtionalShares = parseFloat(displayAddtionalSharesString)
+      const displayAdditionalSharesString = formatBigNumber(additionalSharesBaseBN, baseCollateral.decimals, 4)
+      displayAdditionalShares = parseFloat(displayAdditionalSharesString)
     }
   }
 
@@ -676,7 +676,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'Current prediction',
     },
     {
-      title: `+ ${formatNumber(displayAddtionalShares ? displayAddtionalShares.toString() : '0')} Shares `,
+      title: `+ ${formatNumber(displayAdditionalShares ? displayAdditionalShares.toString() : '0')} Shares `,
       subtitle: `${additionalSharesType} position`,
       tooltip: `To keep the market stable, you receive additional shares for depositing and removing liquidity.`,
       ball: true,

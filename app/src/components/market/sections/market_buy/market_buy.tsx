@@ -25,7 +25,6 @@ import {
   bigNumberToString,
   computeBalanceAfterTrade,
   formatBigNumber,
-  formatNumber,
   getInitialCollateral,
   getSharesInBaseToken,
   mulBN,
@@ -229,10 +228,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           ? displayCollateral
           : collateral
 
-      const sharesAmount = bigNumberToString(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals)
+      const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals)
       setTweet('')
       setStatus(Status.Loading)
-      setMessage(`Buying ${formatNumber(sharesAmount)} shares...`)
+      setMessage(`Buying ${sharesAmount} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
@@ -261,7 +260,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )
       setDisplayAmountToFund(new BigNumber('0'))
       setStatus(Status.Ready)
-      setMessage(`Successfully bought ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
+      setMessage(`Successfully bought ${sharesAmount} ${balances[outcomeIndex].outcomeName} shares.`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)

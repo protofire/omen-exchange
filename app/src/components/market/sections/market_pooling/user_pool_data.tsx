@@ -1,10 +1,9 @@
-import { Zero } from 'ethers/constants'
 import { BigNumber, parseUnits } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
 import { useCompoundService, useConnectedWeb3Context } from '../../../../hooks'
-import { formatBigNumber, formatNumber, getInitialCollateral } from '../../../../util/tools'
+import { formatBigNumber, getInitialCollateral } from '../../../../util/tools'
 import { CompoundTokenType, Token } from '../../../../util/types'
 import { TitleValue } from '../../../common'
 import { ValueStates } from '../../common/transaction_details_row'

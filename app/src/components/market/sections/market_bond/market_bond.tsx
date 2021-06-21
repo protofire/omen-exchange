@@ -9,7 +9,7 @@ import { useConnectedWeb3Context, useContracts, useCpkProxy } from '../../../../
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import { formatBigNumber, formatNumber, getUnit, numberToByte32 } from '../../../../util/tools'
+import { formatBigNumber, getUnit, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
   MarketDetailsTab,

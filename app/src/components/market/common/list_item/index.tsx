@@ -8,6 +8,7 @@ import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getTokenFromAddress } from '../../../../util/networks'
 import {
+  bigNumberToString,
   calcPrediction,
   calcPrice,
   formatBigNumber,
@@ -110,7 +111,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   let token: Token | undefined
   try {
     const tokenInfo = getTokenFromAddress(context.networkId, collateralToken)
-    const volume = formatBigNumber(collateralVolume, tokenInfo.decimals)
+    const volume = bigNumberToString(collateralVolume, tokenInfo.decimals)
     token = { ...tokenInfo, volume }
   } catch (err) {
     logger.debug(err.message)
@@ -183,7 +184,10 @@ export const ListItem: React.FC<Props> = (props: Props) => {
             `${
               Math.floor(Date.now() / 86400000) === lastActiveDay && runningDailyVolumeByHour && decimals
                 ? formatToShortNumber(
-                    formatBigNumber(runningDailyVolumeByHour[Math.floor(Date.now() / (1000 * 60 * 60)) % 24], decimals),
+                    bigNumberToString(
+                      runningDailyVolumeByHour[Math.floor(Date.now() / (1000 * 60 * 60)) % 24],
+                      decimals,
+                    ),
                   )
                 : 0
             } ${symbol} - 24h Volume`}

@@ -24,7 +24,6 @@ import {
   calcXValue,
   computeBalanceAfterTrade,
   formatBigNumber,
-  formatNumber,
   getInitialCollateral,
   getUnit,
   mulBN,
@@ -322,7 +321,7 @@ export const ScalarMarketBuy = (props: Props) => {
       const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals)
       setTweet('')
       setStatus(Status.Loading)
-      setMessage(`Buying ${formatNumber(sharesAmount)} shares...`)
+      setMessage(`Buying ${sharesAmount} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
@@ -352,7 +351,7 @@ export const ScalarMarketBuy = (props: Props) => {
       setDisplayAmountToFund(new BigNumber('0'))
       setAmount(new BigNumber(0))
       setStatus(Status.Ready)
-      setMessage(`Successfully bought ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
+      setMessage(`Successfully bought ${sharesAmount} ${balances[outcomeIndex].outcomeName} shares.`)
     } catch (err) {
       setStatus(Status.Error)
       setTxState(TransactionStep.error)

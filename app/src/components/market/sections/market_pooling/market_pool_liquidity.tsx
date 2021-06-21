@@ -30,7 +30,6 @@ import {
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
   formatBigNumber,
-  formatNumber,
   getBaseTokenForCToken,
   getInitialCollateral,
   getSharesInBaseToken,
@@ -273,7 +272,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           displayCollateral.decimals,
         )
       }
-      setMessage(`Depositing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
+      setMessage(`Depositing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
 
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
@@ -302,7 +301,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setAmountToFund(null)
       setAmountToFundDisplay('')
       setAmountToFundNormalized(null)
-      setMessage(`Successfully deposited ${formatNumber(fundsAmount)} ${displayCollateral.symbol}`)
+      setMessage(`Successfully deposited ${fundsAmount} ${displayCollateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
@@ -328,13 +327,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           baseCollateral,
           depositedTokensTotal,
         )
-        fundsAmount = bigNumberToString(
+        fundsAmount = formatBigNumber(
           displayDepositedTokensTotal || Zero,
           displayCollateral.decimals,
           displayCollateral.decimals,
         )
       }
-      setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
+      setMessage(`Withdrawing funds: ${fundsAmount} ${displayCollateral.symbol}...`)
 
       const conditionId = await marketMaker.getConditionId()
       let useBaseToken = false
@@ -371,7 +370,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
       setAmountToRemoveNormalized(null)
-      setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${displayCollateral.symbol}`)
+      setMessage(`Successfully withdrew ${fundsAmount} ${displayCollateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
@@ -654,7 +653,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           )}
           {activeTab === Tabs.withdraw && (
             <>
-              <TokenBalance text="Pool Tokens" value={formatNumber(displaySharesBalance)} />
+              <TokenBalance text="Pool Tokens" value={displaySharesBalance} />
 
               <TextfieldCustomPlaceholder
                 formField={
@@ -672,7 +671,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setAmountToRemove(fundingBalance)
-                  setAmountToRemoveDisplay(formatBigNumber(displayFundingBalance, baseCollateral.decimals, 5))
+                  setAmountToRemoveDisplay(bigNumberToString(displayFundingBalance, baseCollateral.decimals, 5))
                 }}
                 shouldDisplayMaxButton
                 symbol=""
@@ -712,7 +711,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                   displayCollateral.decimals,
                 )} ${displayTotalSymbol}`}
               />
-              {console.log(sellNoteUserEarnings)}
+
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"

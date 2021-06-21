@@ -20,7 +20,6 @@ import {
   calcXValue,
   computeBalanceAfterTrade,
   formatBigNumber,
-  formatNumber,
   getInitialCollateral,
   getSharesInBaseToken,
   getUnit,
@@ -244,7 +243,7 @@ export const ScalarMarketSell = (props: Props) => {
         useBaseToken = true
       }
       setStatus(Status.Loading)
-      setMessage(`Selling ${formatNumber(displaySharesAmount)} shares...`)
+      setMessage(`Selling ${displaySharesAmount} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
@@ -269,9 +268,7 @@ export const ScalarMarketSell = (props: Props) => {
       setAmountShares(null)
       setAmountSharesToDisplay('')
       setStatus(Status.Ready)
-      setMessage(
-        `Successfully sold ${formatNumber(displaySharesAmount)} '${balances[outcomeIndex].outcomeName}' shares.`,
-      )
+      setMessage(`Successfully sold ${displaySharesAmount} '${balances[outcomeIndex].outcomeName}' shares.`)
     } catch (err) {
       setStatus(Status.Error)
       setTxState(TransactionStep.error)
