@@ -334,7 +334,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount ||
-    (!isUpdated && displayCollateral.address === pseudoNativeAssetAddress)
+    !isUpdated
 
   let currencyFilters =
     collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress

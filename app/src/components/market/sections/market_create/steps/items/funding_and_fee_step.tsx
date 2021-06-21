@@ -332,7 +332,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     amountError !== null ||
     exceedsMaxFee ||
     isNegativeDepositAmount ||
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress)
+    !isUpdated
 
   const showSetAllowance =
     userInputCollateral.address !== pseudoNativeAssetAddress &&

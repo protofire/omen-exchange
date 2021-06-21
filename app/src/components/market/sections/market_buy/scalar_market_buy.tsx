@@ -291,7 +291,7 @@ export const ScalarMarketBuy = (props: Props) => {
       hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount ||
-    (!isUpdated && displayCollateral.address === pseudoNativeAssetAddress)
+    !isUpdated
 
   const finish = async () => {
     const outcomeIndex = positionIndex
