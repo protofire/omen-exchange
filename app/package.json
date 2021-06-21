@@ -13,6 +13,7 @@
     "@kleros/erc-792": "^7.0.0",
     "@kleros/gtcr-encoder": "^1.1.3",
     "@kleros/tcr": "^2.0.0",
+    "@makerdao/multicall": "^0.12.0",
     "@react-corekit/use-interval": "^1.1.1",
     "@realitio/realitio-lib": "^2.0.1",
     "@reduxjs/toolkit": "^1.2.3",
