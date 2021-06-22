@@ -4,8 +4,7 @@ import { useHistory } from 'react-router'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import styled from 'styled-components'
 
-import { useTheme } from '../../../../hooks/useTheme'
-// import theme from '../../../../theme'
+import theme from '../../../../theme'
 import { getOutcomeColor } from '../../../../theme/utils'
 import { calcPrediction } from '../../../../util/tools'
 import { Button } from '../../../button/button'
@@ -15,7 +14,7 @@ import { CustomInlineLoading } from '../history_table'
 
 const ResponsiveWrapper = styled.div`
   margin: 21px 24.5px;
-  border: 1px solid ${({ theme }) => theme.primary4};
+  border: 1px solid ${props => props.theme.borders.borderDisabled};
   padding-bottom: 16px;
   border-radius: 6px;
 `
@@ -23,14 +22,14 @@ const ResponsiveWrapper = styled.div`
 const ChartTooltip = styled.div`
   background: #fff;
   border-radius: 2px;
-  border: 1px solid ${({ theme }) => theme.primary4};
+  border: 1px solid ${props => props.theme.borders.borderDisabled};
   box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.12);
   min-width: 160px;
   padding: 17px;
 `
 
 const TooltipTitle = styled.h4`
-  color: ${({ theme }) => theme.text1};
+  color: ${props => props.theme.colors.textColorDark};
   font-size: 12px;
   font-weight: 500;
   line-height: 1.2;
@@ -43,14 +42,14 @@ const Legends = styled.ul`
   padding: 0;
 `
 const ButtonWrapper = styled.div`
-  border-top: ${({ theme }) => theme.borders.borderLineDisabled};
+  border-top: ${props => props.theme.borders.borderLineDisabled};
   padding-top: 20px;
   padding-left: 24px;
 `
 
 const Legend = styled.li`
   align-items: center;
-  color: ${({ theme }) => theme.text4};
+  color: ${props => props.theme.colors.textColor};
   display: flex;
   font-size: 12px;
   font-weight: 400;
@@ -59,14 +58,14 @@ const Legend = styled.li`
   padding: 0;
 
   strong {
-    color: ${({ theme }) => theme.text3};
+    color: ${props => props.theme.colors.textColorDarker};
     font-weight: 500;
     margin-right: 6px;
   }
 `
 const NoData = styled.div`
   align-items: center;
-  color: ${({ theme }) => theme.text3};
+  color: ${props => props.theme.colors.textColorDarker};
   display: flex;
   font-size: 15px;
   font-weight: 400;
@@ -74,8 +73,8 @@ const NoData = styled.div`
   justify-content: center;
   letter-spacing: 0.4px;
   line-height: 1.3;
-  padding-left: ${({ theme }) => theme.cards.paddingHorizontal};
-  padding-right: ${({ theme }) => theme.cards.paddingHorizontal};
+  padding-left: ${props => props.theme.cards.paddingHorizontal};
+  padding-right: ${props => props.theme.cards.paddingHorizontal};
 `
 
 const AnEvenSmallerLittleBall = styled(OutcomeItemLittleBallOfJoyAndDifferentColors as any)`
@@ -129,7 +128,6 @@ export const HistoryChart: React.FC<Props> = ({
   unit,
 }) => {
   const history = useHistory()
-  const theme = useTheme()
 
   const toScaleValue = (decimal: number, fixed = 0) => {
     return `${calcPrediction(decimal.toString(), scalarLow || new BigNumber(0), scalarHigh || new BigNumber(0)).toFixed(
