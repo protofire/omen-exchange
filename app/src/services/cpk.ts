@@ -1444,16 +1444,22 @@ class CPKService {
     }
   }
 
-  proxyIsUpToDate = async (): Promise<boolean> => {
+  proxyIsUpToDate = async (isNative = false): Promise<boolean> => {
+    if (this.cpk.relay) {
+      return true
+    }
     const network = await this.provider.getNetwork()
     const deployed = await this.cpk.isProxyDeployed()
     if (deployed) {
       const implementation = await this.safe.getMasterCopy()
-      if (implementation.toLowerCase() === getTargetSafeImplementation(network.chainId).toLowerCase()) {
-        return true
+      if (implementation.toLowerCase() !== getTargetSafeImplementation(network.chainId).toLowerCase()) {
+        return false
       }
     }
-    return false
+    if (isNative) {
+      return false
+    }
+    return true
   }
 
   upgradeProxyImplementation = async (): Promise<TransactionReceipt> => {

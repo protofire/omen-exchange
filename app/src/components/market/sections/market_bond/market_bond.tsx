@@ -76,7 +76,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const [txHash, setTxHash] = useState('')
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(true)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
   const showUpgrade = !isUpdated || upgradeFinished
 

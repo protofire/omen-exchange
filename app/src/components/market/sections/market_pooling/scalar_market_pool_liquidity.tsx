@@ -117,10 +117,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
-  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
-  const [upgradeFinished, setUpgradeFinished] = useState(false)
-
   const resolutionDate = question.resolution.getTime()
   const currentDate = new Date().getTime()
   const disableDepositTab = currentDate > resolutionDate
@@ -155,6 +151,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [amountToFundNormalized, setAmountToFundNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToRemoveNormalized, setAmountToRemoveNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const collateralSymbol = collateral.symbol.toLowerCase()
+
+  const isNative = displayCollateral.address === pseudoNativeAssetAddress
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(isNative)
+  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
+  const [upgradeFinished, setUpgradeFinished] = useState(false)
 
   let baseCollateral = collateral
   if (collateralSymbol in CompoundTokenType) {
@@ -737,6 +738,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       )}
       {activeTab === Tabs.deposit && showUpgrade && (
         <SetAllowanceStyled
+          collateral={isNative ? displayCollateral : undefined}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}
