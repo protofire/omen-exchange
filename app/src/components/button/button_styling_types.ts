@@ -20,24 +20,23 @@ export interface ButtonLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement>
 
 const PrimaryCSS = css`
   & {
-    background-color: ${props => props.theme.buttonPrimary.backgroundColor};
-    border-color: ${props => props.theme.buttonPrimary.borderColor};
-    color: ${props => props.theme.buttonPrimary.color};
+    background-color: ${props => props.theme.primary1};
+    border-color: ${props => props.theme.primary1};
+    color: ${props => props.theme.white};
   }
 
   &:hover {
-    background-color: ${props => props.theme.buttonPrimary.backgroundColorHover};
-    border-color: ${props => props.theme.buttonPrimary.borderColorHover};
-    color: ${props => props.theme.buttonPrimary.colorHover};
+    background-color: ${props => props.theme.primary3};
+    border-color: ${props => props.theme.primary3};
+    color: ${props => props.theme.white};
   }
 
   &[disabled],
   &[disabled]:hover {
-    background-color: ${props => props.theme.buttonPrimary.backgroundColorDisabled};
-    border-color: ${props => props.theme.buttonPrimary.borderColorDisabled};
-    color: ${props => props.theme.buttonPrimary.colorDisabled};
+    background-color: ${props => props.theme.white};
+    border-color: ${props => props.theme.primary4};
+    color: ${props => props.theme.text2};
     cursor: not-allowed;
-    opacity: 0.5;
   }
 `
 
