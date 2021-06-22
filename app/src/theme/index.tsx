@@ -5,11 +5,13 @@ import { Colors } from './types'
 
 export function colors(darkMode: boolean): Colors {
   return {
+    //figma link https://www.figma.com/file/zVniQrYgkj8AfQs5zNeBrS/Components-FINAL
+
     // text
     text1: darkMode ? '' : '#37474F',
-    text2: darkMode ? '#C3C5CB' : '#86909E',
-    text3: darkMode ? '#6C7284' : '#333333',
-    text4: darkMode ? '#565A69' : '#757575',
+    text2: darkMode ? '' : '#86909E',
+    text3: darkMode ? '' : '#333333',
+    text4: darkMode ? '' : '#757575',
 
     //primary colors
     primary1: darkMode ? '' : '#5C6BC0',
