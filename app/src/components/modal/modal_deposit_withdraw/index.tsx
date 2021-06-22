@@ -20,7 +20,7 @@ import { BigNumberInput, RadioInput, TextfieldCustomPlaceholder } from '../../co
 import { BigNumberInputReturn } from '../../common/form/big_number_input'
 import { IconArrowBack, IconClose } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
-import { IconInfo } from '../../common/tooltip/img/IconInfo'
+import { IconInfo } from '../../common/icons/IconInfo'
 import { Image } from '../../market/common/token_item'
 import {
   BalanceItem,
