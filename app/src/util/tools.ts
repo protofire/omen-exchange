@@ -71,6 +71,12 @@ export const formatLockDate = (date: number) => {
     .tz('UTC')
     .format(`MMMM Do, YYYY - HH:mm UTC`)
 }
+export const daysUntil = (timestamp: number): number => {
+  const current = moment()
+  const day = moment.unix(timestamp)
+
+  return Math.ceil(moment.duration(day.diff(current)).asDays())
+}
 
 export const checkRpcStatus = async (customUrl: string, setStatus: any, network: any) => {
   try {

@@ -8,7 +8,7 @@ import styled, { withTheme } from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { ERC20Service, OmenGuildService } from '../../../services'
 import { networkIds } from '../../../util/networks'
-import { divBN, formatBigNumber, formatLockDate } from '../../../util/tools'
+import { daysUntil, divBN, formatBigNumber, formatLockDate } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonStateful, ButtonStates } from '../../button/button_stateful'
@@ -210,6 +210,7 @@ const ModalLockTokens = (props: Props) => {
       setAllowanceState(ButtonStates.idle)
     }
   }
+
   const lockTokens = async (amount: BigNumber) => {
     if (!cpk) return
 
@@ -316,7 +317,7 @@ const ModalLockTokens = (props: Props) => {
 
             <DataRow style={{ marginTop: !isLockAmountOpen ? '12px' : '' }}>
               <LightDataItem>{isLockAmountOpen && 'Your '}Vote Weight</LightDataItem>
-              <DarkDataItem>
+              <DarkDataItem style={{ marginTop: !isLockAmountOpen ? '12px' : '' }}>
                 <PercentageText lightColor={!displayLockAmount.isZero()}>
                   {!totalLocked.isZero() && !userLocked.isZero()
                     ? (divBN(userLocked, totalLocked) * 100).toFixed(2)
@@ -339,12 +340,14 @@ const ModalLockTokens = (props: Props) => {
                 {timestamp !== 0 ? (
                   <>
                     {formatLockDate(timestamp * 1000)}
+
                     <div
                       data-arrow-color="transparent"
                       data-for="unlockDate"
-                      data-tip={`${(5265716 / 86400).toFixed(0)} Days remaining`}
+                      data-tip={`${daysUntil(timestamp)} Days remaining`}
+                      style={{ marginLeft: '8px' }}
                     >
-                      <IconAlertInverted size="16" style={{ marginLeft: '8px', verticalAlign: 'text-bottom' }} />
+                      <IconAlertInverted size="16" style={{ verticalAlign: 'text-bottom' }} />
                     </div>
                   </>
                 ) : (
@@ -352,16 +355,15 @@ const ModalLockTokens = (props: Props) => {
                 )}
               </DarkDataItem>
             </DataRow>
-            <ReactTooltip
-              className="customMarketTooltip"
-              data-multiline={true}
-              effect="solid"
-              id="unlockDate"
-              offset={{ top: -70, left: 20 }}
-              place="top"
-              type="light"
-            />
           </ModalMain>
+          <ReactTooltip
+            className="customMarketTooltip"
+            data-multiline={true}
+            effect="solid"
+            id="unlockDate"
+            place="top"
+            type="light"
+          />
           <ButtonSection>
             {!isLockAmountOpen && (
               <ButtonsLockUnlock
