@@ -45,13 +45,14 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   icon?: string
   isOpen: boolean
   message: string
+  currencies?: string
   theme: any
   onClose: () => void
   onClick: () => void
 }
 
 export const ModalClaim = (props: Props) => {
-  const { isOpen, message, onClick, onClose, theme } = props
+  const { currencies, isOpen, message, onClick, onClose, theme } = props
 
   React.useEffect(() => {
     Modal.setAppElement('#root')
@@ -70,7 +71,7 @@ export const ModalClaim = (props: Props) => {
         <ButtonContainer>
           <ModalButtonWrapper>
             <ModalButton buttonType={ButtonType.primary} onClick={onClick}>
-              Claim DAI
+              Claim {currencies}
             </ModalButton>
           </ModalButtonWrapper>
         </ButtonContainer>

@@ -5,37 +5,35 @@ import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 
 import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
-import { useConnectedBalanceContext, useConnectedWeb3Context } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../hooks'
 import { networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { ExchangeType } from '../../../../util/types'
 import { ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
 import { Network } from '../../../common'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
 import {
   ModalConnectWalletWrapper,
   ModalDepositWithdrawWrapper,
   ModalLockYoTokens,
   ModalYourConnectionWrapper,
 } from '../../../modal'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../form/dropdown'
 import { IconAdd, IconClose, IconOmen } from '../../icons'
 import { IconSettings } from '../../icons/IconSettings'
 
 export const HeaderWrapper = styled.div`
-  align-items: flex-end;
+  align-items: center;
   background: ${props => props.theme.header.backgroundColor};
   display: flex;
   flex-grow: 0;
   flex-shrink: 0;
-  height: 45px;
+  height: 88px;
+  padding: 0 30px;
   justify-content: space-between;
   position: sticky;
   top: 0;
   z-index: 5;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    height: ${props => props.theme.header.height};
-  }
+  border-bottom: 1px solid ${props => props.theme.buttonPrimaryLine.borderColorDisabled};
 `
 
 export const HeaderInner = styled.div`
@@ -46,19 +44,19 @@ export const HeaderInner = styled.div`
   justify-content: space-between;
   margin: 0 auto;
   max-width: 100%;
-  padding: 0 10px;
+  padding: 24px 0px;
   position: relative;
   width: ${props => props.theme.themeBreakPoints.xxl};
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    padding: 0 ${props => props.theme.paddings.mainPadding};
-  }
 `
 
-export const LogoWrapper = styled.div<{ disabled?: boolean }>`
+export const LogoWrapper = styled.a<{ disabled?: boolean }>`
   max-width: 90px;
   min-width: fit-content;
   ${props => (props.disabled ? 'pointer-events:none;' : '')};
+
+  &:hover {
+    cursor: pointer;
+  }
 `
 
 const ButtonCreateDesktop = styled(ButtonRound)`
@@ -107,10 +105,6 @@ export const ContentsLeft = styled.div`
   align-items: center;
   display: flex;
   margin: auto auto auto 0;
-
-  @media (min-width: ${props => props.theme.themeBreakPoints.md}) {
-    margin: auto auto 0 0;
-  }
 `
 
 export const ContentsRight = styled.div`
@@ -172,6 +166,7 @@ const HeaderDropdown = styled(Dropdown)`
 `
 
 const MarketAndGovernanceNav = styled.div<{ disabled?: boolean }>`
+  display: none;
   background-color: ${props => (props.disabled ? props => props.theme.buttonSecondary.backgroundColor : 'transparent')};
   ${props => (props.disabled ? 'pointer-events:none;' : '')};
   border-radius: 32px;
@@ -209,19 +204,16 @@ const HeaderContainer: React.FC = (props: any) => {
   const disableConnectButton = isConnectWalletModalOpen
 
   const {
-    daiBalance,
+    arrayOfClaimableTokenBalances,
     fetchBalances,
-    formattedDaiBalance,
     formattedNativeBalance,
-    formattedOmenBalance,
     formattedxDaiBalance,
-    formattedxOmenBalance,
+    mainnetTokens,
     omenBalance,
-    unclaimedDaiAmount,
-    unclaimedOmenAmount,
     xDaiBalance,
+    xDaiTokens,
     xOmenBalance,
-  } = useConnectedBalanceContext()
+  } = context.balances
 
   const networkPlacholder = (
     <DropdownWrapper>
@@ -276,7 +268,7 @@ const HeaderContainer: React.FC = (props: any) => {
     <HeaderWrapper {...restProps}>
       <HeaderInner>
         <ContentsLeft>
-          <LogoWrapper disabled={!hasRouter} onClick={() => props.history && props.history.push('/')}>
+          <LogoWrapper disabled={!hasRouter} href={'/#/liquidity'}>
             <Logo />
           </LogoWrapper>
           <MarketAndGovernanceNav
@@ -330,15 +322,16 @@ const HeaderContainer: React.FC = (props: any) => {
               placeholder={networkPlacholder}
             />
           )}
-
-          <HeaderButton onClick={() => setModalLockTokensState(!isModalLockTokensOpen)}>
-            {relay
-              ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
-              : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
-            <OmenIconWrapper>
-              <IconOmen size={24} />
-            </OmenIconWrapper>
-          </HeaderButton>
+          {account && networkId === networkIds.RINKEBY && (
+            <HeaderButton onClick={() => setModalLockTokensState(!isModalLockTokensOpen)}>
+              {relay
+                ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
+                : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
+              <OmenIconWrapper>
+                <IconOmen size={24} />
+              </OmenIconWrapper>
+            </HeaderButton>
+          )}
 
           {!account && (
             <ButtonConnectWalletStyled
@@ -381,7 +374,6 @@ const HeaderContainer: React.FC = (props: any) => {
         <ModalLockYoTokens
           context={context}
           fetchBalances={fetchBalances}
-          formattedOmenBalance={relay ? formattedxOmenBalance : formattedOmenBalance}
           isOpen={isModalLockTokensOpen}
           omenBalance={relay ? xOmenBalance : omenBalance}
           onClose={() => setModalLockTokensState(false)}
@@ -389,18 +381,15 @@ const HeaderContainer: React.FC = (props: any) => {
         />
 
         <ModalYourConnectionWrapper
+          arrayOfClaimableBalances={arrayOfClaimableTokenBalances}
           changeWallet={() => {
             setYourConnectionModalState(false)
             logout()
             setConnectWalletModalState(true)
           }}
           fetchBalances={fetchBalances}
-          formattedDaiBalance={formattedDaiBalance}
-          formattedNativeBalance={formattedNativeBalance}
-          formattedOmenBalance={formattedOmenBalance}
-          formattedxDaiBalance={formattedxDaiBalance}
-          formattedxOmenBalance={formattedxOmenBalance}
           isOpen={isYourConnectionModalOpen && !isDepositWithdrawModalOpen}
+          mainnetTokens={mainnetTokens}
           onClose={() => setYourConnectionModalState(false)}
           openDepositModal={() => {
             setYourConnectionModalState(false)
@@ -412,9 +401,8 @@ const HeaderContainer: React.FC = (props: any) => {
             setDepositWithdrawType(ExchangeType.withdraw)
             setDepositWithdrawModalState(true)
           }}
-          unclaimedDaiAmount={unclaimedDaiAmount}
-          unclaimedOmenAmount={unclaimedOmenAmount}
           xDaiBalance={xDaiBalance}
+          xDaiTokens={xDaiTokens}
           xOmenBalance={xOmenBalance}
         />
         <ModalConnectWalletWrapper
@@ -422,23 +410,17 @@ const HeaderContainer: React.FC = (props: any) => {
           onClose={() => setConnectWalletModalState(false)}
         />
         <ModalDepositWithdrawWrapper
-          daiBalance={daiBalance}
           exchangeType={depositWithdrawType}
           fetchBalances={fetchBalances}
-          formattedDaiBalance={formattedDaiBalance}
-          formattedOmenBalance={formattedOmenBalance}
-          formattedxDaiBalance={formattedxDaiBalance}
-          formattedxOmenBalance={formattedxOmenBalance}
           isOpen={isDepositWithdrawModalOpen}
-          omenBalance={omenBalance}
+          mainnetTokens={mainnetTokens}
           onBack={() => {
             setDepositWithdrawModalState(false)
             setYourConnectionModalState(true)
           }}
           onClose={() => setDepositWithdrawModalState(false)}
-          unclaimedAmount={unclaimedDaiAmount}
           xDaiBalance={xDaiBalance}
-          xOmenBalance={xOmenBalance}
+          xDaiTokens={xDaiTokens}
         />
       </HeaderInner>
     </HeaderWrapper>

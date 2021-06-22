@@ -11,13 +11,7 @@ import {
   DOCUMENT_FAQ,
   MAX_MARKET_FEE,
 } from '../../../../../../common/constants'
-import {
-  useCollateralBalance,
-  useConnectedCPKContext,
-  useConnectedWeb3Context,
-  useCpkAllowance,
-  useCpkProxy,
-} from '../../../../../../hooks'
+import { useCollateralBalance, useConnectedWeb3Context, useCpkAllowance, useCpkProxy } from '../../../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
@@ -195,10 +189,9 @@ interface Props {
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const cpk = useConnectedCPKContext()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
-  const { account, library: provider, networkId, relay } = context
+  const { account, cpk, library: provider, networkId, relay } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
   const [isServiceChecked, setServiceCheck] = useState<boolean>(false)
   const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
@@ -500,7 +493,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 balance={formatNumber(collateralBalanceFormatted, 5)}
                 context={context}
                 currency={userInputCollateral.address}
-                disabled={relay}
                 onSelect={onCollateralChange}
               />
             </CurrenciesWrapper>

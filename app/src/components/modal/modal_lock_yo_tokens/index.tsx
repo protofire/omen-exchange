@@ -6,7 +6,6 @@ import ReactTooltip from 'react-tooltip'
 import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import { useConnectedCPKContext } from '../../../hooks'
 import { ERC20Service, OmenGuildService } from '../../../services'
 import { networkIds } from '../../../util/networks'
 import { divBN, formatBigNumber, formatLockDate } from '../../../util/tools'
@@ -27,7 +26,6 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   theme?: any
   context: any
   onClose: () => void
-  formattedOmenBalance: string
   omenBalance: BigNumber
   setIsModalLockTokensOpen: any
   fetchBalances: () => Promise<void>
@@ -103,15 +101,15 @@ const ModalLockTokens = (props: Props) => {
   const {
     context,
     fetchBalances,
-    formattedOmenBalance,
+
     isOpen,
     omenBalance,
     onClose,
     setIsModalLockTokensOpen,
     theme,
   } = props
-  const { account, library: provider, networkId } = context
-  const cpk = useConnectedCPKContext()
+  const { account, cpk, library: provider, networkId } = context
+
   const omen = new OmenGuildService(provider, networkId)
 
   const [isLockAmountOpen, setIsLockAmountOpen] = useState<boolean>(false)
@@ -280,7 +278,8 @@ const ModalLockTokens = (props: Props) => {
               <DataRow>
                 <LightDataItem>Omen Account</LightDataItem>
                 <DarkDataItem>
-                  {formattedOmenBalance} OMN{isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
+                  {formatBigNumber(omenBalance, STANDARD_DECIMALS, 2)} OMN
+                  {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
                 </DarkDataItem>
               </DataRow>
               <DataRow>

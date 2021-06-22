@@ -11,8 +11,6 @@ import {
   useAsyncDerivedValue,
   useCollateralBalance,
   useCompoundService,
-  useConnectedBalanceContext,
-  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
@@ -79,10 +77,9 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const cpk = useConnectedCPKContext()
-  const { fetchBalances } = useConnectedBalanceContext()
+  const { fetchBalances } = context.balances
 
-  const { library: provider, networkId, relay } = context
+  const { cpk, library: provider, networkId, relay } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
@@ -126,7 +123,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, displayCollateral.address)
-
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount || Zero))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
@@ -510,7 +506,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <StyledButtonContainer borderTop={true} marginTop={showSetAllowance || showUpgrade || isNegativeAmount}>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => {
+            switchMarketTab(MarketDetailsTab.swap)
+          }}
+        >
           Cancel
         </Button>
         <Button buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled} onClick={() => finish()}>

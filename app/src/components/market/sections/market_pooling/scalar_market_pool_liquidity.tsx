@@ -9,8 +9,6 @@ import { DOCUMENT_FAQ, STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useCollateralBalance,
   useCompoundService,
-  useConnectedBalanceContext,
-  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
@@ -114,9 +112,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   } = marketMakerData
   const context = useConnectedWeb3Context()
   const history = useHistory()
-  const { account, library: provider, networkId, relay } = context
-  const cpk = useConnectedCPKContext()
-  const { fetchBalances } = useConnectedBalanceContext()
+  const { account, cpk, library: provider, networkId, relay } = context
+  const { fetchBalances } = context.balances
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
@@ -329,7 +326,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
 
-      const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
       let useBaseToken = false
       if (displayCollateral.address === pseudoNativeAssetAddress) {
@@ -342,7 +338,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
-        collateralAddress,
+        collateral: marketMakerData.collateral,
         conditionId,
         conditionalTokens,
         compoundService,
@@ -774,8 +770,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         />
       )}
       <BottomButtonWrapper>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
-          Cancel
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => (history.length > 2 ? history.goBack() : history.replace('/liquidity'))}
+        >
+          Back
         </Button>
         {activeTab === Tabs.deposit && (
           <Button buttonType={ButtonType.primaryAlternative} disabled={disableDepositButton} onClick={addFunding}>
