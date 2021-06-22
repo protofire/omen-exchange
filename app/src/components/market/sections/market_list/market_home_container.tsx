@@ -11,8 +11,9 @@ import useLocalStorageState from 'use-local-storage-state'
 import { MAX_MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useMarkets } from '../../../../hooks/useMarkets'
+import { useTheme } from '../../../../hooks/useTheme'
 import { queryCategories } from '../../../../queries/markets_home'
-import theme from '../../../../theme'
+// import theme from '../../../../theme'
 import { getArbitratorsByNetwork, getOutcomes, networkIds } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
@@ -63,15 +64,15 @@ const TextTitle = styled.div`
 `
 const TextDescription = styled.div`
   margin-top: 8px;
-  color: ${props => props.theme.colors.textColorLighter};
+  color: ${({ theme }) => theme.text2};
   line-height: 19px;
 `
 const Link = styled.a`
-  color: ${props => props.theme.colors.clickable};
+  color: ${({ theme }) => theme.primary2};
   text-decoration: underline;
 
   &:hover {
-    color: ${props => props.theme.buttonSecondary.color};
+    color: ${({ theme }) => theme.primary3};
   }
 `
 
@@ -110,6 +111,7 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
 
 const MarketHomeContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
+  const theme = useTheme()
 
   const history = useHistory()
   const [hasSeenBanner, setHasSeenBanner] = useLocalStorageState('hasSeenBanner')

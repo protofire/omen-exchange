@@ -3,7 +3,8 @@ import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
 import { CONFIRMATION_COUNT, STANDARD_DECIMALS } from '../../../../common/constants'
-import theme from '../../../../theme'
+// import theme from '../../../../theme'
+import { useTheme } from '../../../../hooks/useTheme'
 import { getTxHashBlockExplorerURL, networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { TransactionStep } from '../../../../util/types'
@@ -31,7 +32,7 @@ const SvgWrapper = styled.div`
   margin-bottom: 25px;
 `
 const BoldedText = styled.div`
-  color: ${({ theme }) => theme.colors.textColorDark};
+  color: ${({ theme }) => theme.text1};
   font-family: Roboto;
   font-weight: 500;
   font-size: 14px;
@@ -47,10 +48,10 @@ const ChainText = styled.div`
   margin-bottom: 16px;
 `
 const TransactionText = styled.div`
-  color: ${({ theme }) => theme.colors.textColor};
+  color: ${({ theme }) => theme.text4};
 `
 const TransactionLink = styled.a`
-  color: ${({ theme }) => theme.colors.clickable};
+  color: ${({ theme }) => theme.primary2};
 `
 export const TransactionState = ({
   amountToTransfer,
@@ -62,6 +63,7 @@ export const TransactionState = ({
   transactionHash,
   transactionModalVisibility,
 }: Prop) => {
+  const theme = useTheme()
   useEffect(() => {
     if (state === TransactionStep.error) {
       transactionModalVisibility(false)
