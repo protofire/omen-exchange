@@ -492,7 +492,7 @@ export const ScalarMarketSell = (props: Props) => {
         >
           Cancel
         </Button>
-        <Button buttonType={ButtonType.primaryAlternative} disabled={isSellButtonDisabled} onClick={finish}>
+        <Button buttonType={ButtonType.primary} disabled={isSellButtonDisabled} onClick={finish}>
           Sell Position
         </Button>
       </StyledButtonContainer>
