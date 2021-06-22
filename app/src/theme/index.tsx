@@ -1,3 +1,34 @@
+import React from 'react'
+import { ThemeProvider as StyledThemeProvider } from 'styled-components'
+
+import { Colors } from './types'
+
+export function colors(darkMode: boolean): Colors {
+  return {
+    // text
+    text1: darkMode ? '' : '#37474F',
+    text2: darkMode ? '#C3C5CB' : '#86909E',
+    text3: darkMode ? '#6C7284' : '#86909E',
+    text4: darkMode ? '#565A69' : '#757575',
+
+    //primary colors
+    primary1: darkMode ? '' : '#5C6BC0',
+    primary2: darkMode ? '' : '#7986CB',
+    primary3: darkMode ? '' : '#3F51B5',
+    primary4: darkMode ? '' : '#E8EAF6',
+
+    //other
+    white: darkMode ? '' : '#fff',
+    green: darkMode ? '' : '#4B9E98',
+    red: darkMode ? '' : '#E57373',
+    link: darkMode ? '' : '#1E88E5',
+
+    //border
+    border1: darkMode ? '' : '#DCDFF2',
+    border2: darkMode ? '' : '#C5CAE9',
+    border3: darkMode ? '' : '#9FA8DA',
+  }
+}
 const theme = {
   fonts: {
     defaultSize: '14px',
@@ -456,5 +487,38 @@ const theme = {
     positionBall: '#B2DFDB',
   },
 }
-
 export default theme
+
+/* BElLOW IS ALTERNATIVE WAY TO DO MEDIA QUERIES */
+
+// export const MEDIA_WIDTHS = {
+//   upToExtraSmall: 500,
+//   upToSmall: 720,
+//   upToMedium: 960,
+//   upToLarge: 1280,
+// }
+//
+// const mediaWidthTemplates: { [width in keyof typeof MEDIA_WIDTHS]: typeof css } = Object.keys(MEDIA_WIDTHS).reduce(
+//   (accumulator, size) => {
+//     ;(accumulator as any)[size] = (a: any, b: any, c: any) => css`
+//       @media (max-width: ${(MEDIA_WIDTHS as any)[size]}px) {
+//         ${css(a, b, c)};
+//       }
+//     `
+//     return accumulator
+//   },
+//   {},
+// ) as any
+
+function themeAggregator(darkMode: boolean) {
+  return {
+    ...theme,
+    ...colors(darkMode),
+  }
+}
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  //this is temporary until we determine to use dark theme
+  const darkMode = false
+
+  return <StyledThemeProvider theme={themeAggregator(darkMode)}>{children}</StyledThemeProvider>
+}
