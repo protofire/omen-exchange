@@ -64,15 +64,15 @@ const TextTitle = styled.div`
 `
 const TextDescription = styled.div`
   margin-top: 8px;
-  color: ${({ theme }) => theme.text2};
+  color: ${props => props.theme.text2};
   line-height: 19px;
 `
 const Link = styled.a`
-  color: ${({ theme }) => theme.primary2};
+  color: ${props => props.theme.primary2};
   text-decoration: underline;
 
   &:hover {
-    color: ${({ theme }) => theme.primary3};
+    color: ${props => props.theme.primary3};
   }
 `
 
@@ -410,7 +410,7 @@ const MarketHomeContainer: React.FC = () => {
               setHasSeenBanner('true')
             }}
           >
-            <IconClose color={theme.colors.tertiary} hoverEffect size={'24'} />
+            <IconClose color={theme.border1} hoverEffect size={'24'} />
           </CloseStyled>
         </Banner>
       )}

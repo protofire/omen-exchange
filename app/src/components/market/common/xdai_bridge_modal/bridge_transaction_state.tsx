@@ -32,7 +32,7 @@ const SvgWrapper = styled.div`
   margin-bottom: 25px;
 `
 const BoldedText = styled.div`
-  color: ${({ theme }) => theme.text1};
+  color: ${props => props.theme.text1};
   font-family: Roboto;
   font-weight: 500;
   font-size: 14px;
@@ -48,10 +48,10 @@ const ChainText = styled.div`
   margin-bottom: 16px;
 `
 const TransactionText = styled.div`
-  color: ${({ theme }) => theme.text4};
+  color: ${props => props.theme.text4};
 `
 const TransactionLink = styled.a`
-  color: ${({ theme }) => theme.primary2};
+  color: ${props => props.theme.primary2};
 `
 export const TransactionState = ({
   amountToTransfer,
@@ -78,7 +78,7 @@ export const TransactionState = ({
         ) : state === TransactionStep.transactionSubmitted ? (
           <IconArrowUp />
         ) : (
-          <IconArrowUp color={theme.colors.green} />
+          <IconArrowUp color={theme.green} />
         )}
       </SvgWrapper>
 
