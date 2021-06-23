@@ -377,6 +377,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleCollateralChange(token, newAmount)
     setServiceCheck(false)
     setAllowanceFinished(false)
+    setUpgradeFinished(false)
   }
 
   const toggleCustomFee = () => {
@@ -574,6 +575,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             loading={RemoteData.is.asking(allowance)}
             marginBottom
             onUnlock={unlockCollateral}
+            style={{ marginBottom: 20 }}
           />
         )}
         {showUpgrade && (
@@ -582,7 +584,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
             loading={RemoteData.is.asking(proxyIsUpToDate)}
             onUnlock={upgradeProxy}
-            style={{ marginBottom: 20, marginTop: showSetAllowance ? 20 : 0 }}
+            style={{ marginBottom: 20 }}
           />
         )}
         <WarningMessage
