@@ -1452,9 +1452,10 @@ class CPKService {
     const deployed = await this.cpk.isProxyDeployed()
     if (deployed) {
       const implementation = await this.safe.getMasterCopy()
-      if (implementation.toLowerCase() !== getTargetSafeImplementation(network.chainId).toLowerCase()) {
-        return false
+      if (implementation.toLowerCase() === getTargetSafeImplementation(network.chainId).toLowerCase()) {
+        return true
       }
+      return false
     }
     if (isNative) {
       return false
