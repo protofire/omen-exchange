@@ -226,6 +226,7 @@ const ModalLockTokens = (props: Props) => {
       setTxHash(transaction)
       await getTokenLockInfo()
       await fetchBalances()
+      setDisplayLockAmount(Zero)
       setIsTransactionModalOpen(false)
       setIsLockAmountOpen(false)
       setIsModalLockTokensOpen(true)
@@ -317,7 +318,7 @@ const ModalLockTokens = (props: Props) => {
 
             <DataRow style={{ marginTop: !isLockAmountOpen ? '12px' : '' }}>
               <LightDataItem>{isLockAmountOpen && 'Your '}Vote Weight</LightDataItem>
-              <DarkDataItem style={{ marginTop: !isLockAmountOpen ? '12px' : '' }}>
+              <DarkDataItem>
                 <PercentageText lightColor={!displayLockAmount.isZero()}>
                   {!totalLocked.isZero() && !userLocked.isZero()
                     ? (divBN(userLocked, totalLocked) * 100).toFixed(2)
