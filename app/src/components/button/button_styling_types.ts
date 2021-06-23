@@ -167,7 +167,6 @@ export const ButtonCSS = css`
   padding: 12px 17px;
   pointer-events: ${props => ((props as any).disabled ? 'none' : 'initial')};
   text-align: center;
-  transition: all 0.15s ease-out;
   user-select: none;
   white-space: nowrap;
   font-family: Roboto;

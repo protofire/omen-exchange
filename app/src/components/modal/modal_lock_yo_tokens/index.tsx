@@ -187,6 +187,7 @@ const ModalLockTokens = (props: Props) => {
       console.error(`Error while fetching allowance:  `, e.message)
     }
   }
+
   const approve = async () => {
     try {
       if (cpk?.address) {
