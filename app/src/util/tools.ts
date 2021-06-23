@@ -753,21 +753,10 @@ export const bigMin = (array: Big[]) => {
  * Else display is the collateral
  */
 export const getInitialCollateral = (networkId: number, collateral: Token, relay = false): Token => {
-  const collateralSymbol = collateral.symbol.toLowerCase()
-  if (collateralSymbol in CompoundTokenType) {
-    if (collateralSymbol === 'ceth') {
-      return getNativeAsset(networkId)
-    } else {
-      const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
-      const baseToken = getToken(networkId, baseCollateralSymbol)
-      return baseToken
-    }
+  if (collateral.address === getWrapToken(networkId).address) {
+    return getNativeAsset(networkId, relay)
   } else {
-    if (collateral.address === getWrapToken(networkId).address) {
-      return getNativeAsset(networkId, relay)
-    } else {
-      return collateral
-    }
+    return collateral
   }
 }
 
