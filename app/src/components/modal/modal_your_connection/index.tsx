@@ -4,7 +4,7 @@ import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../hooks'
-import { NetworkId, bridgeTokensList, getToken, networkIds } from '../../../util/networks'
+import { bridgeTokensList, getNativeAsset, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
 import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
 import { KnownTokenValue, Token, TransactionStep } from '../../../util/types'
@@ -243,9 +243,15 @@ export const ModalYourConnection = (props: Props) => {
       </BalanceItem>
     )
   })
-  const tokenBalances = (forNetwork: NetworkId) => {
+  const tokenBalances = (forNetwork: number) => {
     return bridgeTokensList.map((token, index) => {
-      const { address, decimals, name, symbol } = getToken(networkIds.MAINNET, token)
+      let Token: Token
+      if (token === 'dai' && forNetwork === networkIds.XDAI) {
+        Token = getNativeAsset(forNetwork)
+      } else {
+        Token = getToken(forNetwork, token)
+      }
+      const { address, decimals, image, name, symbol } = Token
       let balance
 
       if (forNetwork === networkIds.MAINNET)
@@ -257,11 +263,11 @@ export const ModalYourConnection = (props: Props) => {
       return (
         <BalanceItem key={index + address}>
           <BalanceItemSide>
-            <Image size={'24'} src={getImageUrl(address)} />
+            <Image size={'24'} src={image ? image : getImageUrl(address)} />
             <BalanceItemTitle style={{ marginLeft: '12px' }}>{name ? name : symbol}</BalanceItemTitle>
           </BalanceItemSide>
           <BalanceItemBalance>
-            {formatBigNumber(balance, decimals, symbol === 'DAI' ? 2 : 3)} {symbol}
+            {formatBigNumber(balance, decimals, symbol === 'DAI' ? 2 : 3)} {symbol.toUpperCase()}
           </BalanceItemBalance>
         </BalanceItem>
       )
@@ -313,7 +319,7 @@ export const ModalYourConnection = (props: Props) => {
             <BalanceSection>
               <CardHeaderText>Wallet</CardHeaderText>
               <BalanceItems style={{ marginTop: '14px' }}>
-                {tokenBalances(networkId === networkIds.XDAI && !relay ? networkIds.XDAI : networkIds.MAINNET)}
+                {tokenBalances(relay ? networkIds.MAINNET : networkId)}
               </BalanceItems>
             </BalanceSection>
           </ModalCard>
