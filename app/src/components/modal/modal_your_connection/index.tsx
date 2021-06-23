@@ -179,7 +179,7 @@ export const ModalYourConnection = (props: Props) => {
   const context = useConnectedWeb3Context()
   const owner = context.rawWeb3Context.account
 
-  const { cpk, relay } = context
+  const { cpk, networkId, relay } = context
 
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txHash, setTxHash] = useState('')
@@ -247,6 +247,7 @@ export const ModalYourConnection = (props: Props) => {
     return bridgeTokensList.map((token, index) => {
       const { address, decimals, name, symbol } = getToken(networkIds.MAINNET, token)
       let balance
+
       if (forNetwork === networkIds.MAINNET)
         balance = new BigNumber(mainnetTokens.filter((token: Token) => token.symbol === symbol)[0]?.balance || '')
       else if (forNetwork === networkIds.XDAI && symbol === 'DAI') {
@@ -311,7 +312,9 @@ export const ModalYourConnection = (props: Props) => {
             </TopCardHeader>
             <BalanceSection>
               <CardHeaderText>Wallet</CardHeaderText>
-              <BalanceItems style={{ marginTop: '14px' }}>{tokenBalances(networkIds.MAINNET)}</BalanceItems>
+              <BalanceItems style={{ marginTop: '14px' }}>
+                {tokenBalances(networkId === networkIds.XDAI && !relay ? networkIds.XDAI : networkIds.MAINNET)}
+              </BalanceItems>
             </BalanceSection>
           </ModalCard>
           {relay && arrayOfClaimableBalances.length !== 0 && (
