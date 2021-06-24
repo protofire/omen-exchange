@@ -21,7 +21,7 @@ import {
 import { entries, isNotNull } from '../util/type-utils'
 
 import { getImageUrl } from './token'
-import { waitABit } from './tools'
+import { waitABit } from './tools/base'
 import { Arbitrator, Token } from './types'
 
 export type NetworkId = 1 | 4 | 77 | 100

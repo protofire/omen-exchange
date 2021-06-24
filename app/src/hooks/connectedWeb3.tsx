@@ -7,7 +7,7 @@ import connectors from '../util/connectors'
 import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
-import { getNetworkFromChain } from '../util/tools'
+import { getNetworkFromChain } from '../util/tools/base'
 
 import { ConnectedBalance, useBalance } from './useBalance'
 import { useCpk } from './useCpk'

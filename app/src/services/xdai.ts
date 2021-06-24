@@ -16,7 +16,7 @@ import {
   XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
 } from '../common/constants'
 import { getInfuraUrl, knownTokens, networkIds } from '../util/networks'
-import { waitABit } from '../util/tools'
+import { waitABit } from '../util/tools/base'
 
 import { ERC20Service } from './erc20'
 

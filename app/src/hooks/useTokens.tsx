@@ -14,7 +14,7 @@ import {
   pseudoNativeAssetAddress,
 } from '../util/networks'
 import { getImageUrl } from '../util/token'
-import { isObjectEqual } from '../util/tools'
+import { isObjectEqual } from '../util/tools/base'
 import { Token } from '../util/types'
 
 import { ConnectedWeb3Context } from './connectedWeb3'

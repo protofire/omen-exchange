@@ -8,7 +8,7 @@ import { BigNumber } from 'ethers/utils'
 
 import { STANDARD_DECIMALS } from '../common/constants'
 import { getGraphUris, getKlerosCurateGraphUris, getTokensByNetwork, networkIds } from '../util/networks'
-import { waitABit } from '../util/tools'
+import { waitABit } from '../util/tools/base'
 import {
   KlerosDisputeOutcome,
   KlerosItemStatus,

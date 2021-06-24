@@ -1,7 +1,7 @@
 /* eslint-env jest */
 import Big from 'big.js'
 
-import { calcDistributionHint } from '../../../index'
+import { calcDistributionHint } from '../../../base'
 
 const testCases: [number[], number[]][] = [
   [

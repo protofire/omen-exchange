@@ -8,5 +8,7 @@ import { calcAddFundingSendAmounts } from './calcAddFundingSendAmounts'
  * @param addedFunds - the amount of collateral being added to the market maker as liquidity
  * @param distributionHint - a distribution hint as calculated by `calcDistributionHint`
  */
-export const calcInitialFundingSendAmounts = (addedFunds: BigNumber, distributionHint: BigNumber[]): BigNumber[] =>
-  calcAddFundingSendAmounts(addedFunds, distributionHint)
+export const calcInitialFundingSendAmounts = (
+  addedFunds: BigNumber,
+  distributionHint: BigNumber[],
+): Maybe<BigNumber[]> => calcAddFundingSendAmounts(addedFunds, distributionHint)

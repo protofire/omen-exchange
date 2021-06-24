@@ -3,7 +3,7 @@ import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber, formatUnits, parseUnits } from 'ethers/utils'
 
 import { cBATAbi, cDaiAbi, cETHAbi, cUNIAbi, cUSDCAbi, cUSDTAbi, cWBTCAbi } from '../abi/compound_abi'
-import { roundNumberStringToSignificantDigits } from '../util/tools'
+import { roundNumberStringToSignificantDigits } from '../util/tools/base'
 import { Token } from '../util/types'
 
 // use floor as rounding method

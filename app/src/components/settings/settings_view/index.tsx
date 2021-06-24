@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { getChainSpecificAlternativeUrls, getInfuraUrl } from '../../../util/networks'
-import { checkRpcStatus, getNetworkFromChain, isValidHttpUrl } from '../../../util/tools'
+import { checkRpcStatus, getNetworkFromChain, isValidHttpUrl } from '../../../util/tools/base'
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { TextfieldCSS } from '../../common/form/textfield'

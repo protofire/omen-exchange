@@ -1,4 +1,4 @@
-import { delay } from './tools'
+import { delay } from './tools/base'
 
 export type Range = [number, number]
 

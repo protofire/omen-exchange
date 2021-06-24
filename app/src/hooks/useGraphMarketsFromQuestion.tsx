@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
-import { isObjectEqual } from '../util/tools'
+import { isObjectEqual } from '../util/tools/base'
 import { Status } from '../util/types'
 
 const query = gql`

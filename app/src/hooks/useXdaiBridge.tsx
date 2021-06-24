@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 
 import { XdaiService } from '../services'
 import { getToken, networkIds } from '../util/networks'
-import { formatBigNumber } from '../util/tools'
+import { formatBigNumber } from '../util/tools/base'
 import { TransactionStep } from '../util/types'
 
 import { useConnectedWeb3Context } from './connectedWeb3'
