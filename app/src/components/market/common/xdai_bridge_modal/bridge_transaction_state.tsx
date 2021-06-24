@@ -3,8 +3,6 @@ import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
 import { CONFIRMATION_COUNT, STANDARD_DECIMALS } from '../../../../common/constants'
-// import theme from '../../../../theme'
-import { useTheme } from '../../../../hooks/useTheme'
 import { getTxHashBlockExplorerURL, networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { TransactionStep } from '../../../../util/types'
@@ -53,6 +51,11 @@ const TransactionText = styled.div`
 const TransactionLink = styled.a`
   color: ${props => props.theme.primary2};
 `
+
+const IconWrapper = styled.div`
+  color: ${props => props.theme.green};
+`
+
 export const TransactionState = ({
   amountToTransfer,
   fetchBalance,
@@ -63,7 +66,6 @@ export const TransactionState = ({
   transactionHash,
   transactionModalVisibility,
 }: Prop) => {
-  const theme = useTheme()
   useEffect(() => {
     if (state === TransactionStep.error) {
       transactionModalVisibility(false)
@@ -78,7 +80,9 @@ export const TransactionState = ({
         ) : state === TransactionStep.transactionSubmitted ? (
           <IconArrowUp />
         ) : (
-          <IconArrowUp color={theme.green} />
+          <IconWrapper>
+            <IconArrowUp />
+          </IconWrapper>
         )}
       </SvgWrapper>
 

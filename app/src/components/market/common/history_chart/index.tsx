@@ -4,8 +4,6 @@ import { useHistory } from 'react-router'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import styled from 'styled-components'
 
-import { useTheme } from '../../../../hooks/useTheme'
-// import theme from '../../../../theme'
 import { getOutcomeColor } from '../../../../theme/utils'
 import { calcPrediction } from '../../../../util/tools'
 import { Button } from '../../../button/button'
@@ -77,23 +75,17 @@ const NoData = styled.div`
   padding-left: ${props => props.theme.cards.paddingHorizontal};
   padding-right: ${props => props.theme.cards.paddingHorizontal};
 `
-// The 2 functions below are the alternative of calling the useTheme I though could work but TS does not compile the AxisStroke because "Type '(props: any) => string' is not assignable to type 'string'."
-
-// const AxisStroke = (props: any): string => {
-//   return props.theme.colors.verticalDivider
-// }
-
-// const tick = (props: any): { fill: string; fontFamily: string } => {
-//   return {
-//     fill: props.theme.colors.textColor,
-//     fontFamily: 'Roboto',
-//   }
-// }
 
 const AnEvenSmallerLittleBall = styled(OutcomeItemLittleBallOfJoyAndDifferentColors as any)`
   height: 8px;
   margin-right: 12px;
   width: 8px;
+`
+
+const AxisWrapper = styled.div`
+  display: inline;
+  stroke: ${props => props.theme.colors.verticalDivider};
+  fill: ${props => props.theme.colors.textColor};
 `
 
 const toPercent = (decimal: number, fixed = 0) => {
@@ -141,7 +133,6 @@ export const HistoryChart: React.FC<Props> = ({
   unit,
 }) => {
   const history = useHistory()
-  const theme = useTheme()
 
   const toScaleValue = (decimal: number, fixed = 0) => {
     return `${calcPrediction(decimal.toString(), scalarLow || new BigNumber(0), scalarHigh || new BigNumber(0)).toFixed(
@@ -181,25 +172,27 @@ export const HistoryChart: React.FC<Props> = ({
       <ResponsiveWrapper>
         <ResponsiveContainer height={300} width="100%">
           <AreaChart data={data} margin={{ top: 0, right: 0, left: 0, bottom: 0 }} stackOffset="expand">
-            <XAxis
-              dataKey="date"
-              stroke={theme.colors.verticalDivider}
-              tick={{
-                fill: theme.colors.textColor,
-                fontFamily: 'Roboto',
-              }}
-              tickMargin={11}
-            />
-            <YAxis
-              orientation="right"
-              stroke={theme.colors.verticalDivider}
-              tick={{
-                fill: theme.colors.textColor,
-                fontFamily: 'Roboto',
-              }}
-              tickFormatter={isScalar ? toScaleValue : toPercent}
-              tickMargin={10}
-            />
+            <AxisWrapper>
+              <XAxis
+                dataKey="date"
+                stroke={'inherit'}
+                tick={{
+                  fill: 'inherit',
+                  fontFamily: 'Roboto',
+                }}
+                tickMargin={11}
+              />
+              <YAxis
+                orientation="right"
+                stroke={'inherit'}
+                tick={{
+                  fill: 'inherit',
+                  fontFamily: 'Roboto',
+                }}
+                tickFormatter={isScalar ? toScaleValue : toPercent}
+                tickMargin={10}
+              />
+            </AxisWrapper>
             <Tooltip content={isScalar ? renderScalarTooltipContent : renderTooltipContent} />
 
             {outcomes
@@ -229,6 +222,3 @@ export const HistoryChart: React.FC<Props> = ({
     </>
   )
 }
-// function props(_props: any): string | undefined {
-//   throw new Error('Function not implemented.')
-// }

@@ -23,7 +23,7 @@ interface Props {
 }
 
 export const IconClose = (props: Props) => {
-  const { color = 'inherit', hoverEffect = false, onClick, size = '24' } = props
+  const { color = 'inherit' || '#37474F', hoverEffect = false, onClick, size = '24' } = props
 
   return (
     <Wrapper
