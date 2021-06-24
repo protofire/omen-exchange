@@ -152,8 +152,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [amountToRemoveNormalized, setAmountToRemoveNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const collateralSymbol = collateral.symbol.toLowerCase()
 
-  const isNative = displayCollateral.address === pseudoNativeAssetAddress
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy(isNative)
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(displayCollateral.address === pseudoNativeAssetAddress)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
   const [upgradeFinished, setUpgradeFinished] = useState(false)
 
@@ -738,7 +737,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       )}
       {activeTab === Tabs.deposit && showUpgrade && (
         <SetAllowanceStyled
-          collateral={isNative ? displayCollateral : undefined}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}

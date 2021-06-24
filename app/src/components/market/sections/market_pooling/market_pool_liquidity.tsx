@@ -136,8 +136,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [txHash, setTxHash] = useState('')
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
-  const isNative = displayCollateral.address === pseudoNativeAssetAddress
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy(isNative)
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(displayCollateral.address === pseudoNativeAssetAddress)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
   let baseCollateral = collateral
@@ -748,7 +747,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       )}
       {activeTab === Tabs.deposit && showUpgrade && (
         <SetAllowanceStyled
-          collateral={isNative ? displayCollateral : undefined}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}

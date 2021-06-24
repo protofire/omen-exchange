@@ -127,8 +127,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
-  const isNative = displayCollateral.address === pseudoNativeAssetAddress
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy(isNative)
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(displayCollateral.address === pseudoNativeAssetAddress)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
@@ -498,7 +497,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )}
       {showUpgrade && (
         <SetAllowance
-          collateral={isNative ? displayCollateral : undefined}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}

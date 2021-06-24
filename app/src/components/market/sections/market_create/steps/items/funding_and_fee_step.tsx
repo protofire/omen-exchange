@@ -260,8 +260,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
-  const isNative = userInputCollateral.address === pseudoNativeAssetAddress
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy(isNative)
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(userInputCollateral.address === pseudoNativeAssetAddress)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
   useEffect(() => {
@@ -580,7 +579,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         )}
         {showUpgrade && (
           <SetAllowance
-            collateral={isNative ? userInputCollateral : undefined}
             finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
             loading={RemoteData.is.asking(proxyIsUpToDate)}
             onUnlock={upgradeProxy}
