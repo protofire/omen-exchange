@@ -22,7 +22,6 @@ import {
   formatBigNumber,
   formatNumber,
   getInitialCollateral,
-  getSharesInBaseToken,
   mulBN,
 } from '../../../../util/tools'
 import {
@@ -125,15 +124,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     setAmountSharesToDisplay('')
     // eslint-disable-next-line
   }, [collateral.address])
-
-  let displayBalances = balances
-  if (
-    baseCollateral.address !== collateral.address &&
-    collateral.symbol.toLowerCase() in CompoundTokenType &&
-    compoundService
-  ) {
-    displayBalances = getSharesInBaseToken(balances, compoundService, displayCollateral)
-  }
 
   const calcSellAmount = useMemo(
     () => async (
@@ -358,8 +348,6 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           OutcomeTableValue.Probability,
           OutcomeTableValue.Bonded,
         ]}
-        displayBalances={displayBalances}
-        displayCollateral={displayCollateral}
         newShares={displayNewShares}
         outcomeHandleChange={(value: number) => {
           setOutcomeIndex(value)
