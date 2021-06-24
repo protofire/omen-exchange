@@ -3,9 +3,8 @@ import { Helmet } from 'react-helmet'
 import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import { useWeb3Context } from 'web3-react'
 
-import { DISCLAIMER_TEXT, DOCUMENT_TITLE } from '../../common/constants'
+import { DOCUMENT_TITLE } from '../../common/constants'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
-import { Disclaimer } from '../common/disclaimer'
 import { Footer } from '../common/layout/footer'
 import { Header } from '../common/layout/header'
 import { MarketRoutes } from '../market/routes/market_routes'
@@ -56,7 +55,6 @@ export const Main: React.FC = () => {
             )}
           </MainScroll>
           <Footer />
-          {DISCLAIMER_TEXT.length > 0 && <Disclaimer />}
         </MainWrapper>
       </Router>
     </>

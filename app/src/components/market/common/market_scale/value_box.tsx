@@ -2,7 +2,7 @@ import React from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { IconInfo } from '../../../common/tooltip/img/IconInfo'
+import { IconInfo } from '../../../common/icons'
 import { Circle } from '../../common/common_styled'
 import { SCALE_HEIGHT, VALUE_BOXES_MARGIN } from '../common_styled'
 
