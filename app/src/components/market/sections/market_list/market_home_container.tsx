@@ -11,9 +11,7 @@ import useLocalStorageState from 'use-local-storage-state'
 import { MAX_MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { useMarkets } from '../../../../hooks/useMarkets'
-import { useTheme } from '../../../../hooks/useTheme'
 import { queryCategories } from '../../../../queries/markets_home'
-// import theme from '../../../../theme'
 import { getArbitratorsByNetwork, getOutcomes, networkIds } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
@@ -75,6 +73,9 @@ const Link = styled.a`
     color: ${props => props.theme.primary3};
   }
 `
+const IconWrapper = styled.div`
+  color: ${props => props.theme.border1};
+`
 
 const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
   return data.map((graphMarketMakerDataItem: GraphMarketMakerDataItem) => {
@@ -111,7 +112,6 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
 
 const MarketHomeContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
-  const theme = useTheme()
 
   const history = useHistory()
   const [hasSeenBanner, setHasSeenBanner] = useLocalStorageState('hasSeenBanner')
@@ -410,7 +410,9 @@ const MarketHomeContainer: React.FC = () => {
               setHasSeenBanner('true')
             }}
           >
-            <IconClose color={theme.border1} hoverEffect size={'24'} />
+            <IconWrapper>
+              <IconClose hoverEffect size={'24'} />
+            </IconWrapper>
           </CloseStyled>
         </Banner>
       )}
