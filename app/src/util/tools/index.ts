@@ -11,19 +11,18 @@ import {
   SOKOL_NETWORKS,
   STANDARD_DECIMALS,
   XDAI_NETWORKS,
-} from '../common/constants'
-import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
-import { CompoundService } from '../services/compound_service'
-
-import { getLogger } from './logger'
-import { getContractAddress, getNativeAsset, getToken, getWrapToken, networkIds } from './networks'
-import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token, TransactionStep } from './types'
+} from '../../common/constants'
+import { MarketTokenPair } from '../../hooks/useGraphMarketsFromQuestion'
+import { CompoundService } from '../../services/compound_service'
+import { getLogger } from '../logger'
+import { getContractAddress, getNativeAsset, getToken, getWrapToken, networkIds } from '../networks'
+import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token, TransactionStep } from '../types'
 
 const logger = getLogger('Tools')
 
 // use floor as rounding method
 Big.RM = 0
-
+//moved
 export const truncateStringInTheMiddle = (str: string, strPositionStart: number, strPositionEnd: number) => {
   const minTruncatedLength = strPositionStart + strPositionEnd
   if (minTruncatedLength < str.length) {
@@ -31,7 +30,7 @@ export const truncateStringInTheMiddle = (str: string, strPositionStart: number,
   }
   return str
 }
-
+//moved
 export const strip0x = (input: string) => {
   return input.replace(/^0x/, '')
 }
@@ -60,7 +59,7 @@ export const packSignatures = (array: any) => {
 export const signaturesFormatted = (signatures: string[]) => {
   return packSignatures(signatures.map(s => signatureToVRS(s)))
 }
-
+//moved
 export const formatDate = (date: Date, utcAdd = true): string => {
   return moment(date)
     .tz('UTC')
@@ -112,7 +111,7 @@ export const getNetworkFromChain = (chain: string) => {
     : -1
   return network
 }
-
+//moved
 export const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {
   if (!date) {
     return date
@@ -123,7 +122,7 @@ export const convertUTCToLocal = (date: Maybe<Date>): Maybe<Date> => {
     .subtract(offsetMinutes, 'minutes')
     .toDate()
 }
-
+//moved
 // we need to do this because the value selected by react-datepicker
 // uses the local timezone, but we want to interpret it in UTC
 export const convertLocalToUTC = (date: Date): Date => {
@@ -132,6 +131,13 @@ export const convertLocalToUTC = (date: Date): Date => {
     .add(offsetMinutes, 'minutes')
     .toDate()
 }
+//moved
+/**
+ * Performs division between two BigNumbers while temporarily scaling the numerator to preserve precision
+ * @param a - the numerator
+ * @param b - the denominator
+ * @param scale - the factor by which to scale the numerator by before division
+ */
 
 export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
   return (
@@ -141,11 +147,18 @@ export const divBN = (a: BigNumber, b: BigNumber, scale = 10000): number => {
       .toNumber() / scale
   )
 }
-
+//moved
+/**
+ * Performs multiplication between a BigNumber and a decimal number while temporarily scaling the decimal to preserve precision
+ * @param a - a BigNumber to multiply by b
+ * @param b - a decimal by which to multiple a by.
+ * @param scale - the factor by which to scale the numerator by before division
+ */
+//moved
 export const mulBN = (a: BigNumber, b: number, scale = 10000): BigNumber => {
   return a.mul(Math.round(b * scale)).div(scale)
 }
-
+//moved
 /**
  * Computes the price of each outcome token given their holdings. Returns an array of numbers in the range [0, 1]
  */
@@ -164,7 +177,7 @@ export const calcPrice = (holdingsBN: BigNumber[]): number[] => {
 
   return prices.map(price => +price.valueOf())
 }
-
+//no use not found
 /**
  * Computes the cost in collateral of trading `tradeYes` and `tradeNo` outcomes, given that the initial funding is
  * `funding` and the current prices.
@@ -187,7 +200,7 @@ export const calcNetCost = (
     )
   return mulBN(funding, logTerm)
 }
-
+//moved
 /**
  * Computes the balances of the outcome tokens after trading
  */
@@ -201,11 +214,15 @@ export const computeBalanceAfterTrade = (
     throw new Error(`Outcome index '${outcomeIndex}' must be between 0 and '${holdings.length}' - 1`)
   }
 
-  return holdings.map((h, i) => {
+  const newPoolBalances = holdings.map((h, i) => {
     return h.add(amountCollateralSpent).sub(i === outcomeIndex ? amountShares : bigNumberify(0))
   })
+  if (newPoolBalances.some(balance => balance.lte(0))) {
+    throw new Error(`Trade is invalid: trade results in liquidity pool owning a negative number of tokens`)
+  }
+  return newPoolBalances
 }
-
+//moved
 /**
  * Computes the distribution hint that should be used for setting the initial odds to `initialOdds`
  */
@@ -224,7 +241,7 @@ export const calcDistributionHint = (initialOdds: number[]): BigNumber[] => {
 
   return distributionHint
 }
-
+//moved
 /**
  * Computes the amount of collateral that needs to be sold to get `shares` amount of shares. Returns null if the amount
  * couldn't be computed.
@@ -317,7 +334,7 @@ export const getIndexSets = (outcomesCount: number) => {
   const range = (length: number) => [...Array(length)].map((x, i) => i)
   return range(outcomesCount).map(x => 1 << x)
 }
-
+//moved
 export const calcPoolTokens = (
   addedFunds: BigNumber,
   holdingsBN: BigNumber[],
@@ -416,7 +433,7 @@ export const calcInitialFundingSendAmounts = (addedFunds: BigNumber, distributio
 
   return sendAmounts
 }
-
+//moved
 /**
  * Compute the number of outcomes that will be sent to the user by the Market Maker
  * after adding `addedFunds` of collateral.
@@ -439,7 +456,7 @@ export const calcAddFundingSendAmounts = (
 
   return sendAmounts
 }
-
+//mpved
 /**
  * Compute the number of outcomes that will be sent to the user by the Market Maker
  * after removing `removedFunds` of pool shares.
@@ -454,7 +471,7 @@ export const calcRemoveFundingSendAmounts = (
   )
   return sendAmounts
 }
-
+//moved
 /**
  * Compute the amount of collateral that can be obtained via merging after the user
  * removed `removedFunds` of pool shares.
@@ -664,12 +681,13 @@ export const isScalarMarket = (oracle: string, networkId: number): boolean => {
 
   return isScalar
 }
-
+//moved
 export const getUnit = (title: string): string => {
   const splitTitle = title.split('[')
   const unit = splitTitle[splitTitle.length - 1].split(']')[0]
   return unit
 }
+//moved
 export const getScalarTitle = (title: string): string => {
   const unit = getUnit(title)
   const scalarTitle = title.substring(0, title.length - (unit.length + 3))
