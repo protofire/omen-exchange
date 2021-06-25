@@ -1,3 +1,5 @@
+import Big from 'big.js'
+
 export const truncateStringInTheMiddle = (str: string, strPositionStart: number, strPositionEnd: number) => {
   const minTruncatedLength = strPositionStart + strPositionEnd
   if (minTruncatedLength < str.length) {
@@ -17,4 +19,16 @@ export const getScalarTitle = (title: string): string => {
   const unit = getUnit(title)
   const scalarTitle = title.substring(0, title.length - (unit.length + 3))
   return scalarTitle
+}
+/**
+ * Round a given number string to a fixed number of significant digits
+ */
+export const roundNumberStringToSignificantDigits = (value: string, sd: number): string => {
+  const r = new Big(value)
+  const preciseValue = (r as any).prec(sd, 0)
+  if (preciseValue.gt(0)) {
+    return preciseValue.toString()
+  } else {
+    return '0'
+  }
 }

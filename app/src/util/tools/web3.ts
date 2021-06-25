@@ -1,4 +1,12 @@
+import Big from 'big.js'
+import { getAddress } from 'ethers/utils'
+
+import { getLogger } from '../logger'
+import { getNativeAsset, getToken, getWrapToken } from '../networks'
+import { CompoundEnabledTokenType, CompoundTokenType, Token } from '../types'
+
 import { strip0x } from './string_manipulation'
+const logger = getLogger('Tools')
 
 export const packSignatures = (array: any) => {
   const length = array.length.toString()
@@ -23,4 +31,89 @@ export const signatureToVRS = (rawSignature: string) => {
 }
 export const signaturesFormatted = (signatures: string[]) => {
   return packSignatures(signatures.map(s => signatureToVRS(s)))
+}
+export const isContract = async (provider: any, address: string): Promise<boolean> => {
+  const code = await provider.getCode(address)
+  return code && code !== '0x'
+}
+/**
+ * Gets the corresponding cToken for a given token symbol.
+ * Empty string if corresponding cToken doesn't exist
+ */
+export const getCTokenForToken = (token: string): string => {
+  const tokenSymbol = token.toLowerCase()
+  if (tokenSymbol in CompoundEnabledTokenType) {
+    return `c${tokenSymbol}`
+  } else {
+    return ''
+  }
+}
+
+export const isCToken = (symbol: string): boolean => {
+  const tokenSymbol = symbol.toLowerCase()
+  if (tokenSymbol in CompoundTokenType) {
+    return true
+  }
+  return false
+}
+
+/**
+ * Gets base token symbol for a given ctoken
+ */
+export const getBaseTokenForCToken = (token: string): string => {
+  const tokenSymbol = token.toLowerCase()
+  if (tokenSymbol.startsWith('c')) {
+    return tokenSymbol.substring(1, tokenSymbol.length)
+  }
+  return ''
+}
+
+export const getBaseToken = (networkId: number, symbol: string): Token => {
+  const baseTokenSymbol = getBaseTokenForCToken(symbol)
+  if (baseTokenSymbol === 'eth') {
+    return getNativeAsset(networkId)
+  }
+  return getToken(networkId, baseTokenSymbol as KnownToken)
+}
+/**
+ *  Gets initial display collateral
+ * If collateral is cToken type then display is the base collateral
+ * Else display is the collateral
+ */
+export const getInitialCollateral = (networkId: number, collateral: Token, relay = false): Token => {
+  const collateralSymbol = collateral.symbol.toLowerCase()
+  if (collateralSymbol in CompoundTokenType) {
+    if (collateralSymbol === 'ceth') {
+      return getNativeAsset(networkId)
+    } else {
+      const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
+      const baseToken = getToken(networkId, baseCollateralSymbol)
+      return baseToken
+    }
+  } else {
+    if (collateral.address === getWrapToken(networkId).address) {
+      return getNativeAsset(networkId, relay)
+    } else {
+      return collateral
+    }
+  }
+}
+export const bigMin = (array: Big[]) => {
+  let len = array.length
+  let minValue
+  while (len--) {
+    if (!minValue || array[len].lt(minValue)) {
+      minValue = array[len]
+    }
+  }
+  return minValue
+}
+export const isAddress = (address: string): boolean => {
+  try {
+    getAddress(address)
+  } catch (e) {
+    logger.log(`Address '${address}' doesn't exist`)
+    return false
+  }
+  return true
 }

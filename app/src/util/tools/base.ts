@@ -1,73 +1,16 @@
-import axios from 'axios'
 import Big from 'big.js'
-import { BigNumber, formatUnits, getAddress, parseUnits } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 
-import {
-  CONFIRMATION_COUNT,
-  MAIN_NETWORKS,
-  RINKEBY_NETWORKS,
-  SOKOL_NETWORKS,
-  STANDARD_DECIMALS,
-  XDAI_NETWORKS,
-} from '../../common/constants'
+import { STANDARD_DECIMALS } from '../../common/constants'
 import { MarketTokenPair } from '../../hooks/useGraphMarketsFromQuestion'
 import { CompoundService } from '../../services/compound_service'
-import { getLogger } from '../logger'
-import { getContractAddress, getNativeAsset, getToken, getWrapToken, networkIds } from '../networks'
-import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token, TransactionStep } from '../types'
+import { getContractAddress, getNativeAsset, getWrapToken } from '../networks'
+import { BalanceItem, Token } from '../types'
 
-import { calcAddFundingSendAmounts, calcRemoveFundingSendAmounts, divBN, mulBN } from './'
-
-const logger = getLogger('Tools')
+import { calcAddFundingSendAmounts, calcRemoveFundingSendAmounts, divBN, formatBigNumber, mulBN } from './'
 
 // use floor as rounding method
 Big.RM = 0
-
-export const checkRpcStatus = async (customUrl: string, setStatus: any, network: any) => {
-  try {
-    const response = await axios.post(customUrl, {
-      id: +new Date(),
-      jsonrpc: '2.0',
-      method: 'net_version',
-    })
-    if (response.data.error || +response.data.result !== network) {
-      setStatus(false)
-      return false
-    }
-
-    setStatus(true)
-    return true
-  } catch (e) {
-    setStatus(false)
-
-    return false
-  }
-}
-
-export const isValidHttpUrl = (data: string): boolean => {
-  let url
-
-  try {
-    url = new URL(data)
-  } catch (_) {
-    return false
-  }
-
-  return url.protocol === 'http:' || url.protocol === 'https:'
-}
-
-export const getNetworkFromChain = (chain: string) => {
-  const network = RINKEBY_NETWORKS.includes(chain)
-    ? networkIds.RINKEBY
-    : SOKOL_NETWORKS.includes(chain)
-    ? networkIds.SOKOL
-    : MAIN_NETWORKS.includes(chain)
-    ? networkIds.MAINNET
-    : XDAI_NETWORKS.includes(chain)
-    ? networkIds.XDAI
-    : -1
-  return network
-}
 
 //no use not found
 /**
@@ -93,105 +36,11 @@ export const calcNetCost = (
   return mulBN(funding, logTerm)
 }
 
-export const isAddress = (address: string): boolean => {
-  try {
-    getAddress(address)
-  } catch (e) {
-    logger.log(`Address '${address}' doesn't exist`)
-    return false
-  }
-  return true
-}
-
-export const waitForConfirmations = async (
-  hash: string,
-  provider: any,
-  setConfirmations: (confirmations: number) => void,
-  setTxState: (step: TransactionStep) => void,
-  confirmations?: number,
-) => {
-  setTxState(TransactionStep.transactionSubmitted)
-  let receipt
-  const requiredConfs = confirmations ? confirmations : CONFIRMATION_COUNT
-
-  while (!receipt || !receipt.confirmations || (receipt.confirmations && receipt.confirmations <= requiredConfs)) {
-    receipt = await provider.getTransaction(hash)
-    if (receipt && receipt.confirmations) {
-      setTxState(TransactionStep.confirming)
-      const confs = receipt.confirmations > requiredConfs ? requiredConfs : receipt.confirmations
-      setConfirmations(confs)
-    }
-    await waitABit(2000)
-  }
-}
-
-export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string => {
-  return Number(formatUnits(value, decimals)).toFixed(precision)
-}
-
-export const isContract = async (provider: any, address: string): Promise<boolean> => {
-  const code = await provider.getCode(address)
-  return code && code !== '0x'
-}
-
 export const delay = (timeout: number) => new Promise(res => setTimeout(res, timeout))
 
 export const getIndexSets = (outcomesCount: number) => {
   const range = (length: number) => [...Array(length)].map((x, i) => i)
   return range(outcomesCount).map(x => 1 << x)
-}
-
-/**
- * Round a given number string to a fixed number of significant digits
- */
-export const roundNumberStringToSignificantDigits = (value: string, sd: number): string => {
-  const r = new Big(value)
-  const preciseValue = (r as any).prec(sd, 0)
-  if (preciseValue.gt(0)) {
-    return preciseValue.toString()
-  } else {
-    return '0'
-  }
-}
-
-/**
- * Gets the corresponding cToken for a given token symbol.
- * Empty string if corresponding cToken doesn't exist
- */
-export const getCTokenForToken = (token: string): string => {
-  const tokenSymbol = token.toLowerCase()
-  if (tokenSymbol in CompoundEnabledTokenType) {
-    return `c${tokenSymbol}`
-  } else {
-    return ''
-  }
-}
-
-export const isCToken = (symbol: string): boolean => {
-  const tokenSymbol = symbol.toLowerCase()
-  if (tokenSymbol in CompoundTokenType) {
-    return true
-  }
-  return false
-}
-
-/**
- * Gets base token symbol for a given ctoken
- */
-export const getBaseTokenForCToken = (token: string): string => {
-  const tokenSymbol = token.toLowerCase()
-  if (tokenSymbol.startsWith('c')) {
-    return tokenSymbol.substring(1, tokenSymbol.length)
-  }
-  return ''
-}
-
-export const getBaseToken = (networkId: number, symbol: string): Token => {
-  const baseTokenSymbol = getBaseTokenForCToken(symbol)
-  if (baseTokenSymbol === 'eth') {
-    return getNativeAsset(networkId)
-  }
-  return getToken(networkId, baseTokenSymbol as KnownToken)
 }
 
 export const getSharesInBaseToken = (
@@ -225,30 +74,6 @@ export const calcInitialFundingSendAmounts = (addedFunds: BigNumber, distributio
 
   return sendAmounts
 }
-// //moved
-// /**
-//  * Compute the number of outcomes that will be sent to the user by the Market Maker
-//  * after adding `addedFunds` of collateral.
-//  */
-// export const calcAddFundingSendAmounts = (
-//   addedFunds: BigNumber,
-//   holdingsBN: BigNumber[],
-//   poolShareSupply: BigNumber,
-// ): Maybe<BigNumber[]> => {
-//   if (poolShareSupply.eq(0)) {
-//     return null
-//   }
-//
-//   const poolWeight = holdingsBN.reduce((a, b) => (a.gt(b) ? a : b))
-//
-//   const sendAmounts = holdingsBN.map(h => {
-//     const remaining = addedFunds.mul(h).div(poolWeight)
-//     return addedFunds.sub(remaining)
-//   })
-//
-//   return sendAmounts
-// }
-//mpved
 
 /**
  * Like Promise.all but for objects.
@@ -299,28 +124,6 @@ export const limitDecimalPlaces = (value: string, decimals: number) => {
   return Number.parseFloat(limitedString)
 }
 
-export const formatNumber = (number: string, decimals = 2): string => {
-  const fixedInt = parseFloat(number.split(',').join('')).toFixed(decimals)
-  const splitFixedInt = fixedInt.split('.')[0]
-  const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
-  if (number.length < 1) {
-    return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
-  }
-
-  if (Number(number) < 0.01 && Number(number) > 0) {
-    return '<0.01'
-  }
-
-  return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
-}
-
-export const formatHistoryUser = (user: string) => {
-  const firstStringPart = user ? user.substring(0, 5) + '...' : ''
-  const lastPart = user ? user.substring(user.length - 3, user.length) : ''
-
-  return firstStringPart + lastPart
-}
-
 export const calculateSharesBought = (
   poolShares: BigNumber,
   balances: BigNumber[],
@@ -342,22 +145,6 @@ export const calculateSharesBought = (
   })
 
   return sharesAfterAddingFunding[0].sub(sharesAfterRemovingFunding[0])
-}
-export const formatToShortNumber = (number: string, decimals = 2): string => {
-  if (number.length < 1) {
-    return '0'
-  }
-
-  const units = ['', 'K', 'M', 'B', 'T']
-  let unitIndex = 0
-  let rNumber = parseFloat(number.split(',').join(''))
-
-  while (rNumber >= 1000 && unitIndex < 5) {
-    unitIndex += 1
-    rNumber = rNumber / 1000
-  }
-
-  return `${parseFloat(rNumber.toFixed(decimals))}${units[unitIndex]}`
 }
 
 export const isObjectEqual = (obj1?: any, obj2?: any): boolean => {
@@ -401,16 +188,6 @@ export const clampBigNumber = (x: BigNumber, min: BigNumber, max: BigNumber): Bi
   if (x.lt(min)) return min
   if (x.gt(max)) return max
   return x
-}
-
-export const numberToByte32 = (num: string | number, isScalar: boolean): string => {
-  let hex: any
-  if (isScalar) hex = num
-  else hex = new BigNumber(num).toHexString()
-
-  const frontZeros = '0'.repeat(66 - hex.length)
-
-  return `0x${frontZeros}${hex.split('0x')[1]}`
 }
 
 export const isDust = (amount: BigNumber, decimals: number): boolean => {
@@ -486,44 +263,4 @@ export const bigMax = (array: Big[]) => {
     }
   }
   return maxValue
-}
-
-export const bigMin = (array: Big[]) => {
-  let len = array.length
-  let minValue
-  while (len--) {
-    if (!minValue || array[len].lt(minValue)) {
-      minValue = array[len]
-    }
-  }
-  return minValue
-}
-
-/**
- *  Gets initial display collateral
- * If collateral is cToken type then display is the base collateral
- * Else display is the collateral
- */
-export const getInitialCollateral = (networkId: number, collateral: Token, relay = false): Token => {
-  const collateralSymbol = collateral.symbol.toLowerCase()
-  if (collateralSymbol in CompoundTokenType) {
-    if (collateralSymbol === 'ceth') {
-      return getNativeAsset(networkId)
-    } else {
-      const baseCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
-      const baseToken = getToken(networkId, baseCollateralSymbol)
-      return baseToken
-    }
-  } else {
-    if (collateral.address === getWrapToken(networkId).address) {
-      return getNativeAsset(networkId, relay)
-    } else {
-      return collateral
-    }
-  }
-}
-
-export const reverseArray = (array: any[]): any[] => {
-  const newArray = array.map((e, i, a) => a[a.length - 1 - i])
-  return newArray
 }
