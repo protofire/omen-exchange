@@ -11,7 +11,13 @@ import { proxyFactoryAbi } from '../abi/proxy_factory'
 import { RelayService } from '../services/relay'
 import { SafeService } from '../services/safe'
 
-import { getCPKAddresses, getInfuraUrl, getRelayProxyFactory, networkIds } from './networks'
+import {
+  getCPKAddresses,
+  getInfuraUrl,
+  getRelayProxyFactory,
+  getTargetSafeImplementation,
+  networkIds,
+} from './networks'
 
 type Address = string
 
@@ -317,9 +323,21 @@ export const createCPK = async (provider: Web3Provider, relay: boolean) => {
       networks[network.chainId].proxyFactoryAddress = relayProxyFactoryAddress
     }
   }
+
   const transactionManager = relay ? new RelayTransactionManager() : new CpkTransactionManager()
-  const cpk = new OCPK({ ethLibAdapter: new EthersAdapter({ ethers, signer }), transactionManager, networks })
+
+  let cpk = new OCPK({ ethLibAdapter: new EthersAdapter({ ethers, signer }), transactionManager, networks })
   await cpk.init()
+
+  // if this is a brand new user, override the masterCopy
+  const deployed = await cpk.isProxyDeployed()
+
+  if (!relay && !deployed) {
+    networks[network.chainId].masterCopyAddress = getTargetSafeImplementation(network.chainId)
+    cpk = new OCPK({ ethLibAdapter: new EthersAdapter({ ethers, signer }), transactionManager, networks })
+    await cpk.init()
+  }
+
   return cpk
 }
 
