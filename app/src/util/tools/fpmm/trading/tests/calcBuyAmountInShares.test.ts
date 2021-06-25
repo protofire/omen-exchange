@@ -1,6 +1,5 @@
 /* eslint-env jest */
 
-import { Zero } from 'ethers/constants'
 import { bigNumberify } from 'ethers/utils'
 
 import { divBN } from '../../../utils'
