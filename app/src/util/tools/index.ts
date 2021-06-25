@@ -10,7 +10,7 @@ export {
 } from './fpmm/liquidity'
 export { calcPrice } from './fpmm/price'
 export * from './fpmm/trading'
-export * from './base'
+
 export * from './string_manipulation'
 export * from './dates'
 export * from './utils'

@@ -48,3 +48,15 @@ export const numberToByte32 = (num: string | number, isScalar: boolean): string 
 
   return `0x${frontZeros}${hex.split('0x')[1]}`
 }
+
+/**
+ * Given a string representing a floating point number,
+ * return a floating point number with a fixed amount of decimal places.
+ */
+export const limitDecimalPlaces = (value: string, decimals: number) => {
+  const limitedString: string =
+    value.indexOf('.') >= 0
+      ? value.substr(0, value.indexOf('.')) + value.substr(value.indexOf('.'), decimals + 1)
+      : value
+  return Number.parseFloat(limitedString)
+}

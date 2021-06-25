@@ -1,8 +1,8 @@
 import Big from 'big.js'
-import { getAddress } from 'ethers/utils'
+import { BigNumber, getAddress, parseUnits } from 'ethers/utils'
 
 import { getLogger } from '../logger'
-import { getNativeAsset, getToken, getWrapToken } from '../networks'
+import { getContractAddress, getNativeAsset, getToken, getWrapToken } from '../networks'
 import { CompoundEnabledTokenType, CompoundTokenType, Token } from '../types'
 
 import { strip0x } from './string_manipulation'
@@ -116,4 +116,27 @@ export const isAddress = (address: string): boolean => {
     return false
   }
   return true
+}
+export const isScalarMarket = (oracle: string, networkId: number): boolean => {
+  const realitioScalarAdapter = getContractAddress(networkId, 'realitioScalarAdapter')
+
+  let isScalar = false
+  if (oracle === realitioScalarAdapter.toLowerCase()) {
+    isScalar = true
+  }
+
+  return isScalar
+}
+export const isDust = (amount: BigNumber, decimals: number): boolean => {
+  return amount.lt(parseUnits('0.00001', decimals))
+}
+export const clampBigNumber = (x: BigNumber, min: BigNumber, max: BigNumber): BigNumber => {
+  if (x.lt(min)) return min
+  if (x.gt(max)) return max
+  return x
+}
+
+export const getIndexSets = (outcomesCount: number) => {
+  const range = (length: number) => [...Array(length)].map((x, i) => i)
+  return range(outcomesCount).map(x => 1 << x)
 }

@@ -3,7 +3,9 @@ import Big from 'big.js'
 import { WeiPerEther, Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 
-import { ceilDiv, mulBN } from '../../utils'
+import { STANDARD_DECIMALS } from '../../../../common/constants'
+import { formatBigNumber } from '../../formatting'
+import { ceilDiv, divBN, mulBN } from '../../utils'
 
 /**
  * Computes the market maker's balances of outcome tokens after a trade to buy shares of a particular outcome
@@ -128,4 +130,43 @@ export const calcSellAmountInCollateral = (
   }
 
   return null
+}
+
+export const calcXValue = (currentPrediction: BigNumber, lowerBound: BigNumber, upperBound: BigNumber) => {
+  const currentPredictionNumber = Number(formatBigNumber(currentPrediction, STANDARD_DECIMALS))
+  const lowerBoundNumber = Number(formatBigNumber(lowerBound, STANDARD_DECIMALS))
+  const upperBoundNumber = Number(formatBigNumber(upperBound, STANDARD_DECIMALS))
+  const xValue = ((currentPredictionNumber - lowerBoundNumber) / (upperBoundNumber - lowerBoundNumber)) * 100
+  return xValue > 100 ? 100 : xValue < 0 ? 0 : xValue
+}
+
+export const calcPrediction = (probability: string, lowerBound: BigNumber, upperBound: BigNumber) => {
+  const probabilityNumber = Number(probability)
+  const lowerBoundNumber = Number(formatBigNumber(lowerBound, STANDARD_DECIMALS, STANDARD_DECIMALS))
+  const upperBoundNumber = Number(formatBigNumber(upperBound, STANDARD_DECIMALS, STANDARD_DECIMALS))
+  const prediction = probabilityNumber * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
+  return prediction
+}
+
+/**
+ * Computes the cost in collateral of trading `tradeYes` and `tradeNo` outcomes, given that the initial funding is
+ * `funding` and the current prices.
+ */
+export const calcNetCost = (
+  funding: BigNumber,
+  priceYes: number,
+  tradeYes: BigNumber,
+  priceNo: number,
+  tradeNo: BigNumber,
+): BigNumber => {
+  // funding * (offset + log2(oddYes * (2^(tradeYes / funding - offset)) + oddNo * (2^(tradeNo / funding) - offset))
+  const offset = Math.max(divBN(tradeYes, funding), divBN(tradeNo, funding))
+
+  const logTerm =
+    offset +
+    Math.log2(
+      priceYes * Math.pow(2, divBN(tradeYes, funding) - offset) +
+        priceNo * Math.pow(2, divBN(tradeNo, funding) - offset),
+    )
+  return mulBN(funding, logTerm)
 }
