@@ -257,10 +257,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
       }
 
-      let useBaseToken = false
-      if (displayCollateral.address !== collateral.address && collateral.symbol.toLowerCase() in CompoundTokenType) {
-        useBaseToken = true
-      }
       let fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals)
       if (collateralSymbol in CompoundTokenType && displayCollateral.symbol === baseCollateral.symbol) {
         fundsAmount = formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)
@@ -278,12 +274,10 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       await cpk.addFunding({
         amount: amountToFundNormalized || Zero,
-        compoundService,
         collateral: inputCollateral,
         marketMaker,
         setTxHash,
         setTxState,
-        useBaseToken,
       })
 
       await fetchGraphMarketUserTxData()
