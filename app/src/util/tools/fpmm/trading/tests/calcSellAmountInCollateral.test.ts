@@ -2,7 +2,7 @@
 import { BigNumber, bigNumberify } from 'ethers/utils'
 
 import { divBN } from '../../../utils'
-import { calcSellAmountInCollateral } from '../calcSellAmountInCollateral'
+import { calcSellAmountInCollateral } from '../index'
 
 const testCases: [[string, number, string[], number], string][] = [
   [['669745046301742827', 0, ['502512562814070351', '2000000000000000000'], 0.01], '496532989893612286'],

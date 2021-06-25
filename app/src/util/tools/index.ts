@@ -7,6 +7,7 @@ export {
   calcInitialFundingSendAmounts,
   calcAddFundingDepositedAmounts,
   calcInitialFundingDepositedAmounts,
+  calcSharesBought,
 } from './fpmm/liquidity'
 export { calcPrice } from './fpmm/price'
 export * from './fpmm/trading'

@@ -2,7 +2,9 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
 
-import { getContractAddress, getNativeAsset, getToken } from './networks'
+import { getContractAddress, getNativeAsset, getToken } from '../networks'
+import { Token } from '../types'
+
 import {
   bigMax,
   bigMin,
@@ -15,8 +17,8 @@ import {
   calcPrediction,
   calcPrice,
   calcSellAmountInCollateral,
+  calcSharesBought,
   calcXValue,
-  calculateSharesBought,
   clampBigNumber,
   computeBalanceAfterTrade,
   divBN,
@@ -41,8 +43,7 @@ import {
   signaturesFormatted,
   strip0x,
   truncateStringInTheMiddle as truncate,
-} from './tools'
-import { Token } from './types'
+} from './index'
 
 describe('tools', () => {
   describe('calcPrice', () => {
@@ -513,7 +514,7 @@ describe('tools', () => {
       const sharesTwoBig = new BigNumber(sharesTwo)
       const collateralBig = new BigNumber(collateral)
       const resultBig = new BigNumber(result)
-      const calculation = calculateSharesBought(
+      const calculation = calcSharesBought(
         poolSharesBig,
         [balanceOneBig, balanceTwoBig],
         [sharesOneBig, sharesTwoBig],

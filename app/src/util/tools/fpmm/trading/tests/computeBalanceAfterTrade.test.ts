@@ -1,5 +1,7 @@
 /* eslint-env jest */
-import { computeBalanceAfterTrade } from '../computeBalanceAfterTrade'
+import { bigNumberify } from 'ethers/utils'
+
+import { computeBalanceAfterTrade } from '../index'
 
 const testCases: [[number[], number, number, number], number[]][] = [
   [
@@ -20,7 +22,12 @@ describe('computeBalanceAfterTrade', () => {
   it.each(testCases)(
     `should compute the right balance after trade`,
     ([holdings, outcomeIndex, collateral, shares], expected) => {
-      const result = computeBalanceAfterTrade(holdings, outcomeIndex, collateral, shares)
+      const result = computeBalanceAfterTrade(
+        holdings.map(bigNumberify),
+        outcomeIndex,
+        bigNumberify(collateral),
+        bigNumberify(shares),
+      )
 
       result.forEach((x, i) => expect(x.toNumber()).toBeCloseTo(expected[i]))
     },
@@ -28,25 +35,33 @@ describe('computeBalanceAfterTrade', () => {
 
   describe('when index is negative', () => {
     it('throws', () => {
-      expect(() => computeBalanceAfterTrade([100, 100, 100], -1, 50, 100)).toThrow()
+      expect(() =>
+        computeBalanceAfterTrade([100, 100, 100].map(bigNumberify), -1, bigNumberify(50), bigNumberify(100)),
+      ).toThrow()
     })
   })
 
   describe("when index is equal to array's length", () => {
     it('throws', () => {
-      expect(() => computeBalanceAfterTrade([100, 100, 100], 3, 50, 100)).toThrow()
+      expect(() =>
+        computeBalanceAfterTrade([100, 100, 100].map(bigNumberify), 3, bigNumberify(50), bigNumberify(100)),
+      ).toThrow()
     })
   })
 
   describe("when index is bigger than array's length", () => {
     it('throws', () => {
-      expect(() => computeBalanceAfterTrade([100, 100, 100], 10, 50, 100)).toThrow()
+      expect(() =>
+        computeBalanceAfterTrade([100, 100, 100].map(bigNumberify), 10, bigNumberify(50), bigNumberify(100)),
+      ).toThrow()
     })
   })
 
   describe("when trade drains entirety of an outcome's balance", () => {
     it('throws', () => {
-      expect(() => computeBalanceAfterTrade([100, 100, 100], 10, 0, 100)).toThrow()
+      expect(() =>
+        computeBalanceAfterTrade([100, 100, 100].map(bigNumberify), 10, bigNumberify(0), bigNumberify(100)),
+      ).toThrow()
     })
   })
 })

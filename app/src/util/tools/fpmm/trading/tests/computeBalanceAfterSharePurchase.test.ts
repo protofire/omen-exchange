@@ -1,7 +1,7 @@
 /* eslint-env jest */
 import { bigNumberify } from 'ethers/utils'
 
-import { computeBalanceAfterSharePurchase } from '../computeBalanceAfterSharePurchase'
+import { computeBalanceAfterSharePurchase } from '../index'
 
 const testCases: [[number[], number, number, number, number], number[]][] = [
   [
@@ -50,26 +50,38 @@ describe('computeBalanceAfterSharePurchase', () => {
   describe('when index is negative', () => {
     it('throws', () => {
       expect(() =>
-        computeBalanceAfterSharePurchase([bigNumberify(100), bigNumberify(100), bigNumberify(100)], -1, 50, 100, 0),
+        computeBalanceAfterSharePurchase(
+          [bigNumberify(100), bigNumberify(100), bigNumberify(100)],
+          -1,
+          bigNumberify(50),
+          bigNumberify(100),
+          0,
+        ),
       ).toThrow()
     })
   })
 
   describe("when index is equal to array's length", () => {
     it('throws', () => {
-      expect(() => computeBalanceAfterSharePurchase([100, 100, 100], 3, 50, 100, 0)).toThrow()
+      expect(() =>
+        computeBalanceAfterSharePurchase([100, 100, 100].map(bigNumberify), 3, bigNumberify(50), bigNumberify(100), 0),
+      ).toThrow()
     })
   })
 
   describe("when index is bigger than array's length", () => {
     it('throws', () => {
-      expect(() => computeBalanceAfterSharePurchase([100, 100, 100], 10, 50, 100, 0)).toThrow()
+      expect(() =>
+        computeBalanceAfterSharePurchase([100, 100, 100].map(bigNumberify), 10, bigNumberify(50), bigNumberify(100), 0),
+      ).toThrow()
     })
   })
 
   describe("when trade drains entirety of an outcome's balance", () => {
     it('throws', () => {
-      expect(() => computeBalanceAfterSharePurchase([100, 100, 100], 10, 0, 100, 0)).toThrow()
+      expect(() =>
+        computeBalanceAfterSharePurchase([100, 100, 100].map(bigNumberify), 10, bigNumberify(0), bigNumberify(100), 0),
+      ).toThrow()
     })
   })
 })

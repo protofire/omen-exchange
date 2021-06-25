@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import { calcAddFundingSendAmounts } from './calcAddFundingSendAmounts'
 import { calcRemoveFundingSendAmounts } from './calcRemoveFundingSendAmounts'
 
-export const calculateSharesBought = (
+export const calcSharesBought = (
   poolShares: BigNumber,
   balances: BigNumber[],
   shares: BigNumber[],
