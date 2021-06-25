@@ -17,7 +17,7 @@ import theme from './theme'
 import { GlobalStyle } from './theme/global_style'
 import connectors from './util/connectors'
 import { getInfuraUrl } from './util/networks'
-import { checkRpcStatus, getNetworkFromChain } from './util/tools/base'
+import { checkRpcStatus, getNetworkFromChain } from './util/tools'
 
 const store = configureStore({ reducer: balanceReducer })
 

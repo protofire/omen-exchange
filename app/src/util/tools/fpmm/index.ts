@@ -9,9 +9,4 @@ export {
   calcInitialFundingDepositedAmounts,
 } from './liquidity'
 export { calcPrice } from './price'
-export {
-  computeBalanceAfterSharePurchase,
-  computeBalanceAfterShareSale,
-  calcBuyAmountInShares,
-  calcSellAmountInCollateral,
-} from './trading'
+export * from './trading'

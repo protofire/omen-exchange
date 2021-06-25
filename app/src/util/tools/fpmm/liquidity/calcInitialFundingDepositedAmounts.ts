@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 
 import { calcAddFundingDepositedAmounts } from './calcAddFundingDepositedAmounts'
-
+//potentially delteing
 /**
  * Compute the numbers of outcome tokens that will be added to the market maker after adding `addedFunds` of collateral.
  * @dev The distribution hint plays the role of the pool's balances so we can just forward this to calcAddFundingSendAmounts

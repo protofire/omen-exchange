@@ -1,6 +1,6 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
-//stays
+//stays check
 /**
  * Computes the distribution hint that should be used for setting the initial odds to `initialOdds`
  * @param initialOdds - an array of numbers proportional to the initial estimate of the probability of each outcome

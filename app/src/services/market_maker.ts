@@ -2,7 +2,7 @@ import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
-import { calcDistributionHint, calcPrice } from '../util/tools/base'
+import { calcDistributionHint, calcPrice } from '../util/tools'
 import { Market, MarketStatus, MarketWithExtraData } from '../util/types'
 
 import { ConditionalTokenService } from './conditional_token'

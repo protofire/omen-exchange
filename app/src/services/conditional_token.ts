@@ -4,7 +4,7 @@ import { BigNumber, BigNumberish, bigNumberify } from 'ethers/utils'
 
 import { getLogger } from '../util/logger'
 import { getEarliestBlockToCheck } from '../util/networks'
-import { getIndexSets } from '../util/tools/base'
+import { getIndexSets } from '../util/tools'
 
 const logger = getLogger('Services::Conditional-Token')
 

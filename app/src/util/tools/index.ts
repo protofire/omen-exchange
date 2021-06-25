@@ -9,14 +9,9 @@ export {
   calcInitialFundingDepositedAmounts,
 } from './fpmm/liquidity'
 export { calcPrice } from './fpmm/price'
-export {
-  computeBalanceAfterSharePurchase,
-  computeBalanceAfterShareSale,
-  calcBuyAmountInShares,
-  calcSellAmountInCollateral,
-} from './fpmm/trading'
-
+export * from './fpmm/trading'
+export * from './base'
 export * from './string_manipulation'
 export * from './dates'
 export * from './utils'
-export * from './base'
+export * from './web3'

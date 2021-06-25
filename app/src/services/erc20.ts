@@ -4,7 +4,7 @@ import { BigNumber } from 'ethers/utils'
 
 import { STANDARD_DECIMALS } from '../common/constants'
 import { getLogger } from '../util/logger'
-import { isAddress, isContract } from '../util/tools/base'
+import { isAddress, isContract } from '../util/tools'
 import { Token } from '../util/types'
 
 const logger = getLogger('Services::Erc20')

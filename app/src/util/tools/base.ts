@@ -1,7 +1,6 @@
-import { newtonRaphson } from '@fvictorio/newton-raphson-method'
 import axios from 'axios'
 import Big from 'big.js'
-import { BigNumber, bigNumberify, formatUnits, getAddress, parseUnits } from 'ethers/utils'
+import { BigNumber, formatUnits, getAddress, parseUnits } from 'ethers/utils'
 
 import {
   CONFIRMATION_COUNT,
@@ -17,42 +16,12 @@ import { getLogger } from '../logger'
 import { getContractAddress, getNativeAsset, getToken, getWrapToken, networkIds } from '../networks'
 import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token, TransactionStep } from '../types'
 
-import { divBN, mulBN, strip0x } from './'
+import { calcAddFundingSendAmounts, calcRemoveFundingSendAmounts, divBN, mulBN } from './'
 
 const logger = getLogger('Tools')
 
 // use floor as rounding method
 Big.RM = 0
-
-//needs more thought
-// export const strip0x = (input: string) => {
-//   return input.replace(/^0x/, '')
-// }
-export const signatureToVRS = (rawSignature: string) => {
-  const signature = strip0x(rawSignature)
-  const v = signature.substr(64 * 2)
-  const r = signature.substr(0, 32 * 2)
-  const s = signature.substr(32 * 2, 32 * 2)
-  return { v, r, s }
-}
-export const packSignatures = (array: any) => {
-  const length = array.length.toString()
-
-  const msgLength = length.length === 1 ? `0${length}` : length
-  let v = ''
-  let r = ''
-  let s = ''
-  array.forEach((e: any) => {
-    v = v.concat(e.v)
-    r = r.concat(e.r)
-    s = s.concat(e.s)
-  })
-  return `0x${msgLength}${v}${r}${s}`
-}
-
-export const signaturesFormatted = (signatures: string[]) => {
-  return packSignatures(signatures.map(s => signatureToVRS(s)))
-}
 
 export const checkRpcStatus = async (customUrl: string, setStatus: any, network: any) => {
   try {
@@ -100,25 +69,6 @@ export const getNetworkFromChain = (chain: string) => {
   return network
 }
 
-//moved
-/**
- * Computes the price of each outcome token given their holdings. Returns an array of numbers in the range [0, 1]
- */
-export const calcPrice = (holdingsBN: BigNumber[]): number[] => {
-  const holdings = holdingsBN.map(h => new Big(h.toString()))
-
-  const hasZeroHoldings = holdings.every(h => h.toString() === '0')
-  if (hasZeroHoldings) {
-    return holdings.map(() => 0)
-  }
-
-  const product = holdings.reduce((a, b) => a.mul(b))
-  const denominator = holdings.map(h => product.div(h)).reduce((a, b) => a.add(b))
-
-  const prices = holdings.map(holding => product.div(holding).div(denominator))
-
-  return prices.map(price => +price.valueOf())
-}
 //no use not found
 /**
  * Computes the cost in collateral of trading `tradeYes` and `tradeNo` outcomes, given that the initial funding is
@@ -141,92 +91,6 @@ export const calcNetCost = (
         priceNo * Math.pow(2, divBN(tradeNo, funding) - offset),
     )
   return mulBN(funding, logTerm)
-}
-//moved
-/**
- * Computes the balances of the outcome tokens after trading
- */
-export const computeBalanceAfterTrade = (
-  holdings: BigNumber[],
-  outcomeIndex: number, // Outcome selected
-  amountCollateralSpent: BigNumber, // Amount of collateral being spent
-  amountShares: BigNumber, // amount of `outcome` shares being traded
-): BigNumber[] => {
-  if (outcomeIndex < 0 || outcomeIndex >= holdings.length) {
-    throw new Error(`Outcome index '${outcomeIndex}' must be between 0 and '${holdings.length}' - 1`)
-  }
-
-  const newPoolBalances = holdings.map((h, i) => {
-    return h.add(amountCollateralSpent).sub(i === outcomeIndex ? amountShares : bigNumberify(0))
-  })
-  if (newPoolBalances.some(balance => balance.lte(0))) {
-    throw new Error(`Trade is invalid: trade results in liquidity pool owning a negative number of tokens`)
-  }
-  return newPoolBalances
-}
-//moved
-/**
- * Computes the distribution hint that should be used for setting the initial odds to `initialOdds`
- */
-export const calcDistributionHint = (initialOdds: number[]): BigNumber[] => {
-  const allEqual = initialOdds.every(x => x === initialOdds[0])
-  if (allEqual) {
-    return []
-  }
-  const initialOddsBig = initialOdds.map(x => new Big(x))
-  const product = initialOddsBig.reduce((a, b) => a.mul(b))
-
-  const distributionHint = initialOddsBig
-    .map(o => product.div(o))
-    .map(x => x.mul(1000000).round())
-    .map(x => bigNumberify(x.toString()))
-
-  return distributionHint
-}
-//moved
-/**
- * Computes the amount of collateral that needs to be sold to get `shares` amount of shares. Returns null if the amount
- * couldn't be computed.
- *
- * @param sharesToSell The amount of shares that need to be sold
- * @param holdings How many tokens the market maker has of the outcome that is being sold
- * @param otherHoldings How many tokens the market maker has of the outcomes that are not being sold
- * @param fee The fee of the market maker, between 0 and 1
- */
-export const calcSellAmountInCollateral = (
-  sharesToSell: BigNumber,
-  holdings: BigNumber,
-  otherHoldings: BigNumber[],
-  fee: number,
-): Maybe<BigNumber> => {
-  Big.DP = 90
-  const sharesToSellBig = new Big(sharesToSell.toString())
-  const holdingsBig = new Big(holdings.toString())
-  const otherHoldingsBig = otherHoldings.map(x => new Big(x.toString()))
-
-  const f = (r: Big) => {
-    // For three outcomes, where the first outcome is the one being sold, the formula is:
-    // f(r) = ((y - R) * (z - R)) * (x  + a - R) - x*y*z
-    // where:
-    //   `R` is r / (1 - fee)
-    //   `x`, `y`, `z` are the market maker holdings for each outcome
-    //   `a` is the amount of outcomes that are being sold
-    //   `r` (the unknown) is the amount of collateral that will be returned in exchange of `a` tokens
-    const R = r.div(1 - fee)
-    const firstTerm = otherHoldingsBig.map(h => h.minus(R)).reduce((a, b) => a.mul(b))
-    const secondTerm = holdingsBig.plus(sharesToSellBig).minus(R)
-    const thirdTerm = otherHoldingsBig.reduce((a, b) => a.mul(b), holdingsBig)
-    return firstTerm.mul(secondTerm).minus(thirdTerm)
-  }
-
-  const r = newtonRaphson(f, 0, { maxIterations: 100 })
-
-  if (r) {
-    const amountToSell = bigNumberify(r.toFixed(0))
-    return amountToSell
-  }
-
-  return null
 }
 
 export const isAddress = (address: string): boolean => {
@@ -275,20 +139,6 @@ export const delay = (timeout: number) => new Promise(res => setTimeout(res, tim
 export const getIndexSets = (outcomesCount: number) => {
   const range = (length: number) => [...Array(length)].map((x, i) => i)
   return range(outcomesCount).map(x => 1 << x)
-}
-//moved
-export const calcPoolTokens = (
-  addedFunds: BigNumber,
-  holdingsBN: BigNumber[],
-  poolShareSupply: BigNumber,
-): BigNumber => {
-  if (poolShareSupply.gt(0) && holdingsBN.length > 0) {
-    const poolWeight = holdingsBN.reduce((max: BigNumber, h: BigNumber) => (h.gt(max) ? h : max))
-
-    return addedFunds.mul(poolShareSupply).div(poolWeight)
-  } else {
-    return addedFunds
-  }
 }
 
 /**
@@ -375,59 +225,30 @@ export const calcInitialFundingSendAmounts = (addedFunds: BigNumber, distributio
 
   return sendAmounts
 }
-//moved
-/**
- * Compute the number of outcomes that will be sent to the user by the Market Maker
- * after adding `addedFunds` of collateral.
- */
-export const calcAddFundingSendAmounts = (
-  addedFunds: BigNumber,
-  holdingsBN: BigNumber[],
-  poolShareSupply: BigNumber,
-): Maybe<BigNumber[]> => {
-  if (poolShareSupply.eq(0)) {
-    return null
-  }
-
-  const poolWeight = holdingsBN.reduce((a, b) => (a.gt(b) ? a : b))
-
-  const sendAmounts = holdingsBN.map(h => {
-    const remaining = addedFunds.mul(h).div(poolWeight)
-    return addedFunds.sub(remaining)
-  })
-
-  return sendAmounts
-}
+// //moved
+// /**
+//  * Compute the number of outcomes that will be sent to the user by the Market Maker
+//  * after adding `addedFunds` of collateral.
+//  */
+// export const calcAddFundingSendAmounts = (
+//   addedFunds: BigNumber,
+//   holdingsBN: BigNumber[],
+//   poolShareSupply: BigNumber,
+// ): Maybe<BigNumber[]> => {
+//   if (poolShareSupply.eq(0)) {
+//     return null
+//   }
+//
+//   const poolWeight = holdingsBN.reduce((a, b) => (a.gt(b) ? a : b))
+//
+//   const sendAmounts = holdingsBN.map(h => {
+//     const remaining = addedFunds.mul(h).div(poolWeight)
+//     return addedFunds.sub(remaining)
+//   })
+//
+//   return sendAmounts
+// }
 //mpved
-/**
- * Compute the number of outcomes that will be sent to the user by the Market Maker
- * after removing `removedFunds` of pool shares.
- */
-export const calcRemoveFundingSendAmounts = (
-  removedFunds: BigNumber,
-  holdingsBN: BigNumber[],
-  poolShareSupply: BigNumber,
-): BigNumber[] => {
-  const sendAmounts = holdingsBN.map(h =>
-    poolShareSupply.gt(0) ? h.mul(removedFunds).div(poolShareSupply) : new BigNumber(0),
-  )
-  return sendAmounts
-}
-//moved
-/**
- * Compute the amount of collateral that can be obtained via merging after the user
- * removed `removedFunds` of pool shares.
- *
- * This is 0 when the probabilities are uniform (i.e. all the holdings are equal).
- */
-export const calcDepositedTokens = (
-  removedFunds: BigNumber,
-  holdingsBN: BigNumber[],
-  poolShareSupply: BigNumber,
-): BigNumber => {
-  const sendAmounts = calcRemoveFundingSendAmounts(removedFunds, holdingsBN, poolShareSupply)
-  return sendAmounts.reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
-}
 
 /**
  * Like Promise.all but for objects.

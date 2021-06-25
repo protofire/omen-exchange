@@ -27,7 +27,7 @@ import {
   isCToken,
   signaturesFormatted,
   waitABit,
-} from '../util/tools/base'
+} from '../util/tools'
 import { MarketData, Question, Token, TransactionStep } from '../util/types'
 
 import { CompoundService } from './compound_service'
