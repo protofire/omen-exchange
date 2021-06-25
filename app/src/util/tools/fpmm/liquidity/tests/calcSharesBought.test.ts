@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 
 import { calcSharesBought } from '../calcSharesBought'
 
-describe('calcSharesBought', () => {
+describe('calculateSharesBought', () => {
   const testCases: [[number, number[], number[], number], number][] = [
     [[205, [200, 211], [36, 67], 1], 1],
     [[204, [193, 216], [48, 67], 1], 1],
@@ -22,6 +22,8 @@ describe('calcSharesBought', () => {
       [sharesOneBig, sharesTwoBig],
       collateralBig,
     )
-    expect(calculation.toNumber()).toBeCloseTo(resultBig.toNumber())
+    it('calculates correctly', () => {
+      expect(calculation.toNumber()).toBeCloseTo(resultBig.toNumber())
+    })
   }
 })

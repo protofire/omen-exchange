@@ -11,6 +11,8 @@ describe('calcPrediction', () => {
   for (const [[probability, lowerBound, upperBound], result] of testCases) {
     const prediction = calcPrediction(probability, lowerBound, upperBound)
 
-    expect(prediction).toStrictEqual(result)
+    it('calculates correctly', () => {
+      expect(prediction).toStrictEqual(result)
+    })
   }
 })
