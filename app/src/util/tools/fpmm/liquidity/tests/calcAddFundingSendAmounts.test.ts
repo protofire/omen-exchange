@@ -17,4 +17,9 @@ describe('calcAddFundingSendAmounts', () => {
 
     expect(result).toStrictEqual([Zero, Zero, Zero])
   })
+  it('no funding', () => {
+    const result = calcAddFundingSendAmounts(bigNumberify(10), [3, 3, 3].map(bigNumberify), bigNumberify(0))
+
+    expect(result).toBe(null)
+  })
 })
