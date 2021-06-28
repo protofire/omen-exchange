@@ -265,7 +265,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setIsTransactionModalOpen(true)
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
-        collateral: marketMakerData.collateral,
         conditionId,
         conditionalTokens,
         earnings: userEarnings,

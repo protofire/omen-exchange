@@ -12,7 +12,6 @@ import {
   getContractAddress,
   getNativeAsset,
   getTargetSafeImplementation,
-  getToken,
   getTokenFromAddress,
   getWrapToken,
   networkIds,
@@ -23,7 +22,6 @@ import {
   calcDistributionHint,
   clampBigNumber,
   getBaseToken,
-  getBaseTokenForCToken,
   isCToken,
   signaturesFormatted,
   waitABit,
@@ -87,8 +85,6 @@ interface CPKAddFundingParams {
 
 interface CPKRemoveFundingParams {
   amountToMerge: BigNumber
-  collateral: Token
-  compoundService?: CompoundService | null
   conditionId: string
   conditionalTokens: ConditionalTokenService
   earnings: BigNumber
@@ -97,7 +93,6 @@ interface CPKRemoveFundingParams {
   setTxHash: (arg0: string) => void
   setTxState: (step: TransactionStep) => void
   sharesToBurn: BigNumber
-  useBaseToken?: boolean
 }
 
 interface CPKRedeemParams {
@@ -966,8 +961,6 @@ class CPKService {
 
   removeFunding = async ({
     amountToMerge,
-    collateral,
-    compoundService,
     conditionId,
     conditionalTokens,
     earnings,
@@ -976,12 +969,12 @@ class CPKService {
     setTxHash,
     setTxState,
     sharesToBurn,
-    useBaseToken,
   }: CPKRemoveFundingParams): Promise<TransactionReceipt> => {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
       const network = await this.provider.getNetwork()
+      const collateralAddress = await marketMaker.getCollateralToken()
       const networkId = network.chainId
       const transactions: Transaction[] = []
       const removeFundingTx = {
@@ -992,7 +985,7 @@ class CPKService {
       const mergePositionsTx = {
         to: conditionalTokens.address,
         data: ConditionalTokenService.encodeMergePositions(
-          collateral.address,
+          collateralAddress,
           conditionId,
           outcomesCount,
           amountToMerge,
@@ -1004,78 +997,29 @@ class CPKService {
       const txOptions: TxOptions = {}
       await this.getGas(txOptions)
 
-      const collateralSymbol = collateral.symbol.toLowerCase()
-      let userInputCollateral = collateral
       const totalAmountToSend = amountToMerge.add(earnings)
+
       // transfer to the user the merged collateral plus the earned fees
-      const wrapTokenAddress = getWrapToken(this.cpk.relay ? networkIds.XDAI : networkId).address
-      if (useBaseToken || (this.cpk.relay && wrapTokenAddress === collateral.address)) {
-        if (compoundService != null) {
-          // cToken to base token flow
-          if (collateralSymbol === 'ceth') {
-            userInputCollateral = getNativeAsset(networkId)
-          } else {
-            const userInputCollateralSymbol = getBaseTokenForCToken(collateralSymbol) as KnownToken
-            userInputCollateral = getToken(networkId, userInputCollateralSymbol)
-          }
-          // Convert cpk token to base token if user wants to redeem in base
-          const encodedRedeemFunction = CompoundService.encodeRedeemTokens(
-            collateralSymbol,
-            totalAmountToSend.toString(),
-          )
-          // Approve cToken for the cpk contract
-          transactions.push({
-            to: userInputCollateral.address,
-            data: ERC20Service.encodeApproveUnlimited(collateral.address),
-          })
-          // redeeem underlying token from the ctoken token
-          transactions.push({
-            to: collateral.address,
-            data: encodedRedeemFunction,
-          })
-        } else {
-          // Pseudonative asset to base asset flow
-          const collateralToken = getTokenFromAddress(networkId, collateral.address)
-          const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, totalAmountToSend)
-          // If use prefers to get paid in the base native asset then unwrap the asset
-          transactions.push({
-            to: collateral.address,
-            data: encodedWithdrawFunction,
-          })
-        }
+      const wrapToken = getWrapToken(this.cpk.relay ? networkIds.XDAI : networkId)
+      const unwrap = collateralAddress.toLowerCase() === wrapToken.address.toLowerCase()
+      if (unwrap) {
+        const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(wrapToken.symbol, totalAmountToSend)
+        transactions.push({
+          to: collateralAddress,
+          data: encodedWithdrawFunction,
+        })
       }
-      // If we are signed in as a safe we don't need to transfer
+
+      // Transfer asset back to user
       if (!this.isSafeApp) {
-        // transfer to the user the merged collateral plus the earned fees
-        if (useBaseToken) {
-          if (compoundService != null) {
-            const minCollateralAmount = compoundService.calculateCTokenToBaseExchange(
-              userInputCollateral,
-              totalAmountToSend,
-            )
-            if (userInputCollateral.address === pseudoNativeAssetAddress) {
-              // If user wants to redeem in ether simply transfer the funds back to user
-              transactions.push({
-                to: account,
-                value: minCollateralAmount.toString(),
-              })
-            } else {
-              // Transfer base token to the user
-              transactions.push({
-                to: userInputCollateral.address,
-                data: ERC20Service.encodeTransfer(account, minCollateralAmount),
-              })
-            }
-          } else {
-            // Transfer unwrapped asset back to user
-            transactions.push({
-              to: account,
-              value: totalAmountToSend.toString(),
-            })
-          }
+        if (unwrap) {
+          transactions.push({
+            to: account,
+            value: totalAmountToSend.toString(),
+          })
         } else {
           transactions.push({
-            to: collateral.address,
+            to: collateralAddress,
             data: ERC20Service.encodeTransfer(account, totalAmountToSend),
           })
         }
@@ -1332,6 +1276,7 @@ class CPKService {
       throw err
     }
   }
+
   approveCpk = async (addressToApprove: string, tokenAddress: string) => {
     try {
       const txOptions: TxOptions = {}
