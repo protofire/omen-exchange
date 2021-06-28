@@ -72,12 +72,12 @@ const SVGWrapper = styled.span<{ marginLeft?: boolean }>`
   justify-content: center;
   margin-left: ${props => (props.marginLeft ? '10px' : '')};
   z-index: 5;
+  width: 16px;
 `
 
 const Spinner = styled.img`
   animation: ${rotate} 1s linear infinite;
 `
-
 const Check = styled.img``
 
 interface ButtonStatefulProps extends ButtonProps {

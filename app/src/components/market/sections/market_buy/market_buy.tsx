@@ -127,7 +127,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(displayCollateral.address === pseudoNativeAssetAddress)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
@@ -191,10 +191,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     await unlock()
     setAllowanceFinished(true)
   }
-
-  const showUpgrade =
-    (!isUpdated && displayCollateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && displayCollateral.address === pseudoNativeAssetAddress)
 
   const shouldDisplayMaxButton = displayCollateral.address !== pseudoNativeAssetAddress
 
@@ -276,6 +272,8 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
+  const showUpgrade = !isUpdated || upgradeFinished
+
   const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)))
   const feePercentage = Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)) * 100
 
@@ -333,7 +331,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount ||
-    (!isUpdated && displayCollateral.address === pseudoNativeAssetAddress)
+    !isUpdated
 
   let currencyFilters =
     collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress
@@ -499,10 +497,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )}
       {showUpgrade && (
         <SetAllowance
-          collateral={nativeAsset}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}
+          style={{ marginTop: showSetAllowance ? 20 : 0 }}
         />
       )}
       <StyledButtonContainer borderTop={true} marginTop={showSetAllowance || showUpgrade || isNegativeAmount}>
