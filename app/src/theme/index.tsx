@@ -1,5 +1,5 @@
 import React from 'react'
-import { ThemeProvider as StyledThemeProvider } from 'styled-components'
+import styled, { ThemeProvider as StyledThemeProvider } from 'styled-components'
 
 import { Colors } from './types'
 
@@ -523,4 +523,15 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const darkMode = false
 
   return <StyledThemeProvider theme={themeAggregator(darkMode)}>{children}</StyledThemeProvider>
+}
+
+const TextWrapper = styled.div<{ color: keyof Colors }>`
+  color: ${({ color, theme }) => (theme as any)[color]};
+`
+
+// This is a boilerplate start while waiting for Geronimo's figma
+export const TYPE = {
+  main(props: any) {
+    return <TextWrapper color={'text1'} fontWeight={500} {...props} />
+  },
 }
