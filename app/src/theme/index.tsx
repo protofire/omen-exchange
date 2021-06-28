@@ -529,9 +529,81 @@ const TextWrapper = styled.div<{ color: keyof Colors }>`
   color: ${({ color, theme }) => (theme as any)[color]};
 `
 
-// This is a boilerplate start while waiting for Geronimo's figma
 export const TYPE = {
-  main(props: any) {
-    return <TextWrapper color={'text1'} fontWeight={500} {...props} />
+  heading1(props: any) {
+    return (
+      <TextWrapper
+        align={'left'}
+        color={'text3'}
+        fontFamily={'Roboto'}
+        fontSize={'22px'}
+        fontWeight={500}
+        letterSpacing={'0.8px'}
+        lineHeight={'100% || 25.78px'}
+        verticalAlign={'center'}
+        {...props}
+      />
+    )
+  },
+  heading2(props: any) {
+    return (
+      <TextWrapper
+        align={'left'}
+        color={'text3'}
+        fontFamily={'Roboto'}
+        fontSize={'18px'}
+        fontWeight={400}
+        letterSpacing={'0.2px'}
+        lineHeight={'100% || 21.09px'}
+        verticalAlign={'center'}
+        {...props}
+      />
+    )
+  },
+  heading3(props: any) {
+    return (
+      <TextWrapper
+        align={'left'}
+        color={'text3'}
+        fontFamily={'Roboto'}
+        fontSize={'16px'}
+        fontWeight={500}
+        letterSpacing={'0.2px'}
+        lineHeight={'100% || 18.75px'}
+        paragraphSpacing={'4px'}
+        verticalAlign={'top'}
+        {...props}
+      />
+    )
+  },
+  bodyMedium(props: any) {
+    return (
+      <TextWrapper
+        align={'left'}
+        color={'text3'}
+        fontFamily={'Roboto'}
+        fontSize={'14px'}
+        fontWeight={500}
+        letterSpacing={'0.2px'}
+        lineHeight={'100% || 16.41px'}
+        verticalAlign={'top'}
+        {...props}
+      />
+    )
+  },
+  bodyRegular(props: any) {
+    return (
+      <TextWrapper
+        align={'left'}
+        color={'text3'}
+        fontFamily={'Roboto'}
+        fontSize={'14px'}
+        fontWeight={400}
+        letterSpacing={'0.2px'}
+        lineHeight={'100% || 16.41px'}
+        verticalAlign={'top'}
+        {...props}
+      />
+    )
   },
 }
