@@ -2,7 +2,7 @@
 import Big from 'big.js'
 import { BigNumber, parseUnits } from 'ethers/utils'
 
-import { getContractAddress, getNativeAsset, getToken } from '../networks'
+import { getContractAddress, getNativeAsset } from '../networks'
 import { Token } from '../types'
 
 import {
