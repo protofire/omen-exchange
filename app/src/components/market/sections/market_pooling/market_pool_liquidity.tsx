@@ -32,7 +32,6 @@ import {
   formatNumber,
   getBaseTokenForCToken,
   getInitialCollateral,
-  getSharesInBaseToken,
 } from '../../../../util/tools'
 import {
   CompoundTokenType,
@@ -455,10 +454,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
-  let displayBalances = balances
-  if (compoundService && collateral.symbol.toLowerCase() in CompoundTokenType) {
-    displayBalances = getSharesInBaseToken(balances, compoundService, displayCollateral)
-  }
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 
   let displayTotalUserLiquidity = totalUserLiquidity
@@ -582,8 +577,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         balances={balances}
         collateral={collateral}
         disabledColumns={[OutcomeTableValue.OutcomeProbability, OutcomeTableValue.Payout, OutcomeTableValue.Bonded]}
-        displayBalances={displayBalances}
-        displayCollateral={baseCollateral}
         displayRadioSelection={false}
         newShares={activeTab === Tabs.deposit ? displaySharesAfterAddingFunding : displaySharesAfterRemovingFunding}
         probabilities={probabilities}

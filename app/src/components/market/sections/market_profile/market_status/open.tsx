@@ -3,19 +3,12 @@ import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, useLocation, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useCompoundService, useGraphMarketUserTxData } from '../../../../../hooks'
+import { useGraphMarketUserTxData } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
-import { getNativeAsset, getToken, networkIds } from '../../../../../util/networks'
-import { getSharesInBaseToken, getUnit, isDust } from '../../../../../util/tools'
-import {
-  BalanceItem,
-  CompoundTokenType,
-  MarketDetailsTab,
-  MarketMakerData,
-  OutcomeTableValue,
-  Token,
-} from '../../../../../util/types'
+import { getNativeAsset, networkIds } from '../../../../../util/networks'
+import { getUnit, isDust } from '../../../../../util/tools'
+import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { MarketScale } from '../../../common/market_scale'
@@ -101,11 +94,9 @@ const Wrapper = (props: Props) => {
     scalarLow,
     totalPoolShares,
   } = marketMakerData
-  const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
-  const { networkId, relay } = context
+  const { networkId } = context
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
-  const { compoundService: CompoundService } = useCompoundService(collateral, context)
-  const compoundService = CompoundService || null
+
   const nativeAsset = getNativeAsset(networkId)
   const initialBondAmount =
     networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
@@ -121,22 +112,6 @@ const Wrapper = (props: Props) => {
     // eslint-disable-next-line
   }, [question.currentAnswerBond])
 
-  const setCurrentDisplayCollateral = () => {
-    // if collateral is a cToken then convert the collateral and balances to underlying token
-    const collateralSymbol = collateral.symbol.toLowerCase()
-    if (collateralSymbol in CompoundTokenType) {
-      const baseCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length)
-      let baseCollateralToken = collateral
-      if (baseCollateralSymbol === 'eth') {
-        baseCollateralToken = getNativeAsset(networkId, relay)
-      } else {
-        baseCollateralToken = getToken(networkId, baseCollateralSymbol as KnownToken)
-      }
-      setDisplayCollateral(baseCollateralToken)
-    } else {
-      setDisplayCollateral(collateral)
-    }
-  }
   useEffect(() => {
     const timeDifference = new Date(question.resolution).getTime() - new Date().getTime()
     const maxTimeDifference = 86400000
@@ -147,21 +122,9 @@ const Wrapper = (props: Props) => {
       fetchGraphMarketMakerData()
       setCurrentTab(MarketDetailsTab.finalize)
     }
-    setCurrentDisplayCollateral()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
   }, [])
 
-  useEffect(() => {
-    setCurrentDisplayCollateral()
-  }, [collateral.symbol]) // eslint-disable-line react-hooks/exhaustive-deps
-  let displayBalances = balances
-  if (
-    compoundService &&
-    collateral.address !== displayCollateral.address &&
-    collateral.symbol.toLowerCase() in CompoundTokenType
-  ) {
-    displayBalances = getSharesInBaseToken(balances, compoundService, displayCollateral)
-  }
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
     const { shares } = balanceItem
     return shares && !isDust(shares, collateral.decimals)
@@ -185,8 +148,6 @@ const Wrapper = (props: Props) => {
         balances={balances}
         collateral={collateral}
         disabledColumns={disabledColumns}
-        displayBalances={displayBalances}
-        displayCollateral={displayCollateral}
         displayRadioSelection={false}
         probabilities={probabilities}
       />

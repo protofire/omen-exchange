@@ -2,7 +2,7 @@
 import Big from 'big.js'
 import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
 
-import { getContractAddress, getNativeAsset, getToken } from './networks'
+import { getContractAddress, getNativeAsset } from './networks'
 import {
   bigMax,
   bigMin,
@@ -687,7 +687,6 @@ describe('tools', () => {
     const testCases: [[number, Token], Token][] = [
       [[1, getNativeAsset(1)], getNativeAsset(1)],
       [[4, getNativeAsset(4)], getNativeAsset(4)],
-      [[4, getToken(4, 'ceth' as KnownToken)], getNativeAsset(4)],
       [[77, getNativeAsset(77)], getNativeAsset(77)],
       [[100, getNativeAsset(100)], getNativeAsset(100)],
     ]
