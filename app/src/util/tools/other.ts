@@ -1,50 +1,11 @@
-import axios from 'axios'
 import Big from 'big.js'
 
-import {
-  CONFIRMATION_COUNT,
-  MAIN_NETWORKS,
-  RINKEBY_NETWORKS,
-  SOKOL_NETWORKS,
-  XDAI_NETWORKS,
-} from '../../common/constants'
+import { MAIN_NETWORKS, RINKEBY_NETWORKS, SOKOL_NETWORKS, XDAI_NETWORKS } from '../../common/constants'
 import { MarketTokenPair } from '../../hooks/useGraphMarketsFromQuestion'
 import { CompoundService } from '../../services'
 import { getNativeAsset, getWrapToken, networkIds } from '../networks'
-import { BalanceItem, Token, TransactionStep } from '../types'
+import { BalanceItem, Token } from '../types'
 
-export const checkRpcStatus = async (customUrl: string, setStatus: any, network: any) => {
-  try {
-    const response = await axios.post(customUrl, {
-      id: +new Date(),
-      jsonrpc: '2.0',
-      method: 'net_version',
-    })
-    if (response.data.error || +response.data.result !== network) {
-      setStatus(false)
-      return false
-    }
-
-    setStatus(true)
-    return true
-  } catch (e) {
-    setStatus(false)
-
-    return false
-  }
-}
-
-export const isValidHttpUrl = (data: string): boolean => {
-  let url
-
-  try {
-    url = new URL(data)
-  } catch (_) {
-    return false
-  }
-
-  return url.protocol === 'http:' || url.protocol === 'https:'
-}
 export const getNetworkFromChain = (chain: string) => {
   const network = RINKEBY_NETWORKS.includes(chain)
     ? networkIds.RINKEBY
@@ -58,27 +19,6 @@ export const getNetworkFromChain = (chain: string) => {
   return network
 }
 
-export const waitForConfirmations = async (
-  hash: string,
-  provider: any,
-  setConfirmations: (confirmations: number) => void,
-  setTxState: (step: TransactionStep) => void,
-  confirmations?: number,
-) => {
-  setTxState(TransactionStep.transactionSubmitted)
-  let receipt
-  const requiredConfs = confirmations ? confirmations : CONFIRMATION_COUNT
-
-  while (!receipt || !receipt.confirmations || (receipt.confirmations && receipt.confirmations <= requiredConfs)) {
-    receipt = await provider.getTransaction(hash)
-    if (receipt && receipt.confirmations) {
-      setTxState(TransactionStep.confirming)
-      const confs = receipt.confirmations > requiredConfs ? requiredConfs : receipt.confirmations
-      setConfirmations(confs)
-    }
-    await waitABit(2000)
-  }
-}
 export const reverseArray = (array: any[]): any[] => {
   const newArray = array.map((e, i, a) => a[a.length - 1 - i])
   return newArray
@@ -133,23 +73,6 @@ export function range(max: number): number[] {
   return Array.from(new Array(max), (_, i) => i)
 }
 export const delay = (timeout: number) => new Promise(res => setTimeout(res, timeout))
-
-/**
- * Like Promise.all but for objects.
- *
- * Example:
- *   promiseProps({ a: 1, b: Promise.resolve(2) }) resolves to { a: 1, b: 2 }
- */
-export async function promiseProps<T>(obj: { [K in keyof T]: Promise<T[K]> | T[K] }): Promise<T> {
-  const keys = Object.keys(obj)
-  const values = await Promise.all(Object.values(obj))
-  const result: any = {}
-  for (let i = 0; i < values.length; i++) {
-    result[keys[i]] = values[i]
-  }
-
-  return result
-}
 
 export const waitABit = (milli = 1000) =>
   new Promise(resolve => {

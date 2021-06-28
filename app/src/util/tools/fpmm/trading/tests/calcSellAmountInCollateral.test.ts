@@ -1,7 +1,7 @@
 /* eslint-env jest */
 import { BigNumber, bigNumberify } from 'ethers/utils'
 
-import { divBN } from '../../../utils'
+import { divBN } from '../../../maths'
 import { calcSellAmountInCollateral } from '../index'
 
 describe('calcSellAmountInCollateral', () => {

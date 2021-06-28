@@ -11,10 +11,10 @@ export {
 } from './fpmm/liquidity'
 export { calcPrice } from './fpmm/price'
 export * from './fpmm/trading'
-
+export * from './http'
 export * from './string_manipulation'
 export * from './dates'
-export * from './utils'
+export * from './maths'
 export * from './web3'
 export * from './formatting'
 export * from './other'

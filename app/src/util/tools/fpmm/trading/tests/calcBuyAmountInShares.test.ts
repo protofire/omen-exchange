@@ -2,7 +2,7 @@
 
 import { bigNumberify } from 'ethers/utils'
 
-import { divBN } from '../../../utils'
+import { divBN } from '../../../maths'
 import { calcBuyAmountInShares } from '../index'
 
 const testCases: [[string, number, string[]], string][] = [[['1000000', 0, ['100000000', '100000000']], '1970295']]

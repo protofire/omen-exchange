@@ -8,7 +8,6 @@ import { Transaction, verifyProxyAddress } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import {
   bridgeTokensList,
-  getBySafeTx,
   getContractAddress,
   getNativeAsset,
   getTargetSafeImplementation,
@@ -17,16 +16,17 @@ import {
   getWrapToken,
   networkIds,
   pseudoNativeAssetAddress,
-  waitForBlockToSync,
 } from '../util/networks'
 import {
   calcDistributionHint,
   clampBigNumber,
   getBaseToken,
   getBaseTokenForCToken,
+  getBySafeTx,
   isCToken,
   signaturesFormatted,
   waitABit,
+  waitForBlockToSync,
 } from '../util/tools'
 import { MarketData, Question, Token, TransactionStep } from '../util/types'
 

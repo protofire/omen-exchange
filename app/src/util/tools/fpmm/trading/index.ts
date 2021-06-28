@@ -5,7 +5,7 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { formatBigNumber } from '../../formatting'
-import { ceilDiv, divBN, mulBN } from '../../utils'
+import { ceilDiv, divBN, mulBN } from '../../maths'
 
 /**
  * Computes the market maker's balances of outcome tokens after a trade to buy shares of a particular outcome
