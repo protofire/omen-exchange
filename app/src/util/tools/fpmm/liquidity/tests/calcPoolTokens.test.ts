@@ -1,7 +1,7 @@
 /* eslint-env jest */
 import { bigNumberify } from 'ethers/utils'
 
-import { calcPoolTokens } from '../calcPoolTokens'
+import { calcPoolTokens } from '../index'
 
 describe('calcPoolTokens', () => {
   it('should return addedFunds if poolShares are zero', () =>

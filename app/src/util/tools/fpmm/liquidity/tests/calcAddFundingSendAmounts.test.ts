@@ -3,7 +3,7 @@
 import { Zero } from 'ethers/constants'
 import { bigNumberify } from 'ethers/utils'
 
-import { calcAddFundingSendAmounts } from '../calcAddFundingSendAmounts'
+import { calcAddFundingSendAmounts } from '../index'
 
 describe('calcAddFundingSendAmounts', () => {
   it('all holdings are different', () => {

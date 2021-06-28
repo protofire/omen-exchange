@@ -2,7 +2,7 @@
 
 import { bigNumberify } from 'ethers/utils'
 
-import { calcInitialFundingDepositedAmounts } from '../calcInitialFundingDepositedAmounts'
+import { calcInitialFundingDepositedAmounts } from '../index'
 
 describe('calcInitialFundingDepositedAmounts', () => {
   it('Distribution hint is non-uniform', () => {

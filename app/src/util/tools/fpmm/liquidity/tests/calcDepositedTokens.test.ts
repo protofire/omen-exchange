@@ -1,7 +1,7 @@
 import { Zero } from 'ethers/constants'
 import { bigNumberify } from 'ethers/utils'
 
-import { calcDepositedTokens } from '../calcDepositedTokens'
+import { calcDepositedTokens } from '../index'
 
 describe('calcDepositedTokens', () => {
   it('returns min of holdings mapped to factor', () =>

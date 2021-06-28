@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 
-import { calcSharesBought } from '../calcSharesBought'
+import { calcSharesBought } from '../index'
 
 describe('calculateSharesBought', () => {
   const testCases: [[number, number[], number[], number], number][] = [

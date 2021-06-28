@@ -1,6 +1,6 @@
 import { bigNumberify } from 'ethers/utils'
 
-import { calcAddFundingDepositedAmounts } from '../calcAddFundingDepositedAmounts'
+import { calcAddFundingDepositedAmounts } from '../index'
 
 describe('calcAddFundingDepositedAmounts', () => {
   it('all holdings are different', () => {
