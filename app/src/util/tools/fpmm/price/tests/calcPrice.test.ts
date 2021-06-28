@@ -1,5 +1,5 @@
 /* eslint-env jest */
-import { calcPrice } from '../calcPrice'
+import { calcPrice } from '../index'
 
 const testCases: [number[], number[]][] = [
   [
