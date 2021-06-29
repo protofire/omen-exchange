@@ -14,10 +14,10 @@ const Radio = styled.div<{ outcomeIndex: number; checked: boolean }>`
   height: 20px;
   ${props =>
     props.outcomeIndex > -1
-      ? `background-color: ${props.checked ? getOutcomeColor(props.outcomeIndex).darker : '#fff'};
+      ? `background-color: ${props.checked ? getOutcomeColor(false, props.outcomeIndex).darker : '#fff'};
     border-color: ${
-      getOutcomeColor(props.outcomeIndex).darker
-        ? getOutcomeColor(props.outcomeIndex).darker
+      getOutcomeColor(false, props.outcomeIndex).darker
+        ? getOutcomeColor(false, props.outcomeIndex).darker
         : props.theme.colors.primary
     };
     border-style: solid;
