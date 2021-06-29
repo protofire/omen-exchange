@@ -21,7 +21,7 @@ import theme from './theme'
 import { GlobalStyle } from './theme/global_style'
 import connectors from './util/connectors'
 import { getInfuraUrl } from './util/networks'
-import { checkRpcStatus } from './util/tools'
+import { checkRpcStatus, getNetworkFromChain } from './util/tools'
 
 const store = configureStore({ reducer: balanceReducer })
 
@@ -33,29 +33,32 @@ const App: React.FC = (props: any) => {
 
   const networkId = ethereum && ethereum.chainId
   const [status, setStatus] = useState(true)
-  const [settingsView, setSettingsView] = useState(false)
-  let network: number
-
-  useInterval(() => {
-    network = ethereum.networkVersion >> 0
-
-    if (status == false) {
-      setTimeout(() => {
-        if (status == false) setSettingsView(true)
-      }, 2000)
-    }
-  }, FETCH_RPC_INTERVAL)
+  // const [settingsView, setSettingsView] = useState(false)
+  console.log(status)
+  // useInterval(() => {
+  //   network = ethereum.networkVersion >> 0
+  //   console.log('here')
+  //
+  //   if (status == false) {
+  //     setTimeout(() => {
+  //       if (status == false) setSettingsView(true)
+  //     }, 2000)
+  //   }
+  // }, FETCH_RPC_INTERVAL)
 
   useEffect(() => {
-    if (network && network !== -1) checkRpcStatus(getInfuraUrl(network), setStatus, network)
+    const get = getNetworkFromChain(networkId)
+
+    if (get && get !== -1) checkRpcStatus(getInfuraUrl(get), setStatus, get)
+    else setStatus(false)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ethereum])
+  }, [ethereum, networkId])
 
   return (
     <ThemeProvider theme={theme}>
       <Web3Provider connectors={connectors} libraryName="ethers.js">
-        {settingsView ? (
+        {!status ? (
           <Modal
             isOpen={true}
             style={{

@@ -314,10 +314,6 @@ export const ModalYourConnection = (props: Props) => {
       <></>
     )
 
-  const windowObj: any = window
-  const ethereum = windowObj.ethereum
-  const chainId = ethereum && ethereum.chainId
-
   return (
     <>
       <Modal
@@ -353,7 +349,7 @@ export const ModalYourConnection = (props: Props) => {
               />
             </ConnectionModalNavigation>
             <SettingsModalWrapper>
-              <SettingsViewContainer networkId={chainId} {...props} />
+              <SettingsViewContainer networkId={networkId} {...props} />
             </SettingsModalWrapper>
           </ContentWrapper>
         ) : (

@@ -115,14 +115,14 @@ const SettingsButtonWrapper = styled.div`
 
 interface Props {
   history?: any
-  theme?: any
   networkId?: any
 }
 
 export const SettingsViewContainer = (props: Props) => {
   const networkId = props.networkId
-
-  const network = getNetworkFromChain(networkId)
+  console.log(networkId)
+  const network = getNetworkFromChain(networkId.toString())
+  console.log(network)
 
   const [current, setCurrent] = useState(0)
   const [url, setUrl] = useState<string>('')
@@ -190,7 +190,7 @@ export const SettingsViewContainer = (props: Props) => {
       setOnlineStatus(false)
       return
     }
-
+    console.log(network)
     checkRpcStatus(urlObject && urlObject[current] ? urlObject[current].rpcUrl : url, setOnlineStatus, network)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url])

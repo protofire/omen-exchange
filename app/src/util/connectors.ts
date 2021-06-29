@@ -4,9 +4,9 @@ import { ethers } from 'ethers'
 import { Connectors } from 'web3-react'
 
 import { INFURA_PROJECT_ID } from '../common/constants'
-import { getInfuraUrl, infuraNetworkURL, networkIds, supportedNetworkIds } from '../util/networks'
+import { getInfuraUrl, networkIds, supportedNetworkIds } from '../util/networks'
 
-const { InjectedConnector, NetworkOnlyConnector } = Connectors
+const { InjectedConnector } = Connectors
 
 const MetaMask = new InjectedConnector({
   supportedNetworks: supportedNetworkIds,
@@ -95,10 +95,6 @@ const WalletConnect = new WalletConnectConnector()
 //   status ? infuraNetworkURL : infuraNetworkURLxDai,
 // )
 
-const Infura = new NetworkOnlyConnector({
-  providerURL: infuraNetworkURL,
-})
-
 class AuthereumConnector extends Connectors.Connector {
   authereum: any
 
@@ -145,7 +141,6 @@ class SafeConnector extends Connectors.Connector {
 const Safe = new SafeConnector()
 
 export default {
-  Infura,
   MetaMask,
   WalletConnect,
   Authereum,

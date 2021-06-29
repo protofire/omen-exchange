@@ -290,12 +290,13 @@ export const getChainSpecificAlternativeUrls = (networkId: any) => {
   if (!validNetworkId(networkId)) {
     return false
   }
-  if (localStorage.getItem('rpcAddress')) {
-    const data = JSON.parse(<string>localStorage.getItem('rpcAddress'))
-    const network: NetworkId = data.network
-    networks[network].url = data.url
-  }
+
   return networks[networkId].alternativeUrls
+}
+if (localStorage.getItem('rpcAddress')) {
+  const data = JSON.parse(<string>localStorage.getItem('rpcAddress'))
+  const network: NetworkId = data.network
+  networks[network].url = data.url
 }
 
 export const supportedNetworkIds = Object.keys(networks).map(Number) as NetworkId[]
@@ -309,9 +310,6 @@ export const supportedNetworkURLs = entries(networks).reduce<{
   }),
   {},
 )
-
-export const infuraNetworkURL = networks[1].url
-export const infuraNetworkURLxDai = networks[100].url
 
 export const getInfuraUrl = (networkId: number): string => {
   if (!validNetworkId(networkId)) {
