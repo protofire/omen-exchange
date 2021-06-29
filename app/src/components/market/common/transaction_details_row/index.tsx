@@ -44,6 +44,7 @@ const Value = styled.p<{ state: ValueStates; emphasizeValue?: boolean }>`
     };
   font-weight: ${props => (props.emphasizeValue ? '500' : '400')};
   margin: 0;
+  
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
@@ -66,22 +67,21 @@ export const TransactionDetailsRow: React.FC<Props> = props => {
             <Circle data-arrow-color="transparent" data-for="fee" data-tip="A 2% fee goes to liquidity providers.">
               <IconInfo />
             </Circle>
-
-            <ReactTooltip
-              className="customMarketTooltip"
-              data-multiline={true}
-              effect="solid"
-              id="fee"
-              offset={{ top: 0, left: -1 }}
-              place="top"
-              type="light"
-            />
           </>
         ) : null}
       </Title>
       <Value emphasizeValue={emphasizeValue} state={state}>
         {value}
       </Value>
+      <ReactTooltip
+        className="customMarketTooltip"
+        data-multiline={true}
+        effect="solid"
+        id="fee"
+        offset={{ top: 0, left: -1 }}
+        place="top"
+        type="light"
+      />
     </Wrapper>
   )
 }

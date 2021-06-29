@@ -28,7 +28,7 @@ export const ReactTooltipStylesOverride = css`
     font-size: 11px;
     line-height: 1.3;
     max-width: 180px;
-    opacity: 1;
+    opacity: 1 !important;
     padding: 5px 8px;
     text-align: left;
 
@@ -68,7 +68,6 @@ export const ReactTooltipStylesOverride = css`
   }
 
   .customMarketTooltip {
-    opacity: 1 !important;
     ${DefaultTooltip}
   }
 
