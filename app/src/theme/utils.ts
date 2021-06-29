@@ -2,30 +2,30 @@ import { getLogger } from '../util/logger'
 
 const logger = getLogger('Theme::Utils')
 
-export const getOutcomeColor = (darkMode: boolean, index: number): Record<string, any> => {
+export const getOutcomeColor = (index: number): Record<string, any> => {
   const localTheme: Record<string, any> = {
     // text
-    text1: darkMode ? '' : '#37474F',
-    text2: darkMode ? '' : '#86909E',
-    text3: darkMode ? '' : '#333333',
-    text4: darkMode ? '' : '#757575',
+    text1: '#37474F',
+    text2: '#86909E',
+    text3: '#333333',
+    text4: '#757575',
 
     //primary colors
-    primary1: darkMode ? '' : '#5C6BC0',
-    primary2: darkMode ? '' : '#7986CB',
-    primary3: darkMode ? '' : '#3F51B5',
-    primary4: darkMode ? '' : '#E8EAF6',
+    primary1: '#5C6BC0',
+    primary2: '#7986CB',
+    primary3: '#3F51B5',
+    primary4: '#E8EAF6',
 
     //other
-    white: darkMode ? '' : '#fff',
-    green: darkMode ? '' : '#4B9E98',
-    red: darkMode ? '' : '#E57373',
-    link: darkMode ? '' : '#1E88E5',
+    white: '#fff',
+    green: '#4B9E98',
+    red: '#E57373',
+    link: '#1E88E5',
 
     //border
-    border1: darkMode ? '' : '#DCDFF2',
-    border2: darkMode ? '' : '#C5CAE9',
-    border3: darkMode ? '' : '#9FA8DA',
+    border1: '#DCDFF2',
+    border2: '#C5CAE9',
+    border3: '#9FA8DA',
 
     fonts: {
       defaultSize: '14px',

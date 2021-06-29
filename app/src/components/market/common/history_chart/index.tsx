@@ -191,7 +191,7 @@ export const HistoryChart: React.FC<Props> = ({
 
             {outcomes
               .map((outcomeName, index) => {
-                const color = getOutcomeColor(false, index)
+                const color = getOutcomeColor(index)
 
                 return (
                   <Area
