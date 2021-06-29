@@ -72,9 +72,11 @@ class OmenGuildService {
     this.provider = provider
     this.omenGuildAddress = getContractAddress(network, 'omenGuildProxy')
   }
+
   get getOmenGuildContract(): Contract {
     return new ethers.Contract(this.omenGuildAddress, GuildAbi, this.provider).connect(this.user)
   }
+
   get getOmenGuildAddress(): string {
     return this.omenGuildAddress
   }
@@ -83,6 +85,7 @@ class OmenGuildService {
     const guildInterface = new utils.Interface(GuildAbi)
     return guildInterface.functions.lockTokens.encode([amount])
   }
+
   static encodeUnlockTokens = (amount: BigNumber) => {
     const guildInterface = new utils.Interface(GuildAbi)
     return guildInterface.functions.releaseTokens.encode([amount])
@@ -99,17 +102,22 @@ class OmenGuildService {
   tokensLocked = async (address: string) => {
     return this.getOmenGuildContract.tokensLocked(address)
   }
+
   totalLocked = async () => {
     return this.getOmenGuildContract.totalLocked()
   }
+
   omenTokenAddress = async () => {
     return await this.getOmenGuildContract.token()
   }
+
   tokenVault = async () => {
     return this.getOmenGuildContract.tokenVault()
   }
+
   lockTime = async () => {
     return this.getOmenGuildContract.lockTime()
   }
 }
+
 export { OmenGuildService }

@@ -98,16 +98,7 @@ const PercentageText = styled.span<{ lightColor?: boolean }>`
 `
 
 const ModalLockTokens = (props: Props) => {
-  const {
-    context,
-    fetchBalances,
-
-    isOpen,
-    omenBalance,
-    onClose,
-    setIsModalLockTokensOpen,
-    theme,
-  } = props
+  const { context, fetchBalances, isOpen, omenBalance, onClose, setIsModalLockTokensOpen, theme } = props
   const { account, cpk, library: provider, networkId } = context
 
   const omen = new OmenGuildService(provider, networkId)

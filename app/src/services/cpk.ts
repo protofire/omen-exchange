@@ -1483,8 +1483,6 @@ class CPKService {
     setTxHash: (arg0: string) => void,
   ) => {
     try {
-      // setTxHash: (arg0: string) => void
-      //     setTxState: (step: TransactionStep) => void
       const { chainId } = await this.provider.getNetwork()
       const OmenGuild = new OmenGuildService(this.provider, chainId)
 
