@@ -6,7 +6,7 @@ const Wrapper = styled.svg<{ hoverEffect: boolean | undefined }>`
 
   &:hover {
     .path {
-      ${props => props.hoverEffect && `fill: ${props.theme.colors.primaryLight};`}
+      ${props => props.hoverEffect && `fill: ${props.theme.primary1};`}
     }
   }
 
@@ -23,7 +23,7 @@ interface Props {
 }
 
 export const IconClose = (props: Props) => {
-  const { color = '#37474F', hoverEffect = false, onClick, size = '24' } = props
+  const { color = 'inherit || #37474F', hoverEffect = false, onClick, size = '24' } = props
 
   return (
     <Wrapper

@@ -7,7 +7,7 @@ interface Props {
 
 export const IconArrowUp = (props: Props) => {
   const { size = '40' } = props
-  const { color = '#E8EAF6' } = props
+  const { color = 'inherit || #E8EAF6' } = props
   return (
     <svg fill="none" height={size} viewBox="0 0 40 40" width={size} xmlns="http://www.w3.org/2000/svg">
       <path
