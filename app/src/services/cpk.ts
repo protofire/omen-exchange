@@ -1535,9 +1535,11 @@ class CPKService {
   }
   unlockTokens = async (amount: BigNumber) => {
     try {
-      const network = await this.provider.getNetwork()
-      const OmenGuild = new OmenGuildService(this.provider, network.chainId)
-      if (this.cpk.relay) {
+      const { chainId } = await this.provider.getNetwork()
+      const OmenGuild = new OmenGuildService(this.provider, chainId)
+      const { address: omenTokenAddress } = getToken(this.cpk.relay ? networkIds.XDAI : chainId, 'omn')
+
+      if (chainId !== networkIds.MAINNET || this.cpk.relay) {
         const txOptions: TxOptions = {}
         txOptions.gas = defaultGas
 
@@ -1547,6 +1549,13 @@ class CPKService {
             data: OmenGuildService.encodeUnlockTokens(amount),
           },
         ]
+        if (!this.cpk.relay) {
+          const account = await this.provider.getSigner().getAddress()
+          transactions.push({
+            to: omenTokenAddress,
+            data: ERC20Service.encodeTransferFrom(this.cpk.address, account, amount),
+          })
+        }
 
         const { transactionHash } = await this.execTransactions(transactions, txOptions)
 
