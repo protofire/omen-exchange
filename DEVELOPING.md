@@ -9,7 +9,7 @@
    cd app && yarn
    ```
 
-3. Start the application with `yarn start` and connect your wallet to either Rinkeby or the Mainnet.
+3. Start the application with `yarn start` and connect your wallet to either Rinkeby, Mainnet or xDai.
 
 ## Directory structure
 
