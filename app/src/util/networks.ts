@@ -409,6 +409,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     decimals: 8,
     addresses: {
       [networkIds.MAINNET]: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+      [networkIds.RINKEBY]: '0x577d296678535e4903d59a4c929b718e1d575e0a',
       [networkIds.XDAI]: '0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252',
     },
     order: 14,
