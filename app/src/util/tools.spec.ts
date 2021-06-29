@@ -22,6 +22,7 @@ import {
   divBN,
   formatHistoryDate,
   formatHistoryUser,
+  formatLockDate,
   formatNumber,
   formatTimestampToDate,
   formatToShortNumber,
@@ -100,6 +101,17 @@ describe('tools', () => {
         const stripped = strip0x(address)
         expect(stripped).toBe(testCase)
       })
+    }
+  })
+  describe('formatLockDate', () => {
+    const testCases: [number, string][] = [
+      [1610546486000, 'January 13th, 2021 - 14:01 UTC'],
+      [1610460714000, 'January 12th, 2021 - 14:11 UTC'],
+      [1609374633000, 'December 31st, 2020 - 00:30 UTC'],
+    ]
+    for (const [timestamp, result] of testCases) {
+      const unitResult = formatLockDate(timestamp)
+      expect(unitResult).toMatch(result)
     }
   })
   describe('getNetworkFromChain', () => {
