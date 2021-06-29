@@ -9,11 +9,10 @@ import styled from 'styled-components'
 import useLocalStorageState from 'use-local-storage-state'
 
 import { MAX_MARKET_FEE } from '../../../../common/constants'
-import { useConnectedCPKContext, useConnectedWeb3Context } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../hooks'
 import { useMarkets } from '../../../../hooks/useMarkets'
 import { queryCategories } from '../../../../queries/markets_home'
 import theme from '../../../../theme'
-import { getLogger } from '../../../../util/logger'
 import { getArbitratorsByNetwork, getOutcomes, networkIds } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
@@ -31,8 +30,6 @@ import { IconClose } from '../../../common/icons'
 
 import xDaiIntergation from './img/xDaiIntegration.svg'
 import { MarketHome } from './market_home'
-
-const logger = getLogger('MarketHomeContainer')
 
 const Banner = styled.div`
   ${ButtonCSS};
@@ -113,7 +110,7 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
 
 const MarketHomeContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
-  const cpk = useConnectedCPKContext()
+
   const history = useHistory()
   const [hasSeenBanner, setHasSeenBanner] = useLocalStorageState('hasSeenBanner')
 
@@ -233,8 +230,7 @@ const MarketHomeContainer: React.FC = () => {
   const [markets, setMarkets] = useState<RemoteData<MarketMakerDataItem[]>>(RemoteData.notAsked())
   const [categories, setCategories] = useState<RemoteData<CategoryDataItem[]>>(RemoteData.notAsked())
 
-  const defaultCpkAddress = context.relay ? context.account : null
-  const [cpkAddress, setCpkAddress] = useState<Maybe<string>>(defaultCpkAddress)
+  const cpkAddress = context.cpk?.address
 
   const PAGE_SIZE = 12
   const [pageIndex, setPageIndex] = useState(0)
@@ -242,7 +238,6 @@ const MarketHomeContainer: React.FC = () => {
   const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
   const [now, setNow] = useState<string>(calcNow())
   const [isFiltering, setIsFiltering] = useState(false)
-  const { account, library: provider } = context
   const feeBN = ethers.utils.parseEther('' + MAX_MARKET_FEE / Math.pow(10, 2))
 
   const knownArbitrators = getArbitratorsByNetwork(context.networkId).map(x => x.address)
@@ -270,28 +265,10 @@ const MarketHomeContainer: React.FC = () => {
   useInterval(() => setNow(calcNow), 1000 * 60 * 5)
 
   useEffect(() => {
-    const getCpkAddress = async () => {
-      try {
-        if (!cpk) {
-          return
-        }
-        setCpkAddress(cpk.address)
-      } catch (e) {
-        logger.error('Could not get address of CPK', e.message)
-      }
-    }
-
-    if (account) {
-      getCpkAddress()
-    }
-  }, [provider, account, cpk])
-
-  useEffect(() => {
     if (loading) {
       setMarkets(markets => (RemoteData.hasData(markets) ? RemoteData.reloading(markets.data) : RemoteData.loading()))
     } else if (fetchedMarkets) {
       const { fixedProductMarketMakers } = fetchedMarkets
-
       setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
 
       setIsFiltering(false)

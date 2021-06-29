@@ -1,7 +1,6 @@
 import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
-import { useConnectedCPKContext } from './connectedCpk'
 import { ConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
 
@@ -12,9 +11,8 @@ export const useFundingBalance = (
   fundingBalance: Maybe<BigNumber>
   fetchFundingBalance: () => Promise<void>
 } => {
-  const { account, library: provider } = context
+  const { account, cpk, library: provider } = context
   const { buildMarketMaker } = useContracts(context)
-  const cpk = useConnectedCPKContext()
 
   const [fundingBalance, setFundingBalance] = useState<Maybe<BigNumber>>(null)
 
