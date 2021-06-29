@@ -749,8 +749,6 @@ export const bigMin = (array: Big[]) => {
 
 /**
  *  Gets initial display collateral
- * If collateral is cToken type then display is the base collateral
- * Else display is the collateral
  */
 export const getInitialCollateral = (networkId: number, collateral: Token, relay = false): Token => {
   if (collateral.address === getWrapToken(networkId).address) {
