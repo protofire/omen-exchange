@@ -1490,7 +1490,7 @@ class CPKService {
         const signer = this.provider.getSigner()
         const account = await signer.getAddress()
 
-        const omenTokenAddress = await OmenGuild.omenTokenAddress()
+        const { address: omenTokenAddress } = getToken(this.cpk.relay ? networkIds.XDAI : chainId, 'omn')
         const allowanceAddress = await OmenGuild.tokenVault()
         const collateralService = new ERC20Service(this.provider, account, omenTokenAddress)
         const transactions: Transaction[] = []

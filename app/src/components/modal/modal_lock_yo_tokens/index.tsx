@@ -7,7 +7,7 @@ import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { ERC20Service, OmenGuildService } from '../../../services'
-import { networkIds } from '../../../util/networks'
+import { getToken, networkIds } from '../../../util/networks'
 import { daysUntil, divBN, formatBigNumber, formatLockDate } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
@@ -99,7 +99,7 @@ const PercentageText = styled.span<{ lightColor?: boolean }>`
 
 const ModalLockTokens = (props: Props) => {
   const { context, fetchBalances, isOpen, omenBalance, onClose, setIsModalLockTokensOpen, theme } = props
-  const { account, cpk, library: provider, networkId } = context
+  const { account, cpk, library: provider, networkId, relay } = context
 
   const omen = new OmenGuildService(provider, networkId)
 
@@ -168,7 +168,7 @@ const ModalLockTokens = (props: Props) => {
           allowanceAddress = cpk.address
         }
 
-        const omenAddress = await omen.omenTokenAddress()
+        const { address: omenAddress } = getToken(relay ? networkIds.XDAI : networkId, 'omn')
 
         const collateralService = new ERC20Service(provider, account, omenAddress)
         const allowance = await collateralService.allowance(account, allowanceAddress)
@@ -185,12 +185,12 @@ const ModalLockTokens = (props: Props) => {
         setAllowanceState(ButtonStates.working)
         let allowanceAddress
 
-        if (context.networkId === networkIds.MAINNET && !context.relay) {
+        if (context.networkId === networkIds.MAINNET && !relay) {
           allowanceAddress = await omen.tokenVault()
         } else {
           allowanceAddress = cpk.address
         }
-        const omenAddress = await omen.omenTokenAddress()
+        const { address: omenAddress } = getToken(relay ? networkIds.XDAI : networkId, 'omn')
 
         const collateralService = new ERC20Service(context.rawWeb3Context.library, account, omenAddress)
 
