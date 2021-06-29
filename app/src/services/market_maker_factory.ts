@@ -81,10 +81,8 @@ class MarketMakerFactoryService {
     const cloneFactoryInterface = new utils.Interface(['function cloneConstructor(bytes consData) external'])
     let cloneConstructorEncodedCall
     const v2 = getContractAddress(networkId, 'marketMakerFactoryV2')
-    console.log(v2)
 
     if (this.contract.address.toLowerCase() === v2.toLowerCase()) {
-      console.log('yup')
       cloneConstructorEncodedCall = cloneFactoryInterface.functions.cloneConstructor.encode([
         utils.defaultAbiCoder.encode(
           ['address', 'address', 'bytes32[]', 'uint', 'address'],
