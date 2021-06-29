@@ -22,6 +22,7 @@ export const packSignatures = (array: any) => {
   })
   return `0x${msgLength}${v}${r}${s}`
 }
+
 export const signatureToVRS = (rawSignature: string) => {
   const signature = strip0x(rawSignature)
   const v = signature.substr(64 * 2)
@@ -29,13 +30,16 @@ export const signatureToVRS = (rawSignature: string) => {
   const s = signature.substr(32 * 2, 32 * 2)
   return { v, r, s }
 }
+
 export const signaturesFormatted = (signatures: string[]) => {
   return packSignatures(signatures.map(s => signatureToVRS(s)))
 }
+
 export const isContract = async (provider: any, address: string): Promise<boolean> => {
   const code = await provider.getCode(address)
   return code && code !== '0x'
 }
+
 /**
  * Gets the corresponding cToken for a given token symbol.
  * Empty string if corresponding cToken doesn't exist
@@ -75,6 +79,7 @@ export const getBaseToken = (networkId: number, symbol: string): Token => {
   }
   return getToken(networkId, baseTokenSymbol as KnownToken)
 }
+
 /**
  *  Gets initial display collateral
  */
@@ -85,6 +90,7 @@ export const getInitialCollateral = (networkId: number, collateral: Token, relay
     return collateral
   }
 }
+
 export const bigMin = (array: Big[]) => {
   let len = array.length
   let minValue
@@ -95,6 +101,7 @@ export const bigMin = (array: Big[]) => {
   }
   return minValue
 }
+
 export const isAddress = (address: string): boolean => {
   try {
     getAddress(address)
@@ -104,6 +111,7 @@ export const isAddress = (address: string): boolean => {
   }
   return true
 }
+
 export const isScalarMarket = (oracle: string, networkId: number): boolean => {
   const realitioScalarAdapter = getContractAddress(networkId, 'realitioScalarAdapter')
 
@@ -114,9 +122,11 @@ export const isScalarMarket = (oracle: string, networkId: number): boolean => {
 
   return isScalar
 }
+
 export const isDust = (amount: BigNumber, decimals: number): boolean => {
   return amount.lt(parseUnits('0.00001', decimals))
 }
+
 export const clampBigNumber = (x: BigNumber, min: BigNumber, max: BigNumber): BigNumber => {
   if (x.lt(min)) return min
   if (x.gt(max)) return max
