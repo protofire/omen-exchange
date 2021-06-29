@@ -212,8 +212,13 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   )
 
   const depositedTokens = sendAmountsAfterRemovingFunding.length
-    ? sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
+    ? sendAmountsAfterRemovingFunding
+        .map((amount, i) => {
+          return amount.add(balances[i].shares)
+        })
+        .reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
     : new BigNumber(0)
+
   const depositedTokensTotal = depositedTokens.add(userEarnings)
 
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
