@@ -199,10 +199,8 @@ export enum Wallet {
 
 export interface MarketData {
   collateral: Token
-  userInputCollateral: Token
   arbitratorsCustom: Arbitrator[]
   categoriesCustom: string[]
-  compoundInterestRate: string
   question: string
   category: string
   resolution: Date | null
@@ -211,7 +209,6 @@ export interface MarketData {
   funding: BigNumber
   outcomes: Outcome[]
   loadedQuestionId: Maybe<string>
-  useCompoundReserve: boolean
   verifiedLabel?: string
   lowerBound: Maybe<BigNumber>
   upperBound: Maybe<BigNumber>
