@@ -105,7 +105,6 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     runningDailyVolumeByHour,
     scalarHigh,
     scalarLow,
-    scaledLiquidityParameter,
     title,
   } = market
 
