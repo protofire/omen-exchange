@@ -39,7 +39,7 @@ const Banner = styled.div`
   cursor: unset;
   max-width: ${props => props.theme.mainContainer.maxWidth};
   margin-bottom: 20px;
-  border-color: ${props => props.theme.primary1}!important;
+  border-color: ${props => props.theme.borders.borderColor}!important;
 `
 const CloseStyled = styled.div`
   margin-bottom: auto;
@@ -73,8 +73,12 @@ const Link = styled.a`
     color: ${props => props.theme.primary3};
   }
 `
-const IconWrapper = styled.div`
-  color: ${props => props.theme.border1};
+const IconWrapper = styled(IconClose as any)`
+  color: ${props => props.theme.text1};
+
+  &:hover {
+    color: ${props => props.theme.border1};
+  }
 `
 
 const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
@@ -110,7 +114,8 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
   })
 }
 
-const MarketHomeContainer: React.FC = () => {
+const MarketHomeContainer: React.FC = (props: any) => {
+  const { ...restProps } = props
   const context = useConnectedWeb3Context()
 
   const history = useHistory()
@@ -411,7 +416,7 @@ const MarketHomeContainer: React.FC = () => {
             }}
           >
             <IconWrapper>
-              <IconClose hoverEffect size={'24'} />
+              <IconClose hoverEffect size={'24'} {...restProps} />
             </IconWrapper>
           </CloseStyled>
         </Banner>

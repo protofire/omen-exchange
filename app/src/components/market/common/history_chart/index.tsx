@@ -13,7 +13,7 @@ import { CustomInlineLoading } from '../history_table'
 
 const ResponsiveWrapper = styled.div`
   margin: 21px 24.5px;
-  border: 1px solid ${props => props.theme.primary4};
+  border: 1px solid ${props => props.theme.borders.borderDisabled};
   padding-bottom: 16px;
   border-radius: 6px;
 `
