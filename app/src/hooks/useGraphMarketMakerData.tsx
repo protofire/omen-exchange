@@ -119,7 +119,7 @@ type GraphResponseFixedProductMarketMaker = {
   submissionIDs: KlerosSubmission[]
   scalarLow: Maybe<string>
   scalarHigh: Maybe<string>
-  factory: Maybe<string>
+  factory: string
 }
 
 type GraphResponse = {
@@ -151,7 +151,7 @@ export type GraphMarketMakerData = {
   scalarHigh: Maybe<BigNumber>
   outcomeTokenMarginalPrices: string[]
   outcomeTokenAmounts: string[]
-  factory: Maybe<string>
+  factory: string
 }
 
 type Result = {
