@@ -205,9 +205,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
-  const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
-    amount.lt(min) ? amount : min,
-  )
+
+  const depositedTokens = sendAmountsAfterRemovingFunding
+    .map((amount, i) => {
+      return amount.add(balances[i].shares)
+    })
+    .reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
 
   const sharesAfterRemovingFunding = balances.map((balance, i) => {
     return balance.shares.add(sendAmountsAfterRemovingFunding[i]).sub(depositedTokens)
