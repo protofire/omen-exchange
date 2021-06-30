@@ -9,12 +9,10 @@ import { STANDARD_DECIMALS } from '../../../../../common/constants'
 import { useContracts, useGraphMarketUserTxData, useSymbol } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { ERC20Service, RealitioService } from '../../../../../services'
-import { CompoundService } from '../../../../../services/compound_service'
 import { getLogger } from '../../../../../util/logger'
 import { getContractAddress, getNativeAsset } from '../../../../../util/networks'
-import { formatBigNumber, getBaseToken, getUnit, isCToken, isDust } from '../../../../../util/tools'
+import { formatBigNumber, getUnit, isDust } from '../../../../../util/tools'
 import {
-  CompoundTokenType,
   INVALID_ANSWER_ID,
   MarketDetailsTab,
   MarketMakerData,
@@ -167,8 +165,7 @@ const Wrapper = (props: Props) => {
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
-  const marketCollateralToken = collateralToken
-  const [compoundService, setCompoundService] = useState<Maybe<CompoundService>>(null)
+
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
@@ -178,53 +175,7 @@ const Wrapper = (props: Props) => {
   const [userRealitioBalance, setUserRealitioBalance] = useState(Zero)
   const [cpkRealitioBalance, setCpkRealitioBalance] = useState(Zero)
 
-  const [displayEarnedCollateral, setDisplayEarnedCollateral] = useState<BigNumber>(new BigNumber(0))
-
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
-  useMemo(() => {
-    const getResult = async () => {
-      const compoundServiceObject = new CompoundService(
-        marketCollateralToken.address,
-        marketCollateralToken.symbol,
-        provider,
-        account,
-      )
-      await compoundServiceObject.init()
-      setCompoundService(compoundServiceObject)
-    }
-    if (marketCollateralToken.symbol.toLowerCase() in CompoundTokenType) {
-      getResult()
-    }
-  }, [marketCollateralToken.address, account, marketCollateralToken.symbol, provider])
-
-  useEffect(() => {
-    const getDisplayEarnedCollateral = async () => {
-      if (isCToken(marketCollateralToken.symbol)) {
-        const compound = new CompoundService(
-          marketCollateralToken.address,
-          marketCollateralToken.symbol,
-          provider,
-          account,
-        )
-        await compound.init()
-        const earnedCollateral = isScalar
-          ? scalarComputeEarnedCollateral(
-              new Big(finalAnswerPercentage),
-              balances.map(balance => balance.shares),
-            )
-          : computeEarnedCollateral(
-              payouts,
-              balances.map(balance => balance.shares),
-            )
-        if (earnedCollateral) {
-          const baseToken = getBaseToken(networkId, collateralToken.symbol)
-          const earnings = compound.calculateCTokenToBaseExchange(baseToken, earnedCollateral)
-          setDisplayEarnedCollateral(earnings)
-        }
-      }
-    }
-    getDisplayEarnedCollateral()
-  }, [marketCollateralToken.address, isConditionResolved, account, provider, balances]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const resolveCondition = async () => {
     if (!cpk) {
@@ -489,12 +440,7 @@ const Wrapper = (props: Props) => {
   let redeemString = 'NaN'
   let balanceString = ''
   if (earnedCollateral) {
-    if (isCToken(marketCollateralToken.symbol)) {
-      const baseToken = getBaseToken(networkId, collateralToken.symbol)
-      redeemString = `${formatBigNumber(displayEarnedCollateral, baseToken.decimals)} ${baseToken.symbol}`
-    } else {
-      redeemString = `${formatBigNumber(earnedCollateral, collateralToken.decimals)} ${symbol}`
-    }
+    redeemString = `${formatBigNumber(earnedCollateral, collateralToken.decimals)} ${symbol}`
   }
   const nativeAsset = getNativeAsset(networkId, relay)
   if (userRealitioWithdraw) {
@@ -506,11 +452,7 @@ const Wrapper = (props: Props) => {
   return (
     <>
       <TopCard>
-        <MarketTopDetailsClosed
-          collateral={collateral}
-          compoundService={compoundService}
-          marketMakerData={marketMakerData}
-        />
+        <MarketTopDetailsClosed collateral={collateral} marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
         <MarketNavigation

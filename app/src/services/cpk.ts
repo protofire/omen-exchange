@@ -10,7 +10,6 @@ import {
   bridgeTokensList,
   getBySafeTx,
   getContractAddress,
-  getNativeAsset,
   getTargetSafeImplementation,
   getTokenFromAddress,
   getWrapToken,
@@ -18,17 +17,9 @@ import {
   pseudoNativeAssetAddress,
   waitForBlockToSync,
 } from '../util/networks'
-import {
-  calcDistributionHint,
-  clampBigNumber,
-  getBaseToken,
-  isCToken,
-  signaturesFormatted,
-  waitABit,
-} from '../util/tools'
+import { calcDistributionHint, clampBigNumber, signaturesFormatted, waitABit } from '../util/tools'
 import { MarketData, Question, Token, TransactionStep } from '../util/types'
 
-import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
 import { ERC20Service } from './erc20'
 import { MarketMakerService } from './market_maker'
@@ -988,10 +979,7 @@ class CPKService {
         }
       }
 
-      let earnings = earnedCollateral
-      let token = collateralToken
-
-      if (!earnings.isZero()) {
+      if (!earnedCollateral.isZero()) {
         const conditionId = await marketMaker.getConditionId()
 
         transactions.push({
@@ -999,50 +987,27 @@ class CPKService {
           data: ConditionalTokenService.encodeRedeemPositions(collateralToken.address, conditionId, numOutcomes),
         })
 
-        if (isCToken(collateralToken.symbol)) {
-          const compound = new CompoundService(collateralToken.address, collateralToken.symbol, this.provider, account)
-          await compound.init()
-
-          // Convert compound token to base token
-          const encodedRedeemFunction = CompoundService.encodeRedeemTokens(
-            collateralToken.symbol,
-            earnedCollateral.toString(),
-          )
-
-          // Redeeem underlying token
+        const wrapToken = getWrapToken(this.cpk.relay ? networkIds.XDAI : networkId)
+        const unwrap = collateralToken.address.toLowerCase() === wrapToken.address.toLowerCase()
+        if (unwrap) {
+          const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, earnedCollateral)
           transactions.push({
             to: collateralToken.address,
-            data: encodedRedeemFunction,
-          })
-
-          token = getBaseToken(networkId, collateralToken.symbol)
-          earnings = compound.calculateCTokenToBaseExchange(token, earnedCollateral)
-        }
-
-        const wrapToken = getWrapToken(this.cpk.relay ? networkIds.XDAI : networkId)
-        const nativeAsset = getNativeAsset(networkId)
-
-        if (token.address === wrapToken.address) {
-          // unwrap token
-          const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(token.symbol, earnings)
-          transactions.push({
-            to: token.address,
             data: encodedWithdrawFunction,
           })
-          token = nativeAsset
         }
 
         // If we are signed in as a safe we don't need to transfer
         if (!this.isSafeApp) {
-          if (token.address === nativeAsset.address) {
+          if (unwrap) {
             transactions.push({
               to: account,
-              value: earnings.toString(),
+              value: earnedCollateral.toString(),
             })
           } else {
             transactions.push({
-              to: token.address,
-              data: ERC20Service.encodeTransfer(account, earnings),
+              to: collateralToken.address,
+              data: ERC20Service.encodeTransfer(account, earnedCollateral),
             })
           }
         }

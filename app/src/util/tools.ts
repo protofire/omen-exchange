@@ -13,11 +13,10 @@ import {
   XDAI_NETWORKS,
 } from '../common/constants'
 import { MarketTokenPair } from '../hooks/useGraphMarketsFromQuestion'
-import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'
-import { getContractAddress, getNativeAsset, getToken, getWrapToken, networkIds } from './networks'
-import { BalanceItem, CompoundEnabledTokenType, CompoundTokenType, Token, TransactionStep } from './types'
+import { getContractAddress, getNativeAsset, getWrapToken, networkIds } from './networks'
+import { Token, TransactionStep } from './types'
 
 const logger = getLogger('Tools')
 
@@ -343,66 +342,6 @@ export const roundNumberStringToSignificantDigits = (value: string, sd: number):
   } else {
     return '0'
   }
-}
-
-/**
- * Gets the corresponding cToken for a given token symbol.
- * Empty string if corresponding cToken doesn't exist
- */
-export const getCTokenForToken = (token: string): string => {
-  const tokenSymbol = token.toLowerCase()
-  if (tokenSymbol in CompoundEnabledTokenType) {
-    return `c${tokenSymbol}`
-  } else {
-    return ''
-  }
-}
-
-export const isCToken = (symbol: string): boolean => {
-  const tokenSymbol = symbol.toLowerCase()
-  if (tokenSymbol in CompoundTokenType) {
-    return true
-  }
-  return false
-}
-
-/**
- * Gets base token symbol for a given ctoken
- */
-export const getBaseTokenForCToken = (token: string): string => {
-  const tokenSymbol = token.toLowerCase()
-  if (tokenSymbol.startsWith('c')) {
-    return tokenSymbol.substring(1, tokenSymbol.length)
-  }
-  return ''
-}
-
-export const getBaseToken = (networkId: number, symbol: string): Token => {
-  const baseTokenSymbol = getBaseTokenForCToken(symbol)
-  if (baseTokenSymbol === 'eth') {
-    return getNativeAsset(networkId)
-  }
-  return getToken(networkId, baseTokenSymbol as KnownToken)
-}
-
-export const getSharesInBaseToken = (
-  balances: BalanceItem[],
-  compoundService: CompoundService,
-  displayCollateral: Token,
-): BalanceItem[] => {
-  const displayBalances = balances.map(function(bal) {
-    if (bal.shares) {
-      const baseTokenShares = compoundService.calculateCTokenToBaseExchange(displayCollateral, bal.shares)
-      const newBalanceObject = Object.assign({}, bal, {
-        shares: baseTokenShares,
-      })
-      delete newBalanceObject.currentDisplayPrice
-      return newBalanceObject
-    } else {
-      return bal
-    }
-  })
-  return displayBalances
 }
 
 /**
@@ -751,7 +690,7 @@ export const bigMin = (array: Big[]) => {
  *  Gets initial display collateral
  */
 export const getInitialCollateral = (networkId: number, collateral: Token, relay = false): Token => {
-  if (collateral.address === getWrapToken(networkId).address) {
+  if (collateral.address.toLowerCase() === getWrapToken(networkId).address.toLowerCase()) {
     return getNativeAsset(networkId, relay)
   } else {
     return collateral
