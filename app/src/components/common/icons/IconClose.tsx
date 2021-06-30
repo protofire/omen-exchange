@@ -23,10 +23,11 @@ interface Props {
 }
 
 export const IconClose = (props: Props) => {
-  const { color = '#37474F', hoverEffect = false, onClick, size = '24' } = props
+  const { color = '#37474F', hoverEffect = true, onClick, size = '24' } = props
 
   return (
     <Wrapper
+      color={'inherit'}
       fill="none"
       height={size}
       hoverEffect={hoverEffect}
@@ -38,7 +39,7 @@ export const IconClose = (props: Props) => {
       <path
         className="path"
         d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"
-        fill={hoverEffect ? '#DCDFF2' : color}
+        fill={color}
       />
     </Wrapper>
   )
