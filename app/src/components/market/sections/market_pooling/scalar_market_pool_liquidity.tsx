@@ -229,8 +229,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     totalPoolShares,
   )
 
-  const totalDepositedTokens = totalUserShareAmounts.length
-    ? totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
+  const totalDepositedTokens = fundingBalance.gt(0)
+    ? totalUserShareAmounts
+        .map((amount, i) => {
+          return amount.add(balances[i].shares)
+        })
+        .reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
     : new BigNumber(0)
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
