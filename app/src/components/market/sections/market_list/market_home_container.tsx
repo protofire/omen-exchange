@@ -75,9 +75,6 @@ const Link = styled.a`
 `
 const IconWrapper = styled(IconClose as any)`
   color: ${props => props.theme.text1};
-  &:hover {
-    color: ${props => props.theme.border1};
-  }
 `
 
 const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
