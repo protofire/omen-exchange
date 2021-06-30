@@ -1,9 +1,11 @@
+import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useSymbol } from '../../../../hooks'
+import { STANDARD_DECIMALS } from '../../../../common/constants'
+import { useConnectedWeb3Context, useContracts, useSymbol } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getTokenFromAddress } from '../../../../util/networks'
@@ -117,6 +119,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   }
 
   const [details, setDetails] = useState(token || { decimals: 0, symbol: '', volume: '' })
+  const [liquidity, setLiquidity] = useState(new BigNumber(0))
+
   const { decimals, volume } = details
   const symbol = useSymbol(details as Token)
   const now = moment()
@@ -127,7 +131,18 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
   const formattedCreationDate = moment(creationDate).format('MMM Do, YYYY')
 
-  const formattedLiquidity: string = scaledLiquidityParameter.toFixed(2)
+  const contracts = useContracts(context)
+  const { buildMarketMaker } = contracts
+  const marketMaker = buildMarketMaker(address)
+
+  useEffect(() => {
+    const getLiquidity = async () => {
+      setLiquidity(await marketMaker.getTotalSupply())
+    }
+    marketMaker && getLiquidity()
+  })
+
+  const formattedLiquidity: string = formatBigNumber(liquidity, STANDARD_DECIMALS, 2)
 
   useEffect(() => {
     const setToken = async () => {
