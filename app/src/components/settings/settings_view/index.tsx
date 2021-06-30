@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
+import { useWeb3Context } from 'web3-react'
 
 import { getChainSpecificAlternativeUrls, getInfuraUrl } from '../../../util/networks'
 import { checkRpcStatus, getNetworkFromChain, isValidHttpUrl } from '../../../util/tools'
@@ -118,11 +119,20 @@ interface Props {
   networkId?: any
 }
 
-export const SettingsViewContainer = (props: Props) => {
-  const networkId = props.networkId
+export const SettingsViewContainer = ({ networkId: chainID }: Props) => {
+  const { library } = useWeb3Context()
+  const [networkId, setNetwork] = useState(chainID ? chainID : -1)
   console.log(networkId)
+
   const network = getNetworkFromChain(networkId.toString())
   console.log(network)
+  const checkIfReady = async () => {
+    if (library) {
+      await library.ready
+
+      setNetwork(library.network.chainId)
+    }
+  }
 
   const [current, setCurrent] = useState(0)
   const [url, setUrl] = useState<string>('')
@@ -181,6 +191,7 @@ export const SettingsViewContainer = (props: Props) => {
   const isDropDownActive = current === dropdownItems.length - 1
 
   useEffect(() => {
+    checkIfReady()
     if (url.length === 0 && current !== dropdownItems.length - 1 && urlObject) {
       setUrl(urlObject[current].rpcUrl)
     }

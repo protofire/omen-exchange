@@ -29,31 +29,27 @@ const App: React.FC = (props: any) => {
   const { ...restProps } = props
   const windowObj: any = window
 
-  const ethereum = windowObj.ethereum
-
-  const networkId = ethereum && ethereum.chainId
+  const { chainId, networkVersion } = windowObj.ethereum
+  const [networkIds, setNetworkId] = useState(chainId ? chainId : networkVersion ? networkVersion : '-1')
+  const networkId = chainId
   const [status, setStatus] = useState(true)
   // const [settingsView, setSettingsView] = useState(false)
-  console.log(status)
-  // useInterval(() => {
-  //   network = ethereum.networkVersion >> 0
-  //   console.log('here')
-  //
-  //   if (status == false) {
-  //     setTimeout(() => {
-  //       if (status == false) setSettingsView(true)
-  //     }, 2000)
-  //   }
-  // }, FETCH_RPC_INTERVAL)
+
+  console.log(networkId)
 
   useEffect(() => {
-    const get = getNetworkFromChain(networkId)
+    console.log(networkId)
+    setNetworkId(chainId ? chainId : networkVersion ? networkVersion : '-1')
 
-    if (get && get !== -1) checkRpcStatus(getInfuraUrl(get), setStatus, get)
-    else setStatus(false)
+    const get = getNetworkFromChain(networkIds ? networkIds : -1)
+
+    if (get && get !== -1) {
+      console.log('get passes')
+      checkRpcStatus(getInfuraUrl(get), setStatus, get)
+    }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ethereum, networkId])
+  }, [chainId, networkVersion, windowObj])
 
   return (
     <ThemeProvider theme={theme}>
@@ -74,7 +70,7 @@ const App: React.FC = (props: any) => {
                 </ModalTitle>
               </ConnectionModalNavigation>
               <SettingsModalWrapper>
-                <SettingsViewContainer networkId={networkId} />
+                <SettingsViewContainer networkId={networkIds} />
               </SettingsModalWrapper>
             </ContentWrapper>
           </Modal>

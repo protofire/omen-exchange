@@ -71,11 +71,15 @@ export const checkRpcStatus = async (customUrl: string, setStatus: any, network:
   try {
     console.log('here')
 
-    const response = await axios.post(customUrl, {
-      id: +new Date(),
-      jsonrpc: '2.0',
-      method: 'net_version',
-    })
+    const response = await axios.post(
+      customUrl,
+      {
+        id: +new Date(),
+        jsonrpc: '2.0',
+        method: 'net_version',
+      },
+      { timeout: 10000 },
+    )
     console.log(response)
     console.log(network)
     if (response.data.error || +response.data.result !== network) {
@@ -86,6 +90,7 @@ export const checkRpcStatus = async (customUrl: string, setStatus: any, network:
     setStatus(true)
     return true
   } catch (e) {
+    console.log('error handled')
     setStatus(false)
 
     return false
