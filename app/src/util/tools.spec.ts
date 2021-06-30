@@ -19,6 +19,7 @@ import {
   calculateSharesBought,
   clampBigNumber,
   computeBalanceAfterTrade,
+  daysUntil,
   divBN,
   formatHistoryDate,
   formatHistoryUser,
@@ -450,6 +451,19 @@ describe('tools', () => {
     for (const [timestamp, result] of testCases) {
       const unitResult = formatHistoryDate(timestamp)
       expect(unitResult).toMatch(result)
+    }
+  })
+  describe('daysUntil', () => {
+    const testCases: [number, number][] = [
+      [1610546486000, 18621776],
+      [1610460714000, 18620784],
+      [1609374633000, 18608213],
+    ]
+
+    Date.now = jest.fn().mockReturnValue(new Date('2021-06-30T12:33:37.000Z'))
+    for (const [timestamp, result] of testCases) {
+      const unitResult = daysUntil(timestamp)
+      expect(unitResult).toStrictEqual(result)
     }
   })
 
