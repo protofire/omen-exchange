@@ -21,7 +21,7 @@ const ResponsiveWrapper = styled.div`
 const ChartTooltip = styled.div`
   background: #fff;
   border-radius: 2px;
-  border: 1px solid ${props => props.theme.primary4};
+  border: 1px solid ${props => props.theme.borders.borderDisabled};
   box-shadow: 0px 0px 2px rgba(0, 0, 0, 0.12);
   min-width: 160px;
   padding: 17px;

@@ -3,7 +3,7 @@ import { css } from 'styled-components'
 const DefaultTooltip = css`
   &.__react_component_tooltip.type-light {
     &.place-top:after {
-      border: 0 solid ${props => props.theme.primary1} !important;
+      border: 0 solid ${props => props.theme.borders.borderColor} !important;
     }
 
     font-size: ${props => props.theme.fonts.defaultSize};
