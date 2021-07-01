@@ -2,9 +2,8 @@ import Big from 'big.js'
 
 import { MAIN_NETWORKS, RINKEBY_NETWORKS, SOKOL_NETWORKS, XDAI_NETWORKS } from '../../common/constants'
 import { MarketTokenPair } from '../../hooks/useGraphMarketsFromQuestion'
-import { CompoundService } from '../../services'
 import { getNativeAsset, getWrapToken, networkIds } from '../networks'
-import { BalanceItem, Token } from '../types'
+import { Token } from '../types'
 
 export const getNetworkFromChain = (chain: string) => {
   const network = RINKEBY_NETWORKS.includes(chain)
@@ -122,25 +121,4 @@ export const onChangeMarketCurrency = (
       history.replace(`/${selectedMarket.id}`)
     }
   }
-}
-
-//this will probably be deleted with compound cleanup
-export const getSharesInBaseToken = (
-  balances: BalanceItem[],
-  compoundService: CompoundService,
-  displayCollateral: Token,
-): BalanceItem[] => {
-  const displayBalances = balances.map(function(bal) {
-    if (bal.shares) {
-      const baseTokenShares = compoundService.calculateCTokenToBaseExchange(displayCollateral, bal.shares)
-      const newBalanceObject = Object.assign({}, bal, {
-        shares: baseTokenShares,
-      })
-      delete newBalanceObject.currentDisplayPrice
-      return newBalanceObject
-    } else {
-      return bal
-    }
-  })
-  return displayBalances
 }
