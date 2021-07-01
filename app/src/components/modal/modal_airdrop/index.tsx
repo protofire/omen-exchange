@@ -4,12 +4,7 @@ import Modal from 'react-modal'
 import { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import {
-  useAirdropService,
-  useConnectedBalanceContext,
-  useConnectedCPKContext,
-  useConnectedWeb3Context,
-} from '../../../hooks'
+import { useAirdropService, useConnectedWeb3Context } from '../../../hooks'
 import { formatBigNumber } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { IconClose, IconOmen } from '../../common/icons'
@@ -27,9 +22,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const ModalAirdrop = (props: Props) => {
   const { theme } = props
 
-  const cpk = useConnectedCPKContext()
-  const { account, networkId, relay } = useConnectedWeb3Context()
-  const { fetchBalances } = useConnectedBalanceContext()
+  const { account, balances, cpk, networkId, relay } = useConnectedWeb3Context()
 
   const initialIsOpenState = localStorage.getItem('airdrop')
   const [isOpen, setIsOpen] = useState(!initialIsOpenState)
@@ -77,7 +70,7 @@ export const ModalAirdrop = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
       await cpk.claimAirdrop({ account, setTxHash, setTxState })
-      await fetchBalances()
+      await balances.fetchBalances()
     } catch (e) {
       setIsTransactionModalOpen(false)
     }

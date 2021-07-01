@@ -118,7 +118,7 @@ const AirdropCard = (props: Props) => {
       <ModalCard>
         <TopSection>
           <TopSectionLeft>
-            <IconOmen size={38} />
+            <IconOmen id="airdrop" size={38} />
             <TopSectionDetails>
               <TopSectionHeading>Claimable Amount</TopSectionHeading>
               <TopSectionSubHeading green={!claimIsDisabled}>
