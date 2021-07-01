@@ -4,14 +4,19 @@ import { matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 
-import { Network } from '../..'
 import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../hooks'
 import { networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { ExchangeType } from '../../../../util/types'
 import { ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
-import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
+import { Network } from '../../../common'
+import {
+  ModalConnectWalletWrapper,
+  ModalDepositWithdrawWrapper,
+  ModalLockYoTokens,
+  ModalYourConnectionWrapper,
+} from '../../../modal'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../form/dropdown'
 import { IconAdd, IconClose, IconOmen } from '../../icons'
 import { IconSettings } from '../../icons/IconSettings'
@@ -183,6 +188,7 @@ const OmenIconWrapper = styled.div`
 
 const HeaderContainer: React.FC = (props: any) => {
   const context = useConnectedWeb3Context()
+
   const { relay, toggleRelay } = context
   const { account, active, connectorName, error, networkId } = context.rawWeb3Context
 
@@ -190,6 +196,7 @@ const HeaderContainer: React.FC = (props: any) => {
   const [isConnectWalletModalOpen, setConnectWalletModalState] = useState(false)
   const [isYourConnectionModalOpen, setYourConnectionModalState] = useState(false)
   const [isDepositWithdrawModalOpen, setDepositWithdrawModalState] = useState(false)
+  const [isModalLockTokensOpen, setModalLockTokensState] = useState<boolean>(false)
   const [depositWithdrawType, setDepositWithdrawType] = useState<ExchangeType>(ExchangeType.deposit)
   const [marketPage, setMarketPage] = useState(true)
 
@@ -315,9 +322,8 @@ const HeaderContainer: React.FC = (props: any) => {
               placeholder={networkPlacholder}
             />
           )}
-
-          {account && (
-            <HeaderButton style={{ display: 'none' }}>
+          {account && networkId === networkIds.RINKEBY && (
+            <HeaderButton onClick={() => setModalLockTokensState(!isModalLockTokensOpen)}>
               {relay
                 ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
                 : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
@@ -365,6 +371,15 @@ const HeaderContainer: React.FC = (props: any) => {
             <IconSettings />
           </ButtonSettings>
         </ContentsRight>
+        <ModalLockYoTokens
+          context={context}
+          fetchBalances={fetchBalances}
+          isOpen={isModalLockTokensOpen}
+          omenBalance={relay ? xOmenBalance : omenBalance}
+          onClose={() => setModalLockTokensState(false)}
+          setIsModalLockTokensOpen={setModalLockTokensState}
+        />
+
         <ModalYourConnectionWrapper
           arrayOfClaimableBalances={arrayOfClaimableTokenBalances}
           changeWallet={() => {
