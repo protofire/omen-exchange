@@ -287,7 +287,6 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const { decimals: NativeDecimals, symbol: NativeSymbol } = getNativeAsset(networkId, relay)
 
   const collateral = props.collateral ? getInitialCollateral(networkId, props.collateral, relay) : null
-
   const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, STANDARD_DECIMALS))
   const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, STANDARD_DECIMALS))
   const startingPointNumber =
@@ -406,7 +405,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
     setTotalShortPrice(totalShortTradesCost.add(totalShortLiquidityTxsCost))
     setTotalLongPrice(totalLongTradesCost.add(totalLongLiquidityTxsCost))
-  }, [trades, collateral, liquidityTxs])
+    // eslint-disable-next-line
+  }, [trades, props.collateral, liquidityTxs])
 
   const scaleBall: Maybe<HTMLInputElement> = document.querySelector('.scale-ball')
   const handleScaleBallChange = () => {
