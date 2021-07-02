@@ -73,7 +73,7 @@ const Link = styled.a`
     color: ${props => props.theme.primary3};
   }
 `
-const IconWrapper = styled(IconClose as any)`
+const IconCloseWrapped = styled(IconClose)`
   color: ${props => props.theme.text1};
 `
 
@@ -110,8 +110,7 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
   })
 }
 
-const MarketHomeContainer: React.FC = (props: any) => {
-  const { ...restProps } = props
+const MarketHomeContainer: React.FC = () => {
   const context = useConnectedWeb3Context()
 
   const history = useHistory()
@@ -411,9 +410,7 @@ const MarketHomeContainer: React.FC = (props: any) => {
               setHasSeenBanner('true')
             }}
           >
-            <IconWrapper>
-              <IconClose hoverEffect size={'24'} {...restProps} />
-            </IconWrapper>
+            <IconCloseWrapped hoverEffect size={'24'} />
           </CloseStyled>
         </Banner>
       )}

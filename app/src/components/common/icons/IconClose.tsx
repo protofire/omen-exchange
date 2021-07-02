@@ -23,18 +23,20 @@ interface Props {
 }
 
 export const IconClose = (props: Props) => {
-  const { color = '#37474F', hoverEffect = true, onClick, size = '24' } = props
+  // If we keep the default value here it prevails on the styled(IconClose) and subsequent styled components I guess. I suggest to remove it
+  const { color, hoverEffect = false, onClick, size = '24', ...restProps } = props
 
   return (
     <Wrapper
-      color={'inherit'}
-      fill="none"
+      // If we keep 'none' here then only a hardcoded default variables specified above would apply. Instead, having color here makes the styled(IconClose) color apply (without needing the harcoded value). Here the default value for color always prevails on the styled(IconClose), weird
+      fill={color}
       height={size}
       hoverEffect={hoverEffect}
       onClick={onClick}
       viewBox="0 0 24 24"
       width={size}
       xmlns="http://www.w3.org/2000/svg"
+      {...restProps}
     >
       <path
         className="path"
