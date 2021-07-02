@@ -31,19 +31,23 @@ const App: React.FC = (props: any) => {
   console.log(windowObj.ethereum.chainId)
   console.log(windowObj)
   const ethereum = windowObj.ethereum
-  let networkId: any
-  networkId = ethereum.chainId
+  const [networkId, setNetworkId] = useState(ethereum.chainId)
+  const [timer, setTimer] = useState<number>(1)
+  //networkId = ethereum.chainId
 
   const [status, setStatus] = useState(true)
   // const [settingsView, setSettingsView] = useState(false)
 
   useInterval(() => {
     const ethereum = (window as any).ethereum.chainId
-    console.log('inside set Interval app root file chainId', ethereum.chainId)
+    console.log('inside set Interval app root file chainId', ethereum)
 
     const initialRelayState =
       localStorage.getItem('relay') === 'false' || ethereum !== networkIds.MAINNET ? false : true
-    networkId = initialRelayState ? networkIds.XDAI : ethereum ? getNetworkFromChain(ethereum) : '-1'
+    console.log('initialRElay state in interval', initialRelayState)
+    console.log('network set', initialRelayState ? networkIds.XDAI : ethereum ? getNetworkFromChain(ethereum) : '-1')
+    setNetworkId(initialRelayState ? networkIds.XDAI : ethereum ? getNetworkFromChain(ethereum) : '-1')
+    setTimer(timer + 1)
     // if (ethereum === null) {
     //   setStatus(false)
     // }
@@ -58,7 +62,11 @@ const App: React.FC = (props: any) => {
     console.log('Status inside app.tsx', status)
   }, [status])
   useEffect(() => {
-    let get = getNetworkFromChain(networkId)
+    console.log('Networkd id inside app inside app.tsx', networkId)
+  }, [networkId])
+  useEffect(() => {
+    console.log(networkId, 'Netwrokd id used for the main stuff')
+    let get = getNetworkFromChain(networkId ? networkId.toString() : '-1')
     console.log(get, 'Network inside the app.tsx')
 
     if (get && get !== -1) {
@@ -73,7 +81,7 @@ const App: React.FC = (props: any) => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [networkId, ethereum, windowObj, localStorage])
+  }, [networkId, timer])
 
   return (
     <ThemeProvider theme={theme}>
