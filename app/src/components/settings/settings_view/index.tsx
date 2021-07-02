@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
-import { getChainSpecificAlternativeUrls, getInfuraUrl } from '../../../util/networks'
+import { getChainSpecificAlternativeUrls, getInfuraUrl, networkIds } from '../../../util/networks'
 import { checkRpcStatus, getNetworkFromChain, isValidHttpUrl } from '../../../util/tools'
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
@@ -117,20 +117,34 @@ const SettingsButtonWrapper = styled.div`
 interface Props {
   history?: any
   networkId?: any
+  setStatus?: any
 }
 
 export const SettingsViewContainer = ({ networkId: chainID }: Props) => {
   const { library } = useWeb3Context()
-  const [networkId, setNetwork] = useState(chainID ? chainID : -1)
-  console.log(networkId)
 
-  const network = getNetworkFromChain(networkId.toString())
-  console.log(network)
+  // const [networkId, setNetwork] = useState<number>(-1)
+  //console.log('this is network insude the settings ontainer used for displaying stuuf', networkId)
+  let networkId: any
+  const chainId = (window as any).ethereum.chainId
+  const initialRelayState =
+    localStorage.getItem('relay') === 'false' || getNetworkFromChain(chainId) !== networkIds.MAINNET ? false : true
+  console.log('initiatedRelay state inside settings container', initialRelayState)
+  networkId = initialRelayState ? networkIds.XDAI : getNetworkFromChain(chainId)
+  console.log(networkId)
+  // const network = getNetworkFromChain(networkId.toString())
+  // console.log(network)
   const checkIfReady = async () => {
+    const current = getNetworkFromChain(networkId.toString())
+
+    // setNetwork(current)
     if (library) {
       await library.ready
 
-      setNetwork(library.network.chainId)
+      const initialRelayState =
+        localStorage.getItem('relay') === 'false' || library.network.chainId !== networkIds.MAINNET ? false : true
+
+      networkId = initialRelayState ? networkIds.XDAI : library.network.chainId
     }
   }
 
@@ -140,7 +154,7 @@ export const SettingsViewContainer = ({ networkId: chainID }: Props) => {
   const [onlineStatus, setOnlineStatus] = useState<boolean>(false)
   const [customUrl, setCustomUrl] = useState<string>('')
 
-  const urlObject = getChainSpecificAlternativeUrls(network)
+  const urlObject = getChainSpecificAlternativeUrls(networkId)
   let dropdownItems: any[] = []
   if (urlObject) {
     dropdownItems = urlObject.map((item, index) => {
@@ -201,15 +215,15 @@ export const SettingsViewContainer = ({ networkId: chainID }: Props) => {
       setOnlineStatus(false)
       return
     }
-    console.log(network)
-    checkRpcStatus(urlObject && urlObject[current] ? urlObject[current].rpcUrl : url, setOnlineStatus, network)
+
+    checkRpcStatus(urlObject && urlObject[current] ? urlObject[current].rpcUrl : url, setOnlineStatus, networkId)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url])
   useEffect(() => {
     if (localStorage.getItem('rpcAddress')) {
       const data = JSON.parse(localStorage.getItem('rpcAddress') as string)
       setUrl(data.url)
-      if (data.network === getNetworkFromChain(networkId)) {
+      if (data.network === getNetworkFromChain(networkId.toString())) {
         setCurrent(data.index)
         if (data.index === dropdownItems.length - 1) {
           setCustomUrl(data.url)
@@ -274,16 +288,16 @@ export const SettingsViewContainer = ({ networkId: chainID }: Props) => {
         </SetAndSaveButton>
         <SetAndSaveButton
           disabled={
-            url.length === 0 || !isValidUrl || (network !== -1 && getInfuraUrl(network) === url) || !onlineStatus
+            url.length === 0 || !isValidUrl || (networkId !== -1 && getInfuraUrl(networkId) === url) || !onlineStatus
           }
           onClick={async () => {
-            if (!(await checkRpcStatus(url, setOnlineStatus, network))) return
+            if (!(await checkRpcStatus(url, setOnlineStatus, networkId))) return
 
             localStorage.setItem(
               'rpcAddress',
               JSON.stringify({
                 url: url,
-                network: network,
+                network: networkId,
                 index: current,
               }),
             )

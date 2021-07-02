@@ -85,9 +85,16 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     if (networkId) {
       const enableRelay = context.connectorName !== 'Safe' || debugAddress !== ''
-      const { address, isRelay, netId, provider } = getRelayProvider(relay && enableRelay, networkId, library, account)
+      const { address, isRelay, netId, provider } = getRelayProvider(
+        relay && enableRelay,
+        networkId,
+        library,
+        account,
+        props.setStatus,
+      )
 
       const value = {
+        setStatus: props.setStatus,
         account: address || null,
         library: provider,
         networkId: netId,
@@ -165,9 +172,10 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     ...connection,
     cpk,
     balances,
+    setStatus: props.setStatus,
   }
-
   props.setStatus(true)
+  console.log('web3 INTITIATED')
   return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
 }
 
