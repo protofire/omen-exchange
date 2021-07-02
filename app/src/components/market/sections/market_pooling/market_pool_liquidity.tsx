@@ -509,6 +509,44 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
+  const stake = async () => {
+    try {
+      if (!cpk) {
+        return
+      }
+      if (!liquidityMiningCampaign) {
+        throw new Error('No liquidity mining campaign')
+      }
+      if (!account) {
+        throw new Error('Please connect to your wallet to perform this action.')
+      }
+
+      setMessage(
+        `Staking ${formatNumber(formatBigNumber(fundingBalance, STANDARD_DECIMALS, STANDARD_DECIMALS))} pool tokens.`,
+      )
+
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
+
+      await cpk.stakePoolTokens(fundingBalance, liquidityMiningCampaign.id, marketMakerAddress)
+
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
+      await fetchCollateralBalance()
+      await fetchBalances()
+      await fetchStakingData()
+
+      setMessage(`Successfully staked pool tokens.`)
+      setIsTransactionProcessing(false)
+    } catch (err) {
+      setTxState(TransactionStep.error)
+      setMessage(`Error trying to stake pool tokens.`)
+      logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
+    }
+  }
+
   const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address)
 
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
@@ -977,6 +1015,16 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               style={{ marginRight: 12 }}
             >
               Claim Rewards
+            </Button>
+          )}
+          {liquidityMiningCampaign && fundingBalance.gt(0) && rewardApr > 0 && (
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              disabled={fundingBalance.eq(0)}
+              onClick={() => stake()}
+              style={{ marginRight: 12 }}
+            >
+              Stake
             </Button>
           )}
           {activeTab === Tabs.deposit && (
