@@ -34,6 +34,7 @@ import { AirdropService } from './airdrop'
 import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
 import { ERC20Service } from './erc20'
+import { OmenGuildService } from './guild'
 import { MarketMakerService } from './market_maker'
 import { MarketMakerFactoryService } from './market_maker_factory'
 import { OracleService } from './oracle'
@@ -270,9 +271,11 @@ class CPKService {
 
     const txObject = await this.cpk.execTransactions(transactions, txOptions)
     setTxState && setTxState(TransactionStep.transactionSubmitted)
+
     setTxHash && setTxHash(txObject.hash)
     const tx = await this.waitForTransaction(txObject)
     setTxState && setTxState(TransactionStep.transactionConfirmed)
+
     return tx
   }
 
@@ -1480,20 +1483,97 @@ class CPKService {
       throw err
     }
   }
-  approveCpk = async (addressToApprove: string, tokenAddress: string) => {
-    try {
-      const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
 
-      const transactions: Transaction[] = [
-        {
-          to: tokenAddress,
-          data: ERC20Service.encodeApproveUnlimited(OMNI_BRIDGE_XDAI_ADDRESS),
-        },
-      ]
-      return this.execTransactions(transactions)
+  lockTokens = async (
+    amount: BigNumber,
+    setTxState: (step: TransactionStep) => void,
+    setTxHash: (arg0: string) => void,
+  ) => {
+    try {
+      const { chainId } = await this.provider.getNetwork()
+      const OmenGuild = new OmenGuildService(this.provider, chainId)
+
+      if (chainId !== networkIds.MAINNET || this.cpk.relay) {
+        const signer = this.provider.getSigner()
+        const account = await signer.getAddress()
+
+        const { address: omenTokenAddress } = getToken(this.cpk.relay ? networkIds.XDAI : chainId, 'omn')
+        const allowanceAddress = await OmenGuild.tokenVault()
+        const collateralService = new ERC20Service(this.provider, account, omenTokenAddress)
+        const transactions: Transaction[] = []
+
+        const txOptions: TxOptions = {}
+
+        const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
+          this.cpk.address,
+          allowanceAddress,
+          amount,
+        )
+
+        if (!hasCPKEnoughAlowance) {
+          // Step 1:  Approve unlimited amount to be transferred to the token vault if not approved already
+          transactions.push({
+            to: omenTokenAddress,
+            data: ERC20Service.encodeApproveUnlimited(allowanceAddress),
+          })
+        }
+        // Step 2: Fund CPK
+        transactions.push({
+          to: omenTokenAddress,
+          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, amount),
+        })
+        // Step 3: Lock Tokens in the guild
+        transactions.push({
+          to: OmenGuild.omenGuildAddress,
+          data: OmenGuildService.encodeLockTokens(amount),
+        })
+
+        const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+        return transactionHash
+      } else {
+        const transaction = await OmenGuild.lockTokens(amount)
+
+        return transaction.hash
+      }
     } catch (e) {
-      logger.error(`Error while approving ERC20 Token to CPK address : `, e.message)
+      logger.error(`Error while trying to lock Omen tokens : `, e.message)
+      throw e
+    }
+  }
+  unlockTokens = async (amount: BigNumber) => {
+    try {
+      const { chainId } = await this.provider.getNetwork()
+      const OmenGuild = new OmenGuildService(this.provider, chainId)
+      const { address: omenTokenAddress } = getToken(this.cpk.relay ? networkIds.XDAI : chainId, 'omn')
+
+      if (chainId !== networkIds.MAINNET || this.cpk.relay) {
+        const txOptions: TxOptions = {}
+        txOptions.gas = defaultGas
+
+        const transactions: Transaction[] = [
+          {
+            to: OmenGuild.omenGuildAddress,
+            data: OmenGuildService.encodeUnlockTokens(amount),
+          },
+        ]
+        if (!this.cpk.relay) {
+          const account = await this.provider.getSigner().getAddress()
+          transactions.push({
+            to: omenTokenAddress,
+            data: ERC20Service.encodeTransferFrom(this.cpk.address, account, amount),
+          })
+        }
+
+        const { transactionHash } = await this.execTransactions(transactions, txOptions)
+
+        return transactionHash
+      } else {
+        const transaction: Transaction = await OmenGuild.unlockTokens(amount)
+
+        return transaction
+      }
+    } catch (e) {
+      logger.error(`Error while trying to unlock Omen tokens : `, e.message)
       throw e
     }
   }
