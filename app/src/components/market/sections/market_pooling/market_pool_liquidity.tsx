@@ -396,6 +396,68 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     }
   }
 
+  const unstakeClaimAndRemoveFunding = async () => {
+    try {
+      if (!cpk) {
+        return
+      }
+      if (!liquidityMiningCampaign) {
+        throw new Error('No liquidity mining campaign')
+      }
+
+      const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
+      setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
+
+      const collateralAddress = await marketMaker.getCollateralToken()
+      const conditionId = await marketMaker.getConditionId()
+
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
+
+      await cpk.unstakeClaimAndWithdraw({
+        amountToMerge: depositedTokens,
+        campaignAddress: liquidityMiningCampaign.id,
+        collateralAddress,
+        conditionId,
+        conditionalTokens,
+        compoundService,
+        earnings: userEarnings,
+        marketMaker,
+        outcomesCount: balances.length,
+        setTxHash,
+        setTxState,
+        sharesToBurn: amountToRemove || Zero,
+        useBaseToken: false, // Not using base token for staking
+      })
+
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
+      await fetchCollateralBalance()
+      await fetchBalances()
+      await fetchStakingData()
+
+      setAmountToRemove(null)
+      setAmountToRemoveDisplay('')
+      setAmountToRemoveNormalized(null)
+      setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${displayCollateral.symbol}`)
+      setIsTransactionProcessing(false)
+    } catch (err) {
+      setTxState(TransactionStep.error)
+      setMessage(`Error trying to withdraw funds.`)
+      logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
+    }
+  }
+
+  const withdraw = () => {
+    if (userStakedTokens.gt(0)) {
+      unstakeClaimAndRemoveFunding()
+    } else {
+      removeFunding()
+    }
+  }
+
   const claim = async () => {
     try {
       if (!cpk) {
@@ -922,11 +984,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             </Button>
           )}
           {activeTab === Tabs.withdraw && (
-            <Button
-              buttonType={ButtonType.secondaryLine}
-              disabled={disableWithdrawButton}
-              onClick={() => removeFunding()}
-            >
+            <Button buttonType={ButtonType.secondaryLine} disabled={disableWithdrawButton} onClick={() => withdraw()}>
               Withdraw
             </Button>
           )}
