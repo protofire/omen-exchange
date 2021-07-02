@@ -66,6 +66,7 @@ const query = gql`
       }
       scalarLow
       scalarHigh
+      factory
     }
   }
 `
@@ -118,6 +119,7 @@ export type GraphResponseFixedProductMarketMaker = {
   submissionIDs: KlerosSubmission[]
   scalarLow: Maybe<string>
   scalarHigh: Maybe<string>
+  factory: string
 }
 
 type GraphResponse = {
@@ -149,6 +151,7 @@ export type GraphMarketMakerData = {
   scalarHigh: Maybe<BigNumber>
   outcomeTokenMarginalPrices: string[]
   outcomeTokenAmounts: string[]
+  factory: string
 }
 
 type Result = {
@@ -233,6 +236,7 @@ export const wrangleMarketDataResponse = (
     scalarHigh: data.scalarHigh ? bigNumberify(data.scalarHigh || 0) : null,
     outcomeTokenMarginalPrices: data.outcomeTokenMarginalPrices,
     outcomeTokenAmounts: data.outcomeTokenAmounts,
+    factory: data.factory,
   }
 }
 
