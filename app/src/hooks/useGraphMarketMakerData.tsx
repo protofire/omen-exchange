@@ -66,8 +66,8 @@ const query = gql`
       }
       scalarLow
       scalarHigh
+      factory
     }
-    factory
   }
 `
 
