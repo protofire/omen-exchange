@@ -3,9 +3,9 @@ import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
-import { OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../common/constants'
-import { Transaction, verifyProxyAddress } from '../util/cpk'
-import { getLogger } from '../util/logger'
+import { OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../../common/constants'
+import { Transaction, verifyProxyAddress } from '../../util/cpk'
+import { getLogger } from '../../util/logger'
 import {
   bridgeTokensList,
   getContractAddress,
@@ -14,7 +14,7 @@ import {
   getWrapToken,
   networkIds,
   pseudoNativeAssetAddress,
-} from '../util/networks'
+} from '../../util/networks'
 import {
   calcDistributionHint,
   clampBigNumber,
@@ -22,20 +22,21 @@ import {
   signaturesFormatted,
   waitABit,
   waitForBlockToSync,
-} from '../util/tools'
-import { MarketData, Question, Token, TransactionStep } from '../util/types'
+} from '../../util/tools'
+import { MarketData, Question, Token, TransactionStep } from '../../util/types'
+import { ConditionalTokenService } from '../conditional_token'
+import { ERC20Service } from '../erc20'
+import { MarketMakerService } from '../market_maker'
+import { MarketMakerFactoryService } from '../market_maker_factory'
+import { OracleService } from '../oracle'
+import { OvmService } from '../ovm'
+import { RealitioService } from '../realitio'
+import { RelayService } from '../relay'
+import { SafeService } from '../safe'
+import { UnwrapTokenService } from '../unwrap_token'
+import { XdaiService } from '../xdai'
 
-import { ConditionalTokenService } from './conditional_token'
-import { ERC20Service } from './erc20'
-import { MarketMakerService } from './market_maker'
-import { MarketMakerFactoryService } from './market_maker_factory'
-import { OracleService } from './oracle'
-import { OvmService } from './ovm'
-import { RealitioService } from './realitio'
-import { RelayService } from './relay'
-import { SafeService } from './safe'
-import { UnwrapTokenService } from './unwrap_token'
-import { XdaiService } from './xdai'
+import { approve, buy, fee, pipe, setup, transfer, wrap } from './fns'
 
 const logger = getLogger('Services::CPKService')
 
@@ -132,10 +133,11 @@ interface TransactionResult {
   safeTxHash?: string
 }
 
-interface TxOptions {
+export interface TxOptions {
   value?: BigNumber
   gas?: number
 }
+
 interface TxState {
   setTxHash?: (arg0: string) => void
   setTxState?: (step: TransactionStep) => void
@@ -155,6 +157,7 @@ interface CreateMarketResult {
   transaction: TransactionReceipt
   marketMakerAddress: string
 }
+
 class CPKService {
   cpk: any
   provider: Web3Provider
@@ -264,87 +267,20 @@ class CPKService {
     return amount
   }
 
-  buyOutcomes = async ({
-    amount,
-    collateral,
-    marketMaker,
-    outcomeIndex,
-    setTxHash,
-    setTxState,
-  }: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
+  buyOutcomes = async (params: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
-      const signer = this.provider.getSigner()
-      const account = await signer.getAddress()
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
-
-      const transactions: Transaction[] = []
-
-      const txOptions: TxOptions = {}
-      await this.getGas(txOptions)
-
-      const buyAmount = await this.subRelayFee(amount)
-
-      let collateralAddress
-
-      if (collateral.address === pseudoNativeAssetAddress) {
-        // ultimately WETH will be the collateral if we fund with native ether
-        collateralAddress = getWrapToken(networkId).address
-
-        // we need to send the funding amount in native ether
-        if (!this.isSafeApp) {
-          txOptions.value = buyAmount
-        }
-
-        // Step 0: Wrap ether
-        transactions.push({
-          to: collateralAddress,
-          value: buyAmount.toString(),
-        })
-      } else {
-        collateralAddress = await marketMaker.getCollateralToken()
-      }
-
-      const marketMakerAddress = marketMaker.address
-      const collateralService = new ERC20Service(this.provider, account, collateralAddress)
-      logger.log(`CPK address: ${this.cpk.address}`)
-      const outcomeTokensToBuy = await marketMaker.calcBuyAmount(buyAmount, outcomeIndex)
-      logger.log(`Min outcome tokens to buy: ${outcomeTokensToBuy}`)
-
-      // Check  if the allowance of the CPK to the market maker is enough.
-      const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
-        this.cpk.address,
-        marketMakerAddress,
-        buyAmount,
-      )
-
-      if (!hasCPKEnoughAlowance) {
-        // Step 1:  Approve unlimited amount to be transferred to the market maker)
-        transactions.push({
-          to: collateralAddress,
-          data: ERC20Service.encodeApproveUnlimited(marketMakerAddress),
-        })
-      }
-
-      // Step 2: Transfer the amount of collateral being spent from the user to the CPK
-      // If we are funding with native ether we can skip this step
-      // If we are signed in as a safe we don't need to transfer
-      if (!this.isSafeApp && collateral.address !== pseudoNativeAssetAddress) {
-        // Step 2: Transfer the amount of collateral being spent from the user to the CPK
-        transactions.push({
-          to: collateralAddress,
-          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, buyAmount),
-        })
-      }
-      // Step 3: Buy outcome tokens with the CPK
-      transactions.push({
-        to: marketMakerAddress,
-        data: MarketMakerService.encodeBuy(buyAmount, outcomeIndex, outcomeTokensToBuy),
-      })
-
+      const { setTxHash, setTxState } = params
+      const { transactions, txOptions } = await pipe(
+        setup,
+        fee,
+        wrap,
+        approve,
+        transfer,
+        buy,
+      )({ ...params, service: this })
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
-      logger.error(`There was an error buying '${amount.toString()}' of shares`, err.message)
+      logger.error(`There was an error buying '${params.amount.toString()}' of shares`, err.message)
       throw err
     }
   }
