@@ -136,7 +136,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       marketMakerFunding: marketMaker.getTotalSupply(),
       marketMakerUserFunding: cpk && cpk.address ? marketMaker.balanceOf(cpk.address) : new BigNumber(0),
       realitioAnswer: isQuestionFinalized ? contracts.realitio.getResultFor(graphMarketMakerData.question.id) : null,
-      totalEarnings: marketMaker.getCollectedFees(),
+      totalEarnings: marketMaker.getCollectedFees(networkId, graphMarketMakerData.factory),
       totalPoolShares: marketMaker.poolSharesTotalSupply(),
       userPoolShares: cpk && cpk.address ? marketMaker.poolSharesBalanceOf(cpk.address) : new BigNumber(0),
     })
@@ -145,7 +145,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
     if (cpk && cpk.address && marketMakerFunding.gt(0)) {
       try {
-        userEarnings = await marketMaker.getFeesWithdrawableBy(cpk.address)
+        userEarnings = await marketMaker.getFeesWithdrawableBy(cpk.address, networkId, graphMarketMakerData.factory)
       } catch {
         console.warn('Could not retrieve user earnings.')
       }
