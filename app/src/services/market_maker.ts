@@ -83,14 +83,14 @@ class MarketMakerService {
   }
 
   getCollectedFees = async (networkId: number, factory: string): Promise<BigNumber> => {
-    if (factory.toLowerCase() === getContractAddress(networkId, 'marketMakerFactoryV2').toLowerCase()) {
+    if (factory.toLowerCase() !== getContractAddress(networkId, 'marketMakerFactory').toLowerCase()) {
       return new BigNumber(0)
     }
     return this.contract.collectedFees()
   }
 
   getFeesWithdrawableBy = async (account: string, networkId: number, factory: string): Promise<BigNumber> => {
-    if (factory.toLowerCase() === getContractAddress(networkId, 'marketMakerFactoryV2').toLowerCase()) {
+    if (factory.toLowerCase() !== getContractAddress(networkId, 'marketMakerFactory').toLowerCase()) {
       return new BigNumber(0)
     }
     return this.contract.feesWithdrawableBy(account)
