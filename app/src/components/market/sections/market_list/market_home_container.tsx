@@ -345,9 +345,12 @@ const MarketHomeContainer: React.FC = () => {
       }
 
       const routeQueryString = routeQueryArray.join('&')
-      const routeQuery = routeQueryStart.concat(routeQueryString)
+      const routeQuery = routeQueryString ? routeQueryStart.concat(routeQueryString) : ''
 
-      history.push(`${route}${routeQuery}`)
+      const path = `${route}${routeQuery}`
+      if (window.location.hash.replace('#', '') !== path) {
+        history.push(path)
+      }
     },
     [history],
   )

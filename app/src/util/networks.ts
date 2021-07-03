@@ -79,6 +79,7 @@ interface Network {
   defaultToken?: string
   blockExplorer: string
   blockExplorerURL: string
+  airdropAddress?: string[]
 }
 
 type KnownContracts = keyof Network['contracts']
@@ -191,6 +192,7 @@ const networks: { [K in NetworkId]: Network } = {
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
     blockExplorerURL: 'https://rinkeby.etherscan.io',
+    airdropAddress: ['0x0D807bfF8018270F898abAe5677df9DC4B26187B'],
   },
   [networkIds.SOKOL]: {
     label: 'Sokol',
@@ -288,6 +290,7 @@ const networks: { [K in NetworkId]: Network } = {
     targetSafeImplementation: '0x9C75A217AEA76663a9A37687606f099945eb0742',
     blockExplorer: 'blockscout',
     blockExplorerURL: 'https://blockscout.com/poa/xdai',
+    airdropAddress: ['0x282A5cBFaE5025E4E944f14E19c45AF474333fE7'],
   },
 }
 
@@ -721,6 +724,13 @@ export const getKnowArbitratorFromAddress = (networkId: number, address: string)
   }
 
   return 'unknown' as KnownArbitrator
+}
+
+export const getAirdrops = (networkId: number): string[] | undefined => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].airdropAddress
 }
 
 export const getRealitioTimeout = (networkId: number): number => {

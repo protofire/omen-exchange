@@ -30,6 +30,7 @@ import {
 } from '../util/tools'
 import { MarketData, Question, Token, TransactionStep } from '../util/types'
 
+import { AirdropService } from './airdrop'
 import { CompoundService } from './compound_service'
 import { ConditionalTokenService } from './conditional_token'
 import { ERC20Service } from './erc20'
@@ -143,6 +144,12 @@ interface CPKSubmitAnswerParams {
   question: Question
   answer: string
   amount: BigNumber
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
+}
+
+interface CPKClaimAirdropParams {
+  account: string
   setTxHash: (arg0: string) => void
   setTxState: (step: TransactionStep) => void
 }
@@ -1690,6 +1697,21 @@ class CPKService {
     } catch (e) {
       logger.error(`Error trying to claim tokens from xDai bridge`, e.message)
       throw e
+    }
+  }
+
+  claimAirdrop = async ({ account, setTxHash, setTxState }: CPKClaimAirdropParams) => {
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
+    const signer = this.provider.getSigner()
+    const address = await signer.getAddress()
+    const txOptions: TxOptions = {}
+    await this.getGas(txOptions)
+
+    const airdrop = new AirdropService(networkId, this.provider, address, this.cpk.relay)
+    const transactions = await airdrop.encodeClaims(account)
+    if (transactions) {
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     }
   }
 }

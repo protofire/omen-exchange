@@ -11,7 +11,9 @@ import { Header } from '../common/layout/header'
 import { MarketRoutes } from '../market/routes/market_routes'
 import { MarketWizardCreatorContainer } from '../market/sections/market_create/market_wizard_creator_container'
 import { MarketHomeContainer } from '../market/sections/market_list/market_home_container'
+import { ModalAirdropWrapper } from '../modal'
 import SettingsViewContainer from '../settings/settings_view'
+
 const RedirectToHome = () => <Redirect to="/" />
 export const Main: React.FC = () => {
   const context = useWeb3Context()
@@ -29,6 +31,7 @@ export const Main: React.FC = () => {
       <Router>
         <MainWrapper>
           <Header />
+          <ModalAirdropWrapper />
           <Helmet>
             <title>{DOCUMENT_TITLE}</title>
           </Helmet>
