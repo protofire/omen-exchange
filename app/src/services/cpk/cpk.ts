@@ -262,11 +262,11 @@ class CPKService {
     return amount
   }
 
-  getInput = (params: any) => ({ ...params, service: this })
+  service = (params: any) => ({ ...params, service: this })
 
   buyOutcomes = async (params: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
-      const { transactions, txOptions } = await pipe(setup, fee, wrap, approve, transfer, buy)(this.getInput(params))
+      const { transactions, txOptions } = await pipe(setup, fee, wrap, approve, transfer, buy)(this.service(params))
       const { setTxHash, setTxState } = params
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
@@ -285,7 +285,7 @@ class CPKService {
         createQuestion,
         prepareCondition,
         createMarket,
-      )(this.getInput(params))
+      )(this.service(params))
       const { setTxHash, setTxState } = params
       const transaction = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       return {
