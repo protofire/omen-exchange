@@ -33,6 +33,7 @@ import {
   getBaseTokenForCToken,
   getInitialCollateral,
   getSharesInBaseToken,
+  isDust,
 } from '../../../../util/tools'
 import {
   CompoundTokenType,
@@ -205,9 +206,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
-  const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
-    amount.lt(min) ? amount : min,
-  )
+
+  const depositedTokens = sendAmountsAfterRemovingFunding
+    .map((amount, i) => {
+      return amount.add(balances[i].shares)
+    })
+    .reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
 
   const sharesAfterRemovingFunding = balances.map((balance, i) => {
     return balance.shares.add(sendAmountsAfterRemovingFunding[i]).sub(depositedTokens)
@@ -241,9 +245,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     totalPoolShares,
   )
 
-  const totalDepositedTokens = totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) =>
-    amount.lt(min) ? amount : min,
-  )
+  const totalDepositedTokens = fundingBalance.gt(0)
+    ? totalUserShareAmounts
+        .map((amount, i) => {
+          return amount.add(balances[i].shares)
+        })
+        .reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
+    : new BigNumber(0)
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
 
@@ -567,6 +575,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const currencySelectorIsDisabled = relay ? true : currencyFilters.length ? false : true
 
+  const disableWithdrawTab = activeTab !== Tabs.withdraw && isDust(totalUserLiquidity, collateral.decimals)
+
   return (
     <>
       <UserPoolData
@@ -600,6 +610,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             </ButtonTab>
             <ButtonTab
               active={disableDepositTab ? true : activeTab === Tabs.withdraw}
+              disabled={disableWithdrawTab}
               onClick={() => switchTab(Tabs.withdraw)}
             >
               Withdraw
