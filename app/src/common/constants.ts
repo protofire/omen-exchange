@@ -53,7 +53,11 @@ export const TRADING_FEE_OPTIONS = [
   '5.00',
 ]
 
-export const GRAPH_MAINNET_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen'
+export const GRAPH_MAINNET_HTTP =
+  'https://gateway.thegraph.com/api/' +
+  process.env.REACT_APP_GRAPH_API_KEY +
+  '/subgraphs/id/' +
+  process.env.REACT_APP_GRAPH_SUBGRAPH_ID
 export const GRAPH_MAINNET_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen'
 export const GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
 export const GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
