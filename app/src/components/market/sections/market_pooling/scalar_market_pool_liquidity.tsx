@@ -203,7 +203,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
-  const disableWithdrawTab = isDust(fundingBalance, collateral.decimals)
 
   const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(
     amountToRemove || Zero,
@@ -229,8 +228,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     totalPoolShares,
   )
 
-  const totalDepositedTokens = totalUserShareAmounts.length
-    ? totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
+  const totalDepositedTokens = fundingBalance.gt(0)
+    ? totalUserShareAmounts
+        .map((amount, i) => {
+          return amount.add(balances[i].shares)
+        })
+        .reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
     : new BigNumber(0)
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
@@ -560,6 +563,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 
+  const disableWithdrawTab = activeTab !== Tabs.withdraw && isDust(totalUserLiquidity, collateral.decimals)
+
   return (
     <>
       <UserPoolData
@@ -593,7 +598,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
               Deposit
             </ButtonTab>
             <ButtonTab
-              active={!disableWithdrawTab && activeTab === Tabs.withdraw}
+              active={activeTab === Tabs.withdraw}
               disabled={disableWithdrawTab}
               onClick={() => setActiveTab(Tabs.withdraw)}
             >

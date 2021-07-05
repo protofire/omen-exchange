@@ -1,14 +1,15 @@
-import React, { useState } from 'react'
+import { BigNumber } from 'ethers/utils'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
-import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
-import { useCompoundService, useConnectedWeb3Context } from '../../../../hooks'
+import { IMPORT_QUESTION_ID_KEY, STANDARD_DECIMALS } from '../../../../common/constants'
+import { useCompoundService, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import theme from '../../../../theme'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
-import { getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
+import { formatBigNumber, getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { MoreMenu } from '../../../common/form/more_menu'
@@ -63,16 +64,28 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
-    scaledLiquidityParameter,
     submissionIDs,
   } = marketMakerData
 
   const ovmAddress = getContractAddress(networkId, 'omenVerifiedMarkets')
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
+  const [liquidity, setLiquidity] = useState(new BigNumber(0))
+
   const currentTimestamp = new Date().getTime()
 
-  const formattedLiquidity: string = scaledLiquidityParameter ? scaledLiquidityParameter.toFixed(2) : '0'
+  const contracts = useContracts(context)
+  const { buildMarketMaker } = contracts
+  const marketMaker = buildMarketMaker(address)
+
+  useEffect(() => {
+    const getLiquidity = async () => {
+      setLiquidity(await marketMaker.getTotalSupply())
+    }
+    marketMaker && getLiquidity()
+  })
+
+  const formattedLiquidity: string = formatBigNumber(liquidity, STANDARD_DECIMALS, 2)
 
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
