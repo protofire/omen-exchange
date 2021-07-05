@@ -33,6 +33,7 @@ import {
   getBaseTokenForCToken,
   getInitialCollateral,
   getSharesInBaseToken,
+  isDust,
 } from '../../../../util/tools'
 import {
   CompoundTokenType,
@@ -574,6 +575,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const currencySelectorIsDisabled = relay ? true : currencyFilters.length ? false : true
 
+  const disableWithdrawTab = activeTab !== Tabs.withdraw && isDust(totalUserLiquidity, collateral.decimals)
+
   return (
     <>
       <UserPoolData
@@ -607,6 +610,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             </ButtonTab>
             <ButtonTab
               active={disableDepositTab ? true : activeTab === Tabs.withdraw}
+              disabled={disableWithdrawTab}
               onClick={() => switchTab(Tabs.withdraw)}
             >
               Withdraw

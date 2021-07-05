@@ -177,6 +177,18 @@ export const AdvancedFilters = (props: Props) => {
   const wrapTokenAddress = getWrapToken(context.networkId).address.toLowerCase()
   const filter = [wrapTokenAddress]
 
+  const getCurrency = (address: Maybe<string>) => {
+    if (!address) {
+      return null
+    } else if (address.toLowerCase() === nativeAssetAddress) {
+      return wrapTokenAddress
+    } else if (address.toLowerCase() === wrapTokenAddress) {
+      return nativeAssetAddress
+    } else {
+      return address
+    }
+  }
+
   return (
     <Wrapper>
       <Column>
@@ -189,19 +201,11 @@ export const AdvancedFilters = (props: Props) => {
           addAll
           addNativeAsset
           context={context}
-          currency={currency}
+          currency={getCurrency(currency)}
           disabled={false}
           filters={filter}
           negativeFilter
-          onSelect={currency =>
-            onChangeCurrency(
-              currency
-                ? currency.address.toLowerCase() === nativeAssetAddress
-                  ? wrapTokenAddress
-                  : currency.address
-                : null,
-            )
-          }
+          onSelect={currency => onChangeCurrency(currency ? getCurrency(currency.address) : null)}
           placeholder={currency ? '' : 'All'}
         />
       </Column>
