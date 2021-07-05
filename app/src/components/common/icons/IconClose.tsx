@@ -28,7 +28,7 @@ export const IconClose = (props: Props) => {
 
   return (
     <Wrapper
-      // If we keep 'none' here then only a hardcoded default variables specified above would apply. Instead, having color here makes the styled(IconClose) color apply (without needing the harcoded value). Here the default value for color always prevails on the styled(IconClose), weird
+      // If we keep 'none' in the fill here then only a hardcoded default variables specified above would apply. Instead, having color here makes the styled(IconClose) color apply (without needing the harcoded value). Here the default value for color always prevails on the styled(IconClose), weird
       fill={color}
       height={size}
       hoverEffect={hoverEffect}
@@ -41,7 +41,7 @@ export const IconClose = (props: Props) => {
       <path
         className="path"
         d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41Z"
-        fill={color}
+        fill={hoverEffect ? '#DCDFF2' : color}
       />
     </Wrapper>
   )
