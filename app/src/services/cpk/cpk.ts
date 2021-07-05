@@ -15,14 +15,7 @@ import {
   networkIds,
   pseudoNativeAssetAddress,
 } from '../../util/networks'
-import {
-  calcDistributionHint,
-  clampBigNumber,
-  getBySafeTx,
-  signaturesFormatted,
-  waitABit,
-  waitForBlockToSync,
-} from '../../util/tools'
+import { clampBigNumber, getBySafeTx, signaturesFormatted, waitABit, waitForBlockToSync } from '../../util/tools'
 import { MarketData, Question, Token, TransactionStep } from '../../util/types'
 import { ConditionalTokenService } from '../conditional_token'
 import { ERC20Service } from '../erc20'
@@ -36,7 +29,7 @@ import { SafeService } from '../safe'
 import { UnwrapTokenService } from '../unwrap_token'
 import { XdaiService } from '../xdai'
 
-import { approve, buy, fee, pipe, setup, transfer, wrap } from './fns'
+import { approve, buy, createMarket, createQuestion, fee, pipe, prepareCondition, setup, transfer, wrap } from './fns'
 
 const logger = getLogger('Services::CPKService')
 
@@ -61,6 +54,8 @@ interface CPKSellOutcomesParams {
 }
 
 interface CPKCreateMarketParams {
+  amount: BigNumber
+  collateral: Token
   marketData: MarketData
   conditionalTokens: ConditionalTokenService
   realitio: RealitioService
@@ -267,17 +262,12 @@ class CPKService {
     return amount
   }
 
+  getInput = (params: any) => ({ ...params, service: this })
+
   buyOutcomes = async (params: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
+      const { transactions, txOptions } = await pipe(setup, fee, wrap, approve, transfer, buy)(this.getInput(params))
       const { setTxHash, setTxState } = params
-      const { transactions, txOptions } = await pipe(
-        setup,
-        fee,
-        wrap,
-        approve,
-        transfer,
-        buy,
-      )({ ...params, service: this })
       return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (err) {
       logger.error(`There was an error buying '${params.amount.toString()}' of shares`, err.message)
@@ -285,145 +275,18 @@ class CPKService {
     }
   }
 
-  createMarket = async ({
-    conditionalTokens,
-    marketData,
-    marketMakerFactory,
-    realitio,
-    setTxHash,
-    setTxState,
-  }: CPKCreateMarketParams): Promise<CreateMarketResult> => {
+  createMarket = async (params: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
-      const { arbitrator, category, loadedQuestionId, outcomes, question, resolution, spread } = marketData
-
-      if (!resolution) {
-        throw new Error('Resolution time was not specified')
-      }
-
-      const signer = this.provider.getSigner()
-      const account = await signer.getAddress()
-
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
-
-      const conditionalTokensAddress = conditionalTokens.address
-      const realitioAddress = realitio.address
-
-      const openingDateMoment = moment(resolution)
-
-      const transactions: Transaction[] = []
-      const txOptions: TxOptions = {}
-      await this.getGas(txOptions)
-
-      const fundingAmount = await this.subRelayFee(marketData.funding)
-
-      let collateral
-
-      if (marketData.collateral.address === pseudoNativeAssetAddress) {
-        // ultimately WETH will be the collateral if we fund with native ether
-        collateral = getWrapToken(networkId)
-
-        // we need to send the funding amount in native ether
-        if (!this.isSafeApp) {
-          txOptions.value = fundingAmount
-        }
-
-        // Step 0: Wrap ether
-        transactions.push({
-          to: collateral.address,
-          value: fundingAmount.toString(),
-        })
-      } else {
-        collateral = marketData.collateral
-      }
-
-      let questionId: string
-      if (loadedQuestionId) {
-        questionId = loadedQuestionId
-      } else {
-        // Step 1: Create question in realitio
-        transactions.push({
-          to: realitioAddress,
-          data: RealitioService.encodeAskQuestion(
-            question,
-            outcomes,
-            category,
-            arbitrator.address,
-            openingDateMoment,
-            networkId,
-          ),
-        })
-        questionId = await realitio.askQuestionConstant(
-          question,
-          outcomes,
-          category,
-          arbitrator.address,
-          openingDateMoment,
-          networkId,
-          this.cpk.address,
-        )
-      }
-      logger.log(`QuestionID ${questionId}`)
-
-      const oracleAddress = getContractAddress(networkId, 'oracle')
-      const conditionId = conditionalTokens.getConditionId(questionId, oracleAddress, outcomes.length)
-
-      let conditionExists = false
-      if (loadedQuestionId) {
-        conditionExists = await conditionalTokens.doesConditionExist(conditionId)
-      }
-
-      if (!conditionExists) {
-        // Step 2: Prepare condition
-        logger.log(`Adding prepareCondition transaction`)
-
-        transactions.push({
-          to: conditionalTokensAddress,
-          data: ConditionalTokenService.encodePrepareCondition(questionId, oracleAddress, outcomes.length),
-        })
-      }
-
-      logger.log(`ConditionID: ${conditionId}`)
-
-      // Step 3: Approve collateral for factory
-      transactions.push({
-        to: collateral.address,
-        data: ERC20Service.encodeApproveUnlimited(marketMakerFactory.address),
-      })
-
-      // Step 4: Transfer funding from user
-      if (!this.isSafeApp && marketData.collateral.address !== pseudoNativeAssetAddress) {
-        transactions.push({
-          to: collateral.address,
-          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, fundingAmount),
-        })
-      }
-
-      // Step 5: Create market maker
-      const saltNonce = Math.round(Math.random() * 1000000)
-      const predictedMarketMakerAddress = await marketMakerFactory.predictMarketMakerAddress(
-        saltNonce,
-        conditionalTokens.address,
-        collateral.address,
-        conditionId,
-        this.cpk.address,
-        spread,
-      )
-      logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
-      const distributionHint = calcDistributionHint(marketData.outcomes.map(o => o.probability))
-      transactions.push({
-        to: marketMakerFactory.address,
-        data: MarketMakerFactoryService.encodeCreateMarketMaker(
-          saltNonce,
-          conditionalTokens.address,
-          collateral.address,
-          conditionId,
-          spread,
-          fundingAmount,
-          distributionHint,
-        ),
-      })
-
+      const { predictedMarketMakerAddress, transactions, txOptions } = await pipe(
+        setup,
+        wrap,
+        approve,
+        transfer,
+        createQuestion,
+        prepareCondition,
+        createMarket,
+      )(this.getInput(params))
+      const { setTxHash, setTxState } = params
       const transaction = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
       return {
         transaction,

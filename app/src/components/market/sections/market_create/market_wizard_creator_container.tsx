@@ -56,23 +56,25 @@ const MarketWizardCreatorContainer: FC = () => {
         }
 
         if (isScalar) {
-          setMessage('Creating scalar market...')
-          const { marketMakerAddress } = await cpk.createScalarMarket({
-            marketData,
-            conditionalTokens,
-            realitio,
-            marketMakerFactory,
-            setTxHash,
-            setTxState,
-          })
-          await fetchBalances()
-          setMarketMakerAddress(marketMakerAddress)
-          setMarketCreationStatus(MarketCreationStatus.done())
-          history.replace(`/${marketMakerAddress}`)
+          // setMessage('Creating scalar market...')
+          // const { marketMakerAddress } = await cpk.createScalarMarket({
+          //   marketData,
+          //   conditionalTokens,
+          //   realitio,
+          //   marketMakerFactory,
+          //   setTxHash,
+          //   setTxState,
+          // })
+          // await fetchBalances()
+          // setMarketMakerAddress(marketMakerAddress)
+          // setMarketCreationStatus(MarketCreationStatus.done())
+          // history.replace(`/${marketMakerAddress}`)
         } else {
           setMessage('Creating categorical market...')
           const { marketMakerAddress } = await cpk.createMarket({
+            amount: marketData.funding,
             marketData,
+            collateral: marketData.collateral,
             conditionalTokens,
             realitio,
             marketMakerFactory,
