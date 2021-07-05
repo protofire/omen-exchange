@@ -9,6 +9,7 @@ import {
   useRealityLink,
 } from '../../../../hooks'
 import { GraphResponseLiquidityMiningCampaign } from '../../../../hooks/useGraphLiquidityMiningCampaigns'
+import { useTokenPrice } from '../../../../hooks/useTokenPrice'
 import { CompoundService } from '../../../../services/compound_service'
 import { StakingService } from '../../../../services/staking'
 import { getToken, networkIds } from '../../../../util/networks'
@@ -174,6 +175,8 @@ export const AdditionalMarketData: React.FC<Props> = props => {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address)
+
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
   useEffect(() => {
@@ -197,8 +200,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
         getToken(networkId, 'omn'),
         cpk?.address || '',
         1, // Assume pool token value is 1 DAI
-        // TODO: Replace hardcoded price param
-        1,
+        tokenPrice,
         Number(liquidityMiningCampaign.endsAt),
         liquidityMiningCampaign.rewardAmounts[0],
         Number(liquidityMiningCampaign.duration),
@@ -208,7 +210,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
     }
 
     cpk && liquidityMiningCampaign && fetchStakingData()
-  }, [cpk, cpk?.address, liquidityMiningCampaign, networkId, provider])
+  }, [cpk, cpk?.address, liquidityMiningCampaign, networkId, provider, tokenPrice])
 
   return (
     <AdditionalMarketDataWrapper>
