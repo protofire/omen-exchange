@@ -5,8 +5,6 @@ import { useEffect, useState } from 'react'
 
 import { Status } from '../util/types'
 
-import { GraphResponseFixedProductMarketMaker } from './useGraphMarketMakerData'
-
 const query = gql`
   query GetLiquidityMiningCampaignData {
     liquidityMiningCampaigns {

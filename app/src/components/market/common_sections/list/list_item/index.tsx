@@ -178,8 +178,6 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
       const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
 
-      const omnToken = getToken(networkId, 'omn')
-
       const { rewardApr } = await stakingService.getStakingData(
         getToken(networkId, 'omn'),
         cpk?.address || '',
@@ -194,7 +192,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     }
 
     cpk && liquidityMiningCampaign && fetchStakingData()
-  }, [cpk, cpk?.address, liquidityMiningCampaign, networkId, provider])
+  }, [cpk, cpk?.address, liquidityMiningCampaign, networkId, provider, tokenPrice])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
