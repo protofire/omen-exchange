@@ -28,7 +28,7 @@ const ChartTooltip = styled.div`
 `
 
 const TooltipTitle = styled.h4`
-  color: ${props => props.theme.text1};
+  color: ${props => props.theme.colors.textColorDark};
   font-size: 12px;
   font-weight: 500;
   line-height: 1.2;
@@ -48,7 +48,7 @@ const ButtonWrapper = styled.div`
 
 const Legend = styled.li`
   align-items: center;
-  color: ${props => props.theme.text4};
+  color: ${props => props.theme.colors.textColor};
   display: flex;
   font-size: 12px;
   font-weight: 400;
@@ -57,14 +57,14 @@ const Legend = styled.li`
   padding: 0;
 
   strong {
-    color: ${props => props.theme.text3};
+    color: ${props => props.theme.colors.textColorDarker};
     font-weight: 500;
     margin-right: 6px;
   }
 `
 const NoData = styled.div`
   align-items: center;
-  color: ${props => props.theme.text3};
+  color: ${props => props.theme.colors.textColorDarker};
   display: flex;
   font-size: 15px;
   font-weight: 400;
