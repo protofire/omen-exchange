@@ -27,7 +27,6 @@ import {
   waitForBlockToSync,
 } from '../util/networks'
 import {
-  calcAddFundingSendAmounts,
   calcDistributionHint,
   clampBigNumber,
   getBaseToken,
@@ -634,8 +633,7 @@ class CPKService {
 
       const stakingRewardsFactoryAddress = getContractAddress(networkId, 'stakingRewardsFactory')
       const omnTokenAddress = getToken(networkId, 'omn').address
-      // TODO: Lengthen time from execution to account for transaction execution time
-      const startingTimestamp = Math.floor(new Date().getTime() / 1000 + 120)
+      const startingTimestamp = Math.floor(new Date().getTime() / 1000)
       const endingTimestamp = Math.floor((marketData.resolution?.getTime() || 1) / 1000 - DAY_IN_SECONDS)
 
       // Step 6: Create staking distribution contract
@@ -900,8 +898,7 @@ class CPKService {
 
       const stakingRewardsFactoryAddress = getContractAddress(networkId, 'stakingRewardsFactory')
       const omnTokenAddress = getToken(networkId, 'omn').address
-      // TODO: Lengthen time from execution to account for transaction execution time
-      const startingTimestamp = Math.floor(new Date().getTime() / 1000 + 120)
+      const startingTimestamp = Math.floor(new Date().getTime() / 1000)
       const endingTimestamp = Math.floor((marketData.resolution?.getTime() || 1) / 1000 - DAY_IN_SECONDS)
 
       // Step 6: Create staking distribution contract
@@ -1837,8 +1834,6 @@ class CPKService {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
@@ -2067,8 +2062,6 @@ class CPKService {
     try {
       const signer = this.provider.getSigner()
       const account = await signer.getAddress()
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
 
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}

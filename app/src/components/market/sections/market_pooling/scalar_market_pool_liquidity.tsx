@@ -1,7 +1,7 @@
 import Big from 'big.js'
 import { Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
@@ -581,6 +581,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
   useEffect(() => {
     cpk && liquidityMiningCampaign && fetchStakingData()
+    // eslint-disable-next-line
   }, [cpk?.address, liquidityMiningCampaign, cpk])
 
   const unlockCollateral = async () => {
