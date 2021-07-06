@@ -98,10 +98,10 @@ export const pseudoNativeAssetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeE
 export const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
     label: 'Mainnet',
-    url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}11`,
+    url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
     alternativeUrls: [
       {
-        rpcUrl: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}11`,
+        rpcUrl: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
         name: 'Infura',
       },
       { rpcUrl: 'https://cloudflare-eth.com/', name: 'Cloudflare' },
@@ -145,10 +145,10 @@ export const networks: { [K in NetworkId]: Network } = {
   },
   [networkIds.RINKEBY]: {
     label: 'Rinkeby',
-    url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}1`,
+    url: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
     alternativeUrls: [
       {
-        rpcUrl: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}1`,
+        rpcUrl: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
         name: 'Infura',
       },
     ],
@@ -236,10 +236,10 @@ export const networks: { [K in NetworkId]: Network } = {
   },
   [networkIds.XDAI]: {
     label: 'xDai',
-    url: 'https://rpc.mikic.xdaichain.com/',
+    url: 'https://rpc.xdaichain.com/',
     alternativeUrls: [
       {
-        rpcUrl: 'https://rpc.mikic.xdaichain.com/',
+        rpcUrl: 'https://rpc.xdaichain.com/',
         name: 'xDai',
       },
       {
