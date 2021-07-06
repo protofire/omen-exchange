@@ -101,7 +101,7 @@ export const useTokens = (
 
         // setup multicall config
         const network = (networkNames as any)[context.networkId]
-        console.log('web3 connection handling')
+
         const config = {
           rpcUrl: getInfuraUrl(context.networkId),
           multicallAddress: (configs as any)[network.toLowerCase()].multicall,
@@ -159,7 +159,7 @@ export const useTokens = (
               return { ...token, balance, allowance }
             })
           } catch (e) {
-            console.log('here')
+            console.error('Error while fetching tokens: ', e)
           }
         }
 

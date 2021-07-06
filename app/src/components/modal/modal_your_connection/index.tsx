@@ -349,7 +349,7 @@ export const ModalYourConnection = (props: Props) => {
               />
             </ConnectionModalNavigation>
             <SettingsModalWrapper>
-              <SettingsViewContainer networkId={networkId} {...props} />
+              <SettingsViewContainer />
             </SettingsModalWrapper>
           </ContentWrapper>
         ) : (

@@ -114,37 +114,21 @@ const SettingsButtonWrapper = styled.div`
   width: 100%;
 `
 
-interface Props {
-  history?: any
-  networkId?: any
-  setStatus?: any
-}
-
-export const SettingsViewContainer = ({ networkId: chainID }: Props) => {
+export const SettingsViewContainer = () => {
   const { library } = useWeb3Context()
-
-  // const [networkId, setNetwork] = useState<number>(-1)
-  //console.log('this is network insude the settings ontainer used for displaying stuuf', networkId)
-  let networkId: any
   const chainId = (window as any).ethereum.chainId
   const initialRelayState =
     localStorage.getItem('relay') === 'false' || getNetworkFromChain(chainId) !== networkIds.MAINNET ? false : true
-  console.log('initiatedRelay state inside settings container', initialRelayState)
-  networkId = initialRelayState ? networkIds.XDAI : getNetworkFromChain(chainId)
-  console.log(networkId)
-  // const network = getNetworkFromChain(networkId.toString())
-  // console.log(network)
-  const checkIfReady = async () => {
-    const current = getNetworkFromChain(networkId.toString())
+  const [networkId, setNetworkId] = useState(initialRelayState ? networkIds.XDAI : getNetworkFromChain(chainId))
 
-    // setNetwork(current)
+  const checkIfReady = async () => {
     if (library) {
       await library.ready
 
       const initialRelayState =
         localStorage.getItem('relay') === 'false' || library.network.chainId !== networkIds.MAINNET ? false : true
 
-      networkId = initialRelayState ? networkIds.XDAI : library.network.chainId
+      setNetworkId(initialRelayState ? networkIds.XDAI : library.network.chainId)
     }
   }
 

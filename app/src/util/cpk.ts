@@ -18,7 +18,6 @@ import {
   getTargetSafeImplementation,
   networkIds,
 } from './networks'
-import { checkRpcStatus } from './tools'
 
 type Address = string
 
@@ -379,7 +378,6 @@ export const getRelayProvider = (
   networkId: number,
   library: any,
   account: string | null | undefined,
-  setStatus: any,
 ) => {
   try {
     // provider override if running as relay
@@ -408,9 +406,8 @@ export const getRelayProvider = (
         provider,
       }
     }
-  } catch {
-    console.log('Status changed to false inside getRelay Provider')
-    setStatus(false)
+  } catch (e) {
+    console.error('Error while getting relay provider: ', e)
   }
   return {
     address: account,

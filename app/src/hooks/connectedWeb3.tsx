@@ -6,8 +6,8 @@ import { CPKService } from '../services'
 import connectors from '../util/connectors'
 import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
-import { networkIds } from '../util/networks'
-import { getNetworkFromChain } from '../util/tools'
+import { getInfuraUrl, networkIds } from '../util/networks'
+import { checkRpcStatus, getNetworkFromChain } from '../util/tools'
 
 import { ConnectedBalance, useBalance } from './useBalance'
 import { useCpk } from './useCpk'
@@ -85,13 +85,13 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     if (networkId) {
       const enableRelay = context.connectorName !== 'Safe' || debugAddress !== ''
-      const { address, isRelay, netId, provider } = getRelayProvider(
-        relay && enableRelay,
-        networkId,
-        library,
-        account,
+      checkRpcStatus(
+        getInfuraUrl(relay ? networkIds.XDAI : networkId),
         props.setStatus,
+        relay ? networkIds.XDAI : networkId,
       )
+
+      const { address, isRelay, netId, provider } = getRelayProvider(relay && enableRelay, networkId, library, account)
 
       const value = {
         setStatus: props.setStatus,
@@ -175,7 +175,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     setStatus: props.setStatus,
   }
   props.setStatus(true)
-  console.log('web3 INTITIATED')
+
   return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
 }
 

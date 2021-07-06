@@ -69,9 +69,6 @@ export const formatDate = (date: Date, utcAdd = true): string => {
 
 export const checkRpcStatus = async (customUrl: string, setStatus: any, network: any) => {
   try {
-    console.log('WENT INSIDE CHECK RPC STATUS AND FUCKING PAASWED IT')
-    console.log(customUrl, 'URL INSIDDE CHECK')
-    console.log(network, 'networkd insud echeck')
     const response = await axios.post(
       customUrl,
       {
@@ -83,7 +80,6 @@ export const checkRpcStatus = async (customUrl: string, setStatus: any, network:
     )
 
     if (response.data.error || +response.data.result !== network) {
-      console.log('status changed inside checkRPC status to false ')
       setStatus(false)
       return false
     }
@@ -91,7 +87,6 @@ export const checkRpcStatus = async (customUrl: string, setStatus: any, network:
     setStatus(true)
     return true
   } catch (e) {
-    console.log(e, 'status changed to false inside second chck rpc function')
     setStatus(false)
 
     return false
