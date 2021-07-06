@@ -287,8 +287,7 @@ const HeaderContainer: React.FC = (props: any) => {
             <>
               <ButtonCreateDesktop {...exitButtonProps}>
                 <CloseIconWrapper>
-                  {/* I changed and kept that one to show you a testing example, try it out */}
-                  <IconClose hoverEffect />
+                  <IconClose />
                 </CloseIconWrapper>
 
                 <span>Exit</span>
