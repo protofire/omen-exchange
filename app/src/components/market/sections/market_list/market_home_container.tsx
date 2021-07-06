@@ -62,15 +62,15 @@ const TextTitle = styled.div`
 `
 const TextDescription = styled.div`
   margin-top: 8px;
-  color: ${props => props.theme.colors.textColorLighter};
+  color: ${props => props.theme.text2};
   line-height: 19px;
 `
 const Link = styled.a`
-  color: ${props => props.theme.colors.clickable};
+  color: ${props => props.theme.primary2};
   text-decoration: underline;
 
   &:hover {
-    color: ${props => props.theme.buttonSecondary.color};
+    color: ${props => props.theme.primary3};
   }
 `
 const IconCloseWrapped = styled(IconClose)`

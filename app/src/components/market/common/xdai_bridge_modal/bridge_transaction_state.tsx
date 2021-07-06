@@ -30,7 +30,7 @@ const SvgWrapper = styled.div`
   margin-bottom: 25px;
 `
 const BoldedText = styled.div`
-  color: ${props => props.theme.colors.textColorDark};
+  color: ${props => props.theme.text1};
   font-family: Roboto;
   font-weight: 500;
   font-size: 14px;
@@ -45,10 +45,10 @@ const ChainText = styled.div`
   margin-bottom: 16px;
 `
 const TransactionText = styled.div`
-  color: ${props => props.theme.colors.textColor};
+  color: ${props => props.theme.text4};
 `
 const TransactionLink = styled.a`
-  color: ${props => props.theme.colors.clickable};
+  color: ${props => props.theme.primary2};
 `
 const IconWrapper = styled.div`
   color: ${props => props.theme.green};
