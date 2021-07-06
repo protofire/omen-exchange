@@ -29,6 +29,7 @@ export function colors(darkMode: boolean): Colors {
     border1: darkMode ? '' : '#DCDFF2',
     border2: darkMode ? '' : '#C5CAE9',
     border3: darkMode ? '' : '#9FA8DA',
+    border4: darkMode ? '' : '#ECEFF1',
   }
 }
 const theme = {
@@ -244,7 +245,6 @@ const theme = {
       },
     },
   },
-
   wrapperModalStyle: {
     content: {
       backgroundColor: '#fff',
