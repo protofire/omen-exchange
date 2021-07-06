@@ -464,24 +464,6 @@ export enum MarketState {
   none = '',
 }
 
-export enum CompoundTokenType {
-  cdai = 'cdai',
-  cusdc = 'cusdc',
-  cusdt = 'cusdt',
-  cuni = 'cuni',
-  cbat = 'cbat',
-  ceth = 'ceth',
-}
-
-export enum CompoundEnabledTokenType {
-  dai = 'dai',
-  usdc = 'usdc',
-  usdt = 'usdt',
-  uni = 'uni',
-  bat = 'bat',
-  eth = 'eth',
-}
-
 export const INVALID_ANSWER_ID = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 export enum FormState {

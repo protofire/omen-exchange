@@ -106,8 +106,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
 
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
-  const [amountToFundNormalized, setAmountToFundNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
-  const [amountToRemoveNormalized, setAmountToRemoveNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
@@ -223,7 +221,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setIsTransactionModalOpen(true)
 
       await cpk.addFunding({
-        amount: amountToFundNormalized || Zero,
+        amount: amountToFund || Zero,
         collateral,
         marketMaker,
         setTxHash,
@@ -237,7 +235,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setAmountToFund(null)
       setAmountToFundDisplay('')
-      setAmountToFundNormalized(null)
       setMessage(`Successfully deposited ${formatNumber(fundsAmount)} ${collateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
@@ -281,7 +278,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
-      setAmountToRemoveNormalized(null)
       setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${collateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
@@ -333,16 +329,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     currentDate > resolutionDate ||
     isNegativeAmountToFund
 
-  const setDisplayCollateralAmountToFund = (value: BigNumber) => {
-    setAmountToFund(value)
-    setAmountToFundNormalized(value)
-  }
-
-  const setWithdrawAmountToRemove = (withdrawAmount: BigNumber) => {
-    setAmountToRemove(withdrawAmount)
-    setAmountToRemoveNormalized(withdrawAmount)
-  }
-
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 
   const sharesAmountError = isTransactionProcessing
@@ -351,20 +337,20 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     ? null
     : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
     ? `Insufficient balance`
-    : amountToRemoveNormalized?.gt(fundingBalance)
+    : amountToRemove?.gt(fundingBalance)
     ? `Value must be less than or equal to ${sharesBalance} pool shares`
     : null
 
   const disableWithdrawButton =
     !amountToRemove ||
     amountToRemove?.isZero() ||
-    amountToRemoveNormalized?.gt(fundingBalance) ||
+    amountToRemove?.gt(fundingBalance) ||
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 
   const switchTab = (tab: Tabs) => {
     setAmountToFund(new BigNumber('0'))
-    setWithdrawAmountToRemove(new BigNumber('0'))
+    setAmountToRemove(new BigNumber('0'))
     setActiveTab(tab)
   }
 
@@ -423,11 +409,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                     decimals={collateral.decimals}
                     name="amountToFund"
                     onChange={(e: BigNumberInputReturn) => {
-                      setDisplayCollateralAmountToFund(e.value)
+                      setAmountToFund(e.value)
                       setAmountToFundDisplay('')
                     }}
                     style={{ width: 0 }}
-                    value={amountToFundNormalized}
+                    value={amountToFund}
                     valueToDisplay={amountToFundDisplay}
                   />
                 }
@@ -452,11 +438,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                     decimals={collateral.decimals}
                     name="amountToRemove"
                     onChange={(e: BigNumberInputReturn) => {
-                      setWithdrawAmountToRemove(e.value)
+                      setAmountToRemove(e.value)
                       setAmountToRemoveDisplay('')
                     }}
                     style={{ width: 0 }}
-                    value={amountToRemoveNormalized}
+                    value={amountToRemove}
                     valueToDisplay={amountToRemoveDisplay}
                   />
                 }

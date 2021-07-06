@@ -1,14 +1,12 @@
-import { BigNumber, parseUnits } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 import momentTZ from 'moment-timezone'
 import React, { DOMAttributes, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useSymbol, useTokens } from '../../../../hooks'
-import { CompoundService } from '../../../../services'
-import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../util/networks'
-import { formatBigNumber, formatDate, formatToShortNumber, getBaseTokenForCToken } from '../../../../util/tools'
-import { CompoundTokenType, Token } from '../../../../util/types'
+import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
+import { formatBigNumber, formatDate, formatToShortNumber } from '../../../../util/tools'
+import { Token } from '../../../../util/types'
 import { TextToggle } from '../TextToggle'
 
 const MarketDataWrapper = styled.div`
@@ -67,7 +65,6 @@ const MarketDataItemImage = styled.img`
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   collateralVolume: BigNumber
-  compoundService: CompoundService | null
   liquidity: string
   resolutionTimestamp: Date
   runningDailyVolumeByHour: BigNumber[]
@@ -81,7 +78,6 @@ export const MarketData: React.FC<Props> = props => {
   const {
     answerFinalizedTimestamp,
     collateralVolume,
-    compoundService,
     currency,
     isFinalize = false,
     lastActiveDay,
@@ -91,7 +87,6 @@ export const MarketData: React.FC<Props> = props => {
   } = props
 
   const context = useConnectedWeb3Context()
-  const { networkId, relay } = context
   const { tokens } = useTokens(context)
   const [currencyIcon, setCurrencyIcon] = useState<string | undefined>('')
   const [showUTC, setShowUTC] = useState<boolean>(true)
@@ -111,46 +106,21 @@ export const MarketData: React.FC<Props> = props => {
       : new BigNumber('0')
 
   const dailyVolume = formatBigNumber(dailyVolumeValue, currency.decimals)
-
   const totalVolume = formatBigNumber(collateralVolume, currency.decimals)
 
-  let displayDailyVolume = dailyVolume
-  let displayTotalVolume = totalVolume
-  let displayLiquidity = liquidity
-  let baseCurrency = currency
-  const currencySymbol = currency.symbol.toLowerCase()
-  if (compoundService && currencySymbol in CompoundTokenType) {
-    const nativeCompoundAsset = getNativeCompoundAsset(networkId)
-    if (currencySymbol === nativeCompoundAsset.symbol.toLowerCase()) {
-      baseCurrency = getNativeAsset(networkId, relay)
-    } else {
-      const baseCurrencySymbol = getBaseTokenForCToken(currency.symbol) as KnownToken
-      baseCurrency = getToken(networkId, baseCurrencySymbol)
-    }
-    const displayTotalVolumeValue = compoundService.calculateCTokenToBaseExchange(baseCurrency, collateralVolume)
-    displayTotalVolume = formatBigNumber(displayTotalVolumeValue, baseCurrency.decimals)
-
-    const liquidityRaw = parseUnits(liquidity, currency.decimals)
-    const baseTokenLiquidityRaw = compoundService.calculateCTokenToBaseExchange(baseCurrency, liquidityRaw)
-    displayLiquidity = formatBigNumber(baseTokenLiquidityRaw, baseCurrency.decimals)
-
-    const baseDailyVolumeValue = compoundService.calculateCTokenToBaseExchange(baseCurrency, dailyVolumeValue)
-    displayDailyVolume = formatBigNumber(baseDailyVolumeValue, baseCurrency.decimals)
-  }
-  const symbol = useSymbol(baseCurrency)
   return (
     <MarketDataWrapper>
       <MarketDataItem>
         <MarketDataItemTop>
-          {formatToShortNumber(displayLiquidity)} {symbol}
+          {formatToShortNumber(liquidity)} {currency.symbol}
         </MarketDataItemTop>
         <MarketDataItemBottom>Liquidity</MarketDataItemBottom>
       </MarketDataItem>
       <MarketDataItem>
         <MarketDataItemTop>
           <MarketDataItemImage src={currencyIcon && currencyIcon}></MarketDataItemImage>
-          {show24H ? formatToShortNumber(displayDailyVolume) : formatToShortNumber(displayTotalVolume)}
-          &nbsp;{symbol}
+          {show24H ? formatToShortNumber(dailyVolume) : formatToShortNumber(totalVolume)}
+          &nbsp;{currency.symbol}
         </MarketDataItemTop>
         <TextToggle
           alternativeLabel="24h Volume"

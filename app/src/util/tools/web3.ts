@@ -2,8 +2,8 @@ import Big from 'big.js'
 import { BigNumber, getAddress, parseUnits } from 'ethers/utils'
 
 import { getLogger } from '../logger'
-import { getContractAddress, getNativeAsset, getToken, getWrapToken } from '../networks'
-import { CompoundEnabledTokenType, CompoundTokenType, Token } from '../types'
+import { getContractAddress, getNativeAsset, getWrapToken } from '../networks'
+import { Token } from '../types'
 
 import { strip0x } from './string_manipulation'
 const logger = getLogger('Tools')
@@ -41,50 +41,10 @@ export const isContract = async (provider: any, address: string): Promise<boolea
 }
 
 /**
- * Gets the corresponding cToken for a given token symbol.
- * Empty string if corresponding cToken doesn't exist
- */
-export const getCTokenForToken = (token: string): string => {
-  const tokenSymbol = token.toLowerCase()
-  if (tokenSymbol in CompoundEnabledTokenType) {
-    return `c${tokenSymbol}`
-  } else {
-    return ''
-  }
-}
-
-export const isCToken = (symbol: string): boolean => {
-  const tokenSymbol = symbol.toLowerCase()
-  if (tokenSymbol in CompoundTokenType) {
-    return true
-  }
-  return false
-}
-
-/**
- * Gets base token symbol for a given ctoken
- */
-export const getBaseTokenForCToken = (token: string): string => {
-  const tokenSymbol = token.toLowerCase()
-  if (tokenSymbol.startsWith('c')) {
-    return tokenSymbol.substring(1, tokenSymbol.length)
-  }
-  return ''
-}
-
-export const getBaseToken = (networkId: number, symbol: string): Token => {
-  const baseTokenSymbol = getBaseTokenForCToken(symbol)
-  if (baseTokenSymbol === 'eth') {
-    return getNativeAsset(networkId)
-  }
-  return getToken(networkId, baseTokenSymbol as KnownToken)
-}
-
-/**
  *  Gets initial display collateral
  */
 export const getInitialCollateral = (networkId: number, collateral: Token, relay = false): Token => {
-  if (collateral.address === getWrapToken(networkId).address) {
+  if (collateral.address.toLowerCase() === getWrapToken(networkId).address.toLowerCase()) {
     return getNativeAsset(networkId, relay)
   } else {
     return collateral

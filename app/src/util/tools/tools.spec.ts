@@ -15,8 +15,6 @@ import {
   formatNumber,
   formatTimestampToDate,
   formatToShortNumber,
-  getBaseTokenForCToken,
-  getCTokenForToken,
   getIndexSets,
   getInitialCollateral,
   getNetworkFromChain,
@@ -360,28 +358,6 @@ describe('tools', () => {
     for (const [[value, sd], result] of testCases) {
       const significantDigitValue = roundNumberStringToSignificantDigits(value, sd)
       expect(result).toStrictEqual(significantDigitValue)
-    }
-  })
-
-  describe('getCTokenForToken', () => {
-    const testCases: [[string], string][] = [
-      [['eth'], 'ceth'],
-      [['abc'], ''],
-    ]
-    for (const [[value], result] of testCases) {
-      const cTokenValue = getCTokenForToken(value)
-      expect(result).toStrictEqual(cTokenValue)
-    }
-  })
-
-  describe('getBaseTokenForCToken', () => {
-    const testCases: [[string], string][] = [
-      [['ceth'], 'eth'],
-      [['abc'], ''],
-    ]
-    for (const [[value], result] of testCases) {
-      const cTokenValue = getBaseTokenForCToken(value)
-      expect(result).toStrictEqual(cTokenValue)
     }
   })
 
