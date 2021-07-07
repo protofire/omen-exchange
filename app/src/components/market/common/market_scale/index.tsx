@@ -289,6 +289,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const collateral = props.collateral ? getInitialCollateral(networkId, props.collateral, relay) : null
   const lowerBoundNumber = lowerBound && Number(formatBigNumber(lowerBound, STANDARD_DECIMALS))
   const upperBoundNumber = upperBound && Number(formatBigNumber(upperBound, STANDARD_DECIMALS))
+  console.log('CHEKCJSKJASKDFJAKJF', lowerBoundNumber)
+  console.log(upperBoundNumber)
   const startingPointNumber =
     startingPoint && Number(formatBigNumber(startingPoint || new BigNumber(0), STANDARD_DECIMALS))
 
