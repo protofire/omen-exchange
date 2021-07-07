@@ -45,13 +45,13 @@ export const SetAllowance: React.FC<SetAllowanceProps> = (props: SetAllowancePro
 
   return (
     <Wrapper {...restProps}>
-      <Title>{collateral ? 'Set Allowance' : 'Enable Markets'}</Title>
+      <Title>{collateral ? 'Set Allowance' : 'Upgrade Omen Account'}</Title>
       <DescriptionWrapper>
         <Description>
           {collateral
             ? `This permission allows the smart contracts to interact with your ${collateral &&
                 collateral.symbol}. This has to be done for each new token.`
-            : `This permission allows you to interact with market contracts.`}
+            : `A new version of the Omen account smart contract is available. Upgrade your Omen account now.`}
         </Description>
         <ToggleTokenLock finished={finished} loading={loading} onUnlock={onUnlock} />
       </DescriptionWrapper>
