@@ -229,7 +229,7 @@ export const ModalConnectWallet = (props: Props) => {
         isOpen={!context.account && isOpen && !connectingToWalletConnect}
         onRequestClose={onClickCloseButton}
         shouldCloseOnOverlayClick={!isConnectingToWallet}
-        style={{ ...theme.fixedHeightModal, content: { ...theme.fluidHeightModal.content, minHeight: '510px' } }}
+        style={theme.fixedHeightModal}
       >
         <ContentWrapper>
           <ModalNavigation>
