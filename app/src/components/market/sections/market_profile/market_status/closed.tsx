@@ -298,7 +298,7 @@ const Wrapper = (props: Props) => {
       await cpk.redeemPositions({
         isConditionResolved,
         // Round down in case of precision error
-        earnedCollateral: earnedCollateral ? earnedCollateral.mul(99999999).div(100000000) : new BigNumber('0'),
+        amount: earnedCollateral ? earnedCollateral.mul(99999999).div(100000000) : new BigNumber('0'),
         question,
         numOutcomes: balances.length,
         oracle,
@@ -306,7 +306,7 @@ const Wrapper = (props: Props) => {
         isScalar,
         scalarLow,
         scalarHigh,
-        collateralToken,
+        collateral: collateralToken,
         marketMaker,
         conditionalTokens,
         realitioBalance: cpkRealitioBalance,

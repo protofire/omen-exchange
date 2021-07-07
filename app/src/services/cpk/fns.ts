@@ -4,14 +4,22 @@ import moment from 'moment'
 
 import { Transaction } from '../../util/cpk'
 import { getLogger } from '../../util/logger'
-import { getContractAddress, getWrapToken, pseudoNativeAssetAddress } from '../../util/networks'
+import {
+  getContractAddress,
+  getNativeAsset,
+  getTokenFromAddress,
+  getWrapToken,
+  pseudoNativeAssetAddress,
+} from '../../util/networks'
 import { calcDistributionHint, clampBigNumber } from '../../util/tools'
-import { MarketData, Token, TransactionStep } from '../../util/types'
+import { MarketData, Question, Token, TransactionStep } from '../../util/types'
 import { ConditionalTokenService } from '../conditional_token'
 import { ERC20Service } from '../erc20'
 import { MarketMakerService } from '../market_maker'
 import { MarketMakerFactoryService } from '../market_maker_factory'
+import { OracleService } from '../oracle'
 import { RealitioService } from '../realitio'
+import { UnwrapTokenService } from '../unwrap_token'
 
 import { CPKService, TxOptions } from './cpk'
 
@@ -33,10 +41,11 @@ const getMarketCollateral = (token: Token, networkId: number) => {
 
 interface SetupParams {
   service: CPKService
+  collateral: Maybe<Token>
 }
 
 export const setup = async (params: SetupParams) => {
-  const { service } = params
+  const { collateral, service } = params
 
   // account
   const signer = service.provider.getSigner()
@@ -52,7 +61,15 @@ export const setup = async (params: SetupParams) => {
   // tx options
   const txOptions: TxOptions = {}
 
-  return { ...params, account, networkId, transactions, txOptions }
+  // tokens
+  const wrapper = getWrapToken(networkId)
+  const native = getNativeAsset(networkId)
+
+  // wrapping
+  const wrap = collateral ? collateral.address.toLowerCase() === native.address.toLowerCase() : false
+  const unwrap = collateral ? collateral.address.toLowerCase() === wrapper.address.toLowerCase() : false
+
+  return { ...params, account, native, networkId, transactions, txOptions, wrapper, wrap, unwrap }
 }
 
 interface ExecParams {
@@ -107,17 +124,44 @@ interface WrapParams {
   service: CPKService
   transactions: Transaction[]
   txOptions: TxOptions
+  wrap: boolean
+  wrapper: Token
 }
 
 export const wrap = async (params: WrapParams) => {
-  const { amount, collateral, networkId, service, transactions, txOptions } = params
-  if (collateral.address.toLowerCase() === pseudoNativeAssetAddress.toLowerCase()) {
+  const { amount, service, transactions, txOptions, wrap, wrapper } = params
+  if (wrap) {
     if (!service.isSafeApp) {
       txOptions.value = amount
     }
     transactions.push({
-      to: getWrapToken(networkId).address,
+      to: wrapper.address,
       value: amount.toString(),
+    })
+  }
+
+  return params
+}
+
+/**
+ * Unwrap the input amount if required
+ */
+
+interface UnwrapParams {
+  amount: BigNumber
+  collateral: Token
+  transactions: Transaction[]
+  networkId: number
+  unwrap: boolean
+}
+
+export const unwrap = async (params: UnwrapParams) => {
+  const { amount, collateral, transactions, unwrap } = params
+  if (unwrap && !amount.isZero()) {
+    const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateral.symbol, amount)
+    transactions.push({
+      to: collateral.address,
+      data: encodedWithdrawFunction,
     })
   }
 
@@ -149,25 +193,85 @@ export const approve = async (params: ApproveParams) => {
 }
 
 /**
- * Transfer the collateral amount to the CPK if required
+ * Set approval for the market maker to access conditional tokens
  */
 
-interface TransferParams {
+interface ApproveConditionalTokensParams {
+  conditionalTokens: ConditionalTokenService
+  marketMaker: MarketMakerService
+  service: CPKService
+  transactions: Transaction[]
+}
+
+export const approveConditionalTokens = async (params: ApproveConditionalTokensParams) => {
+  const { conditionalTokens, marketMaker, service, transactions } = params
+  const isAlreadyApprovedForMarketMaker = await conditionalTokens.isApprovedForAll(
+    service.cpk.address,
+    marketMaker.address,
+  )
+
+  if (!isAlreadyApprovedForMarketMaker) {
+    transactions.push({
+      to: conditionalTokens.address,
+      data: ConditionalTokenService.encodeSetApprovalForAll(marketMaker.address, true),
+    })
+  }
+
+  return params
+}
+
+/**
+ * Deposit the collateral amount to the CPK if required
+ */
+
+interface DepositParams {
   account: string
   amount: BigNumber
   collateral: Token
   service: CPKService
   transactions: Transaction[]
+  wrap: boolean
 }
 
-export const transfer = async (params: TransferParams) => {
-  const { account, amount, collateral, service, transactions } = params
-  if (!service.isSafeApp && collateral.address !== pseudoNativeAssetAddress) {
+export const deposit = async (params: DepositParams) => {
+  const { account, amount, collateral, service, transactions, wrap } = params
+  if (!service.isSafeApp && !wrap) {
     // Step 2: Transfer the amount of collateral being spent from the user to the CPK
     transactions.push({
       to: collateral.address,
       data: ERC20Service.encodeTransferFrom(account, service.cpk.address, amount),
     })
+  }
+  return params
+}
+
+/**
+ * Withdraw the collateral amount from the CPK if required
+ */
+
+interface WithdrawParams {
+  account: string
+  amount: BigNumber
+  collateral: Token
+  service: CPKService
+  transactions: Transaction[]
+  unwrap: boolean
+}
+
+export const withdraw = async (params: WithdrawParams) => {
+  const { account, amount, collateral, service, transactions, unwrap } = params
+  if (!service.isSafeApp && !amount.isZero()) {
+    if (unwrap) {
+      transactions.push({
+        to: account,
+        value: amount.toString(),
+      })
+    } else {
+      transactions.push({
+        to: collateral.address,
+        data: ERC20Service.encodeTransfer(account, amount),
+      })
+    }
   }
   return params
 }
@@ -195,6 +299,118 @@ export const buy = async (params: BuyParams) => {
     data: MarketMakerService.encodeBuy(amount, outcomeIndex, outcomeTokensToBuy),
   })
 
+  return params
+}
+
+/**
+ * Sell from the market maker with the input amount
+ */
+
+interface SellParams {
+  amount: BigNumber
+  marketMaker: MarketMakerService
+  transactions: Transaction[]
+  outcomeIndex: number
+}
+
+export const sell = async (params: SellParams) => {
+  const { amount, marketMaker, outcomeIndex, transactions } = params
+  const outcomeTokensToSell = await marketMaker.calcSellAmount(amount, outcomeIndex)
+
+  transactions.push({
+    to: marketMaker.address,
+    data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
+  })
+
+  return params
+}
+
+/**
+ * Fund the market maker with the input amount
+ */
+
+interface AddFundsParams {
+  amount: BigNumber
+  marketMaker: MarketMakerService
+  transactions: Transaction[]
+}
+
+export const addFunds = async (params: AddFundsParams) => {
+  const { amount, marketMaker, transactions } = params
+  transactions.push({
+    to: marketMaker.address,
+    data: MarketMakerService.encodeAddFunding(amount),
+  })
+  return params
+}
+
+/**
+ * Remove funds from the market maker
+ */
+
+interface RemoveFundsParams {
+  amountToMerge: BigNumber
+  collateral: Token
+  conditionId: string
+  conditionalTokens: ConditionalTokenService
+  marketMaker: MarketMakerService
+  outcomesCount: number
+  transactions: Transaction[]
+  sharesToBurn: BigNumber
+}
+
+export const removeFunds = async (params: RemoveFundsParams) => {
+  const {
+    amountToMerge,
+    collateral,
+    conditionId,
+    conditionalTokens,
+    marketMaker,
+    outcomesCount,
+    sharesToBurn,
+    transactions,
+  } = params
+
+  transactions.push({
+    to: marketMaker.address,
+    data: MarketMakerService.encodeRemoveFunding(sharesToBurn),
+  })
+
+  transactions.push({
+    to: conditionalTokens.address,
+    data: ConditionalTokenService.encodeMergePositions(collateral.address, conditionId, outcomesCount, amountToMerge),
+  })
+
+  return params
+}
+
+/**
+ * Withdraw balance from realitio
+ */
+
+interface WithdrawRealitioParams {
+  account: string
+  networkId: number
+  realitioBalance: BigNumber
+  service: CPKService
+  transactions: Transaction[]
+}
+
+export const withdrawRealitioBalance = async (params: WithdrawRealitioParams) => {
+  const { account, networkId, realitioBalance, service, transactions } = params
+  // If user has realitio balance, withdraw
+  if (!realitioBalance.isZero()) {
+    transactions.push({
+      to: getContractAddress(networkId, 'realitio'),
+      data: RealitioService.encodeWithdraw(),
+    })
+    if (!service.isSafeApp) {
+      transactions.push({
+        to: account,
+        value: realitioBalance.toString(),
+      })
+    }
+  }
   return params
 }
 
@@ -346,14 +562,117 @@ export const prepareCondition = async (params: PrepareConditionParams) => {
 }
 
 /**
+ * Resolve condition
+ */
+
+interface ResolveConditionParams {
+  isConditionResolved: boolean
+  isScalar: boolean
+  numOutcomes: number
+  oracle: OracleService
+  question: Question
+  realitio: RealitioService
+  scalarLow: Maybe<BigNumber>
+  scalarHigh: Maybe<BigNumber>
+  transactions: Transaction[]
+}
+
+export const resolveCondition = async (params: ResolveConditionParams) => {
+  const {
+    isConditionResolved,
+    isScalar,
+    numOutcomes,
+    oracle,
+    question,
+    realitio,
+    scalarHigh,
+    scalarLow,
+    transactions,
+  } = params
+
+  if (!isConditionResolved) {
+    if (isScalar && scalarLow && scalarHigh) {
+      transactions.push({
+        to: realitio.scalarContract.address,
+        data: RealitioService.encodeResolveCondition(question.id, question.raw, scalarLow, scalarHigh),
+      })
+    } else {
+      transactions.push({
+        to: oracle.address,
+        data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
+      })
+    }
+  }
+
+  return params
+}
+
+/**
+ * Claim winnings
+ */
+
+interface ClaimWinningsParams {
+  isConditionResolved: boolean
+  question: Question
+  realitio: RealitioService
+  transactions: Transaction[]
+}
+
+export const claimWinnings = async (params: ClaimWinningsParams) => {
+  const { isConditionResolved, question, realitio, transactions } = params
+
+  if (!isConditionResolved) {
+    const data = await realitio.encodeClaimWinnings(question.id)
+    if (data) {
+      transactions.push({
+        to: realitio.contract.address,
+        data,
+      })
+    }
+  }
+
+  return params
+}
+
+/**
+ * Redeem position
+ */
+
+interface RedeemPositionParams {
+  amount: BigNumber
+  conditionalTokens: ConditionalTokenService
+  collateral: Token
+  isConditionResolved: boolean
+  question: Question
+  numOutcomes: number
+  marketMaker: MarketMakerService
+  realitio: RealitioService
+  transactions: Transaction[]
+}
+
+export const redeemPosition = async (params: RedeemPositionParams) => {
+  const { amount, collateral, conditionalTokens, marketMaker, numOutcomes, transactions } = params
+
+  const conditionId = await marketMaker.getConditionId()
+  if (!amount.isZero()) {
+    transactions.push({
+      to: conditionalTokens.address,
+      data: ConditionalTokenService.encodeRedeemPositions(collateral.address, conditionId, numOutcomes),
+    })
+  }
+
+  return params
+}
+
+/**
  * Create market maker
  */
 
 interface CreateMarketParams {
   amount: BigNumber
   conditionId: string
-  conditionalTokens: ConditionalTokenService
   collateral: Token
+  conditionalTokens: ConditionalTokenService
   marketData: MarketData
   marketMakerFactory: MarketMakerFactoryService
   realitio: RealitioService
@@ -375,6 +694,7 @@ export const createMarket = async (params: CreateMarketParams) => {
     service,
     transactions,
   } = params
+
   const { lowerBound, outcomes, spread, startingPoint, upperBound } = marketData
 
   if (isScalar) {
@@ -437,14 +757,59 @@ export const createMarket = async (params: CreateMarketParams) => {
 }
 
 /**
- * Wrangle market data to match common inputs
+ * Wrangle Functions
+ * The purpose of wrangle functions is to transform params into common inputs other functions depend on
+ * collateral: The collateral the market maker is using
+ * amount: The amount we are selling/buying
+ * unwrap: If we need to unwrap this asset
  */
 
-interface WrangleMarketDataParams {
+/**
+ * Wrangle create market data
+ */
+
+interface WrangleCreateMarketParams {
   marketData: MarketData
 }
 
-export const wrangleMarketData = async (params: WrangleMarketDataParams) => {
+export const wrangleCreateMarketParams = async (params: WrangleCreateMarketParams) => {
   const { marketData } = params
   return { ...params, amount: marketData.funding, collateral: marketData.collateral }
+}
+
+/**
+ * Wrangle sell input data
+ */
+
+interface WrangleSellParams {
+  marketData: MarketData
+  marketMaker: MarketMakerService
+  networkId: number
+}
+
+export const wrangleSellParams = async (params: WrangleSellParams) => {
+  const { marketMaker, networkId } = params
+  const collateralAddress = await marketMaker.getCollateralToken()
+  const collateral = getTokenFromAddress(networkId, collateralAddress)
+  return { ...params, collateral }
+}
+
+/**
+ * Wrangle remove funds input data
+ */
+
+interface WrangleRemoveFundsParams {
+  amountToMerge: BigNumber
+  earnings: BigNumber
+  marketData: MarketData
+  marketMaker: MarketMakerService
+  networkId: number
+}
+
+export const wrangleRemoveFundsParams = async (params: WrangleRemoveFundsParams) => {
+  const { amountToMerge, earnings, marketMaker, networkId } = params
+  const collateralAddress = await marketMaker.getCollateralToken()
+  const collateral = getTokenFromAddress(networkId, collateralAddress)
+  const amount = amountToMerge.add(earnings)
+  return { ...params, amount, collateral, unwrap }
 }
