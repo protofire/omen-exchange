@@ -14,6 +14,7 @@ import { ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
 import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../form/dropdown'
 import { IconAdd, IconClose, IconOmen } from '../../icons'
+import { IconSettings } from '../../icons/IconSettings'
 
 export const HeaderWrapper = styled.div`
   align-items: center;
@@ -356,6 +357,13 @@ const HeaderContainer: React.FC = (props: any) => {
               <Network claim={false} />
             </HeaderButton>
           )}
+          <ButtonSettings
+            disabled={!hasRouter}
+            {...exitButtonProps}
+            onClick={() => history && history.push('/settings')}
+          >
+            <IconSettings />
+          </ButtonSettings>
         </ContentsRight>
         <ModalYourConnectionWrapper
           arrayOfClaimableBalances={arrayOfClaimableTokenBalances}
