@@ -10,12 +10,11 @@ import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from
 import { KnownTokenValue, Token, TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
-import { IconArrowBack, IconClose, IconMetaMask, IconSettings, IconWalletConnect } from '../../common/icons'
+import { IconClose, IconMetaMask, IconWalletConnect } from '../../common/icons'
 import { IconChevronDown } from '../../common/icons/IconChevronDown'
 import { IconChevronUp } from '../../common/icons/IconChevronUp'
 import { IconJazz } from '../../common/icons/IconJazz'
 import { Image } from '../../market/common/token_item'
-import SettingsViewContainer from '../../settings/settings_view'
 import {
   BalanceItem,
   BalanceItemBalance,
@@ -73,7 +72,7 @@ const AccountInfo = styled.div`
   margin-left: 12px;
 `
 const StrongText = styled.div`
-  font-weight: ${props => props.theme.textfield.fontweight};
+  font-weight: 500;
   font-size: ${props => props.theme.fonts.defaultSize};
   line-height: 14.06px;
   color: ${props => props.theme.textfield.color};
@@ -103,26 +102,18 @@ const AccountInfoAddress = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorDark};
   margin: 0;
-  line-height: ${props => props.theme.fonts.defaultLineHeight}
-  letter-spacing: 0.2px;
-  
 `
 
 const AccountInfoWallet = styled.p`
   font-size: 12px;
   color: ${props => props.theme.colors.textColorLighter};
   margin: 0;
-  line-height: 14px;
-  margin: 4px 0px;
 `
 
 const CardHeaderText = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => props.theme.colors.textColorLighter};
   margin: 0;
-  line-height: ${props => props.theme.fonts.defaultLineHeight};
-  letter-spacing: 0.2px;
-  white-space: nowrap;
 `
 
 const ClaimButton = styled(Button)`
@@ -149,26 +140,9 @@ const SvgWrap = styled.div`
   padding-right: 22px;
 `
 
-export const ConnectionModalNavigation = styled(ModalNavigation as any)`
+const ConnectionModalNavigation = styled(ModalNavigation as any)`
   padding: 0;
   margin-bottom: 16px;
-`
-
-const IconSettingsWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-left: auto;
-  margin-right: 18.66px;
-`
-
-export const SettingsModalWrapper = styled.div`
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  width: 100%;
-  height: 100%;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -208,7 +182,6 @@ export const ModalYourConnection = (props: Props) => {
   const { cpk, networkId, relay } = context
 
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false)
   const [txHash, setTxHash] = useState('')
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
   const [txNetId, setTxNetId] = useState()
@@ -318,125 +291,89 @@ export const ModalYourConnection = (props: Props) => {
     <>
       <Modal
         isOpen={isOpen && !isTransactionModalOpen}
-        onRequestClose={() => {
-          onClose()
-          setIsSettingsModalOpen(false)
-        }}
+        onRequestClose={onClose}
         shouldCloseOnOverlayClick={true}
-        style={
-          isSettingsModalOpen
-            ? {
-                ...theme.fluidHeightModal,
-                content: { ...theme.fluidHeightModal.content, height: '510px' },
-              }
-            : theme.fluidHeightModal
-        }
+        style={theme.fluidHeightModal}
       >
-        {isSettingsModalOpen ? (
-          <ContentWrapper>
-            <ConnectionModalNavigation>
-              <ModalTitle>
-                <IconArrowBack hoverEffect={true} onClick={() => setIsSettingsModalOpen(false)} />
-                <span style={{ marginLeft: '15px' }}>Settings</span>
-              </ModalTitle>
-
-              <IconClose
-                hoverEffect={true}
-                onClick={() => {
-                  setIsSettingsModalOpen(false)
-                  onClose()
-                }}
-              />
-            </ConnectionModalNavigation>
-            <SettingsModalWrapper>
-              <SettingsViewContainer />
-            </SettingsModalWrapper>
-          </ContentWrapper>
-        ) : (
-          <ContentWrapper>
-            <ConnectionModalNavigation>
-              <ModalTitle>Your Connection</ModalTitle>
-              <IconClose hoverEffect={true} onClick={onClose} />
-            </ConnectionModalNavigation>
-
+        <ContentWrapper>
+          <ConnectionModalNavigation>
+            <ModalTitle>Your Connection</ModalTitle>
+            <IconClose hoverEffect={true} onClick={onClose} />
+          </ConnectionModalNavigation>
+          <ModalCard>
+            <TopCardHeader>
+              <TopCardHeaderLeft>
+                <ConnectionIconWrapper>
+                  <ConnectorCircle>{connectorIcon}</ConnectorCircle>
+                  <IconJazz account={owner || ''} size={28} />
+                </ConnectionIconWrapper>
+                <AccountInfo>
+                  <AccountInfoAddress>{truncateStringInTheMiddle(owner || '', 5, 3)}</AccountInfoAddress>
+                  <AccountInfoWallet>{context.rawWeb3Context.connectorName}</AccountInfoWallet>
+                </AccountInfo>
+              </TopCardHeaderLeft>
+              <ChangeWalletButton buttonType={ButtonType.secondaryLine} onClick={changeWallet}>
+                Change
+              </ChangeWalletButton>
+            </TopCardHeader>
+            <BalanceSection>
+              <CardHeaderText>Wallet</CardHeaderText>
+              <BalanceItems style={{ marginTop: '14px' }}>
+                {tokenBalances(relay ? networkIds.MAINNET : networkId)}
+              </BalanceItems>
+            </BalanceSection>
+          </ModalCard>
+          {relay && arrayOfClaimableBalances.length !== 0 && (
             <ModalCard>
-              <TopCardHeader>
-                <TopCardHeaderLeft>
-                  <ConnectionIconWrapper>
-                    <ConnectorCircle>{connectorIcon}</ConnectorCircle>
-                    <IconJazz account={owner || ''} size={28} />
-                  </ConnectionIconWrapper>
-                  <AccountInfo>
-                    <AccountInfoAddress>{truncateStringInTheMiddle(owner || '', 5, 3)}</AccountInfoAddress>
-                    <AccountInfoWallet>{context.rawWeb3Context.connectorName}</AccountInfoWallet>
-                  </AccountInfo>
-                </TopCardHeaderLeft>
-                <IconSettingsWrapper>
-                  <IconSettings hoverEffect={true} onClick={() => setIsSettingsModalOpen(!isSettingsModalOpen)} />
-                </IconSettingsWrapper>
-                <ChangeWalletButton buttonType={ButtonType.secondaryLine} onClick={changeWallet}>
-                  Change
-                </ChangeWalletButton>
-              </TopCardHeader>
-              <BalanceSection>
-                <CardHeaderText>Wallet</CardHeaderText>
-                <BalanceItems style={{ marginTop: '14px' }}>
-                  {tokenBalances(relay ? networkIds.MAINNET : networkId)}
-                </BalanceItems>
+              <BalanceSection borderBottom={displayClaim} style={{ flexDirection: 'row' }}>
+                <ClaimLeftSvg
+                  onClick={() => {
+                    setDisplayClaim(!displayClaim)
+                  }}
+                >
+                  <ClaimLeft>
+                    <StrongText>Claimable Assets</StrongText>
+
+                    <BalanceItemBalance as="div">
+                      {arrayOfClaimableBalances.map(e => e.token.toUpperCase()).join(', ')}
+                    </BalanceItemBalance>
+                  </ClaimLeft>
+                  <SvgWrap>
+                    {displayClaim ? <IconChevronUp /> : <IconChevronDown color={theme.colors.tertiary} />}
+                  </SvgWrap>
+                </ClaimLeftSvg>
+
+                <ClaimButton buttonType={ButtonType.primary} onClick={claim}>
+                  Claim
+                </ClaimButton>
               </BalanceSection>
+
+              {displayClaim && <BalanceSection>{claimableItems}</BalanceSection>}
             </ModalCard>
-            {relay && arrayOfClaimableBalances.length !== 0 && (
-              <ModalCard>
-                <BalanceSection borderBottom={displayClaim} style={{ flexDirection: 'row' }}>
-                  <ClaimLeftSvg
-                    onClick={() => {
-                      setDisplayClaim(!displayClaim)
-                    }}
-                  >
-                    <ClaimLeft>
-                      <StrongText>Claimable Assets</StrongText>
-
-                      <BalanceItemBalance as="div">
-                        {arrayOfClaimableBalances.map(e => e.token.toUpperCase()).join(', ')}
-                      </BalanceItemBalance>
-                    </ClaimLeft>
-                    <SvgWrap>
-                      {displayClaim ? <IconChevronUp /> : <IconChevronDown color={theme.colors.tertiary} />}
-                    </SvgWrap>
-                  </ClaimLeftSvg>
-
-                  <ClaimButton buttonType={ButtonType.primary} onClick={claim}>
-                    Claim
-                  </ClaimButton>
+          )}
+          {relay && (
+            <ModalCard>
+              <>
+                <BalanceSection>
+                  <CardHeaderText>Omen Account</CardHeaderText>
+                  <BalanceItems style={{ marginTop: '14px' }}>{tokenBalances(networkIds.XDAI)}</BalanceItems>
                 </BalanceSection>
-                {displayClaim && <BalanceSection>{claimableItems}</BalanceSection>}
-              </ModalCard>
-            )}
-
-            {relay && (
-              <ModalCard>
-                <>
-                  <BalanceSection>
-                    <CardHeaderText>Omen Account</CardHeaderText>
-                    <BalanceItems style={{ marginTop: '14px' }}>{tokenBalances(networkIds.XDAI)}</BalanceItems>
-                  </BalanceSection>
-                  <DepositWithdrawButtons>
-                    <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositModal}>
-                      Deposit
-                    </DepositWithdrawButton>
-                    <DepositWithdrawButton
-                      buttonType={ButtonType.secondaryLine}
-                      disabled={xOmenBalance.isZero() && xDaiBalance.isZero()}
-                      onClick={openWithdrawModal}
-                    >
-                      Withdraw
-                    </DepositWithdrawButton>
-                  </DepositWithdrawButtons>
-                </>
-              </ModalCard>
-            )}
-          </ContentWrapper>
-        )}
+                <DepositWithdrawButtons>
+                  <DepositWithdrawButton buttonType={ButtonType.secondaryLine} onClick={openDepositModal}>
+                    Deposit
+                  </DepositWithdrawButton>
+                  <DepositWithdrawButton
+                    buttonType={ButtonType.secondaryLine}
+                    disabled={xOmenBalance.isZero() && xDaiBalance.isZero()}
+                    onClick={openWithdrawModal}
+                  >
+                    Withdraw
+                  </DepositWithdrawButton>
+                </DepositWithdrawButtons>
+              </>
+            </ModalCard>
+          )}
+        </ContentWrapper>
       </Modal>
       <ModalTransactionWrapper
         confirmations={confirmations}
