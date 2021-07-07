@@ -24,13 +24,10 @@ export const ModalNavigationLeft = styled.div`
 `
 
 export const ModalTitle = styled.p`
-  font-size: ${props => props.theme.switchNetworkModal.primaryFontSize};
+  font-size: 16px;
   color: ${props => props.theme.colors.textColorDark};
-  font-weight: ${props => props.theme.textfield.fontWeight};
+  font-weight: 500;
   margin: 0;
-  line-height: 19px;
-  letter-spacing: 0.2px;
-  margin-top: 2px;
 `
 
 export const ModalCard = styled.div`

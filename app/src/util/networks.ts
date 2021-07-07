@@ -95,7 +95,7 @@ interface KnownTokenData {
 
 export const pseudoNativeAssetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
 
-export const networks: { [K in NetworkId]: Network } = {
+const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
     label: 'Mainnet',
     url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
@@ -286,13 +286,10 @@ export const networks: { [K in NetworkId]: Network } = {
   },
 }
 
-export const infuraNetworkURL = networks[1].url
-
 export const getChainSpecificAlternativeUrls = (networkId: any) => {
   if (!validNetworkId(networkId)) {
     return false
   }
-
   return networks[networkId].alternativeUrls
 }
 if (localStorage.getItem('rpcAddress')) {
@@ -312,6 +309,8 @@ export const supportedNetworkURLs = entries(networks).reduce<{
   }),
   {},
 )
+
+export const infuraNetworkURL = networks[1].url
 
 export const getInfuraUrl = (networkId: number): string => {
   if (!validNetworkId(networkId)) {
