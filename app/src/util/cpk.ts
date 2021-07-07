@@ -379,28 +379,35 @@ export const getRelayProvider = (
   library: any,
   account: string | null | undefined,
 ) => {
-  // provider override if running as relay
-  if (relay && networkId === networkIds.MAINNET) {
-    const netId = networkIds.XDAI
-    const provider = new ethers.providers.JsonRpcProvider(getInfuraUrl(netId)) as any
-    const address = account ? calcRelayProxyAddress(account, provider) : ''
-    const signer = library.getSigner()
-    const fakeSigner = {
-      provider,
-      getAddress: () => address,
-      _ethersType: 'Signer',
-      // access the connected signer for relay signatures
-      signer: signer,
+  try {
+    // provider override if running as relay
+    if (relay && networkId === networkIds.MAINNET) {
+      const netId = networkIds.XDAI
+
+      const provider = new ethers.providers.JsonRpcProvider(getInfuraUrl(netId)) as any
+      const address = account ? calcRelayProxyAddress(account, provider) : ''
+
+      const signer = library.getSigner()
+      const fakeSigner = {
+        provider,
+        getAddress: () => address,
+        _ethersType: 'Signer',
+        // access the connected signer for relay signatures
+        signer: signer,
+      }
+
+      provider.signer = fakeSigner
+      provider.getSigner = () => fakeSigner
+      provider.relay = true
+      return {
+        address,
+        isRelay: true,
+        netId,
+        provider,
+      }
     }
-    provider.signer = fakeSigner
-    provider.getSigner = () => fakeSigner
-    provider.relay = true
-    return {
-      address,
-      isRelay: true,
-      netId,
-      provider,
-    }
+  } catch (e) {
+    console.error('Error while getting relay provider: ', e)
   }
   return {
     address: account,

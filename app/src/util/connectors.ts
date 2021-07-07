@@ -137,9 +137,9 @@ class SafeConnector extends Connectors.Connector {
 const Safe = new SafeConnector()
 
 export default {
-  Infura,
   MetaMask,
   WalletConnect,
   Authereum,
   Safe,
+  Infura,
 }
