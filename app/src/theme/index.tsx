@@ -526,7 +526,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 }
 
 const TextWrapper = styled.div<{ color: keyof Colors }>`
-  color: ${({ color, theme }) => (theme as any)[color]};
+  color: ${props => props.theme.text3};
   font-family: Roboto;
   letter-spacing: 0.2px;
 `
@@ -542,9 +542,9 @@ export const TYPE = {
     return <TextWrapper fontSize={'16px'} fontWeight={500} lineHeight={'19px'} {...props} />
   },
   bodyMedium(props: any) {
-    return <TextWrapper fontSize={'14px'} fontWeight={500} lineHeight={'16px'} {...props} />
+    return <TextWrapper fontSize={'18px'} fontWeight={500} lineHeight={'16px'} {...props} />
   },
   bodyRegular(props: any) {
-    return <TextWrapper fontSize={'14px'} fontWeight={400} lineHeight={'16px'} {...props} />
+    return <TextWrapper fontSize={'18px'} fontWeight={400} lineHeight={'16px'} {...props} />
   },
 }
