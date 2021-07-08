@@ -107,10 +107,13 @@ export const useMarkets = (options: Options): any => {
   })
 
   React.useEffect(() => {
+    if (!loading) {
+      return
+    }
     setMarkets({
       fixedProductMarketMakers: [],
     })
-  }, [arbitrator, currency, curationSource, category, state, sortBy, templateId])
+  }, [arbitrator, currency, curationSource, category, state, sortBy, templateId, loading])
 
   return { markets, error, fetchMore, loading, moreMarkets }
 }

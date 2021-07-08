@@ -163,7 +163,14 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     }
   }, [context, library, active, error, networkId, safeAppInfo, rpcAddress, debugAddress, debugNetworkId, props])
 
-  if (!networkId || !library || !connection || (connection.account && !cpk) || !balances.fetched) {
+  if (
+    !networkId ||
+    !library ||
+    !connection ||
+    (connection.account && !cpk) ||
+    (connection.account && connection.networkId !== cpk?.provider?.network?.chainId) ||
+    !balances.fetched
+  ) {
     props.setStatus(true)
     return null
   }

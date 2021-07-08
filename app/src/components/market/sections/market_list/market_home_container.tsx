@@ -276,7 +276,7 @@ const MarketHomeContainer: React.FC = () => {
       setMarkets(RemoteData.failure(error))
       setIsFiltering(false)
     }
-  }, [fetchedMarkets, loading, error, context.networkId, PAGE_SIZE, pageIndex])
+  }, [fetchedMarkets, loading, error, context.networkId, PAGE_SIZE, pageIndex, cpkAddress])
 
   useEffect(() => {
     if (categoriesLoading) {
