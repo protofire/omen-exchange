@@ -41,11 +41,10 @@ const getMarketCollateral = (token: Token, networkId: number) => {
 
 interface SetupParams {
   service: CPKService
-  collateral: Maybe<Token>
 }
 
 export const setup = async (params: SetupParams) => {
-  const { collateral, service } = params
+  const { service } = params
 
   // account
   const signer = service.provider.getSigner()
@@ -65,11 +64,7 @@ export const setup = async (params: SetupParams) => {
   const wrapper = getWrapToken(networkId)
   const native = getNativeAsset(networkId)
 
-  // wrapping
-  const wrap = collateral ? collateral.address.toLowerCase() === native.address.toLowerCase() : false
-  const unwrap = collateral ? collateral.address.toLowerCase() === wrapper.address.toLowerCase() : false
-
-  return { ...params, account, native, networkId, transactions, txOptions, wrapper, wrap, unwrap }
+  return { ...params, account, native, networkId, transactions, txOptions, wrapper }
 }
 
 interface ExecParams {
@@ -121,16 +116,16 @@ interface WrapParams {
   amount: BigNumber
   collateral: Token
   networkId: number
+  native: Token
   service: CPKService
   transactions: Transaction[]
   txOptions: TxOptions
-  wrap: boolean
   wrapper: Token
 }
 
 export const wrap = async (params: WrapParams) => {
-  const { amount, service, transactions, txOptions, wrap, wrapper } = params
-  if (wrap) {
+  const { amount, collateral, native, service, transactions, txOptions, wrapper } = params
+  if (collateral.address.toLowerCase() === native.address.toLowerCase()) {
     if (!service.isSafeApp) {
       txOptions.value = amount
     }
@@ -152,12 +147,12 @@ interface UnwrapParams {
   collateral: Token
   transactions: Transaction[]
   networkId: number
-  unwrap: boolean
+  wrapper: Token
 }
 
 export const unwrap = async (params: UnwrapParams) => {
-  const { amount, collateral, transactions, unwrap } = params
-  if (unwrap && !amount.isZero()) {
+  const { amount, collateral, transactions, wrapper } = params
+  if (collateral.address.toLowerCase() === wrapper.address.toLowerCase() && !amount.isZero()) {
     const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateral.symbol, amount)
     transactions.push({
       to: collateral.address,
@@ -228,14 +223,14 @@ interface DepositParams {
   account: string
   amount: BigNumber
   collateral: Token
+  native: Token
   service: CPKService
   transactions: Transaction[]
-  wrap: boolean
 }
 
 export const deposit = async (params: DepositParams) => {
-  const { account, amount, collateral, service, transactions, wrap } = params
-  if (!service.isSafeApp && !wrap) {
+  const { account, amount, collateral, native, service, transactions } = params
+  if (!service.isSafeApp && collateral.address.toLowerCase() !== native.address.toLowerCase()) {
     // Step 2: Transfer the amount of collateral being spent from the user to the CPK
     transactions.push({
       to: collateral.address,
@@ -255,13 +250,13 @@ interface WithdrawParams {
   collateral: Token
   service: CPKService
   transactions: Transaction[]
-  unwrap: boolean
+  wrapper: Token
 }
 
 export const withdraw = async (params: WithdrawParams) => {
-  const { account, amount, collateral, service, transactions, unwrap } = params
+  const { account, amount, collateral, service, transactions, wrapper } = params
   if (!service.isSafeApp && !amount.isZero()) {
-    if (unwrap) {
+    if (collateral.address.toLowerCase() === wrapper.address.toLowerCase()) {
       transactions.push({
         to: account,
         value: amount.toString(),
@@ -760,8 +755,7 @@ export const createMarket = async (params: CreateMarketParams) => {
  * Wrangle Functions
  * The purpose of wrangle functions is to transform params into common inputs other functions depend on
  * collateral: The collateral the market maker is using
- * amount: The amount we are selling/buying
- * unwrap: If we need to unwrap this asset
+ * amount: The amount being spent/withdrawn
  */
 
 /**
@@ -811,5 +805,6 @@ export const wrangleRemoveFundsParams = async (params: WrangleRemoveFundsParams)
   const collateralAddress = await marketMaker.getCollateralToken()
   const collateral = getTokenFromAddress(networkId, collateralAddress)
   const amount = amountToMerge.add(earnings)
-  return { ...params, amount, collateral, unwrap }
+
+  return { ...params, amount, collateral }
 }
