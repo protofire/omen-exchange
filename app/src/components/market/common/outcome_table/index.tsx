@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context, useSymbol } from '../../../../hooks'
 import { getOutcomeColor } from '../../../../theme/utils'
 import { getNativeAsset } from '../../../../util/networks'
-import { formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
+import { bigNumberToString, formatBigNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, BondItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, THead, TR, Table } from '../../../common'
 import { BarDiagram } from '../bar_diagram_probabilities'
@@ -225,10 +225,10 @@ export const OutcomeTable = (props: Props) => {
     const currentPriceFormatted = withWinningOutcome ? payout.toFixed(2) : currentPriceDisplay
     const probability = withWinningOutcome ? Number(payout.mul(100).toString()) : probabilities[outcomeIndex]
     const newPrice = (probabilities[outcomeIndex] / 100).toFixed(2)
-    const formattedPayout = formatBigNumber(mulBN(shares, Number(payout.toString())), collateral.decimals)
+    const formattedPayout = bigNumberToString(mulBN(shares, Number(payout.toString())), collateral.decimals)
     const formattedShares = formatBigNumber(shares, collateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] && payouts[outcomeIndex].gt(0)
-    const formattedNewShares = newShares ? formatBigNumber(newShares[outcomeIndex], collateral.decimals) : null
+    const formattedNewShares = newShares ? bigNumberToString(newShares[outcomeIndex], collateral.decimals) : null
     const showBondBadge = isBond && withWinningOutcome && outcomeIndex === winningBondIndex
     const formattedBondedEth =
       bonds && bonds[outcomeIndex] && bonds[outcomeIndex].bondedEth
@@ -310,15 +310,13 @@ export const OutcomeTable = (props: Props) => {
             <TDFlexDiv textAlign={TableCellsAlign[3]}>
               {formattedShares}{' '}
               {showSharesChange && formattedNewShares !== formattedShares && (
-                <NewValue outcomeIndex={outcomeIndex} value={formattedNewShares && formatNumber(formattedNewShares)} />
+                <NewValue outcomeIndex={outcomeIndex} value={formattedNewShares && formattedNewShares} />
               )}
             </TDFlexDiv>
           </TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Payout) ? null : (
-          <TDStyled textAlign={TableCellsAlign[4]}>
-            {withWinningOutcome && payouts ? formatNumber(formattedPayout) : '0.00'}
-          </TDStyled>
+          <TDStyled textAlign={TableCellsAlign[4]}>{withWinningOutcome && payouts ? formattedPayout : '0.00'}</TDStyled>
         )}
         {disabledColumns.includes(OutcomeTableValue.Bonded) ? null : (
           <TDStyled

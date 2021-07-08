@@ -1,14 +1,14 @@
 import { BigNumber, formatUnits } from 'ethers/utils'
 
 export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string => {
-  console.log('current formatting', Number(formatUnits(value, decimals)).toFixed(precision))
+  // console.log('current formatting', Number(formatUnits(value, decimals)).toFixed(precision))
 
   return Number(formatUnits(value, decimals)).toFixed(precision)
 }
 export const bigNumberToString = (value: BigNumber | string, decimals: number, precision = 2): string => {
   const bigNumner = bigNumberToNumber(value, decimals)
   if (bigNumner < 0.01 && bigNumner > 0) {
-    console.log('Gem1no return', '<0.01')
+    // console.log('Gem1no return', '<0.01')
     return '<0.01'
   }
   return bigNumner.toFixed(precision)
@@ -21,15 +21,15 @@ export const formatNumber = (number: string, decimals = 2): string => {
   const splitFixedInt = fixedInt.split('.')[0]
   const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
   if (number.length < 1) {
-    console.log('firs Option no idea whats going on ', `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`)
+    //console.log('firs Option no idea whats going on ', `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`)
     return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
   }
 
   if (Number(number) < 0.01 && Number(number) > 0) {
-    console.log('Gem1no return', '<0.01')
+    // console.log('Gem1no return', '<0.01')
     return '<0.01'
   }
-  console.log('regular return', `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`)
+  // console.log('regular return', `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`)
   return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
 }
 export const formatHistoryUser = (user: string) => {

@@ -17,7 +17,7 @@ import { BalanceState, fetchAccountBalance } from '../../../../../../store/reduc
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
-import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
+import { bigNumberToString, formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
@@ -499,10 +499,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 value={`${isNaN(spread) ? 0 : spread}%`}
               />
               <TransactionDetailsLine />
-              <TransactionDetailsRow
-                title={'Pool Tokens'}
-                value={formatNumber(formatBigNumber(funding, collateral.decimals, collateral.decimals))}
-              />
+              <TransactionDetailsRow title={'Pool Tokens'} value={bigNumberToString(funding, collateral.decimals)} />
             </TransactionDetailsCard>
           </div>
         </GridTransactionDetailsWrapper>

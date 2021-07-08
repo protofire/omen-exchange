@@ -20,6 +20,7 @@ import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
+  bigNumberToString,
   computeBalanceAfterTrade,
   formatBigNumber,
   formatNumber,
@@ -241,17 +242,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount || Zero)
 
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
-  const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals, collateral.decimals))} ${
-    collateral.symbol
-  }`
-  const baseCostFormatted = `${formatNumber(
-    formatBigNumber(baseCost || Zero, collateral.decimals, collateral.decimals),
-  )}
+  const feeFormatted = `${bigNumberToString(feePaid.mul(-1), collateral.decimals)} ${collateral.symbol}`
+  const baseCostFormatted = `${bigNumberToString(baseCost || Zero, collateral.decimals)}
     ${collateral.symbol}`
-  const potentialProfitFormatted = `${formatNumber(
-    formatBigNumber(potentialProfit, collateral.decimals, collateral.decimals),
-  )} ${collateral.symbol}`
-  const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals, collateral.decimals))
+  const potentialProfitFormatted = `${bigNumberToString(potentialProfit, collateral.decimals)} ${collateral.symbol}`
+  const sharesTotal = bigNumberToString(tradedShares, collateral.decimals)
   const total = `${sharesTotal} Shares`
 
   const amountError = isTransactionProcessing

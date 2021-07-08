@@ -11,7 +11,7 @@ import { useConnectedWeb3Context } from '../../../hooks'
 import { ERC20Service, XdaiService } from '../../../services'
 import { bridgeTokensList, getNativeAsset, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
-import { formatBigNumber, formatNumber, waitForConfirmations } from '../../../util/tools'
+import { bigNumberToString, formatBigNumber, formatNumber, waitForConfirmations } from '../../../util/tools'
 import { ExchangeType, Token, TransactionStep } from '../../../util/types'
 import { Button, ButtonStateful } from '../../button'
 import { ButtonStates } from '../../button/button_stateful'
@@ -384,7 +384,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
                 <span>
                   {exchangeType === ExchangeType.withdraw && currencySelected !== 'dai'
-                    ? `${formatNumber(formatBigNumber(displayFundAmount.div(1000), decimals, decimals), 3)} ${symbol}`
+                    ? `${bigNumberToString(displayFundAmount.div(1000), decimals, 3)} ${symbol}`
                     : `0.00 ${symbol}`}
                 </span>
               </ExchangeDataItem>
@@ -394,11 +394,8 @@ export const ModalDepositWithdraw = (props: Props) => {
 
                 <span>
                   {currencySelected !== 'dai' && exchangeType === ExchangeType.withdraw
-                    ? `${formatNumber(
-                        formatBigNumber(displayFundAmount.sub(displayFundAmount.div(1000)), decimals, decimals),
-                        3,
-                      )} ${symbol}`
-                    : `${formatNumber(formatBigNumber(displayFundAmount, decimals, decimals))} ${symbol}`}
+                    ? `${bigNumberToString(displayFundAmount.sub(displayFundAmount.div(1000)), decimals, 3)} ${symbol}`
+                    : `${bigNumberToString(displayFundAmount, decimals)} ${symbol}`}
                 </span>
               </ExchangeDataItem>
             </>
