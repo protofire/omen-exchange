@@ -25,7 +25,6 @@ import {
   calcXValue,
   computeBalanceAfterTrade,
   formatBigNumber,
-  formatNumber,
   getInitialCollateral,
   getUnit,
   mulBN,

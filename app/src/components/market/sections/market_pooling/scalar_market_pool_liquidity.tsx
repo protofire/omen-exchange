@@ -24,7 +24,6 @@ import {
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
   formatBigNumber,
-  formatNumber,
   getInitialCollateral,
   getUnit,
   isDust,

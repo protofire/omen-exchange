@@ -15,7 +15,6 @@ import {
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
   formatBigNumber,
-  formatNumber,
   getInitialCollateral,
   mulBN,
 } from '../../../../util/tools'

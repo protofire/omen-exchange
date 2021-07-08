@@ -22,7 +22,6 @@ import {
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
   formatBigNumber,
-  formatNumber,
   getInitialCollateral,
 } from '../../../../util/tools'
 import {

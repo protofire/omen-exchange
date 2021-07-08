@@ -4,7 +4,7 @@ import { WeiPerEther, Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { bigNumberToNumber, formatBigNumber } from '../../formatting'
+import { bigNumberToNumber } from '../../formatting'
 import { ceilDiv, divBN, mulBN } from '../../maths'
 
 /**
