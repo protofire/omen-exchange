@@ -8,6 +8,7 @@ import { useConnectedWeb3Context } from '../../../../hooks'
 import { getNativeAsset } from '../../../../util/networks'
 import {
   bigNumberToNumber,
+  bigNumberToString,
   calcPrediction,
   calcXValue,
   formatNumber,
@@ -562,14 +563,14 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       subtitle: 'Predicted Outcome',
     },
     {
-      title: currentAnswerBond ? `${bigNumberToNumber(currentAnswerBond, NativeDecimals)}  ${NativeSymbol}` : '-',
+      title: currentAnswerBond ? `${bigNumberToString(currentAnswerBond, NativeDecimals)}  ${NativeSymbol}` : '-',
       subtitle: 'Bonded',
     },
     {
       title: currentAnswer
         ? currentAnswer === INVALID_ANSWER_ID
           ? 'Invalid'
-          : `${bigNumberToNumber(new BigNumber(currentAnswer), STANDARD_DECIMALS)} ${unit}`
+          : `${bigNumberToString(new BigNumber(currentAnswer), STANDARD_DECIMALS)} ${unit}`
         : '-',
       subtitle: isBonded ? 'Pending Outcome' : 'Final Outcome',
     },

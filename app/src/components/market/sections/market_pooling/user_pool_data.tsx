@@ -75,7 +75,7 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
       />
       <UserDataTitleValue
         title="Total Pool Tokens"
-        value={`${bigNumberToString(totalPoolShares, collateral.decimals, collateral.decimals)}`}
+        value={`${bigNumberToString(totalPoolShares, collateral.decimals)}`}
       />
       <UserDataTitleValue
         state={userEarnings.gt(0) ? ValueStates.success : undefined}
