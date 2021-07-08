@@ -17,7 +17,8 @@ const DefaultTooltip = css`
     background-color: ${theme.colors.mainBodyBackground};
     opacity: 1 !important;
     border-radius: ${theme.borders.commonBorderRadius};
-    border: 1px solid ${theme.borders.tooltip};
+    border: 1px solid ${theme.borders.borderDisabled};
+    box-shadow: 0px 0px 4px ${theme.borders.tooltipShadow};
   }
 `
 
