@@ -518,7 +518,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
 
-      await cpk.stakePoolTokens(fundingBalance, liquidityMiningCampaign.id, marketMakerAddress)
+      await cpk.stakePoolTokens(fundingBalance, liquidityMiningCampaign.id, marketMakerAddress, setTxHash, setTxState)
 
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
