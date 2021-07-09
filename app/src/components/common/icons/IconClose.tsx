@@ -27,7 +27,7 @@ export const IconClose = (props: Props) => {
 
   return (
     <Wrapper
-      fill={'none'}
+      fill="none"
       height={size}
       hoverEffect={hoverEffect}
       onClick={onClick}
