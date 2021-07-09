@@ -1649,7 +1649,13 @@ class CPKService {
     }
   }
 
-  stakePoolTokens = async (amount: BigNumber, campaignAddress: string, marketMakerAddress: string) => {
+  stakePoolTokens = async (
+    amount: BigNumber,
+    campaignAddress: string,
+    marketMakerAddress: string,
+    setTxHash: (arg0: string) => void,
+    setTxState: (step: TransactionStep) => void,
+  ) => {
     try {
       const transactions: Transaction[] = []
       const txOptions: TxOptions = {}
@@ -1672,7 +1678,7 @@ class CPKService {
         data: StakingService.encodeStakePoolTokens(amount),
       })
 
-      const txObject = await this.cpk.execTransactions(transactions, txOptions)
+      const txObject = await this.cpk.execTransactions(transactions, txOptions, setTxHash, setTxState)
       return txObject.hash
     } catch (e) {
       logger.error('Failed to stake pool tokens', e.message)
