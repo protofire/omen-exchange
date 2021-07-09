@@ -1696,8 +1696,7 @@ class CPKService {
         data: StakingService.encodeWithdrawStakedPoolTokens(amount),
       })
 
-      const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      return txObject.hash
+      return this.execTransactions(transactions, txOptions)
     } catch (e) {
       logger.error('Failed to withdraw staked pool tokens', e.message)
       throw e
@@ -1985,8 +1984,7 @@ class CPKService {
         }
       }
 
-      const txObject = await this.cpk.execTransactions(transactions, txOptions)
-      return txObject.hash
+      return this.execTransactions(transactions, txOptions)
     } catch (e) {
       logger.error('Failed to withdraw staked pool tokens and claim reward tokens', e.message)
       throw e
