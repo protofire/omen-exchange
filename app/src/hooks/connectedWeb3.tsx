@@ -85,6 +85,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     if (networkId) {
       const enableRelay = context.connectorName !== 'Safe' || debugAddress !== ''
+
       checkRpcStatus(
         getInfuraUrl(relay ? networkIds.XDAI : networkId),
         props.setStatus,

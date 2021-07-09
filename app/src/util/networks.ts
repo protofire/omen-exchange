@@ -286,8 +286,6 @@ export const networks: { [K in NetworkId]: Network } = {
   },
 }
 
-export const infuraNetworkURL = networks[1].url
-
 export const getChainSpecificAlternativeUrls = (networkId: any) => {
   if (!validNetworkId(networkId)) {
     return false

@@ -241,6 +241,7 @@ const HeaderContainer: React.FC = (props: any) => {
         localStorage.removeItem('walletconnect')
         context.rawWeb3Context.connector.onDeactivation()
       }
+
       context.rawWeb3Context.setConnector('Infura')
     }
   }

@@ -4,7 +4,7 @@ import { ethers } from 'ethers'
 import { Connectors } from 'web3-react'
 
 import { INFURA_PROJECT_ID } from '../common/constants'
-import { getInfuraUrl, infuraNetworkURL, networkIds, supportedNetworkIds } from '../util/networks'
+import { getInfuraUrl, networkIds, networks, supportedNetworkIds } from '../util/networks'
 
 const { InjectedConnector, NetworkOnlyConnector } = Connectors
 
@@ -88,7 +88,8 @@ class WalletConnectConnector extends Connectors.Connector {
 const WalletConnect = new WalletConnectConnector()
 
 const Infura = new NetworkOnlyConnector({
-  providerURL: infuraNetworkURL,
+  providerURL:
+    localStorage.getItem('relay') === 'true' ? networks[networkIds.XDAI].url : networks[networkIds.MAINNET].url,
 })
 
 class AuthereumConnector extends Connectors.Connector {
