@@ -4,7 +4,6 @@ import styled from 'styled-components'
 const Wrapper = styled.svg<{ hoverEffect: boolean | undefined }>`
   cursor: pointer;
 
-  // The hover effect happens here. I tested your solution on different Icon accross the app and it didn't work. I passed the hoverEffect props in where IconClose was. I believe this solution is better than the one you have proposed and we must pass the hoverEffect arg inside every Icons instance throughout the code. I can do this on a separate PR
   &:hover {
     .path {
       ${props => props.hoverEffect && `fill: ${props.theme.colors.primaryLight};`}
@@ -13,7 +12,7 @@ const Wrapper = styled.svg<{ hoverEffect: boolean | undefined }>`
 
   .path {
     transition: 0.2s fill;
-    // fill ${props => (props.hoverEffect ? '#DCDFF2' : '#37474F')};
+    fill: ${props => props.theme.colors.textColorDark};
   }
 `
 
@@ -21,16 +20,14 @@ interface Props {
   hoverEffect?: boolean
   onClick?: () => void
   size?: string
-  color?: string
 }
 
 export const IconClose = (props: Props) => {
-  const { color, hoverEffect = false, onClick, size = '24', ...restProps } = props
+  const { hoverEffect = false, onClick, size = '24', ...restProps } = props
 
   return (
     <Wrapper
-      // Here we must keep the color arg to colour the cross when there is no hover
-      fill={color}
+      fill={'none'}
       height={size}
       hoverEffect={hoverEffect}
       onClick={onClick}
