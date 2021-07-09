@@ -48,7 +48,6 @@ export const useMarkets = (options: Options): any => {
   } = options
 
   const [moreMarkets, setMoreMarkets] = React.useState(true)
-
   const [markets, setMarkets] = React.useState<GraphResponseMarketsGeneric>({ fixedProductMarketMakers: [] })
 
   const fetchMyMarkets = state === MarketStates.myMarkets
@@ -107,10 +106,13 @@ export const useMarkets = (options: Options): any => {
   })
 
   React.useEffect(() => {
+    if (!loading) {
+      return
+    }
     setMarkets({
       fixedProductMarketMakers: [],
     })
-  }, [arbitrator, currency, curationSource, category, state, sortBy, templateId])
+  }, [arbitrator, currency, curationSource, category, state, sortBy, templateId, loading])
 
   return { markets, error, fetchMore, loading, moreMarkets }
 }
