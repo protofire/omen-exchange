@@ -265,7 +265,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     amount.lt(min) ? amount : min,
   )
 
-  const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
+  const totalUserLiquidity = totalDepositedTokens.add(userEarnings).add(userStakedTokens)
 
   const addFunding = async () => {
     try {
