@@ -496,7 +496,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         conditionId,
         conditionalTokens,
         compoundService,
-        earnings: userEarnings,
         marketMaker,
         outcomesCount: balances.length,
         setTxHash,

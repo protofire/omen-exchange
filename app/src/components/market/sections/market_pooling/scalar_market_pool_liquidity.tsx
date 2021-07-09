@@ -424,7 +424,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         conditionId,
         conditionalTokens,
         compoundService,
-        earnings: userEarnings,
         marketMaker,
         outcomesCount: balances.length,
         setTxHash,
