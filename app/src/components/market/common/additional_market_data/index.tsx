@@ -2,12 +2,7 @@ import React, { DOMAttributes, useEffect, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import {
-  useConnectedCPKContext,
-  useConnectedWeb3Context,
-  useGraphLiquidityMiningCampaigns,
-  useRealityLink,
-} from '../../../../hooks'
+import { useConnectedWeb3Context, useGraphLiquidityMiningCampaigns, useRealityLink } from '../../../../hooks'
 import { GraphResponseLiquidityMiningCampaign } from '../../../../hooks/useGraphLiquidityMiningCampaigns'
 import { useTokenPrice } from '../../../../hooks/useTokenPrice'
 import { CompoundService } from '../../../../services/compound_service'
@@ -86,6 +81,7 @@ const AdditionalMarketDataSectionWrapper = styled.a<{
   margin-left: ${props => (props.noMarginLeft ? '0px' : '14px')};
   margin-right: ${props => (props.hasMarginRight ? '14px' : '0px')};
   margin-bottom: 14px;
+  text-transform: capitalize;
   &:hover {
     p {
       color: ${props =>
@@ -141,8 +137,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   const { address, arbitrator, category, collateral, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
 
   const context = useConnectedWeb3Context()
-  const { account, library: provider, networkId, relay } = context
-  const cpk = useConnectedCPKContext()
+  const { account, cpk, library: provider, networkId, relay } = context
 
   const realitioBaseUrl = useRealityLink(!!relay)
   const realitioUrl = id ? `${realitioBaseUrl}/#!/question/${id}` : `${realitioBaseUrl}/`

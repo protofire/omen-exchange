@@ -1,15 +1,16 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../hooks'
+import { STANDARD_DECIMALS } from '../../../../common/constants'
+import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import { CompoundService } from '../../../../services'
 import theme from '../../../../theme'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
-import { getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
+import { formatBigNumber, getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
@@ -61,17 +62,29 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
-    scaledLiquidityParameter,
     submissionIDs,
   } = marketMakerData
   const { title } = question
   const ovmAddress = getContractAddress(networkId, 'omenVerifiedMarkets')
 
   const [showingProgressBar, setShowingProgressBar] = useState(false)
+  const [liquidity, setLiquidity] = useState(new BigNumber(0))
 
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
-  const formattedLiquidity: string = scaledLiquidityParameter ? scaledLiquidityParameter.toFixed(2) : '0'
+  const contracts = useContracts(context)
+  const { buildMarketMaker } = contracts
+  const marketMaker = buildMarketMaker(address)
+
+  useEffect(() => {
+    const getLiquidity = async () => {
+      setLiquidity(await marketMaker.getTotalSupply())
+    }
+    marketMaker && getLiquidity()
+    // eslint-disable-next-line
+  }, [])
+
+  const formattedLiquidity: string = formatBigNumber(liquidity, STANDARD_DECIMALS, 2)
 
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred

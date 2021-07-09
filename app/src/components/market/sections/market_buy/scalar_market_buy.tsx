@@ -10,8 +10,6 @@ import {
   useAsyncDerivedValue,
   useCollateralBalance,
   useCompoundService,
-  useConnectedBalanceContext,
-  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
@@ -76,10 +74,9 @@ interface Props {
 export const ScalarMarketBuy = (props: Props) => {
   const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
   const context = useConnectedWeb3Context()
-  const cpk = useConnectedCPKContext()
-  const { fetchBalances } = useConnectedBalanceContext()
+  const { fetchBalances } = context.balances
 
-  const { library: provider, networkId, relay } = context
+  const { cpk, library: provider, networkId, relay } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const {
@@ -161,12 +158,8 @@ export const ScalarMarketBuy = (props: Props) => {
   }
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(displayCollateral.address === pseudoNativeAssetAddress)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
-
-  const showUpgrade =
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
 
   const upgradeProxy = async () => {
     if (!cpk) {
@@ -270,9 +263,11 @@ export const ScalarMarketBuy = (props: Props) => {
   const total = `${sharesTotal} Shares`
 
   const showSetAllowance =
-    collateral.address !== pseudoNativeAssetAddress &&
+    displayCollateral.address !== pseudoNativeAssetAddress &&
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
+
+  const showUpgrade = !isUpdated || upgradeFinished
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 
@@ -289,11 +284,11 @@ export const ScalarMarketBuy = (props: Props) => {
     (status !== Status.Ready && status !== Status.Error) ||
     amount.isZero() ||
     (!cpk?.isSafeApp &&
-      collateral.address !== pseudoNativeAssetAddress &&
       displayCollateral.address !== pseudoNativeAssetAddress &&
       hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
-    isNegativeAmount
+    isNegativeAmount ||
+    !isUpdated
 
   const finish = async () => {
     const outcomeIndex = positionIndex
@@ -311,6 +306,11 @@ export const ScalarMarketBuy = (props: Props) => {
           inputAmount = compoundService.calculateCTokenToBaseExchange(baseCollateral, amount)
         }
       }
+      const inputCollateral =
+        collateral.symbol !== displayCollateral.symbol && collateral.symbol === nativeAsset.symbol
+          ? displayCollateral
+          : collateral
+
       const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals)
       setTweet('')
       setStatus(Status.Loading)
@@ -320,7 +320,7 @@ export const ScalarMarketBuy = (props: Props) => {
 
       await cpk.buyOutcomes({
         amount: inputAmount,
-        collateral,
+        collateral: inputCollateral,
         compoundService,
         outcomeIndex,
         marketMaker,
@@ -497,7 +497,6 @@ export const ScalarMarketBuy = (props: Props) => {
       )}
       {showUpgrade && (
         <SetAllowance
-          collateral={nativeAsset}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}
@@ -505,7 +504,12 @@ export const ScalarMarketBuy = (props: Props) => {
         />
       )}
       <StyledButtonContainer>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => {
+            switchMarketTab(MarketDetailsTab.swap)
+          }}
+        >
           Cancel
         </Button>
         <Button buttonType={ButtonType.primaryAlternative} disabled={isBuyDisabled} onClick={finish}>

@@ -79,7 +79,7 @@ interface Props {
 
 export const AdvancedFilters = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { networkId, relay } = context
+  const { networkId } = context
 
   const arbitrators = getArbitratorsByNetwork(networkId)
 
@@ -177,36 +177,39 @@ export const AdvancedFilters = (props: Props) => {
   const wrapTokenAddress = getWrapToken(context.networkId).address.toLowerCase()
   const filter = [wrapTokenAddress]
 
+  const getCurrency = (address: Maybe<string>) => {
+    if (!address) {
+      return null
+    } else if (address.toLowerCase() === nativeAssetAddress) {
+      return wrapTokenAddress
+    } else if (address.toLowerCase() === wrapTokenAddress) {
+      return nativeAssetAddress
+    } else {
+      return address
+    }
+  }
+
   return (
     <Wrapper>
-      {!relay && (
-        <Column>
-          <TitleWrapper>
-            <Title>Currency</Title>
-            {currency && <ClearLabel onClick={() => onChangeCurrency(null)}>Clear</ClearLabel>}
-          </TitleWrapper>
+      <Column>
+        <TitleWrapper>
+          <Title>Currency</Title>
+          {currency && <ClearLabel onClick={() => onChangeCurrency(null)}>Clear</ClearLabel>}
+        </TitleWrapper>
 
-          <CurrencySelector
-            addAll
-            addNativeAsset
-            context={context}
-            currency={currency}
-            disabled={false}
-            filters={filter}
-            negativeFilter
-            onSelect={currency =>
-              onChangeCurrency(
-                currency
-                  ? currency.address.toLowerCase() === nativeAssetAddress
-                    ? wrapTokenAddress
-                    : currency.address
-                  : null,
-              )
-            }
-            placeholder={currency ? '' : 'All'}
-          />
-        </Column>
-      )}
+        <CurrencySelector
+          addAll
+          addNativeAsset
+          context={context}
+          currency={getCurrency(currency)}
+          disabled={false}
+          filters={filter}
+          negativeFilter
+          onSelect={currency => onChangeCurrency(currency ? getCurrency(currency.address) : null)}
+          placeholder={currency ? '' : 'All'}
+        />
+      </Column>
+
       {showQuestionType && (
         <Column>
           <TitleWrapper>

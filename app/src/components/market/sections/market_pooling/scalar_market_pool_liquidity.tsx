@@ -9,8 +9,6 @@ import { DOCUMENT_FAQ, STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useCollateralBalance,
   useCompoundService,
-  useConnectedBalanceContext,
-  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
@@ -123,15 +121,10 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   } = marketMakerData
   const context = useConnectedWeb3Context()
   const history = useHistory()
-  const { account, library: provider, networkId, relay } = context
-  const cpk = useConnectedCPKContext()
-  const { fetchBalances } = useConnectedBalanceContext()
+  const { account, cpk, library: provider, networkId, relay } = context
+  const { fetchBalances } = context.balances
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
-
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
-  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
-  const [upgradeFinished, setUpgradeFinished] = useState(false)
 
   const resolutionDate = question.resolution.getTime()
   const currentDate = new Date().getTime()
@@ -175,6 +168,10 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [userStakedTokens, setUserStakedTokens] = useState(new BigNumber(0))
 
   const collateralSymbol = collateral.symbol.toLowerCase()
+
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(displayCollateral.address === pseudoNativeAssetAddress)
+  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
+  const [upgradeFinished, setUpgradeFinished] = useState(false)
 
   let baseCollateral = collateral
   if (collateralSymbol in CompoundTokenType) {
@@ -223,7 +220,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
-  const disableWithdrawTab = isDust(fundingBalance, collateral.decimals)
 
   const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(
     amountToRemove || Zero,
@@ -232,8 +228,13 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   )
 
   const depositedTokens = sendAmountsAfterRemovingFunding.length
-    ? sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
+    ? sendAmountsAfterRemovingFunding
+        .map((amount, i) => {
+          return amount.add(balances[i].shares)
+        })
+        .reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
     : new BigNumber(0)
+
   const depositedTokensTotal = depositedTokens.add(userEarnings)
 
   const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
@@ -244,15 +245,17 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     totalPoolShares,
   )
 
-  const totalDepositedTokens = totalUserShareAmounts.length
-    ? totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
+  const totalDepositedTokens = fundingBalance.gt(0)
+    ? totalUserShareAmounts
+        .map((amount, i) => {
+          return amount.add(balances[i].shares)
+        })
+        .reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
     : new BigNumber(0)
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings).add(userStakedTokens)
 
-  const showUpgrade =
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+  const showUpgrade = !isUpdated || upgradeFinished
 
   const upgradeProxy = async () => {
     if (!cpk) {
@@ -299,10 +302,15 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
 
+      const inputCollateral =
+        collateral.symbol !== displayCollateral.symbol && collateral.symbol === nativeAsset.symbol
+          ? displayCollateral
+          : collateral
+
       await cpk.addFunding({
         amount: amountToFundNormalized || Zero,
         compoundService,
-        collateral,
+        collateral: inputCollateral,
         marketMaker,
         setTxHash,
         setTxState,
@@ -427,7 +435,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
 
       setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
 
-      const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
       let useBaseToken = false
       if (displayCollateral.address === pseudoNativeAssetAddress) {
@@ -437,12 +444,14 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           useBaseToken = true
         }
       }
+
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
+
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
-        collateralAddress,
+        collateral: marketMakerData.collateral,
         conditionId,
         conditionalTokens,
         compoundService,
@@ -680,7 +689,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const disableDepositButton =
     !amountToFund ||
     amountToFund?.isZero() ||
-    (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
+    (!cpk?.isSafeApp &&
+      displayCollateral.address !== pseudoNativeAssetAddress &&
+      hasEnoughAllowance !== Ternary.True) ||
     collateralAmountError !== null ||
     currentDate > resolutionDate ||
     isNegativeAmountToFund
@@ -743,11 +754,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   }
 
   const setDisplayCollateralAmountToFund = (value: BigNumber) => {
-    if (collateral.address === displayCollateral.address) {
-      setAmountToFund(value)
-    } else if (compoundService) {
+    if (compoundService) {
       const baseAmount = compoundService.calculateBaseToCTokenExchange(displayCollateral, value)
       setAmountToFund(baseAmount)
+    } else {
+      setAmountToFund(value)
     }
     setAmountToFundNormalized(value)
   }
@@ -847,6 +858,8 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 
+  const disableWithdrawTab = activeTab !== Tabs.withdraw && isDust(totalUserLiquidity, collateral.decimals)
+
   return (
     <>
       <UserPoolData
@@ -884,7 +897,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
               Deposit
             </ButtonTab>
             <ButtonTab
-              active={!disableWithdrawTab && activeTab === Tabs.withdraw}
+              active={activeTab === Tabs.withdraw}
               disabled={disableWithdrawTab}
               onClick={() => setActiveTab(Tabs.withdraw)}
             >
@@ -1040,7 +1053,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       )}
       {activeTab === Tabs.deposit && showUpgrade && (
         <SetAllowanceStyled
-          collateral={getNativeAsset(networkId, relay)}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}
@@ -1071,8 +1083,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         />
       )}
       <BottomButtonWrapper>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
-          Cancel
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => (history.length > 2 ? history.goBack() : history.replace('/liquidity'))}
+        >
+          Back
         </Button>
         <BottomButtonRight>
           {liquidityMiningCampaign && (

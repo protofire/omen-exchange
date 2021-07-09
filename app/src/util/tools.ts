@@ -290,7 +290,8 @@ export const waitForConfirmations = async (
 ) => {
   setTxState(TransactionStep.transactionSubmitted)
   let receipt
-  const requiredConfs = confirmations || CONFIRMATION_COUNT
+  const requiredConfs = confirmations ? confirmations : CONFIRMATION_COUNT
+
   while (!receipt || !receipt.confirmations || (receipt.confirmations && receipt.confirmations <= requiredConfs)) {
     receipt = await provider.getTransaction(hash)
     if (receipt && receipt.confirmations) {

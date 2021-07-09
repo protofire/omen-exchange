@@ -11,8 +11,6 @@ import {
   useAsyncDerivedValue,
   useCollateralBalance,
   useCompoundService,
-  useConnectedBalanceContext,
-  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
@@ -79,10 +77,9 @@ interface Props extends RouteComponentProps<any> {
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const cpk = useConnectedCPKContext()
-  const { fetchBalances } = useConnectedBalanceContext()
+  const { fetchBalances } = context.balances
 
-  const { library: provider, networkId, relay } = context
+  const { cpk, library: provider, networkId, relay } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
@@ -126,12 +123,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const { allowance, unlock } = useCpkAllowance(signer, displayCollateral.address)
-
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount || Zero))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(displayCollateral.address === pseudoNativeAssetAddress)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
@@ -196,10 +192,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setAllowanceFinished(true)
   }
 
-  const showUpgrade =
-    (!isUpdated && displayCollateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && displayCollateral.address === pseudoNativeAssetAddress)
-
   const shouldDisplayMaxButton = displayCollateral.address !== pseudoNativeAssetAddress
 
   const upgradeProxy = async () => {
@@ -226,6 +218,12 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           useBaseToken = true
         }
       }
+
+      const inputCollateral =
+        collateral.symbol !== displayCollateral.symbol && collateral.symbol === nativeAsset.symbol
+          ? displayCollateral
+          : collateral
+
       const sharesAmount = formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals)
       setTweet('')
       setStatus(Status.Loading)
@@ -233,9 +231,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
+
       await cpk.buyOutcomes({
         amount: inputAmount,
-        collateral,
+        collateral: inputCollateral,
         compoundService,
         marketMaker,
         outcomeIndex,
@@ -269,9 +268,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   }
 
   const showSetAllowance =
-    collateral.address !== pseudoNativeAssetAddress &&
+    displayCollateral.address !== pseudoNativeAssetAddress &&
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
+
+  const showUpgrade = !isUpdated || upgradeFinished
 
   const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)))
   const feePercentage = Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)) * 100
@@ -298,14 +299,14 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
   const feeFormatted = `${formatNumber(
     formatBigNumber(displayFeePaid.mul(-1), displayCollateral.decimals, displayCollateral.decimals),
-  )} ${symbol}`
+  )} ${displayCollateral.symbol}`
   const baseCostFormatted = `${formatNumber(
     formatBigNumber(displayBaseCost || Zero, displayCollateral.decimals, displayCollateral.decimals),
   )}
-    ${symbol}`
+    ${displayCollateral.symbol}`
   const potentialProfitFormatted = `${formatNumber(
     formatBigNumber(displayPotentialProfit, displayCollateral.decimals, displayCollateral.decimals),
-  )} ${symbol}`
+  )} ${displayCollateral.symbol}`
   const sharesTotal = formatNumber(
     formatBigNumber(displayTradedShares, baseCollateral.decimals, baseCollateral.decimals),
   )
@@ -326,12 +327,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     (status !== Status.Ready && status !== Status.Error) ||
     amount?.isZero() ||
     (!cpk?.isSafeApp &&
-      collateral.address !== pseudoNativeAssetAddress &&
       displayCollateral.address !== pseudoNativeAssetAddress &&
       hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount ||
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress)
+    !isUpdated
 
   let currencyFilters =
     collateral.address === wrapToken.address || collateral.address === pseudoNativeAssetAddress
@@ -497,14 +497,19 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )}
       {showUpgrade && (
         <SetAllowance
-          collateral={nativeAsset}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}
+          style={{ marginTop: showSetAllowance ? 20 : 0 }}
         />
       )}
       <StyledButtonContainer borderTop={true} marginTop={showSetAllowance || showUpgrade || isNegativeAmount}>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => switchMarketTab(MarketDetailsTab.swap)}>
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => {
+            switchMarketTab(MarketDetailsTab.swap)
+          }}
+        >
           Cancel
         </Button>
         <Button buttonType={ButtonType.secondaryLine} disabled={isBuyDisabled} onClick={() => finish()}>

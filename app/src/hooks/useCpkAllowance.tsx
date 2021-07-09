@@ -6,7 +6,7 @@ import { ERC20Service } from '../services'
 import { pseudoNativeAssetAddress } from '../util/networks'
 import { RemoteData } from '../util/remote_data'
 
-import { useConnectedCPKContext } from './connectedCpk'
+import { useConnectedWeb3Context } from './connectedWeb3'
 
 /**
  * Return the allowance of the given `signer` for the cpk.
@@ -16,7 +16,7 @@ import { useConnectedCPKContext } from './connectedCpk'
  * `unlock` can be used to set unlimited allowance for the cpk
  */
 export const useCpkAllowance = (signer: Signer, tokenAddress: string) => {
-  const cpk = useConnectedCPKContext()
+  const { cpk } = useConnectedWeb3Context()
   const [allowance, setAllowance] = useState<RemoteData<BigNumber>>(RemoteData.notAsked())
   const provider = signer.provider
 

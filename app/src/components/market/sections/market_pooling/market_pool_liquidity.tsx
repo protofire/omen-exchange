@@ -8,8 +8,6 @@ import { DOCUMENT_FAQ, STANDARD_DECIMALS } from '../../../../common/constants'
 import {
   useCollateralBalance,
   useCompoundService,
-  useConnectedBalanceContext,
-  useConnectedCPKContext,
   useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
@@ -41,6 +39,7 @@ import {
   getBaseTokenForCToken,
   getInitialCollateral,
   getSharesInBaseToken,
+  isDust,
 } from '../../../../util/tools'
 import {
   CompoundTokenType,
@@ -109,9 +108,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
   const history = useHistory()
   const context = useConnectedWeb3Context()
-  const { account, library: provider, networkId, relay } = context
-  const cpk = useConnectedCPKContext()
-  const { fetchBalances } = useConnectedBalanceContext()
+  const { account, cpk, library: provider, networkId, relay } = context
+  const { fetchBalances } = context.balances
 
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
@@ -158,7 +156,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const [userStakedTokens, setUserStakedTokens] = useState(new BigNumber(0))
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(displayCollateral.address === pseudoNativeAssetAddress)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
   let baseCollateral = collateral
@@ -228,9 +226,12 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
-  const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
-    amount.lt(min) ? amount : min,
-  )
+
+  const depositedTokens = sendAmountsAfterRemovingFunding
+    .map((amount, i) => {
+      return amount.add(balances[i].shares)
+    })
+    .reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
 
   const sharesAfterRemovingFunding = balances.map((balance, i) => {
     return balance.shares.add(sendAmountsAfterRemovingFunding[i]).sub(depositedTokens)
@@ -248,6 +249,9 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     displayCollateral.address !== pseudoNativeAssetAddress &&
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
+
+  const showUpgrade = !isUpdated || upgradeFinished
+
   const depositedTokensTotal = depositedTokens.add(userEarnings)
   const { fetchFundingBalance, fundingBalance: maybeFundingBalance } = useFundingBalance(marketMakerAddress, context)
   const fundingBalance = maybeFundingBalance || Zero
@@ -261,9 +265,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     totalPoolShares,
   )
 
-  const totalDepositedTokens = totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) =>
-    amount.lt(min) ? amount : min,
-  )
+  const totalDepositedTokens = fundingBalance.gt(0)
+    ? totalUserShareAmounts
+        .map((amount, i) => {
+          return amount.add(balances[i].shares)
+        })
+        .reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
+    : new BigNumber(0)
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings).add(userStakedTokens)
 
@@ -300,10 +308,16 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
+
+      const inputCollateral =
+        collateral.symbol !== displayCollateral.symbol && collateral.symbol === nativeAsset.symbol
+          ? displayCollateral
+          : collateral
+
       await cpk.addFunding({
         amount: amountToFundNormalized || Zero,
         compoundService,
-        collateral,
+        collateral: inputCollateral,
         marketMaker,
         setTxHash,
         setTxState,
@@ -426,7 +440,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       }
       setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${displayCollateral.symbol}...`)
 
-      const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
       let useBaseToken = false
       if (displayCollateral.address === pseudoNativeAssetAddress) {
@@ -436,12 +449,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           useBaseToken = true
         }
       }
+
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
-        collateralAddress,
+        collateral: marketMakerData.collateral,
         conditionId,
         conditionalTokens,
         compoundService,
@@ -678,10 +692,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     setAllowanceFinished(true)
   }
 
-  const showUpgrade =
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
-
   const upgradeProxy = async () => {
     if (!cpk) {
       return
@@ -704,17 +714,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const disableDepositButton =
     !amountToFund ||
     amountToFund?.isZero() ||
-    (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
+    (!cpk?.isSafeApp &&
+      displayCollateral.address !== pseudoNativeAssetAddress &&
+      hasEnoughAllowance !== Ternary.True) ||
     collateralAmountError !== null ||
     currentDate > resolutionDate ||
     isNegativeAmountToFund
 
   const setDisplayCollateralAmountToFund = (value: BigNumber) => {
-    if (collateral.address === displayCollateral.address) {
-      setAmountToFund(value)
-    } else if (compoundService) {
+    if (compoundService) {
       const baseAmount = compoundService.calculateBaseToCTokenExchange(displayCollateral, value)
       setAmountToFund(baseAmount)
+    } else {
+      setAmountToFund(value)
     }
     setAmountToFundNormalized(value)
   }
@@ -855,6 +867,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const currencySelectorIsDisabled = relay ? true : currencyFilters.length ? false : true
 
+  const disableWithdrawTab = activeTab !== Tabs.withdraw && isDust(totalUserLiquidity, collateral.decimals)
+
   return (
     <>
       <UserPoolData
@@ -892,6 +906,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             </ButtonTab>
             <ButtonTab
               active={disableDepositTab ? true : activeTab === Tabs.withdraw}
+              disabled={disableWithdrawTab}
               onClick={() => switchTab(Tabs.withdraw)}
             >
               Withdraw
@@ -1046,7 +1061,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       )}
       {activeTab === Tabs.deposit && showUpgrade && (
         <SetAllowanceStyled
-          collateral={getNativeAsset(networkId, relay)}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}
@@ -1077,7 +1091,10 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
       <BottomButtonWrapper borderTop>
-        <Button buttonType={ButtonType.secondaryLine} onClick={() => history.goBack()}>
+        <Button
+          buttonType={ButtonType.secondaryLine}
+          onClick={() => (history.length > 2 ? history.goBack() : history.replace('/liquidity'))}
+        >
           Back
         </Button>
         <BottomButtonRight>

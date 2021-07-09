@@ -11,17 +11,11 @@ import {
   DOCUMENT_FAQ,
   MAX_MARKET_FEE,
 } from '../../../../../../common/constants'
-import {
-  useCollateralBalance,
-  useConnectedCPKContext,
-  useConnectedWeb3Context,
-  useCpkAllowance,
-  useCpkProxy,
-} from '../../../../../../hooks'
+import { useCollateralBalance, useConnectedWeb3Context, useCpkAllowance, useCpkProxy } from '../../../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
-import { getNativeAsset, networkIds, pseudoNativeAssetAddress } from '../../../../../../util/networks'
+import { networkIds, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
 import { Arbitrator, CompoundEnabledTokenType, Ternary, Token } from '../../../../../../util/types'
@@ -195,10 +189,10 @@ interface Props {
 
 const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const cpk = useConnectedCPKContext()
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
-  const { account, library: provider, networkId, relay } = context
+
+  const { account, cpk, library: provider, networkId } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
   const [isServiceChecked, setServiceCheck] = useState<boolean>(false)
   const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
@@ -266,7 +260,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(userInputCollateral.address === pseudoNativeAssetAddress)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
   useEffect(() => {
@@ -332,16 +326,15 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     amountError !== null ||
     exceedsMaxFee ||
     isNegativeDepositAmount ||
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress)
+    !isUpdated ||
+    (!cpk?.isSafeApp && userInputCollateral.address !== pseudoNativeAssetAddress && hasZeroAllowance === Ternary.True)
 
   const showSetAllowance =
     userInputCollateral.address !== pseudoNativeAssetAddress &&
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
-  const showUpgrade =
-    (!isUpdated && userInputCollateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && userInputCollateral.address === pseudoNativeAssetAddress)
+  const showUpgrade = !isUpdated || upgradeFinished
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 
@@ -384,6 +377,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     handleCollateralChange(token, newAmount)
     setServiceCheck(false)
     setAllowanceFinished(false)
+    setUpgradeFinished(false)
   }
 
   const toggleCustomFee = () => {
@@ -500,7 +494,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
                 balance={formatNumber(collateralBalanceFormatted, 5)}
                 context={context}
                 currency={userInputCollateral.address}
-                disabled={relay}
                 onSelect={onCollateralChange}
               />
             </CurrenciesWrapper>
@@ -587,7 +580,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         )}
         {showUpgrade && (
           <SetAllowance
-            collateral={getNativeAsset(networkId, relay)}
             finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
             loading={RemoteData.is.asking(proxyIsUpToDate)}
             onUnlock={upgradeProxy}

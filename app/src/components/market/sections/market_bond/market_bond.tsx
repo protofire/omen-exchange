@@ -5,9 +5,10 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { useConnectedCPKContext, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { useConnectedWeb3Context, useContracts, useCpkProxy } from '../../../../hooks'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset } from '../../../../util/networks'
+import { RemoteData } from '../../../../util/remote_data'
 import { formatBigNumber, formatNumber, getUnit, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
@@ -26,6 +27,7 @@ import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
 import { OutcomeTable } from '../../common/outcome_table'
+import { SetAllowance } from '../../common/set_allowance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
@@ -55,9 +57,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   } = marketMakerData
 
   const context = useConnectedWeb3Context()
-  const { account, library: provider, networkId, relay } = context
-
-  const cpk = useConnectedCPKContext()
+  const { account, cpk, library: provider, networkId, relay } = context
 
   const nativeAsset = getNativeAsset(networkId, relay)
   const { symbol } = nativeAsset
@@ -75,6 +75,11 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
 
+  const [upgradeFinished, setUpgradeFinished] = useState(false)
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(true)
+  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
+  const showUpgrade = !isUpdated || upgradeFinished
+
   useEffect(() => {
     const fetchBalance = async () => {
       try {
@@ -89,6 +94,15 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       fetchBalance()
     }
   }, [account, provider, bondNativeAssetAmount])
+
+  const upgradeProxy = async () => {
+    if (!cpk) {
+      return
+    }
+
+    await updateProxy()
+    setUpgradeFinished(true)
+  }
 
   const bondOutcome = async (isInvalid?: boolean) => {
     if (!cpk) {
@@ -110,12 +124,15 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
             : props.isScalar
-            ? `${formatBigNumber(bondOutcomeSelected, nativeAsset.decimals)} ${getUnit(
-                props.marketMakerData.question.title,
-              )}`
+            ? `${formatNumber(
+                formatBigNumber(bondOutcomeSelected, nativeAsset.decimals, nativeAsset.decimals),
+              )} ${getUnit(props.marketMakerData.question.title)}`
             : marketMakerData.question.outcomes[outcomeIndex]
-        } with ${formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals)} ${symbol}`,
+        } with ${formatNumber(
+          formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals, nativeAsset.decimals),
+        )} ${symbol}`,
       )
+
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
@@ -132,15 +149,18 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       })
 
       await fetchGraphMarketMakerData()
-
+      setBondOutcomeDisplay('0')
+      setBondOutcomeSelected(Zero)
       setMessage(
-        `Successfully bonded ${formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals)} ${symbol} on ${
+        `Successfully bonded ${formatNumber(
+          formatBigNumber(bondNativeAssetAmount, nativeAsset.decimals, nativeAsset.decimals),
+        )} ${symbol} on ${
           outcomeIndex >= balances.length || isInvalid
             ? 'Invalid'
             : props.isScalar
-            ? `${formatBigNumber(bondOutcomeSelected, nativeAsset.decimals)} ${getUnit(
-                props.marketMakerData.question.title,
-              )}`
+            ? `${formatNumber(
+                formatBigNumber(bondOutcomeSelected, nativeAsset.decimals, nativeAsset.decimals),
+              )} ${getUnit(props.marketMakerData.question.title)}`
             : marketMakerData.question.outcomes[outcomeIndex]
         }`,
       )
@@ -195,7 +215,14 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           showBondChange
         />
       )}
-
+      {showUpgrade && (
+        <SetAllowance
+          finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
+          loading={RemoteData.is.asking(proxyIsUpToDate)}
+          onUnlock={upgradeProxy}
+          style={{ marginTop: 20 }}
+        />
+      )}
       <GridTransactionDetails>
         <div>
           <>
@@ -281,7 +308,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             Set Invalid
           </Button>
         )}
-        <Button buttonType={ButtonType.primary} disabled={amountError} onClick={() => bondOutcome(false)}>
+        <Button buttonType={ButtonType.primary} disabled={amountError || !isUpdated} onClick={() => bondOutcome(false)}>
           Bond {symbol}
         </Button>
       </BottomButtonWrapper>

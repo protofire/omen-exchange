@@ -1,6 +1,7 @@
 import RealitioQuestionLib from '@realitio/realitio-lib/formatters/question'
 import RealitioTemplateLib from '@realitio/realitio-lib/formatters/template'
 import { Contract, Wallet, ethers, utils } from 'ethers'
+import { AddressZero, HashZero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 // eslint-disable-next-line import/named
 import { Moment } from 'moment'
@@ -8,20 +9,44 @@ import { Moment } from 'moment'
 import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID, UINT_TEMPLATE_ID } from '../common/constants'
 import { Outcome } from '../components/market/sections/market_create/steps/outcomes'
 import { getLogger } from '../util/logger'
-import { getEarliestBlockToCheck, getRealitioTimeout } from '../util/networks'
+import { getEarliestBlockToCheck, getRealitioTimeout, networkIds } from '../util/networks'
 import { Question, QuestionLog, TransactionStep } from '../util/types'
 
 const logger = getLogger('Services::Realitio')
 
 export const realitioAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public payable returns (bytes32)',
+  'event LogNewAnswer(bytes32 answer, bytes32 indexed question_id, bytes32 history_hash, address indexed user, uint256 bond, uint256 ts, bool is_commitment)',
   'event LogNewQuestion(bytes32 indexed question_id, address indexed user, uint256 template_id, string question, bytes32 indexed content_hash, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce, uint256 created)',
   'function isFinalized(bytes32 question_id) view public returns (bool)',
   'function resultFor(bytes32 question_id) external view returns (bytes32)',
   'function submitAnswer(bytes32 question_id, bytes32 answer, uint256 max_previous)',
+  'function withdraw()',
+  'function claimWinnings(bytes32 question_id, bytes32[] history_hashes, address[] addrs, uint256[] bonds, bytes32[] answers)',
+  'function questions(bytes32 question_id) view public returns (bytes32 content_hash, address arbitrator, uint32 opening_ts, uint32 timeout, uint32 finalize_ts, bool is_pending_arbitration, uint256 bounty, bytes32 best_answer, bytes32 history_hash, uint256 bond)',
+  'event LogClaim(bytes32 indexed question_id, address indexed user, uint256 amount)',
 ]
 const realitioCallAbi = [
   'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
+  {
+    constant: true,
+    inputs: [
+      {
+        name: '',
+        type: 'address',
+      },
+    ],
+    name: 'balanceOf',
+    outputs: [
+      {
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    payable: false,
+    stateMutability: 'view',
+    type: 'function',
+  },
 ]
 const realitioScalarAdapterAbi = [
   'function announceConditionQuestionId(bytes32 questionId, uint256 low, uint256 high)',
@@ -30,6 +55,17 @@ const realitioScalarAdapterAbi = [
 
 interface TransactionResult {
   hash: string
+}
+
+interface AnswerValues {
+  user: string
+  answer: string
+  bond: BigNumber
+  history_hash: string
+}
+
+interface AnswerEvent {
+  values: AnswerValues
 }
 
 function getQuestionArgs(
@@ -135,6 +171,124 @@ class RealitioService {
     return questionId
   }
 
+  getAnswers = async (questionId: string): Promise<AnswerEvent[]> => {
+    const filter: any = this.contract.filters.LogNewAnswer(null, questionId)
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
+    const logs = await this.provider.getLogs({
+      ...filter,
+      fromBlock: getEarliestBlockToCheck(networkId),
+      toBlock: 'latest',
+    })
+    const iface = new ethers.utils.Interface(realitioAbi)
+    // @ts-expect-error ignore
+    const events = logs.map(log => iface.parseLog(log))
+    events.reverse()
+    return events
+  }
+
+  hasLogClaims = async (questionId: string) => {
+    const filter: any = this.contract.filters.LogClaim(questionId)
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
+    const logs = await this.provider.getLogs({
+      ...filter,
+      fromBlock: getEarliestBlockToCheck(networkId),
+      toBlock: 'latest',
+    })
+    return logs.length > 0
+  }
+
+  getClaimableBonds = async (questionId: string, currentAnswer: string): Promise<{ [key: string]: BigNumber }> => {
+    const question = await this.contract.questions(questionId)
+    // if claimWinnings was already called the claimable bonds are already in the realitio balance mapping, ready to withdraw
+    if (question.history_hash === HashZero) {
+      return {}
+    }
+
+    // Calc claimable bonds by matching claimWinnings internals: https://github.com/realitio/realitio-contracts/blob/master/truffle/contracts/Realitio.sol#L506
+    const events = await this.getAnswers(questionId)
+
+    // 2.5% bond fee for xdai
+    const BOND_CLAIM_FEE_PROPORTION = new BigNumber('40')
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
+
+    let payee = AddressZero
+    let queuedFunds = new BigNumber('0')
+    let lastBond = new BigNumber('0')
+    const balances: { [key: string]: BigNumber } = {}
+
+    const updateBalance = (addr: string, amount: BigNumber) => {
+      const balance = balances[addr]
+      balances[addr] = balance ? balance.add(amount) : amount
+    }
+
+    for (let i = 0; i < events.length; i++) {
+      const values = events[i].values
+      queuedFunds = queuedFunds.add(lastBond)
+      if (values.answer == currentAnswer) {
+        if (payee === AddressZero) {
+          payee = values.user
+        } else {
+          const answerTakeoverFee = queuedFunds.gte(values.bond) ? values.bond : queuedFunds
+          const payout = queuedFunds.sub(answerTakeoverFee)
+
+          updateBalance(payee, payout)
+
+          payee = values.user
+          queuedFunds = answerTakeoverFee
+        }
+      }
+
+      lastBond = values.bond
+
+      // handle bond fee on xdai - only the last bond is exempt from the bond fee
+      if (networkId === networkIds.XDAI && !lastBond.eq(question.bond)) {
+        lastBond = lastBond.sub(lastBond.div(BOND_CLAIM_FEE_PROPORTION))
+      }
+    }
+
+    // There is nothing left below this bond so the payee can keep what remains
+    const payout = queuedFunds.add(lastBond)
+    updateBalance(payee, payout)
+
+    return balances
+  }
+
+  encodeClaimWinnings = async (questionId: string) => {
+    if (!(await this.hasLogClaims(questionId))) {
+      const events = await this.getAnswers(questionId)
+
+      if (events.length > 0) {
+        // history_hashes Second-last-to-first, the hash of each history entry
+        // eslint-disable-next-line
+        const historyHashes = events.map((event, index) => {
+          // Final one should be empty
+          if (index === events.length - 1) {
+            return HashZero
+          }
+          // Get the history has of the previous answer
+          const next = events[index + 1]
+          return next.values.history_hash
+        })
+
+        // Last-to-first, the address of each answerer or commitment sender
+        const addrs = events.map(({ values }: AnswerEvent) => values.user)
+
+        // Last-to-first, the bond supplied with each answer or commitment
+        const bonds = events.map(({ values }: AnswerEvent) => values.bond)
+
+        // Last-to-first, each answer supplied, or commitment ID if the answer was supplied with commit->reveal
+        const answers = events.map(({ values }: AnswerEvent) => values.answer)
+
+        const iface = new utils.Interface(realitioAbi)
+
+        return iface.functions.claimWinnings.encode([questionId, historyHashes, addrs, bonds, answers])
+      }
+    }
+  }
+
   getQuestion = async (questionId: string): Promise<Question> => {
     const filter: any = this.contract.filters.LogNewQuestion(questionId)
     const network = await this.provider.getNetwork()
@@ -221,6 +375,11 @@ class RealitioService {
       logger.error(`There was an error querying the result for question with id '${questionId}'`, err.message)
       throw err
     }
+  }
+
+  getBalanceOf = async (address: string): Promise<BigNumber> => {
+    const result = await this.constantContract.balanceOf(address)
+    return result
   }
 
   submitAnswer = async (questionId: string, answer: string, amount: BigNumber): Promise<TransactionResult> => {
@@ -322,11 +481,25 @@ class RealitioService {
       const transactionObject = await this.scalarContract.resolve(questionId, question, scalarLow, scalarHigh)
       setTxState && setTxState(TransactionStep.transactionSubmitted)
       setTxHash && setTxHash(transactionObject.hash)
-      const tx = this.provider.waitForTransaction(transactionObject.hash)
+      const tx = await this.provider.waitForTransaction(transactionObject.hash)
       setTxState && setTxState(TransactionStep.transactionConfirmed)
       return tx
     } catch (err) {
       logger.error(`There was an error resolving the condition with question id '${questionId}'`, err.message)
+      throw err
+    }
+  }
+
+  withdraw = async (setTxHash?: (arg0: string) => void, setTxState?: (step: TransactionStep) => void) => {
+    try {
+      const transactionObject = await this.contract.withdraw()
+      setTxState && setTxState(TransactionStep.transactionSubmitted)
+      setTxHash && setTxHash(transactionObject.hash)
+      const tx = await this.provider.waitForTransaction(transactionObject.hash)
+      setTxState && setTxState(TransactionStep.transactionConfirmed)
+      return tx
+    } catch (err) {
+      logger.error(`There was an error withdrawing`, err.message)
       throw err
     }
   }
@@ -341,6 +514,11 @@ class RealitioService {
 
     const resolveConditionInterface = new utils.Interface(realitioScalarAdapterAbi)
     return resolveConditionInterface.functions.resolve.encode(args)
+  }
+
+  static encodeWithdraw = () => {
+    const withdrawInterface = new utils.Interface(realitioAbi)
+    return withdrawInterface.functions.withdraw.encode([])
   }
 }
 

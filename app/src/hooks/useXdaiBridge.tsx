@@ -3,11 +3,10 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
 import { XdaiService } from '../services'
-import { knownTokens, networkIds } from '../util/networks'
+import { getToken, networkIds } from '../util/networks'
 import { formatBigNumber } from '../util/tools'
 import { TransactionStep } from '../util/types'
 
-import { useConnectedCPKContext } from './connectedCpk'
 import { useConnectedWeb3Context } from './connectedWeb3'
 
 interface Prop {
@@ -27,7 +26,7 @@ interface Prop {
 
 export const useXdaiBridge = (amount?: BigNumber): Prop => {
   const [transactionStep, setTransactionStep] = useState<TransactionStep>(TransactionStep.idle)
-  const { account, library: provider, networkId, relay } = useConnectedWeb3Context()
+  const { account, cpk, library: provider, networkId, relay } = useConnectedWeb3Context()
   const [xDaiBalance, setXdaiBalance] = useState<BigNumber>(Zero)
   const [daiBalance, setDaiBalance] = useState<BigNumber>(Zero)
   const [numberOfConfirmations, setNumberOfConfirmations] = useState<any>(0)
@@ -35,8 +34,8 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
   const [unclaimedAmount, setUnclaimedAmount] = useState<BigNumber>(Zero)
   const [claimState, setClaimState] = useState<boolean>(false)
   const [transactionHash, setTransactionHash] = useState<string>('')
-  const cpk = useConnectedCPKContext()
-  const { decimals } = knownTokens['dai']
+
+  const { address, decimals, symbol } = getToken(1, 'dai')
 
   const transferFunction = async () => {
     try {
@@ -44,8 +43,7 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
       if (networkId === networkIds.MAINNET) {
         setTransactionStep(TransactionStep.waitingConfirmation)
 
-        const transaction = await cpk.sendMainnetTokenToBridge(amount)
-
+        const transaction = await cpk.sendMainnetTokenToBridge(amount, address, symbol)
         setTransactionHash(transaction.hash)
         setTransactionStep(TransactionStep.transactionSubmitted)
 
@@ -62,9 +60,15 @@ export const useXdaiBridge = (amount?: BigNumber): Prop => {
         }
         setTransactionStep(TransactionStep.waitingConfirmation)
 
-        const transaction = await cpk.sendXdaiChainTokenToBridge(amount)
+        const transaction = await cpk.sendXdaiChainTokenToBridge(
+          amount,
+          address,
+          { setTxHash: setTransactionHash, setTxState: setTransactionStep },
+          symbol,
+        )
 
         setTransactionHash(transaction)
+
         setTransactionStep(TransactionStep.transactionSubmitted)
 
         // await waitForConfirmations(transaction, cpk, setNumberOfConfirmations, networkId)
