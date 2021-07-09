@@ -1678,8 +1678,7 @@ class CPKService {
         data: StakingService.encodeStakePoolTokens(amount),
       })
 
-      const txObject = await this.cpk.execTransactions(transactions, txOptions, setTxHash, setTxState)
-      return txObject.hash
+      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
     } catch (e) {
       logger.error('Failed to stake pool tokens', e.message)
       throw e
