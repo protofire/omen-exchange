@@ -83,7 +83,8 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       setLiquidity(await marketMaker.getTotalSupply())
     }
     marketMaker && getLiquidity()
-  })
+    // eslint-disable-next-line
+  }, [])
 
   const formattedLiquidity: string = formatBigNumber(liquidity, STANDARD_DECIMALS, 2)
 
