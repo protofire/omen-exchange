@@ -414,6 +414,18 @@ class CPKService {
     }
   }
 
+  proxyIsUpToDate = async (): Promise<boolean> => {
+    const network = await this.provider.getNetwork()
+    const deployed = await this.cpk.isProxyDeployed()
+    if (deployed) {
+      const implementation = await this.safe.getMasterCopy()
+      if (implementation.toLowerCase() === getTargetSafeImplementation(network.chainId).toLowerCase()) {
+        return true
+      }
+    }
+    return false
+  }
+
   upgradeProxyImplementation = async (): Promise<TransactionReceipt> => {
     try {
       const txOptions: TxOptions = {}
@@ -520,18 +532,6 @@ class CPKService {
       logger.error(`Error trying to send XDai to bridge address`, e.message)
       throw e
     }
-  }
-
-  proxyIsUpToDate = async (): Promise<boolean> => {
-    const network = await this.provider.getNetwork()
-    const deployed = await this.cpk.isProxyDeployed()
-    if (deployed) {
-      const implementation = await this.safe.getMasterCopy()
-      if (implementation.toLowerCase() === getTargetSafeImplementation(network.chainId).toLowerCase()) {
-        return true
-      }
-    }
-    return false
   }
 
   fetchLatestUnclaimedTransactions = async () => {
