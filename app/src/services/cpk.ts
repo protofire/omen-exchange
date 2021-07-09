@@ -169,7 +169,6 @@ interface CPKUnstakeClaimAndWithdrawParams {
   compoundService?: CompoundService | null
   conditionId: string
   conditionalTokens: ConditionalTokenService
-  earnings: BigNumber
   marketMaker: MarketMakerService
   outcomesCount: number
   setTxHash: (arg0: string) => void
@@ -1897,7 +1896,6 @@ class CPKService {
     compoundService,
     conditionId,
     conditionalTokens,
-    earnings,
     marketMaker,
     outcomesCount,
     setTxHash,
@@ -1946,7 +1944,7 @@ class CPKService {
       const collateralToken = getTokenFromAddress(networkId, collateralAddress)
       const collateralSymbol = collateralToken.symbol.toLowerCase()
       let userInputCollateral = collateralToken
-      const totalAmountToSend = amountToMerge.add(earnings)
+      const totalAmountToSend = amountToMerge
       // transfer to the user the merged collateral plus the earned fees
       if (useBaseToken || this.cpk.relay) {
         if (compoundService != null) {
