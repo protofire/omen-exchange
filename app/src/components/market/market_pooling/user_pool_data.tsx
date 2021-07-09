@@ -160,7 +160,7 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
         </FlexBoxColumnOrRow>
         {currentApr > 0 && (
           <LpRewardsWrapper>
-            <UserDataTitleValue title="Current APY" value={`${formatNumber(currentApr.toString())}%`} />
+            <UserDataTitleValue title="Current APR" value={`${formatNumber(currentApr.toString())}%`} />
             <UserDataTitleValue title="Total Rewards" value={`${formatNumber(totalRewards.toString())} OMN`} />
             <UserDataTitleValue title="Rewards left" value={`${formatNumber(remainingRewards.toString())} OMN`} />
 
