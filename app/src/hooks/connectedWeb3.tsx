@@ -161,7 +161,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     return () => {
       isSubscribed = false
     }
-  }, [context, library, active, error, networkId, safeAppInfo, rpcAddress, debugAddress, debugNetworkId, props])
+  }, [context, library, active, error, networkId, safeAppInfo, rpcAddress, debugAddress, debugNetworkId])
 
   if (
     !networkId ||
@@ -182,7 +182,6 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     setStatus: props.setStatus,
   }
   props.setStatus(true)
-
   return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
 }
 

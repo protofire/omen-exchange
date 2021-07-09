@@ -48,7 +48,6 @@ export const useMarkets = (options: Options): any => {
   } = options
 
   const [moreMarkets, setMoreMarkets] = React.useState(true)
-
   const [markets, setMarkets] = React.useState<GraphResponseMarketsGeneric>({ fixedProductMarketMakers: [] })
 
   const fetchMyMarkets = state === MarketStates.myMarkets

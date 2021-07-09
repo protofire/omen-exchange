@@ -270,7 +270,6 @@ const MarketHomeContainer: React.FC = () => {
     } else if (fetchedMarkets) {
       const { fixedProductMarketMakers } = fetchedMarkets
       setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
-
       setIsFiltering(false)
     } else if (error) {
       setMarkets(RemoteData.failure(error))
