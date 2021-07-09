@@ -215,7 +215,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     ? totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
     : new BigNumber(0)
 
-  const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
+  const totalUserLiquidity = totalDepositedTokens.add(userEarnings).add(userStakedTokens)
 
   const showUpgrade =
     (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
