@@ -279,6 +279,80 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     }
   }
 
+  const addFundingAndStake = async () => {
+    try {
+      if (!cpk) {
+        return
+      }
+      if (!liquidityMiningCampaign) {
+        throw new Error('No liquidity mining campaign')
+      }
+      if (!account) {
+        throw new Error('Please connect to your wallet to perform this action.')
+      }
+      if (
+        !cpk?.isSafeApp &&
+        collateral.address !== pseudoNativeAssetAddress &&
+        displayCollateral.address !== pseudoNativeAssetAddress &&
+        hasEnoughAllowance !== Ternary.True
+      ) {
+        throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
+      }
+
+      setMessage(
+        `Depositing funds: ${formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)} ${
+          displayCollateral.symbol
+        }...`,
+      )
+
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
+
+      await cpk.depositAndStake({
+        amount: amountToFundNormalized || Zero,
+        campaignAddress: liquidityMiningCampaign.id,
+        collateral,
+        compoundService,
+        holdingsBN: balances.map(b => b.holdings),
+        marketMaker,
+        poolShareSupply: totalPoolShares,
+        setTxHash,
+        setTxState,
+        useBaseToken: false, // Not using base token for staking
+      })
+
+      await fetchGraphMarketMakerData()
+      await fetchFundingBalance()
+      await fetchCollateralBalance()
+      await fetchBalances()
+      await fetchStakingData()
+
+      setAmountToFund(null)
+      setAmountToFundDisplay('')
+      setAmountToFundNormalized(null)
+      setMessage(
+        `Successfully deposited ${formatBigNumber(amountToFundNormalized || Zero, displayCollateral.decimals)} ${
+          displayCollateral.symbol
+        }`,
+      )
+      setIsTransactionProcessing(false)
+    } catch (err) {
+      setTxState(TransactionStep.error)
+      setMessage(`Error trying to deposit funds.`)
+      logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
+    }
+  }
+
+  const deposit = async () => {
+    if (liquidityMiningCampaign && rewardApr > 0) {
+      addFundingAndStake()
+    } else {
+      addFunding()
+    }
+  }
+
   const removeFunding = async () => {
     try {
       if (!cpk) {
@@ -833,7 +907,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
             </Button>
           )}
           {activeTab === Tabs.deposit && (
-            <Button buttonType={ButtonType.primaryAlternative} disabled={disableDepositButton} onClick={addFunding}>
+            <Button buttonType={ButtonType.primaryAlternative} disabled={disableDepositButton} onClick={deposit}>
               Deposit
             </Button>
           )}
