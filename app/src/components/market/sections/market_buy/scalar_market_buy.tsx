@@ -127,7 +127,7 @@ export const ScalarMarketBuy = (props: Props) => {
   }, [marketMakerData.collateral.address])
 
   useEffect(() => {
-    setIsNegativeAmount(formatBigNumber(amount, collateral.decimals, collateral.decimals).includes('-'))
+    setIsNegativeAmount(bigNumberToNumber(amount, collateral.decimals) < 0)
   }, [amount, collateral.decimals])
 
   useEffect(() => {
@@ -210,7 +210,7 @@ export const ScalarMarketBuy = (props: Props) => {
   const baseCost = debouncedAmount.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
 
-  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
+  const currentBalance = `${bigNumberToString(collateralBalance, collateral.decimals, 5)}`
 
   const feeFormatted = `${bigNumberToString(feePaid.mul(-1), collateral.decimals)}
   ${collateral.symbol}`

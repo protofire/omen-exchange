@@ -17,7 +17,13 @@ import { BalanceState, fetchAccountBalance } from '../../../../../../store/reduc
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
-import { bigNumberToString, formatBigNumber, formatDate, formatNumber } from '../../../../../../util/tools'
+import {
+  bigNumberToNumber,
+  bigNumberToString,
+  formatBigNumber,
+  formatDate,
+  formatNumber,
+} from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
@@ -265,7 +271,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   }, [maybeCollateralBalance])
 
   useEffect(() => {
-    setIsNegativeDepositAmount(formatBigNumber(funding, collateral.decimals).includes('-'))
+    setIsNegativeDepositAmount(bigNumberToNumber(funding, collateral.decimals) < 0)
   }, [funding, collateral.decimals])
 
   const resolutionDate = resolution && formatDate(resolution, false)

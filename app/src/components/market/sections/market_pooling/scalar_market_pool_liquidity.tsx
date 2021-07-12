@@ -20,6 +20,7 @@ import { RemoteData } from '../../../../util/remote_data'
 import {
   bigMax,
   bigMin,
+  bigNumberToNumber,
   bigNumberToString,
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
@@ -133,11 +134,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
-    setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
+    setIsNegativeAmountToFund(bigNumberToNumber(amountToFund || Zero, collateral.decimals) < 0)
   }, [amountToFund, collateral.decimals])
 
   useEffect(() => {
-    setIsNegativeAmountToRemove(formatBigNumber(amountToRemove || Zero, collateral.decimals).includes('-'))
+    setIsNegativeAmountToRemove(bigNumberToNumber(amountToRemove || Zero, collateral.decimals) < 0)
   }, [amountToRemove, collateral.decimals])
 
   useEffect(() => {
@@ -189,7 +190,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     : new BigNumber(0)
   const depositedTokensTotal = depositedTokens.add(userEarnings)
 
-  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
+  const feeFormatted = useMemo(() => `${bigNumberToString(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
 
   const totalUserShareAmounts = calcRemoveFundingSendAmounts(
     fundingBalance,

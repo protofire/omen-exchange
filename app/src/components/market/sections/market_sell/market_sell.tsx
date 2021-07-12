@@ -71,7 +71,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
 
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
-    const shares = parseInt(formatBigNumber(balances[i].shares, collateral.decimals))
+    const shares = bigNumberToNumber(balances[i].shares, collateral.decimals)
     if (shares > 0) {
       defaultOutcomeIndex = i
       break
@@ -91,10 +91,10 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
 
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
+  const marketFeeWithTwoDecimals = bigNumberToNumber(fee, STANDARD_DECIMALS)
 
   useEffect(() => {
-    setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
+    setIsNegativeAmountShares(bigNumberToNumber(amountShares || Zero, collateral.decimals) < 0)
   }, [amountShares, collateral.decimals])
 
   useEffect(() => {

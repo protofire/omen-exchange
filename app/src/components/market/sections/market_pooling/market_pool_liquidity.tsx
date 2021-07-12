@@ -17,6 +17,7 @@ import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
+  bigNumberToNumber,
   bigNumberToString,
   calcAddFundingSendAmounts,
   calcPoolTokens,
@@ -115,11 +116,11 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
   useEffect(() => {
-    setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
+    setIsNegativeAmountToFund(bigNumberToNumber(amountToFund || Zero, collateral.decimals) < 0)
   }, [amountToFund, collateral.decimals])
 
   useEffect(() => {
-    setIsNegativeAmountToRemove(formatBigNumber(amountToRemove || Zero, collateral.decimals).includes('-'))
+    setIsNegativeAmountToRemove(bigNumberToNumber(amountToRemove || Zero, collateral.decimals) < 0)
   }, [amountToRemove, collateral.decimals])
 
   useEffect(() => {
@@ -136,7 +137,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const disableDepositTab = currentDate > resolutionDate
   const [activeTab, setActiveTab] = useState(disableDepositTab ? Tabs.withdraw : Tabs.deposit)
 
-  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
+  const feeFormatted = useMemo(() => `${bigNumberToString(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
 
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())

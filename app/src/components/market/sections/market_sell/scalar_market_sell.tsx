@@ -88,7 +88,7 @@ export const ScalarMarketSell = (props: Props) => {
   const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
-    setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
+    setIsNegativeAmountShares(bigNumberToNumber(amountShares || Zero, collateral.decimals) < 0)
   }, [amountShares, collateral.decimals])
 
   useEffect(() => {

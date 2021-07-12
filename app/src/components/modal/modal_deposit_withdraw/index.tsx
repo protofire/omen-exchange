@@ -211,7 +211,7 @@ export const ModalDepositWithdraw = (props: Props) => {
     }
 
     try {
-      setMessage(`${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), decimals)} ${symbol}`)
+      setMessage(`${exchangeType} ${bigNumberToString(displayFundAmount || new BigNumber(0), decimals)} ${symbol}`)
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
       setIsTransactionModalOpen(true)
@@ -276,7 +276,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         <BalanceItemSide>
           <BalanceItemBalance>
             {token?.balance
-              ? formatBigNumber(new BigNumber(token?.balance), decimals, symbol === 'DAI' ? 2 : 3)
+              ? bigNumberToString(new BigNumber(token?.balance), decimals, symbol === 'DAI' ? 2 : 3)
               : '0.00'}{' '}
             {symbol}
           </BalanceItemBalance>
@@ -355,8 +355,8 @@ export const ModalDepositWithdraw = (props: Props) => {
                 <span>Min amount</span>
                 <span>
                   {currencySelected === 'dai'
-                    ? `${formatBigNumber(minDaiBridgeExchange, decimals, 2)} DAI`
-                    : `${formatBigNumber(minOmniBridgeExchange, decimals, 3)} ${symbol}`}
+                    ? `${bigNumberToString(minDaiBridgeExchange, decimals, 2)} DAI`
+                    : `${bigNumberToString(minOmniBridgeExchange, decimals, 3)} ${symbol}`}
                 </span>
               </ExchangeDataItem>
               <ExchangeDataItem style={{ marginTop: '12px' }}>

@@ -3,10 +3,10 @@ import { BigNumber, formatUnits } from 'ethers/utils'
 export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string => {
   return Number(formatUnits(value, decimals)).toFixed(precision)
 }
-export const bigNumberToString = (value: BigNumber | string, decimals: number, precision = 2): string => {
+export const bigNumberToString = (value: BigNumber, decimals: number, precision = 2): string => {
   return formatNumber(formatUnits(value, decimals), precision)
 }
-export const bigNumberToNumber = (value: BigNumber | string, decimals: number): number => {
+export const bigNumberToNumber = (value: BigNumber, decimals: number): number => {
   return Number(formatUnits(value, decimals))
 }
 export const formatNumber = (number: string, decimals = 2): string => {
@@ -14,15 +14,13 @@ export const formatNumber = (number: string, decimals = 2): string => {
   const splitFixedInt = fixedInt.split('.')[0]
   const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
   if (number.length < 1) {
-    //console.log('firs Option no idea whats going on ', `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`)
     return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
   }
 
   if (Number(number) < 0.01 && Number(number) > 0) {
-    // console.log('Gem1no return', '<0.01')
     return '<0.01'
   }
-  // console.log('regular return', `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`)
+
   return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
 }
 export const formatHistoryUser = (user: string) => {

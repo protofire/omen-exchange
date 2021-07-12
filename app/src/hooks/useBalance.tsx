@@ -7,7 +7,7 @@ import { useTokens } from '../hooks'
 import { XdaiService } from '../services'
 import { getLogger } from '../util/logger'
 import { bridgeTokensList, getNativeAsset, networkIds } from '../util/networks'
-import { bigNumberToString, formatBigNumber } from '../util/tools'
+import { bigNumberToString } from '../util/tools'
 import { KnownTokenValue, Token } from '../util/types'
 
 const logger = getLogger('Hooks::ConnectedBalance')
@@ -109,7 +109,7 @@ export const useBalance = (props: any) => {
     ),
     daiBalance,
     xDaiBalance,
-    formattedxDaiBalance: formatBigNumber(xDaiBalance, STANDARD_DECIMALS),
+    formattedxDaiBalance: bigNumberToString(xDaiBalance, STANDARD_DECIMALS),
     fetchBalances,
     fetched: mainnetTokens.length > 0 && xDaiTokens.length > 0,
     omenBalance,

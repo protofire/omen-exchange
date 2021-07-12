@@ -20,10 +20,10 @@ import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
 import {
+  bigNumberToNumber,
   bigNumberToString,
   computeBalanceAfterTrade,
   formatBigNumber,
-  formatNumber,
   getInitialCollateral,
   mulBN,
 } from '../../../../util/tools'
@@ -111,7 +111,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
-    setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals, collateral.decimals).includes('-'))
+    setIsNegativeAmount(bigNumberToNumber(amount || Zero, collateral.decimals) < 0)
   }, [amount, collateral.decimals])
 
   useEffect(() => {
@@ -189,10 +189,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         return
       }
 
-      const sharesAmount = formatBigNumber(tradedShares, collateral.decimals, collateral.decimals)
+      const sharesAmount = bigNumberToString(tradedShares, collateral.decimals)
       setTweet('')
       setStatus(Status.Loading)
-      setMessage(`Buying ${formatNumber(sharesAmount)} shares...`)
+      setMessage(`Buying ${sharesAmount} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
@@ -219,7 +219,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )
       setDisplayAmountToFund(new BigNumber('0'))
       setStatus(Status.Ready)
-      setMessage(`Successfully bought ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
+      setMessage(`Successfully bought ${sharesAmount} ${balances[outcomeIndex].outcomeName} shares.`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
@@ -235,13 +235,14 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
-  const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)))
-  const feePercentage = Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)) * 100
+  const feePaid = mulBN(debouncedAmount || Zero, bigNumberToNumber(fee, STANDARD_DECIMALS))
+  const feePercentage = bigNumberToNumber(fee, STANDARD_DECIMALS) * 100
 
   const baseCost = debouncedAmount?.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount || Zero)
 
-  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
+  const currentBalance = `${bigNumberToString(collateralBalance, collateral.decimals, 5)}`
+
   const feeFormatted = `${bigNumberToString(feePaid.mul(-1), collateral.decimals)} ${collateral.symbol}`
   const baseCostFormatted = `${bigNumberToString(baseCost || Zero, collateral.decimals)}
     ${collateral.symbol}`
@@ -310,7 +311,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             <CurrencySelector
               addBalances
               addNativeAsset
-              balance={formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5)}
+              balance={bigNumberToString(maybeCollateralBalance || Zero, collateral.decimals, 5)}
               context={context}
               currency={collateral.address}
               disabled

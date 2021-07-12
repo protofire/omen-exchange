@@ -9,7 +9,7 @@ import { useConnectedWeb3Context, useContracts, useCpkProxy } from '../../../../
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import { bigNumberToString, formatBigNumber, formatNumber, getUnit, numberToByte32 } from '../../../../util/tools'
+import { bigNumberToString, getUnit, numberToByte32 } from '../../../../util/tools'
 import {
   INVALID_ANSWER_ID,
   MarketDetailsTab,
@@ -278,9 +278,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Profit"
-              value={`${formatNumber(
-                formatBigNumber(currentAnswerBond || new BigNumber(0), STANDARD_DECIMALS),
-              )} ${symbol}`}
+              value={`${bigNumberToString(currentAnswerBond || new BigNumber(0), STANDARD_DECIMALS)} ${symbol}`}
             />
 
             <TransactionDetailsRow

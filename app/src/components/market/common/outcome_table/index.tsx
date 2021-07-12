@@ -6,7 +6,7 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context, useSymbol } from '../../../../hooks'
 import { getOutcomeColor } from '../../../../theme/utils'
 import { getNativeAsset } from '../../../../util/networks'
-import { bigNumberToString, formatBigNumber, mulBN } from '../../../../util/tools'
+import { bigNumberToString, mulBN } from '../../../../util/tools'
 import { BalanceItem, BondItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, THead, TR, Table } from '../../../common'
 import { BarDiagram } from '../bar_diagram_probabilities'
@@ -156,11 +156,11 @@ export const OutcomeTable = (props: Props) => {
     const showBondBadge = isBond && withWinningOutcome && outcomeIndex === winningBondIndex
     const formattedBondedEth =
       bonds && bonds[outcomeIndex] && bonds[outcomeIndex].bondedEth
-        ? formatBigNumber(bonds[outcomeIndex].bondedEth, nativeAsset.decimals)
+        ? bigNumberToString(bonds[outcomeIndex].bondedEth, nativeAsset.decimals)
         : ''
     const formattedNewBondedEth =
       newBonds && newBonds[outcomeIndex].bondedEth
-        ? formatBigNumber(newBonds[outcomeIndex].bondedEth, nativeAsset.decimals)
+        ? bigNumberToString(newBonds[outcomeIndex].bondedEth, nativeAsset.decimals)
         : ''
     return (
       <TRExtended
@@ -226,17 +226,19 @@ export const OutcomeTable = (props: Props) => {
     const probability = withWinningOutcome ? Number(payout.mul(100).toString()) : probabilities[outcomeIndex]
     const newPrice = (probabilities[outcomeIndex] / 100).toFixed(2)
     const formattedPayout = bigNumberToString(mulBN(shares, Number(payout.toString())), collateral.decimals)
-    const formattedShares = formatBigNumber(shares, collateral.decimals)
+    const formattedShares = bigNumberToString(shares, collateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] && payouts[outcomeIndex].gt(0)
+
     const formattedNewShares = newShares ? bigNumberToString(newShares[outcomeIndex], collateral.decimals) : null
+
     const showBondBadge = isBond && withWinningOutcome && outcomeIndex === winningBondIndex
     const formattedBondedEth =
       bonds && bonds[outcomeIndex] && bonds[outcomeIndex].bondedEth
-        ? formatBigNumber(bonds[outcomeIndex].bondedEth, nativeAsset.decimals)
+        ? bigNumberToString(bonds[outcomeIndex].bondedEth, nativeAsset.decimals)
         : ''
     const formattedNewBondedEth =
       newBonds && newBonds[outcomeIndex].bondedEth
-        ? formatBigNumber(newBonds[outcomeIndex].bondedEth, nativeAsset.decimals)
+        ? bigNumberToString(newBonds[outcomeIndex].bondedEth, nativeAsset.decimals)
         : ''
 
     return (
