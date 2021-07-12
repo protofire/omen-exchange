@@ -1,17 +1,10 @@
 import { BigNumber, formatUnits } from 'ethers/utils'
 
 export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string => {
-  // console.log('current formatting', Number(formatUnits(value, decimals)).toFixed(precision))
-
   return Number(formatUnits(value, decimals)).toFixed(precision)
 }
 export const bigNumberToString = (value: BigNumber | string, decimals: number, precision = 2): string => {
-  const bigNumner = bigNumberToNumber(value, decimals)
-  if (bigNumner < 0.01 && bigNumner > 0) {
-    // console.log('Gem1no return', '<0.01')
-    return '<0.01'
-  }
-  return bigNumner.toFixed(precision)
+  return formatNumber(formatUnits(value, decimals), precision)
 }
 export const bigNumberToNumber = (value: BigNumber | string, decimals: number): number => {
   return Number(formatUnits(value, decimals))
