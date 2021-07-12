@@ -149,6 +149,7 @@ const theme = {
   },
   borders: {
     tooltip: '#cfd8dc',
+    tooltipShadow: '#EBEBEB',
     borderColor: '#ECEFF1',
     borderDisabled: '#E8EAF6',
     borderLineDisabled: '1px solid #E8EAF6',

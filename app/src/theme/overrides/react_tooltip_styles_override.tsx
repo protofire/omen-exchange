@@ -15,10 +15,10 @@ const DefaultTooltip = css`
     letter-spacing: 0.1px;
     text-align: left;
     background-color: ${theme.colors.mainBodyBackground};
-    opacity: 1;
+    opacity: 1 !important;
     border-radius: ${theme.borders.commonBorderRadius};
-    box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.05);
-    border: 1px solid ${theme.borders.tooltip};
+    border: 1px solid ${theme.borders.borderDisabled};
+    box-shadow: 0px 0px 4px ${theme.borders.tooltipShadow};
   }
 `
 
@@ -29,7 +29,7 @@ export const ReactTooltipStylesOverride = css`
     font-size: 11px;
     line-height: 1.3;
     max-width: 180px;
-    opacity: 1;
+    opacity: 1 !important;
     padding: 5px 8px;
     text-align: left;
 
