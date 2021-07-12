@@ -318,7 +318,7 @@ const HeaderContainer: React.FC = (props: any) => {
           )}
 
           {account && (
-            <HeaderButton>
+            <HeaderButton style={{ display: 'none' }}>
               {relay
                 ? `${bigNumberToString(xOmenBalance, STANDARD_DECIMALS, 0)}`
                 : `${bigNumberToString(omenBalance, STANDARD_DECIMALS, 0)}`}

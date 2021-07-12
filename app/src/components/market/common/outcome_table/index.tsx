@@ -228,7 +228,6 @@ export const OutcomeTable = (props: Props) => {
     const formattedPayout = bigNumberToString(mulBN(shares, Number(payout.toString())), collateral.decimals)
     const formattedShares = bigNumberToString(shares, collateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] && payouts[outcomeIndex].gt(0)
-
     const formattedNewShares = newShares ? bigNumberToString(newShares[outcomeIndex], collateral.decimals) : null
 
     const showBondBadge = isBond && withWinningOutcome && outcomeIndex === winningBondIndex
