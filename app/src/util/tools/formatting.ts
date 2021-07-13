@@ -29,14 +29,16 @@ export const formatHistoryUser = (user: string) => {
 
   return firstStringPart + lastPart
 }
-export const formatToShortNumber = (number: string, decimals = 2): string => {
-  if (number.length < 1) {
+export const formatToShortNumber = (number: number, decimals = 2): string => {
+  const insider = number.toFixed(2)
+
+  if (insider.length < 1) {
     return '0'
   }
 
   const units = ['', 'K', 'M', 'B', 'T']
   let unitIndex = 0
-  let rNumber = parseFloat(number.split(',').join(''))
+  let rNumber = parseFloat(insider.split(',').join(''))
 
   while (rNumber >= 1000 && unitIndex < 5) {
     unitIndex += 1
