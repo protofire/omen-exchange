@@ -12,7 +12,7 @@ const Wrapper = styled.svg<{ hoverEffect: boolean | undefined }>`
 
   .path {
     transition: 0.2s fill;
-    fill: ${props => props.theme.colors.textColorDark};
+    fill: ${props => props.theme.colors.tertiary};
   }
 `
 
