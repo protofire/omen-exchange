@@ -38,6 +38,7 @@ import {
   sell,
   setup,
   unwrap,
+  validateOracle,
   withdraw,
   withdrawRealitioBalance,
   wrangleCreateMarketParams,
@@ -295,6 +296,7 @@ class CPKService {
         approve,
         deposit,
         createQuestion,
+        validateOracle,
         prepareCondition,
         createMarket,
       )(params)
@@ -317,6 +319,7 @@ class CPKService {
         deposit,
         createQuestion,
         announceCondition,
+        validateOracle,
         prepareCondition,
         createMarket,
       )(params)

@@ -143,7 +143,7 @@ const Wrapper = (props: Props) => {
   const { fetchBalances } = context.balances
 
   const { account, cpk, library: provider, networkId, relay } = context
-  const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
+  const { buildMarketMaker, buildOracle, conditionalTokens, realitio } = useContracts(context)
 
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props
 
@@ -176,6 +176,7 @@ const Wrapper = (props: Props) => {
   const [cpkRealitioBalance, setCpkRealitioBalance] = useState(Zero)
 
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
+  const oracle = useMemo(() => buildOracle(marketMakerData.oracle), [buildOracle, marketMakerData.oracle])
 
   const resolveCondition = async () => {
     if (!cpk) {

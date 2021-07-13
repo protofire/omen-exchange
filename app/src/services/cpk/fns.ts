@@ -503,12 +503,12 @@ interface AnnounceConditionIdParams {
 export const announceCondition = async (params: AnnounceConditionIdParams) => {
   const { marketData, questionId, realitio, transactions } = params
   const { lowerBound, upperBound } = marketData
-  const conditionQuestionId = keccak256(
+  const scalarQuestionId = keccak256(
     defaultAbiCoder.encode(['bytes32', 'uint256', 'uint256'], [questionId, lowerBound, upperBound]),
   )
   if (lowerBound && upperBound) {
     logger.log(`Reality.eth QuestionID ${questionId}`)
-    logger.log(`Conditional Tokens QuestionID ${conditionQuestionId}`)
+    logger.log(`Conditional Tokens QuestionID ${scalarQuestionId}`)
 
     transactions.push({
       to: realitio.scalarContract.address,
@@ -516,7 +516,36 @@ export const announceCondition = async (params: AnnounceConditionIdParams) => {
     })
   }
 
-  return { ...params, conditionQuestionId }
+  return { ...params, scalarQuestionId }
+}
+
+/**
+ * Validate oracle config
+ */
+
+interface ValidateOracleParams {
+  account: string
+  scalarQuestionId: Maybe<string>
+  conditionalTokens: ConditionalTokenService
+  realitio: RealitioService
+  transactions: Transaction[]
+  service: CPKService
+  networkId: number
+}
+
+export const validateOracle = async (params: ValidateOracleParams) => {
+  const { account, conditionalTokens, networkId, realitio, scalarQuestionId, service } = params
+  const oracleAddress = getContractAddress(networkId, scalarQuestionId ? 'realitioScalarAdapter' : 'oracle')
+  const oracle = new OracleService(oracleAddress, service.provider, account)
+  if (realitio.address.toLowerCase() !== (await oracle.realitio()).toLowerCase()) {
+    throw new Error('Oracle / Realitio mismatch ')
+  }
+
+  if (conditionalTokens.address.toLowerCase() !== (await oracle.conditionalTokens()).toLowerCase()) {
+    throw new Error('Oracle / Conditional Tokens mismatch ')
+  }
+
+  return params
 }
 
 /**
@@ -524,7 +553,7 @@ export const announceCondition = async (params: AnnounceConditionIdParams) => {
  */
 
 interface PrepareConditionParams {
-  conditionQuestionId: Maybe<string>
+  scalarQuestionId: Maybe<string>
   conditionalTokens: ConditionalTokenService
   marketData: MarketData
   realitio: RealitioService
@@ -535,12 +564,11 @@ interface PrepareConditionParams {
 }
 
 export const prepareCondition = async (params: PrepareConditionParams) => {
-  const { conditionQuestionId, conditionalTokens, marketData, networkId, questionId, transactions } = params
+  const { conditionalTokens, marketData, networkId, questionId, scalarQuestionId, transactions } = params
   const { outcomes } = marketData
-
-  const oracleAddress = getContractAddress(networkId, conditionQuestionId ? 'realitioScalarAdapter' : 'oracle')
-  const outcomeSlotCount = conditionQuestionId ? 2 : outcomes.length
-  const selectedQuestionId = conditionQuestionId || questionId
+  const oracleAddress = getContractAddress(networkId, scalarQuestionId ? 'realitioScalarAdapter' : 'oracle')
+  const outcomeSlotCount = scalarQuestionId ? 2 : outcomes.length
+  const selectedQuestionId = scalarQuestionId || questionId
   const conditionId = conditionalTokens.getConditionId(selectedQuestionId, oracleAddress, outcomeSlotCount)
 
   const conditionExists = await conditionalTokens.doesConditionExist(conditionId)
