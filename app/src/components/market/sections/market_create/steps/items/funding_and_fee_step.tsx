@@ -281,7 +281,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       : maybeCollateralBalance.isZero() && funding.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : funding.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${collateralBalanceFormatted} ${collateral.symbol}`
+      ? `Value must be less than or equal to ${formattedAmount} ${collateral.symbol}`
       : null
 
   const isCreateMarketbuttonDisabled =
