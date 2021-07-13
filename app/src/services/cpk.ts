@@ -154,9 +154,8 @@ interface CPKDepositAndStakeParams {
   campaignAddress: string
   collateral: Token
   compoundService?: CompoundService | null
-  holdingsBN: BigNumber[]
   marketMaker: MarketMakerService
-  poolShareSupply: BigNumber
+  amountToStake: BigNumber
   useBaseToken?: boolean
   setTxHash: (arg0: string) => void
   setTxState: (step: TransactionStep) => void
@@ -1699,12 +1698,11 @@ class CPKService {
 
   depositAndStake = async ({
     amount,
+    amountToStake,
     campaignAddress,
     collateral,
     compoundService,
-    holdingsBN,
     marketMaker,
-    poolShareSupply,
     setTxHash,
     setTxState,
     useBaseToken,
@@ -1821,10 +1819,6 @@ class CPKService {
         to: marketMaker.address,
         data: MarketMakerService.encodeAddFunding(minCollateralAmount),
       })
-
-      // Calculate amount to stake
-      // addedFunds * poolShareSupply / poolWeight
-      const amountToStake = amount.mul(poolShareSupply).div(holdingsBN.reduce((a, b) => (a.gt(b) ? a : b)))
 
       const erc20Service = new ERC20Service(this.provider, this.cpk.address, marketMaker.address)
       const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(this.cpk.address, campaignAddress, amountToStake)

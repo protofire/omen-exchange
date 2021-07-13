@@ -377,9 +377,8 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         campaignAddress: liquidityMiningCampaign.id,
         collateral,
         compoundService,
-        holdingsBN: balances.map(b => b.holdings),
         marketMaker,
-        poolShareSupply: totalPoolShares,
+        amountToStake: poolTokens,
         setTxHash,
         setTxState,
         useBaseToken: false, // Not using base token for staking
