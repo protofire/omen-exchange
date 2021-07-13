@@ -4,6 +4,7 @@ export const formatBigNumber = (value: BigNumber, decimals: number, precision = 
   return Number(formatUnits(value, decimals)).toFixed(precision)
 }
 export const bigNumberToString = (value: BigNumber, decimals: number, precision = 2): string => {
+  // if (strict) return bigNumberToNumber(value, decimals).toFixed(precision)
   return formatNumber(formatUnits(value, decimals), precision)
 }
 
