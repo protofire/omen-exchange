@@ -1,4 +1,5 @@
 import React, { DOMAttributes } from 'react'
+import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { IconInfo } from '../../../common/tooltip/img/IconInfo'
@@ -43,6 +44,7 @@ const Value = styled.p<{ state: ValueStates; emphasizeValue?: boolean }>`
     };
   font-weight: ${props => (props.emphasizeValue ? '500' : '400')};
   margin: 0;
+  
 `
 
 interface Props extends DOMAttributes<HTMLDivElement> {
@@ -61,20 +63,25 @@ export const TransactionDetailsRow: React.FC<Props> = props => {
       <Title>
         {title}
         {tooltip ? (
-          <Circle
-            data-delay-hide={tooltip ? '500' : ''}
-            data-effect={tooltip ? 'solid' : ''}
-            data-for={tooltip ? 'walletBalanceTooltip' : ''}
-            data-multiline={tooltip ? 'true' : ''}
-            data-tip={tooltip ? tooltip : null}
-          >
-            <IconInfo />
-          </Circle>
+          <>
+            <Circle data-arrow-color="transparent" data-for="fee" data-tip="A 2% fee goes to liquidity providers.">
+              <IconInfo />
+            </Circle>
+          </>
         ) : null}
       </Title>
       <Value emphasizeValue={emphasizeValue} state={state}>
         {value}
       </Value>
+      <ReactTooltip
+        className="customMarketTooltip"
+        data-multiline={true}
+        effect="solid"
+        id="fee"
+        offset={{ top: 0, left: -1 }}
+        place="top"
+        type="light"
+      />
     </Wrapper>
   )
 }

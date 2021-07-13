@@ -141,7 +141,6 @@ const Outcomes = (props: Props) => {
             onClick={() => {
               removeOutcome(index)
             }}
-            title={`Remove outcome ${index + 1}`}
           >
             <IconRemove />
           </CustomButtonCircle>
@@ -180,9 +179,11 @@ const Outcomes = (props: Props) => {
           <OutcomesTBody>{outcomesToRender}</OutcomesTBody>
         </OutcomesTable>
         {canAddOutcome && (
-          <CustomButtonCircleAdd data-testid="new-outcome-button" onClick={addNewOutcome} title="Add new outcome">
-            <IconAdd />
-          </CustomButtonCircleAdd>
+          <>
+            <CustomButtonCircleAdd onClick={addNewOutcome}>
+              <IconAdd />
+            </CustomButtonCircleAdd>
+          </>
         )}
       </OutcomesTableWrapper>
       {manualProbabilitiesAndNoOutcomes && (
