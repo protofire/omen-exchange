@@ -102,7 +102,7 @@ const Wrapper = (props: Props) => {
     totalPoolShares,
   } = marketMakerData
   const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
-  const { networkId, relay } = context
+  const { library: provider, networkId, relay } = context
   const isQuestionOpen = question.resolution.valueOf() < Date.now()
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
@@ -138,15 +138,18 @@ const Wrapper = (props: Props) => {
     }
   }
   useEffect(() => {
-    const timeDifference = new Date(question.resolution).getTime() - new Date().getTime()
-    const maxTimeDifference = 86400000
-    if (timeDifference > 0 && timeDifference < maxTimeDifference) {
-      setTimeout(callAfterTimeout, timeDifference + 2000)
+    const shouldFinalize = async () => {
+      const block = await provider.getBlock('latest')
+      const timestamp = block.timestamp * 1000
+      const resolution = new Date(question.resolution).getTime()
+      if (timestamp >= resolution) {
+        fetchGraphMarketMakerData()
+        setCurrentTab(MarketDetailsTab.finalize)
+      } else {
+        setTimeout(shouldFinalize, 2000)
+      }
     }
-    function callAfterTimeout() {
-      fetchGraphMarketMakerData()
-      setCurrentTab(MarketDetailsTab.finalize)
-    }
+    shouldFinalize()
     setCurrentDisplayCollateral()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
