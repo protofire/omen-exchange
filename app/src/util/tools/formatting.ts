@@ -6,6 +6,7 @@ export const formatBigNumber = (value: BigNumber, decimals: number, precision = 
 export const bigNumberToString = (value: BigNumber, decimals: number, precision = 2): string => {
   return formatNumber(formatUnits(value, decimals), precision)
 }
+
 export const bigNumberToNumber = (value: BigNumber, decimals: number): number => {
   return Number(formatUnits(value, decimals))
 }
