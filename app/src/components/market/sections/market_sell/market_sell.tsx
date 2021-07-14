@@ -14,7 +14,6 @@ import {
   bigNumberToString,
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
-  formatBigNumber,
   getInitialCollateral,
   mulBN,
 } from '../../../../util/tools'
@@ -272,7 +271,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             }
             onClickMaxButton={() => {
               setAmountSharesFromInput(balanceItem.shares)
-              setAmountSharesToDisplay(formatBigNumber(balanceItem.shares, collateral.decimals, 5))
+              setAmountSharesToDisplay(bigNumberToString(balanceItem.shares, collateral.decimals, 5, true))
             }}
             shouldDisplayMaxButton
             symbol={'Shares'}

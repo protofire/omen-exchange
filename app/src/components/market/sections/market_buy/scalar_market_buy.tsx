@@ -24,7 +24,6 @@ import {
   calcPrediction,
   calcXValue,
   computeBalanceAfterTrade,
-  formatBigNumber,
   getInitialCollateral,
   getUnit,
   mulBN,
@@ -354,7 +353,7 @@ export const ScalarMarketBuy = (props: Props) => {
             }
             onClickMaxButton={() => {
               setDisplayAmountToFund(collateralBalance)
-              setAmountDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
+              setAmountDisplay(bigNumberToString(collateralBalance, collateral.decimals, 5, true))
             }}
             shouldDisplayMaxButton={shouldDisplayMaxButton}
             symbol={collateral.symbol}

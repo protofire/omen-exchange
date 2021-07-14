@@ -24,7 +24,6 @@ import {
   bigNumberToString,
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
-  formatBigNumber,
   getInitialCollateral,
   getUnit,
   isDust,
@@ -456,7 +455,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setAmountToFund(collateralBalance)
-                  setAmountToFundDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
+                  setAmountToFundDisplay(bigNumberToString(collateralBalance, collateral.decimals, 5, true))
                 }}
                 shouldDisplayMaxButton={shouldDisplayMaxButton}
                 symbol={collateral.symbol}
@@ -485,7 +484,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setAmountToRemove(fundingBalance)
-                  setAmountToRemoveDisplay(formatBigNumber(fundingBalance, collateral.decimals, 5))
+                  setAmountToRemoveDisplay(bigNumberToString(fundingBalance, collateral.decimals, 5, true))
                 }}
                 shouldDisplayMaxButton
                 symbol="Shares"

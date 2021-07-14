@@ -14,7 +14,6 @@ import {
   calcSellAmountInCollateral,
   calcXValue,
   computeBalanceAfterTrade,
-  formatBigNumber,
   getInitialCollateral,
   getUnit,
   mulBN,
@@ -277,7 +276,7 @@ export const ScalarMarketSell = (props: Props) => {
             }
             onClickMaxButton={() => {
               setAmountSharesFromInput(balanceItem.shares)
-              setAmountSharesToDisplay(formatBigNumber(balanceItem.shares, collateral.decimals, 5))
+              setAmountSharesToDisplay(bigNumberToString(balanceItem.shares, collateral.decimals, 5, true))
             }}
             shouldDisplayMaxButton
             symbol={'Shares'}

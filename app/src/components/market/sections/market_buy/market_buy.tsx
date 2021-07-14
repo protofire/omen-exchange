@@ -23,7 +23,6 @@ import {
   bigNumberToNumber,
   bigNumberToString,
   computeBalanceAfterTrade,
-  formatBigNumber,
   getInitialCollateral,
   mulBN,
 } from '../../../../util/tools'
@@ -335,7 +334,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             }
             onClickMaxButton={() => {
               setDisplayAmountToFund(collateralBalance)
-              setAmountToDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
+              setAmountToDisplay(bigNumberToString(collateralBalance, collateral.decimals, 5, true))
             }}
             shouldDisplayMaxButton={shouldDisplayMaxButton}
             symbol={collateral.symbol}

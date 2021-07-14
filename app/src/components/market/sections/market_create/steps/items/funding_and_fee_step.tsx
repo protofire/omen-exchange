@@ -17,7 +17,7 @@ import { BalanceState, fetchAccountBalance } from '../../../../../../store/reduc
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
-import { bigNumberToNumber, bigNumberToString, formatBigNumber, formatDate } from '../../../../../../util/tools'
+import { bigNumberToNumber, bigNumberToString, formatDate } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
@@ -373,7 +373,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       name: 'funding',
       value: collateralBalance,
     })
-    const formatted = formatBigNumber(collateralBalance, collateral.decimals, 5)
+    const formatted = bigNumberToString(collateralBalance, collateral.decimals, 5, true)
     setAmountToDisplay(formatted)
     setFormattedAmount(formatted)
   }

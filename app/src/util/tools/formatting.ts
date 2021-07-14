@@ -1,10 +1,7 @@
 import { BigNumber, formatUnits } from 'ethers/utils'
 
-export const formatBigNumber = (value: BigNumber, decimals: number, precision = 2): string => {
-  return Number(formatUnits(value, decimals)).toFixed(precision)
-}
-export const bigNumberToString = (value: BigNumber, decimals: number, precision = 2): string => {
-  // if (strict) return bigNumberToNumber(value, decimals).toFixed(precision)
+export const bigNumberToString = (value: BigNumber, decimals: number, precision = 2, strict = false): string => {
+  if (strict) return bigNumberToNumber(value, decimals).toFixed(precision)
   return formatNumber(formatUnits(value, decimals), precision)
 }
 

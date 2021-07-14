@@ -22,7 +22,6 @@ import {
   calcAddFundingSendAmounts,
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
-  formatBigNumber,
   getInitialCollateral,
 } from '../../../../util/tools'
 import {
@@ -420,7 +419,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setAmountToFund(collateralBalance)
-                  setAmountToFundDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
+                  setAmountToFundDisplay(bigNumberToString(collateralBalance, collateral.decimals, 5, true))
                 }}
                 shouldDisplayMaxButton={shouldDisplayMaxButton}
                 symbol={collateral.symbol}
@@ -449,7 +448,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setAmountToRemove(fundingBalance)
-                  setAmountToRemoveDisplay(formatBigNumber(fundingBalance, collateral.decimals, 5))
+                  setAmountToRemoveDisplay(bigNumberToString(fundingBalance, collateral.decimals, 5, true))
                 }}
                 shouldDisplayMaxButton
                 symbol=""
