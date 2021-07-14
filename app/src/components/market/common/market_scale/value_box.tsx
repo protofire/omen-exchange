@@ -107,7 +107,16 @@ export const ValueBox: React.FC<Props> = (props: Props) => {
   return (
     <ValueBoxSegment threeBoxes={props.hasThreeBoxes}>
       <ValueBoxTitle positive={positive}>{title}</ValueBoxTitle>
-      {tooltip && <ReactTooltip id="payoutTooltip" />}
+      {tooltip && (
+        <ReactTooltip
+          className="customMarketTooltip"
+          effect="solid"
+          id="payoutTooltip"
+          offset={{ top: 0, left: -7.5 }}
+          place="top"
+          type="light"
+        />
+      )}
       <ValueBoxSubtitle>
         {ball && <PositionBall />}
         {subtitle}
