@@ -1546,7 +1546,7 @@ class CPKService {
 
         // get mainnet relay signer
         const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
-        console.log(symbol)
+
         // relay to signer address on mainnet
         if (symbol === 'DAI' || symbol === 'xDAI') {
           transactions.push({
