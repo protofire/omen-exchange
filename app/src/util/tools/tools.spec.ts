@@ -1,6 +1,6 @@
 /* eslint-env jest */
 import Big from 'big.js'
-import { BigNumber, parseUnits } from 'ethers/utils'
+import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
 
 import { getContractAddress, getNativeAsset } from '../networks'
 import { Token } from '../types'
@@ -8,6 +8,7 @@ import { Token } from '../types'
 import {
   bigMax,
   bigMin,
+  bigNumberToNumber,
   calcXValue,
   clampBigNumber,
   formatHistoryDate,
@@ -116,6 +117,36 @@ describe('tools', () => {
         const limitedValue = limitDecimalPlaces(value, decimals)
 
         expect(limitedValue).toStrictEqual(result)
+      })
+    }
+  })
+  // describe('bigNumberToString', () => {
+  //   const testCases: [[number, number, number], number][] = [
+  //     [[123, 2, 4], 24],
+  //     [[256, 2, 4], 24],
+  //     [[431, 2, 4], 24],
+  //   ]
+  //
+  //   for (const [outcomesCount, expected] of testCases) {
+  //     it(`should return string representation of BigNumber`, () => {
+  //       const result = getIndexSets(outcomesCount)
+  //
+  //       expect(result).toStrictEqual(expected)
+  //     })
+  //   }
+  // })
+  describe('bigNumberToNumber', () => {
+    const testCases: [[string, number], number][] = [
+      [['123', 18], 123.0],
+      [['256', 123], 256.0],
+      [['431', 18], 431.0],
+    ]
+
+    for (const [values, expected] of testCases) {
+      it(`should return number representation of BigNumber`, () => {
+        const result = bigNumberToNumber(parseUnits(values[0], values[1]), values[1])
+
+        expect(result).toStrictEqual(expected)
       })
     }
   })
