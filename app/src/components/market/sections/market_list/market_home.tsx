@@ -579,7 +579,6 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
             onChangeTemplateId={setTemplateId}
           />
         )}
-
         <ListWrapper>
           {!isFiltering &&
             RemoteData.hasData(markets) &&
