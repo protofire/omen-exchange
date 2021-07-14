@@ -1,6 +1,6 @@
 /* eslint-env jest */
 import Big from 'big.js'
-import { BigNumber, bigNumberify, parseUnits } from 'ethers/utils'
+import { BigNumber, parseUnits } from 'ethers/utils'
 
 import { getContractAddress, getNativeAsset } from '../networks'
 import { Token } from '../types'
