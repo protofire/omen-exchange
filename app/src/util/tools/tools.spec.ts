@@ -9,6 +9,7 @@ import {
   bigMax,
   bigMin,
   bigNumberToNumber,
+  bigNumberToString,
   calcXValue,
   clampBigNumber,
   formatHistoryDate,
@@ -120,33 +121,34 @@ describe('tools', () => {
       })
     }
   })
-  // describe('bigNumberToString', () => {
-  //   const testCases: [[number, number, number], number][] = [
-  //     [[123, 2, 4], 24],
-  //     [[256, 2, 4], 24],
-  //     [[431, 2, 4], 24],
-  //   ]
-  //
-  //   for (const [outcomesCount, expected] of testCases) {
-  //     it(`should return string representation of BigNumber`, () => {
-  //       const result = getIndexSets(outcomesCount)
-  //
-  //       expect(result).toStrictEqual(expected)
-  //     })
-  //   }
-  // })
+  describe('bigNumberToString', () => {
+    const testCases: [[string, number, number], string][] = [
+      [['14300', 18, 3], '14,300.000'],
+      [['0.001', 18, 2], '<0.01'],
+      [['333', 18, 1], '333.0'],
+    ]
+
+    for (const [values, expected] of testCases) {
+      it(`should return string representation of BigNumber`, () => {
+        const constructBigNumber = parseUnits(values[0], values[1])
+        const result = bigNumberToString(constructBigNumber, values[1], values[2])
+        expect(result).toEqual(expected)
+      })
+    }
+  })
   describe('bigNumberToNumber', () => {
     const testCases: [[string, number], number][] = [
-      [['123', 18], 123.0],
-      [['256', 123], 256.0],
-      [['431', 18], 431.0],
+      [['143', 18], 143],
+      [['222', 8], 222],
+      [['333', 18], 333],
     ]
 
     for (const [values, expected] of testCases) {
       it(`should return number representation of BigNumber`, () => {
-        const result = bigNumberToNumber(parseUnits(values[0], values[1]), values[1])
+        const constructBigNumber = parseUnits(values[0], values[1])
+        const result = bigNumberToNumber(constructBigNumber, values[1])
 
-        expect(result).toStrictEqual(expected)
+        expect(result).toEqual(expected)
       })
     }
   })
