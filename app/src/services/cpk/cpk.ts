@@ -4,15 +4,7 @@ import { BigNumber } from 'ethers/utils'
 import { OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../../common/constants'
 import { Transaction, verifyProxyAddress } from '../../util/cpk'
 import { getLogger } from '../../util/logger'
-import {
-  bridgeTokensList,
-  getContractAddress,
-  getTargetSafeImplementation,
-  getTokenFromAddress,
-  getWrapToken,
-  networkIds,
-  pseudoNativeAssetAddress,
-} from '../../util/networks'
+import { bridgeTokensList, getTargetSafeImplementation } from '../../util/networks'
 import { getBySafeTx, signaturesFormatted, waitABit, waitForBlockToSync } from '../../util/tools'
 import { MarketData, Question, Token, TransactionStep } from '../../util/types'
 import { ConditionalTokenService } from '../conditional_token'
@@ -24,22 +16,34 @@ import { OvmService } from '../ovm'
 import { RealitioService } from '../realitio'
 import { RelayService } from '../relay'
 import { SafeService } from '../safe'
-import { UnwrapTokenService } from '../unwrap_token'
 import { XdaiService } from '../xdai'
 
 import {
+  addFunds,
   announceCondition,
   approve,
+  approveConditionalTokens,
   buy,
+  claimWinnings,
   createMarket,
   createQuestion,
+  deposit,
   exec,
   fee,
   pipe,
   prepareCondition,
+  redeemPosition,
+  removeFunds,
+  resolveCondition,
+  sell,
   setup,
-  transfer,
-  wrangleMarketData,
+  unwrap,
+  validateOracle,
+  withdraw,
+  withdrawRealitioBalance,
+  wrangleCreateMarketParams,
+  wrangleRemoveFundsParams,
+  wrangleSellParams,
   wrap,
 } from './fns'
 
@@ -99,8 +103,8 @@ interface CPKRedeemParams {
   isConditionResolved: boolean
   question: Question
   numOutcomes: number
-  earnedCollateral: BigNumber
-  collateralToken: Token
+  amount: BigNumber
+  collateral: Token
   realitio: RealitioService
   oracle: OracleService
   marketMaker: MarketMakerService
@@ -276,7 +280,7 @@ class CPKService {
 
   buyOutcomes = async (params: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
-      const { transaction } = await this.pipe(fee, wrap, approve, transfer, buy)(params)
+      const { transaction } = await this.pipe(fee, wrap, approve, deposit, buy)(params)
       return transaction
     } catch (err) {
       logger.error(`There was an error buying '${params.amount.toString()}' of shares`, err.message)
@@ -287,11 +291,12 @@ class CPKService {
   createMarket = async (params: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
       const { predictedMarketMakerAddress, transaction } = await this.pipe(
-        wrangleMarketData,
+        wrangleCreateMarketParams,
         wrap,
         approve,
-        transfer,
+        deposit,
         createQuestion,
+        validateOracle,
         prepareCondition,
         createMarket,
       )(params)
@@ -308,12 +313,13 @@ class CPKService {
   createScalarMarket = async (params: CPKCreateMarketParams): Promise<CreateMarketResult> => {
     try {
       const { predictedMarketMakerAddress, transaction } = await this.pipe(
-        wrangleMarketData,
+        wrangleCreateMarketParams,
         wrap,
         approve,
-        transfer,
+        deposit,
         createQuestion,
         announceCondition,
+        validateOracle,
         prepareCondition,
         createMarket,
       )(params)
@@ -327,391 +333,65 @@ class CPKService {
     }
   }
 
-  sellOutcomes = async ({
-    amount,
-    conditionalTokens,
-    marketMaker,
-    outcomeIndex,
-    setTxHash,
-    setTxState,
-  }: CPKSellOutcomesParams): Promise<TransactionReceipt> => {
+  sellOutcomes = async (params: CPKSellOutcomesParams): Promise<TransactionReceipt> => {
     try {
-      const signer = this.provider.getSigner()
-      const account = await signer.getAddress()
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
-
-      const outcomeTokensToSell = await marketMaker.calcSellAmount(amount, outcomeIndex)
-      const collateralAddress = await marketMaker.getCollateralToken()
-
-      const transactions: Transaction[] = []
-      const txOptions: TxOptions = {}
-      await this.getGas(txOptions)
-
-      const isAlreadyApprovedForMarketMaker = await conditionalTokens.isApprovedForAll(
-        this.cpk.address,
-        marketMaker.address,
-      )
-
-      if (!isAlreadyApprovedForMarketMaker) {
-        transactions.push({
-          to: conditionalTokens.address,
-          data: ConditionalTokenService.encodeSetApprovalForAll(marketMaker.address, true),
-        })
-      }
-
-      transactions.push({
-        to: marketMaker.address,
-        data: MarketMakerService.encodeSell(amount, outcomeIndex, outcomeTokensToSell),
-      })
-
-      // unwrap native assets (e.g. WETH)
-      const wrapTokenAddress = getWrapToken(this.cpk.relay ? networkIds.XDAI : networkId).address
-      const unwrap = collateralAddress.toLowerCase() === wrapTokenAddress.toLowerCase()
-      if (unwrap) {
-        const collateralToken = getTokenFromAddress(networkId, collateralAddress)
-        const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, amount)
-        transactions.push({
-          to: collateralAddress,
-          data: encodedWithdrawFunction,
-        })
-      }
-
-      // Transfer funding to user if not signed in as a safe app
-      if (!this.isSafeApp) {
-        if (unwrap) {
-          transactions.push({
-            to: account,
-            value: amount.toString(),
-          })
-        } else {
-          transactions.push({
-            to: collateralAddress,
-            data: ERC20Service.encodeTransfer(account, amount),
-          })
-        }
-      }
-
-      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+      const { transaction } = await this.pipe(
+        wrangleSellParams,
+        approveConditionalTokens,
+        sell,
+        unwrap,
+        withdraw,
+      )(params)
+      return transaction
     } catch (err) {
-      logger.error(`There was an error selling '${amount.toString()}' of shares`, err.message)
+      logger.error(`There was an error selling '${params.amount.toString()}' of shares`, err.message)
       throw err
     }
   }
 
-  addFunding = async ({
-    amount,
-    collateral,
-    marketMaker,
-    setTxHash,
-    setTxState,
-  }: CPKAddFundingParams): Promise<TransactionReceipt> => {
+  addFunding = async (params: CPKAddFundingParams): Promise<TransactionReceipt> => {
     try {
-      const signer = this.provider.getSigner()
-      const account = await signer.getAddress()
-
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
-
-      const transactions: Transaction[] = []
-
-      const txOptions: TxOptions = {}
-      await this.getGas(txOptions)
-      const fundingAmount = await this.subRelayFee(amount)
-
-      let collateralAddress
-
-      if (collateral.address === pseudoNativeAssetAddress) {
-        collateralAddress = getWrapToken(networkId).address
-
-        // fund the cpk
-        if (!this.isSafeApp) {
-          txOptions.value = fundingAmount
-        }
-
-        // wrap the asset
-        transactions.push({
-          to: collateralAddress,
-          value: fundingAmount.toString(),
-        })
-      } else {
-        collateralAddress = collateral.address
-      }
-
-      const collateralService = new ERC20Service(this.provider, account, collateralAddress)
-
-      // Check  if the allowance of the CPK to the market maker is enough.
-      const hasCPKEnoughAlowance = await collateralService.hasEnoughAllowance(
-        this.cpk.address,
-        marketMaker.address,
-        fundingAmount,
-      )
-
-      if (!hasCPKEnoughAlowance) {
-        // Step 1:  Approve unlimited amount to be transferred to the market maker
-        transactions.push({
-          to: collateralAddress,
-          data: ERC20Service.encodeApproveUnlimited(marketMaker.address),
-        })
-      }
-
-      // Step 3: Transfer funding from user to the CPK
-      if (!this.isSafeApp && collateral.address !== pseudoNativeAssetAddress) {
-        transactions.push({
-          to: collateral.address,
-          data: ERC20Service.encodeTransferFrom(account, this.cpk.address, fundingAmount),
-        })
-      }
-
-      // Step 4: Add funding to market
-      transactions.push({
-        to: marketMaker.address,
-        data: MarketMakerService.encodeAddFunding(fundingAmount),
-      })
-
-      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+      const { transaction } = await this.pipe(wrap, approve, deposit, addFunds)(params)
+      return transaction
     } catch (err) {
-      logger.error(`There was an error adding an amount of '${amount.toString()}' for funding`, err.message)
+      logger.error(`There was an error adding an amount of '${params.amount.toString()}' for funding`, err.message)
       throw err
     }
   }
 
-  removeFunding = async ({
-    amountToMerge,
-    conditionId,
-    conditionalTokens,
-    earnings,
-    marketMaker,
-    outcomesCount,
-    setTxHash,
-    setTxState,
-    sharesToBurn,
-  }: CPKRemoveFundingParams): Promise<TransactionReceipt> => {
+  removeFunding = async (params: CPKRemoveFundingParams): Promise<TransactionReceipt> => {
     try {
-      const signer = this.provider.getSigner()
-      const account = await signer.getAddress()
-      const network = await this.provider.getNetwork()
-      const collateralAddress = await marketMaker.getCollateralToken()
-      const networkId = network.chainId
-      const transactions: Transaction[] = []
-      const removeFundingTx = {
-        to: marketMaker.address,
-        data: MarketMakerService.encodeRemoveFunding(sharesToBurn),
-      }
-
-      const mergePositionsTx = {
-        to: conditionalTokens.address,
-        data: ConditionalTokenService.encodeMergePositions(
-          collateralAddress,
-          conditionId,
-          outcomesCount,
-          amountToMerge,
-        ),
-      }
-      transactions.push(removeFundingTx)
-      transactions.push(mergePositionsTx)
-
-      const txOptions: TxOptions = {}
-      await this.getGas(txOptions)
-
-      const totalAmountToSend = amountToMerge.add(earnings)
-
-      // transfer to the user the merged collateral plus the earned fees
-      const wrapToken = getWrapToken(this.cpk.relay ? networkIds.XDAI : networkId)
-      const unwrap = collateralAddress.toLowerCase() === wrapToken.address.toLowerCase()
-      if (unwrap) {
-        const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(wrapToken.symbol, totalAmountToSend)
-        transactions.push({
-          to: collateralAddress,
-          data: encodedWithdrawFunction,
-        })
-      }
-
-      // Transfer asset back to user
-      if (!this.isSafeApp) {
-        if (unwrap) {
-          transactions.push({
-            to: account,
-            value: totalAmountToSend.toString(),
-          })
-        } else {
-          transactions.push({
-            to: collateralAddress,
-            data: ERC20Service.encodeTransfer(account, totalAmountToSend),
-          })
-        }
-      }
-
-      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+      const { transaction } = await this.pipe(wrangleRemoveFundsParams, removeFunds, unwrap, withdraw)(params)
+      return transaction
     } catch (err) {
-      logger.error(`There was an error removing amount '${sharesToBurn.toString()}' for funding`, err.message)
+      logger.error(`There was an error removing amount '${params.sharesToBurn.toString()}' for funding`, err.message)
       throw err
     }
   }
 
-  requestVerification = async ({
-    ovmAddress,
-    params,
-    submissionDeposit,
-  }: CPKRequestVerificationParams): Promise<TransactionReceipt> => {
+  redeemPositions = async (params: CPKRedeemParams): Promise<TransactionReceipt> => {
     try {
-      const signer = this.provider.getSigner()
-      const ovm = new OvmService()
-      const contractInstance = await ovm.createOvmContractInstance(signer, ovmAddress)
-
-      const txObject = await ovm.generateTransaction(params, contractInstance, submissionDeposit)
-
-      return this.waitForTransaction(txObject)
+      const { transaction } = await this.pipe(
+        resolveCondition,
+        claimWinnings,
+        redeemPosition,
+        unwrap,
+        withdraw,
+        withdrawRealitioBalance,
+      )(params)
+      return transaction
     } catch (err) {
-      logger.error('Error while requesting market verification via Kleros!', err.message)
+      logger.error(`Error trying to resolve condition or redeem for question id '${params.question.id}'`, err.message)
       throw err
     }
   }
 
-  redeemPositions = async ({
-    collateralToken,
-    conditionalTokens,
-    earnedCollateral,
-    isConditionResolved,
-    isScalar,
-    marketMaker,
-    numOutcomes,
-    oracle,
-    question,
-    realitio,
-    realitioBalance,
-    scalarHigh,
-    scalarLow,
-    setTxHash,
-    setTxState,
-  }: CPKRedeemParams): Promise<TransactionReceipt> => {
+  resolveCondition = async (params: CPKResolveParams) => {
     try {
-      const signer = this.provider.getSigner()
-      const account = await signer.getAddress()
-      const network = await this.provider.getNetwork()
-      const networkId = network.chainId
-
-      const transactions: Transaction[] = []
-      const txOptions: TxOptions = {}
-      await this.getGas(txOptions)
-
-      if (!isConditionResolved) {
-        if (isScalar && scalarLow && scalarHigh) {
-          transactions.push({
-            to: realitio.scalarContract.address,
-            data: RealitioService.encodeResolveCondition(question.id, question.raw, scalarLow, scalarHigh),
-          })
-        } else {
-          transactions.push({
-            to: oracle.address,
-            data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
-          })
-        }
-
-        const data = await realitio.encodeClaimWinnings(question.id)
-        if (data) {
-          transactions.push({
-            to: realitio.contract.address,
-            data,
-          })
-        }
-      }
-
-      if (!earnedCollateral.isZero()) {
-        const conditionId = await marketMaker.getConditionId()
-
-        transactions.push({
-          to: conditionalTokens.address,
-          data: ConditionalTokenService.encodeRedeemPositions(collateralToken.address, conditionId, numOutcomes),
-        })
-
-        const wrapToken = getWrapToken(this.cpk.relay ? networkIds.XDAI : networkId)
-        const unwrap = collateralToken.address.toLowerCase() === wrapToken.address.toLowerCase()
-        if (unwrap) {
-          const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateralToken.symbol, earnedCollateral)
-          transactions.push({
-            to: collateralToken.address,
-            data: encodedWithdrawFunction,
-          })
-        }
-
-        // If we are signed in as a safe we don't need to transfer
-        if (!this.isSafeApp) {
-          if (unwrap) {
-            transactions.push({
-              to: account,
-              value: earnedCollateral.toString(),
-            })
-          } else {
-            transactions.push({
-              to: collateralToken.address,
-              data: ERC20Service.encodeTransfer(account, earnedCollateral),
-            })
-          }
-        }
-      }
-
-      // If user has realitio balance, withdraw
-      if (!realitioBalance.isZero()) {
-        transactions.push({
-          to: getContractAddress(networkId, 'realitio'),
-          data: RealitioService.encodeWithdraw(),
-        })
-
-        if (!this.isSafeApp) {
-          transactions.push({
-            to: account,
-            value: realitioBalance.toString(),
-          })
-        }
-      }
-
-      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+      const { transaction } = await this.pipe(resolveCondition, claimWinnings)(params)
+      return transaction
     } catch (err) {
-      logger.error(`Error trying to resolve condition or redeem for question id '${question.id}'`, err.message)
-      throw err
-    }
-  }
-
-  resolveCondition = async ({
-    isScalar,
-    numOutcomes,
-    oracle,
-    question,
-    realitio,
-    scalarHigh,
-    scalarLow,
-    setTxHash,
-    setTxState,
-  }: CPKResolveParams) => {
-    try {
-      const transactions: Transaction[] = []
-      const txOptions: TxOptions = {}
-      await this.getGas(txOptions)
-
-      if (isScalar && scalarLow && scalarHigh) {
-        transactions.push({
-          to: realitio.scalarContract.address,
-          data: RealitioService.encodeResolveCondition(question.id, question.raw, scalarLow, scalarHigh),
-        })
-      } else {
-        transactions.push({
-          to: oracle.address,
-          data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
-        })
-      }
-
-      const data = await realitio.encodeClaimWinnings(question.id)
-      if (data) {
-        transactions.push({
-          to: realitio.contract.address,
-          data,
-        })
-      }
-
-      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
-    } catch (err) {
-      logger.error(`There was an error resolving the condition with question id '${question.id}'`, err.message)
+      logger.error(`There was an error resolving the condition with question id '${params.question.id}'`, err.message)
       throw err
     }
   }
@@ -905,6 +585,25 @@ class CPKService {
     } catch (e) {
       logger.error(`Error trying to claim tokens from xDai bridge`, e.message)
       throw e
+    }
+  }
+
+  requestVerification = async ({
+    ovmAddress,
+    params,
+    submissionDeposit,
+  }: CPKRequestVerificationParams): Promise<TransactionReceipt> => {
+    try {
+      const signer = this.provider.getSigner()
+      const ovm = new OvmService()
+      const contractInstance = await ovm.createOvmContractInstance(signer, ovmAddress)
+
+      const txObject = await ovm.generateTransaction(params, contractInstance, submissionDeposit)
+
+      return this.waitForTransaction(txObject)
+    } catch (err) {
+      logger.error('Error while requesting market verification via Kleros!', err.message)
+      throw err
     }
   }
 }
