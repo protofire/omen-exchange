@@ -612,7 +612,6 @@ export const resolveCondition = async (params: ResolveConditionParams) => {
     scalarLow,
     transactions,
   } = params
-
   if (!isConditionResolved) {
     if (isScalar && scalarLow && scalarHigh) {
       transactions.push({
@@ -621,7 +620,7 @@ export const resolveCondition = async (params: ResolveConditionParams) => {
       })
     } else {
       transactions.push({
-        to: oracle.address,
+        to: oracle.contract.address,
         data: OracleService.encodeResolveCondition(question.id, question.templateId, question.raw, numOutcomes),
       })
     }
