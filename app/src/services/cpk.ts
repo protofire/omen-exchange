@@ -1546,9 +1546,10 @@ class CPKService {
 
         // get mainnet relay signer
         const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
-
+        console.log(symbol)
         // relay to signer address on mainnet
-        if (symbol === 'DAI') {
+        if (symbol === 'DAI' || symbol === 'xDAI') {
+          console.log('inside there')
           transactions.push({
             to: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
             data: XdaiService.encodeRelayTokens(to),
@@ -1557,6 +1558,7 @@ class CPKService {
           const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
           return transactionHash
         } else {
+          console.log('wtf OMNI HERE')
           transactions.push({
             to: address,
             data: XdaiService.encodeTokenBridgeTransfer(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),

@@ -215,7 +215,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
       setIsTransactionModalOpen(true)
-
+      console.log(symbol)
       const hash =
         exchangeType === ExchangeType.deposit
           ? await cpk.sendMainnetTokenToBridge(displayFundAmount, address, symbol)
