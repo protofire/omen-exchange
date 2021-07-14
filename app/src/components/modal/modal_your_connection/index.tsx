@@ -264,10 +264,12 @@ export const ModalYourConnection = (props: Props) => {
         <BalanceItem key={index + address}>
           <BalanceItemSide>
             <Image size={'24'} src={image ? image : getImageUrl(address)} />
-            <BalanceItemTitle style={{ marginLeft: '12px' }}>{name ? name : symbol}</BalanceItemTitle>
+            <BalanceItemTitle style={{ marginLeft: '12px' }}>
+              {symbol === 'xDAI' ? 'Dai' : name ? name : symbol}
+            </BalanceItemTitle>
           </BalanceItemSide>
           <BalanceItemBalance>
-            {formatBigNumber(balance, decimals, symbol === 'DAI' ? 2 : 3)} {symbol.toUpperCase()}
+            {formatBigNumber(balance, decimals, 3)} {symbol === 'xDAI' ? 'DAI' : symbol.toUpperCase()}
           </BalanceItemBalance>
         </BalanceItem>
       )

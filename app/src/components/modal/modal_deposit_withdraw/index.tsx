@@ -144,7 +144,8 @@ export const ModalDepositWithdraw = (props: Props) => {
   const { address, balance, decimals, symbol } =
     findCurrentTokenBasedOnAction(exchangeType, currencySelected.toUpperCase()) ||
     getToken(context.relay ? networkIds.XDAI : context.networkId, 'dai')
-  const currentTokenMainnet = mainnetTokens.find(element => element.symbol === symbol)
+
+  const currentTokenMainnet = mainnetTokens.find(element => element.symbol === (symbol === 'xDAI' ? 'DAI' : symbol))
 
   const isApprovalVisible =
     (exchangeType === ExchangeType.deposit &&
@@ -211,11 +212,15 @@ export const ModalDepositWithdraw = (props: Props) => {
     }
 
     try {
-      setMessage(`${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), decimals)} ${symbol}`)
+      setMessage(
+        `${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), decimals)} ${
+          symbol === 'xDAI' ? 'Dai' : symbol
+        }`,
+      )
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
       setIsTransactionModalOpen(true)
-      console.log(symbol)
+
       const hash =
         exchangeType === ExchangeType.deposit
           ? await cpk.sendMainnetTokenToBridge(displayFundAmount, address, symbol)
@@ -275,10 +280,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         </BalanceItemSide>
         <BalanceItemSide>
           <BalanceItemBalance>
-            {token?.balance
-              ? formatBigNumber(new BigNumber(token?.balance), decimals, symbol === 'DAI' ? 2 : 3)
-              : '0.00'}{' '}
-            {symbol}
+            {token?.balance ? formatBigNumber(new BigNumber(token.balance), decimals, 3) : '0.00'} {symbol}
           </BalanceItemBalance>
         </BalanceItemSide>
       </BalanceItem>
