@@ -67,6 +67,7 @@ const MarketDataItemImage = styled.img`
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   collateralVolume: BigNumber
+  blocktime?: number
   compoundService: CompoundService | null
   liquidity: string
   resolutionTimestamp: Date
@@ -80,6 +81,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 export const MarketData: React.FC<Props> = props => {
   const {
     answerFinalizedTimestamp,
+    blocktime,
     collateralVolume,
     compoundService,
     currency,
@@ -138,6 +140,7 @@ export const MarketData: React.FC<Props> = props => {
     displayDailyVolume = formatBigNumber(baseDailyVolumeValue, baseCurrency.decimals)
   }
   const symbol = useSymbol(baseCurrency)
+
   return (
     <MarketDataWrapper>
       <MarketDataItem>
@@ -178,9 +181,9 @@ export const MarketData: React.FC<Props> = props => {
           <MarketDataItemBottom>Finalized</MarketDataItemBottom>
         </MarketDataItem>
       )}
-      {!isFinalize && resolutionTimestamp > new Date() && (
+      {!isFinalize && blocktime && blocktime < resolutionTimestamp.getTime() && (
         <MarketDataItem>
-          <MarketDataItemTop>{moment(resolutionTimestamp).fromNow(true)}</MarketDataItemTop>
+          <MarketDataItemTop>{moment(resolutionTimestamp).from(new Date(blocktime), true)}</MarketDataItemTop>
           <MarketDataItemBottom>Remaining</MarketDataItemBottom>
         </MarketDataItem>
       )}
