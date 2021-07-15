@@ -1562,7 +1562,7 @@ class CPKService {
             to: address,
             data: XdaiService.encodeTokenBridgeTransfer(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
           })
-          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState, true)
+          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
 
           return transactionHash
         }
