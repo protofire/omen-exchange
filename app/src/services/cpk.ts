@@ -596,6 +596,7 @@ class CPKService {
         conditionId,
         this.cpk.address,
         spread,
+        networkId,
       )
       logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
       const distributionHint = calcDistributionHint(marketData.outcomes.map(o => o.probability))
@@ -842,6 +843,7 @@ class CPKService {
         conditionId,
         this.cpk.address,
         spread,
+        networkId,
       )
       logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
       transactions.push({
