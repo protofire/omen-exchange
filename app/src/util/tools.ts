@@ -69,11 +69,16 @@ export const formatDate = (date: Date, utcAdd = true): string => {
 
 export const checkRpcStatus = async (customUrl: string, setStatus: any, network: any) => {
   try {
-    const response = await axios.post(customUrl, {
-      id: +new Date(),
-      jsonrpc: '2.0',
-      method: 'net_version',
-    })
+    const response = await axios.post(
+      customUrl,
+      {
+        id: +new Date(),
+        jsonrpc: '2.0',
+        method: 'net_version',
+      },
+      { timeout: 10000 },
+    )
+
     if (response.data.error || +response.data.result !== network) {
       setStatus(false)
       return false
