@@ -253,8 +253,9 @@ class CPKService {
     txOptions?: TxOptions,
     setTxHash?: (arg0: string) => void,
     setTxState?: (step: TransactionStep) => void,
+    excludeFee = false,
   ) => {
-    if (this.cpk.relay) {
+    if (this.cpk.relay && !excludeFee) {
       const { address, fee } = await this.relayService.getInfo()
       transactions.push({
         to: address,
@@ -1554,14 +1555,14 @@ class CPKService {
             data: XdaiService.encodeRelayTokens(to),
             value: amount.toString(),
           })
-          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState, true)
           return transactionHash
         } else {
           transactions.push({
             to: address,
             data: XdaiService.encodeTokenBridgeTransfer(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
           })
-          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState, true)
 
           return transactionHash
         }

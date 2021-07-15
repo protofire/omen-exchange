@@ -240,11 +240,10 @@ export const ModalDepositWithdraw = (props: Props) => {
       setTxHash(hash)
 
       await waitForConfirmations(hash, provider, setConfirmations, setTxState, 13)
-
       if (exchangeType === ExchangeType.deposit && symbol !== 'DAI') {
         await XdaiService.waitForBridgeMessageStatus(hash, context.library)
       }
-      if (exchangeType === ExchangeType.withdraw && symbol !== 'DAI') {
+      if (exchangeType === ExchangeType.withdraw && symbol !== 'xDAI') {
         await XdaiService.waitForClaimSignature(hash, context.library)
       }
       setTxState(TransactionStep.transactionConfirmed)
