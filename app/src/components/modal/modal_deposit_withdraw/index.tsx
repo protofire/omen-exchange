@@ -144,7 +144,8 @@ export const ModalDepositWithdraw = (props: Props) => {
   const { address, balance, decimals, symbol } =
     findCurrentTokenBasedOnAction(exchangeType, currencySelected.toUpperCase()) ||
     getToken(context.relay ? networkIds.XDAI : context.networkId, 'dai')
-  const currentTokenMainnet = mainnetTokens.find(element => element.symbol === symbol)
+
+  const currentTokenMainnet = mainnetTokens.find(element => element.symbol === (symbol === 'xDAI' ? 'DAI' : symbol))
 
   const isApprovalVisible =
     (exchangeType === ExchangeType.deposit &&
@@ -211,7 +212,11 @@ export const ModalDepositWithdraw = (props: Props) => {
     }
 
     try {
-      setMessage(`${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), decimals)} ${symbol}`)
+      setMessage(
+        `${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), decimals)} ${
+          symbol === 'xDAI' ? 'Dai' : symbol
+        }`,
+      )
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
       setIsTransactionModalOpen(true)
@@ -235,11 +240,10 @@ export const ModalDepositWithdraw = (props: Props) => {
       setTxHash(hash)
 
       await waitForConfirmations(hash, provider, setConfirmations, setTxState, 13)
-
       if (exchangeType === ExchangeType.deposit && symbol !== 'DAI') {
         await XdaiService.waitForBridgeMessageStatus(hash, context.library)
       }
-      if (exchangeType === ExchangeType.withdraw && symbol !== 'DAI') {
+      if (exchangeType === ExchangeType.withdraw && symbol !== 'xDAI') {
         await XdaiService.waitForClaimSignature(hash, context.library)
       }
       setTxState(TransactionStep.transactionConfirmed)
@@ -275,10 +279,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         </BalanceItemSide>
         <BalanceItemSide>
           <BalanceItemBalance>
-            {token?.balance
-              ? formatBigNumber(new BigNumber(token?.balance), decimals, symbol === 'DAI' ? 2 : 3)
-              : '0.00'}{' '}
-            {symbol}
+            {token?.balance ? formatBigNumber(new BigNumber(token.balance), decimals, 3) : '0.00'} {symbol}
           </BalanceItemBalance>
         </BalanceItemSide>
       </BalanceItem>
@@ -384,21 +385,24 @@ export const ModalDepositWithdraw = (props: Props) => {
 
                 <span>
                   {exchangeType === ExchangeType.withdraw && currencySelected !== 'dai'
-                    ? `${formatNumber(formatBigNumber(displayFundAmount.div(1000), decimals, decimals), 3)} ${symbol}`
-                    : `0.00 ${symbol}`}
+                    ? `${formatNumber(formatBigNumber(displayFundAmount.div(1000), decimals, decimals), 3)} ${
+                        symbol === 'xDAI' ? 'DAI' : symbol
+                      }`
+                    : `0.00 ${symbol === 'xDAI' ? 'DAI' : symbol}`}
                 </span>
               </ExchangeDataItem>
               <Divider />
               <ExchangeDataItem>
                 <span>Total</span>
-
                 <span>
                   {currencySelected !== 'dai' && exchangeType === ExchangeType.withdraw
                     ? `${formatNumber(
                         formatBigNumber(displayFundAmount.sub(displayFundAmount.div(1000)), decimals, decimals),
                         3,
                       )} ${symbol}`
-                    : `${formatNumber(formatBigNumber(displayFundAmount, decimals, decimals))} ${symbol}`}
+                    : `${formatNumber(formatBigNumber(displayFundAmount, decimals, decimals))} ${
+                        symbol === 'xDAI' ? 'DAI' : symbol
+                      }`}
                 </span>
               </ExchangeDataItem>
             </>
