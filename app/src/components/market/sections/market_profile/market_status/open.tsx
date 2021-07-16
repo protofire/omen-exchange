@@ -102,8 +102,7 @@ const Wrapper = (props: Props) => {
     totalPoolShares,
   } = marketMakerData
   const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
-  const { networkId, relay } = context
-  const isQuestionOpen = question.resolution.valueOf() < Date.now()
+  const { library: provider, networkId, relay } = context
   const { compoundService: CompoundService } = useCompoundService(collateral, context)
   const compoundService = CompoundService || null
   const nativeAsset = getNativeAsset(networkId)
@@ -113,6 +112,10 @@ const Wrapper = (props: Props) => {
   const [bondNativeAssetAmount, setBondNativeAssetAmount] = useState<BigNumber>(
     question.currentAnswerBond ? new BigNumber(question.currentAnswerBond).mul(2) : initialBondAmount,
   )
+
+  const [blocktime, setBlocktime] = useState<number>()
+
+  const isQuestionOpen = question.resolution.valueOf() < (blocktime ? blocktime : Date.now())
 
   useEffect(() => {
     if (question.currentAnswerBond && !new BigNumber(question.currentAnswerBond).mul(2).eq(bondNativeAssetAmount)) {
@@ -137,16 +140,21 @@ const Wrapper = (props: Props) => {
       setDisplayCollateral(collateral)
     }
   }
+
   useEffect(() => {
-    const timeDifference = new Date(question.resolution).getTime() - new Date().getTime()
-    const maxTimeDifference = 86400000
-    if (timeDifference > 0 && timeDifference < maxTimeDifference) {
-      setTimeout(callAfterTimeout, timeDifference + 2000)
+    const shouldFinalize = async () => {
+      const block = await provider.getBlock('latest')
+      const timestamp = block.timestamp * 1000
+      const resolution = new Date(question.resolution).getTime()
+      if (resolution < timestamp) {
+        setCurrentTab(MarketDetailsTab.finalize)
+        fetchGraphMarketMakerData()
+      } else {
+        setTimeout(shouldFinalize, 2000)
+      }
+      setBlocktime(timestamp)
     }
-    function callAfterTimeout() {
-      fetchGraphMarketMakerData()
-      setCurrentTab(MarketDetailsTab.finalize)
-    }
+    shouldFinalize()
     setCurrentDisplayCollateral()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -216,17 +224,6 @@ const Wrapper = (props: Props) => {
     )
   }
 
-  const openInRealitioButton = (
-    <Button
-      buttonType={ButtonType.secondaryLine}
-      onClick={() => {
-        window.open(`${realitioBaseUrl}/#!/question/${question.id}`)
-      }}
-    >
-      Answer on Reality.eth
-    </Button>
-  )
-
   const finalizeButtons = (
     <MarketBottomFinalizeNavGroupWrapper>
       <Button
@@ -271,7 +268,7 @@ const Wrapper = (props: Props) => {
     </MarketBottomNavGroupWrapper>
   )
 
-  const isFinalizing = question.resolution < new Date() && !isQuestionFinalized
+  const isFinalizing = isQuestionOpen && !isQuestionFinalized
 
   const [currentTab, setCurrentTab] = useState(
     isQuestionFinalized || !isFinalizing ? MarketDetailsTab.swap : MarketDetailsTab.finalize,
@@ -317,11 +314,12 @@ const Wrapper = (props: Props) => {
   return (
     <>
       <TopCard>
-        <MarketTopDetailsOpen marketMakerData={marketMakerData} />
+        <MarketTopDetailsOpen blocktime={blocktime} marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
         <MarketNavigation
           activeTab={currentTab}
+          blocktime={blocktime}
           marketMakerData={marketMakerData}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
@@ -367,7 +365,7 @@ const Wrapper = (props: Props) => {
                 >
                   Back
                 </Button>
-                {isQuestionOpen ? openInRealitioButton : buySellButtons}
+                {buySellButtons}
               </StyledButtonContainer>
             </WhenConnected>
           </>

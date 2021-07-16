@@ -419,6 +419,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
   },
   dai: {
     symbol: 'DAI',
+    name: 'Dai',
     decimals: 18,
     addresses: {
       [networkIds.MAINNET]: '0x6b175474e89094c44da98b954eedeac495271d0f',
