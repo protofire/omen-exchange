@@ -8,6 +8,7 @@ import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
 import { getNetworkFromChain } from '../util/tools'
+import { TransactionStep } from '../util/types'
 
 import { ConnectedBalance, useBalance } from './useBalance'
 import { useCpk } from './useCpk'
@@ -51,6 +52,8 @@ interface Props {
 export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   const [connection, setConnection] = useState<ConnectedWeb3Context | null>(null)
   const [networkId, setNetworkId] = useState<number | null>(null)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
   const safeAppInfo = useSafeApp()
   const context = useWeb3Context()
 
@@ -165,6 +168,10 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     ...connection,
     cpk,
     balances,
+    txHash,
+    txState,
+    setTxHash,
+    setTxState,
   }
 
   props.setStatus(true)
