@@ -168,12 +168,21 @@ class CPKService {
   provider: Web3Provider
   safe: SafeService
   relayService: RelayService
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 
-  constructor(cpk: any, provider: Web3Provider) {
+  constructor(
+    cpk: any,
+    provider: Web3Provider,
+    setTxHash: (arg0: string) => void,
+    setTxState: (step: TransactionStep) => void,
+  ) {
     this.cpk = cpk
     this.provider = provider
     this.safe = new SafeService(cpk.address, provider)
     this.relayService = new RelayService()
+    this.setTxHash = setTxHash
+    this.setTxState = setTxState
   }
 
   get address(): string {
