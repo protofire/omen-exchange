@@ -8,7 +8,6 @@ import { createCPK } from '../util/cpk'
  */
 
 export const useCpk = (context: any) => {
-  const { setTxHash, setTxState } = context
   const [cpk, setCpk] = useState<Maybe<CPKService>>(null)
   useEffect(() => {
     let active = true
@@ -16,7 +15,7 @@ export const useCpk = (context: any) => {
     const makeCpk = async () => {
       try {
         if (context) {
-          const { account, library, relay } = context
+          const { account, library, relay, setTxHash, setTxState } = context
           if (account && library) {
             const cpk = await createCPK(library, relay)
             const service = new CPKService(cpk, library, setTxHash, setTxState)
@@ -34,7 +33,7 @@ export const useCpk = (context: any) => {
     return () => {
       active = false
     }
-  }, [context, setTxHash, setTxState])
+  }, [context])
 
   return cpk
 }
