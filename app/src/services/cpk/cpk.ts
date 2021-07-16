@@ -1,14 +1,12 @@
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
-import { OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../../common/constants'
 import { Transaction, verifyProxyAddress } from '../../util/cpk'
 import { getLogger } from '../../util/logger'
 import { bridgeTokensList, getTargetSafeImplementation } from '../../util/networks'
 import { getBySafeTx, signaturesFormatted, waitABit, waitForBlockToSync } from '../../util/tools'
 import { MarketData, Question, Token, TransactionStep } from '../../util/types'
 import { ConditionalTokenService } from '../conditional_token'
-import { ERC20Service } from '../erc20'
 import { MarketMakerService } from '../market_maker'
 import { MarketMakerFactoryService } from '../market_maker_factory'
 import { OracleService } from '../oracle'
@@ -36,8 +34,11 @@ import {
   removeFunds,
   resolveCondition,
   sell,
+  sendFromxDaiToBridge,
   setup,
+  submitAnswer,
   unwrap,
+  upgradeProxy,
   validateOracle,
   withdraw,
   withdrawRealitioBalance,
@@ -51,54 +52,49 @@ const logger = getLogger('Services::CPKService')
 
 const defaultGas = 1500000
 
-interface CPKBuyOutcomesParams {
+interface TxState {
+  setTxHash?: (arg0: string) => void
+  setTxState?: (step: TransactionStep) => void
+}
+
+interface CPKBuyOutcomesParams extends TxState {
   amount: BigNumber
   collateral: Token
   outcomeIndex: number
   marketMaker: MarketMakerService
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
 }
 
-interface CPKSellOutcomesParams {
+interface CPKSellOutcomesParams extends TxState {
   amount: BigNumber
   outcomeIndex: number
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
 }
 
-interface CPKCreateMarketParams {
+interface CPKCreateMarketParams extends TxState {
   marketData: MarketData
   conditionalTokens: ConditionalTokenService
   realitio: RealitioService
   marketMakerFactory: MarketMakerFactoryService
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
 }
 
-interface CPKAddFundingParams {
+interface CPKAddFundingParams extends TxState {
   amount: BigNumber
   collateral: Token
   marketMaker: MarketMakerService
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
 }
 
-interface CPKRemoveFundingParams {
+interface CPKRemoveFundingParams extends TxState {
   amountToMerge: BigNumber
   conditionId: string
   conditionalTokens: ConditionalTokenService
   earnings: BigNumber
   marketMaker: MarketMakerService
   outcomesCount: number
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
   sharesToBurn: BigNumber
 }
 
-interface CPKRedeemParams {
+interface CPKRedeemParams extends TxState {
   isScalar: boolean
   isConditionResolved: boolean
   question: Question
@@ -112,11 +108,9 @@ interface CPKRedeemParams {
   realitioBalance: BigNumber
   scalarLow: Maybe<BigNumber>
   scalarHigh: Maybe<BigNumber>
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
 }
 
-interface CPKResolveParams {
+interface CPKResolveParams extends TxState {
   isScalar: boolean
   realitio: RealitioService
   oracle: OracleService
@@ -124,17 +118,19 @@ interface CPKResolveParams {
   numOutcomes: number
   scalarLow: Maybe<BigNumber>
   scalarHigh: Maybe<BigNumber>
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
 }
 
-interface CPKSubmitAnswerParams {
+interface CPKSubmitAnswerParams extends TxState {
   realitio: RealitioService
   question: Question
   answer: string
   amount: BigNumber
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
+}
+
+interface SendFromxDaiParams extends TxState {
+  amount: BigNumber
+  address: string
+  symbol?: string
 }
 
 interface TransactionResult {
@@ -145,11 +141,6 @@ interface TransactionResult {
 export interface TxOptions {
   value?: BigNumber
   gas?: number
-}
-
-interface TxState {
-  setTxHash?: (arg0: string) => void
-  setTxState?: (step: TransactionStep) => void
 }
 
 const fallbackMultisigTransactionReceipt: TransactionReceipt = {
@@ -276,7 +267,7 @@ class CPKService {
     return amount
   }
 
-  pipe = (...fns: any) => (params: any) => pipe(setup, ...fns, exec)({ ...params, service: this })
+  pipe = (...fns: any) => (params?: any) => pipe(setup, ...fns, exec)({ ...params, service: this })
 
   buyOutcomes = async (params: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
@@ -396,165 +387,56 @@ class CPKService {
     }
   }
 
-  submitAnswer = async ({ amount, answer, question, realitio, setTxHash, setTxState }: CPKSubmitAnswerParams) => {
+  submitAnswer = async (params: CPKSubmitAnswerParams) => {
     try {
-      const txOptions: TxOptions = {}
-      if (!this.isSafeApp) {
-        txOptions.value = amount
-      }
-      const transactions: Transaction[] = [
-        {
-          to: realitio.address,
-          data: RealitioService.encodeSubmitAnswer(question.id, answer),
-          value: amount.toString(),
-        },
-      ]
-      await this.getGas(txOptions)
-      return this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+      const { transaction } = await this.pipe(submitAnswer)(params)
+      return transaction
     } catch (error) {
-      logger.error(`There was an error submitting answer '${question.id}'`, error.message)
+      logger.error(`There was an error submitting answer '${params.question.id}'`, error.message)
       throw error
     }
   }
 
-  proxyIsUpToDate = async (): Promise<boolean> => {
-    const network = await this.provider.getNetwork()
-    const deployed = await this.cpk.isProxyDeployed()
-    if (deployed) {
-      const implementation = await this.safe.getMasterCopy()
-      if (implementation.toLowerCase() === getTargetSafeImplementation(network.chainId).toLowerCase()) {
-        return true
-      }
-    }
-    return false
-  }
-
   upgradeProxyImplementation = async (): Promise<TransactionReceipt> => {
     try {
-      const txOptions: TxOptions = {}
-      const network = await this.provider.getNetwork()
-      await this.getGas(txOptions)
-      const targetGnosisSafeImplementation = getTargetSafeImplementation(network.chainId)
-      const transactions: Transaction[] = [
-        {
-          to: this.cpk.address,
-          data: this.safe.encodeChangeMasterCopy(targetGnosisSafeImplementation),
-        },
-      ]
-      return this.execTransactions(transactions, txOptions)
+      const { transaction } = await this.pipe(upgradeProxy)()
+      return transaction
     } catch (err) {
       logger.error(`Error trying to update proxy`, err.message)
       throw err
     }
   }
 
-  approveCpk = async (addressToApprove: string, tokenAddress: string) => {
+  sendXdaiChainTokenToBridge = async (params: SendFromxDaiParams): Promise<TransactionReceipt> => {
     try {
-      const txOptions: TxOptions = {}
-      txOptions.gas = defaultGas
-
-      const transactions: Transaction[] = [
-        {
-          to: tokenAddress,
-          data: ERC20Service.encodeApproveUnlimited(OMNI_BRIDGE_XDAI_ADDRESS),
-        },
-      ]
-      return this.execTransactions(transactions)
-    } catch (e) {
-      logger.error(`Error while approving ERC20 Token to CPK address : `, e.message)
-      throw e
-    }
-  }
-
-  sendMainnetTokenToBridge = async (amount: BigNumber, address: string, symbol?: string) => {
-    try {
-      if (this.cpk.relay) {
-        const xDaiService = new XdaiService(this.provider)
-        const contract = await xDaiService.generateXdaiBridgeContractInstance(symbol)
-
-        const sender = await this.cpk.ethLibAdapter.signer.signer.getAddress()
-
-        const receiver = this.cpk.address
-
-        // verify proxy address before deposit
-        await verifyProxyAddress(sender, receiver, this.cpk)
-
-        const transaction = await contract.relayTokens(symbol === 'DAI' ? sender : address, receiver, amount)
-        return transaction.hash
-      } else {
-        const xDaiService = new XdaiService(this.provider)
-        const contract = await xDaiService.generateErc20ContractInstance(address)
-        const transaction = await xDaiService.generateSendTransaction(amount, contract, symbol)
-        return transaction
-      }
-    } catch (e) {
-      logger.error(`Error trying to send Dai to bridge address: `, e.message)
-      throw e
-    }
-  }
-
-  sendXdaiChainTokenToBridge = async (
-    amount: BigNumber,
-    address: string,
-    { setTxHash, setTxState }: TxState,
-    symbol?: string,
-  ) => {
-    try {
-      if (this.cpk.relay) {
-        const transactions: Transaction[] = []
-        const txOptions: TxOptions = {}
-        await this.getGas(txOptions)
-
-        // get mainnet relay signer
-        const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
-
-        // relay to signer address on mainnet
-        if (symbol === 'DAI') {
-          transactions.push({
-            to: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
-            data: XdaiService.encodeRelayTokens(to),
-            value: amount.toString(),
-          })
-          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
-          return transactionHash
-        } else {
-          transactions.push({
-            to: address,
-            data: XdaiService.encodeTokenBridgeTransfer(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
-          })
-          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
-
-          return transactionHash
-        }
-      } else {
-        const xDaiService = new XdaiService(this.provider)
-        const transaction = await xDaiService.sendXdaiToBridge(amount)
-        return transaction
-      }
+      const { transaction } = await this.pipe(sendFromxDaiToBridge)(params)
+      return transaction
     } catch (e) {
       logger.error(`Error trying to send XDai to bridge address`, e.message)
       throw e
     }
   }
 
-  fetchLatestUnclaimedTransactions = async () => {
+  /**
+   * Direct transactions
+   */
+
+  sendMainnetTokenToBridge = async (amount: BigNumber, address: string, symbol?: string) => {
     try {
       const xDaiService = new XdaiService(this.provider)
-      const arrayOfTransactions = []
-      const daiData = await xDaiService.fetchXdaiTransactionData()
-      arrayOfTransactions.push(...daiData)
+      const contract = xDaiService.generateXdaiBridgeContractInstance(symbol)
 
-      for (const token of bridgeTokensList) {
-        if (token !== 'dai') {
-          const currentToken = await xDaiService.fetchOmniTransactionData(token)
+      const sender = await this.cpk.ethLibAdapter.signer.signer.getAddress()
 
-          if (currentToken.length !== 0) arrayOfTransactions.push(...currentToken)
-        }
-      }
+      const receiver = this.cpk.address
 
-      return arrayOfTransactions
+      // verify proxy address before deposit
+      await verifyProxyAddress(sender, receiver, this.cpk)
+
+      const transaction = await contract.relayTokens(symbol === 'DAI' ? sender : address, receiver, amount)
+      return transaction
     } catch (e) {
-      logger.error('Error fetching xDai subgraph data', e.message)
+      logger.error(`Error trying to send Dai to bridge address: `, e.message)
       throw e
     }
   }
@@ -605,6 +487,44 @@ class CPKService {
       logger.error('Error while requesting market verification via Kleros!', err.message)
       throw err
     }
+  }
+
+  /**
+   * Getters
+   */
+
+  fetchLatestUnclaimedTransactions = async () => {
+    try {
+      const xDaiService = new XdaiService(this.provider)
+      const arrayOfTransactions = []
+      const daiData = await xDaiService.fetchXdaiTransactionData()
+      arrayOfTransactions.push(...daiData)
+
+      for (const token of bridgeTokensList) {
+        if (token !== 'dai') {
+          const currentToken = await xDaiService.fetchOmniTransactionData(token)
+
+          if (currentToken.length !== 0) arrayOfTransactions.push(...currentToken)
+        }
+      }
+
+      return arrayOfTransactions
+    } catch (e) {
+      logger.error('Error fetching xDai subgraph data', e.message)
+      throw e
+    }
+  }
+
+  proxyIsUpToDate = async (): Promise<boolean> => {
+    const network = await this.provider.getNetwork()
+    const deployed = await this.cpk.isProxyDeployed()
+    if (deployed) {
+      const implementation = await this.safe.getMasterCopy()
+      if (implementation.toLowerCase() === getTargetSafeImplementation(network.chainId).toLowerCase()) {
+        return true
+      }
+    }
+    return false
   }
 }
 

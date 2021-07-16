@@ -2,11 +2,13 @@ import { Zero } from 'ethers/constants'
 import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
+import { OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../../common/constants'
 import { Transaction } from '../../util/cpk'
 import { getLogger } from '../../util/logger'
 import {
   getContractAddress,
   getNativeAsset,
+  getTargetSafeImplementation,
   getTokenFromAddress,
   getWrapToken,
   pseudoNativeAssetAddress,
@@ -20,6 +22,7 @@ import { MarketMakerFactoryService } from '../market_maker_factory'
 import { OracleService } from '../oracle'
 import { RealitioService } from '../realitio'
 import { UnwrapTokenService } from '../unwrap_token'
+import { XdaiService } from '../xdai'
 
 import { CPKService, TxOptions } from './cpk'
 
@@ -776,6 +779,94 @@ export const createMarket = async (params: CreateMarketParams) => {
   })
 
   return { ...params, predictedMarketMakerAddress }
+}
+
+/**
+ * Submit an answer to realitio
+ */
+
+interface SubmitAnswerParams {
+  amount: BigNumber
+  answer: string
+  question: Question
+  realitio: RealitioService
+  service: CPKService
+  transactions: Transaction[]
+  txOptions: TxOptions
+}
+
+export const submitAnswer = async (params: SubmitAnswerParams) => {
+  const { amount, answer, question, realitio, service, transactions, txOptions } = params
+  if (!service.isSafeApp) {
+    txOptions.value = amount
+  }
+
+  transactions.push({
+    to: realitio.address,
+    data: RealitioService.encodeSubmitAnswer(question.id, answer),
+    value: amount.toString(),
+  })
+
+  return params
+}
+
+/**
+ * Upgrade proxy
+ */
+
+interface UpgradeProxyParams {
+  networkId: number
+  service: CPKService
+  transactions: Transaction[]
+}
+
+export const upgradeProxy = async (params: UpgradeProxyParams) => {
+  const { networkId, service, transactions } = params
+  const targetGnosisSafeImplementation = getTargetSafeImplementation(networkId)
+
+  transactions.push({
+    to: service.cpk.address,
+    data: service.safe.encodeChangeMasterCopy(targetGnosisSafeImplementation),
+  })
+
+  return params
+}
+
+/**
+ * Send tokens back to mainnet
+ */
+
+interface SendFromxDaiParams {
+  address: string
+  amount: BigNumber
+  networkId: number
+  service: CPKService
+  transactions: Transaction[]
+  symbol?: string
+}
+
+export const sendFromxDaiToBridge = async (params: SendFromxDaiParams) => {
+  const { address, amount, service, symbol, transactions } = params
+  if (service.cpk.relay) {
+    // get mainnet relay signer
+    const to = await service.cpk.ethLibAdapter.signer.signer.getAddress()
+
+    // relay to signer address on mainnet
+    if (symbol === 'DAI' || symbol === 'xDAI') {
+      transactions.push({
+        to: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
+        data: XdaiService.encodeRelayTokens(to),
+        value: amount.toString(),
+      })
+    } else {
+      transactions.push({
+        to: address,
+        data: XdaiService.encodeTokenBridgeTransfer(OMNI_BRIDGE_XDAI_ADDRESS, amount, to),
+      })
+    }
+  }
+
+  return params
 }
 
 /**
