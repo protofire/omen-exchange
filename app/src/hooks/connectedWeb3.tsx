@@ -25,6 +25,10 @@ export interface ConnectedWeb3Context {
   cpk: Maybe<CPKService>
   balances: ConnectedBalance
   toggleRelay: () => void
+  txHash: string
+  txState: TransactionStep
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 const ConnectedWeb3Context = React.createContext<Maybe<ConnectedWeb3Context>>(null)
@@ -99,6 +103,10 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
         cpk,
         balances,
         toggleRelay,
+        txHash,
+        txState,
+        setTxHash,
+        setTxState,
       }
 
       setConnection(value)
@@ -168,10 +176,6 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     ...connection,
     cpk,
     balances,
-    txHash,
-    txState,
-    setTxHash,
-    setTxState,
   }
 
   props.setStatus(true)
