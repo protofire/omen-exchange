@@ -15,10 +15,10 @@ export const useCpk = (context: any) => {
     const makeCpk = async () => {
       try {
         if (context) {
-          const { account, library, relay, setTxHash, setTxState } = context
+          const { account, library, relay } = context
           if (account && library) {
             const cpk = await createCPK(library, relay)
-            const service = new CPKService(cpk, library, setTxHash, setTxState)
+            const service = new CPKService(cpk, library, context)
             if (active) {
               setCpk(service)
             }

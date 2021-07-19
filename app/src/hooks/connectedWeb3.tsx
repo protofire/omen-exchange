@@ -112,7 +112,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
       setConnection(value)
     }
     // eslint-disable-next-line
-  }, [relay, networkId, context, library, account])
+  }, [relay, networkId, context, library, account, txHash, txState])
 
   useEffect(() => {
     let isSubscribed = true
