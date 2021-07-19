@@ -142,7 +142,7 @@ const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { fetchBalances } = context.balances
 
-  const { account, cpk, library: provider, networkId, relay } = context
+  const { account, cpk, library: provider, networkId, relay, setTxState, txHash, txState } = context
   const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
 
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props
@@ -168,8 +168,6 @@ const Wrapper = (props: Props) => {
 
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
-  const [txHash, setTxHash] = useState('')
   const [userRealitioWithdraw, setUserRealitioWithdraw] = useState(false)
   const [cpkRealitioWithdraw, setCpkRealitioWithdraw] = useState(false)
   const [userRealitioBalance, setUserRealitioBalance] = useState(Zero)
@@ -195,8 +193,6 @@ const Wrapper = (props: Props) => {
         scalarHigh,
         question,
         numOutcomes: balances.length,
-        setTxHash,
-        setTxState,
       })
 
       await fetchGraphMarketMakerData()
@@ -270,7 +266,7 @@ const Wrapper = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
-      await realitio.withdraw(setTxHash, setTxState)
+      await realitio.withdraw()
       await fetchBalances()
       await getRealitioBalance()
 
@@ -310,8 +306,6 @@ const Wrapper = (props: Props) => {
         marketMaker,
         conditionalTokens,
         realitioBalance: cpkRealitioBalance,
-        setTxHash,
-        setTxState,
       })
       await fetchBalances()
       await getRealitioBalance()
