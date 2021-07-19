@@ -258,13 +258,7 @@ class CPKService {
 
   buyOutcomes = async (params: CPKBuyOutcomesParams): Promise<TransactionReceipt> => {
     try {
-      const { transaction } = await this.pipe(
-        fee,
-        wrap,
-        approve,
-        transfer,
-        buy,
-      )({ ...params, setTxHash: this.context?.setTxHash, setTxState: this.context?.setTxState })
+      const { transaction } = await this.pipe(fee, wrap, approve, transfer, buy)(params)
       return transaction
     } catch (err) {
       logger.error(`There was an error buying '${params.amount.toString()}' of shares`, err.message)
