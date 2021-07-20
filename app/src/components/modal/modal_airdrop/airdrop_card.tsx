@@ -1,9 +1,9 @@
 import { BigNumber } from 'ethers/utils'
-import React, { HTMLAttributes, useEffect, useState } from 'react'
+import React, { HTMLAttributes } from 'react'
 import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import { useAirdropService, useConnectedWeb3Context } from '../../../hooks'
+import { useConnectedWeb3Context } from '../../../hooks'
 import { formatBigNumber } from '../../../util/tools'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -81,7 +81,7 @@ const AirdropButton = styled(Button)`
 interface Props extends HTMLAttributes<HTMLDivElement> {
   theme: any
   displayButtons?: boolean
-  displayAmount?: BigNumber
+  displayAmount: BigNumber
   claim?: (account: string, amount: BigNumber) => Promise<void>
   onCheckAddress?: () => void
 }
@@ -89,29 +89,15 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 const AirdropCard = (props: Props) => {
   const { claim, displayAmount, displayButtons = true, onCheckAddress } = props
 
-  const { account, library, networkId, relay } = useConnectedWeb3Context()
-
-  const airdrop = useAirdropService()
-
-  const [amount, setAmount] = useState(new BigNumber('0'))
-
-  useEffect(() => {
-    const getClaimAmount = async () => {
-      const newAmount = await airdrop.getClaimAmount(account)
-      setAmount(newAmount)
-    }
-    if (account && !displayAmount) {
-      getClaimAmount()
-    }
-  }, [airdrop, account, library, networkId, relay, displayAmount])
+  const { account } = useConnectedWeb3Context()
 
   const submitClaim = () => {
-    if (claim && account) {
-      claim(account, displayAmount || amount)
+    if (claim && account && displayAmount) {
+      claim(account, displayAmount)
     }
   }
 
-  const claimIsDisabled = displayAmount ? displayAmount.isZero() : amount.isZero()
+  const claimIsDisabled = !displayAmount || displayAmount.isZero()
 
   return (
     <>
@@ -122,7 +108,7 @@ const AirdropCard = (props: Props) => {
             <TopSectionDetails>
               <TopSectionHeading>Claimable Amount</TopSectionHeading>
               <TopSectionSubHeading green={!claimIsDisabled}>
-                {formatBigNumber(displayAmount || amount, STANDARD_DECIMALS)} OMN
+                {formatBigNumber(displayAmount, STANDARD_DECIMALS)} OMN
               </TopSectionSubHeading>
             </TopSectionDetails>
           </TopSectionLeft>

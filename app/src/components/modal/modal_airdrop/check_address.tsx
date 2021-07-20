@@ -57,7 +57,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const ModalCheckAddress = (props: Props) => {
   const { claim, isOpen, onBack, onClose, theme } = props
 
-  const airdrop = useAirdropService()
+  const { airdrop } = useAirdropService()
 
   const [address, setAddress] = useState('')
   const [amount, setAmount] = useState(new BigNumber('0'))
