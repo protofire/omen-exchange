@@ -76,7 +76,7 @@ const ButtonSection = styled.div`
   justify-content: space-between;
   width: 100%;
   column-gap: 20px;
-  margin-top: 32px;
+  margin-top: 24px;
 `
 const ButtonsLockUnlock = styled(Button)`
   flex: 1;
@@ -94,7 +94,7 @@ const ConditionalWrapper = styled.div<{ hideWrapper: boolean }>`
 `
 const Divider = styled.div`
   border-top: ${props => props.theme.borders.borderLineDisabled};
-  margin: 32px 0;
+  margin: 24px 0;
 `
 const PercentageText = styled.span<{ lightColor?: boolean }>`
   ${props => props.lightColor && `color:${props.theme.colors.textColorLighter}`};
