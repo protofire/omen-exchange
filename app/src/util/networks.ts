@@ -192,7 +192,7 @@ const networks: { [K in NetworkId]: Network } = {
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
     blockExplorerURL: 'https://rinkeby.etherscan.io',
-    airdropAddress: ['0x1aD3CcB0BCE15CF2922792cB894309f460Cd2BA1'],
+    airdropAddress: ['0xf20676162Af8B5f26D8c61288089a2bf63042Ab2'],
   },
   [networkIds.SOKOL]: {
     label: 'Sokol',

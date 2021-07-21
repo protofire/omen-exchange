@@ -14,7 +14,7 @@ const TopSection = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 16px 20px;
+  padding: 20px;
   width: 100%;
   border-bottom: ${props => props.theme.borders.borderLineDisabled};
 `

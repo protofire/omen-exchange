@@ -100,12 +100,6 @@ const PercentageText = styled.span<{ lightColor?: boolean }>`
   ${props => props.lightColor && `color:${props.theme.colors.textColorLighter}`};
 `
 
-const AidropDivider = styled.div`
-  width: 418px;
-  border-top: ${props => props.theme.borders.borderLineDisabled};
-  margin: 24px 0 24px -28px;
-`
-
 const ModalLockTokens = (props: Props) => {
   const { context, fetchBalances, isOpen, omenBalance, onClose, setIsModalLockTokensOpen, theme } = props
   const { account, balances, cpk, library: provider, networkId, relay } = context
@@ -421,8 +415,16 @@ const ModalLockTokens = (props: Props) => {
             </ButtonsLockUnlock>
           </ButtonSection>
         </ContentWrapper>
-        <AidropDivider />
-        <AirdropCardWrapper claim={claim} displayAmount={claimAmount} onCheckAddress={() => setCheckAddress(true)} />
+        {!isLockAmountOpen && (
+          <>
+            <Divider />
+            <AirdropCardWrapper
+              claim={claim}
+              displayAmount={claimAmount}
+              onCheckAddress={() => setCheckAddress(true)}
+            />
+          </>
+        )}
       </Modal>
       <ModalTransactionWrapper
         confirmations={0}
