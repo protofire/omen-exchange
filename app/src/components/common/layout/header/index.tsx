@@ -322,7 +322,7 @@ const HeaderContainer: React.FC = (props: any) => {
               placeholder={networkPlacholder}
             />
           )}
-          {account && networkId === networkIds.RINKEBY && (
+          {account && (
             <HeaderButton onClick={() => setModalLockTokensState(!isModalLockTokensOpen)}>
               {relay
                 ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
@@ -373,13 +373,10 @@ const HeaderContainer: React.FC = (props: any) => {
         </ContentsRight>
         <ModalLockYoTokens
           context={context}
-          fetchBalances={fetchBalances}
           isOpen={isModalLockTokensOpen}
-          omenBalance={relay ? xOmenBalance : omenBalance}
           onClose={() => setModalLockTokensState(false)}
           setIsModalLockTokensOpen={setModalLockTokensState}
         />
-
         <ModalYourConnectionWrapper
           arrayOfClaimableBalances={arrayOfClaimableTokenBalances}
           changeWallet={() => {
