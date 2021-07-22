@@ -104,7 +104,7 @@ const ModalLockTokens = (props: Props) => {
   const { context, fetchBalances, isOpen, omenBalance, onClose, setIsModalLockTokensOpen, theme } = props
   const { account, balances, cpk, library: provider, networkId, relay } = context
 
-  const { claimAmount } = useAirdropService()
+  const { claimAmount, fetchClaimAmount } = useAirdropService()
   const omen = new OmenGuildService(provider, networkId)
 
   const [isLockAmountOpen, setIsLockAmountOpen] = useState<boolean>(false)
@@ -256,6 +256,7 @@ const ModalLockTokens = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
       await cpk.claimAirdrop({ account, setTxHash, setTxState })
+      await fetchClaimAmount()
       await balances.fetchBalances()
     } catch (e) {
       setIsTransactionModalOpen(false)
