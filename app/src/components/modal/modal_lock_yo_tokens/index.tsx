@@ -294,7 +294,7 @@ const ModalLockTokens = (props: Props) => {
           <ModalMain>
             <ConditionalWrapper hideWrapper={!isLockAmountOpen}>
               <DataRow>
-                <LightDataItem>Wallet balance</LightDataItem>
+                <LightDataItem>Wallet Balance</LightDataItem>
                 <DarkDataItem>
                   {formatBigNumber(omenBalance, STANDARD_DECIMALS, 2)} OMN
                   {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
