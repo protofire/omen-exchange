@@ -74,12 +74,10 @@ interface ExecParams {
   service: CPKService
   transactions: Transaction[]
   txOptions: TxOptions
-  setTxHash: (arg0: string) => void
-  setTxState: (step: TransactionStep) => void
 }
 
 export const exec = async (params: ExecParams) => {
-  const { service, setTxHash, setTxState, transactions, txOptions } = params
+  const { service, transactions, txOptions } = params
   if (service.cpk.relay) {
     const { address, fee } = await service.relayService.getInfo()
     transactions.push({
@@ -89,10 +87,10 @@ export const exec = async (params: ExecParams) => {
   }
 
   const txObject = await service.cpk.execTransactions(transactions, txOptions)
-  setTxState && setTxState(TransactionStep.transactionSubmitted)
-  setTxHash && setTxHash(txObject.hash)
+  service.context?.setTxState(TransactionStep.transactionSubmitted)
+  service.context?.setTxHash(txObject.hash)
   const transaction = await service.waitForTransaction(txObject)
-  setTxState && setTxState(TransactionStep.transactionConfirmed)
+  service.context?.setTxState(TransactionStep.transactionConfirmed)
   return { ...params, transaction }
 }
 

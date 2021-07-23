@@ -110,16 +110,13 @@ export const ModalDepositWithdraw = (props: Props) => {
   const { exchangeType, fetchBalances, isOpen, mainnetTokens, onBack, onClose, theme, xDaiBalance, xDaiTokens } = props
 
   const context = useConnectedWeb3Context()
-  const cpk = context.cpk
+  const { cpk, setTxHash, setTxState, txHash, txState } = context
 
   const [currencySelected, setCurrencySelected] = useState<KnownToken>('dai')
 
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-
-  const [txHash, setTxHash] = useState('')
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
   const [txNetId, setTxNetId] = useState()
   const [confirmations, setConfirmations] = useState(0)
   const [message, setMessage] = useState('')
@@ -223,10 +220,9 @@ export const ModalDepositWithdraw = (props: Props) => {
               amount: displayFundAmount,
               address,
               symbol,
-              setTxState,
-              setTxHash,
             })
       const hash = transaction.transactionHash || transaction.hash
+
       const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
       setTxNetId(provider.network.chainId)
       setTxHash(hash)

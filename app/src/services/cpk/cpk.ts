@@ -1,11 +1,12 @@
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
-import { Transaction, verifyProxyAddress } from '../../util/cpk'
+import { ConnectedWeb3Context } from '../../hooks'
+import { verifyProxyAddress } from '../../util/cpk'
 import { getLogger } from '../../util/logger'
 import { bridgeTokensList, getTargetSafeImplementation } from '../../util/networks'
 import { getBySafeTx, signaturesFormatted, waitABit, waitForBlockToSync } from '../../util/tools'
-import { MarketData, Question, Token, TransactionStep } from '../../util/types'
+import { MarketData, Question, Token } from '../../util/types'
 import { ConditionalTokenService } from '../conditional_token'
 import { MarketMakerService } from '../market_maker'
 import { MarketMakerFactoryService } from '../market_maker_factory'
@@ -52,39 +53,34 @@ const logger = getLogger('Services::CPKService')
 
 const defaultGas = 1500000
 
-interface TxState {
-  setTxHash?: (arg0: string) => void
-  setTxState?: (step: TransactionStep) => void
-}
-
-interface CPKBuyOutcomesParams extends TxState {
+interface CPKBuyOutcomesParams {
   amount: BigNumber
   collateral: Token
   outcomeIndex: number
   marketMaker: MarketMakerService
 }
 
-interface CPKSellOutcomesParams extends TxState {
+interface CPKSellOutcomesParams {
   amount: BigNumber
   outcomeIndex: number
   marketMaker: MarketMakerService
   conditionalTokens: ConditionalTokenService
 }
 
-interface CPKCreateMarketParams extends TxState {
+interface CPKCreateMarketParams {
   marketData: MarketData
   conditionalTokens: ConditionalTokenService
   realitio: RealitioService
   marketMakerFactory: MarketMakerFactoryService
 }
 
-interface CPKAddFundingParams extends TxState {
+interface CPKAddFundingParams {
   amount: BigNumber
   collateral: Token
   marketMaker: MarketMakerService
 }
 
-interface CPKRemoveFundingParams extends TxState {
+interface CPKRemoveFundingParams {
   amountToMerge: BigNumber
   conditionId: string
   conditionalTokens: ConditionalTokenService
@@ -94,7 +90,7 @@ interface CPKRemoveFundingParams extends TxState {
   sharesToBurn: BigNumber
 }
 
-interface CPKRedeemParams extends TxState {
+interface CPKRedeemParams {
   isScalar: boolean
   isConditionResolved: boolean
   question: Question
@@ -110,7 +106,7 @@ interface CPKRedeemParams extends TxState {
   scalarHigh: Maybe<BigNumber>
 }
 
-interface CPKResolveParams extends TxState {
+interface CPKResolveParams {
   isScalar: boolean
   realitio: RealitioService
   oracle: OracleService
@@ -120,14 +116,14 @@ interface CPKResolveParams extends TxState {
   scalarHigh: Maybe<BigNumber>
 }
 
-interface CPKSubmitAnswerParams extends TxState {
+interface CPKSubmitAnswerParams {
   realitio: RealitioService
   question: Question
   answer: string
   amount: BigNumber
 }
 
-interface SendFromxDaiParams extends TxState {
+interface SendFromxDaiParams {
   amount: BigNumber
   address: string
   symbol?: string
@@ -163,12 +159,14 @@ class CPKService {
   provider: Web3Provider
   safe: SafeService
   relayService: RelayService
+  context?: ConnectedWeb3Context
 
-  constructor(cpk: any, provider: Web3Provider) {
+  constructor(cpk: any, provider: Web3Provider, context?: ConnectedWeb3Context) {
     this.cpk = cpk
     this.provider = provider
     this.safe = new SafeService(cpk.address, provider)
     this.relayService = new RelayService()
+    this.context = context
   }
 
   get address(): string {
@@ -229,28 +227,6 @@ class CPKService {
       await waitForBlockToSync(network.chainId, transactionReceipt.blockNumber)
     }
     return transactionReceipt
-  }
-
-  execTransactions = async (
-    transactions: Transaction[],
-    txOptions?: TxOptions,
-    setTxHash?: (arg0: string) => void,
-    setTxState?: (step: TransactionStep) => void,
-  ) => {
-    if (this.cpk.relay) {
-      const { address, fee } = await this.relayService.getInfo()
-      transactions.push({
-        to: address,
-        value: fee,
-      })
-    }
-
-    const txObject = await this.cpk.execTransactions(transactions, txOptions)
-    setTxState && setTxState(TransactionStep.transactionSubmitted)
-    setTxHash && setTxHash(txObject.hash)
-    const tx = await this.waitForTransaction(txObject)
-    setTxState && setTxState(TransactionStep.transactionConfirmed)
-    return tx
   }
 
   getGas = async (txOptions: TxOptions): Promise<void> => {
