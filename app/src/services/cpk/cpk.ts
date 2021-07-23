@@ -259,6 +259,7 @@ class CPKService {
     try {
       const { predictedMarketMakerAddress, transaction } = await this.pipe(
         wrangleCreateMarketParams,
+        fee,
         wrap,
         approve,
         deposit,
@@ -281,6 +282,7 @@ class CPKService {
     try {
       const { predictedMarketMakerAddress, transaction } = await this.pipe(
         wrangleCreateMarketParams,
+        fee,
         wrap,
         approve,
         deposit,
@@ -318,7 +320,7 @@ class CPKService {
 
   addFunding = async (params: CPKAddFundingParams): Promise<TransactionReceipt> => {
     try {
-      const { transaction } = await this.pipe(wrap, approve, deposit, addFunds)(params)
+      const { transaction } = await this.pipe(fee, wrap, approve, deposit, addFunds)(params)
       return transaction
     } catch (err) {
       logger.error(`There was an error adding an amount of '${params.amount.toString()}' for funding`, err.message)
