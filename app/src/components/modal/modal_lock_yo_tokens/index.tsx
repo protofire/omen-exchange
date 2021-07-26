@@ -6,6 +6,7 @@ import ReactTooltip from 'react-tooltip'
 import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
+import { useAirdropService } from '../../../hooks'
 import { ERC20Service, OmenGuildService } from '../../../services'
 import { getToken, networkIds } from '../../../util/networks'
 import { daysUntil, divBN, formatBigNumber, formatLockDate } from '../../../util/tools'
@@ -19,6 +20,8 @@ import { IconArrowBack, IconClose, IconOmen } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
 import { ArrowIcon } from '../../market/common/new_value/img/ArrowIcon'
 import { ContentWrapper, ModalNavigation } from '../common_styled'
+import { AirdropCardWrapper } from '../modal_airdrop/airdrop_card'
+import { ModalCheckAddressWrapper } from '../modal_airdrop/check_address'
 import { ModalTransactionWrapper } from '../modal_transaction'
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -73,7 +76,7 @@ const ButtonSection = styled.div`
   justify-content: space-between;
   width: 100%;
   column-gap: 20px;
-  margin-top: 32px;
+  margin-top: 24px;
 `
 const ButtonsLockUnlock = styled(Button)`
   flex: 1;
@@ -91,16 +94,17 @@ const ConditionalWrapper = styled.div<{ hideWrapper: boolean }>`
 `
 const Divider = styled.div`
   border-top: ${props => props.theme.borders.borderLineDisabled};
-  margin: 32px 0;
+  margin: 24px 0;
 `
 const PercentageText = styled.span<{ lightColor?: boolean }>`
   ${props => props.lightColor && `color:${props.theme.colors.textColorLighter}`};
 `
 
 const ModalLockTokens = (props: Props) => {
-  const { context, fetchBalances, isOpen, omenBalance, onClose, setIsModalLockTokensOpen, theme } = props
-  const { account, cpk, library: provider, networkId, relay } = context
+  const { context, fetchBalances, isOpen, omenBalance, setIsModalLockTokensOpen, theme } = props
+  const { account, balances, cpk, library: provider, networkId, relay } = context
 
+  const { claimAmount, fetchClaimAmount } = useAirdropService()
   const omen = new OmenGuildService(provider, networkId)
 
   const [isLockAmountOpen, setIsLockAmountOpen] = useState<boolean>(false)
@@ -117,6 +121,7 @@ const ModalLockTokens = (props: Props) => {
   const [txNetId, setTxNetId] = useState()
   const [omenAllowance, setOmenAllowance] = useState<BigNumber>(Zero)
   const [allowanceState, setAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
+  const [checkAddress, setCheckAddress] = useState(false)
 
   const isApproveVisible =
     (omenAllowance.isZero() && isLockAmountOpen) ||
@@ -241,9 +246,33 @@ const ModalLockTokens = (props: Props) => {
     }
   }
 
+  const claim = async (account: string, amount: BigNumber) => {
+    if (!cpk || !account) {
+      return
+    }
+
+    try {
+      setTransactionMessage(`Claim ${formatBigNumber(amount, STANDARD_DECIMALS)} OMN`)
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
+      await cpk.claimAirdrop({ account, setTxHash, setTxState })
+      await fetchClaimAmount()
+      await balances.fetchBalances()
+    } catch (e) {
+      setIsTransactionModalOpen(false)
+    }
+  }
+
+  const onClose = () => {
+    setIsTransactionModalOpen(false)
+    setCheckAddress(false)
+    setIsLockAmountOpen(false)
+    props.onClose()
+  }
+
   return (
     <>
-      <Modal isOpen={isOpen && !isTransactionModalOpen} style={theme.fluidHeightModal}>
+      <Modal isOpen={isOpen && !isTransactionModalOpen && !checkAddress} style={theme.fluidHeightModal}>
         <ContentWrapper>
           <ModalNavigation style={{ padding: '0', marginBottom: isLockAmountOpen ? '32px' : '24px' }}>
             <NavLeft>
@@ -260,12 +289,7 @@ const ModalLockTokens = (props: Props) => {
               )}
               <HeaderText>{isLockAmountOpen ? 'Lock Omen Token' : 'Omen Guild Membership'}</HeaderText>
             </NavLeft>
-            <IconClose
-              hoverEffect={true}
-              onClick={() => {
-                onClose()
-              }}
-            />
+            <IconClose hoverEffect={true} onClick={onClose} />
           </ModalNavigation>
           <ModalMain>
             <ConditionalWrapper hideWrapper={!isLockAmountOpen}>
@@ -394,6 +418,16 @@ const ModalLockTokens = (props: Props) => {
             </ButtonsLockUnlock>
           </ButtonSection>
         </ContentWrapper>
+        {!isLockAmountOpen && (
+          <>
+            <Divider />
+            <AirdropCardWrapper
+              claim={claim}
+              displayAmount={claimAmount}
+              onCheckAddress={() => setCheckAddress(true)}
+            />
+          </>
+        )}
       </Modal>
       <ModalTransactionWrapper
         confirmations={0}
@@ -402,12 +436,15 @@ const ModalLockTokens = (props: Props) => {
         isOpen={isTransactionModalOpen}
         message={transactionMessage}
         netId={txNetId}
-        onClose={() => {
-          setIsTransactionModalOpen(false)
-          onClose()
-        }}
+        onClose={onClose}
         txHash={txHash}
         txState={txState}
+      />
+      <ModalCheckAddressWrapper
+        claim={claim}
+        isOpen={checkAddress && !isTransactionModalOpen}
+        onBack={() => setCheckAddress(false)}
+        onClose={onClose}
       />
     </>
   )

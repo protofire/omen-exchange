@@ -1,5 +1,5 @@
 import { BigNumber } from 'ethers/utils'
-import React, { HTMLAttributes, useEffect, useState } from 'react'
+import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import { withTheme } from 'styled-components'
 
@@ -22,11 +22,10 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const ModalAirdrop = (props: Props) => {
   const { theme } = props
 
-  const { account, balances, cpk, networkId, relay } = useConnectedWeb3Context()
+  const { balances, cpk } = useConnectedWeb3Context()
 
   const initialIsOpenState = localStorage.getItem('airdrop')
   const [isOpen, setIsOpen] = useState(!initialIsOpenState)
-  const [amount, setAmount] = useState(new BigNumber('0'))
   const [checkAddress, setCheckAddress] = useState(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txHash, setTxHash] = useState('')
@@ -35,23 +34,7 @@ export const ModalAirdrop = (props: Props) => {
 
   Modal.setAppElement('#root')
 
-  const airdrop = useAirdropService()
-
-  useEffect(() => {
-    let active = true
-    const getClaimAmount = async () => {
-      const newAmount = await airdrop.getClaimAmount(account)
-      if (active) {
-        setAmount(newAmount)
-      }
-    }
-    if (account) {
-      getClaimAmount()
-    }
-    return () => {
-      active = false
-    }
-  }, [airdrop, airdrop.relay, account, relay, networkId])
+  const { claimAmount, fetchClaimAmount } = useAirdropService()
 
   const onClose = () => {
     localStorage.setItem('airdrop', 'displayed')
@@ -70,6 +53,7 @@ export const ModalAirdrop = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
       await cpk.claimAirdrop({ account, setTxHash, setTxState })
+      await fetchClaimAmount()
       await balances.fetchBalances()
     } catch (e) {
       setIsTransactionModalOpen(false)
@@ -79,7 +63,7 @@ export const ModalAirdrop = (props: Props) => {
   return (
     <>
       <Modal
-        isOpen={isOpen && !amount.isZero() && !isTransactionModalOpen && !checkAddress}
+        isOpen={isOpen && !claimAmount.isZero() && !isTransactionModalOpen && !checkAddress}
         onRequestClose={onClose}
         shouldCloseOnOverlayClick={true}
         style={theme.fluidHeightModal}
@@ -90,7 +74,7 @@ export const ModalAirdrop = (props: Props) => {
             <IconClose hoverEffect={true} onClick={onClose} />
           </ModalNavigation>
           <Graphic />
-          <AirdropCardWrapper claim={claim} displayAmount={amount} onCheckAddress={() => setCheckAddress(true)} />
+          <AirdropCardWrapper claim={claim} displayAmount={claimAmount} onCheckAddress={() => setCheckAddress(true)} />
         </ContentWrapper>
       </Modal>
       <ModalTransactionWrapper

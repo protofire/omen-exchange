@@ -57,7 +57,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const ModalCheckAddress = (props: Props) => {
   const { claim, isOpen, onBack, onClose, theme } = props
 
-  const airdrop = useAirdropService()
+  const { airdrop } = useAirdropService()
 
   const [address, setAddress] = useState('')
   const [amount, setAmount] = useState(new BigNumber('0'))
@@ -72,9 +72,11 @@ export const ModalCheckAddress = (props: Props) => {
     setLoading(false)
   }
 
-  const submitClaim = () => {
+  const submitClaim = async () => {
     if (claim && address) {
-      claim(address, amount)
+      await claim(address, amount)
+      setAddress('')
+      setAmount(new BigNumber('0'))
     }
   }
 
