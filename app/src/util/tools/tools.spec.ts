@@ -141,6 +141,7 @@ describe('tools', () => {
       [['143', 18], 143],
       [['222', 8], 222],
       [['333', 18], 333],
+      [['0.001', 18], 0.001],
     ]
 
     for (const [values, expected] of testCases) {
