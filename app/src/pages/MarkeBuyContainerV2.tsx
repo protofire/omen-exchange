@@ -1,15 +1,24 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber, BigNumberish } from 'ethers/utils'
-import React, { ReactFragment, useMemo, useState } from 'react'
+import { BigNumber } from 'ethers/utils'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import { STANDARD_DECIMALS } from '../common/constants'
 import { MarketBuy } from '../components/market/sections/market_buy/market_buy'
 import { ScalarMarketBuy } from '../components/market/sections/market_buy/scalar_market_buy'
-import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../hooks'
+import {
+  useAsyncDerivedValue,
+  useCollateralBalance,
+  useConnectedWeb3Context,
+  useContracts,
+  useCpkAllowance,
+  useCpkProxy,
+} from '../hooks'
 import { MarketMakerService } from '../services'
+import { pseudoNativeAssetAddress } from '../util/networks'
+import { RemoteData } from '../util/remote_data'
 import { formatBigNumber, formatNumber, getInitialCollateral, mulBN } from '../util/tools'
 import { calcPrediction, computeBalanceAfterTrade } from '../util/tools/fpmm/trading'
-import { MarketDetailsTab, MarketMakerData, Token } from '../util/types'
+import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../util/types'
 
 interface Props {
   isScalar: boolean
@@ -30,8 +39,24 @@ export type SharedPropsInterface = {
   tradedShares: BigNumber
   marketMaker: MarketMakerService
   amount: BigNumber
-
+  debouncedAmount: any
   setAmount: any
+  isBuyDisabled: boolean
+  amountError: Maybe<string>
+  status: Status
+  setStatus: any
+  newShares: Maybe<BigNumber[]>
+  setIsTransactionProcessing: any
+  collateral: Token
+  setCollateral: any
+  proxyIsUpToDate: RemoteData<boolean>
+  updateProxy: () => Promise<void>
+  fetchCollateralBalance: () => Promise<void>
+  collateralBalance: BigNumber
+  hasZeroAllowance: Ternary
+  hasEnoughAllowance: Ternary
+  allowance: RemoteData<BigNumber>
+  unlock: () => Promise<void>
 }
 
 const MarketBuyContainerV2: React.FC<Props> = (props: Props) => {
@@ -46,10 +71,17 @@ const MarketBuyContainerV2: React.FC<Props> = (props: Props) => {
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [newShares, setNewShares] = useState<Maybe<BigNumber[]>>(null)
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
+  const [status, setStatus] = useState<Status>(Status.Ready)
+  const signer = useMemo(() => context.library.getSigner(), [context.library])
+  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
 
   const initialCollateral = getInitialCollateral(context.networkId, props.marketMakerData.collateral, context.relay)
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
-
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
+    collateral,
+    context,
+  )
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number[] | number, BigNumber]> => {
       let tradedShares: BigNumber
@@ -88,11 +120,42 @@ const MarketBuyContainerV2: React.FC<Props> = (props: Props) => {
     [new BigNumber(0), isScalar ? balances.map(() => 0) : 0, amount],
     calcBuyAmount,
   )
+  useEffect(() => {
+    setIsNegativeAmount(formatBigNumber(amount, collateral.decimals, collateral.decimals).includes('-'))
+  }, [amount, collateral.decimals])
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount || Zero)
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals, collateral.decimals))
   const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)))
   const baseCost = debouncedAmount?.sub(feePaid)
+  const collateralBalance = maybeCollateralBalance || Zero
+  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
+  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
+  const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
+  const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
+  const currentBalance = `${formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5)}`
+  const amountError =
+    !isScalar && isTransactionProcessing
+      ? null
+      : maybeCollateralBalance === null
+      ? null
+      : maybeCollateralBalance.isZero() && amount?.gt(maybeCollateralBalance)
+      ? `Insufficient balance`
+      : amount?.gt(maybeCollateralBalance)
+      ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
+      : null
+  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
+  const isBuyDisabled =
+    (status !== Status.Ready && status !== Status.Error) ||
+    amount.isZero() ||
+    (!context.cpk?.isSafeApp &&
+      collateral.address !== pseudoNativeAssetAddress &&
+      hasEnoughAllowance !== Ternary.True) ||
+    amountError !== null ||
+    isNegativeAmount ||
+    (!isUpdated && collateral.address === pseudoNativeAssetAddress)
   const sharedObject = {
+    status,
+    setStatus,
     potentialProfit,
     sharesTotal,
     baseCost,
@@ -100,13 +163,36 @@ const MarketBuyContainerV2: React.FC<Props> = (props: Props) => {
     probabilitiesOrNewPrediction,
     setOutcomeIndex,
     outcomeIndex,
+    debouncedAmount,
     feePaid,
     tradedShares,
     marketMaker,
     amount,
     setAmount,
+    isBuyDisabled,
+    amountError,
+    newShares,
+    setIsTransactionProcessing,
+    setCollateral,
+    collateral,
+    proxyIsUpToDate,
+    updateProxy,
+    fetchCollateralBalance,
+    collateralBalance,
+    hasZeroAllowance,
+    hasEnoughAllowance,
+    allowance,
+    unlock,
   }
-  return <>{isScalar ? <ScalarMarketBuy sharedProps={sharedObject} {...props} /> : <MarketBuy {...props} />}</>
+  return (
+    <>
+      {isScalar ? (
+        <ScalarMarketBuy sharedProps={sharedObject} {...props} />
+      ) : (
+        <MarketBuy sharedProps={sharedObject} {...props} />
+      )}
+    </>
+  )
 }
 
 export { MarketBuyContainerV2 }

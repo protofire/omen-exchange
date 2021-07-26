@@ -7,32 +7,18 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../common/constants'
-import {
-  useAsyncDerivedValue,
-  useCollateralBalance,
-  useConnectedWeb3Context,
-  useContracts,
-  useCpkAllowance,
-  useCpkProxy,
-} from '../../../../hooks'
-import { MarketMakerService } from '../../../../services'
+import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { SharedPropsInterface } from '../../../../pages/MarkeBuyContainerV2'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import {
-  computeBalanceAfterTrade,
-  formatBigNumber,
-  formatNumber,
-  getInitialCollateral,
-  mulBN,
-} from '../../../../util/tools'
+import { formatBigNumber, formatNumber, getInitialCollateral, mulBN } from '../../../../util/tools'
 import {
   MarketDetailsTab,
   MarketMakerData,
   OutcomeTableValue,
   Status,
   Ternary,
-  Token,
   TransactionStep,
 } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
@@ -69,14 +55,33 @@ interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
+  sharedProps: SharedPropsInterface
 }
 
 const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { fetchBalances } = context.balances
+  const {
+    allowance,
+    amountError,
+    collateral,
+    collateralBalance,
+    debouncedAmount,
+    fetchCollateralBalance,
+    hasEnoughAllowance,
+    hasZeroAllowance,
+    isBuyDisabled,
+    probabilitiesOrNewPrediction: probabilities,
+    proxyIsUpToDate,
+    setCollateral,
+    setIsTransactionProcessing,
+    setStatus,
 
+    tradedShares,
+    unlock,
+    updateProxy,
+  } = props.sharedProps
   const { cpk, library: provider, networkId, relay } = context
-  const signer = useMemo(() => provider.getSigner(), [provider])
 
   const { buildMarketMaker } = useContracts(context)
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
@@ -85,9 +90,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const nativeAsset = getNativeAsset(networkId, relay)
   const initialCollateral = getInitialCollateral(networkId, marketMakerData.collateral, relay)
-  const [collateral, setCollateral] = useState<Token>(initialCollateral)
 
-  const [status, setStatus] = useState<Status>(Status.Ready)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [amount, setAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
@@ -97,14 +100,11 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [newShares, setNewShares] = useState<Maybe<BigNumber[]>>(null)
   const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [allowanceFinished, setAllowanceFinished] = useState(false)
-  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
-  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount || Zero))
-  const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
-  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
+
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
@@ -119,44 +119,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setAmountToDisplay('')
     // eslint-disable-next-line
   }, [marketMakerData.collateral.address])
-
-  // get the amount of shares that will be traded and the estimated prices after trade
-  const calcBuyAmount = useMemo(
-    () => async (amount: BigNumber): Promise<[BigNumber, number[], BigNumber]> => {
-      let tradedShares: BigNumber
-      try {
-        tradedShares = await marketMaker.calcBuyAmount(amount, outcomeIndex)
-      } catch {
-        tradedShares = new BigNumber(0)
-      }
-      const balanceAfterTrade = computeBalanceAfterTrade(
-        balances.map(b => b.holdings),
-        outcomeIndex,
-        amount,
-        tradedShares,
-      )
-      const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
-
-      const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
-      setNewShares(
-        balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)),
-      )
-      return [tradedShares, probabilities, amount]
-    },
-    [balances, marketMaker, outcomeIndex],
-  )
-
-  const [tradedShares, probabilities, debouncedAmount] = useAsyncDerivedValue(
-    amount || Zero,
-    [new BigNumber(0), balances.map(() => 0), amount],
-    calcBuyAmount,
-  )
-
-  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
-    collateral,
-    context,
-  )
-  const collateralBalance = maybeCollateralBalance || Zero
 
   const unlockCollateral = async () => {
     if (!cpk) {
@@ -240,7 +202,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const baseCost = debouncedAmount?.sub(feePaid)
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount || Zero)
 
-  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
   const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals, collateral.decimals))} ${
     collateral.symbol
   }`
@@ -253,25 +214,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   )} ${collateral.symbol}`
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals, collateral.decimals))
   const total = `${sharesTotal} Shares`
-
-  const amountError = isTransactionProcessing
-    ? null
-    : maybeCollateralBalance === null
-    ? null
-    : maybeCollateralBalance.isZero() && amount?.gt(maybeCollateralBalance)
-    ? `Insufficient balance`
-    : amount?.gt(maybeCollateralBalance)
-    ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
-    : null
-
-  const isBuyDisabled =
-    !amount ||
-    (status !== Status.Ready && status !== Status.Error) ||
-    amount?.isZero() ||
-    (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
-    amountError !== null ||
-    isNegativeAmount ||
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress)
 
   const switchOutcome = (value: number) => {
     setNewShares(balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)))
@@ -315,7 +257,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             <CurrencySelector
               addBalances
               addNativeAsset
-              balance={formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5)}
+              balance={formatBigNumber(collateralBalance, collateral.decimals, 5)}
               context={context}
               currency={collateral.address}
               disabled

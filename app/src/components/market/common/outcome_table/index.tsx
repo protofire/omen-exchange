@@ -30,7 +30,7 @@ interface Props {
   getPriceInBaseToken?: (e: number) => number
   outcomeSelected?: number
   payouts?: Maybe<Big[]>
-  probabilities: number[]
+  probabilities: any
   newShares?: Maybe<BigNumber[]>
   newBonds?: BondItem[]
   withWinningOutcome?: boolean
