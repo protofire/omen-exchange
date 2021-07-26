@@ -87,7 +87,7 @@ export const ScalarMarketSell = (props: Props) => {
   const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
-    setIsNegativeAmountShares(bigNumberToNumber(amountShares || Zero, collateral.decimals) < 0)
+    setIsNegativeAmountShares((amountShares || Zero).lt(Zero))
   }, [amountShares, collateral.decimals])
 
   useEffect(() => {
@@ -308,15 +308,8 @@ export const ScalarMarketSell = (props: Props) => {
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
-              emphasizeValue={
-                (tradedCollateral && bigNumberToNumber(tradedCollateral, collateral.decimals) > 0) || false
-              }
-              state={
-                (tradedCollateral &&
-                  bigNumberToNumber(tradedCollateral, collateral.decimals) > 0 &&
-                  ValueStates.important) ||
-                ValueStates.normal
-              }
+              emphasizeValue={(tradedCollateral && tradedCollateral.gt(Zero)) || false}
+              state={(tradedCollateral && tradedCollateral.gt(Zero) && ValueStates.important) || ValueStates.normal}
               title={'Total'}
               value={`${tradedCollateral ? bigNumberToString(tradedCollateral, collateral.decimals) : '0.00'} ${
                 collateral.symbol

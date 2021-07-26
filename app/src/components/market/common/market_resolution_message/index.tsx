@@ -1,8 +1,9 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { bigNumberToNumber, bigNumberToString } from '../../../../util/tools'
+import { bigNumberToString } from '../../../../util/tools'
 import { Arbitrator, Token } from '../../../../util/types'
 
 import { Invalid } from './img/Invalid'
@@ -78,9 +79,8 @@ const MarketResolutionMessage = (props: Props) => {
   } = props
 
   const shares = bigNumberToString(userWinningShares, collateralToken.decimals)
-  const sharesNumber = bigNumberToNumber(userWinningShares, collateralToken.decimals)
 
-  const lost = !invalid && userWinningOutcomes === 0 && sharesNumber > 0
+  const lost = !invalid && userWinningShares.eq(Zero)
   const wonSingle = !invalid && userWinningOutcomes === 1
   const wonMultiple = !invalid && userWinningOutcomes > 1
   const participated = invalid || lost || wonSingle || wonMultiple || realitioWithdraw

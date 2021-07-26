@@ -20,7 +20,6 @@ import { RemoteData } from '../../../../util/remote_data'
 import {
   bigMax,
   bigMin,
-  bigNumberToNumber,
   bigNumberToString,
   calcPoolTokens,
   calcRemoveFundingSendAmounts,
@@ -133,11 +132,11 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
-    setIsNegativeAmountToFund(bigNumberToNumber(amountToFund || Zero, collateral.decimals) < 0)
+    setIsNegativeAmountToFund((amountToFund || Zero).lt(Zero))
   }, [amountToFund, collateral.decimals])
 
   useEffect(() => {
-    setIsNegativeAmountToRemove(bigNumberToNumber(amountToRemove || Zero, collateral.decimals) < 0)
+    setIsNegativeAmountToRemove((amountToRemove || Zero).lt(Zero))
   }, [amountToRemove, collateral.decimals])
 
   useEffect(() => {

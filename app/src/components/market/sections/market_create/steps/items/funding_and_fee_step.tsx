@@ -17,7 +17,7 @@ import { BalanceState, fetchAccountBalance } from '../../../../../../store/reduc
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
-import { bigNumberToNumber, bigNumberToString, formatDate } from '../../../../../../util/tools'
+import { bigNumberToString, formatDate } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../../button'
 import { ButtonType } from '../../../../../button/button_styling_types'
@@ -265,7 +265,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   }, [maybeCollateralBalance])
 
   useEffect(() => {
-    setIsNegativeDepositAmount(bigNumberToNumber(funding, collateral.decimals) < 0)
+    setIsNegativeDepositAmount((funding || Zero).lt(Zero))
   }, [funding, collateral.decimals])
 
   const resolutionDate = resolution && formatDate(resolution, false)
@@ -281,7 +281,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       : maybeCollateralBalance.isZero() && funding.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : funding.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${formattedAmount} ${collateral.symbol}`
+      ? `Value must be less than or equal to ${collateralBalanceFormatted} ${collateral.symbol}`
       : null
 
   const isCreateMarketbuttonDisabled =

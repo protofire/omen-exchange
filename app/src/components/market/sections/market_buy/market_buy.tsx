@@ -110,7 +110,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
-    setIsNegativeAmount(bigNumberToNumber(amount || Zero, collateral.decimals) < 0)
+    setIsNegativeAmount((amount || Zero).lt(Zero))
   }, [amount, collateral.decimals])
 
   useEffect(() => {

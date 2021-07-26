@@ -126,7 +126,7 @@ export const ScalarMarketBuy = (props: Props) => {
   }, [marketMakerData.collateral.address])
 
   useEffect(() => {
-    setIsNegativeAmount(bigNumberToNumber(amount, collateral.decimals) < 0)
+    setIsNegativeAmount((amount || Zero).lt(Zero))
   }, [amount, collateral.decimals])
 
   useEffect(() => {
