@@ -294,8 +294,6 @@ export interface MarketMakerData {
   isConditionResolved: boolean
   isQuestionFinalized: boolean
   collateralVolume: BigNumber
-  marketMakerFunding: BigNumber
-  marketMakerUserFunding: BigNumber
   payouts: Maybe<Big[]>
   question: Question
   realitioAnswer: Maybe<BigNumber>

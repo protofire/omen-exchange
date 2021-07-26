@@ -1,12 +1,15 @@
+import { aggregate } from '@makerdao/multicall'
+import configs from '@makerdao/multicall/src/addresses.json'
 import Big from 'big.js'
+import { ethers } from 'ethers'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
 import { ERC20Service, MarketMakerService, OracleService } from '../services'
 import { getLogger } from '../util/logger'
-import { getArbitratorFromAddress } from '../util/networks'
-import { isScalarMarket, promiseProps } from '../util/tools'
-import { BalanceItem, MarketMakerData, Status, Token } from '../util/types'
+import { getArbitratorFromAddress, getInfuraUrl, networkNames } from '../util/networks'
+import { isScalarMarket } from '../util/tools'
+import { BalanceItem, MarketMakerData, Status } from '../util/types'
 
 import { useConnectedWeb3Context } from './connectedWeb3'
 import { useContracts } from './useContracts'
@@ -75,13 +78,6 @@ const getScalarBalances = (
   return balances
 }
 
-const getERC20Token = async (provider: any, address: string): Promise<Token> => {
-  const erc20Service = new ERC20Service(provider, null, address)
-  const token = await erc20Service.getProfileSummary()
-
-  return token
-}
-
 export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMarketMakerData>, networkId: number) => {
   const context = useConnectedWeb3Context()
 
@@ -96,11 +92,11 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       return
     }
 
-    const { buildMarketMaker, conditionalTokens } = contracts
+    const { buildMarketMaker, conditionalTokens, realitio } = contracts
 
     const marketMaker = buildMarketMaker(graphMarketMakerData.address)
 
-    const { outcomes } = graphMarketMakerData.question
+    const { id, outcomes } = graphMarketMakerData.question
 
     const isQuestionFinalized = graphMarketMakerData.answerFinalizedTimestamp
       ? Date.now() > 1000 * graphMarketMakerData.answerFinalizedTimestamp.toNumber()
@@ -110,39 +106,155 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
     const outcomesLength = isScalar ? 2 : outcomes.length
 
-    const {
-      collateral,
-      isConditionResolved,
-      marketMakerFunding,
-      marketMakerShares,
-      marketMakerUserFunding,
-      realitioAnswer,
-      totalEarnings,
-      totalPoolShares,
-      userPoolShares,
-      userShares,
-    } = await promiseProps({
-      marketMakerShares: marketMaker.getBalanceInformation(graphMarketMakerData.address, outcomesLength),
-      userShares:
-        cpk && cpk.address
-          ? marketMaker.getBalanceInformation(cpk.address, outcomesLength)
-          : outcomes.length
-          ? outcomes.map(() => new BigNumber(0))
-          : [],
-      collateral: getERC20Token(provider, graphMarketMakerData.collateralAddress),
-      isConditionResolved: conditionalTokens.isConditionResolved(graphMarketMakerData.conditionId),
-      marketMakerFunding: marketMaker.getTotalSupply(),
-      marketMakerUserFunding: cpk && cpk.address ? marketMaker.balanceOf(cpk.address) : new BigNumber(0),
-      realitioAnswer: isQuestionFinalized ? contracts.realitio.getResultFor(graphMarketMakerData.question.id) : null,
-      totalEarnings: marketMaker.getCollectedFees(),
-      totalPoolShares: marketMaker.poolSharesTotalSupply(),
-      userPoolShares: cpk && cpk.address ? marketMaker.poolSharesBalanceOf(cpk.address) : new BigNumber(0),
-    })
+    const getSig = (contract: any, fn: string) =>
+      `${contract.contract.interface.functions[fn].signature}(${contract.contract.interface.functions[fn].outputs.map(
+        (output: any) => output.type,
+      )})`
 
-    const userEarnings =
-      cpk && cpk.address && marketMakerFunding.gt(0)
-        ? await marketMaker.getFeesWithdrawableBy(cpk.address)
-        : new BigNumber(0)
+    const network = (networkNames as any)[context.networkId]
+    const config = {
+      rpcUrl: getInfuraUrl(context.networkId),
+      multicallAddress: (configs as any)[network.toLowerCase()].multicall,
+    }
+
+    const { address: marketMakerAddress, collateralAddress } = graphMarketMakerData
+    const conditionalTokensAddress = conditionalTokens.address
+    const erc20 = new ERC20Service(provider, null, collateralAddress)
+
+    // first level of calls
+    let calls = []
+
+    // get collection ids
+    for (let i = 0; i < outcomesLength; i++) {
+      calls.push({
+        target: conditionalTokensAddress,
+        call: [
+          getSig(contracts.conditionalTokens, 'getCollectionId'),
+          ethers.constants.HashZero,
+          graphMarketMakerData.conditionId,
+          1 << i,
+        ],
+        returns: [[`collectionId-${i}`]],
+      })
+    }
+
+    calls.push(
+      // get collateral token information
+      {
+        target: collateralAddress,
+        call: [getSig(erc20, 'decimals')],
+        returns: [['decimals']],
+      },
+      {
+        target: collateralAddress,
+        call: [getSig(erc20, 'symbol')],
+        returns: [['symbol']],
+      },
+      // get market maker funding
+      {
+        target: marketMakerAddress,
+        call: [getSig(marketMaker, 'totalSupply')],
+        returns: [['totalPoolShares']],
+      },
+      // get total earnings
+      {
+        target: marketMakerAddress,
+        call: [getSig(marketMaker, 'collectedFees')],
+        returns: [['totalEarnings']],
+      },
+      // get total pool shares
+      {
+        target: marketMakerAddress,
+        call: [getSig(marketMaker, 'collectedFees')],
+        returns: [['totalEarnings']],
+      },
+      // check if the condition resolved
+      {
+        target: conditionalTokensAddress,
+        call: [getSig(conditionalTokens, 'payoutDenominator'), graphMarketMakerData.conditionId],
+        returns: [['payoutDenominator']],
+      },
+    )
+
+    if (cpk && cpk.address) {
+      // get user market maker funding
+      calls.push(
+        {
+          target: marketMakerAddress,
+          call: [getSig(marketMaker, 'balanceOf'), cpk.address],
+          returns: [['userPoolShares']],
+        },
+        {
+          target: marketMakerAddress,
+          call: [getSig(marketMaker, 'feesWithdrawableBy'), cpk.address],
+          returns: [['userEarnings']],
+        },
+      )
+    }
+
+    if (isQuestionFinalized) {
+      calls.push({
+        target: realitio.address,
+        call: [getSig(realitio, 'resultFor'), id],
+        returns: [['realitioAnswer']],
+      })
+    }
+
+    let response = await aggregate(calls, config)
+
+    // wrangle first results
+    const { decimals, payoutDenominator, symbol, totalEarnings, totalPoolShares } = response.results.transformed
+
+    const userPoolShares = response.results.transformed.userPoolShares || new BigNumber(0)
+    const realitioAnswer = response.results.transformed.realitioAnswer || null
+    const userEarnings = response.results.transformed.userEarnings
+
+    const collateral = {
+      address: graphMarketMakerData.collateralAddress,
+      symbol,
+      decimals,
+    }
+
+    const isConditionResolved = !payoutDenominator.isZero()
+
+    // second level of dependence
+    calls = []
+    for (let i = 0; i < outcomesLength; i++) {
+      const collectionId = response.results.transformed[`collectionId-${i}`]
+      calls.push({
+        target: conditionalTokensAddress,
+        call: [getSig(conditionalTokens, 'getPositionId'), collateralAddress, collectionId],
+        returns: [[`positionId-${i}`]],
+      })
+    }
+    response = await aggregate(calls, config)
+
+    // third level of dependence
+    calls = []
+    for (let i = 0; i < outcomesLength; i++) {
+      const positionId = response.results.transformed[`positionId-${i}`]
+      calls.push({
+        target: conditionalTokensAddress,
+        call: [getSig(conditionalTokens, 'balanceOf'), marketMakerAddress, positionId],
+        returns: [[`shares-${i}`]],
+      })
+      if (cpk && cpk.address) {
+        calls.push({
+          target: conditionalTokensAddress,
+          call: [getSig(conditionalTokens, 'balanceOf'), cpk.address, positionId],
+          returns: [[`user-${i}`]],
+        })
+      }
+    }
+
+    response = await aggregate(calls, config)
+
+    const marketMakerShares = []
+    const userShares = []
+    for (let i = 0; i < outcomesLength; i++) {
+      marketMakerShares.push(response.results.transformed[`shares-${i}`])
+      userShares.push(response.results.transformed[`user-${i}`] || new BigNumber(0))
+    }
 
     const arbitrator = getArbitratorFromAddress(networkId, graphMarketMakerData.arbitratorAddress)
 
@@ -171,8 +283,6 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       userInputCollateral: collateral,
       isConditionResolved,
       isQuestionFinalized,
-      marketMakerFunding,
-      marketMakerUserFunding,
       payouts,
       oracle: graphMarketMakerData.oracle,
       question: graphMarketMakerData.question,
@@ -197,7 +307,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
     setMarketMakerData(newMarketMakerData)
     setStatus(Status.Ready)
-  }, [graphMarketMakerData, provider, contracts, networkId, cpk])
+  }, [graphMarketMakerData, provider, contracts, networkId, cpk, context.networkId])
 
   const fetchData = useCallback(async () => {
     try {
