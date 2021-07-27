@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, useLocation, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { WhenConnected, useConnectedWeb3Context } from '../../../../../contexts/connectedWeb3'
+import { WhenConnected, useConnectedWeb3Context } from '../../../../../contexts'
 import { useCompoundService, useGraphMarketUserTxData } from '../../../../../hooks'
 import { useRealityLink } from '../../../../../hooks/useRealityLink'
 import { getNativeAsset, getToken, networkIds } from '../../../../../util/networks'

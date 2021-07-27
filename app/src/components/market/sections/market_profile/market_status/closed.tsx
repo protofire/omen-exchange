@@ -6,7 +6,7 @@ import { RouteComponentProps, useHistory, useLocation, withRouter } from 'react-
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../../common/constants'
-import { WhenConnected, useConnectedWeb3Context } from '../../../../../contexts/connectedWeb3'
+import { WhenConnected, useConnectedWeb3Context } from '../../../../../contexts'
 import { useContracts, useGraphMarketUserTxData, useSymbol } from '../../../../../hooks'
 import { ERC20Service, RealitioService } from '../../../../../services'
 import { CompoundService } from '../../../../../services/compound_service'
