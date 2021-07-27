@@ -92,6 +92,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     showUpgrade,
     total,
     tradedShares,
+    txHash,
     unlockCollateral,
     upgradeFinished,
     upgradeProxy,
@@ -104,7 +105,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
   const [tweet, setTweet] = useState('')
 
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
-  const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
     setCollateral(initialCollateral)
@@ -132,8 +132,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         collateral,
         marketMaker,
         outcomeIndex,
-        setTxHash,
-        setTxState,
       })
 
       await fetchGraphMarketMakerData()

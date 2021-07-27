@@ -87,6 +87,7 @@ export const ScalarMarketBuy = (props: Props) => {
     showUpgrade,
     total,
     tradedShares,
+    txHash,
     unlockCollateral,
     upgradeFinished,
     upgradeProxy,
@@ -111,7 +112,6 @@ export const ScalarMarketBuy = (props: Props) => {
   const [tweet, setTweet] = useState('')
 
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
-  const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
     setCollateral(initialCollateral)
@@ -158,8 +158,6 @@ export const ScalarMarketBuy = (props: Props) => {
         collateral,
         outcomeIndex,
         marketMaker,
-        setTxHash,
-        setTxState,
       })
 
       await fetchGraphMarketUserTxData()

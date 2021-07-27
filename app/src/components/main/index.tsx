@@ -43,11 +43,10 @@ export const Main: React.FC = () => {
                   path="/settings"
                   render={props => <SettingsViewContainer networkId={networkId} {...props} />}
                 />
-                <Route component={MarketHomeContainer} path="/24h-volume" />
-                <Route component={MarketHomeContainer} path="/volume" />
-                <Route component={MarketHomeContainer} path="/newest" />
-                <Route component={MarketHomeContainer} path="/ending" />
-                <Route component={MarketHomeContainer} path="/liquidity" />
+                <Route
+                  component={MarketHomeContainer}
+                  path={['/24h-volume', '/volume', '/newest', '/ending', '/liquidity']}
+                />
                 <Route component={MarketWizardCreatorContainer} exact path="/create" />
                 <Route component={MarketRoutes} path="/:address" />
                 <Route component={RedirectToHome} />

@@ -87,6 +87,7 @@ export type SharedPropsInterface = {
   total: string
   setDisplayAmountToFund: any
   baseCostFormatted: string
+  txHash: string
 }
 
 const MarketBuyContainer: React.FC<Props> = (props: Props) => {
@@ -308,6 +309,7 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     total,
     setDisplayAmountToFund,
     baseCostFormatted,
+    txHash: context.txHash,
   }
   return (
     <>
