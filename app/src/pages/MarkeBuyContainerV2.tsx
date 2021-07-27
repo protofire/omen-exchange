@@ -6,6 +6,7 @@ import { STANDARD_DECIMALS } from '../common/constants'
 import { MarketBuy } from '../components/market/sections/market_buy/market_buy'
 import { ScalarMarketBuy } from '../components/market/sections/market_buy/scalar_market_buy'
 import {
+  ConnectedWeb3Context,
   useAsyncDerivedValue,
   useCollateralBalance,
   useConnectedWeb3Context,
@@ -13,8 +14,8 @@ import {
   useCpkAllowance,
   useCpkProxy,
 } from '../hooks'
-import { MarketMakerService } from '../services'
-import { pseudoNativeAssetAddress } from '../util/networks'
+import { CPKService, MarketMakerService } from '../services'
+import { getNativeAsset, pseudoNativeAssetAddress } from '../util/networks'
 import { RemoteData } from '../util/remote_data'
 import { formatBigNumber, formatNumber, getInitialCollateral, mulBN } from '../util/tools'
 import { calcPrediction, computeBalanceAfterTrade } from '../util/tools/fpmm/trading'
@@ -45,6 +46,7 @@ export type SharedPropsInterface = {
   amountError: Maybe<string>
   status: Status
   setStatus: any
+  setNewShares: any
   newShares: Maybe<BigNumber[]>
   setIsTransactionProcessing: any
   collateral: Token
@@ -57,6 +59,34 @@ export type SharedPropsInterface = {
   hasEnoughAllowance: Ternary
   allowance: RemoteData<BigNumber>
   unlock: () => Promise<void>
+  initialCollateral: Token
+  nativeAsset: Token
+  cpk: Maybe<CPKService>
+  context: ConnectedWeb3Context
+  isNegativeAmount: boolean
+  setIsNegativeAmount: any
+  amountDisplay: string
+  setAmountDisplay: any
+  unlockCollateral: () => Promise<void>
+  allowanceFinished: boolean
+  setAllowanceFinished: any
+  fetchBalances: () => Promise<void>
+  displayFundAmount: Maybe<BigNumber>
+  setDisplayFundAmount: any
+  showUpgrade: boolean
+  upgradeFinished: boolean
+  setUpgradeFinished: any
+  shouldDisplayMaxButton: boolean
+  upgradeProxy: () => Promise<void>
+  isTransactionModalOpen: boolean
+  setIsTransactionModalOpen: any
+  feePercentage: number
+  showSetAllowance: boolean
+  feeFormatted: string
+  potentialProfitFormatted: string
+  total: string
+  setDisplayAmountToFund: any
+  baseCostFormatted: string
 }
 
 const MarketBuyContainerV2: React.FC<Props> = (props: Props) => {
@@ -68,20 +98,27 @@ const MarketBuyContainerV2: React.FC<Props> = (props: Props) => {
 
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
   //state managment
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [outcomeIndex, setOutcomeIndex] = useState<number>(0)
   const [newShares, setNewShares] = useState<Maybe<BigNumber[]>>(null)
   const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
   const [status, setStatus] = useState<Status>(Status.Ready)
   const signer = useMemo(() => context.library.getSigner(), [context.library])
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
-
+  const [amountDisplay, setAmountDisplay] = useState<string>('')
   const initialCollateral = getInitialCollateral(context.networkId, props.marketMakerData.collateral, context.relay)
+  const nativeAsset = getNativeAsset(context.networkId, context.relay)
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const feePercentage = Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)) * 100
+
   const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
     collateral,
     context,
   )
+  useEffect(() => {
+    setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals, collateral.decimals).includes('-'))
+  }, [amount, collateral.decimals])
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number[] | number, BigNumber]> => {
       let tradedShares: BigNumber
@@ -113,7 +150,7 @@ const MarketBuyContainerV2: React.FC<Props> = (props: Props) => {
         return [tradedShares, probabilities, amount]
       }
     },
-    [balances, marketMaker, outcomeIndex, scalarHigh, scalarLow],
+    [balances, marketMaker, outcomeIndex, scalarHigh, scalarLow, isScalar],
   )
   const [tradedShares, probabilitiesOrNewPrediction, debouncedAmount] = useAsyncDerivedValue(
     amount || Zero,
@@ -126,13 +163,31 @@ const MarketBuyContainerV2: React.FC<Props> = (props: Props) => {
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount || Zero)
   const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals, collateral.decimals))
   const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)))
+  const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals, collateral.decimals))} ${
+    collateral.symbol
+  }`
+
+  const potentialProfitFormatted = `${formatNumber(
+    formatBigNumber(potentialProfit, collateral.decimals, collateral.decimals),
+  )} ${collateral.symbol}`
   const baseCost = debouncedAmount?.sub(feePaid)
+  const baseCostFormatted = `${formatNumber(
+    formatBigNumber(baseCost || Zero, collateral.decimals, collateral.decimals),
+  )}
+  ${collateral.symbol}`
   const collateralBalance = maybeCollateralBalance || Zero
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
   const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
   const currentBalance = `${formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5)}`
+  const [allowanceFinished, setAllowanceFinished] = useState(false)
+  const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
+  const { fetchBalances } = context.balances
+  const showSetAllowance =
+    collateral.address !== pseudoNativeAssetAddress &&
+    !context.cpk?.isSafeApp &&
+    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
   const amountError =
     !isScalar && isTransactionProcessing
       ? null
@@ -144,6 +199,29 @@ const MarketBuyContainerV2: React.FC<Props> = (props: Props) => {
       ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
       : null
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
+  const [upgradeFinished, setUpgradeFinished] = useState(false)
+
+  const unlockCollateral = async () => {
+    if (!context.cpk) {
+      return
+    }
+
+    await unlock()
+    setAllowanceFinished(true)
+  }
+  const setDisplayAmountToFund = (value: BigNumber) => {
+    setAmount(value)
+    setDisplayFundAmount(value)
+  }
+  const upgradeProxy = async () => {
+    if (!context.cpk) {
+      return
+    }
+
+    await updateProxy()
+    setUpgradeFinished(true)
+  }
+  const total = `${sharesTotal} Shares`
   const isBuyDisabled =
     (status !== Status.Ready && status !== Status.Error) ||
     amount.isZero() ||
@@ -153,9 +231,16 @@ const MarketBuyContainerV2: React.FC<Props> = (props: Props) => {
     amountError !== null ||
     isNegativeAmount ||
     (!isUpdated && collateral.address === pseudoNativeAssetAddress)
+
+  const showUpgrade =
+    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
+    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+
+  const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
   const sharedObject = {
     status,
     setStatus,
+    setNewShares,
     potentialProfit,
     sharesTotal,
     baseCost,
@@ -183,6 +268,34 @@ const MarketBuyContainerV2: React.FC<Props> = (props: Props) => {
     hasEnoughAllowance,
     allowance,
     unlock,
+    initialCollateral,
+    nativeAsset,
+    cpk: context.cpk,
+    context,
+    isNegativeAmount,
+    setIsNegativeAmount,
+    amountDisplay,
+    setAmountDisplay,
+    unlockCollateral,
+    allowanceFinished,
+    setAllowanceFinished,
+    fetchBalances,
+    displayFundAmount,
+    setDisplayFundAmount,
+    showUpgrade,
+    shouldDisplayMaxButton,
+    setUpgradeFinished,
+    upgradeFinished,
+    upgradeProxy,
+    isTransactionModalOpen,
+    setIsTransactionModalOpen,
+    feePercentage,
+    showSetAllowance,
+    feeFormatted,
+    potentialProfitFormatted,
+    total,
+    setDisplayAmountToFund,
+    baseCostFormatted,
   }
   return (
     <>
