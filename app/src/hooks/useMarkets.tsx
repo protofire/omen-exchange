@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 
-import { useConnectedWeb3Context } from '../contexts/connectedWeb3'
+import { useConnectedWeb3Context } from '../contexts'
 import { buildQueryMarkets, buildQueryMyMarkets } from '../queries/markets_home'
 import {
   BuildQueryType,
