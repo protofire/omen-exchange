@@ -302,7 +302,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsRow
               emphasizeValue={(tradedCollateral && tradedCollateral.gt(Zero)) || false}
               state={(tradedCollateral && tradedCollateral.gt(Zero) && ValueStates.important) || ValueStates.normal}
-              title={'Totalsss'}
+              title={'Total'}
               value={`${tradedCollateral ? bigNumberToString(tradedCollateral, collateral.decimals) : '0.00'} ${
                 collateral.symbol
               }`}
