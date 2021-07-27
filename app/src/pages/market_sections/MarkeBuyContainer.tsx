@@ -2,9 +2,9 @@ import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 
-import { STANDARD_DECIMALS } from '../common/constants'
-import { MarketBuy } from '../components/market/sections/market_buy/market_buy'
-import { ScalarMarketBuy } from '../components/market/sections/market_buy/scalar_market_buy'
+import { STANDARD_DECIMALS } from '../../common/constants'
+import { MarketBuy } from '../../components/market/sections/market_buy/market_buy'
+import { ScalarMarketBuy } from '../../components/market/sections/market_buy/scalar_market_buy'
 import {
   ConnectedWeb3Context,
   useAsyncDerivedValue,
@@ -13,13 +13,13 @@ import {
   useContracts,
   useCpkAllowance,
   useCpkProxy,
-} from '../hooks'
-import { CPKService, MarketMakerService } from '../services'
-import { getNativeAsset, pseudoNativeAssetAddress } from '../util/networks'
-import { RemoteData } from '../util/remote_data'
-import { formatBigNumber, formatNumber, getInitialCollateral, mulBN } from '../util/tools'
-import { calcPrediction, computeBalanceAfterTrade } from '../util/tools/fpmm/trading'
-import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../util/types'
+} from '../../hooks'
+import { CPKService, MarketMakerService } from '../../services'
+import { getNativeAsset, pseudoNativeAssetAddress } from '../../util/networks'
+import { RemoteData } from '../../util/remote_data'
+import { formatBigNumber, formatNumber, getInitialCollateral, mulBN } from '../../util/tools'
+import { calcPrediction, computeBalanceAfterTrade } from '../../util/tools/fpmm/trading'
+import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../util/types'
 
 interface Props {
   isScalar: boolean
@@ -89,7 +89,7 @@ export type SharedPropsInterface = {
   baseCostFormatted: string
 }
 
-const MarketBuyContainerV2: React.FC<Props> = (props: Props) => {
+const MarketBuyContainer: React.FC<Props> = (props: Props) => {
   const { isScalar } = props
   const context = useConnectedWeb3Context()
   const { buildMarketMaker } = useContracts(context)
@@ -320,4 +320,4 @@ const MarketBuyContainerV2: React.FC<Props> = (props: Props) => {
   )
 }
 
-export { MarketBuyContainerV2 }
+export { MarketBuyContainer }

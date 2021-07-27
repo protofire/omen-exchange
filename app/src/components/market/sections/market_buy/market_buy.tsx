@@ -7,7 +7,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES } from '../../../../common/constants'
-import { SharedPropsInterface } from '../../../../pages/MarkeBuyContainerV2'
+import { SharedPropsInterface } from '../../../../pages/market_sections/MarkeBuyContainer'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
 import { formatBigNumber, formatNumber } from '../../../../util/tools'

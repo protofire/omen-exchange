@@ -8,7 +8,7 @@ import styled from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../../../common/constants'
 import { useContracts, useGraphMarketUserTxData, useSymbol } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
-import { MarketBuyContainerV2 } from '../../../../../pages/MarkeBuyContainerV2'
+import { MarketBuyContainer } from '../../../../../pages/market_sections/MarkeBuyContainer'
 import { ERC20Service, RealitioService } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
 import { getContractAddress, getNativeAsset } from '../../../../../util/networks'
@@ -565,7 +565,7 @@ const Wrapper = (props: Props) => {
         )}
         {currentTab === MarketDetailsTab.history && <MarketHistoryContainer marketMakerData={marketMakerData} />}
         {currentTab === MarketDetailsTab.buy && (
-          <MarketBuyContainerV2
+          <MarketBuyContainer
             fetchGraphMarketMakerData={fetchGraphMarketMakerData}
             fetchGraphMarketUserTxData={fetchGraphMarketUserTxData}
             isScalar={isScalar}
