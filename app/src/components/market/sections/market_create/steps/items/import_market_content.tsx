@@ -1,7 +1,7 @@
 import React, { ChangeEvent, HTMLAttributes, useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
-import { ConnectedWeb3Context } from '../../../../../../contexts/connectedWeb3'
+import { ConnectedWeb3Context } from '../../../../../../contexts'
 import { useAsyncDerivedValue, useContracts, useMarketMakerData } from '../../../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { useRealityLink } from '../../../../../../hooks/useRealityLink'

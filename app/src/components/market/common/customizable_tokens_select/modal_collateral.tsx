@@ -1,7 +1,7 @@
 import React, { ChangeEvent, HTMLAttributes, useState } from 'react'
 import styled from 'styled-components'
 
-import { ConnectedWeb3Context } from '../../../../contexts/connectedWeb3'
+import { ConnectedWeb3Context } from '../../../../contexts'
 import { useCollateral } from '../../../../hooks'
 import { Token } from '../../../../util/types'
 import { Button } from '../../../button'

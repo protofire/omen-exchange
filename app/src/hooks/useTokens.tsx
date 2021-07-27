@@ -4,7 +4,7 @@ import axios from 'axios'
 import { useState } from 'react'
 
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../common/constants'
-import { ConnectedWeb3Context } from '../contexts/connectedWeb3'
+import { ConnectedWeb3Context } from '../contexts'
 import {
   getGraphUris,
   getInfuraUrl,

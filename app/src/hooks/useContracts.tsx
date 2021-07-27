@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 
 import { IPFS_GATEWAY } from '../common/constants'
-import { ConnectedWeb3Context } from '../contexts/connectedWeb3'
+import { ConnectedWeb3Context } from '../contexts'
 import {
   ConditionalTokenService,
   DxTCRService,

@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { ConnectedWeb3Context } from '../../../../hooks'
+import { ConnectedWeb3Context } from '../../../../contexts'
 import { useKlerosCuration } from '../../../../hooks/useKlerosCuration'
 import { MarketDetailsTab, MarketMakerData, Status } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'

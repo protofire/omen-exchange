@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 
-import { ConnectedWeb3Context } from '../contexts/connectedWeb3'
+import { ConnectedWeb3Context } from '../contexts'
 import { CompoundService } from '../services'
 import { CompoundTokenType, Token } from '../util/types'
 

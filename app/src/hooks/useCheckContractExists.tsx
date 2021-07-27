@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import { useEffect, useState } from 'react'
 
-import { ConnectedWeb3Context } from '../contexts/connectedWeb3'
+import { ConnectedWeb3Context } from '../contexts'
 import { getInfuraUrl, networkIds } from '../util/networks'
 import { isContract } from '../util/tools'
 

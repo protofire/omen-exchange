@@ -1,7 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
-import { ConnectedWeb3Context } from '../contexts/connectedWeb3'
+import { ConnectedWeb3Context } from '../contexts'
 import { ERC20Service } from '../services'
 import { pseudoNativeAssetAddress } from '../util/networks'
 import { Token } from '../util/types'

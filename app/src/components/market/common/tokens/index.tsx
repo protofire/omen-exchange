@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { DEFAULT_TOKEN } from '../../../../common/constants'
-import { ConnectedWeb3Context } from '../../../../contexts/connectedWeb3'
+import { ConnectedWeb3Context } from '../../../../contexts'
 import { useContracts } from '../../../../hooks'
 import { getToken } from '../../../../util/networks'
 import { Token } from '../../../../util/types'

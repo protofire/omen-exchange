@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { ConnectedWeb3Context } from '../contexts/connectedWeb3'
+import { ConnectedWeb3Context } from '../contexts'
 import { ERC20Service } from '../services'
 import { getTokenFromAddress } from '../util/networks'
 import { Token } from '../util/types'
