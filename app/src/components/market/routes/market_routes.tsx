@@ -3,7 +3,7 @@ import React from 'react'
 import { Redirect, RouteComponentProps } from 'react-router'
 
 import { FETCH_DETAILS_INTERVAL } from '../../../common/constants'
-import { useConnectedWeb3Context } from '../../../contexts/connectedWeb3'
+import { useConnectedWeb3Context } from '../../../contexts'
 import { useCheckContractExists, useMarketMakerData } from '../../../hooks'
 import { MarketDetailsPage } from '../../../pages'
 import { getLogger } from '../../../util/logger'

@@ -1,4 +1,4 @@
-import { useConnectedWeb3Context } from '../contexts/connectedWeb3'
+import { useConnectedWeb3Context } from '../contexts'
 import { getNativeAsset, getWrapToken } from '../util/networks'
 import { Token } from '../util/types'
 

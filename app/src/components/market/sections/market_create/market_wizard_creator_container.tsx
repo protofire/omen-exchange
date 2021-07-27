@@ -1,7 +1,7 @@
 import React, { FC, useState } from 'react'
 import { useHistory } from 'react-router'
 
-import { useConnectedWeb3Context } from '../../../../contexts/connectedWeb3'
+import { useConnectedWeb3Context } from '../../../../contexts'
 import { useContracts } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { CompoundService } from '../../../../services/compound_service'

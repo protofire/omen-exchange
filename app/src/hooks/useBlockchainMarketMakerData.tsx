@@ -2,7 +2,7 @@ import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
-import { useConnectedWeb3Context } from '../contexts/connectedWeb3'
+import { useConnectedWeb3Context } from '../contexts'
 import { ERC20Service, MarketMakerService, OracleService } from '../services'
 import { getLogger } from '../util/logger'
 import { getArbitratorFromAddress } from '../util/networks'

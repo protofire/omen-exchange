@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { useConnectedWeb3Context } from '../contexts/connectedWeb3'
+import { useConnectedWeb3Context } from '../contexts'
 import { RemoteData } from '../util/remote_data'
 
 /**

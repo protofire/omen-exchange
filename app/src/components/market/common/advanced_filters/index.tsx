@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../contexts/connectedWeb3'
+import { useConnectedWeb3Context } from '../../../../contexts'
 import { getArbitratorsByNetwork, getNativeAsset, getWrapToken } from '../../../../util/networks'
 import { CurationSource } from '../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'

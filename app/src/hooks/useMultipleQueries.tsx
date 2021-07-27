@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { useCallback, useEffect, useState } from 'react'
 
-import { useConnectedWeb3Context } from '../contexts/connectedWeb3'
+import { useConnectedWeb3Context } from '../contexts'
 import { getGraphUris } from '../util/networks'
 
 type GraphVariables = { [key: string]: string }

@@ -2,7 +2,7 @@ import { Signer, constants } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
-import { useConnectedWeb3Context } from '../contexts/connectedWeb3'
+import { useConnectedWeb3Context } from '../contexts'
 import { ERC20Service } from '../services'
 import { pseudoNativeAssetAddress } from '../util/networks'
 import { RemoteData } from '../util/remote_data'
