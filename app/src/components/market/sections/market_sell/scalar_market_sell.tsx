@@ -5,6 +5,7 @@ import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { SharedPropsInterface } from '../../../../pages/market_sections/market_sell_container'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import {
@@ -50,6 +51,7 @@ interface Props {
   fetchGraphMarketUserTxData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
+  sharedProps: SharedPropsInterface
 }
 
 export const ScalarMarketSell = (props: Props) => {

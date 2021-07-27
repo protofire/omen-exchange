@@ -7,6 +7,7 @@ import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { SharedPropsInterface } from '../../../../pages/market_sections/market_sell_container'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import {
@@ -53,6 +54,7 @@ interface Props extends RouteComponentProps<any> {
   fetchGraphMarketMakerData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
+  sharedProps: SharedPropsInterface
 }
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {

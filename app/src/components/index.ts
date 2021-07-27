@@ -3,6 +3,6 @@ export { MarketWizardCreatorContainer } from './market/sections/market_create/ma
 export { MarketViewContainer } from './market/sections/market_profile/market_view_container'
 export { MarketPoolLiquidityContainer } from './market/sections/market_pooling/market_pool_liquidity_container'
 export { MarketBuyContainer } from './market/sections/market_buy/market_buy_container'
-export { MarketSellContainer } from './market/sections/market_sell/market_sell_container'
+export { MarketSellContainer } from '../pages/market_sections/market_sell_container'
 export { MarketHome } from './market/sections/market_list/market_home'
 export { MarketHomeContainer } from './market/sections/market_list/market_home_container'
