@@ -294,16 +294,16 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             />
             <TransactionDetailsRow
               title={'Trading Fee'}
-              value={`${
-                costFee ? bigNumberToString(costFee.mul(-1), collateral.decimals, collateral.decimals) : '0.00'
-              } ${collateral.symbol}`}
+              value={`${costFee ? bigNumberToString(costFee.mul(-1), collateral.decimals) : '0.00'} ${
+                collateral.symbol
+              }`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
               emphasizeValue={(tradedCollateral && tradedCollateral.gt(Zero)) || false}
               state={(tradedCollateral && tradedCollateral.gt(Zero) && ValueStates.important) || ValueStates.normal}
-              title={'Total'}
-              value={`${tradedCollateral ? bigNumberToNumber(tradedCollateral, collateral.decimals) : '0.00'} ${
+              title={'Totalsss'}
+              value={`${tradedCollateral ? bigNumberToString(tradedCollateral, collateral.decimals) : '0.00'} ${
                 collateral.symbol
               }`}
             />
