@@ -5,10 +5,10 @@ import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { DOCUMENT_FAQ, STANDARD_DECIMALS } from '../../../../common/constants'
+import { useConnectedWeb3Context } from '../../../../contexts'
 import {
   useCollateralBalance,
   useCompoundService,
-  useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
   useCpkProxy,

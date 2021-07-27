@@ -2,7 +2,7 @@ import { providers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
-import { ConnectedBalance, useBalance } from '../hooks/useBalance'
+import { ConnectedBalance, useBalance } from '../hooks'
 import { useCpk } from '../hooks/useCpk'
 import { useSafeApp } from '../hooks/useSafeApp'
 import { CPKService } from '../services'

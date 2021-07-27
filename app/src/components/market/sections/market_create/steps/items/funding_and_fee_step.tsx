@@ -11,7 +11,8 @@ import {
   DOCUMENT_FAQ,
   MAX_MARKET_FEE,
 } from '../../../../../../common/constants'
-import { useCollateralBalance, useConnectedWeb3Context, useCpkAllowance, useCpkProxy } from '../../../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../../../contexts'
+import { useCollateralBalance, useCpkAllowance, useCpkProxy } from '../../../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'

@@ -4,12 +4,13 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../contexts'
+import { useContracts } from '../../../../hooks'
 import {
   FpmmTradeDataType,
   HistoryType,
   useGraphFpmmTransactionsFromQuestion,
-} from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
+} from '../../../../hooks/Graph/useGraphFpmmTransactionsFromQuestion'
 import { realitioAbi } from '../../../../services/realitio'
 import { SafeService } from '../../../../services/safe'
 import { getContractAddress } from '../../../../util/networks'

@@ -3,7 +3,7 @@ import { BigNumber, formatUnits } from 'ethers/utils'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../contexts'
 import { useXdaiBridge } from '../../../../hooks/useXdaiBridge'
 import { knownTokens, networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'

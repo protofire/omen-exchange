@@ -4,13 +4,8 @@ import React, { useEffect, useMemo, useState } from 'react'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
-import {
-  useAsyncDerivedValue,
-  useCompoundService,
-  useConnectedWeb3Context,
-  useContracts,
-  useSymbol,
-} from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../contexts'
+import { useAsyncDerivedValue, useCompoundService, useContracts, useSymbol } from '../../../../hooks'
 import { MarketMakerService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getNativeAsset, getWrapToken } from '../../../../util/networks'

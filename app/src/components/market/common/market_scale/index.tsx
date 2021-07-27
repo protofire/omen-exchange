@@ -4,7 +4,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { useCompoundService, useConnectedWeb3Context } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../contexts'
+import { useCompoundService } from '../../../../hooks'
 import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../util/networks'
 import {
   calcPrediction,

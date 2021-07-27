@@ -9,7 +9,7 @@ import styled from 'styled-components'
 import useLocalStorageState from 'use-local-storage-state'
 
 import { MAX_MARKET_FEE } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../contexts'
 import { useMarkets } from '../../../../hooks/useMarkets'
 import { queryCategories } from '../../../../queries/markets_home'
 import theme from '../../../../theme'
