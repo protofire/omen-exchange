@@ -117,6 +117,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [displayFundAmount, setDisplayFundAmount] = useState<BigNumber>(new BigNumber(0))
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+
   const [txNetId, setTxNetId] = useState()
   const [confirmations, setConfirmations] = useState(0)
   const [message, setMessage] = useState('')
@@ -212,6 +213,8 @@ export const ModalDepositWithdraw = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
       setIsTransactionModalOpen(true)
+      const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
+      setTxNetId(provider.network.chainId)
 
       const transaction =
         exchangeType === ExchangeType.deposit
@@ -222,9 +225,6 @@ export const ModalDepositWithdraw = (props: Props) => {
               symbol,
             })
       const hash = transaction.transactionHash || transaction.hash
-
-      const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
-      setTxNetId(provider.network.chainId)
       setTxHash(hash)
 
       await waitForConfirmations(hash, provider, setConfirmations, setTxState, 13)
