@@ -82,12 +82,14 @@ export const ScalarMarketBuy = (props: Props) => {
     setIsTransactionModalOpen,
     setOutcomeIndex: setPositionIndex,
     setStatus,
+    setTxState,
     shouldDisplayMaxButton,
     showSetAllowance,
     showUpgrade,
     total,
     tradedShares,
     txHash,
+    txState,
     unlockCollateral,
     upgradeFinished,
     upgradeProxy,
@@ -110,8 +112,6 @@ export const ScalarMarketBuy = (props: Props) => {
   const [activeTab, setActiveTab] = useState(Tabs.short)
 
   const [tweet, setTweet] = useState('')
-
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
 
   useEffect(() => {
     setCollateral(initialCollateral)

@@ -19,7 +19,7 @@ import { getNativeAsset, pseudoNativeAssetAddress } from '../../util/networks'
 import { RemoteData } from '../../util/remote_data'
 import { formatBigNumber, formatNumber, getInitialCollateral, mulBN } from '../../util/tools'
 import { calcPrediction, computeBalanceAfterTrade } from '../../util/tools/fpmm/trading'
-import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token } from '../../util/types'
+import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token, TransactionStep } from '../../util/types'
 
 interface Props {
   isScalar: boolean
@@ -88,6 +88,8 @@ export type SharedPropsInterface = {
   setDisplayAmountToFund: any
   baseCostFormatted: string
   txHash: string
+  setTxState: any
+  txState: TransactionStep
 }
 
 const MarketBuyContainer: React.FC<Props> = (props: Props) => {
@@ -310,6 +312,8 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     setDisplayAmountToFund,
     baseCostFormatted,
     txHash: context.txHash,
+    setTxState: context.setTxState,
+    txState: context.txState,
   }
   return (
     <>

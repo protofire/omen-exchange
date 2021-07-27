@@ -86,6 +86,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     setNewShares,
     setOutcomeIndex,
     setStatus,
+    setTxState,
     sharesTotal,
     shouldDisplayMaxButton,
     showSetAllowance,
@@ -93,6 +94,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     total,
     tradedShares,
     txHash,
+    txState,
     unlockCollateral,
     upgradeFinished,
     upgradeProxy,
@@ -103,8 +105,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
 
   const [message, setMessage] = useState<string>('')
   const [tweet, setTweet] = useState('')
-
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
 
   useEffect(() => {
     setCollateral(initialCollateral)
