@@ -1,32 +1,12 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../../../hooks'
 import { SharedPropsInterface } from '../../../../pages/market_sections/market_sell_container'
-import { MarketMakerService } from '../../../../services'
-import { getLogger } from '../../../../util/logger'
-import {
-  calcSellAmountInCollateral,
-  computeBalanceAfterTrade,
-  formatBigNumber,
-  formatNumber,
-  getInitialCollateral,
-  mulBN,
-} from '../../../../util/tools'
-import {
-  BalanceItem,
-  MarketDetailsTab,
-  MarketMakerData,
-  OutcomeTableValue,
-  Status,
-  Token,
-  TransactionStep,
-} from '../../../../util/types'
+import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -48,8 +28,6 @@ const StyledButtonContainer = styled(ButtonContainer)`
   margin-top: ${({ theme }) => theme.borders.borderLineDisabled};
 `
 
-const logger = getLogger('Market::Sell')
-
 interface Props extends RouteComponentProps<any> {
   fetchGraphMarketMakerData: () => Promise<void>
   marketMakerData: MarketMakerData
@@ -58,85 +36,35 @@ interface Props extends RouteComponentProps<any> {
 }
 
 const MarketSellWrapper: React.FC<Props> = (props: Props) => {
-  const context = useConnectedWeb3Context()
-  const { cpk, networkId, relay, setTxState, txHash, txState } = context
-  const { fetchBalances } = context.balances
   const {
     amountError,
+    amountShares,
     amountSharesToDisplay,
     balanceItem,
     collateral,
+    costFee,
+    displaySellShares,
     finish,
     isNegativeAmountShares,
     isSellButtonDisabled,
     isTransactionModalOpen,
+    message,
     outcomeIndex,
+    potentialValue,
+    probabilitiesOrNewPrediction: probabilities,
     selectedOutcomeBalance,
     setAmountSharesFromInput,
     setAmountSharesToDisplay,
     setBalanceItem,
     setIsTransactionModalOpen,
     setOutcomeIndex,
+    tradedCollateral,
+    txHash,
+    txState,
   } = props.sharedProps
-  const { buildMarketMaker, conditionalTokens } = useContracts(context)
-  const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
-  const { address: marketMakerAddress, balances, fee } = marketMakerData
 
-  const marketMaker = buildMarketMaker(marketMakerAddress)
-
-  const [amountShares, setAmountShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
-
-  const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
-  const [message, setMessage] = useState<string>('')
-  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
-
-  const calcSellAmount = useMemo(
-    () => async (
-      amountShares: BigNumber,
-    ): Promise<[number[], Maybe<BigNumber>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
-      const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
-      const holdings = balances.map(balance => balance.holdings)
-      const holdingsOfSoldOutcome = holdings[outcomeIndex]
-      const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
-        return index !== outcomeIndex
-      })
-      const amountToSell = calcSellAmountInCollateral(
-        // Round down in case of precision error
-        amountShares.mul(99999999).div(100000000),
-        holdingsOfSoldOutcome,
-        holdingsOfOtherOutcomes,
-        marketFeeWithTwoDecimals,
-      )
-
-      if (!amountToSell) {
-        logger.warn(
-          `Could not compute amount of collateral to sell for '${amountShares.toString()}' and '${holdingsOfSoldOutcome.toString()}'`,
-        )
-        return [[], null, null, null]
-      }
-
-      const balanceAfterTrade = computeBalanceAfterTrade(
-        holdings,
-        outcomeIndex,
-        amountToSell.mul(-1), // negate amounts because it's a sale
-        amountShares.mul(-1),
-      )
-
-      const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
-      const potentialValue = mulBN(amountToSell, 1 / (1 - marketFeeWithTwoDecimals))
-      const costFee = potentialValue.sub(amountToSell)
-      const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
-      logger.log(`Amount to sell ${amountToSell}`)
-      return [probabilities, costFee, amountToSell, potentialValue]
-    },
-    [outcomeIndex, balances, fee],
-  )
-
-  const [probabilities, costFee, tradedCollateral, potentialValue] = useAsyncDerivedValue(
-    amountShares || Zero,
-    [balances.map(() => 0), null, null, null],
-    calcSellAmount,
-  )
+  const { marketMakerData, switchMarketTab } = props
+  const { balances } = marketMakerData
 
   const newShares = balances.map((balance, i) =>
     i === outcomeIndex ? balance.shares.sub(amountShares || Zero) : balance.shares,

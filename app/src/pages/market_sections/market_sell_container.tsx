@@ -48,23 +48,25 @@ export type SharedPropsInterface = {
   setOutcomeIndex: any
   setBalanceItem: any
   collateral: Token
+  costFee: any
+  probabilitiesOrNewPrediction: any
+  tradedCollateral: Maybe<BigNumber>
+  potentialValue: Maybe<BigNumber>
+  amountShares: Maybe<BigNumber>
+  setAmountShares: any
+  displaySellShares: Maybe<BigNumber>
+  message: string
+  txHash: string
+  txState: TransactionStep
 }
 const MarketSellContainer: React.FC<Props> = (props: Props) => {
   const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, isScalar, marketMakerData } = props
   const context = useConnectedWeb3Context()
-  const { cpk, networkId, relay, setTxState } = context
+  const { cpk, networkId, relay, setTxState, txHash, txState } = context
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const { fetchBalances } = context.balances
 
-  const {
-    address: marketMakerAddress,
-    balances,
-    fee,
-    outcomeTokenMarginalPrices,
-    question,
-    scalarHigh,
-    scalarLow,
-  } = marketMakerData
+  const { address: marketMakerAddress, balances, fee, scalarHigh, scalarLow } = marketMakerData
 
   const initialCollateral = getInitialCollateral(networkId, marketMakerData.collateral, relay)
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
@@ -134,7 +136,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
   const calcSellAmount = useMemo(
     () => async (
       amountShares: BigNumber,
-    ): Promise<[Maybe<number[] | BigNumber>, Maybe<BigNumber> | number, Maybe<BigNumber>, Maybe<BigNumber>]> => {
+    ): Promise<[Maybe<BigNumber | number[]>, Maybe<number | number[]>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
       const holdings = balances.map(balance => balance.holdings)
       const holdingsOfSoldOutcome = holdings[positionIndex]
       const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
@@ -153,13 +155,13 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
         logger.warn(
           `Could not compute amount of collateral to sell for '${amountShares.toString()}' and '${holdingsOfSoldOutcome.toString()}'`,
         )
-        if (isScalar) return [null, null, null, null]
-        else return [[], null, null, null]
+        if (isScalar) return [null, 0, null, null]
+        else return [null, [], null, null]
       }
 
       const balanceAfterTrade = computeBalanceAfterTrade(
         isScalar ? balances.map(b => b.holdings) : holdings,
-        positionIndex,
+        isScalar ? positionIndex : outcomeIndex,
         amountToSell.mul(-1), // negate amounts because it's a sale
         amountShares.mul(-1),
       )
@@ -179,16 +181,17 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
       } else {
         const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
 
-        return [probabilities, costFee, amountToSell, potentialValue]
+        return [costFee, probabilities, amountToSell, potentialValue]
       }
     },
-    [positionIndex, balances, fee, scalarLow, scalarHigh],
+    [positionIndex, balances, fee, scalarLow, scalarHigh, outcomeIndex, isScalar],
   )
-  const [newPrediction, costFee, tradedCollateral, potentialValue] = useAsyncDerivedValue(
+  const [costFee, probabilitiesOrNewPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(
     amountShares || Zero,
     isScalar ? [new BigNumber(0), 0, amountShares, new BigNumber(0)] : [balances.map(() => 0), null, null, null],
     calcSellAmount,
   )
+
   const setAmountSharesFromInput = (shares: BigNumber) => {
     setAmountShares(shares)
     setDisplaySellShares(shares)
@@ -237,6 +240,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
 
   const sharedObject = {
     isSellButtonDisabled,
+    amountShares,
     calcSellAmount,
     finish,
     amountError,
@@ -254,6 +258,15 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
     setPositionIndex,
     setOutcomeIndex,
     collateral,
+    costFee,
+    probabilitiesOrNewPrediction,
+    tradedCollateral,
+    potentialValue,
+    setAmountShares,
+    displaySellShares,
+    message,
+    txHash,
+    txState,
   }
 
   return (
