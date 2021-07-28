@@ -255,6 +255,7 @@ export const ScalarMarketSell = (props: Props) => {
             setBalanceItem={setBalanceItem}
             setPositionIndex={setPositionIndex}
           />
+
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput
