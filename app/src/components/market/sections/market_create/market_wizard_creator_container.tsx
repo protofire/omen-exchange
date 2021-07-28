@@ -7,6 +7,7 @@ import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
 import { pseudoNativeAssetAddress } from '../../../../util/networks'
+import { waitUntilContractDeployed } from '../../../../util/tools'
 import { MarketData, TransactionStep } from '../../../../util/types'
 import { ModalConnectWalletWrapper, ModalTransactionWrapper } from '../../../modal'
 
@@ -61,6 +62,7 @@ const MarketWizardCreatorContainer: FC = () => {
             realitio,
             marketMakerFactory,
           })
+          await waitUntilContractDeployed(provider, marketMakerAddress)
           await fetchBalances()
           setMarketMakerAddress(marketMakerAddress)
           setMarketCreationStatus(MarketCreationStatus.done())
@@ -73,6 +75,7 @@ const MarketWizardCreatorContainer: FC = () => {
             realitio,
             marketMakerFactory,
           })
+          await waitUntilContractDeployed(provider, marketMakerAddress)
           await fetchBalances()
           setMarketMakerAddress(marketMakerAddress)
           setMarketCreationStatus(MarketCreationStatus.done())
