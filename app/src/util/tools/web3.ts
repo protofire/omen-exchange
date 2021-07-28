@@ -43,7 +43,7 @@ export const isContract = async (provider: any, address: string): Promise<boolea
 }
 
 export const waitUntilContractDeployed = async (provider: any, address: string) => {
-  while (!isContract(provider, address)) {
+  while (!(await isContract(provider, address))) {
     await waitABit()
   }
 }
