@@ -1,11 +1,25 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
+import { STANDARD_DECIMALS } from '../../common/constants'
 import { MarketSell } from '../../components/market/sections/market_sell/market_sell'
 import { ScalarMarketSell } from '../../components/market/sections/market_sell/scalar_market_sell'
-import { useConnectedWeb3Context } from '../../hooks'
-import { formatBigNumber, formatNumber, getInitialCollateral } from '../../util/tools'
-import { BalanceItem, MarketDetailsTab, MarketMakerData, Status, Token } from '../../util/types'
+import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../../hooks'
+import { MarketMakerService } from '../../services'
+import { getLogger } from '../../util/logger'
+import {
+  calcPrediction,
+  calcSellAmountInCollateral,
+  computeBalanceAfterTrade,
+  formatBigNumber,
+  formatNumber,
+  getInitialCollateral,
+  mulBN,
+} from '../../util/tools'
+import { BalanceItem, MarketDetailsTab, MarketMakerData, Status, Token, TransactionStep } from '../../util/types'
+
+const logger = getLogger('Market::Sell')
 
 interface Props {
   currentTab: MarketDetailsTab
@@ -17,30 +31,99 @@ interface Props {
 }
 export type SharedPropsInterface = {
   isSellButtonDisabled: boolean
+  calcSellAmount: any
+  finish: () => Promise<void>
+  amountError: string | null
+  isNegativeAmountShares: boolean
+  setAmountSharesToDisplay: any
+  amountSharesToDisplay: string
+  selectedOutcomeBalance: string
+  setAmountSharesFromInput: any
+  isTransactionModalOpen: boolean
+  setIsTransactionModalOpen: any
+  balanceItem: BalanceItem
+  outcomeIndex: number
+  positionIndex: number
+  setPositionIndex: any
+  setOutcomeIndex: any
+  setBalanceItem: any
+  collateral: Token
 }
 const MarketSellContainer: React.FC<Props> = (props: Props) => {
-  const { isScalar } = props
+  const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, isScalar, marketMakerData } = props
   const context = useConnectedWeb3Context()
+  const { cpk, networkId, relay, setTxState } = context
+  const { buildMarketMaker, conditionalTokens } = useContracts(context)
+  const { fetchBalances } = context.balances
+
+  const {
+    address: marketMakerAddress,
+    balances,
+    fee,
+    outcomeTokenMarginalPrices,
+    question,
+    scalarHigh,
+    scalarLow,
+  } = marketMakerData
+
+  const initialCollateral = getInitialCollateral(networkId, marketMakerData.collateral, relay)
+  const [collateral, setCollateral] = useState<Token>(initialCollateral)
 
   const [amountShares, setAmountShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
-  const [positionIndex, setPositionIndex] = useState(
-    props.marketMakerData.balances[0].shares.gte(props.marketMakerData.balances[1].shares) ? 0 : 1,
-  )
+  const [positionIndex, setPositionIndex] = useState(balances[0].shares.gte(balances[1].shares) ? 0 : 1)
+  let defaultOutcomeIndex = 0
+  for (let i = 0; i < balances.length; i++) {
+    const shares = parseInt(formatBigNumber(balances[i].shares, collateral.decimals))
+    if (shares > 0) {
+      defaultOutcomeIndex = i
+      break
+    }
+  }
+  const [outcomeIndex, setOutcomeIndex] = useState<number>(defaultOutcomeIndex)
+  const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
+
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
-  const initialCollateral = getInitialCollateral(context.networkId, props.marketMakerData.collateral)
-  const [collateral, setCollateral] = useState<Token>(initialCollateral)
-  const [balanceItem, setBalanceItem] = useState<BalanceItem>(props.marketMakerData.balances[positionIndex])
+
+  const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
+  const [balanceItem, setBalanceItem] = useState<BalanceItem>(
+    marketMakerData.balances[isScalar ? positionIndex : outcomeIndex],
+  )
+  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [status, setStatus] = useState<Status>(Status.Ready)
+  const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
+  const [message, setMessage] = useState<string>('')
   const selectedOutcomeBalance = formatNumber(
     formatBigNumber(balanceItem.shares, collateral.decimals, collateral.decimals),
   )
-  const amountError =
-    balanceItem.shares === null
-      ? null
-      : balanceItem.shares.isZero() && amountShares?.gt(balanceItem.shares)
-      ? `Insufficient balance`
-      : amountShares?.gt(balanceItem.shares)
-      ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
-      : null
+
+  useEffect(() => {
+    if (isScalar) setPositionIndex(balances[0].shares.gte(balances[1].shares) ? 0 : 1)
+    else setOutcomeIndex(defaultOutcomeIndex)
+
+    setBalanceItem(balances[positionIndex])
+    setAmountShares(null)
+    setAmountSharesToDisplay('')
+    setCollateral(initialCollateral)
+    // eslint-disable-next-line
+  }, [marketMakerData.collateral.address])
+  useEffect(() => {
+    setBalanceItem(balances[outcomeIndex])
+    // eslint-disable-next-line
+  }, [balances[outcomeIndex]])
+
+  useEffect(() => {
+    setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
+  }, [amountShares, collateral.decimals])
+  const amountError = isTransactionProcessing
+    ? null
+    : balanceItem.shares === null
+    ? null
+    : balanceItem.shares.isZero() && amountShares?.gt(balanceItem.shares)
+    ? `Insufficient balance`
+    : amountShares?.gt(balanceItem.shares)
+    ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
+    : null
   const isSellButtonDisabled =
     !amountShares ||
     (status !== Status.Ready && status !== Status.Error) ||
@@ -48,7 +131,130 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
     amountError !== null ||
     isNegativeAmountShares
 
-  const sharedObject = { isSellButtonDisabled }
+  const calcSellAmount = useMemo(
+    () => async (
+      amountShares: BigNumber,
+    ): Promise<[Maybe<number[] | BigNumber>, Maybe<BigNumber> | number, Maybe<BigNumber>, Maybe<BigNumber>]> => {
+      const holdings = balances.map(balance => balance.holdings)
+      const holdingsOfSoldOutcome = holdings[positionIndex]
+      const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
+        return index !== positionIndex
+      })
+      const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
+      const amountToSell = calcSellAmountInCollateral(
+        // Round down in case of precision error
+        amountShares.mul(99999999).div(100000000),
+        holdingsOfSoldOutcome,
+        holdingsOfOtherOutcomes,
+        marketFeeWithTwoDecimals,
+      )
+
+      if (!amountToSell) {
+        logger.warn(
+          `Could not compute amount of collateral to sell for '${amountShares.toString()}' and '${holdingsOfSoldOutcome.toString()}'`,
+        )
+        if (isScalar) return [null, null, null, null]
+        else return [[], null, null, null]
+      }
+
+      const balanceAfterTrade = computeBalanceAfterTrade(
+        isScalar ? balances.map(b => b.holdings) : holdings,
+        positionIndex,
+        amountToSell.mul(-1), // negate amounts because it's a sale
+        amountShares.mul(-1),
+      )
+
+      const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
+      const potentialValue = mulBN(amountToSell, 1 / (1 - marketFeeWithTwoDecimals))
+      const costFee = potentialValue.sub(amountToSell)
+
+      logger.log(`Amount to sell ${amountToSell}`)
+      if (isScalar) {
+        const newPrediction = calcPrediction(
+          pricesAfterTrade[1].toString(),
+          scalarLow || new BigNumber(0),
+          scalarHigh || new BigNumber(0),
+        )
+        return [costFee, newPrediction, amountToSell, potentialValue]
+      } else {
+        const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
+
+        return [probabilities, costFee, amountToSell, potentialValue]
+      }
+    },
+    [positionIndex, balances, fee, scalarLow, scalarHigh],
+  )
+  const [newPrediction, costFee, tradedCollateral, potentialValue] = useAsyncDerivedValue(
+    amountShares || Zero,
+    isScalar ? [new BigNumber(0), 0, amountShares, new BigNumber(0)] : [balances.map(() => 0), null, null, null],
+    calcSellAmount,
+  )
+  const setAmountSharesFromInput = (shares: BigNumber) => {
+    setAmountShares(shares)
+    setDisplaySellShares(shares)
+  }
+  const finish = async () => {
+    try {
+      if (!tradedCollateral) {
+        return
+      }
+
+      if (!cpk) {
+        return
+      }
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionProcessing(true)
+      setIsTransactionModalOpen(true)
+      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals, collateral.decimals)
+
+      setStatus(Status.Loading)
+      setMessage(`Selling ${formatNumber(sharesAmount)} shares...`)
+
+      await cpk.sellOutcomes({
+        amount: tradedCollateral,
+        outcomeIndex: isScalar ? positionIndex : outcomeIndex,
+        marketMaker,
+        conditionalTokens,
+      })
+
+      await fetchGraphMarketUserTxData()
+      await fetchGraphMarketMakerData()
+      await fetchBalances()
+      setAmountSharesFromInput(new BigNumber('0'))
+      setDisplaySellShares(null)
+      setAmountShares(null)
+      setStatus(Status.Ready)
+      setMessage(`Successfully sold ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
+      setIsTransactionProcessing(false)
+    } catch (err) {
+      setStatus(Status.Error)
+      setTxState(TransactionStep.error)
+      setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' shares.`)
+      logger.error(`${message} - ${err.message}`)
+      setIsTransactionProcessing(false)
+    }
+  }
+
+  const sharedObject = {
+    isSellButtonDisabled,
+    calcSellAmount,
+    finish,
+    amountError,
+    isNegativeAmountShares,
+    setAmountSharesToDisplay,
+    amountSharesToDisplay,
+    selectedOutcomeBalance,
+    setAmountSharesFromInput,
+    isTransactionModalOpen,
+    setIsTransactionModalOpen,
+    balanceItem,
+    outcomeIndex,
+    positionIndex,
+    setBalanceItem,
+    setPositionIndex,
+    setOutcomeIndex,
+    collateral,
+  }
 
   return (
     <>

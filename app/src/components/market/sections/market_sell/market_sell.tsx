@@ -61,59 +61,40 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { cpk, networkId, relay, setTxState, txHash, txState } = context
   const { fetchBalances } = context.balances
+  const {
+    amountError,
+    amountSharesToDisplay,
+    balanceItem,
+    collateral,
+    finish,
+    isNegativeAmountShares,
+    isSellButtonDisabled,
+    isTransactionModalOpen,
+    outcomeIndex,
+    selectedOutcomeBalance,
+    setAmountSharesFromInput,
+    setAmountSharesToDisplay,
+    setBalanceItem,
+    setIsTransactionModalOpen,
+    setOutcomeIndex,
+  } = props.sharedProps
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const { fetchGraphMarketMakerData, marketMakerData, switchMarketTab } = props
   const { address: marketMakerAddress, balances, fee } = marketMakerData
 
   const marketMaker = buildMarketMaker(marketMakerAddress)
 
-  const initialCollateral = getInitialCollateral(networkId, marketMakerData.collateral, relay)
-  const [collateral, setCollateral] = useState<Token>(initialCollateral)
-
-  let defaultOutcomeIndex = 0
-  for (let i = 0; i < balances.length; i++) {
-    const shares = parseInt(formatBigNumber(balances[i].shares, collateral.decimals))
-    if (shares > 0) {
-      defaultOutcomeIndex = i
-      break
-    }
-  }
-
-  const [status, setStatus] = useState<Status>(Status.Ready)
-  const [outcomeIndex, setOutcomeIndex] = useState<number>(defaultOutcomeIndex)
-  const [balanceItem, setBalanceItem] = useState<BalanceItem>(balances[outcomeIndex])
   const [amountShares, setAmountShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
-  const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
+
   const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
-  const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
   const [message, setMessage] = useState<string>('')
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
-  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-
-  const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
-
-  useEffect(() => {
-    setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
-  }, [amountShares, collateral.decimals])
-
-  useEffect(() => {
-    setBalanceItem(balances[outcomeIndex])
-    // eslint-disable-next-line
-  }, [balances[outcomeIndex]])
-
-  useEffect(() => {
-    setOutcomeIndex(defaultOutcomeIndex)
-    setBalanceItem(balances[defaultOutcomeIndex])
-    setAmountShares(null)
-    setAmountSharesToDisplay('')
-    setCollateral(initialCollateral)
-    // eslint-disable-next-line
-  }, [marketMakerData.collateral.address])
 
   const calcSellAmount = useMemo(
     () => async (
       amountShares: BigNumber,
     ): Promise<[number[], Maybe<BigNumber>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
+      const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
       const holdings = balances.map(balance => balance.holdings)
       const holdingsOfSoldOutcome = holdings[outcomeIndex]
       const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
@@ -148,7 +129,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
       logger.log(`Amount to sell ${amountToSell}`)
       return [probabilities, costFee, amountToSell, potentialValue]
     },
-    [outcomeIndex, balances, marketFeeWithTwoDecimals],
+    [outcomeIndex, balances, fee],
   )
 
   const [probabilities, costFee, tradedCollateral, potentialValue] = useAsyncDerivedValue(
@@ -157,78 +138,11 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     calcSellAmount,
   )
 
-  const finish = async () => {
-    try {
-      if (!tradedCollateral) {
-        return
-      }
-
-      if (!cpk) {
-        return
-      }
-      setTxState(TransactionStep.waitingConfirmation)
-      setIsTransactionProcessing(true)
-      setIsTransactionModalOpen(true)
-      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals, collateral.decimals)
-
-      setStatus(Status.Loading)
-      setMessage(`Selling ${formatNumber(sharesAmount)} shares...`)
-
-      await cpk.sellOutcomes({
-        amount: tradedCollateral,
-        outcomeIndex,
-        marketMaker,
-        conditionalTokens,
-      })
-
-      await fetchGraphMarketMakerData()
-      await fetchBalances()
-      setAmountSharesFromInput(new BigNumber('0'))
-      setDisplaySellShares(null)
-      setAmountShares(null)
-      setStatus(Status.Ready)
-      setMessage(`Successfully sold ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
-      setIsTransactionProcessing(false)
-    } catch (err) {
-      setStatus(Status.Error)
-      setTxState(TransactionStep.error)
-      setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' shares.`)
-      logger.error(`${message} - ${err.message}`)
-      setIsTransactionProcessing(false)
-    }
-  }
-
   const newShares = balances.map((balance, i) =>
     i === outcomeIndex ? balance.shares.sub(amountShares || Zero) : balance.shares,
   )
 
-  const selectedOutcomeBalance = formatNumber(
-    formatBigNumber(balanceItem.shares, collateral.decimals, collateral.decimals),
-  )
-
-  const amountError = isTransactionProcessing
-    ? null
-    : balanceItem.shares === null
-    ? null
-    : balanceItem.shares.isZero() && amountShares?.gt(balanceItem.shares)
-    ? `Insufficient balance`
-    : amountShares?.gt(balanceItem.shares)
-    ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
-    : null
-
-  const setAmountSharesFromInput = (shares: BigNumber) => {
-    setAmountShares(shares)
-    setDisplaySellShares(shares)
-  }
-
   const sellAmountSharesDisplay = formatBigNumber(amountShares || Zero, collateral.decimals)
-
-  const isSellButtonDisabled =
-    !amountShares ||
-    (status !== Status.Ready && status !== Status.Error) ||
-    amountShares?.isZero() ||
-    amountError !== null ||
-    isNegativeAmountShares
 
   return (
     <>
