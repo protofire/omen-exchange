@@ -100,7 +100,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   } = marketMakerData
   const context = useConnectedWeb3Context()
   const history = useHistory()
-  const { account, cpk, library: provider, networkId, relay } = context
+  const { account, cpk, library: provider, networkId, relay, setTxState, txHash, txState } = context
   const { fetchBalances } = context.balances
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const marketMaker = buildMarketMaker(marketMakerAddress)
@@ -128,8 +128,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const [additionalShares, setAdditionalShares] = useState<number>(0)
   const [additionalSharesType, setAdditionalSharesType] = useState<Maybe<AdditionalSharesType>>()
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
-  const [txHash, setTxHash] = useState('')
 
   useEffect(() => {
     setIsNegativeAmountToFund((amountToFund || Zero).lt(Zero))
@@ -240,8 +238,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         amount: amountToFund || Zero,
         collateral,
         marketMaker,
-        setTxHash,
-        setTxState,
       })
 
       await fetchGraphMarketUserTxData()
@@ -281,8 +277,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         earnings: userEarnings,
         marketMaker,
         outcomesCount: balances.length,
-        setTxHash,
-        setTxState,
         sharesToBurn: amountToRemove || Zero,
       })
 

@@ -5,7 +5,9 @@ import { getLogger } from '../logger'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../networks'
 import { Token } from '../types'
 
+import { waitABit } from './other'
 import { strip0x } from './string_manipulation'
+
 const logger = getLogger('Tools')
 
 export const packSignatures = (array: any) => {
@@ -38,6 +40,12 @@ export const signaturesFormatted = (signatures: string[]) => {
 export const isContract = async (provider: any, address: string): Promise<boolean> => {
   const code = await provider.getCode(address)
   return code && code !== '0x'
+}
+
+export const waitUntilContractDeployed = async (provider: any, address: string) => {
+  while (!(await isContract(provider, address))) {
+    await waitABit()
+  }
 }
 
 /**
