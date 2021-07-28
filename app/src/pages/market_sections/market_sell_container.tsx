@@ -48,7 +48,7 @@ export type SharedPropsInterface = {
   setOutcomeIndex: any
   setBalanceItem: any
   collateral: Token
-  costFee: any
+  costFee: Maybe<BigNumber>
   probabilitiesOrNewPrediction: any
   tradedCollateral: Maybe<BigNumber>
   potentialValue: Maybe<BigNumber>
@@ -136,7 +136,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
   const calcSellAmount = useMemo(
     () => async (
       amountShares: BigNumber,
-    ): Promise<[Maybe<BigNumber | number[]>, Maybe<number | number[]>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
+    ): Promise<[Maybe<BigNumber>, Maybe<number | number[]>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
       const holdings = balances.map(balance => balance.holdings)
       const holdingsOfSoldOutcome = holdings[positionIndex]
       const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
@@ -188,7 +188,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
   )
   const [costFee, probabilitiesOrNewPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(
     amountShares || Zero,
-    isScalar ? [new BigNumber(0), 0, amountShares, new BigNumber(0)] : [balances.map(() => 0), null, null, null],
+    isScalar ? [new BigNumber(0), 0, amountShares, new BigNumber(0)] : [null, balances.map(() => 0), null, null],
     calcSellAmount,
   )
 
