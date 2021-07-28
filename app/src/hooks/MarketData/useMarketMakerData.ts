@@ -1,6 +1,6 @@
-import { useConnectedWeb3Context } from '../contexts'
+import { useConnectedWeb3Context } from '../../contexts'
+import { useGraphMarketMakerData } from '../Graph/useGraphMarketMakerData'
 
-import { useGraphMarketMakerData } from './Graph/useGraphMarketMakerData'
 import { useBlockchainMarketMakerData } from './useBlockchainMarketMakerData'
 
 export const useMarketMakerData = (marketMakerAddress: string) => {
