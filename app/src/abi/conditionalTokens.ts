@@ -1,4 +1,4 @@
-const conditionalTokensAbi = [
+export const conditionalTokensAbi = [
   'function prepareCondition(address oracle, bytes32 questionId, uint outcomeSlotCount) external',
   'event ConditionPreparation(bytes32 indexed conditionId, address indexed oracle, bytes32 indexed questionId, uint outcomeSlotCount)',
   'function setApprovalForAll(address operator, bool approved) external',
