@@ -1,9 +1,8 @@
 import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
-import { ConnectedWeb3Context } from '../contexts'
-
-import { useContracts } from './useContracts'
+import { ConnectedWeb3Context } from '../../contexts'
+import { useContracts } from '../useContracts'
 
 export const useFundingBalance = (
   marketMakerAddress: string,
