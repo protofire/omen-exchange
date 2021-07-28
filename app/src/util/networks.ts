@@ -192,7 +192,7 @@ const networks: { [K in NetworkId]: Network } = {
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
     blockExplorerURL: 'https://rinkeby.etherscan.io',
-    airdropAddress: ['0xf20676162Af8B5f26D8c61288089a2bf63042Ab2', '0x402578B74D919d3FB1aF516be9DB021bDc8638a0'],
+    airdropAddress: ['0x85951106cB2183aAB69c4De9536c6FACcBEccd74', '0x402578B74D919d3FB1aF516be9DB021bDc8638a0'],
   },
   [networkIds.SOKOL]: {
     label: 'Sokol',
@@ -344,7 +344,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     addresses: {
       // [networkIds.MAINNET]: '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
       //[networkIds.XDAI]: '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599',
-      [networkIds.RINKEBY]: '0x0A08ECa47C56C305F4FeB4fa062AEcd5807BeBb8',
+      [networkIds.RINKEBY]: '0x8c38a7dbaf522478d046af4a40c45a37a54af9bb',
     },
     order: 22,
   },

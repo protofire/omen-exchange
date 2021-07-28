@@ -72,9 +72,11 @@ export const ModalCheckAddress = (props: Props) => {
     setLoading(false)
   }
 
-  const submitClaim = () => {
+  const submitClaim = async () => {
     if (claim && address) {
-      claim(address, amount)
+      await claim(address, amount)
+      setAddress('')
+      setAmount(new BigNumber('0'))
     }
   }
 

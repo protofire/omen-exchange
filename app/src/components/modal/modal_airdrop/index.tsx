@@ -34,7 +34,7 @@ export const ModalAirdrop = (props: Props) => {
 
   Modal.setAppElement('#root')
 
-  const { claimAmount } = useAirdropService()
+  const { claimAmount, fetchClaimAmount } = useAirdropService()
 
   const onClose = () => {
     localStorage.setItem('airdrop', 'displayed')
@@ -53,6 +53,7 @@ export const ModalAirdrop = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
       await cpk.claimAirdrop({ account, setTxHash, setTxState })
+      await fetchClaimAmount()
       await balances.fetchBalances()
     } catch (e) {
       setIsTransactionModalOpen(false)

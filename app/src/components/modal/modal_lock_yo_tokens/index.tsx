@@ -76,7 +76,7 @@ const ButtonSection = styled.div`
   justify-content: space-between;
   width: 100%;
   column-gap: 20px;
-  margin-top: 32px;
+  margin-top: 24px;
 `
 const ButtonsLockUnlock = styled(Button)`
   flex: 1;
@@ -94,17 +94,18 @@ const ConditionalWrapper = styled.div<{ hideWrapper: boolean }>`
 `
 const Divider = styled.div`
   border-top: ${props => props.theme.borders.borderLineDisabled};
-  margin: 32px 0;
+  margin: 24px 0;
 `
 const PercentageText = styled.span<{ lightColor?: boolean }>`
   ${props => props.lightColor && `color:${props.theme.colors.textColorLighter}`};
 `
 
 const ModalLockTokens = (props: Props) => {
-  const { context, fetchBalances, isOpen, omenBalance, onClose, setIsModalLockTokensOpen, theme } = props
+  const { context, fetchBalances, isOpen, omenBalance, setIsModalLockTokensOpen, theme } = props
   const { account, balances, cpk, library: provider, networkId, relay } = context
 
-  const { claimAmount } = useAirdropService()
+  const { claimAmount, fetchClaimAmount } = useAirdropService()
+
   const omen = new OmenGuildService(provider, networkId)
 
   const [isLockAmountOpen, setIsLockAmountOpen] = useState<boolean>(false)
@@ -256,10 +257,18 @@ const ModalLockTokens = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
       await cpk.claimAirdrop({ account, setTxHash, setTxState })
+      await fetchClaimAmount()
       await balances.fetchBalances()
     } catch (e) {
       setIsTransactionModalOpen(false)
     }
+  }
+
+  const onClose = () => {
+    setIsTransactionModalOpen(false)
+    setCheckAddress(false)
+    setIsLockAmountOpen(false)
+    props.onClose()
   }
 
   return (
@@ -281,12 +290,7 @@ const ModalLockTokens = (props: Props) => {
               )}
               <HeaderText>{isLockAmountOpen ? 'Lock Omen Token' : 'Omen Guild Membership'}</HeaderText>
             </NavLeft>
-            <IconClose
-              hoverEffect={true}
-              onClick={() => {
-                onClose()
-              }}
-            />
+            <IconClose hoverEffect={true} onClick={onClose} />
           </ModalNavigation>
           <ModalMain>
             <ConditionalWrapper hideWrapper={!isLockAmountOpen}>
@@ -433,10 +437,7 @@ const ModalLockTokens = (props: Props) => {
         isOpen={isTransactionModalOpen}
         message={transactionMessage}
         netId={txNetId}
-        onClose={() => {
-          setIsTransactionModalOpen(false)
-          onClose()
-        }}
+        onClose={onClose}
         txHash={txHash}
         txState={txState}
       />
@@ -444,10 +445,7 @@ const ModalLockTokens = (props: Props) => {
         claim={claim}
         isOpen={checkAddress && !isTransactionModalOpen}
         onBack={() => setCheckAddress(false)}
-        onClose={() => {
-          setCheckAddress(false)
-          onClose()
-        }}
+        onClose={onClose}
       />
     </>
   )
