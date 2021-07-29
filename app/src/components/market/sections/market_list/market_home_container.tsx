@@ -10,7 +10,7 @@ import useLocalStorageState from 'use-local-storage-state'
 
 import { MAX_MARKET_FEE } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../contexts'
-import { useMarkets } from '../../../../hooks/MarketData/useMarkets'
+import { useMarkets } from '../../../../hooks/market_data/useMarkets'
 import { queryCategories } from '../../../../queries/markets_home'
 import theme from '../../../../theme'
 import { getArbitratorsByNetwork, getOutcomes, networkIds } from '../../../../util/networks'

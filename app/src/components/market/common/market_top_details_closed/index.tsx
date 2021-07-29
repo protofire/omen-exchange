@@ -4,7 +4,7 @@ import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../contexts'
-import { useGraphMarketsFromQuestion } from '../../../../hooks/Graph/useGraphMarketsFromQuestion'
+import { useGraphMarketsFromQuestion } from '../../../../hooks/graph/useGraphMarketsFromQuestion'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import { CompoundService } from '../../../../services'
 import theme from '../../../../theme'

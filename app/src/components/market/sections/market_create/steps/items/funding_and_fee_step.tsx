@@ -13,7 +13,7 @@ import {
 } from '../../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../../contexts'
 import { useCollateralBalance, useCpkAllowance, useCpkProxy } from '../../../../../../hooks'
-import { useGraphMarketsFromQuestion } from '../../../../../../hooks/Graph/useGraphMarketsFromQuestion'
+import { useGraphMarketsFromQuestion } from '../../../../../../hooks/graph/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
 import { getNativeAsset, networkIds, pseudoNativeAssetAddress } from '../../../../../../util/networks'

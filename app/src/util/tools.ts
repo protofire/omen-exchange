@@ -12,7 +12,7 @@ import {
   STANDARD_DECIMALS,
   XDAI_NETWORKS,
 } from '../common/constants'
-import { MarketTokenPair } from '../hooks/Graph/useGraphMarketsFromQuestion'
+import { MarketTokenPair } from '../hooks/graph/useGraphMarketsFromQuestion'
 import { CompoundService } from '../services/compound_service'
 
 import { getLogger } from './logger'

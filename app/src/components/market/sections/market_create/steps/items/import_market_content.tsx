@@ -3,7 +3,7 @@ import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../../../contexts'
 import { useAsyncDerivedValue, useContracts, useMarketMakerData } from '../../../../../../hooks'
-import { useGraphMarketsFromQuestion } from '../../../../../../hooks/Graph/useGraphMarketsFromQuestion'
+import { useGraphMarketsFromQuestion } from '../../../../../../hooks/graph/useGraphMarketsFromQuestion'
 import { useRealityLink } from '../../../../../../hooks/useRealityLink'
 import { getArbitratorFromAddress } from '../../../../../../util/networks'
 import { formatDate } from '../../../../../../util/tools'

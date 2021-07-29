@@ -8,7 +8,7 @@ import { getLogger } from '../../util/logger'
 import { getArbitratorFromAddress } from '../../util/networks'
 import { isScalarMarket, promiseProps } from '../../util/tools'
 import { BalanceItem, MarketMakerData, Status, Token } from '../../util/types'
-import { GraphMarketMakerData } from '../Graph/useGraphMarketMakerData'
+import { GraphMarketMakerData } from '../graph/useGraphMarketMakerData'
 import { useContracts } from '../useContracts'
 
 const logger = getLogger('useBlockchainMarketMakerData')

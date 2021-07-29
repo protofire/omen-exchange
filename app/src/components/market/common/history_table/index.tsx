@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../contexts'
-import { FpmmTradeDataType } from '../../../../hooks/Graph/useGraphFpmmTransactionsFromQuestion'
+import { FpmmTradeDataType } from '../../../../hooks/graph/useGraphFpmmTransactionsFromQuestion'
 import { getTxHashBlockExplorerURL } from '../../../../util/networks'
 import { formatBigNumber, formatHistoryDate, formatHistoryUser } from '../../../../util/tools'
 import { ButtonRound } from '../../../button'

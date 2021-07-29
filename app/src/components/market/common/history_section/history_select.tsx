@@ -10,7 +10,7 @@ import {
   FpmmTradeDataType,
   HistoryType,
   useGraphFpmmTransactionsFromQuestion,
-} from '../../../../hooks/Graph/useGraphFpmmTransactionsFromQuestion'
+} from '../../../../hooks/graph/useGraphFpmmTransactionsFromQuestion'
 import { realitioAbi } from '../../../../services/realitio'
 import { SafeService } from '../../../../services/safe'
 import { getContractAddress } from '../../../../util/networks'
