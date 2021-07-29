@@ -358,7 +358,6 @@ const theme = {
     positionBall: '#B2DFDB',
   },
 }
-export default theme
 
 /* BElLOW IS ALTERNATIVE WAY TO DO MEDIA QUERIES */
 
