@@ -87,9 +87,8 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
   const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
 
   const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
-  const [balanceItem, setBalanceItem] = useState<BalanceItem>(
-    marketMakerData.balances[isScalar ? positionIndex : outcomeIndex],
-  )
+  const indexToUse = isScalar ? positionIndex : outcomeIndex
+  const [balanceItem, setBalanceItem] = useState<BalanceItem>(marketMakerData.balances[indexToUse])
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [status, setStatus] = useState<Status>(Status.Ready)
@@ -103,16 +102,16 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
     if (isScalar) setPositionIndex(balances[0].shares.gte(balances[1].shares) ? 0 : 1)
     else setOutcomeIndex(defaultOutcomeIndex)
 
-    setBalanceItem(balances[positionIndex])
+    setBalanceItem(balances[indexToUse])
     setAmountShares(null)
     setAmountSharesToDisplay('')
     setCollateral(initialCollateral)
     // eslint-disable-next-line
   }, [marketMakerData.collateral.address])
   useEffect(() => {
-    setBalanceItem(balances[outcomeIndex])
+    setBalanceItem(balances[indexToUse])
     // eslint-disable-next-line
-  }, [balances[outcomeIndex]])
+  }, [balances[indexToUse]])
 
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
@@ -138,9 +137,9 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
       amountShares: BigNumber,
     ): Promise<[Maybe<BigNumber>, Maybe<number | number[]>, Maybe<BigNumber>, Maybe<BigNumber>]> => {
       const holdings = balances.map(balance => balance.holdings)
-      const holdingsOfSoldOutcome = holdings[positionIndex]
+      const holdingsOfSoldOutcome = holdings[indexToUse]
       const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
-        return index !== positionIndex
+        return index !== indexToUse
       })
       const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
       const amountToSell = calcSellAmountInCollateral(
@@ -161,7 +160,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
 
       const balanceAfterTrade = computeBalanceAfterTrade(
         isScalar ? balances.map(b => b.holdings) : holdings,
-        isScalar ? positionIndex : outcomeIndex,
+        indexToUse,
         amountToSell.mul(-1), // negate amounts because it's a sale
         amountShares.mul(-1),
       )
@@ -184,7 +183,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
         return [costFee, probabilities, amountToSell, potentialValue]
       }
     },
-    [positionIndex, balances, fee, scalarLow, scalarHigh, outcomeIndex, isScalar],
+    [indexToUse, balances, fee, scalarLow, scalarHigh, isScalar],
   )
   const [costFee, probabilitiesOrNewPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(
     amountShares || Zero,
@@ -215,7 +214,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,
-        outcomeIndex: isScalar ? positionIndex : outcomeIndex,
+        outcomeIndex: indexToUse,
         marketMaker,
         conditionalTokens,
       })
@@ -227,12 +226,12 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
       setDisplaySellShares(null)
       setAmountShares(null)
       setStatus(Status.Ready)
-      setMessage(`Successfully sold ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
+      setMessage(`Successfully sold ${formatNumber(sharesAmount)} ${balances[indexToUse].outcomeName} shares.`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
       setTxState(TransactionStep.error)
-      setMessage(`Error trying to sell '${balances[outcomeIndex].outcomeName}' shares.`)
+      setMessage(`Error trying to sell '${balances[indexToUse].outcomeName}' shares.`)
       logger.error(`${message} - ${err.message}`)
       setIsTransactionProcessing(false)
     }
