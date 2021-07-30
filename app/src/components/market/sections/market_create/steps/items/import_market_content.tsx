@@ -23,9 +23,9 @@ import {
   PercentWrapper,
   RowWrapper,
 } from '../../../../common/common_styled'
-import { DisplayArbitrator } from '../../../../common/display_arbitrator'
 import { VerifiedRow } from '../../../../common/verified_row'
 import { WarningMessage } from '../../../../common/warning_message'
+import { DisplayArbitrator } from '../../../common_sections/arbitrators/display_arbitrator'
 import { Outcome } from '../outcomes'
 
 const SubsectionTitleStyled = styled(SubsectionTitle)`

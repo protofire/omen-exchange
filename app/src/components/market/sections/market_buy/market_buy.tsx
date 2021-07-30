@@ -48,11 +48,11 @@ import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { SetAllowance } from '../../common/set_allowance'
-import { TransactionDetailsCard } from '../../common/transaction_details_card'
-import { TransactionDetailsLine } from '../../common/transaction_details_line'
-import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WarningMessage } from '../../common/warning_message'
 import { OutcomeTable } from '../common_sections/outcome_table'
+import { TransactionDetailsCard } from '../common_sections/transaction/transaction_details_card'
+import { TransactionDetailsLine } from '../common_sections/transaction/transaction_details_line'
+import { TransactionDetailsRow, ValueStates } from '../common_sections/transaction/transaction_details_row'
 
 const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;

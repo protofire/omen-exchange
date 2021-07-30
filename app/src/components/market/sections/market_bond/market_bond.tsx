@@ -27,10 +27,10 @@ import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
 import { SetAllowance } from '../../common/set_allowance'
-import { TransactionDetailsCard } from '../../common/transaction_details_card'
-import { TransactionDetailsLine } from '../../common/transaction_details_line'
-import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { OutcomeTable } from '../common_sections/outcome_table'
+import { TransactionDetailsCard } from '../common_sections/transaction/transaction_details_card'
+import { TransactionDetailsLine } from '../common_sections/transaction/transaction_details_line'
+import { TransactionDetailsRow, ValueStates } from '../common_sections/transaction/transaction_details_row'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData

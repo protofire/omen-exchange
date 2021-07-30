@@ -58,10 +58,10 @@ import { MarketScale } from '../../common/market_scale'
 import { SetAllowance } from '../../common/set_allowance'
 import { SwitchTransactionToken } from '../../common/switch_transaction_token'
 import { TokenBalance } from '../../common/token_balance'
-import { TransactionDetailsCard } from '../../common/transaction_details_card'
-import { TransactionDetailsLine } from '../../common/transaction_details_line'
-import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WarningMessage } from '../../common/warning_message'
+import { TransactionDetailsCard } from '../common_sections/transaction/transaction_details_card'
+import { TransactionDetailsLine } from '../common_sections/transaction/transaction_details_line'
+import { TransactionDetailsRow, ValueStates } from '../common_sections/transaction/transaction_details_row'
 
 import { UserPoolData } from './user_pool_data'
 

@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Arbitrator } from '../../../../util/types'
-import { ArbitratorIcon } from '../../sections/common_sections/arbitrators/arbitrator_icon'
+import { Arbitrator } from '../../../../../../util/types'
+import { ArbitratorIcon } from '../arbitrator_icon'
 
 const AWrapper = styled.a`
   text-decoration: none !important;

@@ -48,10 +48,10 @@ import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
 import { SetAllowance } from '../../common/set_allowance'
-import { TransactionDetailsCard } from '../../common/transaction_details_card'
-import { TransactionDetailsLine } from '../../common/transaction_details_line'
-import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WarningMessage } from '../../common/warning_message'
+import { TransactionDetailsCard } from '../common_sections/transaction/transaction_details_card'
+import { TransactionDetailsLine } from '../common_sections/transaction/transaction_details_line'
+import { TransactionDetailsRow, ValueStates } from '../common_sections/transaction/transaction_details_row'
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
