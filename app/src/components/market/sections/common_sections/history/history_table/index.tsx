@@ -2,13 +2,13 @@ import React from 'react'
 import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../../../../hooks'
-import { FpmmTradeDataType } from '../../../../../../../hooks/useGraphFpmmTransactionsFromQuestion'
-import { getTxHashBlockExplorerURL } from '../../../../../../../util/networks'
-import { formatBigNumber, formatHistoryDate, formatHistoryUser } from '../../../../../../../util/tools'
-import { ButtonRound } from '../../../../../../button'
-import { IconJazz } from '../../../../../../common/icons/IconJazz'
-import { InlineLoading } from '../../../../../../loading/inline_loading'
+import { useConnectedWeb3Context } from '../../../../../../hooks'
+import { FpmmTradeDataType } from '../../../../../../hooks/useGraphFpmmTransactionsFromQuestion'
+import { getTxHashBlockExplorerURL } from '../../../../../../util/networks'
+import { formatBigNumber, formatHistoryDate, formatHistoryUser } from '../../../../../../util/tools'
+import { ButtonRound } from '../../../../../button'
+import { IconJazz } from '../../../../../common/icons/IconJazz'
+import { InlineLoading } from '../../../../../loading/inline_loading'
 
 const TableWrapper = styled.div`
   text-align: left;

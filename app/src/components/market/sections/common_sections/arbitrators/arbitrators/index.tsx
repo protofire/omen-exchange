@@ -2,9 +2,9 @@ import unionBy from 'lodash.unionby'
 import React from 'react'
 import styled from 'styled-components'
 
-import { getArbitratorsByNetwork } from '../../../../util/networks'
-import { Arbitrator } from '../../../../util/types'
-import { Button } from '../../../button'
+import { getArbitratorsByNetwork } from '../../../../../../util/networks'
+import { Arbitrator } from '../../../../../../util/types'
+import { Button } from '../../../../../button'
 import { ArbitratorIcon } from '../arbitrator_icon'
 
 const Wrapper = styled.div`

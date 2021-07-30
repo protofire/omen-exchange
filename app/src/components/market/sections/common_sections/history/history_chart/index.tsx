@@ -4,12 +4,12 @@ import { useHistory } from 'react-router'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import styled from 'styled-components'
 
-import theme from '../../../../../../../theme'
-import { getOutcomeColor } from '../../../../../../../theme/utils'
-import { calcPrediction } from '../../../../../../../util/tools'
-import { Button } from '../../../../../../button/button'
-import { ButtonType } from '../../../../../../button/button_styling_types'
-import { OutcomeItemLittleBallOfJoyAndDifferentColors } from '../../../../../common/common_styled'
+import theme from '../../../../../../theme'
+import { getOutcomeColor } from '../../../../../../theme/utils'
+import { calcPrediction } from '../../../../../../util/tools'
+import { Button } from '../../../../../button/button'
+import { ButtonType } from '../../../../../button/button_styling_types'
+import { OutcomeItemLittleBallOfJoyAndDifferentColors } from '../../../../common/common_styled'
 import { CustomInlineLoading } from '../history_table'
 
 const ResponsiveWrapper = styled.div`
