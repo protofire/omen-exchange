@@ -29,6 +29,7 @@ interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
   fetchGraphMarketUserTxData: () => Promise<void>
 }
+
 export type SharedPropsInterface = {
   isSellButtonDisabled: boolean
   calcSellAmount: any
@@ -59,20 +60,27 @@ export type SharedPropsInterface = {
   txHash: string
   txState: TransactionStep
 }
+
 const MarketSellContainer: React.FC<Props> = (props: Props) => {
   const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, isScalar, marketMakerData } = props
   const context = useConnectedWeb3Context()
   const { cpk, networkId, relay, setTxState, txHash, txState } = context
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
   const { fetchBalances } = context.balances
-
   const { address: marketMakerAddress, balances, fee, scalarHigh, scalarLow } = marketMakerData
-
   const initialCollateral = getInitialCollateral(networkId, marketMakerData.collateral, relay)
-  const [collateral, setCollateral] = useState<Token>(initialCollateral)
 
+  const [collateral, setCollateral] = useState<Token>(initialCollateral)
   const [amountShares, setAmountShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [positionIndex, setPositionIndex] = useState(balances[0].shares.gte(balances[1].shares) ? 0 : 1)
+  const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
+  const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
+  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [status, setStatus] = useState<Status>(Status.Ready)
+  const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
+  const [message, setMessage] = useState<string>('')
+
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
     const shares = parseInt(formatBigNumber(balances[i].shares, collateral.decimals))
@@ -81,19 +89,13 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
       break
     }
   }
-  const [outcomeIndex, setOutcomeIndex] = useState<number>(defaultOutcomeIndex)
+
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
 
-  const [isNegativeAmountShares, setIsNegativeAmountShares] = useState<boolean>(false)
-
-  const [displaySellShares, setDisplaySellShares] = useState<Maybe<BigNumber>>(new BigNumber(0))
+  const [outcomeIndex, setOutcomeIndex] = useState<number>(defaultOutcomeIndex)
   const indexToUse = isScalar ? positionIndex : outcomeIndex
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(marketMakerData.balances[indexToUse])
-  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
-  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [status, setStatus] = useState<Status>(Status.Ready)
-  const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
-  const [message, setMessage] = useState<string>('')
+
   const selectedOutcomeBalance = formatNumber(
     formatBigNumber(balanceItem.shares, collateral.decimals, collateral.decimals),
   )
@@ -108,6 +110,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
     setCollateral(initialCollateral)
     // eslint-disable-next-line
   }, [marketMakerData.collateral.address])
+
   useEffect(() => {
     setBalanceItem(balances[indexToUse])
     // eslint-disable-next-line
@@ -116,6 +119,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
   }, [amountShares, collateral.decimals])
+
   const amountError = isTransactionProcessing
     ? null
     : balanceItem.shares === null
@@ -125,6 +129,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
     : amountShares?.gt(balanceItem.shares)
     ? `Value must be less than or equal to ${selectedOutcomeBalance} shares`
     : null
+
   const isSellButtonDisabled =
     !amountShares ||
     (status !== Status.Ready && status !== Status.Error) ||
@@ -185,6 +190,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
     },
     [indexToUse, balances, fee, scalarLow, scalarHigh, isScalar],
   )
+
   const [costFee, probabilitiesOrNewPrediction, tradedCollateral, potentialValue] = useAsyncDerivedValue(
     amountShares || Zero,
     isScalar ? [new BigNumber(0), 0, amountShares, new BigNumber(0)] : [null, balances.map(() => 0), null, null],
@@ -195,6 +201,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
     setAmountShares(shares)
     setDisplaySellShares(shares)
   }
+
   const finish = async () => {
     try {
       if (!tradedCollateral) {
