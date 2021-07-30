@@ -26,9 +26,9 @@ import { IconFilter } from '../../../common/icons/IconFilter'
 import { IconSearch } from '../../../common/icons/IconSearch'
 import { InlineLoading } from '../../../loading'
 import { AdvancedFilters } from '../../common/advanced_filters'
-import { ListCard } from '../../common/list_card'
-import { ListItem } from '../../common/list_item'
 import { Search } from '../../common/search'
+import { ListCard } from '../common_sections/list/list_card'
+import { ListItem } from '../common_sections/list/list_item'
 
 const TopContents = styled.div`
   padding: 24px;

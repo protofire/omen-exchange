@@ -8,7 +8,7 @@ import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { TextfieldCSS } from '../../common/form/textfield'
 import { IconBlockscout, IconCloudflare, IconInfura } from '../../common/icons'
 import { IconXdai } from '../../common/icons/IconXdai'
-import { ListCard } from '../../market/common/list_card/index'
+import { ListCard } from '../../market/sections/common_sections/list/list_card/index'
 
 const TopContent = styled.div`
   padding: 24px;

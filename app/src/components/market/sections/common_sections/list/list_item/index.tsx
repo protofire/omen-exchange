@@ -3,10 +3,10 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useSymbol } from '../../../../hooks'
-import { ERC20Service } from '../../../../services'
-import { getLogger } from '../../../../util/logger'
-import { getTokenFromAddress } from '../../../../util/networks'
+import { useConnectedWeb3Context, useSymbol } from '../../../../../../hooks'
+import { ERC20Service } from '../../../../../../services'
+import { getLogger } from '../../../../../../util/logger'
+import { getTokenFromAddress } from '../../../../../../util/networks'
 import {
   calcPrediction,
   calcPrice,
@@ -16,9 +16,9 @@ import {
   getScalarTitle,
   getUnit,
   isScalarMarket,
-} from '../../../../util/tools'
-import { MarketMakerDataItem, Token } from '../../../../util/types'
-import { IconStar } from '../../../common/icons/IconStar'
+} from '../../../../../../util/tools'
+import { MarketMakerDataItem, Token } from '../../../../../../util/types'
+import { IconStar } from '../../../../../common/icons/IconStar'
 
 const Wrapper = styled(NavLink)`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
