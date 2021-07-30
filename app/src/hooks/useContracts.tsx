@@ -47,6 +47,7 @@ export const useContracts = (context: ConnectedWeb3Context) => {
   const klerosTokenViewAddress = getContractAddress(networkId, 'klerosTokenView')
   const klerosTCRAddress = getContractAddress(networkId, 'klerosTCR')
   const omenVerifiedMarketsAddress = getContractAddress(networkId, 'omenVerifiedMarkets')
+
   const kleros = useMemo(
     () =>
       new KlerosService(
@@ -67,6 +68,7 @@ export const useContracts = (context: ConnectedWeb3Context) => {
   )
 
   const dxTCRAddress = getContractAddress(networkId, 'dxTCR')
+
   const dxTCR = useMemo(() => new DxTCRService(dxTCRAddress, provider), [provider, dxTCRAddress])
 
   return useMemo(

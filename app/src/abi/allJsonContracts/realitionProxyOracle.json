@@ -10,67 +10,16 @@
         "internalType": "contract IRealitio",
         "name": "_realitio",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_nuancedBinaryTemplateId",
+        "type": "uint256"
       }
     ],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "constructor"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "realitioQuestionId",
-        "type": "bytes32"
-      },
-      {
-        "indexed": true,
-        "internalType": "bytes32",
-        "name": "conditionQuestionId",
-        "type": "bytes32"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "low",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "high",
-        "type": "uint256"
-      }
-    ],
-    "name": "QuestionIdAnnouncement",
-    "type": "event"
-  },
-  {
-    "constant": false,
-    "inputs": [
-      {
-        "internalType": "bytes32",
-        "name": "questionId",
-        "type": "bytes32"
-      },
-      {
-        "internalType": "uint256",
-        "name": "low",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "high",
-        "type": "uint256"
-      }
-    ],
-    "name": "announceConditionQuestionId",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
   },
   {
     "constant": true,
@@ -81,6 +30,21 @@
         "internalType": "contract IConditionalTokens",
         "name": "",
         "type": "address"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "nuancedBinaryTemplateId",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "payable": false,
@@ -111,18 +75,18 @@
         "type": "bytes32"
       },
       {
+        "internalType": "uint256",
+        "name": "templateId",
+        "type": "uint256"
+      },
+      {
         "internalType": "string",
         "name": "question",
         "type": "string"
       },
       {
         "internalType": "uint256",
-        "name": "low",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "high",
+        "name": "numOutcomes",
         "type": "uint256"
       }
     ],

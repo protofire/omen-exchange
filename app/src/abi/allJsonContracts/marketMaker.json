@@ -19,9 +19,174 @@
     "type": "function"
   },
   {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "approve",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "withdrawFees",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "feesWithdrawableBy",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "constant": true,
     "inputs": [],
-    "name": "implementationMaster",
+    "name": "totalSupply",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "transferFrom",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "name": "addedValue",
+        "type": "uint256"
+      }
+    ],
+    "name": "increaseAllowance",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "investmentAmount",
+        "type": "uint256"
+      },
+      {
+        "name": "outcomeIndex",
+        "type": "uint256"
+      },
+      {
+        "name": "minOutcomeTokensToBuy",
+        "type": "uint256"
+      }
+    ],
+    "name": "buy",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "returnAmount",
+        "type": "uint256"
+      },
+      {
+        "name": "outcomeIndex",
+        "type": "uint256"
+      }
+    ],
+    "name": "calcSellAmount",
+    "outputs": [
+      {
+        "name": "outcomeTokenSellAmount",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "conditionalTokens",
     "outputs": [
       {
         "name": "",
@@ -33,15 +198,57 @@
     "type": "function"
   },
   {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "balanceOf",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "collectedFees",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "constant": false,
     "inputs": [
       {
-        "name": "consData",
-        "type": "bytes"
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "name": "subtractedValue",
+        "type": "uint256"
       }
     ],
-    "name": "cloneConstructor",
-    "outputs": [],
+    "name": "decreaseAllowance",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "function"
@@ -50,35 +257,29 @@
     "constant": false,
     "inputs": [
       {
-        "name": "saltNonce",
-        "type": "uint256"
-      },
-      {
-        "name": "conditionalTokens",
+        "name": "recipient",
         "type": "address"
       },
       {
-        "name": "collateralToken",
-        "type": "address"
-      },
-      {
-        "name": "conditionIds",
-        "type": "bytes32[]"
-      },
-      {
-        "name": "fee",
+        "name": "amount",
         "type": "uint256"
-      },
-      {
-        "name": "initialFunds",
-        "type": "uint256"
-      },
-      {
-        "name": "distributionHint",
-        "type": "uint256[]"
       }
     ],
-    "name": "create2FixedProductMarketMaker",
+    "name": "transfer",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "collateralToken",
     "outputs": [
       {
         "name": "",
@@ -86,7 +287,7 @@
       }
     ],
     "payable": false,
-    "stateMutability": "nonpayable",
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -128,6 +329,116 @@
     "constant": false,
     "inputs": [
       {
+        "name": "returnAmount",
+        "type": "uint256"
+      },
+      {
+        "name": "outcomeIndex",
+        "type": "uint256"
+      },
+      {
+        "name": "maxOutcomeTokensToSell",
+        "type": "uint256"
+      }
+    ],
+    "name": "sell",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "addedFunds",
+        "type": "uint256"
+      },
+      {
+        "name": "distributionHint",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "addFunding",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "conditionIds",
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "name": "spender",
+        "type": "address"
+      }
+    ],
+    "name": "allowance",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "fee",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
+        "name": "sharesToBurn",
+        "type": "uint256"
+      }
+    ],
+    "name": "removeFunding",
+    "outputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [
+      {
         "name": "operator",
         "type": "address"
       },
@@ -160,47 +471,27 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
-    "anonymous": false,
+    "constant": true,
     "inputs": [
       {
-        "indexed": true,
-        "name": "creator",
-        "type": "address"
+        "name": "investmentAmount",
+        "type": "uint256"
       },
       {
-        "indexed": false,
-        "name": "fixedProductMarketMaker",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "name": "conditionalTokens",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "name": "collateralToken",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "name": "conditionIds",
-        "type": "bytes32[]"
-      },
-      {
-        "indexed": false,
-        "name": "fee",
+        "name": "outcomeIndex",
         "type": "uint256"
       }
     ],
-    "name": "FixedProductMarketMakerCreation",
-    "type": "event"
+    "name": "calcBuyAmount",
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
   },
   {
     "anonymous": false,
@@ -320,16 +611,43 @@
     "inputs": [
       {
         "indexed": true,
-        "name": "target",
+        "name": "from",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "name": "to",
         "type": "address"
       },
       {
         "indexed": false,
-        "name": "clone",
-        "type": "address"
+        "name": "value",
+        "type": "uint256"
       }
     ],
-    "name": "CloneCreated",
+    "name": "Transfer",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "name": "value",
+        "type": "uint256"
+      }
+    ],
+    "name": "Approval",
     "type": "event"
   }
 ]
