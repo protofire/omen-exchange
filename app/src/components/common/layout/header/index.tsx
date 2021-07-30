@@ -325,7 +325,7 @@ const HeaderContainer: React.FC = (props: any) => {
           {account && (
             <HeaderButton onClick={() => setModalLockTokensState(!isModalLockTokensOpen)}>
               {relay
-                ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
+                ? `${formatBigNumber(omenBalance.add(xOmenBalance), STANDARD_DECIMALS, 0)}`
                 : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
               <OmenIconWrapper>
                 <IconOmen size={24} />
