@@ -22,7 +22,6 @@ import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { ModalTransactionWrapper } from '../../../modal'
-import { AssetBalance } from '../../common/asset_balance'
 import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
@@ -31,6 +30,7 @@ import { OutcomeTable } from '../common_sections/outcome_table'
 import { TransactionDetailsCard } from '../common_sections/transaction/transaction_details_card'
 import { TransactionDetailsLine } from '../common_sections/transaction/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../common_sections/transaction/transaction_details_row'
+import { AssetBalance } from '../common_sections/user_balances/asset_balance'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData

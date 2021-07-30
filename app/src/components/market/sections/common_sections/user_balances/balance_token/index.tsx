@@ -2,10 +2,10 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { formatBigNumber } from '../../../../util/tools'
-import { Token } from '../../../../util/types'
-import { FormRowLink } from '../../../common/form/form_row_link'
-import { FormRowNote } from '../../../common/form/form_row_note'
+import { formatBigNumber } from '../../../../../../util/tools'
+import { Token } from '../../../../../../util/types'
+import { FormRowLink } from '../../../../../common/form/form_row_link'
+import { FormRowNote } from '../../../../../common/form/form_row_note'
 
 interface Props {
   collateral: Token
