@@ -28,6 +28,7 @@ interface Props {
   fetchGraphMarketMakerData: () => Promise<void>
   fetchGraphMarketUserTxData: () => Promise<void>
 }
+
 export type SharedPropsInterface = {
   potentialProfit: BigNumber
   sharesTotal: string
@@ -122,6 +123,7 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     collateral,
     context,
   )
+
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals, collateral.decimals).includes('-'))
   }, [amount, collateral.decimals])
@@ -159,14 +161,17 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     },
     [balances, marketMaker, outcomeIndex, scalarHigh, scalarLow, isScalar],
   )
+
   const [tradedShares, probabilitiesOrNewPrediction, debouncedAmount] = useAsyncDerivedValue(
     amount || Zero,
     [new BigNumber(0), !isScalar ? balances.map(() => 0) : 0, amount],
     calcBuyAmount,
   )
+
   useEffect(() => {
     setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals, collateral.decimals).includes('-'))
   }, [amount, collateral.decimals])
+
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount || Zero)
 
   const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)))
@@ -177,27 +182,29 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
   const potentialProfitFormatted = `${formatNumber(
     formatBigNumber(potentialProfit, collateral.decimals, collateral.decimals),
   )} ${collateral.symbol}`
+
   const baseCost = debouncedAmount?.sub(feePaid)
   const baseCostFormatted = `${formatNumber(
     formatBigNumber(baseCost || Zero, collateral.decimals, collateral.decimals),
   )}
   ${collateral.symbol}`
+
   const collateralBalance = maybeCollateralBalance || Zero
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
-
   const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
   const currentBalance = `${formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5)}`
-
   const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const { fetchBalances } = context.balances
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
+
   const showSetAllowance =
     collateral.address !== pseudoNativeAssetAddress &&
     !context.cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
+
   const amountError =
     !isScalar && isTransactionProcessing
       ? null
@@ -217,6 +224,7 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     await unlock()
     setAllowanceFinished(true)
   }
+
   const setDisplayAmountToFund = (value: BigNumber) => {
     setAmount(value)
     setDisplayFundAmount(value)
@@ -225,9 +233,11 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
+
   const showUpgrade =
     (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
     (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+
   const upgradeProxy = async () => {
     if (!context.cpk) {
       return
@@ -315,6 +325,7 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     setTxState: context.setTxState,
     txState: context.txState,
   }
+
   return (
     <>
       {isScalar ? (
