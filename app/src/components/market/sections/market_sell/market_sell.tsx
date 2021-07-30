@@ -7,7 +7,6 @@ import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { BigNumberInputReturn } from '../../../../components/common/form/big_number_input'
-import { WarningMessage } from '../../../../components/market/common/warning_message'
 import {
   TransactionDetailsRow,
   ValueStates,
@@ -49,6 +48,7 @@ import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { SwitchTransactionToken } from '../../common/switch_transaction_token'
 import { TokenBalance } from '../../common/token_balance'
+import { WarningMessage } from '../common_sections/messages/warning_message'
 import { OutcomeTable } from '../common_sections/outcome_table'
 import { TransactionDetailsCard } from '../common_sections/transaction/transaction_details_card'
 import { TransactionDetailsLine } from '../common_sections/transaction/transaction_details_line'

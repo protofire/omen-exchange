@@ -2,8 +2,8 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { formatBigNumber } from '../../../../util/tools'
-import { Arbitrator, Token } from '../../../../util/types'
+import { formatBigNumber } from '../../../../../../util/tools'
+import { Arbitrator, Token } from '../../../../../../util/types'
 
 import { Invalid } from './img/Invalid'
 import { Lost } from './img/Lost'

@@ -24,8 +24,8 @@ import {
   RowWrapper,
 } from '../../../../common/common_styled'
 import { VerifiedRow } from '../../../../common/verified_row'
-import { WarningMessage } from '../../../../common/warning_message'
 import { DisplayArbitrator } from '../../../common_sections/arbitrators/display_arbitrator'
+import { WarningMessage } from '../../../common_sections/messages/warning_message'
 import { Outcome } from '../outcomes'
 
 const SubsectionTitleStyled = styled(SubsectionTitle)`
