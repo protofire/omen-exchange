@@ -1,4 +1,7 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber, formatUnits } from 'ethers/utils'
+
+import { isDust } from './web3'
 
 /**
  * Formats BigNumber value to string (used mostly for displaying)
@@ -8,6 +11,7 @@ import { BigNumber, formatUnits } from 'ethers/utils'
  * @param strict - If strict is set to true string returned will not be modified by formatNumber function which returns '<0.01' if value is small
  */
 export const bigNumberToString = (value: BigNumber, decimals: number, precision = 2, strict = false): string => {
+  if (isDust(value, decimals)) return bigNumberToNumber(Zero, decimals).toFixed(precision)
   if (strict) return bigNumberToNumber(value, decimals).toFixed(precision)
   return formatNumber(formatUnits(value, decimals), precision)
 }

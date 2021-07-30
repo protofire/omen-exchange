@@ -15,7 +15,6 @@ import {
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
   getInitialCollateral,
-  isDust,
   mulBN,
 } from '../../../../util/tools'
 import {
@@ -201,9 +200,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     i === outcomeIndex ? balance.shares.sub(amountShares || Zero) : balance.shares,
   )
 
-  const selectedOutcomeBalance = isDust(balanceItem.shares, collateral.decimals)
-    ? '0.00'
-    : bigNumberToString(balanceItem.shares, collateral.decimals)
+  const selectedOutcomeBalance = bigNumberToString(balanceItem.shares, collateral.decimals)
 
   const amountError = isTransactionProcessing
     ? null
