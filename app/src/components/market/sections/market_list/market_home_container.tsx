@@ -29,7 +29,7 @@ import { ButtonCSS } from '../../../button/button_styling_types'
 import { IconClose } from '../../../common/icons'
 
 import xDaiIntergation from './img/xDaiIntegration.svg'
-import { MarketHome } from './market_home'
+import { MarketHome, myMarketsSortOptions } from './market_home'
 
 const Banner = styled.div`
   ${ButtonCSS};
@@ -148,17 +148,23 @@ const MarketHomeContainer: React.FC = () => {
   if (searchRoute) searchRoute = searchRoute.split('&')[0]
 
   let sortParam: Maybe<MarketsSortCriteria> = stateRoute === 'MY_MARKETS' ? 'openingTimestamp' : 'usdLiquidityParameter'
+  let sortIndex: number = stateRoute === 'MY_MARKETS' ? 1 : 2
   if (sortRoute === '24h-volume') {
+    sortIndex = 0
     sortParam = `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria
   } else if (sortRoute === 'volume') {
+    sortIndex = 1
     sortParam = 'usdVolume'
+  } else if (sortRoute === 'liquidity') {
+    sortIndex = 2
+    sortParam = 'usdLiquidityParameter'
   } else if (sortRoute === 'newest') {
+    sortIndex = 3
     sortParam = 'creationTimestamp'
   } else if (sortRoute === 'ending') {
+    sortIndex = 4
     sortParam = 'openingTimestamp'
     sortDirection = 'asc'
-  } else if (sortRoute === 'liquidity') {
-    sortParam = 'usdLiquidityParameter'
   }
 
   let currencyParam: string | null
@@ -219,6 +225,7 @@ const MarketHomeContainer: React.FC = () => {
     state: stateParam,
     category: categoryParam,
     title: searchParam,
+    sortIndex: sortIndex,
     sortBy: sortParam,
     sortByDirection: sortDirection,
     arbitrator: arbitratorParam,
@@ -355,12 +362,12 @@ const MarketHomeContainer: React.FC = () => {
     let newFilter = filter
     if (
       filter.state === MarketStates.myMarkets &&
-      filter.sortBy !== 'openingTimestamp' &&
-      filter.sortBy !== 'creationTimestamp'
+      filter.sortIndex &&
+      filter.sortIndex >= myMarketsSortOptions.length
     ) {
       newFilter = {
         ...filter,
-        sortBy: 'openingTimestamp',
+        sortIndex: 1,
       }
     }
 

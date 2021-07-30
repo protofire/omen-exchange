@@ -276,6 +276,7 @@ export interface MarketFilters {
   state: MarketStates
   category: string
   title: Maybe<string>
+  sortIndex: Maybe<number>
   sortBy: Maybe<MarketsSortCriteria>
   sortByDirection: 'desc' | 'asc'
   arbitrator: Maybe<string>
