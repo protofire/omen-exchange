@@ -135,11 +135,10 @@ export const ModalDepositWithdraw = (props: Props) => {
       )
     } else if (exchange === ExchangeType.withdraw && symbol === 'DAI') {
       const nativeAsset = getNativeAsset(networkIds.XDAI)
-
       return { ...nativeAsset, balance: xDaiBalance ? xDaiBalance.toString() : '0' }
     } else return xDaiTokens.find(token => token.symbol === (symbol === 'DAI' ? 'xDAI' : symbol))
   }
-  const { address, balance, decimals, symbol } =
+  const { address, balance, decimals, image, symbol } =
     findCurrentTokenBasedOnAction(exchangeType, currencySelected.toUpperCase()) ||
     getToken(context.relay ? networkIds.XDAI : context.networkId, 'dai')
   const currentTokenMainnet = mainnetTokens.find(element => element.symbol === symbol)
@@ -424,15 +423,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       <ModalTransactionWrapper
         confirmations={confirmations}
         confirmationsRequired={13}
-        icon={
-          <Image
-            size={'24'}
-            src={getImageUrl(
-              currentTokenMainnet && currentTokenMainnet.address ? currentTokenMainnet.address : address,
-            )}
-            style={{ marginLeft: '10px' }}
-          />
-        }
+        icon={<Image size={'24'} src={image} style={{ marginLeft: '10px' }} />}
         isOpen={isTransactionModalOpen}
         message={message}
         netId={txNetId}
