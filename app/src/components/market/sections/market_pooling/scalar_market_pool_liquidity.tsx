@@ -57,11 +57,11 @@ import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
 import { SetAllowance } from '../../common/set_allowance'
 import { SwitchTransactionToken } from '../../common/switch_transaction_token'
-import { TokenBalance } from '../../common/token_balance'
 import { WarningMessage } from '../common_sections/messages/warning_message'
 import { TransactionDetailsCard } from '../common_sections/transaction/transaction_details_card'
 import { TransactionDetailsLine } from '../common_sections/transaction/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../common_sections/transaction/transaction_details_row'
+import { TokenBalance } from '../common_sections/user_balances/token_balance'
 
 import { UserPoolData } from './user_pool_data'
 

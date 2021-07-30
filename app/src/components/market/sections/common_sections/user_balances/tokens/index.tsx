@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { DEFAULT_TOKEN } from '../../../../common/constants'
-import { useContracts } from '../../../../hooks'
-import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { getToken } from '../../../../util/networks'
-import { Token } from '../../../../util/types'
-import { Select } from '../../../common/form/select'
+import { DEFAULT_TOKEN } from '../../../../../../common/constants'
+import { useContracts } from '../../../../../../hooks'
+import { ConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
+import { getToken } from '../../../../../../util/networks'
+import { Token } from '../../../../../../util/types'
+import { Select } from '../../../../../common/form/select'
 
 interface Props {
   autoFocus?: boolean

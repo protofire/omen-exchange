@@ -1,7 +1,7 @@
 import React from 'react'
 
-import { getMarketTitles } from '../../../../util/tools'
-import { SubsectionTitle } from '../../../common'
+import { getMarketTitles } from '../../../../../../util/tools'
+import { SubsectionTitle } from '../../../../../common'
 
 interface Props {
   title?: string

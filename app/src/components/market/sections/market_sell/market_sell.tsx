@@ -47,11 +47,11 @@ import { ModalTransactionWrapper } from '../../../modal'
 import { GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { SwitchTransactionToken } from '../../common/switch_transaction_token'
-import { TokenBalance } from '../../common/token_balance'
 import { WarningMessage } from '../common_sections/messages/warning_message'
 import { OutcomeTable } from '../common_sections/outcome_table'
 import { TransactionDetailsCard } from '../common_sections/transaction/transaction_details_card'
 import { TransactionDetailsLine } from '../common_sections/transaction/transaction_details_line'
+import { TokenBalance } from '../common_sections/user_balances/token_balance'
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;

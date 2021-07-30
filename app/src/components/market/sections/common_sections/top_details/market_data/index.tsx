@@ -4,12 +4,12 @@ import momentTZ from 'moment-timezone'
 import React, { DOMAttributes, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useSymbol, useTokens } from '../../../../hooks'
-import { CompoundService } from '../../../../services'
-import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../util/networks'
-import { formatBigNumber, formatDate, formatToShortNumber, getBaseTokenForCToken } from '../../../../util/tools'
-import { CompoundTokenType, Token } from '../../../../util/types'
-import { TextToggle } from '../TextToggle'
+import { useConnectedWeb3Context, useSymbol, useTokens } from '../../../../../../hooks'
+import { CompoundService } from '../../../../../../services'
+import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../../../util/networks'
+import { formatBigNumber, formatDate, formatToShortNumber, getBaseTokenForCToken } from '../../../../../../util/tools'
+import { CompoundTokenType, Token } from '../../../../../../util/types'
+import { TextToggle } from '../../../../common/TextToggle'
 
 const MarketDataWrapper = styled.div`
   display: flex;
