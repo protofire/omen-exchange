@@ -6,10 +6,11 @@ import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../hooks'
 import { useKlerosCuration } from '../../../../hooks/useKlerosCuration'
-import { MarketDetailsTab, MarketMakerData, Status } from '../../../../util/types'
+import { MarketDetailsTab, MarketMakerData, Status, TransactionStep } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
-import { FullLoading, InlineLoading } from '../../../loading'
+import { InlineLoading } from '../../../loading'
+import { ModalTransactionWrapper } from '../../../modal'
 import { CurationRow, GenericError } from '../../common/common_styled'
 
 import { DxDaoCuration } from './option/dxdao_curation'
@@ -39,7 +40,8 @@ interface Props extends RouteComponentProps<any> {
 const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   const { context, fetchGraphMarketMakerData, marketMakerData } = props || {}
   const [selection, setSelection] = useState<number | undefined>()
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [message, setMessage] = useState<string>('')
   const { data, error, status, syncAndRefetchData } = useKlerosCuration(
     marketMakerData,
     context,
@@ -47,7 +49,7 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   )
 
   const history = useHistory()
-  const cpk = context.cpk
+  const { cpk, setTxState, txHash, txState } = context
 
   const selectSource = useCallback(
     (value: number) => {
@@ -65,13 +67,11 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
   const { address, curatedByDxDao, question } = marketMakerData || {}
   const { title } = question || {}
   useEffect(() => {
-    if (isModalOpen && verificationState != 1) setIsModalOpen(false)
+    if (isTransactionModalOpen && verificationState != 1) setIsTransactionModalOpen(false)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [marketVerificationData])
   const onSubmitMarket = useCallback(async () => {
     try {
-      setIsModalOpen(true)
-
       const columns = [
         {
           label: 'Question',
@@ -89,9 +89,12 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
 
       const encodedParams = gtcrEncode({ columns, values })
       if (!cpk || !marketMakerData || !data || !ovmAddress) {
-        setIsModalOpen(false)
         return
       }
+
+      setIsTransactionModalOpen(true)
+      setMessage(`Requesting ${selection === 0 ? `Kleros` : `DxDao`} verification`)
+      setTxState(TransactionStep.waitingConfirmation)
 
       const transaction = await cpk.requestVerification({
         params: encodedParams,
@@ -103,11 +106,12 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
         await syncAndRefetchData(transaction.blockNumber)
       }
 
-      setIsModalOpen(false)
+      setMessage(`Successfully requested ${selection === 0 ? `Kleros` : `DxDao`} verification`)
     } catch {
-      setIsModalOpen(false)
+      setIsTransactionModalOpen(false)
+      setTxState(TransactionStep.error)
     }
-  }, [address, data, ovmAddress, title, marketMakerData, cpk, syncAndRefetchData])
+  }, [address, data, ovmAddress, title, marketMakerData, cpk, syncAndRefetchData, selection, setTxState])
 
   if (!loading && errorMessage) return <GenericError>{errorMessage || 'Failed to fetch curation data'}</GenericError>
 
@@ -133,7 +137,15 @@ const MarketVerifyWrapper: React.FC<Props> = (props: Props) => {
           Request Verification
         </Button>
       </BottomButtonWrapper>
-      {isModalOpen && <FullLoading message={`Requesting ${selection === 0 ? `Kleros` : `DxDao`} verification`} />}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={message}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={txHash}
+        txState={txState}
+      />
     </MarketVerification>
   )
 }
