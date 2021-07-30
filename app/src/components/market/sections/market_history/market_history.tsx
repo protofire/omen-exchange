@@ -2,7 +2,7 @@ import React from 'react'
 import { RouteComponentProps, withRouter } from 'react-router-dom'
 
 import { MarketMakerData } from '../../../../util/types'
-import { HistorySelectContainer } from '../../common/history_section'
+import { HistorySelectContainer } from '../common_sections/outcome_table/history/history_section'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
