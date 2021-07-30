@@ -26,11 +26,11 @@ import { AssetBalance } from '../../common/asset_balance'
 import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
-import { OutcomeTable } from '../../common/outcome_table'
 import { SetAllowance } from '../../common/set_allowance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
+import { OutcomeTable } from '../common_sections/outcome_table'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData
