@@ -110,7 +110,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const { exchangeType, fetchBalances, isOpen, mainnetTokens, onBack, onClose, theme, xDaiBalance, xDaiTokens } = props
 
   const context = useConnectedWeb3Context()
-  const cpk = context.cpk
+  const { cpk, setTxHash, setTxState, txHash, txState } = context
 
   const [currencySelected, setCurrencySelected] = useState<KnownToken>('dai')
 
@@ -118,8 +118,6 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
 
-  const [txHash, setTxHash] = useState('')
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
   const [txNetId, setTxNetId] = useState()
   const [confirmations, setConfirmations] = useState(0)
   const [message, setMessage] = useState('')
@@ -137,11 +135,10 @@ export const ModalDepositWithdraw = (props: Props) => {
       )
     } else if (exchange === ExchangeType.withdraw && symbol === 'DAI') {
       const nativeAsset = getNativeAsset(networkIds.XDAI)
-
       return { ...nativeAsset, balance: xDaiBalance ? xDaiBalance.toString() : '0' }
     } else return xDaiTokens.find(token => token.symbol === (symbol === 'DAI' ? 'xDAI' : symbol))
   }
-  const { address, balance, decimals, symbol } =
+  const { address, balance, decimals, image, symbol } =
     findCurrentTokenBasedOnAction(exchangeType, currencySelected.toUpperCase()) ||
     getToken(context.relay ? networkIds.XDAI : context.networkId, 'dai')
   const currentTokenMainnet = mainnetTokens.find(element => element.symbol === symbol)
@@ -215,23 +212,18 @@ export const ModalDepositWithdraw = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
       setIsTransactionModalOpen(true)
+      const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
+      setTxNetId(provider.network.chainId)
 
-      const hash =
+      const transaction =
         exchangeType === ExchangeType.deposit
           ? await cpk.sendMainnetTokenToBridge(displayFundAmount, address, symbol)
-          : await cpk.sendXdaiChainTokenToBridge(
-              displayFundAmount,
+          : await cpk.sendXdaiChainTokenToBridge({
+              amount: displayFundAmount,
               address,
-              {
-                setTxState,
-                setTxHash,
-              },
               symbol,
-            )
-
-      const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
-
-      setTxNetId(provider.network.chainId)
+            })
+      const hash = transaction.transactionHash || transaction.hash
       setTxHash(hash)
 
       await waitForConfirmations(hash, provider, setConfirmations, setTxState, 13)
@@ -239,7 +231,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       if (exchangeType === ExchangeType.deposit && symbol !== 'DAI') {
         await XdaiService.waitForBridgeMessageStatus(hash, context.library)
       }
-      if (exchangeType === ExchangeType.withdraw && symbol !== 'DAI') {
+      if (exchangeType === ExchangeType.withdraw && symbol !== 'xDAI') {
         await XdaiService.waitForClaimSignature(hash, context.library)
       }
       setTxState(TransactionStep.transactionConfirmed)
@@ -431,15 +423,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       <ModalTransactionWrapper
         confirmations={confirmations}
         confirmationsRequired={13}
-        icon={
-          <Image
-            size={'24'}
-            src={getImageUrl(
-              currentTokenMainnet && currentTokenMainnet.address ? currentTokenMainnet.address : address,
-            )}
-            style={{ marginLeft: '10px' }}
-          />
-        }
+        icon={<Image size={'24'} src={image} style={{ marginLeft: '10px' }} />}
         isOpen={isTransactionModalOpen}
         message={message}
         netId={txNetId}

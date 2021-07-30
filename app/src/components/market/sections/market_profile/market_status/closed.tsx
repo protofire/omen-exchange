@@ -142,8 +142,8 @@ const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { fetchBalances } = context.balances
 
-  const { account, cpk, library: provider, networkId, relay } = context
-  const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
+  const { account, cpk, library: provider, networkId, relay, setTxState, txHash, txState } = context
+  const { buildMarketMaker, buildOracle, conditionalTokens, realitio } = useContracts(context)
 
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props
 
@@ -168,14 +168,13 @@ const Wrapper = (props: Props) => {
 
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
-  const [txHash, setTxHash] = useState('')
   const [userRealitioWithdraw, setUserRealitioWithdraw] = useState(false)
   const [cpkRealitioWithdraw, setCpkRealitioWithdraw] = useState(false)
   const [userRealitioBalance, setUserRealitioBalance] = useState(Zero)
   const [cpkRealitioBalance, setCpkRealitioBalance] = useState(Zero)
 
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
+  const oracle = useMemo(() => buildOracle(marketMakerData.oracle), [buildOracle, marketMakerData.oracle])
 
   const resolveCondition = async () => {
     if (!cpk) {
@@ -195,8 +194,6 @@ const Wrapper = (props: Props) => {
         scalarHigh,
         question,
         numOutcomes: balances.length,
-        setTxHash,
-        setTxState,
       })
 
       await fetchGraphMarketMakerData()
@@ -270,7 +267,7 @@ const Wrapper = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
-      await realitio.withdraw(setTxHash, setTxState)
+      await realitio.withdraw()
       await fetchBalances()
       await getRealitioBalance()
 
@@ -298,7 +295,7 @@ const Wrapper = (props: Props) => {
       await cpk.redeemPositions({
         isConditionResolved,
         // Round down in case of precision error
-        earnedCollateral: earnedCollateral ? earnedCollateral.mul(99999999).div(100000000) : new BigNumber('0'),
+        amount: earnedCollateral ? earnedCollateral.mul(99999999).div(100000000) : new BigNumber('0'),
         question,
         numOutcomes: balances.length,
         oracle,
@@ -306,12 +303,10 @@ const Wrapper = (props: Props) => {
         isScalar,
         scalarLow,
         scalarHigh,
-        collateralToken,
+        collateral: collateralToken,
         marketMaker,
         conditionalTokens,
         realitioBalance: cpkRealitioBalance,
-        setTxHash,
-        setTxState,
       })
       await fetchBalances()
       await getRealitioBalance()
