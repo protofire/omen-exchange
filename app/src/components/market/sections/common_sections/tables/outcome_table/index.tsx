@@ -17,9 +17,9 @@ import {
   TDStyled,
   THStyled,
 } from '../../../../common/common_styled'
-import { NewValue } from '../../../../common/new_value'
 import { WinningBadge } from '../../../../common/winning_badge'
-import { BarDiagram } from '../../bottom_card_details/categorical/bar_diagram_probabilities'
+import { BarDiagram } from '../../card_bottom_details/categorical/bar_diagram_probabilities'
+import { NewValue } from '../new_value'
 
 interface Props {
   balances: BalanceItem[]
