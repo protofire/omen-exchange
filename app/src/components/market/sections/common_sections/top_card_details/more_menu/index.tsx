@@ -1,7 +1,7 @@
 import React, { DOMAttributes, useCallback, useState } from 'react'
 import styled, { css } from 'styled-components'
 
-import { IconMore } from '../../icons'
+import { IconMore } from '../../../../../common/icons'
 
 const MoreButtonWidth = '40px'
 

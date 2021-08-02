@@ -12,11 +12,11 @@ import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../..
 import { getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../../../util/tools'
 import { MarketMakerData, MarketState, Token } from '../../../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../../../common'
-import { AdditionalMarketData } from '../../../../common/additional_market_data'
 import { CurrencySelector } from '../../../../common/currency_selector'
-import { ProgressBar } from '../../../../common/progress_bar'
-import { ProgressBarToggle } from '../../../../common/progress_bar/toggle'
+import { AdditionalMarketData } from '../additional_market_data'
 import { MarketData } from '../market_data'
+import { ProgressBar } from '../progress_bar'
+import { ProgressBarToggle } from '../progress_bar/toggle'
 
 const SubsectionTitleLeftWrapper = styled.div`
   display: flex;

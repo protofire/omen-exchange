@@ -2,12 +2,12 @@ import React, { DOMAttributes, useEffect, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useRealityLink } from '../../../../hooks'
-import { CompoundService } from '../../../../services/compound_service'
-import { networkIds } from '../../../../util/networks'
-import { Arbitrator, CompoundTokenType, KlerosItemStatus, KlerosSubmission, Token } from '../../../../util/types'
-import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
-import { CompoundIconNoBorder } from '../../../common/icons/currencies/CompoundIconNoBorder'
+import { useConnectedWeb3Context, useRealityLink } from '../../../../../../hooks'
+import { CompoundService } from '../../../../../../services/compound_service'
+import { networkIds } from '../../../../../../util/networks'
+import { Arbitrator, CompoundTokenType, KlerosItemStatus, KlerosSubmission, Token } from '../../../../../../util/types'
+import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../../../common/icons'
+import { CompoundIconNoBorder } from '../../../../../common/icons/currencies/CompoundIconNoBorder'
 
 const AdditionalMarketDataWrapper = styled.div`
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
