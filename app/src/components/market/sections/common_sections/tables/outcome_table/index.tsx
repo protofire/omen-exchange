@@ -3,13 +3,13 @@ import { BigNumber } from 'ethers/utils'
 import React, { useCallback } from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useSymbol } from '../../../../../hooks'
-import { getOutcomeColor } from '../../../../../theme/utils'
-import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../../util/networks'
-import { formatBigNumber, formatNumber, getBaseTokenForCToken, mulBN } from '../../../../../util/tools'
-import { BalanceItem, BondItem, CompoundTokenType, OutcomeTableValue, Token } from '../../../../../util/types'
-import { RadioInput, TD, THead, TR, Table } from '../../../../common'
-import { BarDiagram } from '../../../common/bar_diagram_probabilities'
+import { useConnectedWeb3Context, useSymbol } from '../../../../../../hooks'
+import { getOutcomeColor } from '../../../../../../theme/utils'
+import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../../../util/networks'
+import { formatBigNumber, formatNumber, getBaseTokenForCToken, mulBN } from '../../../../../../util/tools'
+import { BalanceItem, BondItem, CompoundTokenType, OutcomeTableValue, Token } from '../../../../../../util/types'
+import { RadioInput, TD, THead, TR, Table } from '../../../../../common'
+import { BarDiagram } from '../../../../common/bar_diagram_probabilities'
 import {
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,
@@ -17,9 +17,9 @@ import {
   PaddingCSS,
   TDStyled,
   THStyled,
-} from '../../../common/common_styled'
-import { NewValue } from '../../../common/new_value'
-import { WinningBadge } from '../../../common/winning_badge'
+} from '../../../../common/common_styled'
+import { NewValue } from '../../../../common/new_value'
+import { WinningBadge } from '../../../../common/winning_badge'
 
 interface Props {
   balances: BalanceItem[]

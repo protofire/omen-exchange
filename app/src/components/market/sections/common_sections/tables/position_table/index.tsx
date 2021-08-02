@@ -2,17 +2,17 @@ import { BigNumber, parseUnits } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { useCompoundService, useConnectedWeb3Context, useSymbol } from '../../../../hooks'
-import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../util/networks'
+import { useCompoundService, useConnectedWeb3Context, useSymbol } from '../../../../../../hooks'
+import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../../../util/networks'
 import {
   formatBigNumber,
   formatNumber,
   getBaseTokenForCToken,
   isDust,
   roundNumberStringToSignificantDigits,
-} from '../../../../util/tools'
-import { BalanceItem, CompoundTokenType, PositionTableValue, Token } from '../../../../util/types'
-import { TD, THead, TR, Table } from '../../../common'
+} from '../../../../../../util/tools'
+import { BalanceItem, CompoundTokenType, PositionTableValue, Token } from '../../../../../../util/types'
+import { TD, THead, TR, Table } from '../../../../../common'
 import {
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,
@@ -20,7 +20,7 @@ import {
   PaddingCSS,
   TDStyled,
   THStyled,
-} from '../../common/common_styled'
+} from '../../../../common/common_styled'
 
 const TableWrapper = styled.div`
   margin-left: -24px

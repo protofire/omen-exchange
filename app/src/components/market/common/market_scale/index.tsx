@@ -29,8 +29,8 @@ import {
   TradeType,
 } from '../../../../util/types'
 import { IconDraggable } from '../../../common/icons'
+import { PositionTable } from '../../sections/common_sections/tables/position_table'
 import { SCALE_HEIGHT } from '../common_styled'
-import { PositionTable } from '../position_table'
 
 import { ValueBoxes } from './value_boxes'
 
