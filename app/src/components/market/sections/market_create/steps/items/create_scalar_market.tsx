@@ -12,7 +12,7 @@ import { DateField, FormRow, Textfield } from '../../../../../common'
 import { BigNumberInput, BigNumberInputReturn } from '../../../../../common/form/big_number_input'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { Arbitrators } from '../../../common_sections/arbitrators/arbitrators'
-import { WarningMessage } from '../../../common_sections/messages/warning_message'
+import { WarningMessage } from '../../../common_sections/messages_text/warning_message'
 import { Categories } from '../../../common_sections/search_filter_categories/categories'
 
 import { ButtonCategory, ButtonCategoryTextOverflow } from './ask_question_step'

@@ -21,7 +21,7 @@ import { BigNumberInputReturn } from '../../common/form/big_number_input'
 import { IconArrowBack, IconClose } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
 import { IconInfo } from '../../common/tooltip/img/IconInfo'
-import { Image } from '../../market/sections/common_sections/messages/token_item'
+import { Image } from '../../market/sections/common_sections/messages_text/token_item'
 import {
   BalanceItem,
   BalanceItemBalance,

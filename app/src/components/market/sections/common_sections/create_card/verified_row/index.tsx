@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { IconAlert, IconVerified } from '../../../common/icons'
+import { IconAlert, IconVerified } from '../../../../../common/icons'
 
 const Wrapper = styled.span<{ verified: boolean }>`
   display: flex;

@@ -7,7 +7,7 @@ import { formatBigNumber } from '../../../../../../util/tools'
 import { Token } from '../../../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../../../common/form/dropdown'
 import { Spinner } from '../../../../../loading/spinner'
-import { TokenItem } from '../../messages/token_item'
+import { TokenItem } from '../../messages_text/token_item'
 
 const Wrapper = styled.div`
   display: flex;

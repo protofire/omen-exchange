@@ -1,9 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { getCTokenForToken } from '../../../../util/tools'
-import { IconTick } from '../../../common/icons'
-import { CompoundIcon } from '../../../common/icons/currencies/CompoundIcon'
+import { getCTokenForToken } from '../../../../../../util/tools'
+import { IconTick } from '../../../../../common/icons'
+import { CompoundIcon } from '../../../../../common/icons/currencies/CompoundIcon'
 
 const Wrapper = styled.div`
   border-radius: 4px;

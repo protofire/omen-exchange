@@ -14,9 +14,9 @@ import { BigNumberInputReturn } from '../../../../../common/form/big_number_inpu
 import { CommonDisabledCSS } from '../../../../../common/form/common_styled'
 import { QuestionInput } from '../../../../../common/form/question_input'
 import { MarginsButton } from '../../../../common/common_styled'
-import { CreateCard } from '../../../../common/create_card'
 import { Arbitrators } from '../../../common_sections/arbitrators/arbitrators'
-import { WarningMessage } from '../../../common_sections/messages/warning_message'
+import { CreateCard } from '../../../common_sections/create_card'
+import { WarningMessage } from '../../../common_sections/messages_text/warning_message'
 import { Categories } from '../../../common_sections/search_filter_categories/categories'
 import { Outcome, Outcomes } from '../outcomes'
 

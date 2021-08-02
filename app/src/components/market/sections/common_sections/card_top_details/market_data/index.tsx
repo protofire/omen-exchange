@@ -9,7 +9,7 @@ import { CompoundService } from '../../../../../../services'
 import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../../../util/networks'
 import { formatBigNumber, formatDate, formatToShortNumber, getBaseTokenForCToken } from '../../../../../../util/tools'
 import { CompoundTokenType, Token } from '../../../../../../util/types'
-import { TextToggle } from '../../../../common/TextToggle'
+import { TextToggle } from '../../messages_text/TextToggle'
 
 const MarketDataWrapper = styled.div`
   display: flex;

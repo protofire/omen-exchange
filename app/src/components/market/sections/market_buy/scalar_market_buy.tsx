@@ -47,7 +47,7 @@ import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_s
 import { SetAllowance } from '../common_sections/allowance/set_allowance'
 import { GridTransactionDetails } from '../common_sections/card_bottom_details/grid_transaction_details'
 import { MarketScale } from '../common_sections/card_bottom_details/scalar/market_scale'
-import { WarningMessage } from '../common_sections/messages/warning_message'
+import { WarningMessage } from '../common_sections/messages_text/warning_message'
 import { CurrencySelector } from '../common_sections/user_transactions_tokens/currency_selector'
 import { TransactionDetailsCard } from '../common_sections/user_transactions_tokens/transaction/transaction_details_card'
 import { TransactionDetailsLine } from '../common_sections/user_transactions_tokens/transaction/transaction_details_line'

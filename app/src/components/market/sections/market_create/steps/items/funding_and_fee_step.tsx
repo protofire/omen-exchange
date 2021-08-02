@@ -24,7 +24,6 @@ import { ButtonType } from '../../../../../button/button_styling_types'
 import { BigNumberInput, SubsectionTitle, TextfieldCustomPlaceholder } from '../../../../../common'
 import { BigNumberInputReturn } from '../../../../../common/form/big_number_input'
 import { TitleValue } from '../../../../../common/text/title_value'
-import { AddCompoundService } from '../../../../common/add_compound_service'
 import {
   CurrenciesWrapper,
   GenericError,
@@ -40,13 +39,14 @@ import {
   OutcomesTable,
   OutcomesTableWrapper,
 } from '../../../../common/common_styled'
-import { CreateCard } from '../../../../common/create_card'
-import { VerifiedRow } from '../../../../common/verified_row'
 import { SetAllowance } from '../../../common_sections/allowance/set_allowance'
 import { DisplayArbitrator } from '../../../common_sections/arbitrators/display_arbitrator'
 import { GridTransactionDetails } from '../../../common_sections/card_bottom_details/grid_transaction_details'
 import { MarketScale } from '../../../common_sections/card_bottom_details/scalar/market_scale'
-import { WarningMessage } from '../../../common_sections/messages/warning_message'
+import { CreateCard } from '../../../common_sections/create_card'
+import { AddCompoundService } from '../../../common_sections/create_card/add_compound_service'
+import { VerifiedRow } from '../../../common_sections/create_card/verified_row'
+import { WarningMessage } from '../../../common_sections/messages_text/warning_message'
 import { CurrencySelector } from '../../../common_sections/user_transactions_tokens/currency_selector'
 import { TradingFeeSelector } from '../../../common_sections/user_transactions_tokens/trading_fee_selector'
 import { TransactionDetailsCard } from '../../../common_sections/user_transactions_tokens/transaction/transaction_details_card'

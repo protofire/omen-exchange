@@ -1,7 +1,7 @@
 import React, { MouseEventHandler } from 'react'
 import styled from 'styled-components'
 
-import { IconMiniDown, IconMiniUp } from '../../../common/icons'
+import { IconMiniDown, IconMiniUp } from '../../../../../common/icons'
 
 interface Props {
   mainLabel: string

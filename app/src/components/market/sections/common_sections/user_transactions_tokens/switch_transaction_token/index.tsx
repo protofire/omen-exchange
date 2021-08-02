@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Token } from '../../../../util/types'
-import { IconReceiveAsset } from '../../../common/icons'
+import { Token } from '../../../../../../util/types'
+import { IconReceiveAsset } from '../../../../../common/icons'
 
 const SwitchComponentWrapper = styled.div`
   text-align: right;

@@ -23,9 +23,9 @@ import {
   PercentWrapper,
   RowWrapper,
 } from '../../../../common/common_styled'
-import { VerifiedRow } from '../../../../common/verified_row'
 import { DisplayArbitrator } from '../../../common_sections/arbitrators/display_arbitrator'
-import { WarningMessage } from '../../../common_sections/messages/warning_message'
+import { VerifiedRow } from '../../../common_sections/create_card/verified_row'
+import { WarningMessage } from '../../../common_sections/messages_text/warning_message'
 import { Outcome } from '../outcomes'
 
 const SubsectionTitleStyled = styled(SubsectionTitle)`
