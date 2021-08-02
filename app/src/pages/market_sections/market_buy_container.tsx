@@ -197,7 +197,8 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
   const { fetchBalances } = context.balances
 
   const [allowanceFinished, setAllowanceFinished] = useState(false)
-  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
+  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount || Zero))
+
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   const showSetAllowance =
