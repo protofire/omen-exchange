@@ -6,7 +6,7 @@ import { verifyProxyAddress } from '../../util/cpk'
 import { getLogger } from '../../util/logger'
 import { bridgeTokensList, getTargetSafeImplementation } from '../../util/networks'
 import { getBySafeTx, signaturesFormatted, waitABit, waitForBlockToSync } from '../../util/tools'
-import { MarketData, Question, Token } from '../../util/types'
+import { MarketData, Question, Token, TransactionStep } from '../../util/types'
 import { ConditionalTokenService } from '../conditional_token'
 import { MarketMakerService } from '../market_maker'
 import { MarketMakerFactoryService } from '../market_maker_factory'
@@ -457,10 +457,12 @@ class CPKService {
       const signer = this.provider.getSigner()
       const ovm = new OvmService()
       const contractInstance = await ovm.createOvmContractInstance(signer, ovmAddress)
-
       const txObject = await ovm.generateTransaction(params, contractInstance, submissionDeposit)
-
-      return this.waitForTransaction(txObject)
+      this.context?.setTxState(TransactionStep.transactionSubmitted)
+      this.context?.setTxHash(txObject.hash)
+      const transaction = await this.waitForTransaction(txObject)
+      this.context?.setTxState(TransactionStep.transactionConfirmed)
+      return transaction
     } catch (err) {
       logger.error('Error while requesting market verification via Kleros!', err.message)
       throw err
