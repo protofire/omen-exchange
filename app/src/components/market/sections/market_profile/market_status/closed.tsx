@@ -9,6 +9,7 @@ import { STANDARD_DECIMALS } from '../../../../../common/constants'
 import { useContracts, useGraphMarketUserTxData, useSymbol } from '../../../../../hooks'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { MarketBuyContainer } from '../../../../../pages/market_sections/market_buy_container'
+import { MarketSellContainer } from '../../../../../pages/market_sections/market_sell_container'
 import { ERC20Service, RealitioService } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
 import { getContractAddress, getNativeAsset } from '../../../../../util/networks'
@@ -33,7 +34,6 @@ import { ViewCard } from '../../../common/view_card'
 import { MarketHistoryContainer } from '../../market_history/market_history_container'
 import { MarketNavigation } from '../../market_navigation'
 import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
-import { MarketSellContainer } from '../../market_sell/market_sell_container'
 
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
