@@ -1,36 +1,16 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React from 'react'
 import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { DOCUMENT_FAQ, STANDARD_DECIMALS } from '../../../../common/constants'
-import {
-  useCollateralBalance,
-  useConnectedWeb3Context,
-  useContracts,
-  useCpkAllowance,
-  useCpkProxy,
-  useFundingBalance,
-} from '../../../../hooks'
-import { getLogger } from '../../../../util/logger'
-import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { DOCUMENT_FAQ } from '../../../../common/constants'
+import { useConnectedWeb3Context } from '../../../../hooks'
+import { SharedPropsInterface } from '../../../../pages/market_sections/market_pool_liquidity_container'
+import { getNativeAsset } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import {
-  bigNumberToString,
-  calcAddFundingSendAmounts,
-  calcPoolTokens,
-  calcRemoveFundingSendAmounts,
-  getInitialCollateral,
-} from '../../../../util/tools'
-import {
-  MarketDetailsTab,
-  MarketMakerData,
-  OutcomeTableValue,
-  Ternary,
-  Token,
-  TransactionStep,
-} from '../../../../util/types'
+import { bigNumberToString, calcAddFundingSendAmounts, calcRemoveFundingSendAmounts } from '../../../../util/tools'
+import { MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -54,6 +34,7 @@ interface Props extends RouteComponentProps<any> {
   theme?: any
   switchMarketTab: (arg0: MarketDetailsTab) => void
   fetchGraphMarketMakerData: () => Promise<void>
+  sharedProps: SharedPropsInterface
 }
 
 enum Tabs {
@@ -75,74 +56,57 @@ const SetAllowanceStyled = styled(SetAllowance)`
   margin-bottom: 20px;
 `
 
-const logger = getLogger('Market::Fund')
-
 const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
-  const { fetchGraphMarketMakerData, marketMakerData } = props
-  const { address: marketMakerAddress, balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
+  const { marketMakerData, sharedProps } = props
+  const {
+    activeTab,
+    addFunding,
+    allowance,
+    allowanceFinished,
+    amountToFund,
+    amountToFundDisplay,
+    amountToRemove,
+    amountToRemoveDisplay,
+    collateral,
+    collateralAmountError,
+    collateralBalance,
+    depositedTokens,
+    depositedTokensTotal,
+    disableDepositButton,
+    disableDepositTab,
+    disableWithdrawButton,
+    feeFormatted,
+    fundingBalance,
+    isNegativeAmountToFund,
+    isNegativeAmountToRemove,
+    isTransactionModalOpen,
+    message,
+    poolTokens,
+    proxyIsUpToDate,
+    removeFunding,
+    setActiveTab,
+    setAmountToFund,
+    setAmountToFundDisplay,
+    setAmountToRemove,
+    setAmountToRemoveDisplay,
+    setIsTransactionModalOpen,
+    sharesAmountError,
+    sharesBalance,
+    shouldDisplayMaxButton,
+    showSetAllowance,
+    showUpgrade,
+    totalUserLiquidity,
+    txHash,
+    txState,
+    unlockCollateral,
+    upgradeFinished,
+    upgradeProxy,
+    walletBalance,
+  } = sharedProps
+  const { balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
   const history = useHistory()
   const context = useConnectedWeb3Context()
-  const { account, cpk, library: provider, networkId, relay, setTxState, txHash, txState } = context
-  const { fetchBalances } = context.balances
-
-  const { buildMarketMaker, conditionalTokens } = useContracts(context)
-  const marketMaker = buildMarketMaker(marketMakerAddress)
-
-  const signer = useMemo(() => provider.getSigner(), [provider])
-  const [allowanceFinished, setAllowanceFinished] = useState(false)
-
-  const initialCollateral = getInitialCollateral(context.networkId, marketMakerData.collateral, relay)
-  const [collateral, setCollateral] = useState<Token>(initialCollateral)
-
-  const [amountToFund, setAmountToFund] = useState<Maybe<BigNumber>>(new BigNumber(0))
-  const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
-  const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
-  const [amountToRemove, setAmountToRemove] = useState<Maybe<BigNumber>>(new BigNumber(0))
-  const [amountToRemoveDisplay, setAmountToRemoveDisplay] = useState<string>('')
-  const [isNegativeAmountToRemove, setIsNegativeAmountToRemove] = useState<boolean>(false)
-  const [message, setMessage] = useState<string>('')
-
-  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
-
-  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
-  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-
-  const [upgradeFinished, setUpgradeFinished] = useState(false)
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
-  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
-
-  useEffect(() => {
-    setIsNegativeAmountToFund((amountToFund || Zero).lt(Zero))
-  }, [amountToFund, collateral.decimals])
-
-  useEffect(() => {
-    setIsNegativeAmountToRemove((amountToRemove || Zero).lt(Zero))
-  }, [amountToRemove, collateral.decimals])
-
-  useEffect(() => {
-    setCollateral(initialCollateral)
-    setAmountToFund(null)
-    setAmountToFundDisplay('')
-    setAmountToRemove(null)
-    setAmountToRemoveDisplay('')
-    // eslint-disable-next-line
-  }, [marketMakerData.collateral.address])
-
-  const resolutionDate = marketMakerData.question.resolution.getTime()
-  const currentDate = new Date().getTime()
-  const disableDepositTab = currentDate > resolutionDate
-  const [activeTab, setActiveTab] = useState(disableDepositTab ? Tabs.withdraw : Tabs.deposit)
-
-  const feeFormatted = useMemo(() => `${bigNumberToString(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
-
-  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
-  const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
-
-  const poolTokens = calcPoolTokens(
-    amountToFund || Zero,
-    balances.map(b => b.holdings),
-    totalPoolShares,
-  )
+  const { networkId, relay } = context
 
   const sendAmountsAfterAddingFunding = calcAddFundingSendAmounts(
     amountToFund || Zero,
@@ -158,9 +122,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
-  const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
-    amount.lt(min) ? amount : min,
-  )
 
   const sharesAfterRemovingFunding = balances.map((balance, i) => {
     return balance.shares.add(sendAmountsAfterRemovingFunding[i]).sub(depositedTokens)
@@ -168,178 +129,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
 
   const showSharesChange = activeTab === Tabs.deposit ? amountToFund?.gt(0) : amountToRemove?.gt(0)
 
-  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
-    collateral,
-    context,
-  )
-  const collateralBalance = maybeCollateralBalance || Zero
   const probabilities = balances.map(balance => balance.probability)
-  const showSetAllowance =
-    collateral.address !== pseudoNativeAssetAddress &&
-    !cpk?.isSafeApp &&
-    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
-  const depositedTokensTotal = depositedTokens.add(userEarnings)
-  const { fetchFundingBalance, fundingBalance: maybeFundingBalance } = useFundingBalance(marketMakerAddress, context)
-  const fundingBalance = maybeFundingBalance || Zero
-
-  const walletBalance = bigNumberToString(collateralBalance, collateral.decimals, 5)
-  const sharesBalance = bigNumberToString(fundingBalance, collateral.decimals)
-
-  const totalUserShareAmounts = calcRemoveFundingSendAmounts(
-    fundingBalance,
-    balances.map(b => b.holdings),
-    totalPoolShares,
-  )
-
-  const totalDepositedTokens = totalUserShareAmounts.reduce((min: BigNumber, amount: BigNumber) =>
-    amount.lt(min) ? amount : min,
-  )
-
-  const totalUserLiquidity = totalDepositedTokens.add(userEarnings)
-
-  const addFunding = async () => {
-    try {
-      if (!cpk) {
-        return
-      }
-      if (!account) {
-        throw new Error('Please connect to your wallet to perform this action.')
-      }
-      if (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) {
-        throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
-      }
-
-      const fundsAmount = bigNumberToString(amountToFund || Zero, collateral.decimals)
-
-      setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
-
-      setTxState(TransactionStep.waitingConfirmation)
-      setIsTransactionProcessing(true)
-      setIsTransactionModalOpen(true)
-
-      await cpk.addFunding({
-        amount: amountToFund || Zero,
-        collateral,
-        marketMaker,
-      })
-
-      await fetchGraphMarketMakerData()
-      await fetchFundingBalance()
-      await fetchCollateralBalance()
-      await fetchBalances()
-
-      setAmountToFund(null)
-      setAmountToFundDisplay('')
-      setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
-      setIsTransactionProcessing(false)
-    } catch (err) {
-      setTxState(TransactionStep.error)
-      setMessage(`Error trying to deposit funds.`)
-      logger.error(`${message} - ${err.message}`)
-      setIsTransactionProcessing(false)
-    }
-  }
-
-  const removeFunding = async () => {
-    try {
-      if (!cpk) {
-        return
-      }
-
-      const fundsAmount = bigNumberToString(depositedTokensTotal, collateral.decimals)
-
-      setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
-
-      const conditionId = await marketMaker.getConditionId()
-
-      setTxState(TransactionStep.waitingConfirmation)
-      setIsTransactionProcessing(true)
-      setIsTransactionModalOpen(true)
-      await cpk.removeFunding({
-        amountToMerge: depositedTokens,
-        conditionId,
-        conditionalTokens,
-        earnings: userEarnings,
-        marketMaker,
-        outcomesCount: balances.length,
-        sharesToBurn: amountToRemove || Zero,
-      })
-      await fetchGraphMarketMakerData()
-      await fetchFundingBalance()
-      await fetchCollateralBalance()
-      await fetchBalances()
-
-      setAmountToRemove(null)
-      setAmountToRemoveDisplay('')
-      setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
-      setIsTransactionProcessing(false)
-    } catch (err) {
-      setTxState(TransactionStep.error)
-      setMessage(`Error trying to withdraw funds.`)
-      logger.error(`${message} - ${err.message}`)
-      setIsTransactionProcessing(false)
-    }
-  }
-
-  const unlockCollateral = async () => {
-    if (!cpk) {
-      return
-    }
-
-    await unlock()
-
-    setAllowanceFinished(true)
-  }
-
-  const showUpgrade =
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
-
-  const upgradeProxy = async () => {
-    if (!cpk) {
-      return
-    }
-
-    await updateProxy()
-    setUpgradeFinished(true)
-  }
-
-  const collateralAmountError = isTransactionProcessing
-    ? null
-    : maybeCollateralBalance === null
-    ? null
-    : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
-    ? `Insufficient balance`
-    : amountToFund?.gt(maybeCollateralBalance)
-    ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
-    : null
-
-  const disableDepositButton =
-    !amountToFund ||
-    amountToFund?.isZero() ||
-    (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
-    collateralAmountError !== null ||
-    currentDate > resolutionDate ||
-    isNegativeAmountToFund
-
-  const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
-
-  const sharesAmountError = isTransactionProcessing
-    ? null
-    : maybeFundingBalance === null
-    ? null
-    : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
-    ? `Insufficient balance`
-    : amountToRemove?.gt(fundingBalance)
-    ? `Value must be less than or equal to ${sharesBalance} pool shares`
-    : null
-
-  const disableWithdrawButton =
-    !amountToRemove ||
-    amountToRemove?.isZero() ||
-    amountToRemove?.gt(fundingBalance) ||
-    sharesAmountError !== null ||
-    isNegativeAmountToRemove
 
   const switchTab = (tab: Tabs) => {
     setAmountToFund(new BigNumber('0'))
