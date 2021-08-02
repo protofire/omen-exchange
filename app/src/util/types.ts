@@ -194,7 +194,6 @@ export interface Arbitrator {
 export enum Wallet {
   MetaMask = 'MetaMask',
   WalletConnect = 'WalletConnect',
-  Authereum = 'Authereum',
 }
 
 export interface MarketData {
@@ -294,8 +293,6 @@ export interface MarketMakerData {
   isConditionResolved: boolean
   isQuestionFinalized: boolean
   collateralVolume: BigNumber
-  marketMakerFunding: BigNumber
-  marketMakerUserFunding: BigNumber
   payouts: Maybe<Big[]>
   question: Question
   realitioAnswer: Maybe<BigNumber>
