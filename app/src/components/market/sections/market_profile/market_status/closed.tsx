@@ -8,13 +8,14 @@ import styled from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../../../common/constants'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../../contexts'
 import { useContracts, useGraphMarketUserTxData, useSymbol } from '../../../../../hooks'
+import { MarketBuyContainer } from '../../../../../pages/market_sections/market_buy_container'
+import { MarketPoolLiquidityContainer } from '../../../../../pages/market_sections/market_pool_liquidity_container'
+import { MarketSellContainer } from '../../../../../pages/market_sections/market_sell_container'
 import { ERC20Service, RealitioService } from '../../../../../services'
-import { CompoundService } from '../../../../../services/compound_service'
 import { getLogger } from '../../../../../util/logger'
 import { getContractAddress, getNativeAsset } from '../../../../../util/networks'
-import { formatBigNumber, getBaseToken, getUnit, isCToken, isDust } from '../../../../../util/tools'
+import { formatBigNumber, getUnit, isDust } from '../../../../../util/tools'
 import {
-  CompoundTokenType,
   INVALID_ANSWER_ID,
   MarketDetailsTab,
   MarketMakerData,
@@ -31,11 +32,8 @@ import { MarketScale } from '../../../common/market_scale'
 import { MarketTopDetailsClosed } from '../../../common/market_top_details_closed'
 import { OutcomeTable } from '../../../common/outcome_table'
 import { ViewCard } from '../../../common/view_card'
-import { MarketBuyContainer } from '../../market_buy/market_buy_container'
 import { MarketHistoryContainer } from '../../market_history/market_history_container'
 import { MarketNavigation } from '../../market_navigation'
-import { MarketPoolLiquidityContainer } from '../../market_pooling/market_pool_liquidity_container'
-import { MarketSellContainer } from '../../market_sell/market_sell_container'
 
 const TopCard = styled(ViewCard)`
   padding-bottom: 0;
@@ -144,8 +142,8 @@ const Wrapper = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { fetchBalances } = context.balances
 
-  const { account, cpk, library: provider, networkId, relay } = context
-  const { buildMarketMaker, conditionalTokens, oracle, realitio } = useContracts(context)
+  const { account, cpk, library: provider, networkId, relay, setTxState, txHash, txState } = context
+  const { buildMarketMaker, buildOracle, conditionalTokens, realitio } = useContracts(context)
 
   const { fetchGraphMarketMakerData, isScalar, marketMakerData } = props
 
@@ -167,64 +165,16 @@ const Wrapper = (props: Props) => {
 
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
-  const marketCollateralToken = collateralToken
-  const [compoundService, setCompoundService] = useState<Maybe<CompoundService>>(null)
+
   const [collateral, setCollateral] = useState<BigNumber>(new BigNumber(0))
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
-  const [txHash, setTxHash] = useState('')
   const [userRealitioWithdraw, setUserRealitioWithdraw] = useState(false)
   const [cpkRealitioWithdraw, setCpkRealitioWithdraw] = useState(false)
   const [userRealitioBalance, setUserRealitioBalance] = useState(Zero)
   const [cpkRealitioBalance, setCpkRealitioBalance] = useState(Zero)
 
-  const [displayEarnedCollateral, setDisplayEarnedCollateral] = useState<BigNumber>(new BigNumber(0))
-
   const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
-  useMemo(() => {
-    const getResult = async () => {
-      const compoundServiceObject = new CompoundService(
-        marketCollateralToken.address,
-        marketCollateralToken.symbol,
-        provider,
-        account,
-      )
-      await compoundServiceObject.init()
-      setCompoundService(compoundServiceObject)
-    }
-    if (marketCollateralToken.symbol.toLowerCase() in CompoundTokenType) {
-      getResult()
-    }
-  }, [marketCollateralToken.address, account, marketCollateralToken.symbol, provider])
-
-  useEffect(() => {
-    const getDisplayEarnedCollateral = async () => {
-      if (isCToken(marketCollateralToken.symbol)) {
-        const compound = new CompoundService(
-          marketCollateralToken.address,
-          marketCollateralToken.symbol,
-          provider,
-          account,
-        )
-        await compound.init()
-        const earnedCollateral = isScalar
-          ? scalarComputeEarnedCollateral(
-              new Big(finalAnswerPercentage),
-              balances.map(balance => balance.shares),
-            )
-          : computeEarnedCollateral(
-              payouts,
-              balances.map(balance => balance.shares),
-            )
-        if (earnedCollateral) {
-          const baseToken = getBaseToken(networkId, collateralToken.symbol)
-          const earnings = compound.calculateCTokenToBaseExchange(baseToken, earnedCollateral)
-          setDisplayEarnedCollateral(earnings)
-        }
-      }
-    }
-    getDisplayEarnedCollateral()
-  }, [marketCollateralToken.address, isConditionResolved, account, provider, balances]) // eslint-disable-line react-hooks/exhaustive-deps
+  const oracle = useMemo(() => buildOracle(marketMakerData.oracle), [buildOracle, marketMakerData.oracle])
 
   const resolveCondition = async () => {
     if (!cpk) {
@@ -244,8 +194,6 @@ const Wrapper = (props: Props) => {
         scalarHigh,
         question,
         numOutcomes: balances.length,
-        setTxHash,
-        setTxState,
       })
 
       await fetchGraphMarketMakerData()
@@ -319,7 +267,7 @@ const Wrapper = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
-      await realitio.withdraw(setTxHash, setTxState)
+      await realitio.withdraw()
       await fetchBalances()
       await getRealitioBalance()
 
@@ -347,7 +295,7 @@ const Wrapper = (props: Props) => {
       await cpk.redeemPositions({
         isConditionResolved,
         // Round down in case of precision error
-        earnedCollateral: earnedCollateral ? earnedCollateral.mul(99999999).div(100000000) : new BigNumber('0'),
+        amount: earnedCollateral ? earnedCollateral.mul(99999999).div(100000000) : new BigNumber('0'),
         question,
         numOutcomes: balances.length,
         oracle,
@@ -355,12 +303,10 @@ const Wrapper = (props: Props) => {
         isScalar,
         scalarLow,
         scalarHigh,
-        collateralToken,
+        collateral: collateralToken,
         marketMaker,
         conditionalTokens,
         realitioBalance: cpkRealitioBalance,
-        setTxHash,
-        setTxState,
       })
       await fetchBalances()
       await getRealitioBalance()
@@ -489,12 +435,7 @@ const Wrapper = (props: Props) => {
   let redeemString = 'NaN'
   let balanceString = ''
   if (earnedCollateral) {
-    if (isCToken(marketCollateralToken.symbol)) {
-      const baseToken = getBaseToken(networkId, collateralToken.symbol)
-      redeemString = `${formatBigNumber(displayEarnedCollateral, baseToken.decimals)} ${baseToken.symbol}`
-    } else {
-      redeemString = `${formatBigNumber(earnedCollateral, collateralToken.decimals)} ${symbol}`
-    }
+    redeemString = `${formatBigNumber(earnedCollateral, collateralToken.decimals)} ${symbol}`
   }
   const nativeAsset = getNativeAsset(networkId, relay)
   if (userRealitioWithdraw) {
@@ -506,11 +447,7 @@ const Wrapper = (props: Props) => {
   return (
     <>
       <TopCard>
-        <MarketTopDetailsClosed
-          collateral={collateral}
-          compoundService={compoundService}
-          marketMakerData={marketMakerData}
-        />
+        <MarketTopDetailsClosed collateral={collateral} marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
         <MarketNavigation

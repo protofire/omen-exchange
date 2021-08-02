@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { version as appVersion } from '../../../../../package.json'
-import { DISCLAIMER_TEXT, DOCUMENT_FAQ, DOCUMENT_VALIDITY_RULES, SHOW_FOOTER } from '../../../../common/constants'
+import { DOCUMENT_FAQ, DOCUMENT_VALIDITY_RULES, SHOW_FOOTER } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../contexts'
 import { useContracts } from '../../../../hooks'
 import { getAddressBlockExplorerURL } from '../../../../util/networks'
@@ -48,7 +48,7 @@ export const Footer = () => {
 
   return SHOW_FOOTER ? (
     <>
-      <Wrapper paddingBottomSmall={DISCLAIMER_TEXT ? true : false}>
+      <Wrapper paddingBottomSmall>
         <Link href="https://github.com/protofire/gnosis-conditional-exchange">Version {appVersion}</Link>
         <Break>·</Break>
         <Link

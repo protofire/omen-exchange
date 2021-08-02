@@ -58,7 +58,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   } = marketMakerData
 
   const context = useConnectedWeb3Context()
-  const { account, cpk, library: provider, networkId, relay } = context
+  const { account, cpk, library: provider, networkId, relay, setTxState, txHash, txState } = context
 
   const nativeAsset = getNativeAsset(networkId, relay)
   const { symbol } = nativeAsset
@@ -73,8 +73,6 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
 
   const [nativeAssetBalance, setNativeAssetBalance] = useState<BigNumber>(Zero)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
-  const [txHash, setTxHash] = useState('')
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
@@ -145,8 +143,6 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         question,
         answer,
         amount: bondNativeAssetAmount,
-        setTxHash,
-        setTxState,
       })
 
       await fetchGraphMarketMakerData()

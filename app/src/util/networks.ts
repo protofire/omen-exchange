@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 import {
   DEFAULT_ARBITRATOR,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
@@ -21,7 +19,6 @@ import {
 import { entries, isNotNull } from '../util/type-utils'
 
 import { getImageUrl } from './token'
-import { waitABit } from './tools'
 import { Arbitrator, Token } from './types'
 
 export type NetworkId = 1 | 4 | 77 | 100
@@ -838,51 +835,11 @@ export const getNativeAsset = (networkId: number, relay = false): Token => {
   return asset
 }
 
-export const getNativeCompoundAsset = (networkId: number): Token => {
-  if (!validNetworkId(networkId)) {
-    throw new Error(`Unsupported network id: '${networkId}'`)
-  } else {
-    const knownToken = 'ceth' as KnownToken
-    return getToken(networkId, knownToken)
-  }
-}
-
 export const getTargetSafeImplementation = (networkId: number): string => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
   return networks[networkId].targetSafeImplementation.toLowerCase()
-}
-
-export const getGraphMeta = async (networkId: number) => {
-  const query = `
-    query {
-      _meta {
-        block {
-          hash
-          number
-        }
-      }
-    }
-  `
-  const { httpUri } = getGraphUris(networkId)
-  const result = await axios.post(httpUri, { query })
-  return result.data.data._meta.block
-}
-
-export const waitForBlockToSync = async (networkId: number, blockNum: number) => {
-  let block
-  while (!block || block.number < blockNum + 1) {
-    block = await getGraphMeta(networkId)
-    await waitABit()
-  }
-}
-
-export const getBySafeTx = async (networkId: number, safeTxHash: string) => {
-  const networkName = (networkNames as any)[networkId].toLowerCase()
-  const txServiceUrl = `https://safe-transaction.${networkName}.gnosis.io/api/v1`
-  const result = await axios.get(`${txServiceUrl}/transactions/${safeTxHash}`)
-  return result.data
 }
 
 export const getBlockExplorer = (networkId: number): string => {

@@ -3,9 +3,8 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../contexts'
-import { useCompoundService } from '../../../../hooks'
 import { formatBigNumber, formatNumber, getInitialCollateral } from '../../../../util/tools'
-import { CompoundTokenType, Token } from '../../../../util/types'
+import { Token } from '../../../../util/types'
 import { TitleValue } from '../../../common'
 import { ValueStates } from '../../common/transaction_details_row'
 
@@ -63,48 +62,36 @@ interface Props {
 }
 
 export const UserPoolData: React.FC<Props> = (props: Props) => {
-  const { collateral, totalEarnings, totalPoolShares, totalUserLiquidity, userEarnings } = props
+  const { totalEarnings, totalPoolShares, totalUserLiquidity, userEarnings } = props
   const context = useConnectedWeb3Context()
   const { networkId } = context
-  const baseCollateral = getInitialCollateral(networkId, collateral)
-  let displayUserLiquidity = totalUserLiquidity
-  let displayPoolTokens = totalPoolShares
-  let displayUserEarnings = userEarnings
-  let displayTotalEarnings = totalEarnings
-  const { compoundService: CompoundService } = useCompoundService(collateral, context)
-  const compoundService = CompoundService || null
-  if (collateral.symbol.toLowerCase() in CompoundTokenType && compoundService) {
-    displayUserLiquidity = compoundService.calculateCTokenToBaseExchange(baseCollateral, totalUserLiquidity)
-    displayPoolTokens = compoundService.calculateCTokenToBaseExchange(baseCollateral, totalPoolShares)
-    displayUserEarnings = compoundService.calculateCTokenToBaseExchange(baseCollateral, userEarnings)
-    displayTotalEarnings = compoundService.calculateCTokenToBaseExchange(baseCollateral, totalEarnings)
-  }
+  const collateral = getInitialCollateral(networkId, props.collateral)
 
   return (
     <UserData>
       <UserDataTitleValue
         title="Your Liquidity"
-        value={`${formatNumber(
-          formatBigNumber(displayUserLiquidity, baseCollateral.decimals, baseCollateral.decimals),
-        )} ${baseCollateral.symbol}`}
+        value={`${formatNumber(formatBigNumber(totalUserLiquidity, collateral.decimals, collateral.decimals))} ${
+          collateral.symbol
+        }`}
       />
       <UserDataTitleValue
         title="Total Pool Tokens"
-        value={`${formatNumber(formatBigNumber(displayPoolTokens, baseCollateral.decimals, baseCollateral.decimals))}`}
+        value={`${formatNumber(formatBigNumber(totalPoolShares, collateral.decimals, collateral.decimals))}`}
       />
       <UserDataTitleValue
         state={userEarnings.gt(0) ? ValueStates.success : undefined}
         title="Your Earnings"
-        value={`${displayUserEarnings.gt(0) ? '+' : ''}${formatNumber(
-          formatBigNumber(displayUserEarnings, baseCollateral.decimals, baseCollateral.decimals),
-        )} ${baseCollateral.symbol}`}
+        value={`${userEarnings.gt(0) ? '+' : ''}${formatNumber(
+          formatBigNumber(userEarnings, collateral.decimals, collateral.decimals),
+        )} ${collateral.symbol}`}
       />
       <UserDataTitleValue
-        state={displayTotalEarnings.gt(0) ? ValueStates.success : undefined}
+        state={totalEarnings.gt(0) ? ValueStates.success : undefined}
         title="Total Earnings"
-        value={`${displayTotalEarnings.gt(0) ? '+' : ''}${formatNumber(
-          formatBigNumber(displayTotalEarnings, baseCollateral.decimals, baseCollateral.decimals),
-        )} ${baseCollateral.symbol}`}
+        value={`${totalEarnings.gt(0) ? '+' : ''}${formatNumber(
+          formatBigNumber(totalEarnings, collateral.decimals, collateral.decimals),
+        )} ${collateral.symbol}`}
       />
     </UserData>
   )

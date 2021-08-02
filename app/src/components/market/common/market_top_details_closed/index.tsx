@@ -7,9 +7,8 @@ import { useConnectedWeb3Context } from '../../../../contexts'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/graph/useGraphMarketsFromQuestion'
 import { useTheme } from '../../../../hooks/useTheme'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
-import { CompoundService } from '../../../../services'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
-import { getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
+import { getInitialCollateral, getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
@@ -37,14 +36,13 @@ const MarketCurrencySelector = styled(CurrencySelector)`
 interface Props {
   marketMakerData: MarketMakerData
   collateral: BigNumber
-  compoundService: CompoundService | null
 }
 
 const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const theme = useTheme()
   const { networkId, relay } = context
-  const { compoundService, marketMakerData } = props
+  const { marketMakerData } = props
   const history = useHistory()
 
   const { width } = useWindowDimensions()
@@ -54,7 +52,6 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     address,
     answerFinalizedTimestamp,
     arbitrator,
-    collateral,
     collateralVolume,
     creationTimestamp,
     curatedByDxDao,
@@ -67,6 +64,8 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   } = marketMakerData
   const { title } = question
   const ovmAddress = getContractAddress(networkId, 'omenVerifiedMarkets')
+
+  const collateral = getInitialCollateral(networkId, marketMakerData.collateral, relay)
 
   const [showingProgressBar, setShowingProgressBar] = useState(false)
 
@@ -128,7 +127,6 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
       <MarketData
         answerFinalizedTimestamp={marketMakerData.answerFinalizedTimestamp}
         collateralVolume={collateralVolume}
-        compoundService={compoundService}
         currency={collateral}
         lastActiveDay={lastActiveDay}
         liquidity={formattedLiquidity}

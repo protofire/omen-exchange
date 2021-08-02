@@ -1,17 +1,14 @@
-import { aggregate } from '@makerdao/multicall'
-import configs from '@makerdao/multicall/src/addresses.json'
 import axios from 'axios'
 import { useState } from 'react'
 
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../../common/constants'
 import { ConnectedWeb3Context } from '../../contexts'
+import { getMultiCallConfig, multicall } from '../../util/multicall'
 import {
   getGraphUris,
-  getInfuraUrl,
   getNativeAsset,
   getOmenTCRListId,
   getTokensByNetwork,
-  networkNames,
   pseudoNativeAssetAddress,
 } from '../../util/networks'
 import { getImageUrl } from '../../util/token'
@@ -98,13 +95,6 @@ export const useTokens = (
 
         const { account } = context
 
-        // setup multicall config
-        const network = (networkNames as any)[context.networkId]
-        const config = {
-          rpcUrl: getInfuraUrl(context.networkId),
-          multicallAddress: (configs as any)[network.toLowerCase()].multicall,
-        }
-
         // aggregate call array
         const calls = []
 
@@ -121,7 +111,7 @@ export const useTokens = (
               if (addBalances) {
                 // use getEthBalance helper in multicall contract
                 calls.push({
-                  target: config.multicallAddress,
+                  target: getMultiCallConfig(context.networkId).multicallAddress,
                   call: ['getEthBalance(address)(uint256)', account],
                   returns: [[balanceKey]],
                 })
@@ -148,7 +138,7 @@ export const useTokens = (
         }
 
         if (calls.length) {
-          const response = await aggregate(calls, config)
+          const response = await multicall(calls, context.networkId)
           tokenData = tokenData.map(token => {
             const results = response.results.original
             const balance = results[getBalanceKey(token.address)]

@@ -11,6 +11,7 @@ import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
 import { getNetworkFromChain } from '../util/tools'
+import { TransactionStep } from '../util/types'
 
 const logger = getLogger('Hooks::ConnectedWeb3')
 
@@ -23,6 +24,10 @@ export interface ConnectedWeb3Context {
   cpk: Maybe<CPKService>
   balances: ConnectedBalance
   toggleRelay: () => void
+  txHash: string
+  txState: TransactionStep
+  setTxHash: (arg0: string) => void
+  setTxState: (step: TransactionStep) => void
 }
 
 const ConnectedWeb3Context = React.createContext<Maybe<ConnectedWeb3Context>>(null)
@@ -50,6 +55,8 @@ interface Props {
 export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   const [connection, setConnection] = useState<ConnectedWeb3Context | null>(null)
   const [networkId, setNetworkId] = useState<number | null>(null)
+  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
+  const [txHash, setTxHash] = useState('')
   const safeAppInfo = useSafeApp()
   const context = useWeb3Context()
 
@@ -95,12 +102,16 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
         cpk,
         balances,
         toggleRelay,
+        txHash,
+        txState,
+        setTxHash,
+        setTxState,
       }
 
       setConnection(value)
     }
     // eslint-disable-next-line
-  }, [relay, networkId, context, library, account])
+  }, [relay, networkId, context, library, account, txHash, txState])
 
   useEffect(() => {
     let isSubscribed = true

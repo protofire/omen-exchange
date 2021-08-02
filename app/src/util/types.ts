@@ -194,15 +194,12 @@ export interface Arbitrator {
 export enum Wallet {
   MetaMask = 'MetaMask',
   WalletConnect = 'WalletConnect',
-  Authereum = 'Authereum',
 }
 
 export interface MarketData {
   collateral: Token
-  userInputCollateral: Token
   arbitratorsCustom: Arbitrator[]
   categoriesCustom: string[]
-  compoundInterestRate: string
   question: string
   category: string
   resolution: Date | null
@@ -211,7 +208,6 @@ export interface MarketData {
   funding: BigNumber
   outcomes: Outcome[]
   loadedQuestionId: Maybe<string>
-  useCompoundReserve: boolean
   verifiedLabel?: string
   lowerBound: Maybe<BigNumber>
   upperBound: Maybe<BigNumber>
@@ -297,8 +293,6 @@ export interface MarketMakerData {
   isConditionResolved: boolean
   isQuestionFinalized: boolean
   collateralVolume: BigNumber
-  marketMakerFunding: BigNumber
-  marketMakerUserFunding: BigNumber
   payouts: Maybe<Big[]>
   question: Question
   realitioAnswer: Maybe<BigNumber>
@@ -465,24 +459,6 @@ export enum MarketState {
   arbitration = 'arbitration',
   closed = 'closed',
   none = '',
-}
-
-export enum CompoundTokenType {
-  cdai = 'cdai',
-  cusdc = 'cusdc',
-  cusdt = 'cusdt',
-  cuni = 'cuni',
-  cbat = 'cbat',
-  ceth = 'ceth',
-}
-
-export enum CompoundEnabledTokenType {
-  dai = 'dai',
-  usdc = 'usdc',
-  usdt = 'usdt',
-  uni = 'uni',
-  bat = 'bat',
-  eth = 'eth',
 }
 
 export const INVALID_ANSWER_ID = '0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'

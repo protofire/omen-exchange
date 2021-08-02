@@ -10,7 +10,8 @@ import { useConnectedWeb3Context } from '../../../../contexts'
 import { networkIds } from '../../../../util/networks'
 import { formatBigNumber } from '../../../../util/tools'
 import { ExchangeType } from '../../../../util/types'
-import { ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
+import { Button, ButtonCircle, ButtonRound } from '../../../button'
+import { ButtonType } from '../../../button/button_styling_types'
 import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../form/dropdown'
 import { IconAdd, IconClose, IconOmen } from '../../icons'
@@ -83,8 +84,8 @@ const ButtonCSS = css`
   }
 `
 
-const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
-  ${ButtonCSS}
+const ButtonConnectWalletStyled = styled(Button)`
+  margin-left: 12px;
 `
 
 export const ButtonSettings = styled(ButtonRound)`
@@ -329,12 +330,14 @@ const HeaderContainer: React.FC = (props: any) => {
 
           {!account && (
             <ButtonConnectWalletStyled
-              disabled={disableConnectButton || !hasRouter}
-              modalState={isConnectWalletModalOpen}
+              buttonType={ButtonType.primary}
+              disabled={disableConnectButton || !hasRouter || isConnectWalletModalOpen}
               onClick={() => {
                 setConnectWalletModalState(true)
               }}
-            />
+            >
+              {isConnectWalletModalOpen ? 'Connecting' : 'Connect'}
+            </ButtonConnectWalletStyled>
           )}
           {disableConnectButton && <ReactTooltip id="connectButtonTooltip" />}
 

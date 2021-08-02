@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { ConnectedWeb3Context } from '../contexts'
 import { getLogger } from '../util/logger'
-import { waitForBlockToSync } from '../util/networks'
+import { waitForBlockToSync } from '../util/tools'
 import { KlerosCurationData, MarketMakerData, Status } from '../util/types'
 
 import { useContracts } from './useContracts'

@@ -34,7 +34,7 @@ interface Props {
   context: ConnectedWeb3Context
   disabled?: boolean
   filters?: Array<string>
-  onSelect: (currency: Token | null) => void
+  onSelect?: (currency: Token | null) => void
   balance?: string
   placeholder?: Maybe<string>
   addAll?: boolean
@@ -70,7 +70,7 @@ export const CurrencySelector: React.FC<Props> = props => {
 
   const onChange = (address: string) => {
     for (const token of tokens) {
-      if (token.address === address) {
+      if (token.address === address && onSelect) {
         onSelect(token)
       }
     }
@@ -82,7 +82,7 @@ export const CurrencySelector: React.FC<Props> = props => {
     currencyDropdownData.push({
       content: 'All',
       onClick: () => {
-        if (!disabled) {
+        if (!disabled && onSelect) {
           onSelect(null)
         }
       },

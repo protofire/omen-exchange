@@ -3,9 +3,8 @@ import { Helmet } from 'react-helmet'
 import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import { useWeb3Context } from 'web3-react'
 
-import { DISCLAIMER_TEXT, DOCUMENT_TITLE } from '../../common/constants'
+import { DOCUMENT_TITLE } from '../../common/constants'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
-import { Disclaimer } from '../common/disclaimer'
 import { Footer } from '../common/layout/footer'
 import { Header } from '../common/layout/header'
 import { MarketRoutes } from '../market/routes/market_routes'
@@ -44,11 +43,10 @@ export const Main: React.FC = () => {
                   path="/settings"
                   render={props => <SettingsViewContainer networkId={networkId} {...props} />}
                 />
-                <Route component={MarketHomeContainer} path="/24h-volume" />
-                <Route component={MarketHomeContainer} path="/volume" />
-                <Route component={MarketHomeContainer} path="/newest" />
-                <Route component={MarketHomeContainer} path="/ending" />
-                <Route component={MarketHomeContainer} path="/liquidity" />
+                <Route
+                  component={MarketHomeContainer}
+                  path={['/24h-volume', '/volume', '/newest', '/ending', '/liquidity']}
+                />
                 <Route component={MarketWizardCreatorContainer} exact path="/create" />
                 <Route component={MarketRoutes} path="/:address" />
                 <Route component={RedirectToHome} />
@@ -56,7 +54,6 @@ export const Main: React.FC = () => {
             )}
           </MainScroll>
           <Footer />
-          {DISCLAIMER_TEXT.length > 0 && <Disclaimer />}
         </MainWrapper>
       </Router>
     </>

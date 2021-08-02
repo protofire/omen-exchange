@@ -5,7 +5,7 @@ import { wETHabi, wsPOAabi, wxDaiabi } from '../abi/wrapped_asset'
 
 class UnwrapTokenService {
   static withdrawAmount = (symbol: string, amount: BigNumber): string => {
-    const contractABI = UnwrapTokenService.getABI(symbol)
+    const contractABI = UnwrapTokenService.getABI(symbol.toLowerCase())
     const withdrawInterface = new utils.Interface(contractABI)
     return withdrawInterface.functions.withdraw.encode([amount.toString()])
   }

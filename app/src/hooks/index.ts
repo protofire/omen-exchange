@@ -5,7 +5,6 @@ export { useBlockchainMarketMakerData } from './market_data/useBlockchainMarketM
 export { useCheckContractExists } from './useCheckContractExists'
 export { useCollateral } from './useCollateral'
 export { useCollateralBalance } from './user_tx/useCollateralBalance'
-export { useCompoundService } from './useCompoundService'
 export { useContracts } from './useContracts'
 export { useCpkAllowance } from './cpk/useCpkAllowance'
 export { useCpkProxy } from './cpk/useCpkProxy'

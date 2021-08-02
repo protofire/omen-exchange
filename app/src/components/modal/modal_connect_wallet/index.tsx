@@ -146,7 +146,6 @@ export const ModalConnectWallet = (props: Props) => {
   const context = useWeb3Context()
   const [connectingToWalletConnect, setConnectingToWalletConnect] = useState(false)
   const [connectingToMetamask, setConnectingToMetamask] = useState(false)
-  const [connectingToAuthereum, setConnectingToAuthereum] = useState(false)
   const { isOpen, onClose, theme } = props
 
   if (context.error) {
@@ -163,9 +162,6 @@ export const ModalConnectWallet = (props: Props) => {
     if (wallet === Wallet.MetaMask) {
       setConnectingToMetamask(true)
     }
-    if (wallet === Wallet.Authereum) {
-      setConnectingToAuthereum(true)
-    }
 
     if (wallet) {
       context.setConnector(wallet)
@@ -176,7 +172,6 @@ export const ModalConnectWallet = (props: Props) => {
   const resetEverything = useCallback(() => {
     setConnectingToWalletConnect(false)
     setConnectingToMetamask(false)
-    setConnectingToAuthereum(false)
   }, [])
 
   const onClickCloseButton = useCallback(() => {
@@ -200,14 +195,7 @@ export const ModalConnectWallet = (props: Props) => {
     }
   }, [context, onClickCloseButton, connectingToMetamask])
 
-  useEffect(() => {
-    if (connectingToAuthereum && context.account && context.connectorName === Wallet.Authereum) {
-      onClickCloseButton()
-      setConnectingToAuthereum(false)
-    }
-  }, [context, onClickCloseButton, connectingToAuthereum])
-
-  const isConnectingToWallet = connectingToMetamask || connectingToWalletConnect || connectingToAuthereum
+  const isConnectingToWallet = connectingToMetamask || connectingToWalletConnect
   let connectingText = `Connecting to wallet`
   if (connectingToMetamask) {
     connectingText = 'Requesting permission on Metamask'

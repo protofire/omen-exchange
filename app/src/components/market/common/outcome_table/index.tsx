@@ -6,9 +6,9 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context } from '../../../../contexts'
 import { useSymbol } from '../../../../hooks'
 import { getOutcomeColor } from '../../../../theme/utils'
-import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../util/networks'
-import { formatBigNumber, formatNumber, getBaseTokenForCToken, mulBN } from '../../../../util/tools'
-import { BalanceItem, BondItem, CompoundTokenType, OutcomeTableValue, Token } from '../../../../util/types'
+import { getNativeAsset } from '../../../../util/networks'
+import { formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
+import { BalanceItem, BondItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, THead, TR, Table } from '../../../common'
 import { BarDiagram } from '../bar_diagram_probabilities'
 import {
@@ -25,15 +25,13 @@ import { WinningBadge } from '../winning_badge'
 interface Props {
   balances: BalanceItem[]
   collateral: Token
-  displayBalances?: BalanceItem[]
-  displayCollateral?: Token
   disabledColumns?: OutcomeTableValue[]
   displayRadioSelection?: boolean
   outcomeHandleChange?: (e: number) => void
   getPriceInBaseToken?: (e: number) => number
   outcomeSelected?: number
   payouts?: Maybe<Big[]>
-  probabilities: number[]
+  probabilities: any
   newShares?: Maybe<BigNumber[]>
   newBonds?: BondItem[]
   withWinningOutcome?: boolean
@@ -90,8 +88,6 @@ export const OutcomeTable = (props: Props) => {
     balances,
     collateral,
     disabledColumns = [],
-    displayCollateral = collateral,
-    displayBalances = balances,
     displayRadioSelection = true,
     newShares = null,
     outcomeHandleChange,
@@ -126,7 +122,7 @@ export const OutcomeTable = (props: Props) => {
   ]
 
   const TableCellsAlign = ['left', 'left', 'right', 'right', 'right', 'right', 'right']
-  const symbol = useSymbol(displayCollateral)
+  const symbol = useSymbol(collateral)
   const renderTableHeader = () => {
     return (
       <THead>
@@ -218,18 +214,6 @@ export const OutcomeTable = (props: Props) => {
   }
 
   const renderTableRow = (balanceItem: BalanceItem, outcomeIndex: number) => {
-    const currentCollateral = displayCollateral ? displayCollateral : collateral
-    let baseCollateral = collateral
-    const collateralSymbol = collateral.symbol.toLowerCase()
-    if (collateralSymbol in CompoundTokenType) {
-      const nativeCompoundAsset = getNativeCompoundAsset(networkId)
-      if (collateralSymbol === nativeCompoundAsset.symbol.toLowerCase()) {
-        baseCollateral = getNativeAsset(networkId)
-      } else {
-        const baseCollateralSymbol = getBaseTokenForCToken(collateral.symbol.toLowerCase()) as KnownToken
-        baseCollateral = getToken(networkId, baseCollateralSymbol)
-      }
-    }
     const { currentDisplayPrice, currentPrice, outcomeName, payout, shares } = balanceItem
     let currentPriceValue = Number(currentPrice)
     if (currentDisplayPrice && Number(currentDisplayPrice) > 0) {
@@ -242,10 +226,10 @@ export const OutcomeTable = (props: Props) => {
     const currentPriceFormatted = withWinningOutcome ? payout.toFixed(2) : currentPriceDisplay
     const probability = withWinningOutcome ? Number(payout.mul(100).toString()) : probabilities[outcomeIndex]
     const newPrice = (probabilities[outcomeIndex] / 100).toFixed(2)
-    const formattedPayout = formatBigNumber(mulBN(shares, Number(payout.toString())), currentCollateral.decimals)
-    const formattedShares = formatBigNumber(shares, baseCollateral.decimals)
+    const formattedPayout = formatBigNumber(mulBN(shares, Number(payout.toString())), collateral.decimals)
+    const formattedShares = formatBigNumber(shares, collateral.decimals)
     const isWinningOutcome = payouts && payouts[outcomeIndex] && payouts[outcomeIndex].gt(0)
-    const formattedNewShares = newShares ? formatBigNumber(newShares[outcomeIndex], baseCollateral.decimals) : null
+    const formattedNewShares = newShares ? formatBigNumber(newShares[outcomeIndex], collateral.decimals) : null
     const showBondBadge = isBond && withWinningOutcome && outcomeIndex === winningBondIndex
     const formattedBondedEth =
       bonds && bonds[outcomeIndex] && bonds[outcomeIndex].bondedEth
@@ -354,13 +338,13 @@ export const OutcomeTable = (props: Props) => {
     )
   }
 
-  const renderTable = () => displayBalances.map((balanceItem: BalanceItem, index) => renderTableRow(balanceItem, index))
+  const renderTable = () => balances.map((balanceItem: BalanceItem, index) => renderTableRow(balanceItem, index))
 
   return (
     <TableWrapper>
       <Table head={renderTableHeader()}>
         {renderTable()}
-        {isBond && renderInvalidRow(displayBalances.length)}
+        {isBond && renderInvalidRow(balances.length)}
       </Table>
     </TableWrapper>
   )

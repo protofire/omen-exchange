@@ -1,14 +1,12 @@
-import React, { DOMAttributes, useEffect, useState } from 'react'
+import React, { DOMAttributes } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../contexts'
 import { useRealityLink } from '../../../../hooks'
-import { CompoundService } from '../../../../services/compound_service'
 import { networkIds } from '../../../../util/networks'
-import { Arbitrator, CompoundTokenType, KlerosItemStatus, KlerosSubmission, Token } from '../../../../util/types'
+import { Arbitrator, KlerosItemStatus, KlerosSubmission, Token } from '../../../../util/types'
 import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
-import { CompoundIconNoBorder } from '../../../common/icons/currencies/CompoundIconNoBorder'
 
 const AdditionalMarketDataWrapper = styled.div`
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
@@ -40,13 +38,6 @@ const AdditionalMarketDataLeft = styled.div`
       margin-right: 22px !important;
       margin-bottom: 10px !important;
     }
-  }
-`
-
-const CompoundInterestWrapper = styled.div<{ customColor: string }>`
-  color: ${props => props.theme.colors.green};
-  &:hover {
-    color: ${props => props.customColor};
   }
 `
 
@@ -124,10 +115,10 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { address, arbitrator, category, collateral, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
+  const { address, arbitrator, category, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
 
   const context = useConnectedWeb3Context()
-  const { account, library: provider, relay } = context
+  const { relay } = context
 
   const realitioBaseUrl = useRealityLink(!!relay)
   const realitioUrl = id ? `${realitioBaseUrl}/#!/question/${id}` : `${realitioBaseUrl}/`
@@ -145,18 +136,6 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   queryParams.append('col1', title)
   queryParams.append('col2', `https://omen.eth.link/#/${address}`)
 
-  const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
-
-  useEffect(() => {
-    const getAPY = async () => {
-      const compoundServiceObject = new CompoundService(collateral.address, collateral.symbol, provider, account)
-      const supplyRate = await compoundServiceObject.calculateSupplyRateAPY()
-      setCompoundInterestRate(supplyRate.toFixed(2))
-    }
-    if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-      getAPY()
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <AdditionalMarketDataWrapper>
       <AdditionalMarketDataLeft>
@@ -207,23 +186,6 @@ export const AdditionalMarketData: React.FC<Props> = props => {
               {curatedByDxDaoOrKleros ? 'Verified' : 'Not Verified'}
             </AdditionalMarketDataSectionTitle>
           </AdditionalMarketDataSectionWrapper>
-        )}
-        {collateral.symbol.toLowerCase() in CompoundTokenType ? (
-          <AdditionalMarketDataSectionWrapper
-            customColor={'#00897B'}
-            customColorChange={true}
-            data-arrow-color="transparent"
-            data-for="marketData"
-            data-tip={`This market is earning ${compoundInterestRate}% APY powered by compound.finance`}
-            noMarginLeft={true}
-          >
-            <CompoundIconNoBorder />
-            <AdditionalMarketDataSectionTitle>
-              <CompoundInterestWrapper customColor={'#00897B'}>{compoundInterestRate}% APY</CompoundInterestWrapper>
-            </AdditionalMarketDataSectionTitle>
-          </AdditionalMarketDataSectionWrapper>
-        ) : (
-          <span />
         )}
       </AdditionalMarketDataLeft>
       <ReactTooltip

@@ -4,12 +4,11 @@ import styled from 'styled-components'
 
 import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../contexts'
-import { useCompoundService } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/graph/useGraphMarketsFromQuestion'
 import { useTheme } from '../../../../hooks/useTheme'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
-import { getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
+import { getInitialCollateral, getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { MoreMenu } from '../../../common/form/more_menu'
@@ -57,7 +56,6 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     address,
     answerFinalizedTimestamp,
     arbitrator,
-    collateral,
     collateralVolume,
     creationTimestamp,
     curatedByDxDao,
@@ -72,14 +70,12 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const ovmAddress = getContractAddress(networkId, 'omenVerifiedMarkets')
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
+  const collateral = getInitialCollateral(networkId, marketMakerData.collateral, relay)
+
   const currentTimestamp = new Date().getTime()
 
   const formattedLiquidity: string = scaledLiquidityParameter ? scaledLiquidityParameter.toFixed(2) : '0'
 
-  const { compoundService: CompoundService } = useCompoundService(collateral, context)
-  const compoundService = CompoundService || null
-
-  // const finalizedTimestampDate = answerFinalizedTimestamp && new Date(answerFinalizedTimestamp.toNumber() * 1000)
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred
 
@@ -164,7 +160,6 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       <MarketData
         answerFinalizedTimestamp={marketMakerData.answerFinalizedTimestamp}
         collateralVolume={collateralVolume}
-        compoundService={compoundService}
         currency={collateral}
         isFinalize={marketState === MarketState.finalizing}
         lastActiveDay={lastActiveDay}
