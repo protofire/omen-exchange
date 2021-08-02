@@ -11,9 +11,9 @@ import { ButtonType } from '../../../../../button/button_styling_types'
 import { DateField, FormRow, Textfield } from '../../../../../common'
 import { BigNumberInput, BigNumberInputReturn } from '../../../../../common/form/big_number_input'
 import { QuestionInput } from '../../../../../common/form/question_input'
-import { Categories } from '../../../../common/categories'
 import { Arbitrators } from '../../../common_sections/arbitrators/arbitrators'
 import { WarningMessage } from '../../../common_sections/messages/warning_message'
+import { Categories } from '../../../common_sections/search_filter_categories/categories'
 
 import { ButtonCategory, ButtonCategoryTextOverflow } from './ask_question_step'
 

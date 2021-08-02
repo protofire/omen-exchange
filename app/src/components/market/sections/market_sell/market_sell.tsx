@@ -8,10 +8,6 @@ import styled from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { BigNumberInputReturn } from '../../../../components/common/form/big_number_input'
 import {
-  TransactionDetailsRow,
-  ValueStates,
-} from '../../../../components/market/sections/common_sections/transaction/transaction_details_row'
-import {
   useAsyncDerivedValue,
   useCompoundService,
   useConnectedWeb3Context,
@@ -49,9 +45,13 @@ import { SwitchTransactionToken } from '../../common/switch_transaction_token'
 import { GridTransactionDetails } from '../common_sections/bottom_card_details/grid_transaction_details'
 import { WarningMessage } from '../common_sections/messages/warning_message'
 import { OutcomeTable } from '../common_sections/tables/outcome_table'
-import { TransactionDetailsCard } from '../common_sections/transaction/transaction_details_card'
-import { TransactionDetailsLine } from '../common_sections/transaction/transaction_details_line'
-import { TokenBalance } from '../common_sections/user_balances/token_balance'
+import { TransactionDetailsCard } from '../common_sections/user_transactions_tokens/transaction/transaction_details_card'
+import { TransactionDetailsLine } from '../common_sections/user_transactions_tokens/transaction/transaction_details_line'
+import {
+  TransactionDetailsRow,
+  ValueStates,
+} from '../common_sections/user_transactions_tokens/transaction/transaction_details_row'
+import { TokenBalance } from '../common_sections/user_transactions_tokens/user_balances/token_balance'
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;

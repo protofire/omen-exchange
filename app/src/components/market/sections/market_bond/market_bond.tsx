@@ -23,14 +23,17 @@ import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { ModalTransactionWrapper } from '../../../modal'
 import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
-import { SetAllowance } from '../../common/set_allowance'
+import { SetAllowance } from '../common_sections/allowance/set_allowance'
 import { GridTransactionDetails } from '../common_sections/bottom_card_details/grid_transaction_details'
 import { MarketScale } from '../common_sections/bottom_card_details/scalar/market_scale'
 import { OutcomeTable } from '../common_sections/tables/outcome_table'
-import { TransactionDetailsCard } from '../common_sections/transaction/transaction_details_card'
-import { TransactionDetailsLine } from '../common_sections/transaction/transaction_details_line'
-import { TransactionDetailsRow, ValueStates } from '../common_sections/transaction/transaction_details_row'
-import { AssetBalance } from '../common_sections/user_balances/asset_balance'
+import { TransactionDetailsCard } from '../common_sections/user_transactions_tokens/transaction/transaction_details_card'
+import { TransactionDetailsLine } from '../common_sections/user_transactions_tokens/transaction/transaction_details_line'
+import {
+  TransactionDetailsRow,
+  ValueStates,
+} from '../common_sections/user_transactions_tokens/transaction/transaction_details_row'
+import { AssetBalance } from '../common_sections/user_transactions_tokens/user_balances/asset_balance'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData

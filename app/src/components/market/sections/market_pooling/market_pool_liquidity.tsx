@@ -49,16 +49,19 @@ import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { ModalTransactionWrapper } from '../../../modal'
 import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_styled'
-import { CurrencySelector } from '../../common/currency_selector'
-import { SetAllowance } from '../../common/set_allowance'
 import { SwitchTransactionToken } from '../../common/switch_transaction_token'
+import { SetAllowance } from '../common_sections/allowance/set_allowance'
 import { GridTransactionDetails } from '../common_sections/bottom_card_details/grid_transaction_details'
 import { WarningMessage } from '../common_sections/messages/warning_message'
 import { OutcomeTable } from '../common_sections/tables/outcome_table'
-import { TransactionDetailsCard } from '../common_sections/transaction/transaction_details_card'
-import { TransactionDetailsLine } from '../common_sections/transaction/transaction_details_line'
-import { TransactionDetailsRow, ValueStates } from '../common_sections/transaction/transaction_details_row'
-import { TokenBalance } from '../common_sections/user_balances/token_balance'
+import { CurrencySelector } from '../common_sections/user_transactions_tokens/currency_selector'
+import { TransactionDetailsCard } from '../common_sections/user_transactions_tokens/transaction/transaction_details_card'
+import { TransactionDetailsLine } from '../common_sections/user_transactions_tokens/transaction/transaction_details_line'
+import {
+  TransactionDetailsRow,
+  ValueStates,
+} from '../common_sections/user_transactions_tokens/transaction/transaction_details_row'
+import { TokenBalance } from '../common_sections/user_transactions_tokens/user_balances/token_balance'
 
 import { UserPoolData } from './user_pool_data'
 

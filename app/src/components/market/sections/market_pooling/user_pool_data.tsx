@@ -6,7 +6,7 @@ import { useCompoundService, useConnectedWeb3Context } from '../../../../hooks'
 import { formatBigNumber, formatNumber, getInitialCollateral } from '../../../../util/tools'
 import { CompoundTokenType, Token } from '../../../../util/types'
 import { TitleValue } from '../../../common'
-import { ValueStates } from '../common_sections/transaction/transaction_details_row'
+import { ValueStates } from '../common_sections/user_transactions_tokens/transaction/transaction_details_row'
 
 const UserDataTitleValue = styled(TitleValue)`
   flex: 0 calc(50% - 16px);

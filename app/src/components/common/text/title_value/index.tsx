@@ -3,7 +3,7 @@ import React, { DOMAttributes } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { ValueStates } from '../../../market/sections/common_sections/transaction/transaction_details_row'
+import { ValueStates } from '../../../market/sections/common_sections/user_transactions_tokens/transaction/transaction_details_row'
 
 const Wrapper = styled.div`
   display: flex;

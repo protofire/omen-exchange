@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import styled from 'styled-components'
 
 import { Card } from '../../common/card'
-import { Spinner } from '../../common/spinner'
+import { Spinner } from '../spinner'
 
 const Wrapper = styled.div`
   align-items: center;

@@ -41,17 +41,20 @@ import {
   OutcomesTableWrapper,
 } from '../../../../common/common_styled'
 import { CreateCard } from '../../../../common/create_card'
-import { CurrencySelector } from '../../../../common/currency_selector'
-import { SetAllowance } from '../../../../common/set_allowance'
-import { TradingFeeSelector } from '../../../../common/trading_fee_selector'
 import { VerifiedRow } from '../../../../common/verified_row'
+import { SetAllowance } from '../../../common_sections/allowance/set_allowance'
 import { DisplayArbitrator } from '../../../common_sections/arbitrators/display_arbitrator'
 import { GridTransactionDetails } from '../../../common_sections/bottom_card_details/grid_transaction_details'
 import { MarketScale } from '../../../common_sections/bottom_card_details/scalar/market_scale'
 import { WarningMessage } from '../../../common_sections/messages/warning_message'
-import { TransactionDetailsCard } from '../../../common_sections/transaction/transaction_details_card'
-import { TransactionDetailsLine } from '../../../common_sections/transaction/transaction_details_line'
-import { TransactionDetailsRow, ValueStates } from '../../../common_sections/transaction/transaction_details_row'
+import { CurrencySelector } from '../../../common_sections/user_transactions_tokens/currency_selector'
+import { TradingFeeSelector } from '../../../common_sections/user_transactions_tokens/trading_fee_selector'
+import { TransactionDetailsCard } from '../../../common_sections/user_transactions_tokens/transaction/transaction_details_card'
+import { TransactionDetailsLine } from '../../../common_sections/user_transactions_tokens/transaction/transaction_details_line'
+import {
+  TransactionDetailsRow,
+  ValueStates,
+} from '../../../common_sections/user_transactions_tokens/transaction/transaction_details_row'
 import { Outcome } from '../outcomes'
 
 const CreateCardTop = styled(CreateCard)`
