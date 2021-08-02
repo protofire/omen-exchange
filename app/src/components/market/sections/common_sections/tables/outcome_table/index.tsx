@@ -9,7 +9,6 @@ import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../..
 import { formatBigNumber, formatNumber, getBaseTokenForCToken, mulBN } from '../../../../../../util/tools'
 import { BalanceItem, BondItem, CompoundTokenType, OutcomeTableValue, Token } from '../../../../../../util/types'
 import { RadioInput, TD, THead, TR, Table } from '../../../../../common'
-import { BarDiagram } from '../../../../common/bar_diagram_probabilities'
 import {
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,
@@ -20,6 +19,7 @@ import {
 } from '../../../../common/common_styled'
 import { NewValue } from '../../../../common/new_value'
 import { WinningBadge } from '../../../../common/winning_badge'
+import { BarDiagram } from '../../bottom_card_details/categorical/bar_diagram_probabilities'
 
 interface Props {
   balances: BalanceItem[]

@@ -3,9 +3,9 @@ import { BigNumber, parseUnits } from 'ethers/utils'
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
-import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { useCompoundService, useConnectedWeb3Context } from '../../../../hooks'
-import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../util/networks'
+import { STANDARD_DECIMALS } from '../../../../../../../common/constants'
+import { useCompoundService, useConnectedWeb3Context } from '../../../../../../../hooks'
+import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../../../../util/networks'
 import {
   calcPrediction,
   calcXValue,
@@ -14,7 +14,7 @@ import {
   getBaseTokenForCToken,
   isDust,
   roundNumberStringToSignificantDigits,
-} from '../../../../util/tools'
+} from '../../../../../../../util/tools'
 import {
   AdditionalSharesType,
   BalanceItem,
@@ -27,10 +27,10 @@ import {
   Token,
   TradeObject,
   TradeType,
-} from '../../../../util/types'
-import { IconDraggable } from '../../../common/icons'
-import { PositionTable } from '../../sections/common_sections/tables/position_table'
-import { SCALE_HEIGHT } from '../common_styled'
+} from '../../../../../../../util/types'
+import { IconDraggable } from '../../../../../../common/icons'
+import { SCALE_HEIGHT } from '../../../../../common/common_styled'
+import { PositionTable } from '../../../tables/position_table'
 
 import { ValueBoxes } from './value_boxes'
 

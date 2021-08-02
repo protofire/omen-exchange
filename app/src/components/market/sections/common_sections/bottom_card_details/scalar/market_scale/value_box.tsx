@@ -2,9 +2,8 @@ import React from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { IconInfo } from '../../../common/tooltip/img/IconInfo'
-import { Circle } from '../../common/common_styled'
-import { SCALE_HEIGHT, VALUE_BOXES_MARGIN } from '../common_styled'
+import { IconInfo } from '../../../../../../common/tooltip/img/IconInfo'
+import { Circle, SCALE_HEIGHT, VALUE_BOXES_MARGIN } from '../../../../../common/common_styled'
 
 const ValueBoxSegment = styled.div<{ threeBoxes?: boolean }>`
   font-size: ${props => props.theme.fonts.defaultSize};
