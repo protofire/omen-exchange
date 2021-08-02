@@ -2,15 +2,14 @@ import Big from 'big.js'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
-import { ERC20Service, MarketMakerService, OracleService } from '../services'
-import { getLogger } from '../util/logger'
-import { getArbitratorFromAddress } from '../util/networks'
-import { isScalarMarket, promiseProps } from '../util/tools'
-import { BalanceItem, MarketMakerData, Status, Token } from '../util/types'
-
-import { useConnectedWeb3Context } from './connectedWeb3'
-import { useContracts } from './useContracts'
-import { GraphMarketMakerData } from './useGraphMarketMakerData'
+import { useConnectedWeb3Context } from '../../contexts'
+import { ERC20Service, MarketMakerService, OracleService } from '../../services'
+import { getLogger } from '../../util/logger'
+import { getArbitratorFromAddress } from '../../util/networks'
+import { isScalarMarket, promiseProps } from '../../util/tools'
+import { BalanceItem, MarketMakerData, Status, Token } from '../../util/types'
+import { GraphMarketMakerData } from '../graph/useGraphMarketMakerData'
+import { useContracts } from '../useContracts'
 
 const logger = getLogger('useBlockchainMarketMakerData')
 

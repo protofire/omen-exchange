@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
-import { Status } from '../util/types'
+import { Status } from '../../util/types'
 
 const fragment = gql`
   fragment TransactionFields on FpmmTransaction {

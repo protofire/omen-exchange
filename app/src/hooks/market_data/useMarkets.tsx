@@ -1,7 +1,8 @@
 import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 
-import { buildQueryMarkets, buildQueryMyMarkets } from '../queries/markets_home'
+import { useConnectedWeb3Context } from '../../contexts'
+import { buildQueryMarkets, buildQueryMyMarkets } from '../../queries/markets_home'
 import {
   BuildQueryType,
   GraphMarketMakerDataItem,
@@ -10,9 +11,7 @@ import {
   GraphResponseMyMarkets,
   MarketFilters,
   MarketStates,
-} from '../util/types'
-
-import { useConnectedWeb3Context } from './connectedWeb3'
+} from '../../util/types'
 
 interface MarketVariables {
   first: number

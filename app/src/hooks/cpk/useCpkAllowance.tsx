@@ -2,11 +2,10 @@ import { Signer, constants } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
-import { ERC20Service } from '../services'
-import { pseudoNativeAssetAddress } from '../util/networks'
-import { RemoteData } from '../util/remote_data'
-
-import { useConnectedWeb3Context } from './connectedWeb3'
+import { useConnectedWeb3Context } from '../../contexts'
+import { ERC20Service } from '../../services'
+import { pseudoNativeAssetAddress } from '../../util/networks'
+import { RemoteData } from '../../util/remote_data'
 
 /**
  * Return the allowance of the given `signer` for the cpk.

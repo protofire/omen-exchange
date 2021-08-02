@@ -4,7 +4,7 @@ import React, { ChangeEvent, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../../../common/constants'
-import { ConnectedWeb3Context } from '../../../../../../hooks'
+import { ConnectedWeb3Context } from '../../../../../../contexts'
 import { formatBigNumber } from '../../../../../../util/tools'
 import { Arbitrator } from '../../../../../../util/types'
 import { ButtonType } from '../../../../../button/button_styling_types'

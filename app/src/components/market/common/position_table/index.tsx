@@ -2,7 +2,8 @@ import { BigNumber, parseUnits } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { useCompoundService, useConnectedWeb3Context, useSymbol } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../contexts'
+import { useCompoundService, useSymbol } from '../../../../hooks'
 import { getNativeAsset, getNativeCompoundAsset, getToken } from '../../../../util/networks'
 import {
   formatBigNumber,

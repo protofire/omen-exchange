@@ -7,11 +7,11 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../common/constants'
+import { useConnectedWeb3Context } from '../../../../contexts'
 import {
   useAsyncDerivedValue,
   useCollateralBalance,
   useCompoundService,
-  useConnectedWeb3Context,
   useContracts,
   useCpkAllowance,
   useCpkProxy,
