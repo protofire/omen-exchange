@@ -5,14 +5,8 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { STANDARD_DECIMALS } from '../../common/constants'
 import { MarketPoolLiquidity } from '../../components/market/sections/market_pooling/market_pool_liquidity'
 import { ScalarMarketPoolLiquidity } from '../../components/market/sections/market_pooling/scalar_market_pool_liquidity'
-import {
-  useCollateralBalance,
-  useConnectedWeb3Context,
-  useContracts,
-  useCpkAllowance,
-  useCpkProxy,
-  useFundingBalance,
-} from '../../hooks'
+import { useConnectedWeb3Context } from '../../contexts'
+import { useCollateralBalance, useContracts, useCpkAllowance, useCpkProxy, useFundingBalance } from '../../hooks'
 import { getLogger } from '../../util/logger'
 import { pseudoNativeAssetAddress } from '../../util/networks'
 import { RemoteData } from '../../util/remote_data'

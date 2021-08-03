@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ConnectedWeb3Context } from '../../../../hooks'
+import { ConnectedWeb3Context } from '../../../../contexts'
 import { MarketDetailsTab, MarketMakerData } from '../../../../util/types'
 
 import { MarketVerify } from './market_verify'

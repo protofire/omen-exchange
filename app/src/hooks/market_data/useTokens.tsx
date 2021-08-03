@@ -1,20 +1,19 @@
 import axios from 'axios'
 import { useState } from 'react'
 
-import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../common/constants'
-import { getMultiCallConfig, multicall } from '../util/multicall'
+import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../../common/constants'
+import { ConnectedWeb3Context } from '../../contexts'
+import { getMultiCallConfig, multicall } from '../../util/multicall'
 import {
   getGraphUris,
   getNativeAsset,
   getOmenTCRListId,
   getTokensByNetwork,
   pseudoNativeAssetAddress,
-} from '../util/networks'
-import { getImageUrl } from '../util/token'
-import { isObjectEqual } from '../util/tools'
-import { Token } from '../util/types'
-
-import { ConnectedWeb3Context } from './connectedWeb3'
+} from '../../util/networks'
+import { getImageUrl } from '../../util/token'
+import { isObjectEqual } from '../../util/tools'
+import { Token } from '../../util/types'
 
 const query = `
   query GetTokenList($listId: String!) {

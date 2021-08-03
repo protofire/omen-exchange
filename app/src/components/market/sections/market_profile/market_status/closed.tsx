@@ -6,8 +6,8 @@ import { RouteComponentProps, useHistory, useLocation, withRouter } from 'react-
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../../common/constants'
+import { WhenConnected, useConnectedWeb3Context } from '../../../../../contexts'
 import { useContracts, useGraphMarketUserTxData, useSymbol } from '../../../../../hooks'
-import { WhenConnected, useConnectedWeb3Context } from '../../../../../hooks/connectedWeb3'
 import { MarketBuyContainer } from '../../../../../pages/market_sections/market_buy_container'
 import { MarketPoolLiquidityContainer } from '../../../../../pages/market_sections/market_pool_liquidity_container'
 import { MarketSellContainer } from '../../../../../pages/market_sections/market_sell_container'

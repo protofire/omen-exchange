@@ -1,7 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import React, { useEffect, useState } from 'react'
 import { Provider } from 'react-redux'
-import { ThemeProvider } from 'styled-components'
 import Web3Provider from 'web3-react'
 
 import 'react-datepicker/dist/react-datepicker.css'
@@ -10,10 +9,10 @@ import 'sanitize.css'
 import { HeaderNoRouter } from './components/common/layout/header'
 import { Main } from './components/main'
 import SettingsViewContainer from './components/settings/settings_view'
+import { ConnectedWeb3 } from './contexts'
 import { ApolloProviderWrapper } from './contexts/Apollo'
-import { ConnectedWeb3 } from './hooks'
 import balanceReducer from './store/reducer'
-import theme from './theme'
+import { ThemeProvider } from './theme'
 import { GlobalStyle } from './theme/global_style'
 import connectors from './util/connectors'
 import { getInfuraUrl } from './util/networks'
@@ -35,7 +34,7 @@ const App: React.FC = () => {
   }, [ethereum])
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider>
       <Web3Provider connectors={connectors} libraryName="ethers.js">
         {!status ? (
           <>

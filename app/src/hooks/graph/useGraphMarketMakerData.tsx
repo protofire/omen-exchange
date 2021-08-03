@@ -4,9 +4,9 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
-import { getLogger } from '../util/logger'
-import { getOutcomes } from '../util/networks'
-import { AnswerItem, BondItem, INVALID_ANSWER_ID, KlerosSubmission, Question, Status } from '../util/types'
+import { getLogger } from '../../util/logger'
+import { getOutcomes } from '../../util/networks'
+import { AnswerItem, BondItem, INVALID_ANSWER_ID, KlerosSubmission, Question, Status } from '../../util/types'
 
 const logger = getLogger('useGraphMarketMakerData')
 

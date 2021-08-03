@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { DOCUMENT_FAQ } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../contexts'
 import { SharedPropsInterface } from '../../../../pages/market_sections/market_pool_liquidity_container'
 import { getNativeAsset } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
@@ -361,12 +361,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           Back
         </Button>
         {activeTab === Tabs.deposit && (
-          <Button buttonType={ButtonType.primaryAlternative} disabled={disableDepositButton} onClick={addFunding}>
+          <Button buttonType={ButtonType.primary} disabled={disableDepositButton} onClick={addFunding}>
             Deposit
           </Button>
         )}
         {activeTab === Tabs.withdraw && (
-          <Button buttonType={ButtonType.primaryAlternative} disabled={disableWithdrawButton} onClick={removeFunding}>
+          <Button buttonType={ButtonType.primary} disabled={disableWithdrawButton} onClick={removeFunding}>
             Withdraw
           </Button>
         )}

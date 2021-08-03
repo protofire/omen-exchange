@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
-import { CPKService } from '../services'
-import { createCPK } from '../util/cpk'
+import { CPKService } from '../../services'
+import { createCPK } from '../../util/cpk'
 
 /**
  * Returns an instance of CPKService. While the instance is being (asynchronously) created, the returned value is null.

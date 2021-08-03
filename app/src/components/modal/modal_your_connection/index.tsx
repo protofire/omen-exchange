@@ -3,7 +3,7 @@ import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../hooks'
+import { useConnectedWeb3Context } from '../../../contexts'
 import { NetworkId, bridgeTokensList, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
 import { bigNumberToString, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'

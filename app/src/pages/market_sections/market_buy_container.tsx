@@ -5,15 +5,8 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { STANDARD_DECIMALS } from '../../common/constants'
 import { MarketBuy } from '../../components/market/sections/market_buy/market_buy'
 import { ScalarMarketBuy } from '../../components/market/sections/market_buy/scalar_market_buy'
-import {
-  ConnectedWeb3Context,
-  useAsyncDerivedValue,
-  useCollateralBalance,
-  useConnectedWeb3Context,
-  useContracts,
-  useCpkAllowance,
-  useCpkProxy,
-} from '../../hooks'
+import { ConnectedWeb3Context, useConnectedWeb3Context } from '../../contexts'
+import { useAsyncDerivedValue, useCollateralBalance, useContracts, useCpkAllowance, useCpkProxy } from '../../hooks'
 import { CPKService, MarketMakerService } from '../../services'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../util/networks'
 import { RemoteData } from '../../util/remote_data'

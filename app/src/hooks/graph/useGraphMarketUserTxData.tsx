@@ -3,9 +3,9 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
-import { getLogger } from '../util/logger'
-import { getContractAddress } from '../util/networks'
-import { LiquidityObject, LiquidityType, Status, TradeObject, TradeType } from '../util/types'
+import { getLogger } from '../../util/logger'
+import { getContractAddress } from '../../util/networks'
+import { LiquidityObject, LiquidityType, Status, TradeObject, TradeType } from '../../util/types'
 
 const logger = getLogger('useGraphMarketUserTxData')
 

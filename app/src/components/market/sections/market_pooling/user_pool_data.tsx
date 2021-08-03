@@ -2,7 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../contexts'
 import { bigNumberToString, getInitialCollateral } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
 import { TitleValue } from '../../../common'

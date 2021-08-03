@@ -1,3 +1,37 @@
+import React from 'react'
+import styled, { ThemeProvider as StyledThemeProvider } from 'styled-components'
+
+import { Colors } from './types'
+
+export function colors(darkMode: boolean): Colors {
+  return {
+    //figma link https://www.figma.com/file/zVniQrYgkj8AfQs5zNeBrS/Components-FINAL
+
+    // text
+    text1: darkMode ? '' : '#37474F',
+    text2: darkMode ? '' : '#86909E',
+    text3: darkMode ? '' : '#333333',
+    text4: darkMode ? '' : '#757575',
+
+    //primary colors
+    primary1: darkMode ? '' : '#5C6BC0',
+    primary2: darkMode ? '' : '#7986CB',
+    primary3: darkMode ? '' : '#3F51B5',
+    primary4: darkMode ? '' : '#E8EAF6',
+
+    //other
+    white: darkMode ? '' : '#fff',
+    green: darkMode ? '' : '#4B9E98',
+    red: darkMode ? '' : '#E57373',
+    link: darkMode ? '' : '#1E88E5',
+
+    //border
+    border1: darkMode ? '' : '#DCDFF2',
+    border2: darkMode ? '' : '#C5CAE9',
+    border3: darkMode ? '' : '#9FA8DA',
+    border4: darkMode ? '' : '#ECEFF1',
+  }
+}
 const theme = {
   fonts: {
     defaultSize: '14px',
@@ -211,138 +245,6 @@ const theme = {
       },
     },
   },
-  outcomes: {
-    colors: [
-      {
-        darker: '#8E24AA',
-        medium: '#e1bee7',
-      },
-      {
-        darker: '#00897B',
-        medium: '#b2dfdb',
-      },
-      {
-        darker: '#d2b994',
-        medium: '#ffe0b2',
-      },
-      {
-        darker: '#b9b992',
-        medium: '#e7e7be',
-      },
-      {
-        darker: '#9db992',
-        medium: '#bedfb2',
-      },
-      {
-        darker: '#ca89bd',
-        medium: '#ffb2f0',
-      },
-      {
-        darker: '#cc9c9c',
-        medium: '#e7bebe',
-      },
-      {
-        darker: '#9ebd91',
-        medium: '#bfdfb2',
-      },
-      {
-        darker: '#af7171',
-        medium: '#ffb2b2',
-      },
-      {
-        darker: '#6d9677',
-        medium: '#90bb9b',
-      },
-      {
-        darker: '#7b91a9',
-        medium: '#b2c8df',
-      },
-      {
-        darker: '#a980c3',
-        medium: '#e1b2ff',
-      },
-      {
-        darker: '#b18bac',
-        medium: '#e7bee2',
-      },
-      {
-        darker: '#484343',
-        medium: '#757575',
-      },
-      {
-        darker: '#b38037',
-        medium: '#f0ad4e',
-      },
-      {
-        darker: '#acb8c1',
-        medium: '#e3f2fd',
-      },
-      {
-        darker: '#679053',
-        medium: '#8dc572',
-      },
-      {
-        darker: '#131a1d',
-        medium: '#37474f',
-      },
-      {
-        darker: '#17486f',
-        medium: '#216ba5',
-      },
-      {
-        darker: '#7e97ad',
-        medium: '#bbdefb',
-      },
-      {
-        darker: '#879caf',
-        medium: '#d6ebfd',
-      },
-      {
-        darker: '#265986',
-        medium: '#337ab7',
-      },
-      {
-        darker: '#0e488a',
-        medium: '#1565c0',
-      },
-      {
-        darker: '#4d535d',
-        medium: '#86909e',
-      },
-      {
-        darker: '#6b3838',
-        medium: '#be6464',
-      },
-      {
-        darker: '#313f46',
-        medium: '#607d8b',
-      },
-      {
-        darker: '#464646',
-        medium: '#9e9e9e',
-      },
-      {
-        darker: '#3c2922',
-        medium: '#795548',
-      },
-      {
-        darker: '#a03716',
-        medium: '#ff5722',
-      },
-      {
-        darker: '#c17300',
-        medium: '#ff9800',
-      },
-      {
-        darker: '#b1a325',
-        medium: '#ffeb3b',
-      },
-      {
-        darker: '#a51546',
-        medium: '#e91e63',
-      },
-    ],
-  },
   wrapperModalStyle: {
     content: {
       backgroundColor: '#fff',
@@ -457,4 +359,60 @@ const theme = {
   },
 }
 
-export default theme
+/* BElLOW IS ALTERNATIVE WAY TO DO MEDIA QUERIES */
+
+// export const MEDIA_WIDTHS = {
+//   upToExtraSmall: 500,
+//   upToSmall: 720,
+//   upToMedium: 960,
+//   upToLarge: 1280,
+// }
+//
+// const mediaWidthTemplates: { [width in keyof typeof MEDIA_WIDTHS]: typeof css } = Object.keys(MEDIA_WIDTHS).reduce(
+//   (accumulator, size) => {
+//     ;(accumulator as any)[size] = (a: any, b: any, c: any) => css`
+//       @media (max-width: ${(MEDIA_WIDTHS as any)[size]}px) {
+//         ${css(a, b, c)};
+//       }
+//     `
+//     return accumulator
+//   },
+//   {},
+// ) as any
+
+function themeAggregator(darkMode: boolean) {
+  return {
+    ...theme,
+    ...colors(darkMode),
+  }
+}
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  //this is temporary until we determine to use dark theme
+  const darkMode = false
+
+  return <StyledThemeProvider theme={themeAggregator(darkMode)}>{children}</StyledThemeProvider>
+}
+
+const TextWrapper = styled.div<{ color: keyof Colors }>`
+  color: ${props => props.theme.text3};
+  font-family: Roboto;
+  letter-spacing: 0.2px;
+`
+
+export const TYPE = {
+  heading1(props: any) {
+    return <TextWrapper fontSize={'22px'} fontWeight={500} letterSpacing={'0.8px'} lineHeight={'26px'} {...props} />
+  },
+  heading2(props: any) {
+    return <TextWrapper fontSize={'18px'} fontWeight={400} lineHeight={'21px'} {...props} />
+  },
+  heading3(props: any) {
+    return <TextWrapper fontSize={'16px'} fontWeight={500} lineHeight={'19px'} {...props} />
+  },
+  bodyMedium(props: any) {
+    return <TextWrapper fontSize={'14px'} fontWeight={500} lineHeight={'18px'} {...props} />
+  },
+  bodyRegular(props: any) {
+    return <TextWrapper fontSize={'14px'} fontWeight={400} lineHeight={'18px'} {...props} />
+  },
+}

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../contexts'
 import { getNativeAsset } from '../../../../util/networks'
 import {
   bigNumberToNumber,

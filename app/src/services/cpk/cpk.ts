@@ -1,7 +1,7 @@
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
-import { ConnectedWeb3Context } from '../../hooks'
+import { ConnectedWeb3Context } from '../../contexts'
 import { verifyProxyAddress } from '../../util/cpk'
 import { getLogger } from '../../util/logger'
 import { bridgeTokensList, getTargetSafeImplementation } from '../../util/networks'

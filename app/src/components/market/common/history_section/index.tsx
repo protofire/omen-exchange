@@ -4,7 +4,8 @@ import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
 
 import { EARLIEST_MAINNET_BLOCK_TO_CHECK, EARLIEST_RINKEBY_BLOCK_TO_CHECK } from '../../../../common/constants'
-import { useConnectedWeb3Context, useMultipleQueries } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../contexts'
+import { useMultipleQueries } from '../../../../hooks'
 import { isScalarMarket, keys, range, waitABit } from '../../../../util/tools'
 import { Period } from '../../../../util/types'
 
