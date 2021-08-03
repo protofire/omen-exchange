@@ -1,34 +1,16 @@
 import { stripIndents } from 'common-tags'
 import { Zero } from 'ethers/constants'
 import { BigNumber, parseUnits } from 'ethers/utils'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
-import {
-  useAsyncDerivedValue,
-  useCollateralBalance,
-  useConnectedWeb3Context,
-  useContracts,
-  useCpkAllowance,
-  useCpkProxy,
-} from '../../../../hooks'
-import { MarketMakerService } from '../../../../services'
+import { SharedPropsInterface } from '../../../../pages/market_sections/market_buy_container'
 import { getLogger } from '../../../../util/logger'
-import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import {
-  calcPrediction,
-  calcXValue,
-  computeBalanceAfterTrade,
-  formatBigNumber,
-  formatNumber,
-  getInitialCollateral,
-  getUnit,
-  mulBN,
-} from '../../../../util/tools'
-import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token, TransactionStep } from '../../../../util/types'
+import { calcXValue, formatBigNumber, formatNumber, getUnit } from '../../../../util/tools'
+import { MarketDetailsTab, MarketMakerData, Status, TransactionStep } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
 import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
@@ -60,61 +42,76 @@ interface Props {
   fetchGraphMarketUserTxData: () => Promise<void>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
+  sharedProps: SharedPropsInterface
 }
 
 export const ScalarMarketBuy = (props: Props) => {
-  const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, switchMarketTab } = props
-  const context = useConnectedWeb3Context()
-  const { fetchBalances } = context.balances
-
-  const { cpk, library: provider, networkId, relay, setTxState, txHash, txState } = context
-  const signer = useMemo(() => provider.getSigner(), [provider])
+  const { fetchGraphMarketMakerData, fetchGraphMarketUserTxData, marketMakerData, sharedProps, switchMarketTab } = props
+  const {
+    allowance,
+    allowanceFinished,
+    amount,
+    amountDisplay,
+    amountError,
+    baseCostFormatted,
+    collateral,
+    collateralBalance,
+    context,
+    cpk,
+    displayFundAmount,
+    feeFormatted,
+    feePaid,
+    feePercentage,
+    fetchBalances,
+    fetchCollateralBalance,
+    initialCollateral,
+    isBuyDisabled,
+    isNegativeAmount,
+    isTransactionModalOpen,
+    marketMaker,
+    nativeAsset,
+    outcomeIndex: positionIndex,
+    potentialProfit,
+    potentialProfitFormatted,
+    probabilitiesOrNewPrediction: newPrediction,
+    proxyIsUpToDate,
+    setAmount,
+    setAmountDisplay,
+    setCollateral,
+    setDisplayAmountToFund,
+    setIsTransactionModalOpen,
+    setOutcomeIndex: setPositionIndex,
+    setStatus,
+    setTxState,
+    shouldDisplayMaxButton,
+    showSetAllowance,
+    showUpgrade,
+    total,
+    tradedShares,
+    txHash,
+    txState,
+    unlockCollateral,
+    upgradeFinished,
+    upgradeProxy,
+  } = sharedProps
 
   const {
     address: marketMakerAddress,
     balances,
-    fee,
     outcomeTokenMarginalPrices,
     question,
     scalarHigh,
     scalarLow,
   } = marketMakerData
-  const { buildMarketMaker } = useContracts(context)
-  const marketMaker = useMemo(() => buildMarketMaker(marketMakerAddress), [buildMarketMaker, marketMakerAddress])
-
+  const [message, setMessage] = useState<string>('')
   const Tabs = {
     short: 'short',
     long: 'long',
   }
 
-  const [amount, setAmount] = useState<BigNumber>(new BigNumber(0))
-  const [amountDisplay, setAmountDisplay] = useState<string>('')
-
-  const nativeAsset = getNativeAsset(networkId, relay)
-  const initialCollateral = getInitialCollateral(networkId, marketMakerData.collateral, relay)
-  const [collateral, setCollateral] = useState<Token>(initialCollateral)
-
   const [activeTab, setActiveTab] = useState(Tabs.short)
-  const [positionIndex, setPositionIndex] = useState(0)
-  const [status, setStatus] = useState<Status>(Status.Ready)
-  const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
-  const [message, setMessage] = useState<string>('')
+
   const [tweet, setTweet] = useState('')
-  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-
-  const [allowanceFinished, setAllowanceFinished] = useState(false)
-
-  const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
-
-  const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
-  const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amount))
-  const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
-
-  const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
-    collateral,
-    context,
-  )
-  const collateralBalance = maybeCollateralBalance || Zero
 
   useEffect(() => {
     setCollateral(initialCollateral)
@@ -124,74 +121,11 @@ export const ScalarMarketBuy = (props: Props) => {
   }, [marketMakerData.collateral.address])
 
   useEffect(() => {
-    setIsNegativeAmount(formatBigNumber(amount, collateral.decimals, collateral.decimals).includes('-'))
-  }, [amount, collateral.decimals])
-
-  useEffect(() => {
     activeTab === Tabs.short ? setPositionIndex(0) : setPositionIndex(1)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, Tabs.short])
 
   const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
-
-  const unlockCollateral = async () => {
-    if (!cpk) {
-      return
-    }
-
-    await unlock()
-    setAllowanceFinished(true)
-  }
-
-  const [upgradeFinished, setUpgradeFinished] = useState(false)
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
-  const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
-
-  const showUpgrade =
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
-
-  const upgradeProxy = async () => {
-    if (!cpk) {
-      return
-    }
-
-    await updateProxy()
-    setUpgradeFinished(true)
-  }
-
-  const calcBuyAmount = useMemo(
-    () => async (amount: BigNumber): Promise<[BigNumber, number, BigNumber]> => {
-      let tradedShares: BigNumber
-
-      try {
-        tradedShares = await marketMaker.calcBuyAmount(amount, positionIndex)
-      } catch {
-        tradedShares = new BigNumber(0)
-      }
-
-      const balanceAfterTrade = computeBalanceAfterTrade(
-        balances.map(b => b.holdings),
-        positionIndex,
-        amount,
-        tradedShares,
-      )
-      const pricesAfterTrade = MarketMakerService.getActualPrice(balanceAfterTrade)
-
-      const newPrediction = calcPrediction(
-        pricesAfterTrade[1].toString(),
-        scalarLow || new BigNumber(0),
-        scalarHigh || new BigNumber(0),
-      )
-
-      return [tradedShares, newPrediction, amount]
-    },
-    [balances, marketMaker, positionIndex, scalarLow, scalarHigh],
-  )
-  const [tradedShares, newPrediction, debouncedAmount] = useAsyncDerivedValue(
-    amount,
-    [new BigNumber(0), 0, amount],
-    calcBuyAmount,
-  )
 
   const formattedNewPrediction =
     newPrediction &&
@@ -201,55 +135,9 @@ export const ScalarMarketBuy = (props: Props) => {
       scalarHigh || new BigNumber(0),
     ) / 100
 
-  const feePaid = mulBN(debouncedAmount, Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)))
-  const feePercentage = Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)) * 100
-
-  const baseCost = debouncedAmount.sub(feePaid)
-  const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount)
-
-  const currentBalance = `${formatBigNumber(collateralBalance, collateral.decimals, 5)}`
-
-  const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals, collateral.decimals))}
-  ${collateral.symbol}`
-  const baseCostFormatted = `${formatNumber(
-    formatBigNumber(baseCost || Zero, collateral.decimals, collateral.decimals),
-  )}
-  ${collateral.symbol}`
-  const potentialProfitFormatted = `${formatNumber(
-    formatBigNumber(potentialProfit, collateral.decimals, collateral.decimals),
-  )} ${collateral.symbol}`
-
   const potentialLossFormatted = `${formatNumber(formatBigNumber(amount, collateral.decimals, collateral.decimals))} ${
     collateral.symbol
   }`
-
-  const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals, collateral.decimals))
-
-  const total = `${sharesTotal} Shares`
-
-  const showSetAllowance =
-    collateral.address !== pseudoNativeAssetAddress &&
-    !cpk?.isSafeApp &&
-    (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
-
-  const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
-
-  const amountError =
-    maybeCollateralBalance === null
-      ? null
-      : maybeCollateralBalance.isZero() && amount.gt(maybeCollateralBalance)
-      ? `Insufficient balance`
-      : amount.gt(maybeCollateralBalance)
-      ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
-      : null
-
-  const isBuyDisabled =
-    (status !== Status.Ready && status !== Status.Error) ||
-    amount.isZero() ||
-    (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
-    amountError !== null ||
-    isNegativeAmount ||
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress)
 
   const finish = async () => {
     const outcomeIndex = positionIndex
@@ -294,11 +182,6 @@ export const ScalarMarketBuy = (props: Props) => {
       setMessage(`Error trying to buy '${balances[outcomeIndex].outcomeName}' Shares.`)
       logger.error(`${message} - ${err.message}`)
     }
-  }
-
-  const setDisplayAmountToFund = (value: BigNumber) => {
-    setAmount(value)
-    setDisplayFundAmount(value)
   }
 
   return (

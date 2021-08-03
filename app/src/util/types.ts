@@ -194,7 +194,6 @@ export interface Arbitrator {
 export enum Wallet {
   MetaMask = 'MetaMask',
   WalletConnect = 'WalletConnect',
-  Authereum = 'Authereum',
 }
 
 export interface MarketData {
