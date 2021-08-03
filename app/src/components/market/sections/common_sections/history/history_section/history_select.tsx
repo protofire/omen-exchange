@@ -3,21 +3,26 @@ import { BigNumber, Interface, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { STANDARD_DECIMALS } from '../../../../../../common/constants'
+import { useConnectedWeb3Context, useContracts } from '../../../../../../hooks'
 import {
   FpmmTradeDataType,
   HistoryType,
   useGraphFpmmTransactionsFromQuestion,
-} from '../../../../hooks/useGraphFpmmTransactionsFromQuestion'
-import { realitioAbi } from '../../../../services/realitio'
-import { SafeService } from '../../../../services/safe'
-import { getContractAddress } from '../../../../util/networks'
-import { calcPrice, calcSellAmountInCollateral, formatBigNumber, formatTimestampToDate } from '../../../../util/tools'
-import { HistoricData, Period } from '../../../../util/types'
-import { ButtonRound, ButtonSelectable } from '../../../button'
-import { Dropdown, DropdownPosition } from '../../../common/form/dropdown'
-import { commonWrapperCSS } from '../common_styled'
+} from '../../../../../../hooks/useGraphFpmmTransactionsFromQuestion'
+import { realitioAbi } from '../../../../../../services/realitio'
+import { SafeService } from '../../../../../../services/safe'
+import { getContractAddress } from '../../../../../../util/networks'
+import {
+  calcPrice,
+  calcSellAmountInCollateral,
+  formatBigNumber,
+  formatTimestampToDate,
+} from '../../../../../../util/tools'
+import { HistoricData, Period } from '../../../../../../util/types'
+import { ButtonRound, ButtonSelectable } from '../../../../../button'
+import { Dropdown, DropdownPosition } from '../../../../../common/form/dropdown'
+import { commonWrapperCSS } from '../../../../common/common_styled'
 import { HistoryChart } from '../history_chart'
 import { HistoryTable } from '../history_table'
 
