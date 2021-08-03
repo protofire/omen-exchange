@@ -1,7 +1,7 @@
 import React, { DOMAttributes, HTMLAttributes } from 'react'
 import styled from 'styled-components'
 
-import { Token } from '../../../../util/types'
+import { Token } from '../../../../../../util/types'
 import { ToggleTokenLock, ToggleTokenLockProps } from '../toggle_token_lock'
 
 const Wrapper = styled.div`

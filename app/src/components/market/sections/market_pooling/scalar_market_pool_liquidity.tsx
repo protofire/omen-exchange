@@ -20,12 +20,12 @@ import { CurrenciesWrapper, GenericError, TabsGrid } from '../../common/common_s
 import { CurrencySelector } from '../../common/currency_selector'
 import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { MarketScale } from '../../common/market_scale'
-import { SetAllowance } from '../../common/set_allowance'
 import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WarningMessage } from '../../common/warning_message'
+import { SetAllowance } from '../common_sections/allowance/set_allowance'
 
 import { UserPoolData } from './user_pool_data'
 
