@@ -28,9 +28,9 @@ import { TokenBalance } from '../../common/token_balance'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
-import { WarningMessage } from '../../common/warning_message'
 import { SetAllowance } from '../common_sections/allowance/set_allowance'
 import { GridTransactionDetails } from '../common_sections/card_bottom_details/grid_transaction_details'
+import { WarningMessage } from '../common_sections/message_text/warning_message'
 
 import { UserPoolData } from './user_pool_data'
 

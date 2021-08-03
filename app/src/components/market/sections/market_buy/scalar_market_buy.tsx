@@ -21,10 +21,10 @@ import { CurrencySelector } from '../../common/currency_selector'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
-import { WarningMessage } from '../../common/warning_message'
 import { SetAllowance } from '../common_sections/allowance/set_allowance'
 import { GridTransactionDetails } from '../common_sections/card_bottom_details/grid_transaction_details'
 import { MarketScale } from '../common_sections/card_bottom_details/market_scale'
+import { WarningMessage } from '../common_sections/message_text/warning_message'
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;

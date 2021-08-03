@@ -7,7 +7,7 @@ import styled from 'styled-components'
 import { useConnectedWeb3Context, useTokens } from '../../../../../../hooks'
 import { formatBigNumber, formatDate, formatToShortNumber } from '../../../../../../util/tools'
 import { Token } from '../../../../../../util/types'
-import { TextToggle } from '../../../../common/TextToggle'
+import { TextToggle } from '../../message_text/TextToggle'
 
 const MarketDataWrapper = styled.div`
   display: flex;
