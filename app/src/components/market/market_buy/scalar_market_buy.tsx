@@ -9,7 +9,7 @@ import { STANDARD_DECIMALS } from '../../../common/constants'
 import { SharedPropsInterface } from '../../../pages/market_sections/market_buy_container'
 import { getLogger } from '../../../util/logger'
 import { RemoteData } from '../../../util/remote_data'
-import { calcXValue, formatBigNumber, formatNumber, getUnit } from '../../../util/tools'
+import { bigNumberToString, calcXValue, getUnit } from '../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, Status, TransactionStep } from '../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -125,7 +125,7 @@ export const ScalarMarketBuy = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, Tabs.short])
 
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
+  const walletBalance = bigNumberToString(collateralBalance, collateral.decimals, 5)
 
   const formattedNewPrediction =
     newPrediction &&
@@ -135,9 +135,7 @@ export const ScalarMarketBuy = (props: Props) => {
       scalarHigh || new BigNumber(0),
     ) / 100
 
-  const potentialLossFormatted = `${formatNumber(formatBigNumber(amount, collateral.decimals, collateral.decimals))} ${
-    collateral.symbol
-  }`
+  const potentialLossFormatted = `${bigNumberToString(amount, collateral.decimals)} ${collateral.symbol}`
 
   const finish = async () => {
     const outcomeIndex = positionIndex
@@ -146,10 +144,10 @@ export const ScalarMarketBuy = (props: Props) => {
         return
       }
 
-      const sharesAmount = formatBigNumber(tradedShares, collateral.decimals, collateral.decimals)
+      const sharesAmount = bigNumberToString(tradedShares, collateral.decimals)
       setTweet('')
       setStatus(Status.Loading)
-      setMessage(`Buying ${formatNumber(sharesAmount)} shares...`)
+      setMessage(`Buying ${sharesAmount} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
@@ -175,7 +173,7 @@ export const ScalarMarketBuy = (props: Props) => {
       setDisplayAmountToFund(new BigNumber('0'))
       setAmount(new BigNumber(0))
       setStatus(Status.Ready)
-      setMessage(`Successfully bought ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
+      setMessage(`Successfully bought ${sharesAmount} ${balances[outcomeIndex].outcomeName} shares.`)
     } catch (err) {
       setStatus(Status.Error)
       setTxState(TransactionStep.error)
@@ -238,7 +236,7 @@ export const ScalarMarketBuy = (props: Props) => {
             }
             onClickMaxButton={() => {
               setDisplayAmountToFund(collateralBalance)
-              setAmountDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
+              setAmountDisplay(bigNumberToString(collateralBalance, collateral.decimals, 5, true))
             }}
             shouldDisplayMaxButton={shouldDisplayMaxButton}
             symbol={collateral.symbol}

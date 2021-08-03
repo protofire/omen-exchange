@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { SharedPropsInterface } from '../../../pages/market_sections/market_sell_container'
-import { calcXValue, formatBigNumber, formatNumber, getUnit } from '../../../util/tools'
+import { bigNumberToString, calcXValue, getUnit } from '../../../util/tools'
 import { MarketDetailsTab, MarketMakerData } from '../../../util/types'
 import { Button, ButtonContainer } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -107,6 +107,7 @@ export const ScalarMarketSell = (props: Props) => {
             setBalanceItem={setBalanceItem}
             setPositionIndex={setPositionIndex}
           />
+
           <TextfieldCustomPlaceholder
             formField={
               <BigNumberInput
@@ -124,7 +125,7 @@ export const ScalarMarketSell = (props: Props) => {
             }
             onClickMaxButton={() => {
               setAmountSharesFromInput(balanceItem.shares)
-              setAmountSharesToDisplay(formatBigNumber(balanceItem.shares, collateral.decimals, 5))
+              setAmountSharesToDisplay(bigNumberToString(balanceItem.shares, collateral.decimals, 5, true))
             }}
             shouldDisplayMaxButton
             symbol={'Shares'}
@@ -135,7 +136,7 @@ export const ScalarMarketSell = (props: Props) => {
           <TransactionDetailsCard>
             <TransactionDetailsRow
               title={'Sell Amount'}
-              value={`${formatNumber(formatBigNumber(amountShares || Zero, collateral.decimals))} Shares`}
+              value={`${bigNumberToString(amountShares || Zero, collateral.decimals)} Shares`}
             />
             <TransactionDetailsRow
               emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
@@ -143,36 +144,25 @@ export const ScalarMarketSell = (props: Props) => {
               title={'Revenue'}
               value={
                 potentialValue
-                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, collateral.decimals))}
+                  ? `${bigNumberToString(potentialValue, collateral.decimals)}
                   ${collateral.symbol}`
                   : '0.00'
               }
             />
             <TransactionDetailsRow
               title={'Fee'}
-              value={`${
-                costFee
-                  ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, collateral.decimals))
-                  : '0.00'
-              } ${collateral.symbol}`}
+              value={`${costFee ? bigNumberToString(costFee.mul(-1), collateral.decimals) : '0.00'} ${
+                collateral.symbol
+              }`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
-              emphasizeValue={
-                (tradedCollateral && parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0) || false
-              }
-              state={
-                (tradedCollateral &&
-                  parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0 &&
-                  ValueStates.important) ||
-                ValueStates.normal
-              }
+              emphasizeValue={(tradedCollateral && tradedCollateral.gt(Zero)) || false}
+              state={(tradedCollateral && tradedCollateral.gt(Zero) && ValueStates.important) || ValueStates.normal}
               title={'Total'}
-              value={`${
-                tradedCollateral
-                  ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, collateral.decimals))
-                  : '0.00'
-              } ${collateral.symbol}`}
+              value={`${tradedCollateral ? bigNumberToString(tradedCollateral, collateral.decimals) : '0.00'} ${
+                collateral.symbol
+              }`}
             />
           </TransactionDetailsCard>
         </div>
