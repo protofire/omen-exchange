@@ -100,8 +100,8 @@ const SecondaryLineCSS = css`
   &[disabled],
   &[disabled]:hover {
     background-color: ${props => props.theme.white};
-    border-color: ${props => props.theme.border1};
-    color: ${props => props.theme.text1};
+    border-color: ${props => props.theme.primary4};
+    color: ${props => props.theme.text2};
     cursor: not-allowed;
   }
 `
