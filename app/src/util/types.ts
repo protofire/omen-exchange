@@ -2,7 +2,7 @@ import Big from 'big.js'
 import { Block } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
-import { Outcome } from '../components/market/sections/market_create/steps/outcomes'
+import { Outcome } from '../components/market/market_create/steps/outcomes'
 
 export enum Status {
   Ready = 'Ready',

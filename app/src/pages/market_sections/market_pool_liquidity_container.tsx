@@ -3,8 +3,8 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 
 import { STANDARD_DECIMALS } from '../../common/constants'
-import { MarketPoolLiquidity } from '../../components/market/sections/market_pooling/market_pool_liquidity'
-import { ScalarMarketPoolLiquidity } from '../../components/market/sections/market_pooling/scalar_market_pool_liquidity'
+import { MarketPoolLiquidity } from '../../components/market/market_pooling/market_pool_liquidity'
+import { ScalarMarketPoolLiquidity } from '../../components/market/market_pooling/scalar_market_pool_liquidity'
 import {
   useCollateralBalance,
   useConnectedWeb3Context,

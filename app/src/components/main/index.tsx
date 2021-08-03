@@ -7,10 +7,11 @@ import { DOCUMENT_TITLE } from '../../common/constants'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
 import { Footer } from '../common/layout/footer'
 import { Header } from '../common/layout/header'
-import { MarketRoutes } from '../market/routes/market_routes'
-import { MarketWizardCreatorContainer } from '../market/sections/market_create/market_wizard_creator_container'
-import { MarketHomeContainer } from '../market/sections/market_list/market_home_container'
+import { MarketWizardCreatorContainer } from '../market/market_create/market_wizard_creator_container'
+import { MarketHomeContainer } from '../market/market_list/market_home_container'
 import SettingsViewContainer from '../settings/settings_view'
+
+import { MarketRoutes } from './routes/market_routes'
 const RedirectToHome = () => <Redirect to="/" />
 export const Main: React.FC = () => {
   const context = useWeb3Context()
