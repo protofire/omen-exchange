@@ -116,8 +116,15 @@ const MarketHomeContainer: React.FC = () => {
 
   const location = useLocation()
 
-  const sortRoute = location.pathname.split('/')[1]
+  const stateFilter = location.search.includes('state')
+  let stateRoute = location.search.split('state=')[1]
+  if (stateRoute) stateRoute = stateRoute.split('&')[0]
+
+  let sortRoute
   let sortDirection: 'desc' | 'asc' = 'desc'
+  if (stateRoute !== 'MY_MARKETS') {
+    sortRoute = location.pathname.split('/')[1]
+  }
 
   const currencyFilter = location.pathname.includes('currency')
   let currencyRoute = location.pathname.split('/currency/')[1]
@@ -139,32 +146,30 @@ const MarketHomeContainer: React.FC = () => {
   let typeRoute = location.pathname.split('/type/')[1]
   if (typeRoute) typeRoute = typeRoute.split('/')[0]
 
-  const stateFilter = location.search.includes('state')
-  let stateRoute = location.search.split('state=')[1]
-  if (stateRoute) stateRoute = stateRoute.split('&')[0]
-
   const searchFilter = location.search.includes('tag')
   let searchRoute = location.search.split('tag=')[1]
   if (searchRoute) searchRoute = searchRoute.split('&')[0]
 
   let sortParam: Maybe<MarketsSortCriteria> = stateRoute === 'MY_MARKETS' ? 'openingTimestamp' : 'usdLiquidityParameter'
   let sortIndex: number = stateRoute === 'MY_MARKETS' ? 1 : 2
-  if (sortRoute === '24h-volume') {
-    sortIndex = 0
-    sortParam = `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria
-  } else if (sortRoute === 'volume') {
-    sortIndex = 1
-    sortParam = 'usdVolume'
-  } else if (sortRoute === 'liquidity') {
-    sortIndex = 2
-    sortParam = 'usdLiquidityParameter'
-  } else if (sortRoute === 'newest') {
-    sortIndex = 3
-    sortParam = 'creationTimestamp'
-  } else if (sortRoute === 'ending') {
-    sortIndex = 4
-    sortParam = 'openingTimestamp'
-    sortDirection = 'asc'
+  if (stateRoute !== 'MY_MARKETS') {
+    if (sortRoute === '24h-volume') {
+      sortIndex = 0
+      sortParam = `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria
+    } else if (sortRoute === 'volume') {
+      sortIndex = 1
+      sortParam = 'usdVolume'
+    } else if (sortRoute === 'liquidity') {
+      sortIndex = 2
+      sortParam = 'usdLiquidityParameter'
+    } else if (sortRoute === 'newest') {
+      sortIndex = 3
+      sortParam = 'creationTimestamp'
+    } else if (sortRoute === 'ending') {
+      sortIndex = 4
+      sortParam = 'openingTimestamp'
+      sortDirection = 'asc'
+    }
   }
 
   let currencyParam: string | null
@@ -310,16 +315,18 @@ const MarketHomeContainer: React.FC = () => {
       const routeQueryStart = '?'
       const routeQueryArray: string[] = []
 
-      if (filter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}`) {
-        route += '/24h-volume'
-      } else if (filter.sortBy === 'usdVolume') {
-        route += '/volume'
-      } else if (filter.sortBy === 'creationTimestamp') {
-        route += '/newest'
-      } else if (filter.sortBy === 'openingTimestamp') {
-        route += '/ending'
-      } else if (filter.sortBy === 'usdLiquidityParameter') {
-        route += '/liquidity'
+      if (filter.state !== 'MY_MARKETS') {
+        if (filter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}`) {
+          route += '/24h-volume'
+        } else if (filter.sortBy === 'usdVolume') {
+          route += '/volume'
+        } else if (filter.sortBy === 'creationTimestamp') {
+          route += '/newest'
+        } else if (filter.sortBy === 'openingTimestamp') {
+          route += '/ending'
+        } else if (filter.sortBy === 'usdLiquidityParameter') {
+          route += '/liquidity'
+        }
       }
 
       if (filter.currency) {

@@ -316,7 +316,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       state: MarketStates.open,
       title: 'Open',
       active: state === MarketStates.open,
-      onClick: () => setState(MarketStates.open),
+      onClick: () => {
+        setState(MarketStates.open)
+        setSortIndex(2)
+        setSortBy('usdLiquidityParameter')
+      },
     },
     {
       state: MarketStates.pending,
