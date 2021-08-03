@@ -10,13 +10,7 @@ import { useCollateralBalance, useContracts, useCpkAllowance, useCpkProxy, useFu
 import { getLogger } from '../../util/logger'
 import { pseudoNativeAssetAddress } from '../../util/networks'
 import { RemoteData } from '../../util/remote_data'
-import {
-  calcPoolTokens,
-  calcRemoveFundingSendAmounts,
-  formatBigNumber,
-  formatNumber,
-  getInitialCollateral,
-} from '../../util/tools'
+import { bigNumberToString, calcPoolTokens, calcRemoveFundingSendAmounts, getInitialCollateral } from '../../util/tools'
 import { MarketDetailsTab, MarketMakerData, Ternary, Token, TransactionStep } from '../../util/types'
 
 interface Props {
@@ -119,10 +113,10 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     collateral,
     context,
   )
-  const feeFormatted = useMemo(() => `${formatBigNumber(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
+  const feeFormatted = useMemo(() => `${bigNumberToString(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
   const collateralBalance = maybeCollateralBalance || Zero
-  const walletBalance = formatNumber(formatBigNumber(collateralBalance, collateral.decimals, 5), 5)
-  const sharesBalance = formatBigNumber(fundingBalance, collateral.decimals)
+  const walletBalance = bigNumberToString(collateralBalance, collateral.decimals, 5)
+  const sharesBalance = bigNumberToString(fundingBalance, collateral.decimals)
 
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
@@ -191,9 +185,9 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
         throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
       }
 
-      const fundsAmount = formatBigNumber(amountToFund || Zero, collateral.decimals, collateral.decimals)
+      const fundsAmount = bigNumberToString(amountToFund || Zero, collateral.decimals)
 
-      setMessage(`Depositing funds: ${formatNumber(fundsAmount)} ${collateral.symbol}...`)
+      setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
 
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
@@ -212,7 +206,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
 
       setAmountToFund(null)
       setAmountToFundDisplay('')
-      setMessage(`Successfully deposited ${formatNumber(fundsAmount)} ${collateral.symbol}`)
+      setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
@@ -239,9 +233,9 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
         return
       }
 
-      const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
+      const fundsAmount = bigNumberToString(depositedTokensTotal, collateral.decimals)
 
-      setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${collateral.symbol}...`)
+      setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
 
       const conditionId = await marketMaker.getConditionId()
 
@@ -264,7 +258,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
 
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
-      setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${collateral.symbol}`)
+      setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
@@ -296,11 +290,11 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   )
 
   useEffect(() => {
-    setIsNegativeAmountToFund(formatBigNumber(amountToFund || Zero, collateral.decimals).includes('-'))
+    setIsNegativeAmountToFund((amountToFund || Zero).lt(Zero))
   }, [amountToFund, collateral.decimals])
 
   useEffect(() => {
-    setIsNegativeAmountToRemove(formatBigNumber(amountToRemove || Zero, collateral.decimals).includes('-'))
+    setIsNegativeAmountToRemove((amountToRemove || Zero).lt(Zero))
   }, [amountToRemove, collateral.decimals])
 
   const showSetAllowance =

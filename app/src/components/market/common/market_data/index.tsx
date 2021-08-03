@@ -6,7 +6,7 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../contexts'
 import { useTokens } from '../../../../hooks'
-import { formatBigNumber, formatDate, formatToShortNumber } from '../../../../util/tools'
+import { bigNumberToNumber, formatDate, formatToShortNumber } from '../../../../util/tools'
 import { Token } from '../../../../util/types'
 import { TextToggle } from '../TextToggle'
 
@@ -66,7 +66,7 @@ const MarketDataItemImage = styled.img`
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   collateralVolume: BigNumber
-  liquidity: string
+  liquidity: number
   resolutionTimestamp: Date
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
@@ -106,8 +106,8 @@ export const MarketData: React.FC<Props> = props => {
       ? runningDailyVolumeByHour[Math.floor(Date.now() / (1000 * 60 * 60)) % 24]
       : new BigNumber('0')
 
-  const dailyVolume = formatBigNumber(dailyVolumeValue, currency.decimals)
-  const totalVolume = formatBigNumber(collateralVolume, currency.decimals)
+  const dailyVolume = bigNumberToNumber(dailyVolumeValue, currency.decimals)
+  const totalVolume = bigNumberToNumber(collateralVolume, currency.decimals)
 
   return (
     <MarketDataWrapper>

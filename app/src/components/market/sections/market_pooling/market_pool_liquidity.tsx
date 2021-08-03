@@ -9,12 +9,7 @@ import { useConnectedWeb3Context } from '../../../../contexts'
 import { SharedPropsInterface } from '../../../../pages/market_sections/market_pool_liquidity_container'
 import { getNativeAsset } from '../../../../util/networks'
 import { RemoteData } from '../../../../util/remote_data'
-import {
-  calcAddFundingSendAmounts,
-  calcRemoveFundingSendAmounts,
-  formatBigNumber,
-  formatNumber,
-} from '../../../../util/tools'
+import { bigNumberToString, calcAddFundingSendAmounts, calcRemoveFundingSendAmounts } from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -207,7 +202,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setAmountToFund(collateralBalance)
-                  setAmountToFundDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
+                  setAmountToFundDisplay(bigNumberToString(collateralBalance, collateral.decimals, 5, true))
                 }}
                 shouldDisplayMaxButton={shouldDisplayMaxButton}
                 symbol={collateral.symbol}
@@ -218,7 +213,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           )}
           {activeTab === Tabs.withdraw && (
             <>
-              <TokenBalance text="Pool Tokens" value={formatNumber(sharesBalance)} />
+              <TokenBalance text="Pool Tokens" value={sharesBalance} />
 
               <TextfieldCustomPlaceholder
                 formField={
@@ -236,7 +231,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setAmountToRemove(fundingBalance)
-                  setAmountToRemoveDisplay(formatBigNumber(fundingBalance, collateral.decimals, 5))
+                  setAmountToRemoveDisplay(bigNumberToString(fundingBalance, collateral.decimals, 5, true))
                 }}
                 shouldDisplayMaxButton
                 symbol=""
@@ -260,7 +255,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 emphasizeValue={poolTokens.gt(0)}
                 state={(poolTokens.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Pool Tokens"
-                value={`${formatNumber(formatBigNumber(poolTokens, collateral.decimals, collateral.decimals))}`}
+                value={`${bigNumberToString(poolTokens, collateral.decimals)}`}
               />
             </TransactionDetailsCard>
           )}
@@ -270,25 +265,19 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
                 emphasizeValue={userEarnings.gt(0)}
                 state={ValueStates.success}
                 title="Earned"
-                value={`${formatNumber(formatBigNumber(userEarnings, collateral.decimals, collateral.decimals))} ${
-                  collateral.symbol
-                }`}
+                value={`${bigNumberToString(userEarnings, collateral.decimals)} ${collateral.symbol}`}
               />
               <TransactionDetailsRow
                 state={ValueStates.normal}
                 title="Deposited"
-                value={`${formatNumber(formatBigNumber(depositedTokens, collateral.decimals, collateral.decimals))} ${
-                  collateral.symbol
-                }`}
+                value={`${bigNumberToString(depositedTokens, collateral.decimals)} ${collateral.symbol}`}
               />
               <TransactionDetailsLine />
               <TransactionDetailsRow
                 emphasizeValue={depositedTokensTotal.gt(0)}
                 state={(depositedTokensTotal.gt(0) && ValueStates.important) || ValueStates.normal}
                 title="Total"
-                value={`${formatNumber(
-                  formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals),
-                )} ${collateral.symbol}`}
+                value={`${bigNumberToString(depositedTokensTotal, collateral.decimals)} ${collateral.symbol}`}
               />
             </TransactionDetailsCard>
           )}

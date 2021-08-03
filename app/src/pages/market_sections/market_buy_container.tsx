@@ -10,7 +10,7 @@ import { useAsyncDerivedValue, useCollateralBalance, useContracts, useCpkAllowan
 import { CPKService, MarketMakerService } from '../../services'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../util/networks'
 import { RemoteData } from '../../util/remote_data'
-import { formatBigNumber, formatNumber, getInitialCollateral, mulBN } from '../../util/tools'
+import { bigNumberToNumber, bigNumberToString, getInitialCollateral, mulBN } from '../../util/tools'
 import { calcPrediction, computeBalanceAfterTrade } from '../../util/tools/fpmm/trading'
 import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token, TransactionStep } from '../../util/types'
 
@@ -110,7 +110,7 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
   const initialCollateral = getInitialCollateral(context.networkId, props.marketMakerData.collateral, context.relay)
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
 
-  const feePercentage = Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)) * 100
+  const feePercentage = bigNumberToNumber(fee, STANDARD_DECIMALS) * 100
 
   const { collateralBalance: maybeCollateralBalance, fetchCollateralBalance } = useCollateralBalance(
     collateral,
@@ -118,7 +118,7 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
   )
 
   useEffect(() => {
-    setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals, collateral.decimals).includes('-'))
+    setIsNegativeAmount((amount || Zero).lt(Zero))
   }, [amount, collateral.decimals])
 
   const calcBuyAmount = useMemo(
@@ -162,30 +162,25 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
   )
 
   useEffect(() => {
-    setIsNegativeAmount(formatBigNumber(amount || Zero, collateral.decimals, collateral.decimals).includes('-'))
+    setIsNegativeAmount((amount || Zero).lt(Zero))
   }, [amount, collateral.decimals])
 
   const potentialProfit = tradedShares.isZero() ? new BigNumber(0) : tradedShares.sub(amount || Zero)
 
-  const feePaid = mulBN(debouncedAmount || Zero, Number(formatBigNumber(fee, STANDARD_DECIMALS, 4)))
-  const feeFormatted = `${formatNumber(formatBigNumber(feePaid.mul(-1), collateral.decimals, collateral.decimals))} ${
-    collateral.symbol
-  }`
+  const feePaid = mulBN(debouncedAmount, bigNumberToNumber(fee, STANDARD_DECIMALS))
+  const feeFormatted = `${bigNumberToString(feePaid.mul(-1), collateral.decimals)}
+  ${collateral.symbol}`
 
-  const potentialProfitFormatted = `${formatNumber(
-    formatBigNumber(potentialProfit, collateral.decimals, collateral.decimals),
-  )} ${collateral.symbol}`
+  const potentialProfitFormatted = `${bigNumberToString(potentialProfit, collateral.decimals)} ${collateral.symbol}`
 
   const baseCost = debouncedAmount?.sub(feePaid)
-  const baseCostFormatted = `${formatNumber(
-    formatBigNumber(baseCost || Zero, collateral.decimals, collateral.decimals),
-  )}
+  const baseCostFormatted = `${bigNumberToString(baseCost || Zero, collateral.decimals)}
   ${collateral.symbol}`
 
   const collateralBalance = maybeCollateralBalance || Zero
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
   const [isNegativeAmount, setIsNegativeAmount] = useState<boolean>(false)
-  const currentBalance = `${formatBigNumber(maybeCollateralBalance || Zero, collateral.decimals, 5)}`
+  const currentBalance = `${bigNumberToString(collateralBalance, collateral.decimals, 5)}`
   const [displayFundAmount, setDisplayFundAmount] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const { fetchBalances } = context.balances
 
@@ -253,7 +248,7 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     (!isUpdated && collateral.address === pseudoNativeAssetAddress)
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
-  const sharesTotal = formatNumber(formatBigNumber(tradedShares, collateral.decimals, collateral.decimals))
+  const sharesTotal = bigNumberToString(tradedShares, collateral.decimals)
   const total = `${sharesTotal} Shares`
 
   const sharedObject = {
