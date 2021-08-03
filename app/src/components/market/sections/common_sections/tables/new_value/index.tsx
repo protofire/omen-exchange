@@ -1,7 +1,7 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
-import { getOutcomeColor } from '../../../../theme/utils'
+import { getOutcomeColor } from '../../../../../../theme/utils'
 
 import { ArrowIcon } from './img/ArrowIcon'
 

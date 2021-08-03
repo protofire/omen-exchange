@@ -2,9 +2,9 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { formatBigNumber, formatNumber, isDust } from '../../../../util/tools'
-import { BalanceItem, PositionTableValue, Token } from '../../../../util/types'
-import { TD, THead, TR, Table } from '../../../common'
+import { formatBigNumber, formatNumber, isDust } from '../../../../../../util/tools'
+import { BalanceItem, PositionTableValue, Token } from '../../../../../../util/types'
+import { TD, THead, TR, Table } from '../../../../../common'
 import {
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,
@@ -12,7 +12,7 @@ import {
   PaddingCSS,
   TDStyled,
   THStyled,
-} from '../../common/common_styled'
+} from '../../../../common/common_styled'
 
 const TableWrapper = styled.div`
   margin-left: -24px

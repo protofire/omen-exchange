@@ -22,7 +22,7 @@ export { Spinner } from './spinner'
 export { SubsectionTitle } from './text/subsection_title'
 
 export { SubsectionTitleWrapper } from '../market/sections/common_sections/card_top_details/subsection_title_wrapper'
-export { TD, TH, THead, TR, Table } from './tables/table'
+export { TD, TH, THead, TR, Table } from '../market/sections/common_sections/tables/table'
 export { Textfield } from './form/textfield'
 export { SimpleTextfield } from './form/simiple_textfield'
 export { TextfieldCustomSymbol as TextfieldCustomPlaceholder } from './form/textfield_custom_symbol'

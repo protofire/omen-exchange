@@ -24,13 +24,13 @@ import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { ModalTransactionWrapper } from '../../../modal'
 import { AssetBalance } from '../../common/asset_balance'
 import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
-import { OutcomeTable } from '../../common/outcome_table'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { SetAllowance } from '../common_sections/allowance/set_allowance'
 import { GridTransactionDetails } from '../common_sections/card_bottom_details/grid_transaction_details'
 import { MarketScale } from '../common_sections/card_bottom_details/market_scale'
+import { OutcomeTable } from '../common_sections/tables/outcome_table'
 
 interface Props extends RouteComponentProps<any> {
   marketMakerData: MarketMakerData

@@ -28,7 +28,7 @@ import {
 } from '../../../../../../util/types'
 import { IconDraggable } from '../../../../../common/icons'
 import { SCALE_HEIGHT } from '../../../../common/common_styled'
-import { PositionTable } from '../../../../common/position_table'
+import { PositionTable } from '../../tables/position_table'
 
 import { ValueBoxes } from './value_boxes'
 
