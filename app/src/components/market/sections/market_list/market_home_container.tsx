@@ -272,13 +272,12 @@ const MarketHomeContainer: React.FC = () => {
     } else if (fetchedMarkets) {
       const { fixedProductMarketMakers } = fetchedMarkets
       setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
-
       setIsFiltering(false)
     } else if (error) {
       setMarkets(RemoteData.failure(error))
       setIsFiltering(false)
     }
-  }, [fetchedMarkets, loading, error, context.networkId, PAGE_SIZE, pageIndex])
+  }, [fetchedMarkets, loading, error, context.networkId, PAGE_SIZE, pageIndex, cpkAddress])
 
   useEffect(() => {
     if (categoriesLoading) {

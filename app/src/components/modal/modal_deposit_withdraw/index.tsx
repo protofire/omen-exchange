@@ -141,7 +141,8 @@ export const ModalDepositWithdraw = (props: Props) => {
   const { address, balance, decimals, image, symbol } =
     findCurrentTokenBasedOnAction(exchangeType, currencySelected.toUpperCase()) ||
     getToken(context.relay ? networkIds.XDAI : context.networkId, 'dai')
-  const currentTokenMainnet = mainnetTokens.find(element => element.symbol === symbol)
+
+  const currentTokenMainnet = mainnetTokens.find(element => element.symbol === (symbol === 'xDAI' ? 'DAI' : symbol))
 
   const isApprovalVisible =
     (exchangeType === ExchangeType.deposit &&
@@ -208,7 +209,11 @@ export const ModalDepositWithdraw = (props: Props) => {
     }
 
     try {
-      setMessage(`${exchangeType} ${bigNumberToString(displayFundAmount || new BigNumber(0), decimals)} ${symbol}`)
+      setMessage(
+        `${exchangeType} ${bigNumberToString(displayFundAmount || new BigNumber(0), decimals)} ${
+          symbol === 'xDAI' ? 'Dai' : symbol
+        }`,
+      )
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
       setIsTransactionModalOpen(true)
@@ -227,7 +232,6 @@ export const ModalDepositWithdraw = (props: Props) => {
       setTxHash(hash)
 
       await waitForConfirmations(hash, provider, setConfirmations, setTxState, 13)
-
       if (exchangeType === ExchangeType.deposit && symbol !== 'DAI') {
         await XdaiService.waitForBridgeMessageStatus(hash, context.library)
       }
@@ -376,18 +380,17 @@ export const ModalDepositWithdraw = (props: Props) => {
 
                 <span>
                   {exchangeType === ExchangeType.withdraw && currencySelected !== 'dai'
-                    ? `${bigNumberToString(displayFundAmount.div(1000), decimals, 3)} ${symbol}`
-                    : `0.00 ${symbol}`}
+                    ? `${bigNumberToString(displayFundAmount.div(1000), decimals, 3)} ${symbol === 'xDAI' ? 'DAI' : symbol}`
+                    : `0.00 ${symbol === 'xDAI' ? 'DAI' : symbol}`}
                 </span>
               </ExchangeDataItem>
               <Divider />
               <ExchangeDataItem>
                 <span>Total</span>
-
                 <span>
                   {currencySelected !== 'dai' && exchangeType === ExchangeType.withdraw
                     ? `${bigNumberToString(displayFundAmount.sub(displayFundAmount.div(1000)), decimals, 3)} ${symbol}`
-                    : `${bigNumberToString(displayFundAmount, decimals)} ${symbol}`}
+                    : `${bigNumberToString(displayFundAmount, decimals)} ${ symbol === 'xDAI' ? 'DAI' : symbol}`}
                 </span>
               </ExchangeDataItem>
             </>

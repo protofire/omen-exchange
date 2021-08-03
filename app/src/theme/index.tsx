@@ -183,6 +183,7 @@ const theme = {
   },
   borders: {
     tooltip: '#cfd8dc',
+    tooltipShadow: '#EBEBEB',
     borderColor: '#ECEFF1',
     borderDisabled: '#E8EAF6',
     borderLineDisabled: '1px solid #E8EAF6',
@@ -279,8 +280,7 @@ const theme = {
   },
   fixedHeightModal: {
     content: {
-      height: '510px',
-      width: '382px',
+      width: '420px',
       padding: '28px',
       borderRadius: '8px',
       border: '1px solid #ECEFF1',

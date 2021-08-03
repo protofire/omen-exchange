@@ -1,14 +1,25 @@
-import React, { useState } from 'react'
+import { BigNumber } from 'ethers/utils'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
+<<<<<<< HEAD
 import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../contexts'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/graph/useGraphMarketsFromQuestion'
 import { useTheme } from '../../../../hooks/useTheme'
+=======
+import { IMPORT_QUESTION_ID_KEY, STANDARD_DECIMALS } from '../../../../common/constants'
+import { useCompoundService, useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
+>>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
+<<<<<<< HEAD
 import { getInitialCollateral, getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
+=======
+import { formatBigNumber, getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
+>>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { MoreMenu } from '../../../common/form/more_menu'
@@ -39,6 +50,7 @@ const MarketCurrencySelector = styled(CurrencySelector)`
 interface Props {
   marketMakerData: MarketMakerData
   title?: string
+  blocktime?: number
 }
 
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
@@ -51,7 +63,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const [showingProgressBar, setShowingProgressBar] = useState(false)
   const history = useHistory()
 
-  const { marketMakerData } = props
+  const { blocktime, marketMakerData } = props
   const {
     address,
     answerFinalizedTimestamp,
@@ -63,16 +75,35 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
-    scaledLiquidityParameter,
     submissionIDs,
   } = marketMakerData
 
   const ovmAddress = getContractAddress(networkId, 'omenVerifiedMarkets')
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
+<<<<<<< HEAD
   const collateral = getInitialCollateral(networkId, marketMakerData.collateral, relay)
 
   const currentTimestamp = new Date().getTime()
+=======
+  const [liquidity, setLiquidity] = useState(new BigNumber(0))
+
+  const currentTimestamp = blocktime ? blocktime : new Date().getTime()
+
+  const contracts = useContracts(context)
+  const { buildMarketMaker } = contracts
+  const marketMaker = buildMarketMaker(address)
+
+  useEffect(() => {
+    const getLiquidity = async () => {
+      setLiquidity(await marketMaker.getTotalSupply())
+    }
+    marketMaker && getLiquidity()
+    // eslint-disable-next-line
+  }, [])
+
+  const formattedLiquidity: string = formatBigNumber(liquidity, STANDARD_DECIMALS, 2)
+>>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
 
   const formattedLiquidity: number = scaledLiquidityParameter ? scaledLiquidityParameter : 0
 
@@ -159,6 +190,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       )}
       <MarketData
         answerFinalizedTimestamp={marketMakerData.answerFinalizedTimestamp}
+        blocktime={blocktime}
         collateralVolume={collateralVolume}
         currency={collateral}
         isFinalize={marketState === MarketState.finalizing}

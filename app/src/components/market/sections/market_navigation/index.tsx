@@ -32,21 +32,22 @@ const MarketSetOutcomeTab = styled.div`
 
 interface Props {
   activeTab: string
+  blocktime?: number
   hasWinningOutcomes?: Maybe<boolean>
   marketMakerData: MarketMakerData
   switchMarketTab: (arg0: MarketDetailsTab) => void
 }
 
 export const MarketNavigation = (props: Props) => {
-  const { activeTab, hasWinningOutcomes, marketMakerData, switchMarketTab } = props
+  const { activeTab, blocktime, hasWinningOutcomes, marketMakerData, switchMarketTab } = props
 
   const context = useConnectedWeb3Context()
 
   const { isQuestionFinalized, question } = marketMakerData
-  const currentTimestamp = new Date().getTime()
-
-  const isOpen = question.resolution.getTime() > currentTimestamp
-  const isFinalizing = question.resolution < new Date() && !isQuestionFinalized
+  const currentTimestamp = blocktime ? blocktime : new Date().getTime()
+  const resolutionTimestamp = question.resolution.getTime()
+  const isOpen = resolutionTimestamp > currentTimestamp
+  const isFinalizing = resolutionTimestamp < currentTimestamp && !isQuestionFinalized
 
   if (activeTab === MarketDetailsTab.setOutcome) {
     return (

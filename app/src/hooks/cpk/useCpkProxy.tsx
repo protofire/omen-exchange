@@ -7,17 +7,17 @@ import { RemoteData } from '../../util/remote_data'
  * Return details about a user's proxy contract
  * proxyIsUpToDate: Has the proxy implementation been upgraded to the target implementation
  */
-export const useCpkProxy = () => {
+export const useCpkProxy = (isNative = false) => {
   const { cpk } = useConnectedWeb3Context()
 
   const [proxyIsUpToDate, setUpdated] = useState<RemoteData<boolean>>(RemoteData.notAsked())
 
   const fetchUpdated = useCallback(async () => {
     if (cpk) {
-      const updated = await cpk.proxyIsUpToDate()
+      const updated = await cpk.proxyIsUpToDate(isNative)
       setUpdated(RemoteData.success(updated))
     }
-  }, [cpk])
+  }, [cpk, isNative])
 
   const updateProxy = useCallback(async () => {
     if (cpk) {

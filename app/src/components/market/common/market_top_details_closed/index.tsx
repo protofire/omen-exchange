@@ -1,14 +1,24 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
+<<<<<<< HEAD
 import { useConnectedWeb3Context } from '../../../../contexts'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/graph/useGraphMarketsFromQuestion'
 import { useTheme } from '../../../../hooks/useTheme'
+=======
+import { STANDARD_DECIMALS } from '../../../../common/constants'
+import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
+>>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
+<<<<<<< HEAD
 import { getInitialCollateral, getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
+=======
+import { formatBigNumber, getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
+>>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
@@ -59,7 +69,6 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
-    scaledLiquidityParameter,
     submissionIDs,
   } = marketMakerData
   const { title } = question
@@ -68,10 +77,27 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const collateral = getInitialCollateral(networkId, marketMakerData.collateral, relay)
 
   const [showingProgressBar, setShowingProgressBar] = useState(false)
+  const [liquidity, setLiquidity] = useState(new BigNumber(0))
 
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
+<<<<<<< HEAD
   const formattedLiquidity: number = scaledLiquidityParameter ? scaledLiquidityParameter : 0
+=======
+  const contracts = useContracts(context)
+  const { buildMarketMaker } = contracts
+  const marketMaker = buildMarketMaker(address)
+
+  useEffect(() => {
+    const getLiquidity = async () => {
+      setLiquidity(await marketMaker.getTotalSupply())
+    }
+    marketMaker && getLiquidity()
+    // eslint-disable-next-line
+  }, [])
+
+  const formattedLiquidity: string = formatBigNumber(liquidity, STANDARD_DECIMALS, 2)
+>>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
 
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred

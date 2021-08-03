@@ -86,7 +86,6 @@ const CommentLabel = styled.div`
 const TitleValueVertical = styled(TitleValue)`
   flex-direction: column;
   justify-content: flex-start;
-  text-transform: capitalize;
 
   > h2 {
     margin: 0 0 8px;
