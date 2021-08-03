@@ -7,7 +7,8 @@ import { getHexDataLength, joinHexData } from 'contract-proxy-kit/lib/esm/utils/
 import { ethers } from 'ethers'
 import { Web3Provider } from 'ethers/providers'
 
-import { proxyFactoryAbi } from '../abi/proxy_factory'
+import proxyFactoryAbi from '../abi/allJsonContracts/proxyFactory.json'
+//import { proxyFactoryAbi } from '../abi/proxy_factory'
 import { RelayService } from '../services/relay'
 import { SafeService } from '../services/safe'
 
