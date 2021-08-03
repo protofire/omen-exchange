@@ -41,7 +41,6 @@ import {
 } from '../../../../common/common_styled'
 import { CreateCard } from '../../../../common/create_card'
 import { CurrencySelector } from '../../../../common/currency_selector'
-import { DisplayArbitrator } from '../../../../common/display_arbitrator'
 import { GridTransactionDetails } from '../../../../common/grid_transaction_details'
 import { MarketScale } from '../../../../common/market_scale'
 import { TradingFeeSelector } from '../../../../common/trading_fee_selector'
@@ -51,6 +50,7 @@ import { TransactionDetailsRow, ValueStates } from '../../../../common/transacti
 import { VerifiedRow } from '../../../../common/verified_row'
 import { WarningMessage } from '../../../../common/warning_message'
 import { SetAllowance } from '../../../common_sections/allowance/set_allowance'
+import { DisplayArbitrator } from '../../../common_sections/arbitrators/display_arbitrator'
 import { Outcome } from '../outcomes'
 
 const CreateCardTop = styled(CreateCard)`

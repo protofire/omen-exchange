@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { IconDxDao, IconKleros } from '../../../common/icons'
+import { IconDxDao, IconKleros } from '../../../../../common/icons'
 
 interface Props {
   id: Maybe<string>
