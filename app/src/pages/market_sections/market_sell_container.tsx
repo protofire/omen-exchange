@@ -9,11 +9,11 @@ import { useAsyncDerivedValue, useConnectedWeb3Context, useContracts } from '../
 import { MarketMakerService } from '../../services'
 import { getLogger } from '../../util/logger'
 import {
+  bigNumberToNumber,
+  bigNumberToString,
   calcPrediction,
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
-  formatBigNumber,
-  formatNumber,
   getInitialCollateral,
   mulBN,
 } from '../../util/tools'
@@ -83,7 +83,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
 
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
-    const shares = parseInt(formatBigNumber(balances[i].shares, collateral.decimals))
+    const shares = bigNumberToNumber(balances[i].shares, collateral.decimals)
     if (shares > 0) {
       defaultOutcomeIndex = i
       break
@@ -96,9 +96,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
   const indexToUse = isScalar ? positionIndex : outcomeIndex
   const [balanceItem, setBalanceItem] = useState<BalanceItem>(marketMakerData.balances[indexToUse])
 
-  const selectedOutcomeBalance = formatNumber(
-    formatBigNumber(balanceItem.shares, collateral.decimals, collateral.decimals),
-  )
+  const selectedOutcomeBalance = bigNumberToString(balanceItem.shares, collateral.decimals)
 
   useEffect(() => {
     if (isScalar) setPositionIndex(balances[0].shares.gte(balances[1].shares) ? 0 : 1)
@@ -117,7 +115,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
   }, [balances[indexToUse]])
 
   useEffect(() => {
-    setIsNegativeAmountShares(formatBigNumber(amountShares || Zero, collateral.decimals).includes('-'))
+    setIsNegativeAmountShares((amountShares || Zero).lt(Zero))
   }, [amountShares, collateral.decimals])
 
   const amountError = isTransactionProcessing
@@ -146,7 +144,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
       const holdingsOfOtherOutcomes = holdings.filter((item, index) => {
         return index !== indexToUse
       })
-      const marketFeeWithTwoDecimals = Number(formatBigNumber(fee, STANDARD_DECIMALS))
+      const marketFeeWithTwoDecimals = bigNumberToNumber(fee, STANDARD_DECIMALS)
       const amountToSell = calcSellAmountInCollateral(
         // Round down in case of precision error
         amountShares.mul(99999999).div(100000000),
@@ -214,10 +212,10 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
-      const sharesAmount = formatBigNumber(amountShares || Zero, collateral.decimals, collateral.decimals)
+      const sharesAmount = bigNumberToString(amountShares || Zero, collateral.decimals)
 
       setStatus(Status.Loading)
-      setMessage(`Selling ${formatNumber(sharesAmount)} shares...`)
+      setMessage(`Selling ${sharesAmount} shares...`)
 
       await cpk.sellOutcomes({
         amount: tradedCollateral,
@@ -233,7 +231,7 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
       setDisplaySellShares(null)
       setAmountShares(null)
       setStatus(Status.Ready)
-      setMessage(`Successfully sold ${formatNumber(sharesAmount)} ${balances[indexToUse].outcomeName} shares.`)
+      setMessage(`Successfully sold ${sharesAmount} ${balances[indexToUse].outcomeName} shares.`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)

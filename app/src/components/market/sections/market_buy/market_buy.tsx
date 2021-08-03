@@ -10,7 +10,7 @@ import { DOCUMENT_VALIDITY_RULES } from '../../../../common/constants'
 import { SharedPropsInterface } from '../../../../pages/market_sections/market_buy_container'
 import { getLogger } from '../../../../util/logger'
 import { RemoteData } from '../../../../util/remote_data'
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { bigNumberToString } from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, OutcomeTableValue, Status, TransactionStep } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -119,10 +119,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
         return
       }
 
-      const sharesAmount = formatBigNumber(tradedShares, collateral.decimals, collateral.decimals)
+      const sharesAmount = bigNumberToString(tradedShares, collateral.decimals)
       setTweet('')
       setStatus(Status.Loading)
-      setMessage(`Buying ${formatNumber(sharesAmount)} shares...`)
+      setMessage(`Buying ${sharesAmount} shares...`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
@@ -147,7 +147,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )
       setDisplayAmountToFund(new BigNumber('0'))
       setStatus(Status.Ready)
-      setMessage(`Successfully bought ${formatNumber(sharesAmount)} ${balances[outcomeIndex].outcomeName} shares.`)
+      setMessage(`Successfully bought ${sharesAmount} ${balances[outcomeIndex].outcomeName} shares.`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setStatus(Status.Error)
@@ -197,7 +197,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             <CurrencySelector
               addBalances
               addNativeAsset
-              balance={formatBigNumber(collateralBalance, collateral.decimals, 5)}
+              balance={bigNumberToString(collateralBalance, collateral.decimals, 5)}
               context={context}
               currency={collateral.address}
               disabled
@@ -221,7 +221,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
             }
             onClickMaxButton={() => {
               setDisplayAmountToFund(collateralBalance)
-              setAmountDisplay(formatBigNumber(collateralBalance, collateral.decimals, 5))
+              setAmountDisplay(bigNumberToString(collateralBalance, collateral.decimals, 5, true))
             }}
             shouldDisplayMaxButton={shouldDisplayMaxButton}
             symbol={collateral.symbol}

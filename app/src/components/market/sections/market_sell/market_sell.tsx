@@ -5,7 +5,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { SharedPropsInterface } from '../../../../pages/market_sections/market_sell_container'
-import { formatBigNumber, formatNumber } from '../../../../util/tools'
+import { bigNumberToString } from '../../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'
@@ -70,7 +70,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     i === outcomeIndex ? balance.shares.sub(amountShares || Zero) : balance.shares,
   )
 
-  const sellAmountSharesDisplay = formatBigNumber(amountShares || Zero, collateral.decimals)
+  const sellAmountSharesDisplay = bigNumberToString(amountShares || Zero, collateral.decimals)
 
   return (
     <>
@@ -113,7 +113,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
             }
             onClickMaxButton={() => {
               setAmountSharesFromInput(balanceItem.shares)
-              setAmountSharesToDisplay(formatBigNumber(balanceItem.shares, collateral.decimals, 5))
+              setAmountSharesToDisplay(bigNumberToString(balanceItem.shares, collateral.decimals, 5, true))
             }}
             shouldDisplayMaxButton
             symbol={'Shares'}
@@ -122,43 +122,32 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
         </div>
         <div>
           <TransactionDetailsCard>
-            <TransactionDetailsRow title={'Sell Amount'} value={`${formatNumber(sellAmountSharesDisplay)} Shares`} />
+            <TransactionDetailsRow title={'Sell Amount'} value={`${sellAmountSharesDisplay} Shares`} />
             <TransactionDetailsRow
               emphasizeValue={potentialValue ? potentialValue.gt(0) : false}
               state={ValueStates.success}
               title={'Profit'}
               value={
                 potentialValue
-                  ? `${formatNumber(formatBigNumber(potentialValue, collateral.decimals, collateral.decimals))} 
+                  ? `${bigNumberToString(potentialValue, collateral.decimals)} 
                   ${collateral.symbol}`
                   : '0.00'
               }
             />
             <TransactionDetailsRow
               title={'Trading Fee'}
-              value={`${
-                costFee
-                  ? formatNumber(formatBigNumber(costFee.mul(-1), collateral.decimals, collateral.decimals))
-                  : '0.00'
-              } ${collateral.symbol}`}
+              value={`${costFee ? bigNumberToString(costFee.mul(-1), collateral.decimals) : '0.00'} ${
+                collateral.symbol
+              }`}
             />
             <TransactionDetailsLine />
             <TransactionDetailsRow
-              emphasizeValue={
-                (tradedCollateral && parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0) || false
-              }
-              state={
-                (tradedCollateral &&
-                  parseFloat(formatBigNumber(tradedCollateral, collateral.decimals, 2)) > 0 &&
-                  ValueStates.important) ||
-                ValueStates.normal
-              }
+              emphasizeValue={(tradedCollateral && tradedCollateral.gt(Zero)) || false}
+              state={(tradedCollateral && tradedCollateral.gt(Zero) && ValueStates.important) || ValueStates.normal}
               title={'Total'}
-              value={`${
-                tradedCollateral
-                  ? formatNumber(formatBigNumber(tradedCollateral, collateral.decimals, collateral.decimals))
-                  : '0.00'
-              } ${collateral.symbol}`}
+              value={`${tradedCollateral ? bigNumberToString(tradedCollateral, collateral.decimals) : '0.00'} ${
+                collateral.symbol
+              }`}
             />
           </TransactionDetailsCard>
         </div>
