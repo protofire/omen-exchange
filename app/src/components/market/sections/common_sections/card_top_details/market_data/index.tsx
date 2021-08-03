@@ -4,10 +4,10 @@ import momentTZ from 'moment-timezone'
 import React, { DOMAttributes, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useTokens } from '../../../../hooks'
-import { formatBigNumber, formatDate, formatToShortNumber } from '../../../../util/tools'
-import { Token } from '../../../../util/types'
-import { TextToggle } from '../TextToggle'
+import { useConnectedWeb3Context, useTokens } from '../../../../../../hooks'
+import { formatBigNumber, formatDate, formatToShortNumber } from '../../../../../../util/tools'
+import { Token } from '../../../../../../util/types'
+import { TextToggle } from '../../../../common/TextToggle'
 
 const MarketDataWrapper = styled.div`
   display: flex;

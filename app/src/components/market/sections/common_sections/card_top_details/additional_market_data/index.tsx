@@ -2,10 +2,10 @@ import React, { DOMAttributes } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useRealityLink } from '../../../../hooks'
-import { networkIds } from '../../../../util/networks'
-import { Arbitrator, KlerosItemStatus, KlerosSubmission, Token } from '../../../../util/types'
-import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../common/icons'
+import { useConnectedWeb3Context, useRealityLink } from '../../../../../../hooks'
+import { networkIds } from '../../../../../../util/networks'
+import { Arbitrator, KlerosItemStatus, KlerosSubmission, Token } from '../../../../../../util/types'
+import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../../../common/icons'
 
 const AdditionalMarketDataWrapper = styled.div`
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
