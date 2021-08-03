@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { ValueBoxItem } from '../../../../util/types'
-import { VALUE_BOXES_MARGIN } from '../common_styled'
+import { ValueBoxItem } from '../../../../../../util/types'
+import { VALUE_BOXES_MARGIN } from '../../../../common/common_styled'
 
 import { ValueBox } from './value_box'
 

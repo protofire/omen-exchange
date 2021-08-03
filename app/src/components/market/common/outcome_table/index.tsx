@@ -9,7 +9,7 @@ import { getNativeAsset } from '../../../../util/networks'
 import { formatBigNumber, formatNumber, mulBN } from '../../../../util/tools'
 import { BalanceItem, BondItem, OutcomeTableValue, Token } from '../../../../util/types'
 import { RadioInput, TD, THead, TR, Table } from '../../../common'
-import { BarDiagram } from '../bar_diagram_probabilities'
+import { BarDiagram } from '../../sections/common_sections/card_bottom_details/bar_diagram_probabilities'
 import {
   OutcomeItemLittleBallOfJoyAndDifferentColors,
   OutcomeItemText,

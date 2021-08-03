@@ -19,13 +19,13 @@ import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { ModalTransactionWrapper } from '../../../modal'
 import { CurrenciesWrapper, GenericError } from '../../common/common_styled'
 import { CurrencySelector } from '../../common/currency_selector'
-import { GridTransactionDetails } from '../../common/grid_transaction_details'
 import { OutcomeTable } from '../../common/outcome_table'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WarningMessage } from '../../common/warning_message'
 import { SetAllowance } from '../common_sections/allowance/set_allowance'
+import { GridTransactionDetails } from '../common_sections/card_bottom_details/grid_transaction_details'
 
 const WarningMessageStyled = styled(WarningMessage)`
   margin-top: 20px;

@@ -13,13 +13,13 @@ import { BigNumberInput, TextfieldCustomPlaceholder } from '../../../common'
 import { BigNumberInputReturn } from '../../../common/form/big_number_input'
 import { ModalTransactionWrapper } from '../../../modal'
 import { GenericError } from '../../common/common_styled'
-import { GridTransactionDetails } from '../../common/grid_transaction_details'
-import { MarketScale } from '../../common/market_scale'
 import { PositionSelectionBox } from '../../common/position_selection_box'
 import { TransactionDetailsCard } from '../../common/transaction_details_card'
 import { TransactionDetailsLine } from '../../common/transaction_details_line'
 import { TransactionDetailsRow, ValueStates } from '../../common/transaction_details_row'
 import { WarningMessage } from '../../common/warning_message'
+import { GridTransactionDetails } from '../common_sections/card_bottom_details/grid_transaction_details'
+import { MarketScale } from '../common_sections/card_bottom_details/market_scale'
 
 const StyledButtonContainer = styled(ButtonContainer)`
   justify-content: space-between;
