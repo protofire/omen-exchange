@@ -1,8 +1,8 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
-import { IconInfo } from '../../../common/icons'
-import { Circle } from '../../common/common_styled'
+import { IconInfo } from '../../../../../common/icons'
+import { Circle } from '../../../../common/common_styled'
 
 export enum ValueStates {
   error,

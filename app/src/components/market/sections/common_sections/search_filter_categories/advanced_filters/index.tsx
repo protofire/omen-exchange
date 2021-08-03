@@ -6,7 +6,7 @@ import { getArbitratorsByNetwork, getNativeAsset, getWrapToken } from '../../../
 import { CurationSource } from '../../../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../../../common/form/dropdown'
 import { IconDxDao, IconKleros } from '../../../../../common/icons'
-import { CurrencySelector } from '../../../../common/currency_selector'
+import { CurrencySelector } from '../../user_transactions_tokens/currency_selector'
 
 const Wrapper = styled.div`
   column-gap: 20px;

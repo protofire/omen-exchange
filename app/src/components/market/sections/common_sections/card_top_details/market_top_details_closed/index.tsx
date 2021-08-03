@@ -15,7 +15,7 @@ import {
 } from '../../../../../../util/tools'
 import { MarketMakerData, MarketState, Token } from '../../../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../../../common'
-import { CurrencySelector } from '../../../../common/currency_selector'
+import { CurrencySelector } from '../../user_transactions_tokens/currency_selector'
 import { AdditionalMarketData } from '../additional_market_data'
 import { MarketData } from '../market_data'
 import { ProgressBar } from '../progress_bar'

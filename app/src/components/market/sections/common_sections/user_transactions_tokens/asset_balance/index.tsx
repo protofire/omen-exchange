@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Token } from '../../../../util/types'
+import { Token } from '../../../../../../util/types'
 
 const Wrapper = styled.div`
   align-items: center;

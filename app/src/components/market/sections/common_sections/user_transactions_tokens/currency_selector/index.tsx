@@ -2,12 +2,12 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect } from 'react'
 import styled, { css } from 'styled-components'
 
-import { ConnectedWeb3Context, useTokens } from '../../../../hooks'
-import { formatBigNumber } from '../../../../util/tools'
-import { Token } from '../../../../util/types'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
-import { Spinner } from '../../../common/spinner'
-import { TokenItem } from '../../sections/common_sections/message_text/token_item'
+import { ConnectedWeb3Context, useTokens } from '../../../../../../hooks'
+import { formatBigNumber } from '../../../../../../util/tools'
+import { Token } from '../../../../../../util/types'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../../../common/form/dropdown'
+import { Spinner } from '../../../../../common/spinner'
+import { TokenItem } from '../../message_text/token_item'
 
 const Wrapper = styled.div`
   display: flex;

@@ -1,8 +1,8 @@
 import React from 'react'
 import styled, { css } from 'styled-components'
 
-import { TRADING_FEE_OPTIONS } from '../../../../common/constants'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
+import { TRADING_FEE_OPTIONS } from '../../../../../../common/constants'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../../../common/form/dropdown'
 
 const Wrapper = styled.div`
   display: flex;

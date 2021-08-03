@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-import { ConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { Token } from '../../../../util/types'
-import { FormRowLink } from '../../../common/form/form_row_link'
+import { ConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
+import { Token } from '../../../../../../util/types'
+import { FormRowLink } from '../../../../../common/form/form_row_link'
 import { Tokens } from '../tokens'
 
 import { ModalCollateral } from './modal_collateral'
