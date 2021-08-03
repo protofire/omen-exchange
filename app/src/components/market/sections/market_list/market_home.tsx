@@ -25,10 +25,10 @@ import {
 import { IconFilter } from '../../../common/icons/IconFilter'
 import { IconSearch } from '../../../common/icons/IconSearch'
 import { InlineLoading } from '../../../loading'
-import { AdvancedFilters } from '../../common/advanced_filters'
-import { Search } from '../../common/search'
 import { ListCard } from '../common_sections/list/list_card'
 import { ListItem } from '../common_sections/list/list_item'
+import { AdvancedFilters } from '../common_sections/search_filter_categories/advanced_filters'
+import { Search } from '../common_sections/search_filter_categories/search'
 
 const TopContents = styled.div`
   padding: 24px;

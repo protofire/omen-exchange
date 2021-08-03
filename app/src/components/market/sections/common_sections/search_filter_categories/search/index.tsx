@@ -1,8 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { Textfield } from '../../../common'
-import { IconSearchGrey } from '../../../common/icons'
+import { Textfield } from '../../../../../common'
+import { IconSearchGrey } from '../../../../../common/icons'
 
 const Wrapper = styled.div`
   margin: 0 25px 24px 25px;

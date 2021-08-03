@@ -1,12 +1,12 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
-import { getArbitratorsByNetwork, getNativeAsset, getWrapToken } from '../../../../util/networks'
-import { CurationSource } from '../../../../util/types'
-import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../common/form/dropdown'
-import { IconDxDao, IconKleros } from '../../../common/icons'
-import { CurrencySelector } from '../../common/currency_selector'
+import { useConnectedWeb3Context } from '../../../../../../hooks/connectedWeb3'
+import { getArbitratorsByNetwork, getNativeAsset, getWrapToken } from '../../../../../../util/networks'
+import { CurationSource } from '../../../../../../util/types'
+import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../../../common/form/dropdown'
+import { IconDxDao, IconKleros } from '../../../../../common/icons'
+import { CurrencySelector } from '../../../../common/currency_selector'
 
 const Wrapper = styled.div`
   column-gap: 20px;
