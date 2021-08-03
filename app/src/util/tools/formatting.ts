@@ -11,7 +11,8 @@ import { isDust } from './web3'
  * @param strict - If strict is set to true string returned will not be modified by formatNumber function which returns '<0.01' if value is small
  */
 export const bigNumberToString = (value: BigNumber, decimals: number, precision = 2, strict = false): string => {
-  if (isDust(value, decimals)) return bigNumberToNumber(Zero, decimals).toFixed(precision)
+  const bigNumber = new BigNumber(value)
+  if (isDust(bigNumber, decimals)) return bigNumberToNumber(Zero, decimals).toFixed(precision)
   if (strict) return bigNumberToNumber(value, decimals).toFixed(precision)
   return formatNumber(formatUnits(value, decimals), precision)
 }
