@@ -1,17 +1,16 @@
 import React, { FC, useState } from 'react'
 import { useHistory } from 'react-router'
 
-import { useConnectedWeb3Context } from '../../../contexts'
-import { useContracts } from '../../../hooks'
-import { ERC20Service } from '../../../services'
-import { getLogger } from '../../../util/logger'
-import { MarketCreationStatus } from '../../../util/market_creation_status_data'
-import { pseudoNativeAssetAddress } from '../../../util/networks'
-import { waitUntilContractDeployed } from '../../../util/tools'
-import { MarketData, TransactionStep } from '../../../util/types'
-import { ModalConnectWalletWrapper, ModalTransactionWrapper } from '../../modal'
-
-import { MarketWizardCreator } from './market_wizard_creator'
+import { MarketWizardCreator } from '../../components/market/market_create/market_wizard_creator'
+import { ModalConnectWalletWrapper, ModalTransactionWrapper } from '../../components/modal'
+import { useConnectedWeb3Context } from '../../contexts'
+import { useContracts } from '../../hooks'
+import { ERC20Service } from '../../services'
+import { getLogger } from '../../util/logger'
+import { MarketCreationStatus } from '../../util/market_creation_status_data'
+import { pseudoNativeAssetAddress } from '../../util/networks'
+import { waitUntilContractDeployed } from '../../util/tools'
+import { MarketData, TransactionStep } from '../../util/types'
 
 const logger = getLogger('Market::MarketWizardCreatorContainer')
 

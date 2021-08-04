@@ -6,9 +6,12 @@ import styled from 'styled-components'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../contexts'
 import { useGraphMarketUserTxData } from '../../../../hooks'
 import { useRealityLink } from '../../../../hooks/useRealityLink'
+import { MarketBondContainer } from '../../../../pages/market_sections/market_bond_container'
 import { MarketBuyContainer } from '../../../../pages/market_sections/market_buy_container'
+import { MarketHistoryContainer } from '../../../../pages/market_sections/market_history_container'
 import { MarketPoolLiquidityContainer } from '../../../../pages/market_sections/market_pool_liquidity_container'
 import { MarketSellContainer } from '../../../../pages/market_sections/market_sell_container'
+import { MarketVerifyContainer } from '../../../../pages/market_sections/market_verify_container'
 import { getNativeAsset, networkIds } from '../../../../util/networks'
 import { getUnit, isDust } from '../../../../util/tools'
 import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../util/types'
@@ -19,10 +22,7 @@ import { MarketTopDetailsOpen } from '../../common_sections/card_top_details/mar
 import { WarningMessage } from '../../common_sections/message_text/warning_message'
 import { OutcomeTable } from '../../common_sections/tables/outcome_table'
 import { ViewCard } from '../../common_sections/view_card'
-import { MarketBondContainer } from '../../market_bond/market_bond_container'
-import { MarketHistoryContainer } from '../../market_history/market_history_container'
 import { MarketNavigation } from '../../market_navigation'
-import { MarketVerifyContainer } from '../../market_verify/market_verify_container'
 
 export const TopCard = styled(ViewCard)`
   padding: 24px;

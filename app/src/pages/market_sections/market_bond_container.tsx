@@ -1,9 +1,8 @@
 import { BigNumber } from 'ethers/utils'
 import React from 'react'
 
-import { MarketDetailsTab, MarketMakerData } from '../../../util/types'
-
-import { MarketBond } from './market_bond'
+import { MarketBond } from '../../components/market/market_bond/market_bond'
+import { MarketDetailsTab, MarketMakerData } from '../../util/types'
 
 interface Props {
   marketMakerData: MarketMakerData

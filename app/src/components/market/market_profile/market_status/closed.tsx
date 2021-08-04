@@ -9,6 +9,7 @@ import { STANDARD_DECIMALS } from '../../../../common/constants'
 import { WhenConnected, useConnectedWeb3Context } from '../../../../contexts'
 import { useContracts, useGraphMarketUserTxData, useSymbol } from '../../../../hooks'
 import { MarketBuyContainer } from '../../../../pages/market_sections/market_buy_container'
+import { MarketHistoryContainer } from '../../../../pages/market_sections/market_history_container'
 import { MarketPoolLiquidityContainer } from '../../../../pages/market_sections/market_pool_liquidity_container'
 import { MarketSellContainer } from '../../../../pages/market_sections/market_sell_container'
 import { ERC20Service, RealitioService } from '../../../../services'
@@ -32,7 +33,6 @@ import MarketResolutionMessage from '../../common_sections/message_text/market_r
 import { OutcomeTable } from '../../common_sections/tables/outcome_table'
 import { ViewCard } from '../../common_sections/view_card'
 import { MarginsButton } from '../../common_styled'
-import { MarketHistoryContainer } from '../../market_history/market_history_container'
 import { MarketNavigation } from '../../market_navigation'
 
 const TopCard = styled(ViewCard)`

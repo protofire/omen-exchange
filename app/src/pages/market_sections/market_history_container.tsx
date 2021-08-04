@@ -1,8 +1,7 @@
 import React from 'react'
 
-import { MarketMakerData } from '../../../util/types'
-
-import { MarketHistory } from './market_history'
+import { MarketHistory } from '../../components/market/market_history/market_history'
+import { MarketMakerData } from '../../util/types'
 
 interface Props {
   marketMakerData: MarketMakerData

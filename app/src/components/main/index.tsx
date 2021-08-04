@@ -4,11 +4,11 @@ import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import { useWeb3Context } from 'web3-react'
 
 import { DOCUMENT_TITLE } from '../../common/constants'
+import { MarketHomeContainer } from '../../pages/market_sections/market_home_container'
+import { MarketWizardCreatorContainer } from '../../pages/market_sections/market_wizard_creator_container'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
 import { Footer } from '../common/layout/footer'
 import { Header } from '../common/layout/header'
-import { MarketWizardCreatorContainer } from '../market/market_create/market_wizard_creator_container'
-import { MarketHomeContainer } from '../market/market_list/market_home_container'
 import SettingsViewContainer from '../settings/settings_view'
 
 import { MarketRoutes } from './routes/market_routes'

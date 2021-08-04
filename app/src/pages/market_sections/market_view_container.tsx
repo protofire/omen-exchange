@@ -1,9 +1,8 @@
 import React from 'react'
 
-import { useConnectedWeb3Context } from '../../../contexts'
-import { MarketMakerData } from '../../../util/types'
-
-import { MarketView } from './market_view'
+import { MarketView } from '../../components/market/market_profile/market_view'
+import { useConnectedWeb3Context } from '../../contexts'
+import { MarketMakerData } from '../../util/types'
 
 interface Props {
   marketMakerData: MarketMakerData

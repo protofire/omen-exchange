@@ -8,12 +8,16 @@ import { useLocation } from 'react-router-dom'
 import styled from 'styled-components'
 import useLocalStorageState from 'use-local-storage-state'
 
-import { MAX_MARKET_FEE } from '../../../common/constants'
-import { useConnectedWeb3Context } from '../../../contexts'
-import { useMarkets } from '../../../hooks/market_data/useMarkets'
-import { queryCategories } from '../../../queries/markets_home'
-import { getArbitratorsByNetwork, getOutcomes, networkIds } from '../../../util/networks'
-import { RemoteData } from '../../../util/remote_data'
+import { MAX_MARKET_FEE } from '../../common/constants'
+import { ButtonCSS } from '../../components/button/button_styling_types'
+import { IconClose } from '../../components/common/icons'
+import xDaiIntergation from '../../components/market/market_list/img/xDaiIntegration.svg'
+import { MarketHome } from '../../components/market/market_list/market_home'
+import { useConnectedWeb3Context } from '../../contexts'
+import { useMarkets } from '../../hooks/market_data/useMarkets'
+import { queryCategories } from '../../queries/markets_home'
+import { getArbitratorsByNetwork, getOutcomes, networkIds } from '../../util/networks'
+import { RemoteData } from '../../util/remote_data'
 import {
   CategoryDataItem,
   CurationSource,
@@ -23,12 +27,7 @@ import {
   MarketMakerDataItem,
   MarketStates,
   MarketsSortCriteria,
-} from '../../../util/types'
-import { ButtonCSS } from '../../button/button_styling_types'
-import { IconClose } from '../../common/icons'
-
-import xDaiIntergation from './img/xDaiIntegration.svg'
-import { MarketHome } from './market_home'
+} from '../../util/types'
 
 const Banner = styled.div`
   ${ButtonCSS};
