@@ -23,25 +23,6 @@ import { ProgressBar } from '../progress_bar'
 import { ProgressBarToggle } from '../progress_bar/toggle'
 import { SubsectionTitleWrapper } from '../subsection_title_wrapper'
 
-// import { useConnectedWeb3Context } from '../../../../contexts'
-// import { useContracts } from '../../../../hooks'
-// import { useGraphMarketsFromQuestion } from '../../../../hooks/graph/useGraphMarketsFromQuestion'
-// import { useTheme } from '../../../../hooks/useTheme'
-// import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
-// import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
-// import {
-//   bigNumberToString,
-//   getInitialCollateral,
-//   getMarketRelatedQuestionFilter,
-//   onChangeMarketCurrency,
-// } from '../../../../util/tools'
-// import { MarketMakerData, MarketState, Token } from '../../../../util/types'
-// import { SubsectionTitleWrapper } from '../../../common'
-// import { AdditionalMarketData } from '../additional_market_data'
-// import { MarketData } from '../market_data'
-// import { ProgressBar } from '../progress_bar'
-// import { ProgressBarToggle } from '../progress_bar/toggle'
-
 const SubsectionTitleLeftWrapper = styled.div`
   display: flex;
   align-items: center;
