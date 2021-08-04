@@ -14,7 +14,7 @@ import { IconArrowBack, IconClose, IconMetaMask, IconSettings, IconWalletConnect
 import { IconChevronDown } from '../../common/icons/IconChevronDown'
 import { IconChevronUp } from '../../common/icons/IconChevronUp'
 import { IconJazz } from '../../common/icons/IconJazz'
-import { Image } from '../../market/common/token_item'
+import { Image } from '../../market/common_sections/message_text/token_item'
 import SettingsViewContainer from '../../settings/settings_view'
 import {
   BalanceItem,
