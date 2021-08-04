@@ -56,7 +56,6 @@ export const buildQueryMyMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) =
     sortBy === 'openingTimestamp' ? 'openingTimestamp_gt: $now' : '',
     category === 'All' ? '' : 'category: $category',
     arbitrator ? 'arbitrator: $arbitrator' : 'arbitrator_in: $knownArbitrators',
-    'oracle_in: $knownOracles',
     currency ? 'collateralToken: $currency' : '',
     title ? 'title_contains: $title' : '',
   ]
