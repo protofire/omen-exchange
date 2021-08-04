@@ -33,7 +33,8 @@ export const useCpkProxy = (isNative = false) => {
 
   useEffect(() => {
     fetchUpdated()
-  }, [cpk, fetchUpdated])
+    // eslint-disable-next-line
+  }, [cpk?.address])
 
   return {
     proxyIsUpToDate,
