@@ -4,7 +4,7 @@ import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../contexts'
-import { NetworkId, bridgeTokensList, getToken, networkIds } from '../../../util/networks'
+import { bridgeTokensList, getNativeAsset, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
 import { bigNumberToString, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
 import { KnownTokenValue, Token, TransactionStep } from '../../../util/types'
@@ -205,7 +205,7 @@ export const ModalYourConnection = (props: Props) => {
   const context = useConnectedWeb3Context()
   const owner = context.rawWeb3Context.account
 
-  const { cpk, relay, setTxHash, setTxState, txHash, txState } = context
+  const { cpk, networkId, relay, setTxHash, setTxState, txHash, txState } = context
 
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
@@ -293,7 +293,8 @@ export const ModalYourConnection = (props: Props) => {
             </BalanceItemTitle>
           </BalanceItemSide>
           <BalanceItemBalance>
-            {bigNumberToString(balance, decimals, symbol === 'DAI' ? 2 : 3)} {symbol === 'xDAI' ? 'DAI' : symbol.toUpperCase()}
+            {bigNumberToString(balance, decimals, symbol === 'DAI' ? 2 : 3)}{' '}
+            {symbol === 'xDAI' ? 'DAI' : symbol.toUpperCase()}
           </BalanceItemBalance>
         </BalanceItem>
       )

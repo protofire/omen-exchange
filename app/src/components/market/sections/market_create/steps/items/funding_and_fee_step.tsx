@@ -16,11 +16,7 @@ import { useCollateralBalance, useCpkAllowance, useCpkProxy } from '../../../../
 import { useGraphMarketsFromQuestion } from '../../../../../../hooks/graph/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../../util/market_creation_status_data'
-<<<<<<< HEAD
-import { getNativeAsset, pseudoNativeAssetAddress } from '../../../../../../util/networks'
-=======
-import { networkIds, pseudoNativeAssetAddress } from '../../../../../../util/networks'
->>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
+import { pseudoNativeAssetAddress } from '../../../../../../util/networks'
 import { RemoteData } from '../../../../../../util/remote_data'
 import { bigNumberToString, formatDate } from '../../../../../../util/tools'
 import { Arbitrator, Ternary, Token } from '../../../../../../util/types'
@@ -193,7 +189,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const balance = useSelector((state: BalanceState): Maybe<BigNumber> => state.balance && new BigNumber(state.balance))
   const dispatch = useDispatch()
 
-  const { account, cpk, library: provider, networkId } = context
+  const { account, cpk, library: provider } = context
   const signer = useMemo(() => provider.getSigner(), [provider])
   const {
     back,
@@ -249,7 +245,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const hasZeroAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.isZero())
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy(userInputCollateral.address === pseudoNativeAssetAddress)
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(collateral.address === pseudoNativeAssetAddress)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
   useEffect(() => {
@@ -301,20 +297,14 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
     exceedsMaxFee ||
     isNegativeDepositAmount ||
     !isUpdated ||
-    (!cpk?.isSafeApp && userInputCollateral.address !== pseudoNativeAssetAddress && hasZeroAllowance === Ternary.True)
+    (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasZeroAllowance === Ternary.True)
 
   const showSetAllowance =
     collateral.address !== pseudoNativeAssetAddress &&
     !cpk?.isSafeApp &&
     (allowanceFinished || hasZeroAllowance === Ternary.True || hasEnoughAllowance === Ternary.False)
 
-<<<<<<< HEAD
-  const showUpgrade =
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
-=======
   const showUpgrade = !isUpdated || upgradeFinished
->>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
 

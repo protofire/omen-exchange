@@ -4,18 +4,15 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-<<<<<<< HEAD
-import { useConnectedWeb3Context } from '../../../../contexts'
-import { useSymbol } from '../../../../hooks'
-=======
 import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { useConnectedWeb3Context, useContracts, useSymbol } from '../../../../hooks'
->>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
+import { useConnectedWeb3Context } from '../../../../contexts'
+import { useContracts, useSymbol } from '../../../../hooks'
 import { ERC20Service } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getTokenFromAddress } from '../../../../util/networks'
 import {
   bigNumberToNumber,
+  bigNumberToString,
   calcPrediction,
   calcPrice,
   formatNumber,
@@ -123,13 +120,9 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     logger.debug(err.message)
   }
 
-<<<<<<< HEAD
-  const [details, setDetails] = useState(token || { decimals: 0, symbol: '', volume: 0 })
-=======
-  const [details, setDetails] = useState(token || { decimals: 0, symbol: '', volume: '' })
+  const [details, setDetails] = useState(token || { decimals: STANDARD_DECIMALS, symbol: '', volume: 0 })
   const [liquidity, setLiquidity] = useState(new BigNumber(0))
 
->>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
   const { decimals, volume } = details
   const symbol = useSymbol(details as Token)
   const now = moment()
@@ -140,9 +133,6 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
   const formattedCreationDate = moment(creationDate).format('MMM Do, YYYY')
 
-<<<<<<< HEAD
-  const formattedLiquidity: number = scaledLiquidityParameter
-=======
   const contracts = useContracts(context)
   const { buildMarketMaker } = contracts
   const marketMaker = buildMarketMaker(address)
@@ -155,8 +145,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     // eslint-disable-next-line
   }, [])
 
-  const formattedLiquidity: string = formatBigNumber(liquidity, STANDARD_DECIMALS, 2)
->>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
+  const formattedLiquidity: string = bigNumberToString(liquidity, details.decimals)
 
   useEffect(() => {
     const setToken = async () => {
@@ -219,8 +208,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
                   )
                 : 0
             } ${symbol} - 24h Volume`}
-          {currentFilter.sortBy === 'usdLiquidityParameter' &&
-            `${formatToShortNumber(formattedLiquidity)} ${symbol} - Liquidity`}
+          {currentFilter.sortBy === 'usdLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
         </span>
       </Info>

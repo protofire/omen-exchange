@@ -67,7 +67,7 @@ const MarketDataItemImage = styled.img`
 interface Props extends DOMAttributes<HTMLDivElement> {
   collateralVolume: BigNumber
   blocktime?: number
-  liquidity: number
+  liquidity: string
   resolutionTimestamp: Date
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
@@ -115,7 +115,7 @@ export const MarketData: React.FC<Props> = props => {
     <MarketDataWrapper>
       <MarketDataItem>
         <MarketDataItemTop>
-          {formatToShortNumber(liquidity)} {currency.symbol}
+          {liquidity} {currency.symbol}
         </MarketDataItemTop>
         <MarketDataItemBottom>Liquidity</MarketDataItemBottom>
       </MarketDataItem>

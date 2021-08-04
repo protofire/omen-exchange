@@ -32,7 +32,8 @@ export function colors(darkMode: boolean): Colors {
     border4: darkMode ? '' : '#ECEFF1',
   }
 }
-const theme = {
+
+export const theme = {
   fonts: {
     defaultSize: '14px',
     defaultLineHeight: '16px',

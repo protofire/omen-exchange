@@ -10,7 +10,13 @@ import { useCollateralBalance, useContracts, useCpkAllowance, useCpkProxy, useFu
 import { getLogger } from '../../util/logger'
 import { pseudoNativeAssetAddress } from '../../util/networks'
 import { RemoteData } from '../../util/remote_data'
-import { bigNumberToString, calcPoolTokens, calcRemoveFundingSendAmounts, getInitialCollateral } from '../../util/tools'
+import {
+  bigNumberToString,
+  calcPoolTokens,
+  calcRemoveFundingSendAmounts,
+  getInitialCollateral,
+  isDust,
+} from '../../util/tools'
 import { MarketDetailsTab, MarketMakerData, Ternary, Token, TransactionStep } from '../../util/types'
 
 interface Props {
@@ -30,6 +36,7 @@ export type SharedPropsInterface = {
   disableDepositButton: boolean
   sharesAmountError: string | null
   disableWithdrawButton: boolean
+  disableWithdrawTab: boolean
   totalUserLiquidity: BigNumber
   showUpgrade: boolean
   collateralAmountError: Maybe<string>
@@ -289,6 +296,8 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     totalPoolShares,
   )
 
+  const disableWithdrawTab = activeTab !== Tabs.withdraw && isDust(totalUserLiquidity, collateral.decimals)
+
   useEffect(() => {
     setIsNegativeAmountToFund((amountToFund || Zero).lt(Zero))
   }, [amountToFund, collateral.decimals])
@@ -321,6 +330,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     disableDepositButton,
     sharesAmountError,
     disableWithdrawButton,
+    disableWithdrawTab,
     totalUserLiquidity,
     showUpgrade,
     collateralAmountError,

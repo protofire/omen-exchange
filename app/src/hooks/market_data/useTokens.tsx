@@ -95,17 +95,6 @@ export const useTokens = (
 
         const { account } = context
 
-<<<<<<< HEAD:app/src/hooks/market_data/useTokens.tsx
-=======
-        // setup multicall config
-        const network = (networkNames as any)[context.networkId]
-
-        const config = {
-          rpcUrl: getInfuraUrl(context.networkId),
-          multicallAddress: (configs as any)[network.toLowerCase()].multicall,
-        }
-
->>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f:app/src/hooks/useTokens.tsx
         // aggregate call array
         const calls = []
 
@@ -149,17 +138,8 @@ export const useTokens = (
         }
 
         if (calls.length) {
-<<<<<<< HEAD:app/src/hooks/market_data/useTokens.tsx
-          const response = await multicall(calls, context.networkId)
-          tokenData = tokenData.map(token => {
-            const results = response.results.original
-            const balance = results[getBalanceKey(token.address)]
-            const allowance = results[getAllowanceKey(token.address)]
-            return { ...token, balance, allowance }
-          })
-=======
           try {
-            const response = await aggregate(calls, config)
+            const response = await multicall(calls, context.networkId)
             tokenData = tokenData.map(token => {
               const results = response.results.original
               const balance = results[getBalanceKey(token.address)]
@@ -169,7 +149,6 @@ export const useTokens = (
           } catch (e) {
             console.error('Error while fetching tokens: ', e)
           }
->>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f:app/src/hooks/useTokens.tsx
         }
 
         if (!isObjectEqual(tokens, tokenData)) {

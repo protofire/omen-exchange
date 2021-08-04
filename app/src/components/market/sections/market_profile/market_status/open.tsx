@@ -94,16 +94,8 @@ const Wrapper = (props: Props) => {
     scalarLow,
     totalPoolShares,
   } = marketMakerData
-<<<<<<< HEAD
-  const { networkId } = context
-  const isQuestionOpen = question.resolution.valueOf() < Date.now()
+  const { library: provider, networkId } = context
 
-=======
-  const [displayCollateral, setDisplayCollateral] = useState<Token>(collateral)
-  const { library: provider, networkId, relay } = context
-  const { compoundService: CompoundService } = useCompoundService(collateral, context)
-  const compoundService = CompoundService || null
->>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
   const nativeAsset = getNativeAsset(networkId)
   const initialBondAmount =
     networkId === networkIds.XDAI ? parseUnits('10', nativeAsset.decimals) : parseUnits('0.01', nativeAsset.decimals)
@@ -123,26 +115,6 @@ const Wrapper = (props: Props) => {
     // eslint-disable-next-line
   }, [question.currentAnswerBond])
 
-<<<<<<< HEAD
-=======
-  const setCurrentDisplayCollateral = () => {
-    // if collateral is a cToken then convert the collateral and balances to underlying token
-    const collateralSymbol = collateral.symbol.toLowerCase()
-    if (collateralSymbol in CompoundTokenType) {
-      const baseCollateralSymbol = collateralSymbol.substring(1, collateralSymbol.length)
-      let baseCollateralToken = collateral
-      if (baseCollateralSymbol === 'eth') {
-        baseCollateralToken = getNativeAsset(networkId, relay)
-      } else {
-        baseCollateralToken = getToken(networkId, baseCollateralSymbol as KnownToken)
-      }
-      setDisplayCollateral(baseCollateralToken)
-    } else {
-      setDisplayCollateral(collateral)
-    }
-  }
-
->>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
   useEffect(() => {
     const shouldFinalize = async () => {
       const block = await provider.getBlock('latest')
@@ -156,13 +128,8 @@ const Wrapper = (props: Props) => {
       }
       setBlocktime(timestamp)
     }
-<<<<<<< HEAD
-    // eslint-disable-next-line
-=======
     shouldFinalize()
-    setCurrentDisplayCollateral()
     // eslint-disable-next-line react-hooks/exhaustive-deps
->>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
   }, [])
 
   const userHasShares = balances.some((balanceItem: BalanceItem) => {

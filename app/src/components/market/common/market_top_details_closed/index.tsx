@@ -3,22 +3,18 @@ import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
-<<<<<<< HEAD
 import { useConnectedWeb3Context } from '../../../../contexts'
+import { useContracts } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/graph/useGraphMarketsFromQuestion'
 import { useTheme } from '../../../../hooks/useTheme'
-=======
-import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
-import { useGraphMarketsFromQuestion } from '../../../../hooks/useGraphMarketsFromQuestion'
->>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
-<<<<<<< HEAD
-import { getInitialCollateral, getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
-=======
-import { formatBigNumber, getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../util/tools'
->>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
+import {
+  bigNumberToString,
+  getInitialCollateral,
+  getMarketRelatedQuestionFilter,
+  onChangeMarketCurrency,
+} from '../../../../util/tools'
 import { MarketMakerData, MarketState, Token } from '../../../../util/types'
 import { SubsectionTitleWrapper } from '../../../common'
 import { AdditionalMarketData } from '../additional_market_data'
@@ -81,9 +77,6 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
 
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
-<<<<<<< HEAD
-  const formattedLiquidity: number = scaledLiquidityParameter ? scaledLiquidityParameter : 0
-=======
   const contracts = useContracts(context)
   const { buildMarketMaker } = contracts
   const marketMaker = buildMarketMaker(address)
@@ -96,8 +89,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     // eslint-disable-next-line
   }, [])
 
-  const formattedLiquidity: string = formatBigNumber(liquidity, STANDARD_DECIMALS, 2)
->>>>>>> 20dcca21fe3d9821237b0e27036eeeb48301430f
+  const formattedLiquidity: string = bigNumberToString(liquidity, collateral.decimals)
 
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred

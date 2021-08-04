@@ -9,13 +9,9 @@ import { CPKService } from '../services'
 import connectors from '../util/connectors'
 import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
-import { TransactionStep } from '../util/types'
 import { getInfuraUrl, networkIds } from '../util/networks'
 import { checkRpcStatus, getNetworkFromChain } from '../util/tools'
-
-import { ConnectedBalance, useBalance } from './useBalance'
-import { useCpk } from './useCpk'
-import { useSafeApp } from './useSafeApp'
+import { TransactionStep } from '../util/types'
 
 const logger = getLogger('Hooks::ConnectedWeb3')
 

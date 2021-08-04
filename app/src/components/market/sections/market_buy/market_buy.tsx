@@ -71,7 +71,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     isNegativeAmount,
     isTransactionModalOpen,
     marketMaker,
-    nativeAsset,
     newShares,
     outcomeIndex,
     potentialProfitFormatted,

@@ -380,7 +380,9 @@ export const ModalDepositWithdraw = (props: Props) => {
 
                 <span>
                   {exchangeType === ExchangeType.withdraw && currencySelected !== 'dai'
-                    ? `${bigNumberToString(displayFundAmount.div(1000), decimals, 3)} ${symbol === 'xDAI' ? 'DAI' : symbol}`
+                    ? `${bigNumberToString(displayFundAmount.div(1000), decimals, 3)} ${
+                        symbol === 'xDAI' ? 'DAI' : symbol
+                      }`
                     : `0.00 ${symbol === 'xDAI' ? 'DAI' : symbol}`}
                 </span>
               </ExchangeDataItem>
@@ -390,7 +392,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                 <span>
                   {currencySelected !== 'dai' && exchangeType === ExchangeType.withdraw
                     ? `${bigNumberToString(displayFundAmount.sub(displayFundAmount.div(1000)), decimals, 3)} ${symbol}`
-                    : `${bigNumberToString(displayFundAmount, decimals)} ${ symbol === 'xDAI' ? 'DAI' : symbol}`}
+                    : `${bigNumberToString(displayFundAmount, decimals)} ${symbol === 'xDAI' ? 'DAI' : symbol}`}
                 </span>
               </ExchangeDataItem>
             </>

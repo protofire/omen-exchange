@@ -69,7 +69,6 @@ export const ScalarMarketBuy = (props: Props) => {
     isNegativeAmount,
     isTransactionModalOpen,
     marketMaker,
-    nativeAsset,
     outcomeIndex: positionIndex,
     potentialProfit,
     potentialProfitFormatted,
