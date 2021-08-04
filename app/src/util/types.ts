@@ -361,6 +361,7 @@ export type GraphMarketMakerDataItem = {
   arbitrator: string
   category: string
   templateId: string
+  totalPoolShares: BigNumber
   usdLiquidityParameter: string
   curatedByDxDao: boolean
   scaledLiquidityParameter: string
@@ -396,6 +397,7 @@ export type MarketMakerDataItem = {
   arbitrator: string
   category: string
   templateId: number
+  totalPoolShares: BigNumber
   usdLiquidityParameter: number
   curatedByDxDao: boolean
   scaledLiquidityParameter: number
