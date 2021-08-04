@@ -11,7 +11,6 @@ import { getLogger } from '../../../../util/logger'
 import { getTokenFromAddress } from '../../../../util/networks'
 import {
   bigNumberToNumber,
-  bigNumberToString,
   calcPrediction,
   calcPrice,
   formatNumber,
@@ -132,7 +131,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
   const formattedCreationDate = moment(creationDate).format('MMM Do, YYYY')
 
-  const formattedLiquidity: string = bigNumberToString(totalPoolShares, details.decimals)
+  const formattedLiquidity: string = formatToShortNumber(bigNumberToNumber(totalPoolShares, details.decimals))
 
   useEffect(() => {
     const setToken = async () => {

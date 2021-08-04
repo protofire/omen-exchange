@@ -9,7 +9,8 @@ import { useTheme } from '../../../../hooks/useTheme'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
 import {
-  bigNumberToString,
+  bigNumberToNumber,
+  formatToShortNumber,
   getInitialCollateral,
   getMarketRelatedQuestionFilter,
   onChangeMarketCurrency,
@@ -77,7 +78,7 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
 
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
-  const formattedLiquidity: string = bigNumberToString(totalPoolShares, collateral.decimals)
+  const formattedLiquidity: string = formatToShortNumber(bigNumberToNumber(totalPoolShares, collateral.decimals))
 
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred
