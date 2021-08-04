@@ -5,7 +5,8 @@ import { RouteComponentProps, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import { useConnectedWeb3Context, useContracts, useCpkProxy } from '../../../hooks'
+import { useConnectedWeb3Context } from '../../../contexts'
+import { useContracts, useCpkProxy } from '../../../hooks'
 import { getLogger } from '../../../util/logger'
 import { getNativeAsset } from '../../../util/networks'
 import { RemoteData } from '../../../util/remote_data'
@@ -75,7 +76,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
 
   const [upgradeFinished, setUpgradeFinished] = useState(false)
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(true)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
   const showUpgrade = !isUpdated || upgradeFinished
 
@@ -210,7 +211,6 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
       )}
       {showUpgrade && (
         <SetAllowance
-          collateral={nativeAsset}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}

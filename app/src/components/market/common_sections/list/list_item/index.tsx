@@ -1,14 +1,18 @@
+import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useSymbol } from '../../../../../hooks'
+import { STANDARD_DECIMALS } from '../../../../../common/constants'
+import { useConnectedWeb3Context } from '../../../../../contexts'
+import { useContracts, useSymbol } from '../../../../../hooks'
 import { ERC20Service } from '../../../../../services'
 import { getLogger } from '../../../../../util/logger'
 import { getTokenFromAddress } from '../../../../../util/networks'
 import {
   bigNumberToNumber,
+  bigNumberToString,
   calcPrediction,
   calcPrice,
   formatNumber,
@@ -103,7 +107,6 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     runningDailyVolumeByHour,
     scalarHigh,
     scalarLow,
-    scaledLiquidityParameter,
     title,
   } = market
 
@@ -117,7 +120,9 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     logger.debug(err.message)
   }
 
-  const [details, setDetails] = useState(token || { decimals: 0, symbol: '', volume: 0 })
+  const [details, setDetails] = useState(token || { decimals: STANDARD_DECIMALS, symbol: '', volume: 0 })
+  const [liquidity, setLiquidity] = useState(new BigNumber(0))
+
   const { decimals, volume } = details
   const symbol = useSymbol(details as Token)
   const now = moment()
@@ -128,7 +133,19 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
   const formattedCreationDate = moment(creationDate).format('MMM Do, YYYY')
 
-  const formattedLiquidity: number = scaledLiquidityParameter
+  const contracts = useContracts(context)
+  const { buildMarketMaker } = contracts
+  const marketMaker = buildMarketMaker(address)
+
+  useEffect(() => {
+    const getLiquidity = async () => {
+      setLiquidity(await marketMaker.getTotalSupply())
+    }
+    marketMaker && getLiquidity()
+    // eslint-disable-next-line
+  }, [])
+
+  const formattedLiquidity: string = bigNumberToString(liquidity, details.decimals)
 
   useEffect(() => {
     const setToken = async () => {
@@ -191,8 +208,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
                   )
                 : 0
             } ${symbol} - 24h Volume`}
-          {currentFilter.sortBy === 'usdLiquidityParameter' &&
-            `${formatToShortNumber(formattedLiquidity)} ${symbol} - Liquidity`}
+          {currentFilter.sortBy === 'usdLiquidityParameter' && `${formattedLiquidity} ${symbol} - Liquidity`}
           {currentFilter.sortBy === 'creationTimestamp' && `${formattedCreationDate} - Created`}
         </span>
       </Info>

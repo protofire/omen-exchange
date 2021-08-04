@@ -5,9 +5,8 @@ import { RouteComponentProps, useHistory, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { DOCUMENT_FAQ } from '../../../common/constants'
-import { useConnectedWeb3Context } from '../../../hooks'
+import { useConnectedWeb3Context } from '../../../contexts'
 import { SharedPropsInterface } from '../../../pages/market_sections/market_pool_liquidity_container'
-import { getNativeAsset } from '../../../util/networks'
 import { RemoteData } from '../../../util/remote_data'
 import { bigNumberToString, calcAddFundingSendAmounts, calcRemoveFundingSendAmounts } from '../../../util/tools'
 import { MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../util/types'
@@ -75,6 +74,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     disableDepositButton,
     disableDepositTab,
     disableWithdrawButton,
+    disableWithdrawTab,
     feeFormatted,
     fundingBalance,
     isNegativeAmountToFund,
@@ -106,7 +106,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const { balances, fee, totalEarnings, totalPoolShares, userEarnings } = marketMakerData
   const history = useHistory()
   const context = useConnectedWeb3Context()
-  const { networkId, relay } = context
 
   const sendAmountsAfterAddingFunding = calcAddFundingSendAmounts(
     amountToFund || Zero,
@@ -130,7 +129,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
   const showSharesChange = activeTab === Tabs.deposit ? amountToFund?.gt(0) : amountToRemove?.gt(0)
 
   const probabilities = balances.map(balance => balance.probability)
-
   const switchTab = (tab: Tabs) => {
     setAmountToFund(new BigNumber('0'))
     setAmountToRemove(new BigNumber('0'))
@@ -168,6 +166,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
             </ButtonTab>
             <ButtonTab
               active={disableDepositTab ? true : activeTab === Tabs.withdraw}
+              disabled={disableWithdrawTab}
               onClick={() => switchTab(Tabs.withdraw)}
             >
               Withdraw
@@ -293,7 +292,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
       )}
       {activeTab === Tabs.deposit && showUpgrade && (
         <SetAllowanceStyled
-          collateral={getNativeAsset(networkId, relay)}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}

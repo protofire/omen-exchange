@@ -15,7 +15,7 @@ export const ToggleTokenLock = (props: ToggleTokenLockProps) => {
 
   return (
     <ButtonStateful disabled={loading || finished} onClick={onUnlock} state={state}>
-      Set
+      Upgrade
     </ButtonStateful>
   )
 }

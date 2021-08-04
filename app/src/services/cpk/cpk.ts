@@ -1,7 +1,7 @@
 import { TransactionReceipt, Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
-import { ConnectedWeb3Context } from '../../hooks'
+import { ConnectedWeb3Context } from '../../contexts'
 import { verifyProxyAddress } from '../../util/cpk'
 import { getLogger } from '../../util/logger'
 import { bridgeTokensList, getTargetSafeImplementation } from '../../util/networks'
@@ -493,7 +493,10 @@ class CPKService {
     }
   }
 
-  proxyIsUpToDate = async (): Promise<boolean> => {
+  proxyIsUpToDate = async (isNative = false): Promise<boolean> => {
+    if (this.cpk.relay) {
+      return true
+    }
     const network = await this.provider.getNetwork()
     const deployed = await this.cpk.isProxyDeployed()
     if (deployed) {
@@ -501,8 +504,12 @@ class CPKService {
       if (implementation.toLowerCase() === getTargetSafeImplementation(network.chainId).toLowerCase()) {
         return true
       }
+      return false
     }
-    return false
+    if (isNative) {
+      return false
+    }
+    return true
   }
 }
 

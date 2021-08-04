@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Helmet } from 'react-helmet'
 import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import { useWeb3Context } from 'web3-react'
@@ -13,16 +13,9 @@ import SettingsViewContainer from '../settings/settings_view'
 
 import { MarketRoutes } from './routes/market_routes'
 const RedirectToHome = () => <Redirect to="/" />
+
 export const Main: React.FC = () => {
   const context = useWeb3Context()
-
-  const windowObj: any = window
-  const defaultChainID = 1
-  const [networkId, setNetworkId] = useState(windowObj.ethereum ? windowObj.ethereum.chainId : defaultChainID)
-
-  if (windowObj.ethereum) {
-    windowObj.ethereum.on('chainChanged', (chainId: string) => setNetworkId(chainId))
-  }
 
   return (
     <>
@@ -39,11 +32,7 @@ export const Main: React.FC = () => {
                 <Route exact path="/">
                   <Redirect to="/liquidity" />
                 </Route>
-                <Route
-                  exact
-                  path="/settings"
-                  render={props => <SettingsViewContainer networkId={networkId} {...props} />}
-                />
+                <Route component={SettingsViewContainer} exact path="/settings" />
                 <Route
                   component={MarketHomeContainer}
                   path={['/24h-volume', '/volume', '/newest', '/ending', '/liquidity']}

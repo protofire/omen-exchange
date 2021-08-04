@@ -3,8 +3,8 @@ import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory, useLocation, withRouter } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { WhenConnected, useConnectedWeb3Context } from '../../../../contexts'
 import { useGraphMarketUserTxData } from '../../../../hooks'
-import { WhenConnected, useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
 import { useRealityLink } from '../../../../hooks/useRealityLink'
 import { MarketBuyContainer } from '../../../../pages/market_sections/market_buy_container'
 import { MarketPoolLiquidityContainer } from '../../../../pages/market_sections/market_pool_liquidity_container'
@@ -94,8 +94,7 @@ const Wrapper = (props: Props) => {
     scalarLow,
     totalPoolShares,
   } = marketMakerData
-  const { networkId } = context
-  const isQuestionOpen = question.resolution.valueOf() < Date.now()
+  const { library: provider, networkId } = context
 
   const nativeAsset = getNativeAsset(networkId)
   const initialBondAmount =
@@ -105,6 +104,10 @@ const Wrapper = (props: Props) => {
     question.currentAnswerBond ? new BigNumber(question.currentAnswerBond).mul(2) : initialBondAmount,
   )
 
+  const [blocktime, setBlocktime] = useState<number>()
+
+  const isQuestionOpen = question.resolution.valueOf() < (blocktime ? blocktime : Date.now())
+
   useEffect(() => {
     if (question.currentAnswerBond && !new BigNumber(question.currentAnswerBond).mul(2).eq(bondNativeAssetAmount)) {
       setBondNativeAssetAmount(new BigNumber(question.currentAnswerBond).mul(2))
@@ -113,16 +116,20 @@ const Wrapper = (props: Props) => {
   }, [question.currentAnswerBond])
 
   useEffect(() => {
-    const timeDifference = new Date(question.resolution).getTime() - new Date().getTime()
-    const maxTimeDifference = 86400000
-    if (timeDifference > 0 && timeDifference < maxTimeDifference) {
-      setTimeout(callAfterTimeout, timeDifference + 2000)
+    const shouldFinalize = async () => {
+      const block = await provider.getBlock('latest')
+      const timestamp = block.timestamp * 1000
+      const resolution = new Date(question.resolution).getTime()
+      if (resolution < timestamp) {
+        setCurrentTab(MarketDetailsTab.finalize)
+        fetchGraphMarketMakerData()
+      } else {
+        setTimeout(shouldFinalize, 2000)
+      }
+      setBlocktime(timestamp)
     }
-    function callAfterTimeout() {
-      fetchGraphMarketMakerData()
-      setCurrentTab(MarketDetailsTab.finalize)
-    }
-    // eslint-disable-next-line
+    shouldFinalize()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const userHasShares = balances.some((balanceItem: BalanceItem) => {
@@ -177,17 +184,6 @@ const Wrapper = (props: Props) => {
     )
   }
 
-  const openInRealitioButton = (
-    <Button
-      buttonType={ButtonType.secondaryLine}
-      onClick={() => {
-        window.open(`${realitioBaseUrl}/#!/question/${question.id}`)
-      }}
-    >
-      Answer on Reality.eth
-    </Button>
-  )
-
   const finalizeButtons = (
     <MarketBottomFinalizeNavGroupWrapper>
       <Button
@@ -232,7 +228,7 @@ const Wrapper = (props: Props) => {
     </MarketBottomNavGroupWrapper>
   )
 
-  const isFinalizing = question.resolution < new Date() && !isQuestionFinalized
+  const isFinalizing = isQuestionOpen && !isQuestionFinalized
 
   const [currentTab, setCurrentTab] = useState(
     isQuestionFinalized || !isFinalizing ? MarketDetailsTab.swap : MarketDetailsTab.finalize,
@@ -278,11 +274,12 @@ const Wrapper = (props: Props) => {
   return (
     <>
       <TopCard>
-        <MarketTopDetailsOpen marketMakerData={marketMakerData} />
+        <MarketTopDetailsOpen blocktime={blocktime} marketMakerData={marketMakerData} />
       </TopCard>
       <BottomCard>
         <MarketNavigation
           activeTab={currentTab}
+          blocktime={blocktime}
           marketMakerData={marketMakerData}
           switchMarketTab={switchMarketTab}
         ></MarketNavigation>
@@ -328,7 +325,7 @@ const Wrapper = (props: Props) => {
                 >
                   Back
                 </Button>
-                {isQuestionOpen ? openInRealitioButton : buySellButtons}
+                {buySellButtons}
               </StyledButtonContainer>
             </WhenConnected>
           </>

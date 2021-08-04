@@ -2,17 +2,16 @@ import { providers } from 'ethers'
 import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
+import { ConnectedBalance, useBalance } from '../hooks'
+import { useCpk } from '../hooks/cpk/useCpk'
+import { useSafeApp } from '../hooks/useSafeApp'
 import { CPKService } from '../services'
 import connectors from '../util/connectors'
 import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
-import { networkIds } from '../util/networks'
-import { getNetworkFromChain } from '../util/tools'
+import { getInfuraUrl, networkIds } from '../util/networks'
+import { checkRpcStatus, getNetworkFromChain } from '../util/tools'
 import { TransactionStep } from '../util/types'
-
-import { ConnectedBalance, useBalance } from './useBalance'
-import { useCpk } from './useCpk'
-import { useSafeApp } from './useSafeApp'
 
 const logger = getLogger('Hooks::ConnectedWeb3')
 
@@ -92,9 +91,17 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     if (networkId) {
       const enableRelay = context.connectorName !== 'Safe' || debugAddress !== ''
+
+      checkRpcStatus(
+        getInfuraUrl(relay ? networkIds.XDAI : networkId),
+        props.setStatus,
+        relay ? networkIds.XDAI : networkId,
+      )
+
       const { address, isRelay, netId, provider } = getRelayProvider(relay && enableRelay, networkId, library, account)
 
       const value = {
+        setStatus: props.setStatus,
         account: address || null,
         library: provider,
         networkId: netId,
@@ -167,7 +174,14 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     }
   }, [context, library, active, error, networkId, safeAppInfo, rpcAddress, debugAddress, debugNetworkId])
 
-  if (!networkId || !library || !connection || (connection.account && !cpk) || !balances.fetched) {
+  if (
+    !networkId ||
+    !library ||
+    !connection ||
+    (connection.account && !cpk) ||
+    (connection.account && connection.networkId !== cpk?.provider?.network?.chainId) ||
+    !balances.fetched
+  ) {
     props.setStatus(true)
     return null
   }
@@ -176,8 +190,8 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     ...connection,
     cpk,
     balances,
+    setStatus: props.setStatus,
   }
-
   props.setStatus(true)
   return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
 }

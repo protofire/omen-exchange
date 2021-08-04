@@ -5,15 +5,8 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { STANDARD_DECIMALS } from '../../common/constants'
 import { MarketBuy } from '../../components/market/market_buy/market_buy'
 import { ScalarMarketBuy } from '../../components/market/market_buy/scalar_market_buy'
-import {
-  ConnectedWeb3Context,
-  useAsyncDerivedValue,
-  useCollateralBalance,
-  useConnectedWeb3Context,
-  useContracts,
-  useCpkAllowance,
-  useCpkProxy,
-} from '../../hooks'
+import { ConnectedWeb3Context, useConnectedWeb3Context } from '../../contexts'
+import { useAsyncDerivedValue, useCollateralBalance, useContracts, useCpkAllowance, useCpkProxy } from '../../hooks'
 import { CPKService, MarketMakerService } from '../../services'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../util/networks'
 import { RemoteData } from '../../util/remote_data'
@@ -226,13 +219,11 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     setDisplayFundAmount(value)
   }
 
-  const { proxyIsUpToDate, updateProxy } = useCpkProxy()
+  const { proxyIsUpToDate, updateProxy } = useCpkProxy(collateral.address === pseudoNativeAssetAddress)
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
-  const showUpgrade =
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress) ||
-    (upgradeFinished && collateral.address === pseudoNativeAssetAddress)
+  const showUpgrade = !isUpdated || upgradeFinished
 
   const upgradeProxy = async () => {
     if (!context.cpk) {
@@ -252,7 +243,7 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
       hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount ||
-    (!isUpdated && collateral.address === pseudoNativeAssetAddress)
+    !isUpdated
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
   const sharesTotal = bigNumberToString(tradedShares, collateral.decimals)

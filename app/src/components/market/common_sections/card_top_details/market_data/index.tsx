@@ -4,7 +4,8 @@ import momentTZ from 'moment-timezone'
 import React, { DOMAttributes, useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context, useTokens } from '../../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../../contexts'
+import { useTokens } from '../../../../../hooks'
 import { bigNumberToNumber, formatDate, formatToShortNumber } from '../../../../../util/tools'
 import { Token } from '../../../../../util/types'
 import { TextToggle } from '../../message_text/TextToggle'
@@ -65,7 +66,8 @@ const MarketDataItemImage = styled.img`
 
 interface Props extends DOMAttributes<HTMLDivElement> {
   collateralVolume: BigNumber
-  liquidity: number
+  blocktime?: number
+  liquidity: string
   resolutionTimestamp: Date
   runningDailyVolumeByHour: BigNumber[]
   lastActiveDay: number
@@ -77,6 +79,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 export const MarketData: React.FC<Props> = props => {
   const {
     answerFinalizedTimestamp,
+    blocktime,
     collateralVolume,
     currency,
     isFinalize = false,
@@ -112,7 +115,7 @@ export const MarketData: React.FC<Props> = props => {
     <MarketDataWrapper>
       <MarketDataItem>
         <MarketDataItemTop>
-          {formatToShortNumber(liquidity)} {currency.symbol}
+          {liquidity} {currency.symbol}
         </MarketDataItemTop>
         <MarketDataItemBottom>Liquidity</MarketDataItemBottom>
       </MarketDataItem>
@@ -148,9 +151,9 @@ export const MarketData: React.FC<Props> = props => {
           <MarketDataItemBottom>Finalized</MarketDataItemBottom>
         </MarketDataItem>
       )}
-      {!isFinalize && resolutionTimestamp > new Date() && (
+      {!isFinalize && blocktime && blocktime < resolutionTimestamp.getTime() && (
         <MarketDataItem>
-          <MarketDataItemTop>{moment(resolutionTimestamp).fromNow(true)}</MarketDataItemTop>
+          <MarketDataItemTop>{moment(resolutionTimestamp).from(new Date(blocktime), true)}</MarketDataItemTop>
           <MarketDataItemBottom>Remaining</MarketDataItemBottom>
         </MarketDataItem>
       )}

@@ -6,7 +6,7 @@ import styled, { css } from 'styled-components'
 
 import { Network } from '../..'
 import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../contexts'
 import { networkIds } from '../../../../util/networks'
 import { bigNumberToString } from '../../../../util/tools'
 import { ExchangeType } from '../../../../util/types'
@@ -15,7 +15,6 @@ import { ButtonType } from '../../../button/button_styling_types'
 import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../form/dropdown'
 import { IconAdd, IconClose, IconOmen } from '../../icons'
-import { IconSettings } from '../../icons/IconSettings'
 
 export const HeaderWrapper = styled.div`
   align-items: center;
@@ -243,6 +242,7 @@ const HeaderContainer: React.FC = (props: any) => {
         localStorage.removeItem('walletconnect')
         context.rawWeb3Context.connector.onDeactivation()
       }
+
       context.rawWeb3Context.setConnector('Infura')
     }
   }
@@ -360,13 +360,6 @@ const HeaderContainer: React.FC = (props: any) => {
               <Network claim={false} />
             </HeaderButton>
           )}
-          <ButtonSettings
-            disabled={!hasRouter}
-            {...exitButtonProps}
-            onClick={() => history && history.push('/settings')}
-          >
-            <IconSettings />
-          </ButtonSettings>
         </ContentsRight>
         <ModalYourConnectionWrapper
           arrayOfClaimableBalances={arrayOfClaimableTokenBalances}

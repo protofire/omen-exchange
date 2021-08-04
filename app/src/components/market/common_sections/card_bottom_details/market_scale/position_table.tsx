@@ -15,8 +15,8 @@ import {
 } from '../../../common_styled'
 
 const TableWrapper = styled.div`
-  margin-left: -24px
-  margin-right: -24px
+  margin-left: -24px;
+  margin-right: -24px;
 `
 
 const ColoredTDStyled = styled(TDStyled as any)<{ positive?: boolean | undefined }>`

@@ -9,7 +9,7 @@ import { Moment } from 'moment'
 import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID, UINT_TEMPLATE_ID } from '../common/constants'
 import { Outcome } from '../components/market/market_create/steps/outcomes'
 import { getLogger } from '../util/logger'
-import { getEarliestBlockToCheck, getRealitioTimeout } from '../util/networks'
+import { getEarliestBlockToCheck, getRealitioTimeout, networkIds } from '../util/networks'
 import { Question, QuestionLog, TransactionStep } from '../util/types'
 
 const logger = getLogger('Services::Realitio')
@@ -209,6 +209,11 @@ class RealitioService {
     // Calc claimable bonds by matching claimWinnings internals: https://github.com/realitio/realitio-contracts/blob/master/truffle/contracts/Realitio.sol#L506
     const events = await this.getAnswers(questionId)
 
+    // 2.5% bond fee for xdai
+    const BOND_CLAIM_FEE_PROPORTION = new BigNumber('40')
+    const network = await this.provider.getNetwork()
+    const networkId = network.chainId
+
     let payee = AddressZero
     let queuedFunds = new BigNumber('0')
     let lastBond = new BigNumber('0')
@@ -237,6 +242,11 @@ class RealitioService {
       }
 
       lastBond = values.bond
+
+      // handle bond fee on xdai - only the last bond is exempt from the bond fee
+      if (networkId === networkIds.XDAI && !lastBond.eq(question.bond)) {
+        lastBond = lastBond.sub(lastBond.div(BOND_CLAIM_FEE_PROPORTION))
+      }
     }
 
     // There is nothing left below this bond so the payee can keep what remains

@@ -3,7 +3,8 @@ import styled from 'styled-components'
 
 import { version as appVersion } from '../../../../../package.json'
 import { DOCUMENT_FAQ, DOCUMENT_VALIDITY_RULES, SHOW_FOOTER } from '../../../../common/constants'
-import { useConnectedWeb3Context, useContracts } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../contexts'
+import { useContracts } from '../../../../hooks'
 import { getAddressBlockExplorerURL } from '../../../../util/networks'
 
 const Wrapper = styled.div<{ paddingBottomSmall?: boolean }>`

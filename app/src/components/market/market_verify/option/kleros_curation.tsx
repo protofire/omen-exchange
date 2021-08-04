@@ -88,6 +88,7 @@ const IconWrapper = styled.div`
   }
 `
 const SuccessVerify = styled.a<{ green?: boolean }>`
+  text-transform: capitalize;
   ${props => (props.green ? '' : 'cursor: pointer;')};
   color: ${props => (props.green ? props.theme.colors.green : props.theme.colors.clickable)};
   font-weight: ${props => props.theme.textfield.fontWeight};
@@ -300,7 +301,7 @@ export const KlerosCuration: FC<Props> = (props: Props) => {
         <CurationRightColumn>
           <StatusContainer>
             <SuccessVerify href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
-              verified
+              Verified
             </SuccessVerify>
             <IconWrapper as="a" href={baseKlerosLink} rel="noopener noreferrer" target="_blank">
               <IconTick />

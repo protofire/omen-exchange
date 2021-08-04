@@ -5,11 +5,10 @@ import { useHistory } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { DOCUMENT_FAQ } from '../../../common/constants'
-import { useConnectedWeb3Context } from '../../../hooks'
+import { useConnectedWeb3Context } from '../../../contexts'
 import { SharedPropsInterface } from '../../../pages/market_sections/market_pool_liquidity_container'
-import { getNativeAsset } from '../../../util/networks'
 import { RemoteData } from '../../../util/remote_data'
-import { bigMax, bigMin, bigNumberToString, getUnit, isDust } from '../../../util/tools'
+import { bigMax, bigMin, bigNumberToString, getUnit } from '../../../util/tools'
 import { AdditionalSharesType, MarketDetailsTab, MarketMakerData } from '../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -77,6 +76,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     disableDepositButton,
     disableDepositTab,
     disableWithdrawButton,
+    disableWithdrawTab,
     feeFormatted,
     fundingBalance,
     isNegativeAmountToFund,
@@ -118,12 +118,9 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   } = marketMakerData
   const context = useConnectedWeb3Context()
   const history = useHistory()
-  const { networkId, relay } = context
 
   const [additionalShares, setAdditionalShares] = useState<number>(0)
   const [additionalSharesType, setAdditionalSharesType] = useState<Maybe<AdditionalSharesType>>()
-
-  const disableWithdrawTab = isDust(fundingBalance, collateral.decimals)
 
   useEffect(() => {
     // Use floor as rounding method
@@ -196,7 +193,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
               Deposit
             </ButtonTab>
             <ButtonTab
-              active={!disableWithdrawTab && activeTab === Tabs.withdraw}
+              active={activeTab === Tabs.withdraw}
               disabled={disableWithdrawTab}
               onClick={() => setActiveTab(Tabs.withdraw)}
             >
@@ -323,7 +320,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
       )}
       {activeTab === Tabs.deposit && showUpgrade && (
         <SetAllowanceStyled
-          collateral={getNativeAsset(networkId, relay)}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}
@@ -361,12 +357,12 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
           Back
         </Button>
         {activeTab === Tabs.deposit && (
-          <Button buttonType={ButtonType.primaryAlternative} disabled={disableDepositButton} onClick={addFunding}>
+          <Button buttonType={ButtonType.primary} disabled={disableDepositButton} onClick={addFunding}>
             Deposit
           </Button>
         )}
         {activeTab === Tabs.withdraw && (
-          <Button buttonType={ButtonType.primaryAlternative} disabled={disableWithdrawButton} onClick={removeFunding}>
+          <Button buttonType={ButtonType.primary} disabled={disableWithdrawButton} onClick={removeFunding}>
             Withdraw
           </Button>
         )}

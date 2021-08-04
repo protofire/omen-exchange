@@ -71,7 +71,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     isNegativeAmount,
     isTransactionModalOpen,
     marketMaker,
-    nativeAsset,
     newShares,
     outcomeIndex,
     potentialProfitFormatted,
@@ -272,10 +271,10 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
       )}
       {showUpgrade && (
         <SetAllowance
-          collateral={nativeAsset}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}
+          style={{ marginTop: showSetAllowance ? 20 : 0 }}
         />
       )}
       <StyledButtonContainer borderTop={true} marginTop={showSetAllowance || showUpgrade || isNegativeAmount}>

@@ -1,7 +1,7 @@
 import { useQuery } from '@apollo/react-hooks'
 import gql from 'graphql-tag'
 
-import { Status } from '../util/types'
+import { Status } from '../../util/types'
 
 const query = gql`
   query {

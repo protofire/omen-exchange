@@ -1,7 +1,7 @@
 import Big from 'big.js'
 
 import { MAIN_NETWORKS, RINKEBY_NETWORKS, SOKOL_NETWORKS, XDAI_NETWORKS } from '../../common/constants'
-import { MarketTokenPair } from '../../hooks/useGraphMarketsFromQuestion'
+import { MarketTokenPair } from '../../hooks/graph/useGraphMarketsFromQuestion'
 import { getNativeAsset, getWrapToken, networkIds } from '../networks'
 import { Token } from '../types'
 

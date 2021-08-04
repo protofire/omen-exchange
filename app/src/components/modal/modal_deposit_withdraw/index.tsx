@@ -7,7 +7,7 @@ import ReactTooltip from 'react-tooltip'
 import styled, { withTheme } from 'styled-components'
 
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../../../common/constants'
-import { useConnectedWeb3Context } from '../../../hooks'
+import { useConnectedWeb3Context } from '../../../contexts'
 import { ERC20Service, XdaiService } from '../../../services'
 import { bridgeTokensList, getNativeAsset, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
@@ -39,7 +39,7 @@ import { ModalTransactionWrapper } from '../modal_transaction'
 
 const InputInfo = styled.div`
   font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => props.theme.colors.textColorLighter};
+  color: ${props => props.theme.text2};
 
   width: 100%;
   margin-bottom: auto;
@@ -54,7 +54,7 @@ const InputInfo = styled.div`
 `
 const WalletText = styled.div`
   margin-bottom: 14px;
-  color: ${props => props.theme.colors.textColorLighter};
+  color: ${props => props.theme.text2};
   line-height: 16.41px;
   letter-spacing: 0.2px;
 `
@@ -64,11 +64,11 @@ const DepositWithdrawButton = styled(Button)`
 `
 const ApproveButton = styled(ButtonStateful)`
   flex: 1;
-  border-color: ${props => props.theme.buttonSecondary.color};
+  border-color: ${props => props.theme.primary4};
 
   margin-right: 16px;
   &:hover {
-    background-color: ${props => props.theme.colors.primaryLight};
+    background-color: ${props => props.theme.primary1};
   }
 `
 
@@ -78,7 +78,7 @@ const ExchangeDataItem = styled.div`
   width: 100%;
   line-height: ${props => props.theme.fonts.defaultLineHeight};
   letter-spacing: 0.2px;
-  color: ${props => props.theme.colors.textColorLightish};
+  color: ${props => props.theme.text2};
 `
 
 const BottomButtons = styled.div`
@@ -141,7 +141,8 @@ export const ModalDepositWithdraw = (props: Props) => {
   const { address, balance, decimals, image, symbol } =
     findCurrentTokenBasedOnAction(exchangeType, currencySelected.toUpperCase()) ||
     getToken(context.relay ? networkIds.XDAI : context.networkId, 'dai')
-  const currentTokenMainnet = mainnetTokens.find(element => element.symbol === symbol)
+
+  const currentTokenMainnet = mainnetTokens.find(element => element.symbol === (symbol === 'xDAI' ? 'DAI' : symbol))
 
   const isApprovalVisible =
     (exchangeType === ExchangeType.deposit &&
@@ -208,7 +209,11 @@ export const ModalDepositWithdraw = (props: Props) => {
     }
 
     try {
-      setMessage(`${exchangeType} ${bigNumberToString(displayFundAmount || new BigNumber(0), decimals)} ${symbol}`)
+      setMessage(
+        `${exchangeType} ${bigNumberToString(displayFundAmount || new BigNumber(0), decimals)} ${
+          symbol === 'xDAI' ? 'Dai' : symbol
+        }`,
+      )
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
       setIsTransactionModalOpen(true)
@@ -227,7 +232,6 @@ export const ModalDepositWithdraw = (props: Props) => {
       setTxHash(hash)
 
       await waitForConfirmations(hash, provider, setConfirmations, setTxState, 13)
-
       if (exchangeType === ExchangeType.deposit && symbol !== 'DAI') {
         await XdaiService.waitForBridgeMessageStatus(hash, context.library)
       }
@@ -376,18 +380,19 @@ export const ModalDepositWithdraw = (props: Props) => {
 
                 <span>
                   {exchangeType === ExchangeType.withdraw && currencySelected !== 'dai'
-                    ? `${bigNumberToString(displayFundAmount.div(1000), decimals, 3)} ${symbol}`
-                    : `0.00 ${symbol}`}
+                    ? `${bigNumberToString(displayFundAmount.div(1000), decimals, 3)} ${
+                        symbol === 'xDAI' ? 'DAI' : symbol
+                      }`
+                    : `0.00 ${symbol === 'xDAI' ? 'DAI' : symbol}`}
                 </span>
               </ExchangeDataItem>
               <Divider />
               <ExchangeDataItem>
                 <span>Total</span>
-
                 <span>
                   {currencySelected !== 'dai' && exchangeType === ExchangeType.withdraw
                     ? `${bigNumberToString(displayFundAmount.sub(displayFundAmount.div(1000)), decimals, 3)} ${symbol}`
-                    : `${bigNumberToString(displayFundAmount, decimals)} ${symbol}`}
+                    : `${bigNumberToString(displayFundAmount, decimals)} ${symbol === 'xDAI' ? 'DAI' : symbol}`}
                 </span>
               </ExchangeDataItem>
             </>
@@ -408,7 +413,7 @@ export const ModalDepositWithdraw = (props: Props) => {
             )}
 
             <DepositWithdrawButton
-              buttonType={ButtonType.primaryAlternative}
+              buttonType={ButtonType.primary}
               disabled={isDepositWithdrawDisabled}
               onClick={depositWithdraw}
             >

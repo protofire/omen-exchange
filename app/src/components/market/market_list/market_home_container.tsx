@@ -9,10 +9,9 @@ import styled from 'styled-components'
 import useLocalStorageState from 'use-local-storage-state'
 
 import { MAX_MARKET_FEE } from '../../../common/constants'
-import { useConnectedWeb3Context } from '../../../hooks'
-import { useMarkets } from '../../../hooks/useMarkets'
+import { useConnectedWeb3Context } from '../../../contexts'
+import { useMarkets } from '../../../hooks/market_data/useMarkets'
 import { queryCategories } from '../../../queries/markets_home'
-import theme from '../../../theme'
 import { getArbitratorsByNetwork, getOutcomes, networkIds } from '../../../util/networks'
 import { RemoteData } from '../../../util/remote_data'
 import {
@@ -63,16 +62,19 @@ const TextTitle = styled.div`
 `
 const TextDescription = styled.div`
   margin-top: 8px;
-  color: ${props => props.theme.colors.textColorLighter};
+  color: ${props => props.theme.text2};
   line-height: 19px;
 `
 const Link = styled.a`
-  color: ${props => props.theme.colors.clickable};
+  color: ${props => props.theme.primary2};
   text-decoration: underline;
 
   &:hover {
-    color: ${props => props.theme.buttonSecondary.color};
+    color: ${props => props.theme.primary3};
   }
+`
+const IconCloseWrapped = styled(IconClose)`
+  color: ${props => props.theme.text1};
 `
 
 const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): MarketMakerDataItem[] => {
@@ -270,13 +272,12 @@ const MarketHomeContainer: React.FC = () => {
     } else if (fetchedMarkets) {
       const { fixedProductMarketMakers } = fetchedMarkets
       setMarkets(RemoteData.success(wrangleResponse(fixedProductMarketMakers, context.networkId)))
-
       setIsFiltering(false)
     } else if (error) {
       setMarkets(RemoteData.failure(error))
       setIsFiltering(false)
     }
-  }, [fetchedMarkets, loading, error, context.networkId, PAGE_SIZE, pageIndex])
+  }, [fetchedMarkets, loading, error, context.networkId, PAGE_SIZE, pageIndex, cpkAddress])
 
   useEffect(() => {
     if (categoriesLoading) {
@@ -408,7 +409,7 @@ const MarketHomeContainer: React.FC = () => {
               setHasSeenBanner('true')
             }}
           >
-            <IconClose color={theme.colors.tertiary} hoverEffect size={'24'} />
+            <IconCloseWrapped hoverEffect size={'24'} />
           </CloseStyled>
         </Banner>
       )}

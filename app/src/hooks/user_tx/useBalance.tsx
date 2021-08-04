@@ -2,13 +2,13 @@ import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
-import { STANDARD_DECIMALS } from '../common/constants'
-import { useTokens } from '../hooks'
-import { XdaiService } from '../services'
-import { getLogger } from '../util/logger'
-import { bridgeTokensList, getNativeAsset, networkIds } from '../util/networks'
-import { bigNumberToString } from '../util/tools'
-import { KnownTokenValue, Token } from '../util/types'
+import { STANDARD_DECIMALS } from '../../common/constants'
+import { XdaiService } from '../../services'
+import { getLogger } from '../../util/logger'
+import { bridgeTokensList, getNativeAsset, networkIds } from '../../util/networks'
+import { bigNumberToString } from '../../util/tools'
+import { KnownTokenValue, Token } from '../../util/types'
+import { useTokens } from '../index'
 
 const logger = getLogger('Hooks::ConnectedBalance')
 

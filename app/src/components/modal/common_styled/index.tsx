@@ -24,10 +24,13 @@ export const ModalNavigationLeft = styled.div`
 `
 
 export const ModalTitle = styled.p`
-  font-size: 16px;
+  font-size: ${props => props.theme.switchNetworkModal.primaryFontSize};
   color: ${props => props.theme.colors.textColorDark};
-  font-weight: 500;
+  font-weight: ${props => props.theme.textfield.fontWeight};
   margin: 0;
+  line-height: 19px;
+  letter-spacing: 0.2px;
+  margin-top: 2px;
 `
 
 export const ModalCard = styled.div`
@@ -69,7 +72,6 @@ export const BalanceItemTitle = styled.p<{ notSelected?: boolean }>`
   font-size: ${props => props.theme.fonts.defaultSize};
   color: ${props => (props.notSelected ? props.theme.colors.textColorLighter : props.theme.colors.textColorDark)};
   margin: 0;
-  text-transform: capitalize;
 `
 
 export const BalanceItemBalance = styled.p`

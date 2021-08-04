@@ -1,7 +1,8 @@
 import { useQuery } from '@apollo/react-hooks'
 import React from 'react'
 
-import { buildQueryMarkets, buildQueryMyMarkets } from '../queries/markets_home'
+import { useConnectedWeb3Context } from '../../contexts'
+import { buildQueryMarkets, buildQueryMyMarkets } from '../../queries/markets_home'
 import {
   BuildQueryType,
   GraphMarketMakerDataItem,
@@ -10,9 +11,7 @@ import {
   GraphResponseMyMarkets,
   MarketFilters,
   MarketStates,
-} from '../util/types'
-
-import { useConnectedWeb3Context } from './connectedWeb3'
+} from '../../util/types'
 
 interface MarketVariables {
   first: number
@@ -48,7 +47,6 @@ export const useMarkets = (options: Options): any => {
   } = options
 
   const [moreMarkets, setMoreMarkets] = React.useState(true)
-
   const [markets, setMarkets] = React.useState<GraphResponseMarketsGeneric>({ fixedProductMarketMakers: [] })
 
   const fetchMyMarkets = state === MarketStates.myMarkets
@@ -107,10 +105,13 @@ export const useMarkets = (options: Options): any => {
   })
 
   React.useEffect(() => {
+    if (!loading) {
+      return
+    }
     setMarkets({
       fixedProductMarketMakers: [],
     })
-  }, [arbitrator, currency, curationSource, category, state, sortBy, templateId])
+  }, [arbitrator, currency, curationSource, category, state, sortBy, templateId, loading])
 
   return { markets, error, fetchMore, loading, moreMarkets }
 }

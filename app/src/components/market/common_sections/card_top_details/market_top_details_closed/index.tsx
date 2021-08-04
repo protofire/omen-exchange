@@ -1,21 +1,46 @@
 import { BigNumber } from 'ethers/utils'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../../../hooks'
-import { useGraphMarketsFromQuestion } from '../../../../../hooks/useGraphMarketsFromQuestion'
+import { useConnectedWeb3Context } from '../../../../../contexts'
+import { useContracts } from '../../../../../hooks'
+import { useGraphMarketsFromQuestion } from '../../../../../hooks/graph/useGraphMarketsFromQuestion'
+import { useTheme } from '../../../../../hooks/useTheme'
 import { useWindowDimensions } from '../../../../../hooks/useWindowDimensions'
-import theme from '../../../../../theme'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../../util/networks'
-import { getInitialCollateral, getMarketRelatedQuestionFilter, onChangeMarketCurrency } from '../../../../../util/tools'
+import {
+  bigNumberToString,
+  getInitialCollateral,
+  getMarketRelatedQuestionFilter,
+  onChangeMarketCurrency,
+} from '../../../../../util/tools'
 import { MarketMakerData, MarketState, Token } from '../../../../../util/types'
-import { SubsectionTitleWrapper } from '../../../../common'
 import { CurrencySelector } from '../../user_transactions_tokens/currency_selector'
 import { AdditionalMarketData } from '../additional_market_data'
 import { MarketData } from '../market_data'
 import { ProgressBar } from '../progress_bar'
 import { ProgressBarToggle } from '../progress_bar/toggle'
+import { SubsectionTitleWrapper } from '../subsection_title_wrapper'
+
+// import { useConnectedWeb3Context } from '../../../../contexts'
+// import { useContracts } from '../../../../hooks'
+// import { useGraphMarketsFromQuestion } from '../../../../hooks/graph/useGraphMarketsFromQuestion'
+// import { useTheme } from '../../../../hooks/useTheme'
+// import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
+// import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../util/networks'
+// import {
+//   bigNumberToString,
+//   getInitialCollateral,
+//   getMarketRelatedQuestionFilter,
+//   onChangeMarketCurrency,
+// } from '../../../../util/tools'
+// import { MarketMakerData, MarketState, Token } from '../../../../util/types'
+// import { SubsectionTitleWrapper } from '../../../common'
+// import { AdditionalMarketData } from '../additional_market_data'
+// import { MarketData } from '../market_data'
+// import { ProgressBar } from '../progress_bar'
+// import { ProgressBarToggle } from '../progress_bar/toggle'
 
 const SubsectionTitleLeftWrapper = styled.div`
   display: flex;
@@ -40,6 +65,7 @@ interface Props {
 
 const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
+  const theme = useTheme()
   const { networkId, relay } = context
   const { marketMakerData } = props
   const history = useHistory()
@@ -58,7 +84,6 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
     lastActiveDay,
     question,
     runningDailyVolumeByHour,
-    scaledLiquidityParameter,
     submissionIDs,
   } = marketMakerData
   const { title } = question
@@ -67,10 +92,23 @@ const MarketTopDetailsClosed: React.FC<Props> = (props: Props) => {
   const collateral = getInitialCollateral(networkId, marketMakerData.collateral, relay)
 
   const [showingProgressBar, setShowingProgressBar] = useState(false)
+  const [liquidity, setLiquidity] = useState(new BigNumber(0))
 
   const creationDate = new Date(1000 * parseInt(creationTimestamp))
 
-  const formattedLiquidity: number = scaledLiquidityParameter ? scaledLiquidityParameter : 0
+  const contracts = useContracts(context)
+  const { buildMarketMaker } = contracts
+  const marketMaker = buildMarketMaker(address)
+
+  useEffect(() => {
+    const getLiquidity = async () => {
+      setLiquidity(await marketMaker.getTotalSupply())
+    }
+    marketMaker && getLiquidity()
+    // eslint-disable-next-line
+  }, [])
+
+  const formattedLiquidity: string = bigNumberToString(liquidity, collateral.decimals)
 
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred

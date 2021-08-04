@@ -3,16 +3,15 @@ import { ethers } from 'ethers'
 import { BigNumber, bigNumberify, solidityKeccak256 } from 'ethers/utils'
 import { useCallback, useEffect, useState } from 'react'
 
-import { ERC20Service, MarketMakerService, OracleService } from '../services'
-import { getLogger } from '../util/logger'
-import { getCallSig, multicall } from '../util/multicall'
-import { getArbitratorFromAddress } from '../util/networks'
-import { isScalarMarket } from '../util/tools'
-import { BalanceItem, MarketMakerData, Status } from '../util/types'
-
-import { useConnectedWeb3Context } from './connectedWeb3'
-import { useContracts } from './useContracts'
-import { GraphMarketMakerData } from './useGraphMarketMakerData'
+import { useConnectedWeb3Context } from '../../contexts'
+import { ERC20Service, MarketMakerService, OracleService } from '../../services'
+import { getLogger } from '../../util/logger'
+import { getCallSig, multicall } from '../../util/multicall'
+import { getArbitratorFromAddress } from '../../util/networks'
+import { isScalarMarket } from '../../util/tools'
+import { BalanceItem, MarketMakerData, Status } from '../../util/types'
+import { GraphMarketMakerData } from '../graph/useGraphMarketMakerData'
+import { useContracts } from '../useContracts'
 
 const logger = getLogger('useBlockchainMarketMakerData')
 

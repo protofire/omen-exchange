@@ -69,7 +69,6 @@ export const ScalarMarketBuy = (props: Props) => {
     isNegativeAmount,
     isTransactionModalOpen,
     marketMaker,
-    nativeAsset,
     outcomeIndex: positionIndex,
     potentialProfit,
     potentialProfitFormatted,
@@ -283,7 +282,6 @@ export const ScalarMarketBuy = (props: Props) => {
       )}
       {showUpgrade && (
         <SetAllowance
-          collateral={nativeAsset}
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}
@@ -299,7 +297,7 @@ export const ScalarMarketBuy = (props: Props) => {
         >
           Cancel
         </Button>
-        <Button buttonType={ButtonType.primaryAlternative} disabled={isBuyDisabled} onClick={finish}>
+        <Button buttonType={ButtonType.primary} disabled={isBuyDisabled} onClick={finish}>
           Buy Position
         </Button>
       </StyledButtonContainer>
