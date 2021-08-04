@@ -1,7 +1,7 @@
 import { utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
-import { wETHabi, wsPOAabi, wxDaiabi } from '../abi/wrapped_asset'
+import wrappedAsset from '../abi/wrappedAsset.json'
 
 class UnwrapTokenService {
   static withdrawAmount = (symbol: string, amount: BigNumber): string => {
@@ -14,11 +14,9 @@ class UnwrapTokenService {
     const symbolLowerCase = symbol.toLowerCase()
     switch (symbolLowerCase) {
       case 'wxdai':
-        return wxDaiabi
       case 'wspoa':
-        return wsPOAabi
       case 'weth':
-        return wETHabi
+        return wrappedAsset
       default:
         return []
     }
