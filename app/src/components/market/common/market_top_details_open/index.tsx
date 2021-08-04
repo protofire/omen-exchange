@@ -1,11 +1,9 @@
-import { BigNumber } from 'ethers/utils'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useHistory } from 'react-router'
 import styled from 'styled-components'
 
 import { IMPORT_QUESTION_ID_KEY } from '../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../contexts'
-import { useContracts } from '../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../hooks/graph/useGraphMarketsFromQuestion'
 import { useTheme } from '../../../../hooks/useTheme'
 import { useWindowDimensions } from '../../../../hooks/useWindowDimensions'
@@ -72,6 +70,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
     question,
     runningDailyVolumeByHour,
     submissionIDs,
+    totalPoolShares,
   } = marketMakerData
 
   const ovmAddress = getContractAddress(networkId, 'omenVerifiedMarkets')
@@ -79,23 +78,9 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
 
   const collateral = getInitialCollateral(networkId, marketMakerData.collateral, relay)
 
-  const [liquidity, setLiquidity] = useState(new BigNumber(0))
-
   const currentTimestamp = blocktime ? blocktime : new Date().getTime()
 
-  const contracts = useContracts(context)
-  const { buildMarketMaker } = contracts
-  const marketMaker = buildMarketMaker(address)
-
-  useEffect(() => {
-    const getLiquidity = async () => {
-      setLiquidity(await marketMaker.getTotalSupply())
-    }
-    marketMaker && getLiquidity()
-    // eslint-disable-next-line
-  }, [])
-
-  const formattedLiquidity: string = bigNumberToString(liquidity, collateral.decimals)
+  const formattedLiquidity: string = bigNumberToString(totalPoolShares, collateral.decimals)
 
   const isPendingArbitration = question.isPendingArbitration
   const arbitrationOccurred = question.arbitrationOccurred
