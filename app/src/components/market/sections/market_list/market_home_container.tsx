@@ -82,7 +82,6 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
     const outcomes = graphMarketMakerDataItem.outcomes
       ? graphMarketMakerDataItem.outcomes
       : getOutcomes(networkId, +graphMarketMakerDataItem.templateId)
-
     return {
       address: graphMarketMakerDataItem.id,
       arbitrator: graphMarketMakerDataItem.arbitrator,
@@ -100,6 +99,7 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       outcomeTokenMarginalPrices: graphMarketMakerDataItem.outcomeTokenMarginalPrices,
       outcomes,
       templateId: +graphMarketMakerDataItem.templateId,
+      totalPoolShares: graphMarketMakerDataItem.totalPoolShares,
       title: graphMarketMakerDataItem.title,
       usdLiquidityParameter: parseFloat(graphMarketMakerDataItem.usdLiquidityParameter),
       klerosTCRregistered: graphMarketMakerDataItem.klerosTCRregistered,

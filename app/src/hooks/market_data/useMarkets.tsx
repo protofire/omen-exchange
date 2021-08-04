@@ -1,8 +1,9 @@
 import { useQuery } from '@apollo/react-hooks'
-import React from 'react'
+import { useEffect, useState } from 'react'
 
 import { useConnectedWeb3Context } from '../../contexts'
 import { buildQueryMarkets, buildQueryMyMarkets } from '../../queries/markets_home'
+import { multicall } from '../../util/multicall'
 import {
   BuildQueryType,
   GraphMarketMakerDataItem,
@@ -25,6 +26,8 @@ interface MarketVariables {
 
 type Options = MarketVariables & MarketFilters
 
+const totalSuppyFnSig = 'totalSupply()(uint256)'
+
 const normalizeFetchedData = (data: GraphResponseMyMarkets): GraphMarketMakerDataItem[] => {
   return data && data.account ? data.account.fpmmParticipations.map(fpmm => fpmm.fixedProductMarketMakers) : []
 }
@@ -46,8 +49,9 @@ export const useMarkets = (options: Options): any => {
     title,
   } = options
 
-  const [moreMarkets, setMoreMarkets] = React.useState(true)
-  const [markets, setMarkets] = React.useState<GraphResponseMarketsGeneric>({ fixedProductMarketMakers: [] })
+  const [internalLoading, setInternalLoading] = useState(true)
+  const [moreMarkets, setMoreMarkets] = useState(true)
+  const [markets, setMarkets] = useState<GraphResponseMarketsGeneric>({ fixedProductMarketMakers: [] })
 
   const fetchMyMarkets = state === MarketStates.myMarkets
   const queryOptions: BuildQueryType = {
@@ -79,7 +83,7 @@ export const useMarkets = (options: Options): any => {
     // it may make sense to use a ‘network-only’ fetch policy.
     // This policy favors showing the most up-to-date information over quick responses.
     fetchPolicy: 'network-only',
-    onCompleted: (data: GraphResponseMarkets) => {
+    onCompleted: async (data: GraphResponseMarkets) => {
       let internalMarkets: GraphMarketMakerDataItem[] = []
       if (fetchMyMarkets) {
         internalMarkets = normalizeFetchedData(data as GraphResponseMyMarkets)
@@ -87,31 +91,53 @@ export const useMarkets = (options: Options): any => {
         const marketsGeneric = data as GraphResponseMarketsGeneric
         internalMarkets = marketsGeneric.fixedProductMarketMakers
       }
+
       setMoreMarkets(internalMarkets.length === first + 1)
       if (internalMarkets.length === first + 1) {
         internalMarkets = internalMarkets.slice(0, first)
       }
-
       if (internalMarkets && internalMarkets.length === 0 && skipFromOptions === 0) {
         setMarkets({
           fixedProductMarketMakers: [],
         })
       } else {
+        const calls = internalMarkets.map(({ id }) => ({
+          target: id,
+          call: [totalSuppyFnSig],
+          returns: [[`${id}-totalPoolShares`]],
+        }))
+
+        const response = await multicall(calls, networkId)
+
+        internalMarkets = internalMarkets.map(market => ({
+          ...market,
+          totalPoolShares: response.results.transformed[`${market.id}-totalPoolShares`],
+        }))
+
         setMarkets({
           fixedProductMarketMakers: internalMarkets,
         })
       }
+
+      setInternalLoading(false)
     },
+    onError: () => setInternalLoading(false),
   })
 
-  React.useEffect(() => {
-    if (!loading) {
-      return
+  useEffect(() => {
+    if (loading) {
+      setInternalLoading(true)
+      setMarkets({
+        fixedProductMarketMakers: [],
+      })
     }
+  }, [loading])
+
+  useEffect(() => {
     setMarkets({
       fixedProductMarketMakers: [],
     })
-  }, [arbitrator, currency, curationSource, category, state, sortBy, templateId, loading])
+  }, [arbitrator, currency, curationSource, category, state, sortBy, templateId])
 
-  return { markets, error, fetchMore, loading, moreMarkets }
+  return { markets, error, fetchMore, loading: internalLoading, moreMarkets }
 }
