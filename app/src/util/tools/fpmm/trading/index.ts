@@ -53,7 +53,7 @@ export const computeBalanceAfterTrade = (
     return h.add(amountCollateralSpent).sub(i === outcomeIndex ? amountShares : bigNumberify(0))
   })
   if (newPoolBalances.some(balance => balance.lte(0))) {
-    throw new Error(`Trade is invalid: trade results in liquidity pool owning a negative number of tokens`)
+    console.warn(`Trade is invalid: trade results in liquidity pool owning a negative number of tokens`)
   }
   return newPoolBalances
 }
