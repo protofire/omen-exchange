@@ -109,6 +109,11 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
 
   const initialCollateral = getInitialCollateral(context.networkId, props.marketMakerData.collateral, context.relay)
   const [collateral, setCollateral] = useState<Token>(initialCollateral)
+  const [previousState, setPreviousState] = useState<[BigNumber, number[] | number, BigNumber]>([
+    Zero,
+    isScalar ? 0 : new Array(balances.length).fill(0),
+    Zero,
+  ])
 
   const feePercentage = bigNumberToNumber(fee, STANDARD_DECIMALS) * 100
 
@@ -123,9 +128,7 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
 
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number[] | number, BigNumber]> => {
-      const dummyArray = new Array(balances.length).fill(0)
-
-      if (isTransactionProcessing) return [Zero, isScalar ? 0 : dummyArray, Zero]
+      if (isTransactionProcessing) return previousState
       let tradedShares: BigNumber
       try {
         tradedShares = await marketMaker.calcBuyAmount(amount, outcomeIndex)
@@ -145,17 +148,19 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
           scalarLow || new BigNumber(0),
           scalarHigh || new BigNumber(0),
         )
-
+        setPreviousState([tradedShares, newPrediction, amount])
         return [tradedShares, newPrediction, amount]
       } else {
         const probabilities = pricesAfterTrade.map(priceAfterTrade => priceAfterTrade * 100)
         setNewShares(
           balances.map((balance, i) => (i === outcomeIndex ? balance.shares.add(tradedShares) : balance.shares)),
         )
+        setPreviousState([tradedShares, probabilities, amount])
         return [tradedShares, probabilities, amount]
       }
     },
-    [balances, marketMaker, outcomeIndex, scalarHigh, scalarLow, isScalar],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [balances, marketMaker, outcomeIndex, scalarHigh, scalarLow, isScalar, isTransactionProcessing],
   )
 
   const [tradedShares, probabilitiesOrNewPrediction, debouncedAmount] = useAsyncDerivedValue(
