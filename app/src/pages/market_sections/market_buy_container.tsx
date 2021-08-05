@@ -123,6 +123,9 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
 
   const calcBuyAmount = useMemo(
     () => async (amount: BigNumber): Promise<[BigNumber, number[] | number, BigNumber]> => {
+      const dummyArray = new Array(balances.length).fill(0)
+
+      if (isTransactionProcessing) return [Zero, isScalar ? 0 : dummyArray, Zero]
       let tradedShares: BigNumber
       try {
         tradedShares = await marketMaker.calcBuyAmount(amount, outcomeIndex)
