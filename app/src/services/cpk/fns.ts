@@ -74,11 +74,12 @@ interface ExecParams {
   service: CPKService
   transactions: Transaction[]
   txOptions: TxOptions
+  includeFee: boolean
 }
 
 export const exec = async (params: ExecParams) => {
-  const { service, transactions, txOptions } = params
-  if (service.cpk.relay) {
+  const { includeFee = true, service, transactions, txOptions } = params
+  if (service.cpk.relay && includeFee) {
     const { address, fee } = await service.relayService.getInfo()
     transactions.push({
       to: address,
@@ -860,6 +861,7 @@ export const sendFromxDaiToBridge = async (params: SendFromxDaiParams) => {
         data: XdaiService.encodeRelayTokens(to),
         value: amount.toString(),
       })
+      return { ...params, includeFee: false }
     } else {
       transactions.push({
         to: address,
