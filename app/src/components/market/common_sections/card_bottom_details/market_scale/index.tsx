@@ -582,25 +582,25 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const amountValueBoxData = [
     {
-      title: `${formatNumber(currentPredictionNumber.toString(), 3)} ${unit}`,
+      title: `${formatNumber(currentPredictionNumber.toString())} ${unit}`,
       subtitle: 'Current Prediction',
     },
     {
-      title: `${formatNumber(scaleValuePrediction.toString(), 3)} ${unit}`,
+      title: `${formatNumber(scaleValuePrediction.toString())} ${unit}`,
       subtitle: 'New Prediction',
     },
     {
-      title: `${formatNumber(yourPayout.toString(), 3)} ${collateral && collateral.symbol}`,
+      title: `${formatNumber(yourPayout.toString())} ${collateral && collateral.symbol}`,
       subtitle: 'Your Payout',
-      tooltip: `Your payout if the market resolves at ${formatNumber(scaleValuePrediction.toString(), 3)} ${unit}`,
+      tooltip: `Your payout if the market resolves at ${formatNumber(scaleValuePrediction.toString())} ${unit}`,
       positive:
         yourPayout > (tradeAmountNumber || 0) ? true : yourPayout < (tradeAmountNumber || 0) ? false : undefined,
     },
     {
       title: `${profitLoss > 0 ? '+' : ''}
-      ${formatNumber(profitLoss ? profitLoss.toString() : '0', 3)} ${collateral && collateral.symbol}`,
+      ${formatNumber(profitLoss ? profitLoss.toString() : '0')} ${collateral && collateral.symbol}`,
       subtitle: 'Profit/Loss',
-      tooltip: `Your profit/loss if the market resolves at ${formatNumber(scaleValuePrediction.toString(), 3)} ${unit}`,
+      tooltip: `Your profit/loss if the market resolves at ${formatNumber(scaleValuePrediction.toString())} ${unit}`,
       positive: profitLoss > 0 ? true : profitLoss < 0 ? false : undefined,
     },
   ]
