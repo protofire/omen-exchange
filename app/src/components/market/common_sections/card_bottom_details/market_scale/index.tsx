@@ -582,11 +582,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const amountValueBoxData = [
     {
-      title: `${formatNumber(currentPredictionNumber.toString())} ${unit}`,
+      title: `${formatNumber(currentPredictionNumber.toString(), 3)} ${unit}`,
       subtitle: 'Current Prediction',
     },
     {
-      title: `${formatNumber(scaleValuePrediction.toString())} ${unit}`,
+      title: `${formatNumber(scaleValuePrediction.toString(), 3)} ${unit}`,
       subtitle: 'New Prediction',
     },
     {
