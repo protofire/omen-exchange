@@ -291,7 +291,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const lowerBoundNumber = lowerBound && bigNumberToNumber(lowerBound, STANDARD_DECIMALS)
   const upperBoundNumber = upperBound && bigNumberToNumber(upperBound, STANDARD_DECIMALS)
 
-  const startingPointNumber = startingPoint && bigNumberToNumber(startingPoint || new BigNumber(0), STANDARD_DECIMALS)
+  const startingPointNumber =
+    startingPoint && bigNumberToString(startingPoint || new BigNumber(0), STANDARD_DECIMALS, 3, true)
 
   const currentPredictionNumber = calcPrediction(currentPrediction || '', lowerBound, upperBound)
   const newPredictionNumber = calcPrediction(newPrediction?.toString() || '', lowerBound, upperBound)
@@ -542,13 +543,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const singleValueBoxData = [
     {
-      title: `${
-        currentPrediction
-          ? formatNumber(currentPredictionNumber.toString(), 3)
-          : startingPoint
-          ? startingPointNumber
-          : ''
-      }
+      title: `${currentPrediction ? currentPredictionNumber.toFixed(3) : startingPoint ? startingPointNumber : ''}
       ${currentPrediction || startingPoint ? ` ${unit}` : 'Unknown'}`,
       subtitle: startingPointTitle,
       xValue: currentPrediction
@@ -582,11 +577,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const amountValueBoxData = [
     {
-      title: `${formatNumber(currentPredictionNumber.toString(), 3)} ${unit}`,
+      title: `${currentPredictionNumber.toFixed(3)} ${unit}`,
       subtitle: 'Current Prediction',
     },
     {
-      title: `${formatNumber(scaleValuePrediction.toString(), 3)} ${unit}`,
+      title: `${scaleValuePrediction.toFixed(3)} ${unit}`,
       subtitle: 'New Prediction',
     },
     {
@@ -628,20 +623,20 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       >
         <ScaleTitleWrapper>
           <ScaleTitle>
-            {formatNumber(lowerBoundNumber.toString(), 3)} {unit}
+            {lowerBoundNumber.toFixed(3)} {unit}
           </ScaleTitle>
           <ScaleTitle>
-            {formatNumber(`${upperBoundNumber / 2 + lowerBoundNumber / 2}`, 3)}
+            {(upperBoundNumber / 2 + lowerBoundNumber / 2).toFixed(3)}
             {` ${unit}`}
           </ScaleTitle>
           <ScaleTitle>
-            {formatNumber(upperBoundNumber.toString(), 3)} {unit}
+            {upperBoundNumber.toFixed(3)} {unit}
           </ScaleTitle>
         </ScaleTitleWrapper>
         <Scale>
           <ScaleBallContainer>
             <ScaleTooltip id="scale-tooltip" static={currentTab === MarketDetailsTab.sell} xValue={scaleValue || 0}>
-              <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString(), 3)} ${unit}`}</ScaleTooltipMessage>
+              <ScaleTooltipMessage>{`${scaleValuePrediction.toFixed(3)} ${unit}`}</ScaleTooltipMessage>
             </ScaleTooltip>
             <ScaleBall xValue={scaleValue}>
               <IconDraggable />
