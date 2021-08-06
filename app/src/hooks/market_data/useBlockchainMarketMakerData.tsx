@@ -165,12 +165,6 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
           call: [getCallSig(marketMaker, 'balanceOf'), cpk.address],
           returns: [['userPoolShares']],
         },
-        // get user earnings
-        {
-          target: marketMakerAddress,
-          call: [getCallSig(marketMaker, 'feesWithdrawableBy'), cpk.address],
-          returns: [['userEarnings']],
-        },
       )
     }
 
@@ -190,7 +184,6 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
     const userPoolShares = results.userPoolShares || new BigNumber(0)
     const realitioAnswer = results.realitioAnswer || null
-    const userEarnings = results.userEarnings || new BigNumber(0)
 
     const collateral = {
       address: collateralAddress,
@@ -216,6 +209,15 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
           call: [getCallSig(conditionalTokens, 'balanceOf'), cpk.address, positionId],
           returns: [[`user-${i}`]],
         })
+
+        if (!userPoolShares.isZero()) {
+          // get user earnings
+          calls.push({
+            target: marketMakerAddress,
+            call: [getCallSig(marketMaker, 'feesWithdrawableBy'), cpk.address],
+            returns: [['userEarnings']],
+          })
+        }
       }
     }
 
@@ -227,6 +229,8 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       marketMakerShares.push(results[`shares-${i}`])
       userShares.push(results[`user-${i}`] || new BigNumber(0))
     }
+
+    const userEarnings = results.userEarnings || new BigNumber(0)
 
     const arbitrator = getArbitratorFromAddress(networkId, arbitratorAddress)
 
