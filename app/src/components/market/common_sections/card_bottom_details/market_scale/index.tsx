@@ -209,7 +209,7 @@ const ScaleTooltip = styled.div<{ static: boolean | undefined; xValue: number }>
   white-space: nowrap;
   opacity: 0;
   transition: 0.2s opacity;
-  ${props => props.static && 'opacity: 1;'}
+  ${props => props.static && 'opacity: 1;'};
   color: ${props => (props.static ? props.theme.colors.textColorDark : props.theme.colors.black)};
 `
 
@@ -543,7 +543,11 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
   const singleValueBoxData = [
     {
       title: `${
-        currentPrediction ? formatNumber(currentPredictionNumber.toString()) : startingPoint ? startingPointNumber : ''
+        currentPrediction
+          ? formatNumber(currentPredictionNumber.toString(), 3)
+          : startingPoint
+          ? startingPointNumber
+          : ''
       }
       ${currentPrediction || startingPoint ? ` ${unit}` : 'Unknown'}`,
       subtitle: startingPointTitle,
@@ -578,25 +582,25 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
 
   const amountValueBoxData = [
     {
-      title: `${formatNumber(currentPredictionNumber.toString())} ${unit}`,
+      title: `${formatNumber(currentPredictionNumber.toString(), 3)} ${unit}`,
       subtitle: 'Current Prediction',
     },
     {
-      title: `${formatNumber(scaleValuePrediction.toString())} ${unit}`,
+      title: `${formatNumber(scaleValuePrediction.toString(), 3)} ${unit}`,
       subtitle: 'New Prediction',
     },
     {
-      title: `${formatNumber(yourPayout.toString())} ${collateral && collateral.symbol}`,
+      title: `${formatNumber(yourPayout.toString(), 3)} ${collateral && collateral.symbol}`,
       subtitle: 'Your Payout',
-      tooltip: `Your payout if the market resolves at ${formatNumber(scaleValuePrediction.toString())} ${unit}`,
+      tooltip: `Your payout if the market resolves at ${formatNumber(scaleValuePrediction.toString(), 3)} ${unit}`,
       positive:
         yourPayout > (tradeAmountNumber || 0) ? true : yourPayout < (tradeAmountNumber || 0) ? false : undefined,
     },
     {
       title: `${profitLoss > 0 ? '+' : ''}
-      ${formatNumber(profitLoss ? profitLoss.toString() : '0')} ${collateral && collateral.symbol}`,
+      ${formatNumber(profitLoss ? profitLoss.toString() : '0', 3)} ${collateral && collateral.symbol}`,
       subtitle: 'Profit/Loss',
-      tooltip: `Your profit/loss if the market resolves at ${formatNumber(scaleValuePrediction.toString())} ${unit}`,
+      tooltip: `Your profit/loss if the market resolves at ${formatNumber(scaleValuePrediction.toString(), 3)} ${unit}`,
       positive: profitLoss > 0 ? true : profitLoss < 0 ? false : undefined,
     },
   ]
@@ -624,20 +628,20 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
       >
         <ScaleTitleWrapper>
           <ScaleTitle>
-            {formatNumber(lowerBoundNumber.toString())} {unit}
+            {formatNumber(lowerBoundNumber.toString(), 3)} {unit}
           </ScaleTitle>
           <ScaleTitle>
-            {formatNumber(`${upperBoundNumber / 2 + lowerBoundNumber / 2}`)}
+            {formatNumber(`${upperBoundNumber / 2 + lowerBoundNumber / 2}`, 3)}
             {` ${unit}`}
           </ScaleTitle>
           <ScaleTitle>
-            {formatNumber(upperBoundNumber.toString())} {unit}
+            {formatNumber(upperBoundNumber.toString(), 3)} {unit}
           </ScaleTitle>
         </ScaleTitleWrapper>
         <Scale>
           <ScaleBallContainer>
             <ScaleTooltip id="scale-tooltip" static={currentTab === MarketDetailsTab.sell} xValue={scaleValue || 0}>
-              <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString())} ${unit}`}</ScaleTooltipMessage>
+              <ScaleTooltipMessage>{`${formatNumber(scaleValuePrediction.toString(), 3)} ${unit}`}</ScaleTooltipMessage>
             </ScaleTooltip>
             <ScaleBall xValue={scaleValue}>
               <IconDraggable />
