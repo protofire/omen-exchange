@@ -1,7 +1,7 @@
 import { Contract, ethers } from 'ethers'
 import { BigNumberish } from 'ethers/utils'
 
-const dxTCRAbi = ['function getTokens(uint256 _listId) public view returns (address[])']
+import dxTCRAbi from '../abi/dxTcr.json'
 
 export class DxTCRService {
   contract: Contract
