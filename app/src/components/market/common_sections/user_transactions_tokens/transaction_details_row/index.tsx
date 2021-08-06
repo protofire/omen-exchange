@@ -64,7 +64,7 @@ export const TransactionDetailsRow: React.FC<Props> = props => {
         {title}
         {tooltip ? (
           <>
-            <Circle data-arrow-color="transparent" data-for="fee" data-tip="A 2% fee goes to liquidity providers.">
+            <Circle data-arrow-color="transparent" data-for="fee" data-tip={tooltip}>
               <IconInfo />
             </Circle>
           </>
