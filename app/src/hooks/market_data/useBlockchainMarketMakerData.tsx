@@ -210,7 +210,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
           returns: [[`user-${i}`]],
         })
 
-        if (!userPoolShares.isZero()) {
+        if (!totalPoolShares.isZero()) {
           // get user earnings
           calls.push({
             target: marketMakerAddress,
