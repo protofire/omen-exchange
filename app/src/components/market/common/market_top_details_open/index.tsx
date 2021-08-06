@@ -40,6 +40,7 @@ const MarketCurrencySelector = styled(CurrencySelector)`
 interface Props {
   marketMakerData: MarketMakerData
   title?: string
+  blocktime?: number
 }
 
 const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
@@ -51,7 +52,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   const [showingProgressBar, setShowingProgressBar] = useState(false)
   const history = useHistory()
 
-  const { marketMakerData } = props
+  const { blocktime, marketMakerData } = props
   const {
     address,
     answerFinalizedTimestamp,
@@ -72,7 +73,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
 
   const [liquidity, setLiquidity] = useState(new BigNumber(0))
 
-  const currentTimestamp = new Date().getTime()
+  const currentTimestamp = blocktime ? blocktime : new Date().getTime()
 
   const contracts = useContracts(context)
   const { buildMarketMaker } = contracts
@@ -175,6 +176,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
       )}
       <MarketData
         answerFinalizedTimestamp={marketMakerData.answerFinalizedTimestamp}
+        blocktime={blocktime}
         collateralVolume={collateralVolume}
         compoundService={compoundService}
         currency={collateral}

@@ -253,8 +253,9 @@ class CPKService {
     txOptions?: TxOptions,
     setTxHash?: (arg0: string) => void,
     setTxState?: (step: TransactionStep) => void,
+    excludeFee = false,
   ) => {
-    if (this.cpk.relay) {
+    if (this.cpk.relay && !excludeFee) {
       const { address, fee } = await this.relayService.getInfo()
       transactions.push({
         to: address,
@@ -1548,13 +1549,13 @@ class CPKService {
         const to = await this.cpk.ethLibAdapter.signer.signer.getAddress()
 
         // relay to signer address on mainnet
-        if (symbol === 'DAI') {
+        if (symbol === 'DAI' || symbol === 'xDAI') {
           transactions.push({
             to: XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS,
             data: XdaiService.encodeRelayTokens(to),
             value: amount.toString(),
           })
-          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState)
+          const { transactionHash } = await this.execTransactions(transactions, txOptions, setTxHash, setTxState, true)
           return transactionHash
         } else {
           transactions.push({

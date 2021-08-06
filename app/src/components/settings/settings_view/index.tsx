@@ -1,29 +1,19 @@
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
+import { useWeb3Context } from 'web3-react'
 
-import { getChainSpecificAlternativeUrls, getInfuraUrl } from '../../../util/networks'
+import { getChainSpecificAlternativeUrls, getInfuraUrl, networkIds } from '../../../util/networks'
 import { checkRpcStatus, getNetworkFromChain, isValidHttpUrl } from '../../../util/tools'
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { TextfieldCSS } from '../../common/form/textfield'
 import { IconBlockscout, IconCloudflare, IconInfura } from '../../common/icons'
 import { IconXdai } from '../../common/icons/IconXdai'
-import { ListCard } from '../../market/common/list_card/index'
+import { ModalCard } from '../../modal/common_styled'
 
-const TopContent = styled.div`
-  padding: 24px;
+const Column = styled.div`
+  width: 100%;
 `
-const MainContent = styled.div`
-  padding: 24px;
-  border-top: ${props => props.theme.borders.borderLineDisabled};
-`
-
-const BottomContent = styled(MainContent as any)`
-  display: flex;
-  justify-content: space-between;
-`
-
-const Column = styled.div``
 
 const Row = styled.div`
   width: 100%;
@@ -34,15 +24,7 @@ const Row = styled.div`
 
 const StatusSection = styled(Row as any)`
   justify-content: flex-start;
-  margin-top: 6px;
-`
-
-const Text = styled.p`
-  color: ${props => props.theme.colors.textColorDark};
-  font-size: 16px;
-  line-height: 18.75px;
-  letter-spacing: 0.4px;
-  margin: 0;
+  margin-top: 5px;
 `
 
 const TextLighter = styled.p`
@@ -52,13 +34,9 @@ const TextLighter = styled.p`
   margin: 0;
 `
 
-const ButtonRow = styled.div`
-  display: flex;
-  margin-left: auto;
-
-  button:first-child {
-    margin-right: 12px;
-  }
+const SetAndSaveButton = styled(ButtonRound)`
+  flex: 1;
+  padding: 12px 17px;
 `
 
 const FiltersControls = styled.div<{ disabled?: boolean }>`
@@ -107,27 +85,52 @@ const StatusBadge = styled.div<{ status: boolean }>`
 `
 
 const Input = styled.input`
-  margin-top: 20px;
-
+  margin: 12px 0px;
   ${TextfieldCSS};
-`
-const SettingsWrapper = styled(ListCard)`
-  min-height: initial;
+  padding: 12px 20px;
+  width: 100%;
 `
 
 const ImageWrap = styled.div`
   margin-right: 10px;
 `
-interface Props {
-  history?: any
 
-  networkId?: any
-}
+const TopCardHeader = styled.div<{ borderTop?: boolean }>`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: ${props => props.theme.cards.paddingVertical};
+  width: 100%;
+  border-top: ${props => (props.borderTop ? props.theme.borders.borderLineDisabled : '')};
+`
 
-const SettingsViewContainer = (props: Props) => {
-  const networkId = props.networkId
+const RPCTextWrapper = styled.span`
+  line-height: ${props => props.theme.fonts.defaultLineHeight};
+`
 
-  const network = getNetworkFromChain(networkId)
+const SettingsButtonWrapper = styled.div`
+  display: flex;
+  margin-top: auto;
+  width: 100%;
+`
+
+export const SettingsViewContainer = () => {
+  const { library } = useWeb3Context()
+  const chainId = (window as any).ethereum.chainId
+  const initialRelayState =
+    localStorage.getItem('relay') === 'false' || getNetworkFromChain(chainId) !== networkIds.MAINNET ? false : true
+  const [networkId, setNetworkId] = useState(initialRelayState ? networkIds.XDAI : getNetworkFromChain(chainId))
+
+  const checkIfReady = async () => {
+    if (library) {
+      await library.ready
+
+      const initialRelayState =
+        localStorage.getItem('relay') === 'false' || library.network.chainId !== networkIds.MAINNET ? false : true
+
+      setNetworkId(initialRelayState ? networkIds.XDAI : library.network.chainId)
+    }
+  }
 
   const [current, setCurrent] = useState(0)
   const [url, setUrl] = useState<string>('')
@@ -135,7 +138,7 @@ const SettingsViewContainer = (props: Props) => {
   const [onlineStatus, setOnlineStatus] = useState<boolean>(false)
   const [customUrl, setCustomUrl] = useState<string>('')
 
-  const urlObject = getChainSpecificAlternativeUrls(network)
+  const urlObject = getChainSpecificAlternativeUrls(networkId)
   let dropdownItems: any[] = []
   if (urlObject) {
     dropdownItems = urlObject.map((item, index) => {
@@ -183,7 +186,10 @@ const SettingsViewContainer = (props: Props) => {
     }
   })
 
+  const isDropDownActive = current === dropdownItems.length - 1
+
   useEffect(() => {
+    checkIfReady()
     if (url.length === 0 && current !== dropdownItems.length - 1 && urlObject) {
       setUrl(urlObject[current].rpcUrl)
     }
@@ -194,14 +200,14 @@ const SettingsViewContainer = (props: Props) => {
       return
     }
 
-    checkRpcStatus(urlObject && urlObject[current] ? urlObject[current].rpcUrl : url, setOnlineStatus, network)
+    checkRpcStatus(urlObject && urlObject[current] ? urlObject[current].rpcUrl : url, setOnlineStatus, networkId)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url])
   useEffect(() => {
     if (localStorage.getItem('rpcAddress')) {
       const data = JSON.parse(localStorage.getItem('rpcAddress') as string)
       setUrl(data.url)
-      if (data.network === getNetworkFromChain(networkId)) {
+      if (data.network === getNetworkFromChain(networkId.toString())) {
         setCurrent(data.index)
         if (data.index === dropdownItems.length - 1) {
           setCustomUrl(data.url)
@@ -212,79 +218,81 @@ const SettingsViewContainer = (props: Props) => {
   }, [])
 
   return (
-    <SettingsWrapper>
-      <TopContent>
-        <Text>Settings</Text>
-      </TopContent>
+    <>
+      <ModalCard>
+        <TopCardHeader>
+          <Row>
+            <Column>
+              <RPCTextWrapper>RPC Endpoint</RPCTextWrapper>
+              <StatusSection>
+                <StatusBadge status={onlineStatus} />
 
-      <MainContent>
-        <Row>
-          <Column>
-            <Text>RPC Endpoint</Text>
-            <StatusSection>
-              <StatusBadge status={onlineStatus} />
-              <TextLighter>Status: {onlineStatus ? 'OK' : 'Unavailable'}</TextLighter>
-            </StatusSection>
-          </Column>
-          <FiltersControls>
-            <NodeDropdown currentItem={current} dirty dropdownPosition={DropdownPosition.center} items={filterItems} />
-          </FiltersControls>
-        </Row>
-        {current === dropdownItems.length - 1 && (
-          <Input
-            onChange={event => {
-              setUrl(event.target.value)
-              if (current === dropdownItems.length - 1) setCustomUrl(event.target.value)
-            }}
-            placeholder={'Paste your RPC URL'}
-            value={customUrl}
-          ></Input>
+                <TextLighter>Status: {onlineStatus ? 'OK' : 'Unavailable'}</TextLighter>
+              </StatusSection>
+            </Column>
+            <FiltersControls>
+              <NodeDropdown
+                currentItem={current}
+                dirty
+                dropdownPosition={DropdownPosition.center}
+                items={filterItems}
+              />
+            </FiltersControls>
+          </Row>
+        </TopCardHeader>
+
+        {isDropDownActive && (
+          <TopCardHeader borderTop={true} style={{ paddingBottom: '10px' }}>
+            <Row>
+              <Column>
+                <RPCTextWrapper>Custom RPC URL</RPCTextWrapper>
+                <Input
+                  onChange={event => {
+                    setUrl(event.target.value)
+                    if (isDropDownActive) setCustomUrl(event.target.value)
+                  }}
+                  placeholder={'Paste your RPC URL'}
+                  value={customUrl}
+                ></Input>
+              </Column>
+            </Row>
+          </TopCardHeader>
         )}
-      </MainContent>
+      </ModalCard>
 
-      <BottomContent>
-        {props.history && (
-          <ButtonRound
-            onClick={() => {
-              props.history.push('/')
-            }}
-          >
-            Back
-          </ButtonRound>
-        )}
+      <SettingsButtonWrapper>
+        <SetAndSaveButton
+          onClick={() => {
+            setCurrent(0)
+            urlObject && setUrl(urlObject[0].rpcUrl)
+          }}
+          style={{ marginRight: '8px' }}
+        >
+          Set to Default
+        </SetAndSaveButton>
+        <SetAndSaveButton
+          disabled={
+            url.length === 0 || !isValidUrl || (networkId !== -1 && getInfuraUrl(networkId) === url) || !onlineStatus
+          }
+          onClick={async () => {
+            if (!(await checkRpcStatus(url, setOnlineStatus, networkId))) return
 
-        <ButtonRow>
-          <ButtonRound
-            onClick={() => {
-              setCurrent(0)
-              urlObject && setUrl(urlObject[0].rpcUrl)
-            }}
-          >
-            Set to Default
-          </ButtonRound>
-          <ButtonRound
-            disabled={
-              url.length === 0 || !isValidUrl || (network !== -1 && getInfuraUrl(network) === url) || !onlineStatus
-            }
-            onClick={async () => {
-              if (!(await checkRpcStatus(url, setOnlineStatus, network))) return
-
-              localStorage.setItem(
-                'rpcAddress',
-                JSON.stringify({
-                  url: url,
-                  network: network,
-                  index: current,
-                }),
-              )
-              window.location.reload()
-            }}
-          >
-            Save
-          </ButtonRound>
-        </ButtonRow>
-      </BottomContent>
-    </SettingsWrapper>
+            localStorage.setItem(
+              'rpcAddress',
+              JSON.stringify({
+                url: url,
+                network: networkId,
+                index: current,
+              }),
+            )
+            window.location.reload()
+          }}
+          style={{ marginLeft: '8px' }}
+        >
+          Save
+        </SetAndSaveButton>
+      </SettingsButtonWrapper>
+    </>
   )
 }
 

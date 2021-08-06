@@ -101,6 +101,7 @@ export const useTokens = (
 
         // setup multicall config
         const network = (networkNames as any)[context.networkId]
+
         const config = {
           rpcUrl: getInfuraUrl(context.networkId),
           multicallAddress: (configs as any)[network.toLowerCase()].multicall,
@@ -149,13 +150,17 @@ export const useTokens = (
         }
 
         if (calls.length) {
-          const response = await aggregate(calls, config)
-          tokenData = tokenData.map(token => {
-            const results = response.results.original
-            const balance = results[getBalanceKey(token.address)]
-            const allowance = results[getAllowanceKey(token.address)]
-            return { ...token, balance, allowance }
-          })
+          try {
+            const response = await aggregate(calls, config)
+            tokenData = tokenData.map(token => {
+              const results = response.results.original
+              const balance = results[getBalanceKey(token.address)]
+              const allowance = results[getAllowanceKey(token.address)]
+              return { ...token, balance, allowance }
+            })
+          } catch (e) {
+            console.error('Error while fetching tokens: ', e)
+          }
         }
 
         if (!isObjectEqual(tokens, tokenData)) {
