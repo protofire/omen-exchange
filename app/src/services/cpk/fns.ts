@@ -13,7 +13,7 @@ import {
   getWrapToken,
   pseudoNativeAssetAddress,
 } from '../../util/networks'
-import { calcDistributionHint, clampBigNumber } from '../../util/tools'
+import { calcDistributionHint, clampBigNumber, isContract } from '../../util/tools'
 import { MarketData, Question, Token, TransactionStep } from '../../util/types'
 import { ConditionalTokenService } from '../conditional_token'
 import { ERC20Service } from '../erc20'
@@ -821,6 +821,10 @@ interface UpgradeProxyParams {
 export const upgradeProxy = async (params: UpgradeProxyParams) => {
   const { networkId, service, transactions } = params
   const targetGnosisSafeImplementation = getTargetSafeImplementation(networkId)
+
+  if (!(await isContract(service.provider, targetGnosisSafeImplementation))) {
+    throw new Error('Target safe implementation does not exist')
+  }
 
   transactions.push({
     to: service.cpk.address,

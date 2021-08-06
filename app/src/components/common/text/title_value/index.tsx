@@ -3,7 +3,7 @@ import React, { DOMAttributes } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
-import { ValueStates } from '../../../market/common/transaction_details_row'
+import { ValueStates } from '../../../market/common_sections/user_transactions_tokens/transaction_details_row'
 
 const Wrapper = styled.div`
   display: flex;
@@ -79,7 +79,7 @@ export const TitleValue: React.FC<Props> = (props: Props) => {
   //create message for when the market ends
   const endDate = date
   const endsText = moment(endDate).fromNow()
-  const endsMessage = moment(endDate).isAfter(now) ? `Ends ${endsText}` : `Ended ${endsText}`
+  const endsMessage = moment(endDate).isAfter(now) ? `, ends ${endsText}` : `ended ${endsText}`
 
   //create message for local time
   const tzName = moment.tz.guess()
@@ -95,13 +95,20 @@ export const TitleValue: React.FC<Props> = (props: Props) => {
         data-effect={tooltip ? 'solid' : ''}
         data-for={tooltip ? 'walletBalanceTooltip' : ''}
         data-multiline={tooltip ? 'true' : ''}
-        data-tip={tooltip ? localResolution.format(formatting) + '<br />' + endsMessage : null}
+        data-tip={tooltip ? localResolution.format(formatting) + endsMessage : null}
         invertedColors={invertedColors}
         state={state}
       >
         {value}
       </Value>
-      <ReactTooltip id="walletBalanceTooltip" />
+      <ReactTooltip
+        className="customMarketTooltip"
+        effect="solid"
+        id="walletBalanceTooltip"
+        offset={{ top: 0, left: -7.5 }}
+        place="top"
+        type="light"
+      />
     </Wrapper>
   )
 }

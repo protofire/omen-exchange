@@ -1,24 +1,22 @@
 import { css } from 'styled-components'
 
-import theme from '../index'
-
 const DefaultTooltip = css`
   &.__react_component_tooltip.type-light {
     &.place-top:after {
-      border: 0 solid ${theme.borders.borderColor} !important;
+      border: 0 solid ${props => props.theme.borders.borderColor} !important;
     }
 
-    font-size: ${theme.fonts.defaultSize};
+    font-size: ${props => props.theme.fonts.defaultSize};
     font-style: normal;
     font-weight: 400;
     line-height: 20px;
     letter-spacing: 0.1px;
     text-align: left;
-    background-color: ${theme.colors.mainBodyBackground};
+    background-color: ${props => props.theme.white};
     opacity: 1;
-    border-radius: ${theme.borders.commonBorderRadius};
+    border-radius: ${props => props.theme.borders.commonBorderRadius};
     box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.05);
-    border: 1px solid ${theme.borders.tooltip};
+    border: 1px solid ${props => props.theme.borders.tooltip};
   }
 `
 
@@ -29,7 +27,7 @@ export const ReactTooltipStylesOverride = css`
     font-size: 11px;
     line-height: 1.3;
     max-width: 180px;
-    opacity: 1;
+    opacity: 1 !important;
     padding: 5px 8px;
     text-align: left;
 

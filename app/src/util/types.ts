@@ -2,7 +2,7 @@ import Big from 'big.js'
 import { Block } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
-import { Outcome } from '../components/market/sections/market_create/steps/outcomes'
+import { Outcome } from '../components/market/market_create/steps/outcomes'
 
 export enum Status {
   Ready = 'Ready',
@@ -138,7 +138,7 @@ export interface Token {
   decimals: number
   symbol: string
   image?: string
-  volume?: string
+  volume?: number
   balance?: string
   name?: string
   allowance?: string
@@ -361,6 +361,7 @@ export type GraphMarketMakerDataItem = {
   arbitrator: string
   category: string
   templateId: string
+  totalPoolShares: BigNumber
   usdLiquidityParameter: string
   curatedByDxDao: boolean
   scaledLiquidityParameter: string
@@ -396,6 +397,7 @@ export type MarketMakerDataItem = {
   arbitrator: string
   category: string
   templateId: number
+  totalPoolShares: BigNumber
   usdLiquidityParameter: number
   curatedByDxDao: boolean
   scaledLiquidityParameter: number

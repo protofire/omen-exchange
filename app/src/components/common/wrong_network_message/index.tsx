@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 import { networkIds } from '../../../util/networks'
 import { ButtonContainer, ButtonLink } from '../../button'
-import { ViewCard } from '../../market/common/view_card'
+import { ViewCard } from '../../market/common_sections/view_card'
 import { SectionTitle } from '../text/section_title'
 import { SubsectionTitle } from '../text/subsection_title'
 
