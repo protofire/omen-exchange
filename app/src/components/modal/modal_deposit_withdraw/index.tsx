@@ -7,11 +7,11 @@ import ReactTooltip from 'react-tooltip'
 import styled, { withTheme } from 'styled-components'
 
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../../../common/constants'
-import { useConnectedWeb3Context } from '../../../hooks'
+import { useConnectedWeb3Context } from '../../../contexts'
 import { ERC20Service, XdaiService } from '../../../services'
 import { bridgeTokensList, getNativeAsset, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
-import { formatBigNumber, formatNumber, waitForConfirmations } from '../../../util/tools'
+import { bigNumberToString, waitForConfirmations } from '../../../util/tools'
 import { ExchangeType, Token, TransactionStep } from '../../../util/types'
 import { Button, ButtonStateful } from '../../button'
 import { ButtonStates } from '../../button/button_stateful'
@@ -20,8 +20,8 @@ import { BigNumberInput, RadioInput, TextfieldCustomPlaceholder } from '../../co
 import { BigNumberInputReturn } from '../../common/form/big_number_input'
 import { IconArrowBack, IconClose } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
-import { IconInfo } from '../../common/tooltip/img/IconInfo'
-import { Image } from '../../market/common/token_item'
+import { IconInfo } from '../../common/icons/IconInfo'
+import { Image } from '../../market/common_sections/message_text/token_item'
 import {
   BalanceItem,
   BalanceItemBalance,
@@ -39,7 +39,7 @@ import { ModalTransactionWrapper } from '../modal_transaction'
 
 const InputInfo = styled.div`
   font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => props.theme.colors.textColorLighter};
+  color: ${props => props.theme.text2};
 
   width: 100%;
   margin-bottom: auto;
@@ -54,7 +54,7 @@ const InputInfo = styled.div`
 `
 const WalletText = styled.div`
   margin-bottom: 14px;
-  color: ${props => props.theme.colors.textColorLighter};
+  color: ${props => props.theme.text2};
   line-height: 16.41px;
   letter-spacing: 0.2px;
 `
@@ -64,11 +64,11 @@ const DepositWithdrawButton = styled(Button)`
 `
 const ApproveButton = styled(ButtonStateful)`
   flex: 1;
-  border-color: ${props => props.theme.buttonSecondary.color};
+  border-color: ${props => props.theme.primary4};
 
   margin-right: 16px;
   &:hover {
-    background-color: ${props => props.theme.colors.primaryLight};
+    background-color: ${props => props.theme.primary1};
   }
 `
 
@@ -78,7 +78,7 @@ const ExchangeDataItem = styled.div`
   width: 100%;
   line-height: ${props => props.theme.fonts.defaultLineHeight};
   letter-spacing: 0.2px;
-  color: ${props => props.theme.colors.textColorLightish};
+  color: ${props => props.theme.text2};
 `
 
 const BottomButtons = styled.div`
@@ -110,7 +110,7 @@ export const ModalDepositWithdraw = (props: Props) => {
   const { exchangeType, fetchBalances, isOpen, mainnetTokens, onBack, onClose, theme, xDaiBalance, xDaiTokens } = props
 
   const context = useConnectedWeb3Context()
-  const cpk = context.cpk
+  const { cpk, setTxHash, setTxState, txHash, txState } = context
 
   const [currencySelected, setCurrencySelected] = useState<KnownToken>('dai')
 
@@ -118,8 +118,6 @@ export const ModalDepositWithdraw = (props: Props) => {
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
 
-  const [txHash, setTxHash] = useState('')
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
   const [txNetId, setTxNetId] = useState()
   const [confirmations, setConfirmations] = useState(0)
   const [message, setMessage] = useState('')
@@ -137,11 +135,10 @@ export const ModalDepositWithdraw = (props: Props) => {
       )
     } else if (exchange === ExchangeType.withdraw && symbol === 'DAI') {
       const nativeAsset = getNativeAsset(networkIds.XDAI)
-
       return { ...nativeAsset, balance: xDaiBalance ? xDaiBalance.toString() : '0' }
     } else return xDaiTokens.find(token => token.symbol === (symbol === 'DAI' ? 'xDAI' : symbol))
   }
-  const { address, balance, decimals, symbol } =
+  const { address, balance, decimals, image, symbol } =
     findCurrentTokenBasedOnAction(exchangeType, currencySelected.toUpperCase()) ||
     getToken(context.relay ? networkIds.XDAI : context.networkId, 'dai')
 
@@ -213,30 +210,25 @@ export const ModalDepositWithdraw = (props: Props) => {
 
     try {
       setMessage(
-        `${exchangeType} ${formatBigNumber(displayFundAmount || new BigNumber(0), decimals)} ${
+        `${exchangeType} ${bigNumberToString(displayFundAmount || new BigNumber(0), decimals)} ${
           symbol === 'xDAI' ? 'Dai' : symbol
         }`,
       )
       setTxState(TransactionStep.waitingConfirmation)
       setConfirmations(0)
       setIsTransactionModalOpen(true)
+      const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
+      setTxNetId(provider.network.chainId)
 
-      const hash =
+      const transaction =
         exchangeType === ExchangeType.deposit
           ? await cpk.sendMainnetTokenToBridge(displayFundAmount, address, symbol)
-          : await cpk.sendXdaiChainTokenToBridge(
-              displayFundAmount,
+          : await cpk.sendXdaiChainTokenToBridge({
+              amount: displayFundAmount,
               address,
-              {
-                setTxState,
-                setTxHash,
-              },
               symbol,
-            )
-
-      const provider = exchangeType === ExchangeType.deposit ? context.rawWeb3Context.library : context.library
-
-      setTxNetId(provider.network.chainId)
+            })
+      const hash = transaction.transactionHash || transaction.hash
       setTxHash(hash)
 
       await waitForConfirmations(hash, provider, setConfirmations, setTxState, 13)
@@ -279,7 +271,10 @@ export const ModalDepositWithdraw = (props: Props) => {
         </BalanceItemSide>
         <BalanceItemSide>
           <BalanceItemBalance>
-            {token?.balance ? formatBigNumber(new BigNumber(token.balance), decimals, 3) : '0.00'} {symbol}
+            {token?.balance
+              ? bigNumberToString(new BigNumber(token?.balance), decimals, symbol === 'DAI' ? 2 : 3)
+              : '0.00'}{' '}
+            {symbol}
           </BalanceItemBalance>
         </BalanceItemSide>
       </BalanceItem>
@@ -340,7 +335,7 @@ export const ModalDepositWithdraw = (props: Props) => {
             }
             onClickMaxButton={() => {
               setDisplayFundAmount(wallet)
-              setAmountToDisplay(formatBigNumber(wallet, decimals, 5))
+              setAmountToDisplay(bigNumberToString(wallet, decimals, 5, true))
             }}
             shouldDisplayMaxButton={true}
             symbol={symbol}
@@ -356,8 +351,8 @@ export const ModalDepositWithdraw = (props: Props) => {
                 <span>Min amount</span>
                 <span>
                   {currencySelected === 'dai'
-                    ? `${formatBigNumber(minDaiBridgeExchange, decimals, 2)} DAI`
-                    : `${formatBigNumber(minOmniBridgeExchange, decimals, 3)} ${symbol}`}
+                    ? `${bigNumberToString(minDaiBridgeExchange, decimals, 2)} DAI`
+                    : `${bigNumberToString(minOmniBridgeExchange, decimals, 3)} ${symbol}`}
                 </span>
               </ExchangeDataItem>
               <ExchangeDataItem style={{ marginTop: '12px' }}>
@@ -385,7 +380,7 @@ export const ModalDepositWithdraw = (props: Props) => {
 
                 <span>
                   {exchangeType === ExchangeType.withdraw && currencySelected !== 'dai'
-                    ? `${formatNumber(formatBigNumber(displayFundAmount.div(1000), decimals, decimals), 3)} ${
+                    ? `${bigNumberToString(displayFundAmount.div(1000), decimals, 3)} ${
                         symbol === 'xDAI' ? 'DAI' : symbol
                       }`
                     : `0.00 ${symbol === 'xDAI' ? 'DAI' : symbol}`}
@@ -396,13 +391,8 @@ export const ModalDepositWithdraw = (props: Props) => {
                 <span>Total</span>
                 <span>
                   {currencySelected !== 'dai' && exchangeType === ExchangeType.withdraw
-                    ? `${formatNumber(
-                        formatBigNumber(displayFundAmount.sub(displayFundAmount.div(1000)), decimals, decimals),
-                        3,
-                      )} ${symbol}`
-                    : `${formatNumber(formatBigNumber(displayFundAmount, decimals, decimals))} ${
-                        symbol === 'xDAI' ? 'DAI' : symbol
-                      }`}
+                    ? `${bigNumberToString(displayFundAmount.sub(displayFundAmount.div(1000)), decimals, 3)} ${symbol}`
+                    : `${bigNumberToString(displayFundAmount, decimals)} ${symbol === 'xDAI' ? 'DAI' : symbol}`}
                 </span>
               </ExchangeDataItem>
             </>
@@ -423,7 +413,7 @@ export const ModalDepositWithdraw = (props: Props) => {
             )}
 
             <DepositWithdrawButton
-              buttonType={ButtonType.primaryAlternative}
+              buttonType={ButtonType.primary}
               disabled={isDepositWithdrawDisabled}
               onClick={depositWithdraw}
             >
@@ -435,15 +425,7 @@ export const ModalDepositWithdraw = (props: Props) => {
       <ModalTransactionWrapper
         confirmations={confirmations}
         confirmationsRequired={13}
-        icon={
-          <Image
-            size={'24'}
-            src={getImageUrl(
-              currentTokenMainnet && currentTokenMainnet.address ? currentTokenMainnet.address : address,
-            )}
-            style={{ marginLeft: '10px' }}
-          />
-        }
+        icon={<Image size={'24'} src={image} style={{ marginLeft: '10px' }} />}
         isOpen={isTransactionModalOpen}
         message={message}
         netId={txNetId}
