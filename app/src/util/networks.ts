@@ -176,7 +176,7 @@ const networks: { [K in NetworkId]: Network } = {
       klerosTCR: '0x0000000000000000000000000000000000000000',
       dxTCR: '0x03165DF66d9448E45c2f5137486af3E7e752a352',
       omenVerifiedMarkets: '0x3b29096b7ab49428923d902cEC3dFEaa49993234',
-      stakingRewardsFactory: '0x6FF4E7cFb9d912A4f62EC721Ef4864494AFB2259',
+      stakingRewardsFactory: '0xf50d900859da289a34204bC5FcA14c77575BD910',
     },
     cpk: {
       masterCopyAddress: '0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F',
