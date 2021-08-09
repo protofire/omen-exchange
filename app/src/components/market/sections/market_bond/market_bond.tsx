@@ -44,6 +44,7 @@ interface Props extends RouteComponentProps<any> {
 const BottomButtonWrapper = styled(ButtonContainer)`
   margin: 0 -24px;
   padding: 20px 24px 0;
+  ${props => (props.marginTop ? '20px' : '0')}
 `
 
 const logger = getLogger('Market::Bond')
@@ -215,15 +216,6 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           showBondChange
         />
       )}
-      {showUpgrade && (
-        <SetAllowance
-          collateral={nativeAsset}
-          finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
-          loading={RemoteData.is.asking(proxyIsUpToDate)}
-          onUnlock={upgradeProxy}
-          style={{ marginTop: 20 }}
-        />
-      )}
       <GridTransactionDetails>
         <div>
           <>
@@ -296,7 +288,16 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         </div>
       </GridTransactionDetails>
 
-      <BottomButtonWrapper borderTop>
+      {showUpgrade && (
+        <SetAllowance
+          collateral={nativeAsset}
+          finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
+          loading={RemoteData.is.asking(proxyIsUpToDate)}
+          onUnlock={upgradeProxy}
+        />
+      )}
+
+      <BottomButtonWrapper borderTop marginTop={showUpgrade && true}>
         <Button
           buttonType={ButtonType.secondaryLine}
           onClick={() => switchMarketTab(MarketDetailsTab.finalize)}
