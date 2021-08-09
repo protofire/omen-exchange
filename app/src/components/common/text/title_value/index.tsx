@@ -96,7 +96,6 @@ export const TitleValue: React.FC<Props> = (props: Props) => {
         data-for={tooltip ? 'walletBalanceTooltip' : ''}
         data-multiline={tooltip ? 'true' : ''}
         data-tip={tooltip ? localResolution.format(formatting) + endsMessage : null}
-        invertedColors={invertedColors}
         state={state}
         vertical={vertical}
       >

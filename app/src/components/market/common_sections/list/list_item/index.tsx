@@ -3,14 +3,19 @@ import React, { HTMLAttributes, useEffect, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../contexts'
 import { useSymbol } from '../../../../../hooks'
+import {
+  GraphResponseLiquidityMiningCampaign,
+  useGraphLiquidityMiningCampaigns,
+} from '../../../../../hooks/useGraphLiquidityMiningCampaigns'
+import { useTokenPrice } from '../../../../../hooks/useTokenPrice'
 import { ERC20Service } from '../../../../../services'
 import { StakingService } from '../../../../../services/staking'
 import { getLogger } from '../../../../../util/logger'
-import { getOMNToken, getTokenFromAddress } from '../../../../../util/networks'
+import { getOMNToken, getToken, getTokenFromAddress } from '../../../../../util/networks'
 import {
-  bigNumberToNumber,
   calcPrediction,
   calcPrice,
   formatNumber,
@@ -19,6 +24,7 @@ import {
   getUnit,
   isScalarMarket,
 } from '../../../../../util/tools'
+import { bigNumberToNumber } from '../../../../../util/tools/formatting'
 import { MarketMakerDataItem, Token } from '../../../../../util/types'
 import { IconApySmall, IconStar } from '../../../../common/icons'
 
@@ -94,8 +100,7 @@ const logger = getLogger('Market::ListItem')
 
 export const ListItem: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { account, library: provider, networkId } = context
-  const cpk = useConnectedCPKContext()
+  const { account, cpk, library: provider, networkId } = context
 
   const { currentFilter, market } = props
   const {

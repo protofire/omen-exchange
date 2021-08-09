@@ -10,7 +10,8 @@ import { useContracts, useCpkProxy } from '../../../hooks'
 import { getLogger } from '../../../util/logger'
 import { getNativeAsset } from '../../../util/networks'
 import { RemoteData } from '../../../util/remote_data'
-import { bigNumberToString, getUnit, numberToByte32 } from '../../../util/tools'
+import { getUnit, numberToByte32 } from '../../../util/tools'
+import { bigNumberToString } from '../../../util/tools/formatting'
 import {
   INVALID_ANSWER_ID,
   MarketDetailsTab,

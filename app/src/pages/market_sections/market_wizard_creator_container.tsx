@@ -9,7 +9,7 @@ import { ERC20Service } from '../../services'
 import { getLogger } from '../../util/logger'
 import { MarketCreationStatus } from '../../util/market_creation_status_data'
 import { pseudoNativeAssetAddress } from '../../util/networks'
-import { waitUntilContractDeployed } from '../../util/tools'
+import { waitUntilContractDeployed } from '../../util/tools/web3'
 import { MarketData, TransactionStep } from '../../util/types'
 
 const logger = getLogger('Market::MarketWizardCreatorContainer')

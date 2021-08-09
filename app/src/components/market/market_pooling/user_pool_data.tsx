@@ -97,7 +97,6 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
   } = props
   const context = useConnectedWeb3Context()
   const { networkId } = context
-  const collateral = getInitialCollateral(networkId, props.collateral)
 
   return (
     <>

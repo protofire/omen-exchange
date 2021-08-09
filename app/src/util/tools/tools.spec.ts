@@ -3,12 +3,15 @@ import Big from 'big.js'
 import { BigNumber, parseUnits } from 'ethers/utils'
 
 import { getContractAddress, getNativeAsset } from '../networks'
+import { Token } from '../types'
+
 import {
   bigMax,
   bigMin,
   bigNumberToNumber,
   bigNumberToString,
   calcXValue,
+  calculateRewardApr,
   clampBigNumber,
   formatHistoryDate,
   formatHistoryUser,
@@ -18,6 +21,7 @@ import {
   getIndexSets,
   getInitialCollateral,
   getNetworkFromChain,
+  getRemainingRewards,
   getScalarTitle,
   getUnit,
   isDust,
@@ -29,10 +33,7 @@ import {
   signaturesFormatted,
   strip0x,
   truncateStringInTheMiddle as truncate,
-  getRemainingRewards,
-  calculateRewardApr,
 } from './index'
-import { Token } from '../types'
 
 describe('tools', () => {
   describe('strip0x', () => {

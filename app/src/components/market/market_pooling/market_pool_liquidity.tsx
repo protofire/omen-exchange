@@ -8,7 +8,8 @@ import { DOCUMENT_FAQ } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../contexts'
 import { SharedPropsInterface } from '../../../pages/market_sections/market_pool_liquidity_container'
 import { RemoteData } from '../../../util/remote_data'
-import { bigNumberToString, calcAddFundingSendAmounts, calcRemoveFundingSendAmounts } from '../../../util/tools'
+import { calcAddFundingSendAmounts, calcRemoveFundingSendAmounts } from '../../../util/tools'
+import { bigNumberToString } from '../../../util/tools/formatting'
 import { MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../util/types'
 import { Button, ButtonContainer, ButtonTab } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -139,9 +140,13 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     <>
       <UserPoolData
         collateral={collateral}
+        currentApr={rewardApr}
+        earnedRewards={earnedRewards}
+        remainingRewards={remainingRewards}
         symbol={collateral.symbol}
         totalEarnings={totalEarnings}
         totalPoolShares={totalPoolShares}
+        totalRewards={totalRewards}
         totalUserLiquidity={totalUserLiquidity}
         userEarnings={userEarnings}
       />

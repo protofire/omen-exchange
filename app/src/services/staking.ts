@@ -2,7 +2,7 @@ import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
 import { STANDARD_DECIMALS } from '../common/constants'
-import { calculateRewardApr, formatBigNumber, getRemainingRewards } from '../util/tools'
+import { bigNumberToString, calculateRewardApr, getRemainingRewards } from '../util/tools'
 import { Token } from '../util/types'
 
 const abi = [
@@ -286,9 +286,8 @@ class StakingService {
     const timeRemaining = endingTimestamp - Math.floor(Date.now() / 1000)
 
     const remainingRewards = Number(
-      formatBigNumber(
+      bigNumberToString(
         getRemainingRewards(rewardsAmount, timeRemaining, duration, rewardToken.decimals),
-        rewardToken.decimals,
         rewardToken.decimals,
       ),
     )
