@@ -4,7 +4,7 @@ import { WeiPerEther, Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify } from 'ethers/utils'
 
 import { STANDARD_DECIMALS } from '../../../../common/constants'
-import { bigNumberToNumber } from '../../formatting'
+import { bigNumberToNumber, limitDecimalPlaces } from '../../formatting'
 import { ceilDiv, divBN, mulBN } from '../../maths'
 
 /**
@@ -145,7 +145,7 @@ export const calcPrediction = (probability: string, lowerBound: BigNumber, upper
   const lowerBoundNumber = bigNumberToNumber(lowerBound, STANDARD_DECIMALS)
   const upperBoundNumber = bigNumberToNumber(upperBound, STANDARD_DECIMALS)
   const prediction = probabilityNumber * (upperBoundNumber - lowerBoundNumber) + lowerBoundNumber
-  return prediction
+  return limitDecimalPlaces(String(prediction), STANDARD_DECIMALS)
 }
 
 /**
