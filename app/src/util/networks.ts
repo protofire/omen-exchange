@@ -102,6 +102,10 @@ export const networks: { [K in NetworkId]: Network } = {
         name: 'Infura',
       },
       { rpcUrl: 'https://cloudflare-eth.com/', name: 'Cloudflare' },
+      {
+        rpcUrl: `https://eth-mainnet.gateway.pokt.network/v1/lb/61116f89a585a200351491db`,
+        name: 'POKT Network',
+      },
     ],
     graphHttpUri: GRAPH_MAINNET_HTTP,
     graphWsUri: GRAPH_MAINNET_WS,
@@ -147,6 +151,10 @@ export const networks: { [K in NetworkId]: Network } = {
       {
         rpcUrl: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
         name: 'Infura',
+      },
+      {
+        rpcUrl: `https://eth-rinkeby.gateway.pokt.network/v1/lb/61116c81a585a20035149067`,
+        name: 'POKT Network',
       },
     ],
     graphHttpUri: GRAPH_RINKEBY_HTTP,
@@ -242,6 +250,10 @@ export const networks: { [K in NetworkId]: Network } = {
       {
         rpcUrl: 'https://dai.poa.network/',
         name: 'Blockscout',
+      },
+      {
+        rpcUrl: 'https://poa-xdai.gateway.pokt.network/v1/lb/6111748ba585a2003514997b',
+        name: 'POKT Network',
       },
     ],
     graphHttpUri: GRAPH_XDAI_HTTP,
