@@ -24,6 +24,7 @@ import {
   approveCampaign,
   approveConditionalTokens,
   buy,
+  claim,
   claimWinnings,
   createMarket,
   createQuestion,
@@ -46,6 +47,7 @@ import {
   validateOracle,
   withdraw,
   withdrawRealitioBalance,
+  withdrawRewards,
   wrangleCreateMarketParams,
   wrangleRemoveFundsParams,
   wrangleSellParams,
@@ -546,7 +548,7 @@ class CPKService {
 
   stakePoolTokens = async (params: CPKStakePoolTokensParams) => {
     try {
-      const { transaction } = await this.pipe(approveCampaign, stake)(params)
+      const { transaction } = await this.pipe(fee, approveCampaign, stake)(params)
       return transaction
     } catch (err) {
       logger.error('Failed to stake pool tokens', err.message)
@@ -556,10 +558,20 @@ class CPKService {
 
   unstakePoolTokens = async (params: CPKUnstakePoolTokensParams) => {
     try {
-      const { transaction } = await this.pipe(unstake)(params)
+      const { transaction } = await this.pipe(fee, unstake)(params)
       return transaction
     } catch (err) {
       logger.error('Failed to withdraw staked pool tokens', err.message)
+      throw err
+    }
+  }
+
+  claimRewardTokens = async (campaignAddress: string) => {
+    try {
+      const { transaction } = await this.pipe(fee, claim, withdrawRewards)(campaignAddress)
+      return transaction
+    } catch (err) {
+      logger.error('Failed to claim reward tokens', err.message)
       throw err
     }
   }

@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
+import { BigNumber, bigNumberify, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
 import { OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../../common/constants'
@@ -283,6 +283,77 @@ export const unstake = async (params: UnstakeParams) => {
     to: campaignAddress,
     data: StakingService.encodeWithdrawStakedPoolTokens(amount),
   })
+
+  return params
+}
+
+/**
+ * Claim reward tokens
+ */
+
+interface ClaimParams {
+  campaignAddress: string
+  transactions: Transaction[]
+  service: CPKService
+}
+
+export const claim = async (params: ClaimParams) => {
+  const { campaignAddress, service, transactions } = params
+
+  transactions.push({
+    to: campaignAddress,
+    data: StakingService.encodeClaimAll(service.cpk.address),
+  })
+
+  return params
+}
+
+/**
+ * Withdraw reward tokens
+ */
+
+interface WithdrawRewardsParams {
+  campaignAddress: string
+  transactions: Transaction[]
+  service: CPKService
+}
+
+export const withdrawRewards = async (params: WithdrawRewardsParams) => {
+  const { campaignAddress, service, transactions } = params
+
+  const signer = service.provider.getSigner()
+  const account = await signer.getAddress()
+
+  // If relay used, keep reward tokens in relay
+  if (!service.cpk.relay) {
+    // Calculate amount to send from CPK to EOA
+    // claimable rewards + unclaimed rewards (if any)
+    const stakingService = new StakingService(service.provider, service.cpk.address, campaignAddress)
+    const rewardTokens = await stakingService.getRewardTokens()
+    const claimableRewards = await stakingService.getClaimableRewards(service.cpk.address)
+
+    for (let i = 0; i < rewardTokens.length; i++) {
+      const erc20Service = new ERC20Service(service.provider, service.cpk.address, rewardTokens[i])
+      const unclaimedRewards = bigNumberify(await erc20Service.getCollateral(service.cpk.address))
+      const totalRewardsAmount = claimableRewards[i].add(unclaimedRewards)
+
+      const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(service.cpk.address, account, totalRewardsAmount)
+
+      // Approve unlimited if not already done
+      if (!hasEnoughAllowance) {
+        transactions.push({
+          to: rewardTokens[i],
+          data: ERC20Service.encodeApproveUnlimited(account),
+        })
+      }
+
+      // Transfer all rewards from cpk to EOA
+      transactions.push({
+        to: rewardTokens[i],
+        data: ERC20Service.encodeTransfer(account, totalRewardsAmount),
+      })
+    }
+  }
 
   return params
 }
