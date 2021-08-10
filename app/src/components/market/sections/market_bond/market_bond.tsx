@@ -44,7 +44,6 @@ interface Props extends RouteComponentProps<any> {
 const BottomButtonWrapper = styled(ButtonContainer)`
   margin: 0 -24px;
   padding: 20px 24px 0;
-  ${props => (props.marginTop ? '20px' : '0')}
 `
 
 const logger = getLogger('Market::Bond')
@@ -297,7 +296,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
 
-      <BottomButtonWrapper borderTop marginTop={showUpgrade && true}>
+      <BottomButtonWrapper borderTop marginTop={showUpgrade ? true : false}>
         <Button
           buttonType={ButtonType.secondaryLine}
           onClick={() => switchMarketTab(MarketDetailsTab.finalize)}
