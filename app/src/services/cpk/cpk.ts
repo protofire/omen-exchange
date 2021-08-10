@@ -30,6 +30,7 @@ import {
   createQuestion,
   deposit,
   exec,
+  exitStaking,
   fee,
   pipe,
   prepareCondition,
@@ -598,6 +599,16 @@ class CPKService {
         withdraw,
         withdrawRewards,
       )(params)
+      return transaction
+    } catch (err) {
+      logger.error('There was an error unstaking, claiming and withdrawing funding', err.message)
+      throw err
+    }
+  }
+
+  unstakeAndClaim = async (campaignAddress: string) => {
+    try {
+      const { transaction } = await this.pipe(fee, exitStaking, withdrawRewards)(campaignAddress)
       return transaction
     } catch (err) {
       logger.error('There was an error unstaking, claiming and withdrawing funding', err.message)

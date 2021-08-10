@@ -288,6 +288,27 @@ export const unstake = async (params: UnstakeParams) => {
 }
 
 /**
+ * Exit staking pool
+ */
+
+interface ExitStakingParams {
+  campaignAddress: string
+  transactions: Transaction[]
+  service: CPKService
+}
+
+export const exitStaking = async (params: ExitStakingParams) => {
+  const { campaignAddress, service, transactions } = params
+
+  transactions.push({
+    to: campaignAddress,
+    data: StakingService.encodeExit(service.cpk.address),
+  })
+
+  return params
+}
+
+/**
  * Claim reward tokens
  */
 
