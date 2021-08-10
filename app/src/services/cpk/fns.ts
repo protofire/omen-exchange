@@ -1,14 +1,15 @@
-import { Zero } from 'ethers/constants'
+import { MaxUint256, Zero } from 'ethers/constants'
 import { BigNumber, bigNumberify, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
-import { OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../../common/constants'
+import { DAY_IN_SECONDS, OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../../common/constants'
 import { Transaction } from '../../util/cpk'
 import { getLogger } from '../../util/logger'
 import {
   getContractAddress,
   getNativeAsset,
   getTargetSafeImplementation,
+  getToken,
   getTokenFromAddress,
   getWrapToken,
   pseudoNativeAssetAddress,
@@ -22,6 +23,7 @@ import { MarketMakerFactoryService } from '../market_maker_factory'
 import { OracleService } from '../oracle'
 import { RealitioService } from '../realitio'
 import { StakingService } from '../staking'
+import { StakingFactoryService } from '../staking_factory'
 import { UnwrapTokenService } from '../unwrap_token'
 import { XdaiService } from '../xdai'
 
@@ -937,6 +939,25 @@ export const createMarket = async (params: CreateMarketParams) => {
       spread,
       amount,
       distributionHint,
+    ),
+  })
+
+  const stakingRewardsFactoryAddress = getContractAddress(networkId, 'stakingRewardsFactory')
+  const omnTokenAddress = getToken(networkId, 'omn').address
+  const startingTimestamp = Math.floor(new Date().getTime() / 1000)
+  const endingTimestamp = Math.floor((marketData.resolution?.getTime() || 1) / 1000 - DAY_IN_SECONDS)
+
+  // Step 6: Create staking distribution contract
+  transactions.push({
+    to: stakingRewardsFactoryAddress || '',
+    data: StakingFactoryService.encodeCreateDistribution(
+      [omnTokenAddress],
+      predictedMarketMakerAddress,
+      [new BigNumber(0)],
+      startingTimestamp,
+      endingTimestamp,
+      false,
+      MaxUint256,
     ),
   })
 
