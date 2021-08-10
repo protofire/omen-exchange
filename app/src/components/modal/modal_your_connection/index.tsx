@@ -3,10 +3,10 @@ import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
-import { useConnectedWeb3Context } from '../../../hooks'
+import { useConnectedWeb3Context } from '../../../contexts'
 import { bridgeTokensList, getNativeAsset, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
-import { formatBigNumber, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
+import { bigNumberToString, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
 import { KnownTokenValue, Token, TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -14,7 +14,7 @@ import { IconArrowBack, IconClose, IconMetaMask, IconSettings, IconWalletConnect
 import { IconChevronDown } from '../../common/icons/IconChevronDown'
 import { IconChevronUp } from '../../common/icons/IconChevronUp'
 import { IconJazz } from '../../common/icons/IconJazz'
-import { Image } from '../../market/common/token_item'
+import { Image } from '../../market/common_sections/message_text/token_item'
 import SettingsViewContainer from '../../settings/settings_view'
 import {
   BalanceItem,
@@ -205,12 +205,10 @@ export const ModalYourConnection = (props: Props) => {
   const context = useConnectedWeb3Context()
   const owner = context.rawWeb3Context.account
 
-  const { cpk, networkId, relay } = context
+  const { cpk, networkId, relay, setTxHash, setTxState, txHash, txState } = context
 
-  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState<boolean>(false)
-  const [txHash, setTxHash] = useState('')
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txNetId, setTxNetId] = useState()
   const [confirmations, setConfirmations] = useState(0)
   const [message, setMessage] = useState('')
@@ -226,10 +224,9 @@ export const ModalYourConnection = (props: Props) => {
         `Claim ${arrayOfClaimableBalances
           .map(
             e =>
-              `${formatBigNumber(
+              `${bigNumberToString(
                 e.value,
                 getToken(networkIds.MAINNET, e.token).decimals,
-                2,
               )}${' '}${e.token.toUpperCase()}`,
           )
           .join(', ')}`,
@@ -265,7 +262,7 @@ export const ModalYourConnection = (props: Props) => {
           <BalanceItemTitle style={{ marginLeft: '4px' }}>{name ? name : token}</BalanceItemTitle>
         </BalanceItemSide>
         <BalanceItemBalance>
-          {formatBigNumber(value, decimals, 2)} {token.toUpperCase()}
+          {bigNumberToString(value, decimals)} {token.toUpperCase()}
         </BalanceItemBalance>
       </BalanceItem>
     )
@@ -296,7 +293,8 @@ export const ModalYourConnection = (props: Props) => {
             </BalanceItemTitle>
           </BalanceItemSide>
           <BalanceItemBalance>
-            {formatBigNumber(balance, decimals, 3)} {symbol === 'xDAI' ? 'DAI' : symbol.toUpperCase()}
+            {bigNumberToString(balance, decimals, symbol === 'DAI' ? 2 : 3)}{' '}
+            {symbol === 'xDAI' ? 'DAI' : symbol.toUpperCase()}
           </BalanceItemBalance>
         </BalanceItem>
       )
