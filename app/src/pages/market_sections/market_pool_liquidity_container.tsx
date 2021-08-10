@@ -53,7 +53,7 @@ export type SharedPropsInterface = {
   deposit: () => void
   removeFunding: () => Promise<void>
   unstakeClaimAndRemoveFunding: () => Promise<void>
-  withdraw: () => Promise<void>
+  withdraw: () => void
   claim: () => Promise<void>
   stake: () => Promise<void>
   showSetAllowance: boolean
@@ -95,7 +95,7 @@ export type SharedPropsInterface = {
   earnedRewards: number
   remainingRewards: number
   totalRewards: number
-  liquidityMiningCampaign: Maybe<GraphResponseLiquidityMiningCampaign>
+  liquidityMiningCampaign: GraphResponseLiquidityMiningCampaign | null | undefined
   userStakedTokens: BigNumber
 }
 
@@ -349,7 +349,6 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
       setIsTransactionModalOpen(true)
       await cpk.removeFunding({
         amountToMerge: depositedTokens,
-        collateral: marketMakerData.collateral,
         conditionId,
         conditionalTokens,
         earnings: userEarnings,
@@ -498,7 +497,11 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
 
-      await cpk.stakePoolTokens(fundingBalance, liquidityMiningCampaign.id, marketMakerAddress)
+      await cpk.stakePoolTokens({
+        amount: fundingBalance,
+        campaignAddress: liquidityMiningCampaign.id,
+        marketMakerAddress,
+      })
 
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()

@@ -911,6 +911,7 @@ export const createMarket = async (params: CreateMarketParams) => {
     conditionId,
     service.cpk.address,
     spread,
+    networkId,
   )
   logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
 
