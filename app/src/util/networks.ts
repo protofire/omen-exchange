@@ -192,7 +192,7 @@ const networks: { [K in NetworkId]: Network } = {
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
     blockExplorerURL: 'https://rinkeby.etherscan.io',
-    airdropAddress: ['0x85951106cB2183aAB69c4De9536c6FACcBEccd74'],
+    airdropAddress: [],
   },
   [networkIds.SOKOL]: {
     label: 'Sokol',
@@ -290,7 +290,7 @@ const networks: { [K in NetworkId]: Network } = {
     targetSafeImplementation: '0x9C75A217AEA76663a9A37687606f099945eb0742',
     blockExplorer: 'blockscout',
     blockExplorerURL: 'https://blockscout.com/poa/xdai',
-    airdropAddress: ['0xbC576232F6cb52ab908591Bc3b8FC292096DBb13'],
+    airdropAddress: ['0xbDf378FE53B89e2c3Cd638c66A9017E5b6822141', '0x868fc6343bfeDbED13935AFa7580Ba5BcC4b1409'],
   },
 }
 
@@ -342,8 +342,8 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     name: 'Omen',
     decimals: 18,
     addresses: {
-      [networkIds.MAINNET]: '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
-      [networkIds.XDAI]: '0x8c409129e12c9b636e0eec580c6a05e0eda776b5',
+      [networkIds.MAINNET]: '0xa7370f2a5AFAa987492cD0f5c0fE14191C70aaA5',
+      [networkIds.XDAI]: '0xF52eAbb903831E2026a6A50Ce813fc871B5578f4',
       [networkIds.RINKEBY]: '0x8c38a7dbaf522478d046af4a40c45a37a54af9bb',
     },
     order: 22,

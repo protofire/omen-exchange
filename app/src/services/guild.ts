@@ -64,7 +64,7 @@ class OmenGuildService {
   network: number
   provider: any
   omenGuildAddress: string
-  contract: Contract
+  contract?: Contract
 
   constructor(provider: Web3Provider, network: number) {
     const signer = provider.getSigner()
@@ -72,7 +72,9 @@ class OmenGuildService {
     this.network = network
     this.provider = provider
     this.omenGuildAddress = getContractAddress(network, 'omenGuildProxy')
-    this.contract = new ethers.Contract(this.omenGuildAddress, GuildAbi, provider.getSigner()).connect(signer)
+    if (this.omenGuildAddress) {
+      this.contract = new ethers.Contract(this.omenGuildAddress, GuildAbi, provider.getSigner()).connect(signer)
+    }
   }
 
   get getOmenGuildAddress(): string {
@@ -90,31 +92,31 @@ class OmenGuildService {
   }
 
   lockTokens = async (amount: BigNumber) => {
-    return await this.contract.lockTokens(amount)
+    return await this.contract?.lockTokens(amount)
   }
 
   unlockTokens = async (amount: BigNumber) => {
-    return await this.contract.releaseTokens(amount)
+    return await this.contract?.releaseTokens(amount)
   }
 
   tokensLocked = async (address: string) => {
-    return this.contract.tokensLocked(address)
+    return this.contract?.tokensLocked(address)
   }
 
   totalLocked = async () => {
-    return this.contract.totalLocked()
+    return this.contract?.totalLocked()
   }
 
   omenTokenAddress = async () => {
-    return await this.contract.token()
+    return await this.contract?.token()
   }
 
   tokenVault = async () => {
-    return this.contract.tokenVault()
+    return this.contract?.tokenVault()
   }
 
   lockTime = async () => {
-    return this.contract.lockTime()
+    return this.contract?.lockTime()
   }
 }
 
