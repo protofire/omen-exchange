@@ -98,6 +98,8 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
   const { networkId } = context
 
+  const baseCollateral = getInitialCollateral(networkId, collateral)
+
   return (
     <>
       <HeaderWrapper>
@@ -113,60 +115,50 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
           <UserDataWrapper>
             <UserDataTitleValue
               title={currentApr > 0 ? 'Total Liquidity' : 'Your Liquidity'}
-              value={`${formatNumber(
-                formatBigNumber(
-                  currentApr > 0 ? displayPoolTokens : displayUserLiquidity,
-                  baseCollateral.decimals,
-                  baseCollateral.decimals,
-                ),
+              value={`${bigNumberToString(
+                currentApr > 0 ? totalPoolShares : totalUserLiquidity,
+                baseCollateral.decimals,
               )} ${baseCollateral.symbol}`}
             />
             <UserDataTitleValue
               title={currentApr > 0 ? 'Total Earnings' : 'Total Liquidity'}
               value={`${
-                currentApr > 0 && displayTotalEarnings.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''
-              }${formatNumber(
-                formatBigNumber(
-                  currentApr > 0 ? displayTotalEarnings : displayPoolTokens,
-                  baseCollateral.decimals,
-                  baseCollateral.decimals,
-                ),
-              )} ${baseCollateral.symbol}`}
+                currentApr > 0 && totalEarnings.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''
+              }${bigNumberToString(currentApr > 0 ? totalEarnings : totalPoolShares, baseCollateral.decimals)} ${
+                baseCollateral.symbol
+              }`}
             />
           </UserDataWrapper>
           <UserDataWrapper style={currentApr > 0 ? { marginLeft: '0px' } : { marginLeft: '32px' }}>
             <UserDataTitleValue
               title={currentApr > 0 ? 'Your Liquidity' : 'Total Earnings'}
               value={`${
-                currentApr == 0 && displayTotalEarnings.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''
-              }${formatNumber(
-                formatBigNumber(
-                  currentApr > 0 ? displayUserLiquidity : displayTotalEarnings,
-                  baseCollateral.decimals,
-                  baseCollateral.decimals,
-                ),
-              )} ${baseCollateral.symbol}`}
+                currentApr == 0 && totalEarnings.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''
+              }${bigNumberToString(currentApr > 0 ? totalUserLiquidity : totalEarnings, baseCollateral.decimals)} ${
+                baseCollateral.symbol
+              }`}
             />
 
             <UserDataTitleValue
               state={userEarnings.gt(0) ? ValueStates.success : undefined}
               title="Your Earnings"
-              value={`${displayUserEarnings.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''}${formatNumber(
-                formatBigNumber(displayUserEarnings, baseCollateral.decimals, baseCollateral.decimals),
+              value={`${userEarnings.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''}${bigNumberToString(
+                userEarnings,
+                baseCollateral.decimals,
               )} ${baseCollateral.symbol}`}
             />
           </UserDataWrapper>
         </FlexBoxColumnOrRow>
         {currentApr > 0 && (
           <LpRewardsWrapper>
-            <UserDataTitleValue title="Current APR" value={`${formatNumber(currentApr.toString())}%`} />
-            <UserDataTitleValue title="Total Rewards" value={`${formatNumber(totalRewards.toString())} OMN`} />
-            <UserDataTitleValue title="Rewards left" value={`${formatNumber(remainingRewards.toString())} OMN`} />
+            <UserDataTitleValue title="Current APR" value={`${currentApr.toFixed(2)}%`} />
+            <UserDataTitleValue title="Total Rewards" value={`${totalRewards.toFixed(2)} OMN`} />
+            <UserDataTitleValue title="Rewards left" value={`${remainingRewards.toFixed(2)} OMN`} />
 
             <UserDataTitleValue
               state={earnedRewards > 0 ? ValueStates.success : undefined}
               title="Your Rewards"
-              value={`${formatNumber(earnedRewards.toString())} OMN`}
+              value={`${earnedRewards.toFixed(2)} OMN`}
             />
           </LpRewardsWrapper>
         )}

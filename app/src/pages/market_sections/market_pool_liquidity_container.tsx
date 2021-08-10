@@ -237,7 +237,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
       if (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) {
         throw new Error("This method shouldn't be called if 'hasEnoughAllowance' is unknown or false")
       }
-      let fundsAmount = bigNumberToString(amountToFund || Zero, collateral.decimals)
+      const fundsAmount = bigNumberToString(amountToFund || Zero, collateral.decimals)
       setMessage(`Depositing funds: ${fundsAmount} ${collateral.symbol}...`)
 
       setTxState(TransactionStep.waitingConfirmation)
@@ -339,7 +339,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
         return
       }
 
-      let fundsAmount = bigNumberToString(depositedTokensTotal, collateral.decimals, collateral.decimals)
+      const fundsAmount = bigNumberToString(depositedTokensTotal, collateral.decimals, collateral.decimals)
       setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
 
       const conditionId = await marketMaker.getConditionId()
