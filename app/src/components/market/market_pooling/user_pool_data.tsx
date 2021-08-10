@@ -88,7 +88,6 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
     currentApr,
     earnedRewards,
     remainingRewards,
-    symbol,
     totalEarnings,
     totalPoolShares,
     totalRewards,

@@ -10,11 +10,10 @@ import {
 } from '../../../../../hooks/useGraphLiquidityMiningCampaigns'
 import { useTokenPrice } from '../../../../../hooks/useTokenPrice'
 import { StakingService } from '../../../../../services/staking'
-import { getOMNToken, getToken, networkIds } from '../../../../../util/networks'
+import { getToken, networkIds } from '../../../../../util/networks'
 import { formatNumber } from '../../../../../util/tools'
 import { Arbitrator, KlerosItemStatus, KlerosSubmission, Token } from '../../../../../util/types'
 import { IconAlert, IconApy, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../../common/icons'
-import { CompoundIconNoBorder } from '../../../../common/icons/currencies/CompoundIconNoBorder'
 
 const AdditionalMarketDataWrapper = styled.div`
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
@@ -133,7 +132,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   const { address, arbitrator, category, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
 
   const context = useConnectedWeb3Context()
-  const { account, cpk, library: provider, networkId, relay } = context
+  const { cpk, library: provider, networkId, relay } = context
 
   const realitioBaseUrl = useRealityLink(!!relay)
   const realitioUrl = id ? `${realitioBaseUrl}/#!/question/${id}` : `${realitioBaseUrl}/`
@@ -151,16 +150,11 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   queryParams.append('col1', title)
   queryParams.append('col2', `https://omen.eth.link/#/${address}`)
 
-  const [compoundInterestRate, setCompoundInterestRate] = useState<string>('-')
   const [rewardApr, setRewardApr] = useState(0)
   const [liquidityMiningCampaign, setLiquidityMiningCampaign] = useState<Maybe<GraphResponseLiquidityMiningCampaign>>()
 
   const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address)
-  const {
-    fetchData: refetchLiquidityMiningCampaigns,
-    liquidityMiningCampaigns,
-    status,
-  } = useGraphLiquidityMiningCampaigns()
+  const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
   useEffect(() => {
     if (liquidityMiningCampaigns) {

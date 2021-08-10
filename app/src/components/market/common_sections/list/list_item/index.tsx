@@ -14,7 +14,7 @@ import { useTokenPrice } from '../../../../../hooks/useTokenPrice'
 import { ERC20Service } from '../../../../../services'
 import { StakingService } from '../../../../../services/staking'
 import { getLogger } from '../../../../../util/logger'
-import { getOMNToken, getToken, getTokenFromAddress } from '../../../../../util/networks'
+import { getToken, getTokenFromAddress } from '../../../../../util/networks'
 import {
   calcPrediction,
   calcPrice,

@@ -119,8 +119,6 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
-  const [amountToFundNormalized, setAmountToFundNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
-  const [amountToRemoveNormalized, setAmountToRemoveNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
   const [amountToRemove, setAmountToRemove] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
@@ -257,7 +255,6 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
 
       setAmountToFund(null)
       setAmountToFundDisplay('')
-      setAmountToFundNormalized(null)
       setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
@@ -312,7 +309,6 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
 
       setAmountToFund(null)
       setAmountToFundDisplay('')
-      setAmountToFundNormalized(null)
       setMessage(
         `Successfully deposited ${bigNumberToString(amountToFund || Zero, collateral.decimals)} ${collateral.symbol}`,
       )
@@ -363,7 +359,6 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
 
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
-      setAmountToRemoveNormalized(null)
       setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
@@ -412,7 +407,6 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
 
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
-      setAmountToRemoveNormalized(null)
       setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
