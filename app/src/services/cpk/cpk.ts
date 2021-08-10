@@ -139,6 +139,12 @@ interface CPKDepositAndStakeParams {
   amountToStake: BigNumber
 }
 
+interface CPKStakePoolTokensParams {
+  amount: BigNumber
+  campaignAddress: string
+  marketMakerAddress: string
+}
+
 interface TransactionResult {
   hash?: string
   safeTxHash?: string
@@ -528,6 +534,16 @@ class CPKService {
       return transaction
     } catch (err) {
       logger.error(`There was an error depositing and staking liquidity`, err.message)
+      throw err
+    }
+  }
+
+  stakePoolTokens = async (params: CPKStakePoolTokensParams) => {
+    try {
+      const { transaction } = await this.pipe(approveCampaign, stake)(params)
+      return transaction
+    } catch (err) {
+      logger.error('Failed to stake pool tokens', err.message)
       throw err
     }
   }
