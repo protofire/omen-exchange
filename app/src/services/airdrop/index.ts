@@ -51,25 +51,24 @@ class AirdropService {
 
   getClaims = async (address: Maybe<string>) => {
     if (this.airdrops) {
-      const network = await this.provider.getNetwork()
       const claims = await Promise.all(
-        this.airdrops.map(async airdrop => {
-          const claim = await AirdropService.getClaim(
-            airdrop.address,
-            address,
-            network.chainId,
-            this.provider,
-            this.relay,
-          )
-          if (claim && claim.amount) {
-            try {
-              const claimed = await airdrop.isClaimed(claim.index)
-              if (!claimed) {
-                return { ...claim, airdrop: airdrop.address }
-              }
-              // eslint-disable-next-line
-            } catch {}
-          }
+        this.airdrops.map(async (airdrop, index) => {
+          try {
+            const response = await fetch(
+              `https://raw.githubusercontent.com/hexyls/omen-airdrop/blob/master/${index + 1}/${address}.json`,
+            )
+            const claim = await response.json()
+            if (claim && claim.amount) {
+              try {
+                const claimed = await airdrop.isClaimed(claim.index)
+                if (!claimed) {
+                  return { ...claim, airdrop: airdrop.address }
+                }
+                // eslint-disable-next-line
+              } catch {}
+            }
+            // eslint-disable-next-line
+          } catch {}
         }),
       )
       return claims.filter(claim => claim)
