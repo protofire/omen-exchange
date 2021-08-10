@@ -246,7 +246,7 @@ export const approveCampaign = async (params: ApproveCampaignParams) => {
 }
 
 /**
- * Set approval for the staking campaign to access pool tokens
+ * Stake pool tokens
  */
 
 interface StakeParams {
@@ -261,6 +261,27 @@ export const stake = async (params: StakeParams) => {
   transactions.push({
     to: campaignAddress,
     data: StakingService.encodeStakePoolTokens(amountToStake),
+  })
+
+  return params
+}
+
+/**
+ * Unstake pool tokens
+ */
+
+interface UnstakeParams {
+  amount: BigNumber
+  campaignAddress: string
+  transactions: Transaction[]
+}
+
+export const unstake = async (params: UnstakeParams) => {
+  const { amount, campaignAddress, transactions } = params
+
+  transactions.push({
+    to: campaignAddress,
+    data: StakingService.encodeWithdrawStakedPoolTokens(amount),
   })
 
   return params

@@ -40,6 +40,7 @@ import {
   setup,
   stake,
   submitAnswer,
+  unstake,
   unwrap,
   upgradeProxy,
   validateOracle,
@@ -143,6 +144,11 @@ interface CPKStakePoolTokensParams {
   amount: BigNumber
   campaignAddress: string
   marketMakerAddress: string
+}
+
+interface CPKUnstakePoolTokensParams {
+  amount: BigNumber
+  campaignAddress: string
 }
 
 interface TransactionResult {
@@ -544,6 +550,16 @@ class CPKService {
       return transaction
     } catch (err) {
       logger.error('Failed to stake pool tokens', err.message)
+      throw err
+    }
+  }
+
+  unstakePoolTokens = async (params: CPKUnstakePoolTokensParams) => {
+    try {
+      const { transaction } = await this.pipe(unstake)(params)
+      return transaction
+    } catch (err) {
+      logger.error('Failed to withdraw staked pool tokens', err.message)
       throw err
     }
   }
