@@ -213,7 +213,7 @@ export const networks: { [K in NetworkId]: Network } = {
       realitio: '0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03',
       realitioScalarAdapter: '0x1D369EEC97cF2E62c8DBB804b3998Bf15bcb67dB',
       marketMakerFactory: '0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5',
-      marketMakerFactoryV2: '0x0000000000000000000000000000000000000000',
+      marketMakerFactoryV2: '0x9540F19d947204e424c2d7959cF932E47Ab75B3e',
       conditionalTokens: '0x0Db8C35045a830DC7F2A4dd87ef90e7A9Cd0534f',
       oracle: '0x9E6bd63aEbFb2E858B6111cea9C389f7664F7108',
       klerosBadge: '0x0000000000000000000000000000000000000000',
@@ -221,7 +221,7 @@ export const networks: { [K in NetworkId]: Network } = {
       klerosTCR: '0x0000000000000000000000000000000000000000',
       dxTCR: '0x5486a9050f2aC6f535a72526e37738A060508361',
       omenVerifiedMarkets: '0x0000000000000000000000000000000000000000',
-      stakingRewardsFactory: '0x0000000000000000000000000000000000000000',
+      stakingRewardsFactory: '0x4A679ECefE7adD212f846BD86389E4278eC25d34',
     },
     cpk: {
       masterCopyAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
