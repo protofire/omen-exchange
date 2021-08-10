@@ -36,6 +36,11 @@ const BottomButtonWrapper = styled(ButtonContainer)`
   padding: 20px 24px 0;
 `
 
+const ButtonBottomRight = styled.div`
+  display: flex;
+  align-items: center;
+`
+
 const WarningMessageStyled = styled(WarningMessage)`
   margin-bottom: 0;
   margin-bottom: 24px;
@@ -62,31 +67,35 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
   const { marketMakerData, sharedProps } = props
   const {
     activeTab,
-    addFunding,
     allowance,
     allowanceFinished,
     amountToFund,
     amountToFundDisplay,
     amountToRemove,
     amountToRemoveDisplay,
+    claim,
     collateral,
     collateralAmountError,
     collateralBalance,
+    deposit,
     depositedTokens,
     depositedTokensTotal,
     disableDepositButton,
     disableDepositTab,
     disableWithdrawButton,
     disableWithdrawTab,
+    earnedRewards,
     feeFormatted,
     fundingBalance,
     isNegativeAmountToFund,
     isNegativeAmountToRemove,
     isTransactionModalOpen,
+    liquidityMiningCampaign,
     message,
     poolTokens,
     proxyIsUpToDate,
-    removeFunding,
+    remainingRewards,
+    rewardApr,
     setActiveTab,
     setAmountToFund,
     setAmountToFundDisplay,
@@ -98,14 +107,19 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     shouldDisplayMaxButton,
     showSetAllowance,
     showUpgrade,
+    stake,
+    totalRewards,
     totalUserLiquidity,
     txHash,
     txState,
     unlockCollateral,
     upgradeFinished,
     upgradeProxy,
+    userStakedTokens,
     walletBalance,
+    withdraw,
   } = sharedProps
+
   const {
     fee,
     outcomeTokenAmounts,
@@ -165,9 +179,13 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     <>
       <UserPoolData
         collateral={collateral}
+        currentApr={rewardApr}
+        earnedRewards={earnedRewards}
+        remainingRewards={remainingRewards}
         symbol={collateral.symbol}
         totalEarnings={totalEarnings}
         totalPoolShares={totalPoolShares}
+        totalRewards={totalRewards}
         totalUserLiquidity={totalUserLiquidity}
         userEarnings={userEarnings}
       />
@@ -351,22 +369,44 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         />
       )}
       <BottomButtonWrapper>
-        <Button
-          buttonType={ButtonType.secondaryLine}
-          onClick={() => (history.length > 2 ? history.goBack() : history.replace('/liquidity'))}
-        >
-          Back
-        </Button>
-        {activeTab === Tabs.deposit && (
-          <Button buttonType={ButtonType.primary} disabled={disableDepositButton} onClick={addFunding}>
-            Deposit
+        <ButtonBottomRight>
+          {liquidityMiningCampaign && (
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              disabled={!(userStakedTokens && userStakedTokens.gt(0) && earnedRewards > 0)}
+              onClick={() => claim()}
+              style={{ marginRight: 12 }}
+            >
+              Claim Rewards
+            </Button>
+          )}
+          {liquidityMiningCampaign && fundingBalance.gt(0) && rewardApr > 0 && (
+            <Button
+              buttonType={ButtonType.secondaryLine}
+              disabled={fundingBalance.eq(0)}
+              onClick={() => stake()}
+              style={{ marginRight: 12 }}
+            >
+              Stake
+            </Button>
+          )}
+          <Button
+            buttonType={ButtonType.secondaryLine}
+            onClick={() => (history.length > 2 ? history.goBack() : history.replace('/liquidity'))}
+          >
+            Back
           </Button>
-        )}
-        {activeTab === Tabs.withdraw && (
-          <Button buttonType={ButtonType.primary} disabled={disableWithdrawButton} onClick={removeFunding}>
-            Withdraw
-          </Button>
-        )}
+          {activeTab === Tabs.deposit && (
+            <Button buttonType={ButtonType.primary} disabled={disableDepositButton} onClick={deposit}>
+              Deposit
+            </Button>
+          )}
+          {activeTab === Tabs.withdraw && (
+            <Button buttonType={ButtonType.primary} disabled={disableWithdrawButton} onClick={withdraw}>
+              Withdraw
+            </Button>
+          )}
+        </ButtonBottomRight>
       </BottomButtonWrapper>
       <ModalTransactionWrapper
         confirmations={0}

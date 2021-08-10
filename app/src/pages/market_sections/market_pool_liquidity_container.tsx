@@ -1,5 +1,5 @@
 import { Zero } from 'ethers/constants'
-import { BigNumber } from 'ethers/utils'
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useMemo, useState } from 'react'
 
 import { STANDARD_DECIMALS } from '../../common/constants'
@@ -49,7 +49,13 @@ export type SharedPropsInterface = {
   feeFormatted: string
   poolTokens: BigNumber
   addFunding: () => Promise<void>
+  addFundingAndStake: () => Promise<void>
+  deposit: () => void
   removeFunding: () => Promise<void>
+  unstakeClaimAndRemoveFunding: () => Promise<void>
+  withdraw: () => Promise<void>
+  claim: () => Promise<void>
+  stake: () => Promise<void>
   showSetAllowance: boolean
   depositedTokensTotal: BigNumber
   depositedTokens: BigNumber
@@ -85,6 +91,12 @@ export type SharedPropsInterface = {
   setAmountToRemoveDisplay: any
   amountToRemove: Maybe<BigNumber>
   setAmountToRemove: any
+  rewardApr: number
+  earnedRewards: number
+  remainingRewards: number
+  totalRewards: number
+  liquidityMiningCampaign: Maybe<GraphResponseLiquidityMiningCampaign>
+  userStakedTokens: BigNumber
 }
 
 const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
@@ -92,7 +104,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
 
   const { address: marketMakerAddress, balances, fee, totalPoolShares, userEarnings } = marketMakerData
-  const { account, cpk, library: provider, relay, setTxState, txHash, txState } = context
+  const { account, cpk, library: provider, networkId, relay, setTxState, txHash, txState } = context
   const { fetchBalances } = context.balances
   const signer = useMemo(() => provider.getSigner(), [provider])
   const { buildMarketMaker, conditionalTokens } = useContracts(context)
@@ -107,6 +119,8 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
   const [isNegativeAmountToFund, setIsNegativeAmountToFund] = useState<boolean>(false)
   const [amountToFundDisplay, setAmountToFundDisplay] = useState<string>('')
+  const [amountToFundNormalized, setAmountToFundNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
+  const [amountToRemoveNormalized, setAmountToRemoveNormalized] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [message, setMessage] = useState<string>('')
   const [amountToRemove, setAmountToRemove] = useState<Maybe<BigNumber>>(new BigNumber(0))
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
@@ -121,6 +135,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   const [totalRewards, setTotalRewards] = useState(0)
   const [liquidityMiningCampaign, setLiquidityMiningCampaign] = useState<Maybe<GraphResponseLiquidityMiningCampaign>>()
   const [userStakedTokens, setUserStakedTokens] = useState(new BigNumber(0))
+  const [icon, setIcon] = useState<boolean>(false)
 
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
@@ -131,6 +146,16 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     collateral,
     context,
   )
+
+  const sendAmountsAfterRemovingFunding = calcRemoveFundingSendAmounts(
+    amountToRemove || Zero,
+    balances.map(b => b.holdings),
+    totalPoolShares,
+  )
+  const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
+    amount.lt(min) ? amount : min,
+  )
+  const depositedTokensTotal = depositedTokens.add(userEarnings)
   const feeFormatted = useMemo(() => `${bigNumberToString(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
   const collateralBalance = maybeCollateralBalance || Zero
   const walletBalance = bigNumberToString(collateralBalance, collateral.decimals, 5)
@@ -232,7 +257,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
 
       setAmountToFund(null)
       setAmountToFundDisplay('')
-      setAmountToFund(null)
+      setAmountToFundNormalized(null)
       setMessage(`Successfully deposited ${fundsAmount} ${collateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
@@ -275,12 +300,8 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
         amount: amountToFund || Zero,
         campaignAddress: liquidityMiningCampaign.id,
         collateral,
-        compoundService,
         marketMaker,
         amountToStake: poolTokens,
-        setTxHash,
-        setTxState,
-        useBaseToken: false, // Not using base token for staking
       })
 
       await fetchGraphMarketMakerData()
@@ -291,9 +312,9 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
 
       setAmountToFund(null)
       setAmountToFundDisplay('')
-      setAmountToFund(null)
+      setAmountToFundNormalized(null)
       setMessage(
-        `Successfully deposited ${formatBigNumber(amountToFund || Zero, collateral.decimals)} ${collateral.symbol}`,
+        `Successfully deposited ${bigNumberToString(amountToFund || Zero, collateral.decimals)} ${collateral.symbol}`,
       )
       setIsTransactionProcessing(false)
     } catch (err) {
@@ -318,25 +339,10 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
         return
       }
 
-      let fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
-      if (compoundService && collateralSymbol in CompoundTokenType && collateral.symbol === baseCollateral.symbol) {
-        const displayDepositedTokensTotal = compoundService.calculateCTokenToBaseExchange(
-          baseCollateral,
-          depositedTokensTotal,
-        )
-        fundsAmount = formatBigNumber(displayDepositedTokensTotal || Zero, collateral.decimals, collateral.decimals)
-      }
-      setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${collateral.symbol}...`)
+      let fundsAmount = bigNumberToString(depositedTokensTotal, collateral.decimals, collateral.decimals)
+      setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
 
       const conditionId = await marketMaker.getConditionId()
-      let useBaseToken = false
-      if (collateral.address === pseudoNativeAssetAddress) {
-        useBaseToken = true
-      } else if (collateral.symbol.toLowerCase() in CompoundTokenType) {
-        if (collateral.address !== collateral.address) {
-          useBaseToken = true
-        }
-      }
 
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
@@ -346,14 +352,10 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
         collateral: marketMakerData.collateral,
         conditionId,
         conditionalTokens,
-        compoundService,
         earnings: userEarnings,
         marketMaker,
         outcomesCount: balances.length,
-        setTxHash,
-        setTxState,
         sharesToBurn: amountToRemove || Zero,
-        useBaseToken,
       })
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
@@ -363,7 +365,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
       setAmountToRemoveNormalized(null)
-      setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${collateral.symbol}`)
+      setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
@@ -382,8 +384,8 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
         throw new Error('No liquidity mining campaign')
       }
 
-      const fundsAmount = formatBigNumber(depositedTokensTotal, collateral.decimals, collateral.decimals)
-      setMessage(`Withdrawing funds: ${formatNumber(fundsAmount)} ${collateral.symbol}...`)
+      const fundsAmount = bigNumberToString(depositedTokensTotal, collateral.decimals)
+      setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
 
       const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
@@ -398,13 +400,9 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
         collateralAddress,
         conditionId,
         conditionalTokens,
-        compoundService,
         marketMaker,
         outcomesCount: balances.length,
-        setTxHash,
-        setTxState,
         sharesToBurn: amountToRemove || Zero,
-        useBaseToken: false, // Not using base token for staking
       })
 
       await fetchGraphMarketMakerData()
@@ -416,7 +414,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
       setAmountToRemove(null)
       setAmountToRemoveDisplay('')
       setAmountToRemoveNormalized(null)
-      setMessage(`Successfully withdrew ${formatNumber(fundsAmount)} ${collateral.symbol}`)
+      setMessage(`Successfully withdrew ${fundsAmount} ${collateral.symbol}`)
       setIsTransactionProcessing(false)
     } catch (err) {
       setTxState(TransactionStep.error)
@@ -450,12 +448,10 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
       const claimableRewards = await stakingService.getClaimableRewards(cpk.address)
 
       setMessage(
-        `Claiming ${formatNumber(
-          formatBigNumber(
-            claimableRewards[0],
-            getToken(networkId, 'omn').decimals,
-            getToken(networkId, 'omn').decimals,
-          ),
+        `Claiming ${bigNumberToString(
+          claimableRewards[0],
+          getToken(networkId, 'omn').decimals,
+          getToken(networkId, 'omn').decimals,
         )} OMN`,
       )
       setIcon(true)
@@ -464,7 +460,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
 
-      await cpk.claimRewardTokens(liquidityMiningCampaign.id, setTxHash, setTxState)
+      await cpk.claimRewardTokens(liquidityMiningCampaign.id)
 
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
@@ -496,15 +492,13 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
         throw new Error('Please connect to your wallet to perform this action.')
       }
 
-      setMessage(
-        `Staking ${formatNumber(formatBigNumber(fundingBalance, STANDARD_DECIMALS, STANDARD_DECIMALS))} pool tokens.`,
-      )
+      setMessage(`Staking ${bigNumberToString(fundingBalance, STANDARD_DECIMALS)} pool tokens.`)
 
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
       setIsTransactionModalOpen(true)
 
-      await cpk.stakePoolTokens(fundingBalance, liquidityMiningCampaign.id, marketMakerAddress, setTxHash, setTxState)
+      await cpk.stakePoolTokens(fundingBalance, liquidityMiningCampaign.id, marketMakerAddress)
 
       await fetchGraphMarketMakerData()
       await fetchFundingBalance()
@@ -628,7 +622,13 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     feeFormatted,
     poolTokens,
     addFunding,
+    addFundingAndStake,
+    deposit,
     removeFunding,
+    unstakeClaimAndRemoveFunding,
+    withdraw,
+    claim,
+    stake,
     showSetAllowance,
     depositedTokensTotal,
     depositedTokens,
@@ -664,6 +664,12 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     setAmountToRemove,
     amountToRemoveDisplay,
     setAmountToRemoveDisplay,
+    rewardApr,
+    earnedRewards,
+    remainingRewards,
+    totalRewards,
+    liquidityMiningCampaign,
+    userStakedTokens,
   }
 
   return (
