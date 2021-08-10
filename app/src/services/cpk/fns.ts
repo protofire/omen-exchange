@@ -21,6 +21,7 @@ import { MarketMakerService } from '../market_maker'
 import { MarketMakerFactoryService } from '../market_maker_factory'
 import { OracleService } from '../oracle'
 import { RealitioService } from '../realitio'
+import { StakingService } from '../staking'
 import { UnwrapTokenService } from '../unwrap_token'
 import { XdaiService } from '../xdai'
 
@@ -213,6 +214,54 @@ export const approveConditionalTokens = async (params: ApproveConditionalTokensP
       data: ConditionalTokenService.encodeSetApprovalForAll(marketMaker.address, true),
     })
   }
+
+  return params
+}
+
+/**
+ * Set approval for the staking campaign to access pool tokens
+ */
+
+interface ApproveCampaignParams {
+  amountToStake: BigNumber
+  campaignAddress: string
+  marketMaker: MarketMakerService
+  service: CPKService
+  transactions: Transaction[]
+}
+
+export const approveCampaign = async (params: ApproveCampaignParams) => {
+  const { amountToStake, campaignAddress, marketMaker, service, transactions } = params
+  const erc20Service = new ERC20Service(service.provider, service.cpk.address, marketMaker.address)
+  const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(service.cpk.address, campaignAddress, amountToStake)
+
+  if (!hasEnoughAllowance) {
+    transactions.push({
+      to: marketMaker.address,
+      data: ERC20Service.encodeApproveUnlimited(campaignAddress),
+    })
+  }
+
+  return params
+}
+
+/**
+ * Set approval for the staking campaign to access pool tokens
+ */
+
+interface StakeParams {
+  amountToStake: BigNumber
+  campaignAddress: string
+  transactions: Transaction[]
+}
+
+export const stake = async (params: StakeParams) => {
+  const { amountToStake, campaignAddress, transactions } = params
+
+  transactions.push({
+    to: campaignAddress,
+    data: StakingService.encodeStakePoolTokens(amountToStake),
+  })
 
   return params
 }

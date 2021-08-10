@@ -21,6 +21,7 @@ import {
   addFunds,
   announceCondition,
   approve,
+  approveCampaign,
   approveConditionalTokens,
   buy,
   claimWinnings,
@@ -37,6 +38,7 @@ import {
   sell,
   sendFromxDaiToBridge,
   setup,
+  stake,
   submitAnswer,
   unwrap,
   upgradeProxy,
@@ -127,6 +129,14 @@ interface SendFromxDaiParams {
   amount: BigNumber
   address: string
   symbol?: string
+}
+
+interface CPKDepositAndStakeParams {
+  amount: BigNumber
+  campaignAddress: string
+  collateral: Token
+  marketMaker: MarketMakerService
+  amountToStake: BigNumber
 }
 
 interface TransactionResult {
@@ -510,6 +520,16 @@ class CPKService {
       return false
     }
     return true
+  }
+
+  depositAndStake = async (params: CPKDepositAndStakeParams) => {
+    try {
+      const { transaction } = await this.pipe(fee, wrap, approve, deposit, addFunds, approveCampaign, stake)(params)
+      return transaction
+    } catch (err) {
+      logger.error(`There was an error depositing and staking liquidity`, err.message)
+      throw err
+    }
   }
 }
 
