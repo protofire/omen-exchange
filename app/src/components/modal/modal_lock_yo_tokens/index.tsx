@@ -29,10 +29,9 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   theme?: any
   context: any
   onClose: () => void
-  omenBalance: BigNumber
   setIsModalLockTokensOpen: any
-  fetchBalances: () => Promise<void>
 }
+
 const NavLeft = styled.div`
   display: flex;
   align-items: center;
@@ -101,13 +100,14 @@ const PercentageText = styled.span<{ lightColor?: boolean }>`
 `
 
 const ModalLockTokens = (props: Props) => {
-  const { context, fetchBalances, isOpen, omenBalance, setIsModalLockTokensOpen, theme } = props
+  const { context, isOpen, setIsModalLockTokensOpen, theme } = props
   const { account, balances, cpk, library: provider, networkId, relay } = context
+
+  const { fetchBalances, omenBalance, xOmenBalance } = balances
 
   const { claimAmount, fetchClaimAmount } = useAirdropService()
 
-  const omen = new OmenGuildService(provider, networkId)
-
+  const [omen, setOmen] = useState(new OmenGuildService(provider, networkId))
   const [isLockAmountOpen, setIsLockAmountOpen] = useState<boolean>(false)
   const [displayLockAmount, setDisplayLockAmount] = useState<BigNumber>(Zero)
   const [amountToDisplay, setAmountToDisplay] = useState<string>('')
@@ -131,6 +131,7 @@ const ModalLockTokens = (props: Props) => {
   useEffect(() => {
     setAllowanceState(ButtonStates.idle)
     ;(async () => {
+      setOmen(new OmenGuildService(provider, networkId))
       await getTokenLockInfo()
       await fetchAllowance()
     })()
@@ -295,12 +296,21 @@ const ModalLockTokens = (props: Props) => {
           <ModalMain>
             <ConditionalWrapper hideWrapper={!isLockAmountOpen}>
               <DataRow>
-                <LightDataItem>Omen Account</LightDataItem>
+                <LightDataItem>Wallet Balance</LightDataItem>
                 <DarkDataItem>
                   {formatBigNumber(omenBalance, STANDARD_DECIMALS, 2)} OMN
                   {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
                 </DarkDataItem>
               </DataRow>
+              {relay && (
+                <DataRow>
+                  <LightDataItem>Omen Account</LightDataItem>
+                  <DarkDataItem>
+                    {formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 2)} OMN
+                    {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
+                  </DarkDataItem>
+                </DataRow>
+              )}
               <DataRow>
                 <LightDataItem>Locked in Guild</LightDataItem>
                 <DarkDataItem>
