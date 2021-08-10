@@ -16,6 +16,10 @@ import { Question, QuestionLog, TransactionStep } from '../util/types'
 
 const logger = getLogger('Services::Realitio')
 
+const askQuestionConstant = [
+  'function askQuestion(uint256 template_id, string question, address arbitrator, uint32 timeout, uint32 opening_ts, uint256 nonce) public constant returns (bytes32)',
+]
+
 interface TransactionResult {
   hash: string
 }
@@ -82,7 +86,7 @@ class RealitioService {
       this.scalarContract = new ethers.Contract(scalarAddress, realitioScalarAdapterAbi, provider)
     }
 
-    this.constantContract = new ethers.Contract(address, realitioAbi, provider)
+    this.constantContract = new ethers.Contract(address, askQuestionConstant, provider)
     this.signerAddress = signerAddress
     this.provider = provider
   }
@@ -341,7 +345,7 @@ class RealitioService {
   }
 
   getBalanceOf = async (address: string): Promise<BigNumber> => {
-    const result = await this.constantContract.balanceOf(address)
+    const result = await this.contract.balanceOf(address)
     return result
   }
 
