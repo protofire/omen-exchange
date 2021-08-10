@@ -28,7 +28,7 @@ export const useTokenPrice = (address: string) => {
   })
 
   useEffect(() => {
-    if (data && data.token.usdPerToken) {
+    if (data && data.token) {
       setTokenPrice(Number(data.token.usdPerToken))
     }
   }, [data])
