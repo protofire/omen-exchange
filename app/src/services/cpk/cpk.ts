@@ -153,6 +153,17 @@ interface CPKUnstakePoolTokensParams {
   campaignAddress: string
 }
 
+interface CPKUnstakeClaimAndWithdrawParams {
+  amountToMerge: BigNumber
+  campaignAddress: string
+  collateralAddress: string
+  conditionId: string
+  conditionalTokens: ConditionalTokenService
+  marketMaker: MarketMakerService
+  outcomesCount: number
+  sharesToBurn: BigNumber
+}
+
 interface TransactionResult {
   hash?: string
   safeTxHash?: string
@@ -572,6 +583,24 @@ class CPKService {
       return transaction
     } catch (err) {
       logger.error('Failed to claim reward tokens', err.message)
+      throw err
+    }
+  }
+
+  unstakeClaimAndWithdraw = async (params: CPKUnstakeClaimAndWithdrawParams) => {
+    try {
+      const { transaction } = await this.pipe(
+        fee,
+        claim,
+        unstake,
+        removeFunds,
+        unwrap,
+        withdraw,
+        withdrawRewards,
+      )(params)
+      return transaction
+    } catch (err) {
+      logger.error('There was an error unstaking, claiming and withdrawing funding', err.message)
       throw err
     }
   }
