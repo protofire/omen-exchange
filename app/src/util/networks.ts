@@ -104,7 +104,7 @@ export const networks: { [K in NetworkId]: Network } = {
       { rpcUrl: 'https://cloudflare-eth.com/', name: 'Cloudflare' },
       {
         rpcUrl: `https://eth-mainnet.gateway.pokt.network/v1/lb/61116f89a585a200351491db`,
-        name: 'POKT Network',
+        name: 'Pokt',
       },
     ],
     graphHttpUri: GRAPH_MAINNET_HTTP,
@@ -154,7 +154,7 @@ export const networks: { [K in NetworkId]: Network } = {
       },
       {
         rpcUrl: `https://eth-rinkeby.gateway.pokt.network/v1/lb/61116c81a585a20035149067`,
-        name: 'POKT Network',
+        name: 'Pokt',
       },
     ],
     graphHttpUri: GRAPH_RINKEBY_HTTP,
@@ -253,7 +253,7 @@ export const networks: { [K in NetworkId]: Network } = {
       },
       {
         rpcUrl: 'https://poa-xdai.gateway.pokt.network/v1/lb/6111748ba585a2003514997b',
-        name: 'POKT Network',
+        name: 'Pokt',
       },
     ],
     graphHttpUri: GRAPH_XDAI_HTTP,
