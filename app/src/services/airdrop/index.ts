@@ -1,9 +1,8 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
-import { BigNumber, getAddress } from 'ethers/utils'
+import { BigNumber } from 'ethers/utils'
 
-import { Transaction, calcRelayProxyAddress } from '../../util/cpk'
-import { getAirdrops, networkIds } from '../../util/networks'
-import { isAddress } from '../../util/tools'
+import { Transaction } from '../../util/cpk'
+import { getAirdrops } from '../../util/networks'
 
 import { airdropAbi } from './abi'
 
@@ -22,47 +21,20 @@ class AirdropService {
     }
   }
 
-  static getClaim = async (
-    airdrop: string,
-    address: Maybe<string>,
-    networkId: number,
-    provider: any,
-    relay: boolean,
-  ) => {
-    // handle / format address
-    const lowerCaseAddress = address && address.toLowerCase()
-    const recipient = lowerCaseAddress && isAddress(lowerCaseAddress) && getAddress(lowerCaseAddress)
-    // eslint-disable-next-line
-    const proofs = require(`./${airdrop}.json`)
-    if (recipient) {
-      if (networkId === networkIds.XDAI) {
-        const proxyAddress = calcRelayProxyAddress(recipient, provider)
-        const proxyClaim = proxyAddress && proofs.claims[proxyAddress]
-        if (proxyClaim && relay) {
-          return { ...proxyClaim, recipient: proxyAddress }
-        }
-      }
-      const claim = proofs.claims[recipient]
-      if (claim) {
-        return { ...claim, recipient }
-      }
-    }
-  }
-
-  getClaims = async (address: Maybe<string>) => {
+  getClaims = async (recipient: Maybe<string>) => {
     if (this.airdrops) {
       const claims = await Promise.all(
         this.airdrops.map(async (airdrop, index) => {
           try {
             const response = await fetch(
-              `https://raw.githubusercontent.com/hexyls/omen-airdrop/blob/master/${index + 1}/${address}.json`,
+              `https://raw.githubusercontent.com/hexyls/omen-airdrop/master/${index + 1}/${recipient}.json`,
             )
             const claim = await response.json()
             if (claim && claim.amount) {
               try {
                 const claimed = await airdrop.isClaimed(claim.index)
                 if (!claimed) {
-                  return { ...claim, airdrop: airdrop.address }
+                  return { ...claim, airdrop: airdrop.address, recipient }
                 }
                 // eslint-disable-next-line
               } catch {}
