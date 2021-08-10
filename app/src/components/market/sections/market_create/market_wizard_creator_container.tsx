@@ -1,25 +1,22 @@
 import React, { FC, useState } from 'react'
 import { useHistory } from 'react-router'
 
-import { useConnectedBalanceContext, useConnectedCPKContext, useContracts } from '../../../../hooks'
-import { useConnectedWeb3Context } from '../../../../hooks/connectedWeb3'
+import { useContracts } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../contexts/connectedWeb3'
 import { ERC20Service } from '../../../../services'
-import { CompoundService } from '../../../../services/compound_service'
 import { getLogger } from '../../../../util/logger'
 import { MarketCreationStatus } from '../../../../util/market_creation_status_data'
-import { getToken, pseudoNativeAssetAddress } from '../../../../util/networks'
+import { pseudoNativeAssetAddress } from '../../../../util/networks'
 import { MarketData, TransactionStep } from '../../../../util/types'
 import { ModalConnectWalletWrapper, ModalTransactionWrapper } from '../../../modal'
 
-import { MarketWizardCreator } from './market_wizard_creator'
+import { MarketWizardCreator } from '../../../market/market_create/market_wizard_creator'
 
 const logger = getLogger('Market::MarketWizardCreatorContainer')
 
 const MarketWizardCreatorContainer: FC = () => {
   const context = useConnectedWeb3Context()
-  const cpk = useConnectedCPKContext()
-  const { fetchBalances } = useConnectedBalanceContext()
-  const { account, library: provider } = context
+  const { account, cpk, library: provider } = context
   const history = useHistory()
 
   const [isModalOpen, setModalState] = useState(false)
@@ -31,20 +28,6 @@ const MarketWizardCreatorContainer: FC = () => {
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
   const [txHash, setTxHash] = useState('')
-
-  const getCompoundInterestRate = async (symbol: string): Promise<number> => {
-    const tokenSymbol = symbol.toLowerCase()
-    let cToken = `c${tokenSymbol}`
-    if (tokenSymbol === 'weth') {
-      cToken = 'ceth'
-    }
-    const compoundCollateralToken = cToken as KnownToken
-    const compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
-    const compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
-    await compoundService.init()
-    const supplyRate = compoundService.calculateSupplyRateAPY()
-    return supplyRate
-  }
 
   const handleSubmit = async (marketData: MarketData, isScalar: boolean) => {
     try {
@@ -62,72 +45,34 @@ const MarketWizardCreatorContainer: FC = () => {
         setTxState(TransactionStep.waitingConfirmation)
         setIsTransactionModalOpen(true)
 
-        if (
-          !cpk.isSafeApp &&
-          marketData.collateral.address !== pseudoNativeAssetAddress &&
-          marketData.userInputCollateral.address !== pseudoNativeAssetAddress
-        ) {
+        if (!cpk.isSafeApp && marketData.collateral.address !== pseudoNativeAssetAddress) {
           // Approve collateral to the proxy contract
-          const collateralService = new ERC20Service(provider, account, marketData.userInputCollateral.address)
+          const collateralService = new ERC20Service(provider, account, marketData.collateral.address)
           const hasEnoughAlowance = await collateralService.hasEnoughAllowance(account, cpk.address, marketData.funding)
           if (!hasEnoughAlowance) {
             await collateralService.approveUnlimited(cpk.address)
           }
         }
-        let compoundTokenDetails = marketData.userInputCollateral
-        let compoundService = null
-        const userInputCollateralSymbol = marketData.userInputCollateral.symbol.toLowerCase()
-        const useCompoundReserve = marketData.useCompoundReserve
-        if (useCompoundReserve) {
-          const cToken = `c${userInputCollateralSymbol}`
-          const compoundCollateralToken = cToken as KnownToken
-          compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
-          compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
-          await compoundService.init()
-        }
         if (isScalar) {
           setMessage('Creating scalar market...')
           const { marketMakerAddress } = await cpk.createScalarMarket({
-            compoundService,
-            compoundTokenDetails,
             marketData,
             conditionalTokens,
             realitio,
             marketMakerFactory: marketMakerFactoryV2,
-            useCompoundReserve,
-            setTxHash,
-            setTxState,
           })
-          await fetchBalances()
           setMarketMakerAddress(marketMakerAddress)
 
           setMarketCreationStatus(MarketCreationStatus.done())
           history.replace(`/${marketMakerAddress}`)
         } else {
           setMessage('Creating categorical market...')
-          let compoundTokenDetails = marketData.userInputCollateral
-          let compoundService = null
-          const userInputCollateralSymbol = marketData.userInputCollateral.symbol.toLowerCase()
-          const useCompoundReserve = marketData.useCompoundReserve
-          if (useCompoundReserve) {
-            const cToken = `c${userInputCollateralSymbol}`
-            const compoundCollateralToken = cToken as KnownToken
-            compoundTokenDetails = getToken(context.networkId, compoundCollateralToken)
-            compoundService = new CompoundService(compoundTokenDetails.address, cToken, provider, account)
-            await compoundService.init()
-          }
           const { marketMakerAddress } = await cpk.createMarket({
-            compoundService,
-            compoundTokenDetails,
             marketData,
             conditionalTokens,
             realitio,
             marketMakerFactory: marketMakerFactoryV2,
-            setTxHash,
-            setTxState,
-            useCompoundReserve,
           })
-          await fetchBalances()
           setMarketMakerAddress(marketMakerAddress)
           setMarketCreationStatus(MarketCreationStatus.done())
           history.replace(`/${marketMakerAddress}`)
@@ -144,7 +89,6 @@ const MarketWizardCreatorContainer: FC = () => {
     <>
       <MarketWizardCreator
         callback={handleSubmit}
-        getCompoundInterestRate={getCompoundInterestRate}
         marketCreationStatus={marketCreationStatus}
         marketMakerAddress={marketMakerAddress}
       />
