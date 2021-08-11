@@ -1,10 +1,9 @@
 import WalletConnectProvider from '@walletconnect/web3-provider'
-import AuthereumApi from 'authereum'
 import { ethers } from 'ethers'
 import { Connectors } from 'web3-react'
 
 import { INFURA_PROJECT_ID } from '../common/constants'
-import { getInfuraUrl, infuraNetworkURL, networkIds, supportedNetworkIds } from '../util/networks'
+import { getInfuraUrl, networkIds, networks, supportedNetworkIds } from '../util/networks'
 
 const { InjectedConnector, NetworkOnlyConnector } = Connectors
 
@@ -88,29 +87,9 @@ class WalletConnectConnector extends Connectors.Connector {
 const WalletConnect = new WalletConnectConnector()
 
 const Infura = new NetworkOnlyConnector({
-  providerURL: infuraNetworkURL,
+  providerURL:
+    localStorage.getItem('relay') === 'true' ? networks[networkIds.XDAI].url : networks[networkIds.MAINNET].url,
 })
-
-class AuthereumConnector extends Connectors.Connector {
-  authereum: any
-
-  onActivation(): Promise<void> {
-    this.authereum = new AuthereumApi()
-    return this.authereum.login()
-  }
-
-  getProvider() {
-    return this.authereum.getProvider()
-  }
-
-  changeNetwork(network: string) {
-    this.authereum = new AuthereumApi({
-      networkId: network,
-    })
-  }
-}
-
-const Authereum = new AuthereumConnector()
 
 class SafeConnector extends Connectors.Connector {
   init(address: string, networkId: number) {
@@ -137,9 +116,8 @@ class SafeConnector extends Connectors.Connector {
 const Safe = new SafeConnector()
 
 export default {
-  Infura,
   MetaMask,
   WalletConnect,
-  Authereum,
   Safe,
+  Infura,
 }

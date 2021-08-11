@@ -53,7 +53,8 @@ export const TRADING_FEE_OPTIONS = [
   '5.00',
 ]
 
-export const GRAPH_MAINNET_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen'
+export const GRAPH_MAINNET_HTTP =
+  'https://gateway.thegraph.com/api/47e8db8d0f1b4a6c98b190e04f20dcb1/subgraphs/id/0x0503024fcc5e1bd834530e69d592dbb6e8c03968-0'
 export const GRAPH_MAINNET_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen'
 export const GRAPH_RINKEBY_HTTP = 'https://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
 export const GRAPH_RINKEBY_WS = 'wss://api.thegraph.com/subgraphs/name/protofire/omen-rinkeby'
@@ -97,9 +98,8 @@ export const TWITTER_CARD = 'summary_large_image'
 export const TWITTER_IMAGE_ALT = 'Omen'
 export const TWITTER_SITE = '@Omen_eth'
 
-export const DISCLAIMER_TEXT = ''
-
 export const FETCH_DETAILS_INTERVAL = parseInt('15000', 10)
+export const FETCH_RPC_INTERVAL = parseInt('5000', 10)
 export const SHOW_FOOTER = true
 export const IMPORT_QUESTION_ID_KEY = 'importQuestionId'
 

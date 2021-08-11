@@ -11,7 +11,13 @@ import { proxyFactoryAbi } from '../abi/proxy_factory'
 import { RelayService } from '../services/relay'
 import { SafeService } from '../services/safe'
 
-import { getCPKAddresses, getInfuraUrl, getRelayProxyFactory, networkIds } from './networks'
+import {
+  getCPKAddresses,
+  getInfuraUrl,
+  getRelayProxyFactory,
+  getTargetSafeImplementation,
+  networkIds,
+} from './networks'
 
 type Address = string
 
@@ -317,9 +323,21 @@ export const createCPK = async (provider: Web3Provider, relay: boolean) => {
       networks[network.chainId].proxyFactoryAddress = relayProxyFactoryAddress
     }
   }
+
   const transactionManager = relay ? new RelayTransactionManager() : new CpkTransactionManager()
-  const cpk = new OCPK({ ethLibAdapter: new EthersAdapter({ ethers, signer }), transactionManager, networks })
+
+  let cpk = new OCPK({ ethLibAdapter: new EthersAdapter({ ethers, signer }), transactionManager, networks })
   await cpk.init()
+
+  // if this is a brand new user, override the masterCopy
+  const deployed = await cpk.isProxyDeployed()
+
+  if (!relay && !deployed) {
+    networks[network.chainId].masterCopyAddress = getTargetSafeImplementation(network.chainId)
+    cpk = new OCPK({ ethLibAdapter: new EthersAdapter({ ethers, signer }), transactionManager, networks })
+    await cpk.init()
+  }
+
   return cpk
 }
 
@@ -361,28 +379,35 @@ export const getRelayProvider = (
   library: any,
   account: string | null | undefined,
 ) => {
-  // provider override if running as relay
-  if (relay && networkId === networkIds.MAINNET) {
-    const netId = networkIds.XDAI
-    const provider = new ethers.providers.JsonRpcProvider(getInfuraUrl(netId)) as any
-    const address = account ? calcRelayProxyAddress(account, provider) : ''
-    const signer = library.getSigner()
-    const fakeSigner = {
-      provider,
-      getAddress: () => address,
-      _ethersType: 'Signer',
-      // access the connected signer for relay signatures
-      signer: signer,
+  try {
+    // provider override if running as relay
+    if (relay && networkId === networkIds.MAINNET) {
+      const netId = networkIds.XDAI
+
+      const provider = new ethers.providers.JsonRpcProvider(getInfuraUrl(netId)) as any
+      const address = account ? calcRelayProxyAddress(account, provider) : ''
+
+      const signer = library.getSigner()
+      const fakeSigner = {
+        provider,
+        getAddress: () => address,
+        _ethersType: 'Signer',
+        // access the connected signer for relay signatures
+        signer: signer,
+      }
+
+      provider.signer = fakeSigner
+      provider.getSigner = () => fakeSigner
+      provider.relay = true
+      return {
+        address,
+        isRelay: true,
+        netId,
+        provider,
+      }
     }
-    provider.signer = fakeSigner
-    provider.getSigner = () => fakeSigner
-    provider.relay = true
-    return {
-      address,
-      isRelay: true,
-      netId,
-      provider,
-    }
+  } catch (e) {
+    console.error('Error while getting relay provider: ', e)
   }
   return {
     address: account,

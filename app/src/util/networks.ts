@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 import {
   DEFAULT_ARBITRATOR,
   EARLIEST_MAINNET_BLOCK_TO_CHECK,
@@ -21,7 +19,6 @@ import {
 import { entries, isNotNull } from '../util/type-utils'
 
 import { getImageUrl } from './token'
-import { waitABit } from './tools'
 import { Arbitrator, Token } from './types'
 
 export type NetworkId = 1 | 4 | 77 | 100
@@ -97,7 +94,7 @@ interface KnownTokenData {
 
 export const pseudoNativeAssetAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'
 
-const networks: { [K in NetworkId]: Network } = {
+export const networks: { [K in NetworkId]: Network } = {
   [networkIds.MAINNET]: {
     label: 'Mainnet',
     url: `https://mainnet.infura.io/v3/${INFURA_PROJECT_ID}`,
@@ -298,6 +295,7 @@ export const getChainSpecificAlternativeUrls = (networkId: any) => {
   if (!validNetworkId(networkId)) {
     return false
   }
+
   return networks[networkId].alternativeUrls
 }
 if (localStorage.getItem('rpcAddress')) {
@@ -317,8 +315,6 @@ export const supportedNetworkURLs = entries(networks).reduce<{
   }),
   {},
 )
-
-export const infuraNetworkURL = networks[1].url
 
 export const getInfuraUrl = (networkId: number): string => {
   if (!validNetworkId(networkId)) {
@@ -416,12 +412,14 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     decimals: 8,
     addresses: {
       [networkIds.MAINNET]: '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599',
+      [networkIds.RINKEBY]: '0x577d296678535e4903d59a4c929b718e1d575e0a',
       [networkIds.XDAI]: '0x8e5bBbb09Ed1ebdE8674Cda39A0c169401db4252',
     },
     order: 14,
   },
   dai: {
     symbol: 'DAI',
+    name: 'Dai',
     decimals: 18,
     addresses: {
       [networkIds.MAINNET]: '0x6b175474e89094c44da98b954eedeac495271d0f',
@@ -853,51 +851,11 @@ export const getNativeAsset = (networkId: number, relay = false): Token => {
   return asset
 }
 
-export const getNativeCompoundAsset = (networkId: number): Token => {
-  if (!validNetworkId(networkId)) {
-    throw new Error(`Unsupported network id: '${networkId}'`)
-  } else {
-    const knownToken = 'ceth' as KnownToken
-    return getToken(networkId, knownToken)
-  }
-}
-
 export const getTargetSafeImplementation = (networkId: number): string => {
   if (!validNetworkId(networkId)) {
     throw new Error(`Unsupported network id: '${networkId}'`)
   }
   return networks[networkId].targetSafeImplementation.toLowerCase()
-}
-
-export const getGraphMeta = async (networkId: number) => {
-  const query = `
-    query {
-      _meta {
-        block {
-          hash
-          number
-        }
-      }
-    }
-  `
-  const { httpUri } = getGraphUris(networkId)
-  const result = await axios.post(httpUri, { query })
-  return result.data.data._meta.block
-}
-
-export const waitForBlockToSync = async (networkId: number, blockNum: number) => {
-  let block
-  while (!block || block.number < blockNum + 1) {
-    block = await getGraphMeta(networkId)
-    await waitABit()
-  }
-}
-
-export const getBySafeTx = async (networkId: number, safeTxHash: string) => {
-  const networkName = (networkNames as any)[networkId].toLowerCase()
-  const txServiceUrl = `https://safe-transaction.${networkName}.gnosis.io/api/v1`
-  const result = await axios.get(`${txServiceUrl}/transactions/${safeTxHash}`)
-  return result.data
 }
 
 export const getBlockExplorer = (networkId: number): string => {
