@@ -23,12 +23,15 @@ import {
   approve,
   approveConditionalTokens,
   buy,
+  claimAirdrop,
   claimWinnings,
   createMarket,
   createQuestion,
   deposit,
   exec,
   fee,
+  genericApproval,
+  lockTokens,
   pipe,
   prepareCondition,
   redeemPosition,
@@ -38,12 +41,14 @@ import {
   sendFromxDaiToBridge,
   setup,
   submitAnswer,
+  unlockTokens,
   unwrap,
   upgradeProxy,
   validateOracle,
   withdraw,
   withdrawRealitioBalance,
   wrangleCreateMarketParams,
+  wrangleLockParams,
   wrangleRemoveFundsParams,
   wrangleSellParams,
   wrap,
@@ -129,9 +134,17 @@ interface SendFromxDaiParams {
   symbol?: string
 }
 
+interface LockTokensParams {
+  amount: BigNumber
+}
+
 interface TransactionResult {
   hash?: string
   safeTxHash?: string
+}
+
+interface CPKClaimAirdropParams {
+  account: string
 }
 
 export interface TxOptions {
@@ -391,6 +404,36 @@ class CPKService {
       return transaction
     } catch (e) {
       logger.error(`Error trying to send XDai to bridge address`, e.message)
+      throw e
+    }
+  }
+
+  lockTokens = async (params: LockTokensParams) => {
+    try {
+      const { transaction } = await this.pipe(wrangleLockParams, genericApproval, deposit, lockTokens)(params)
+      return transaction
+    } catch (e) {
+      logger.error(`Error while trying to lock Omen tokens : `, e.message)
+      throw e
+    }
+  }
+
+  unlockTokens = async (params: LockTokensParams) => {
+    try {
+      const { transaction } = await this.pipe(wrangleLockParams, unlockTokens, withdraw)(params)
+      return transaction
+    } catch (e) {
+      logger.error(`Error while trying to unlock Omen tokens : `, e.message)
+      throw e
+    }
+  }
+
+  claimAirdrop = async (params: CPKClaimAirdropParams) => {
+    try {
+      const { transaction } = await this.pipe(claimAirdrop)(params)
+      return transaction
+    } catch (e) {
+      logger.error(`Error while trying to claim airdrop : `, e.message)
       throw e
     }
   }
