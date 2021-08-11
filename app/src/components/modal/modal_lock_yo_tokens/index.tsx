@@ -264,6 +264,7 @@ const ModalLockTokens = (props: Props) => {
     setIsTransactionModalOpen(false)
     setCheckAddress(false)
     setIsLockAmountOpen(false)
+    setDisplayLockAmount(Zero)
     props.onClose()
   }
 
