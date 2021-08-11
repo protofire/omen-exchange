@@ -1,10 +1,9 @@
 import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
-import { Transaction } from '../../util/cpk'
-import { getAirdrops } from '../../util/networks'
-
-import { airdropAbi } from './abi'
+import airdropAbi from '../abi/airdrop.json'
+import { Transaction } from '../util/cpk'
+import { getAirdrops } from '../util/networks'
 
 class AirdropService {
   airdrops?: Contract[]
