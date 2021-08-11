@@ -34,7 +34,7 @@ const TopSectionDetails = styled.div`
 `
 
 const TopSectionHeading = styled.div`
-  color: ${props => props.theme.colors.textColorDark};
+  color: ${props => props.theme.text1};
   font-weight: ${props => props.theme.textfield.fontWeight};
 `
 
@@ -43,7 +43,7 @@ interface Subheading {
 }
 
 const TopSectionSubHeading = styled.div<Subheading>`
-  color: ${props => (props.green ? props.theme.colors.green : props.theme.colors.textColorLighter)};
+  color: ${props => (props.green ? props.theme.green : props.theme.text2)};
   font-weight: ${props => props.theme.textfield.fontWeight};
 `
 
@@ -61,17 +61,17 @@ const BottomSectionTextWrapper = styled.div`
 `
 
 const BottomSectionHeading = styled.div`
-  color: ${props => props.theme.colors.textColorDark};
+  color: ${props => props.theme.text1};
   font-weight: ${props => props.theme.textfield.fontWeight};
 `
 
 const BottomSectionSubheading = styled.div`
-  color: ${props => props.theme.colors.textColorLighter};
+  color: ${props => props.theme.text2};
   font-size: ${props => props.theme.fonts.defaultSize};
 `
 
 const BottomSectionDescription = styled.div`
-  color: ${props => props.theme.colors.textColorLighter};
+  color: ${props => props.theme.text2};
 `
 
 const AirdropButton = styled(Button)`

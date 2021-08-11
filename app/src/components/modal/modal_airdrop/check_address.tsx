@@ -27,19 +27,19 @@ const RecipientLabel = styled(FormLabel)`
 `
 
 const AddressField = styled(Textfield)<{ error: boolean }>`
-  border-color: ${props => (props.error ? props.theme.colors.alert : props.theme.textfield.borderColor)};
+  border-color: ${props => (props.error ? props.theme.red : props.theme.border1)};
   &:hover {
-    border-color: ${props => (props.error ? props.theme.colors.alert : props.theme.textfield.borderColorOnHover)};
+    border-color: ${props => (props.error ? props.theme.red : props.theme.border2)};
   }
 
   &:active,
   &:focus {
-    border-color: ${props => (props.error ? props.theme.colors.alert : props.theme.textfield.borderColorActive)};
+    border-color: ${props => (props.error ? props.theme.red : props.theme.border3)};
   }
 `
 
 const ErrorMessage = styled.div`
-  color: ${props => props.theme.colors.alert};
+  color: ${props => props.theme.red};
   margin-top: 12px;
   font-size: ${props => props.theme.fonts.defaultSize};
   line-height: 16px;
