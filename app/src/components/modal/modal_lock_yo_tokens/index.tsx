@@ -330,7 +330,7 @@ const ModalLockTokens = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setDisplayLockAmount(omenBalance)
-                  setAmountToDisplay(bigNumberToString(omenBalance, STANDARD_DECIMALS, 2))
+                  setAmountToDisplay(bigNumberToString(omenBalance, STANDARD_DECIMALS, 2, true))
                 }}
                 shouldDisplayMaxButton={true}
                 symbol={'OMN'}
