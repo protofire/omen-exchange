@@ -411,7 +411,7 @@ const ModalLockTokens = (props: Props) => {
               disabled={
                 (displayLockAmount.isZero() ||
                   omenBalance.isZero() ||
-                  displayLockAmount.gte(omenBalance) ||
+                  displayLockAmount.gt(omenBalance) ||
                   displayLockAmount.gt(omenAllowance)) &&
                 isLockAmountOpen
               }
