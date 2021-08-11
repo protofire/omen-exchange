@@ -106,6 +106,7 @@ const TopCardHeader = styled.div<{ borderTop?: boolean }>`
 
 const RPCTextWrapper = styled.span`
   line-height: ${props => props.theme.fonts.defaultLineHeight};
+  font-size: ${props => props.theme.fonts.defaultSize};
 `
 
 const SettingsButtonWrapper = styled.div`
