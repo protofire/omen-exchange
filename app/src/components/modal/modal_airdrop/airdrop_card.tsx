@@ -4,6 +4,7 @@ import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../contexts'
+import { TYPE } from '../../../theme'
 import { bigNumberToString } from '../../../util/tools'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -33,10 +34,10 @@ const TopSectionDetails = styled.div`
   margin-left: 16px;
 `
 
-const TopSectionHeading = styled.div`
-  color: ${props => props.theme.text1};
-  font-weight: ${props => props.theme.textfield.fontWeight};
-`
+// const TopSectionHeading = styled.div`
+//   color: ${props => props.theme.text1};
+//   font-weight: ${props => props.theme.textfield.fontWeight};
+// `
 
 interface Subheading {
   green: boolean
@@ -106,7 +107,7 @@ const AirdropCard = (props: Props) => {
           <TopSectionLeft>
             <IconOmen id="airdrop" size={38} />
             <TopSectionDetails>
-              <TopSectionHeading>Claimable Amount</TopSectionHeading>
+              <TYPE.heading3 color={'text1'}>Claimable Amount</TYPE.heading3>
               <TopSectionSubHeading green={!claimIsDisabled}>
                 {bigNumberToString(displayAmount, STANDARD_DECIMALS)} OMN
               </TopSectionSubHeading>

@@ -394,11 +394,26 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return <StyledThemeProvider theme={themeAggregator(darkMode)}>{children}</StyledThemeProvider>
 }
 
-const TextWrapper = styled.div<{ color: keyof Colors }>`
-  color: ${props => props.theme.text3};
+interface TextProps {
+  color: keyof Colors
+  fontWeight: number
+  fontSize: string
+}
+
+// const TextWrapper = styled.div<TextProps>`
+//   color: ${({ color, theme }) => (theme as any)[color]};
+//   font-weight: ${({ fontWeight, theme }) => (theme as any)[fontWeight]};
+//   font-size: ${({ fontSize, theme }) => (theme as any)[fontSize]};
+//   font-family: Roboto;
+//   letter-spacing: 0.2px;
+// `
+
+const TextWrapper = styled.div<TextProps>`
+  color: ${({ color, theme }) => (theme as any)[color]};
   font-family: Roboto;
   letter-spacing: 0.2px;
 `
+// color: ${({ color, theme }) => (theme as any)[color]};
 
 export const TYPE = {
   heading1(props: any) {
