@@ -341,9 +341,9 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     name: 'Omen',
     decimals: 18,
     addresses: {
-      // [networkIds.MAINNET]: '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
-      //[networkIds.XDAI]: '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599',
-      [networkIds.RINKEBY]: '0x0A08ECa47C56C305F4FeB4fa062AEcd5807BeBb8',
+      [networkIds.MAINNET]: '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
+      [networkIds.XDAI]: '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599',
+      [networkIds.RINKEBY]: '0xa8b4b1dc4efc8f8c48e430a4faaaf36075670139',
     },
     order: 22,
   },
