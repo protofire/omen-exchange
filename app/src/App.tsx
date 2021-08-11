@@ -60,7 +60,7 @@ const App: React.FC = (props: any) => {
             <ContentWrapper>
               <ConnectionModalNavigation>
                 <ModalTitle>
-                  <span style={{ marginLeft: '15px' }}>Settings</span>
+                  <span>Settings</span>
                 </ModalTitle>
               </ConnectionModalNavigation>
               <SettingsModalWrapper>

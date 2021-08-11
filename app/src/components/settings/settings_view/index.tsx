@@ -106,6 +106,7 @@ const TopCardHeader = styled.div<{ borderTop?: boolean }>`
 
 const RPCTextWrapper = styled.span`
   line-height: ${props => props.theme.fonts.defaultLineHeight};
+  font-size: ${props => props.theme.fonts.defaultSize};
 `
 
 const SettingsButtonWrapper = styled.div`
@@ -240,7 +241,6 @@ export const SettingsViewContainer = () => {
             </FiltersControls>
           </Row>
         </TopCardHeader>
-
         {isDropDownActive && (
           <TopCardHeader borderTop={true} style={{ paddingBottom: '10px' }}>
             <Row>
