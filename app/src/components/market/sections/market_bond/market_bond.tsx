@@ -296,7 +296,7 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         />
       )}
 
-      <BottomButtonWrapper borderTop marginTop={showUpgrade ? true : false}>
+      <BottomButtonWrapper borderTop marginTop={showUpgrade}>
         <Button
           buttonType={ButtonType.secondaryLine}
           onClick={() => switchMarketTab(MarketDetailsTab.finalize)}
