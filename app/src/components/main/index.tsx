@@ -9,9 +9,11 @@ import { MarketWizardCreatorContainer } from '../../pages/market_sections/market
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
 import { Footer } from '../common/layout/footer'
 import { Header } from '../common/layout/header'
+import { ModalAirdropWrapper } from '../modal'
 import SettingsViewContainer from '../settings/settings_view'
 
 import { MarketRoutes } from './routes/market_routes'
+
 const RedirectToHome = () => <Redirect to="/" />
 
 export const Main: React.FC = () => {
@@ -22,6 +24,7 @@ export const Main: React.FC = () => {
       <Router>
         <MainWrapper>
           <Header />
+          <ModalAirdropWrapper />
           <Helmet>
             <title>{DOCUMENT_TITLE}</title>
           </Helmet>

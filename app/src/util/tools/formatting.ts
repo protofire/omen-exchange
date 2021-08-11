@@ -1,5 +1,6 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber, formatUnits } from 'ethers/utils'
+import moment from 'moment-timezone'
 
 import { isDust } from './web3'
 
@@ -82,4 +83,17 @@ export const limitDecimalPlaces = (value: string, decimals: number) => {
       ? value.substr(0, value.indexOf('.')) + value.substr(value.indexOf('.'), decimals + 1)
       : value
   return Number.parseFloat(limitedString)
+}
+
+export const formatLockDate = (date: number) => {
+  return moment(date)
+    .tz('UTC')
+    .format(`MMMM Do, YYYY - HH:mm UTC`)
+}
+
+export const daysUntil = (timestamp: number): number => {
+  const current = moment()
+  const day = moment.unix(timestamp)
+
+  return Math.ceil(moment.duration(day.diff(current)).asDays())
 }
