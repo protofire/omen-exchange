@@ -4,8 +4,9 @@ import Modal from 'react-modal'
 import { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import { useAirdropService, useConnectedWeb3Context } from '../../../hooks'
-import { formatBigNumber } from '../../../util/tools'
+import { useConnectedWeb3Context } from '../../../contexts'
+import { useAirdropService } from '../../../hooks'
+import { bigNumberToString } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { IconClose, IconOmen } from '../../common/icons'
 import { ContentWrapper, ModalNavigation, ModalNavigationLeft } from '../common_styled'
@@ -22,14 +23,12 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export const ModalAirdrop = (props: Props) => {
   const { theme } = props
 
-  const { balances, cpk } = useConnectedWeb3Context()
+  const { balances, cpk, setTxState, txHash, txState } = useConnectedWeb3Context()
 
   const initialIsOpenState = localStorage.getItem('airdrop')
   const [isOpen, setIsOpen] = useState(!initialIsOpenState)
   const [checkAddress, setCheckAddress] = useState(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
-  const [txHash, setTxHash] = useState('')
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.waitingConfirmation)
   const [message, setMessage] = useState('')
 
   Modal.setAppElement('#root')
@@ -49,10 +48,10 @@ export const ModalAirdrop = (props: Props) => {
     }
 
     try {
-      setMessage(`Claim ${formatBigNumber(amount, STANDARD_DECIMALS)} OMN`)
+      setMessage(`Claim ${bigNumberToString(amount, STANDARD_DECIMALS)} OMN`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
-      await cpk.claimAirdrop({ account, setTxHash, setTxState })
+      await cpk.claimAirdrop({ account })
       await fetchClaimAmount()
       await balances.fetchBalances()
     } catch (e) {

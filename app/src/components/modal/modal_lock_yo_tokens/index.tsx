@@ -9,7 +9,7 @@ import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useAirdropService } from '../../../hooks'
 import { ERC20Service, OmenGuildService } from '../../../services'
 import { getToken, networkIds } from '../../../util/networks'
-import { daysUntil, divBN, formatBigNumber, formatLockDate } from '../../../util/tools'
+import { bigNumberToString, daysUntil, divBN, formatLockDate } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonStateful, ButtonStates } from '../../button/button_stateful'
@@ -18,7 +18,7 @@ import { TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInput, BigNumberInputReturn } from '../../common/form/big_number_input'
 import { IconArrowBack, IconClose, IconOmen } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
-import { ArrowIcon } from '../../market/common/new_value/img/ArrowIcon'
+import { ArrowIcon } from '../../market/common_sections/tables/new_value/img/ArrowIcon'
 import { ContentWrapper, ModalNavigation } from '../common_styled'
 import { AirdropCardWrapper } from '../modal_airdrop/airdrop_card'
 import { ModalCheckAddressWrapper } from '../modal_airdrop/check_address'
@@ -101,7 +101,7 @@ const PercentageText = styled.span<{ lightColor?: boolean }>`
 
 const ModalLockTokens = (props: Props) => {
   const { context, isOpen, setIsModalLockTokensOpen, theme } = props
-  const { account, balances, cpk, library: provider, networkId, relay } = context
+  const { account, balances, cpk, library: provider, networkId, relay, setTxState, txHash, txState } = context
 
   const { fetchBalances, omenBalance, xOmenBalance } = balances
 
@@ -117,9 +117,6 @@ const ModalLockTokens = (props: Props) => {
   const [unlockTimeLeft, setUnlockTimeLeft] = useState<number>(0)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [transactionMessage, setTransactionMessage] = useState<string>('')
-  const [txHash, setTxHash] = useState<any>('')
-  const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
-  const [txNetId, setTxNetId] = useState()
   const [omenAllowance, setOmenAllowance] = useState<BigNumber>(Zero)
   const [allowanceState, setAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
   const [checkAddress, setCheckAddress] = useState(false)
@@ -141,7 +138,7 @@ const ModalLockTokens = (props: Props) => {
 
   const getTokenLockInfo = async () => {
     try {
-      if (cpk?.address) {
+      if (cpk?.address && omen.omenGuildAddress) {
         let address
         if (context.networkId === networkIds.MAINNET && !context.relay) {
           address = await omen.tokenVault()
@@ -165,9 +162,10 @@ const ModalLockTokens = (props: Props) => {
       console.error(`Error while trying to fetch locked token info:  `, e.message)
     }
   }
+
   const fetchAllowance = async () => {
     try {
-      if (cpk) {
+      if (cpk && omen.omenGuildAddress) {
         let allowanceAddress
         if (context.networkId === networkIds.MAINNET && !context.relay) {
           allowanceAddress = await omen.tokenVault()
@@ -215,14 +213,12 @@ const ModalLockTokens = (props: Props) => {
 
     try {
       setTxState(TransactionStep.waitingConfirmation)
-      setTransactionMessage(`Lock ${formatBigNumber(amount, STANDARD_DECIMALS, 2)} OMN`)
+      setTransactionMessage(`Lock ${bigNumberToString(amount, STANDARD_DECIMALS, 2)} OMN`)
 
       setIsTransactionModalOpen(true)
 
-      const transaction = await cpk.lockTokens(amount, setTxState, setTxHash)
+      await cpk.lockTokens({ amount })
 
-      setTxNetId(provider.network.chainId)
-      setTxHash(transaction)
       await getTokenLockInfo()
       await fetchBalances()
       setDisplayLockAmount(Zero)
@@ -233,16 +229,15 @@ const ModalLockTokens = (props: Props) => {
       setTxState(TransactionStep.error)
     }
   }
+
   const unlockTokens = async () => {
     if (!cpk) return
     setTxState(TransactionStep.waitingConfirmation)
     try {
-      setTransactionMessage(`Unlock ${formatBigNumber(userLocked, STANDARD_DECIMALS, 2)} OMN`)
+      setTransactionMessage(`Unlock ${bigNumberToString(userLocked, STANDARD_DECIMALS, 2)} OMN`)
 
       setIsTransactionModalOpen(true)
-      const hash = await cpk.unlockTokens(userLocked)
-      setTxNetId(provider.network.chainId)
-      setTxHash(hash)
+      await cpk.unlockTokens({ amount: userLocked })
     } catch (e) {
       setTxState(TransactionStep.error)
     }
@@ -254,10 +249,10 @@ const ModalLockTokens = (props: Props) => {
     }
 
     try {
-      setTransactionMessage(`Claim ${formatBigNumber(amount, STANDARD_DECIMALS)} OMN`)
+      setTransactionMessage(`Claim ${bigNumberToString(amount, STANDARD_DECIMALS)} OMN`)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
-      await cpk.claimAirdrop({ account, setTxHash, setTxState })
+      await cpk.claimAirdrop({ account })
       await fetchClaimAmount()
       await balances.fetchBalances()
     } catch (e) {
@@ -298,7 +293,7 @@ const ModalLockTokens = (props: Props) => {
               <DataRow>
                 <LightDataItem>Wallet Balance</LightDataItem>
                 <DarkDataItem>
-                  {formatBigNumber(omenBalance, STANDARD_DECIMALS, 2)} OMN
+                  {bigNumberToString(omenBalance, STANDARD_DECIMALS, 2)} OMN
                   {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
                 </DarkDataItem>
               </DataRow>
@@ -306,7 +301,7 @@ const ModalLockTokens = (props: Props) => {
                 <DataRow>
                   <LightDataItem>Omen Account</LightDataItem>
                   <DarkDataItem>
-                    {formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 2)} OMN
+                    {bigNumberToString(xOmenBalance, STANDARD_DECIMALS, 2)} OMN
                     {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
                   </DarkDataItem>
                 </DataRow>
@@ -314,7 +309,7 @@ const ModalLockTokens = (props: Props) => {
               <DataRow>
                 <LightDataItem>Locked in Guild</LightDataItem>
                 <DarkDataItem>
-                  {formatBigNumber(userLocked, 18, 2)} OMN
+                  {bigNumberToString(userLocked, 18, 2)} OMN
                   {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
                 </DarkDataItem>
               </DataRow>
@@ -335,7 +330,7 @@ const ModalLockTokens = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setDisplayLockAmount(omenBalance)
-                  setAmountToDisplay(formatBigNumber(omenBalance, STANDARD_DECIMALS, 2))
+                  setAmountToDisplay(bigNumberToString(omenBalance, STANDARD_DECIMALS, 2))
                 }}
                 shouldDisplayMaxButton={true}
                 symbol={'OMN'}
@@ -394,11 +389,7 @@ const ModalLockTokens = (props: Props) => {
           />
           <ButtonSection>
             {!isLockAmountOpen && (
-              <ButtonsLockUnlock
-                buttonType={ButtonType.primaryAlternative}
-                disabled={unlockTimeLeft >= 0}
-                onClick={unlockTokens}
-              >
+              <ButtonsLockUnlock buttonType={ButtonType.primary} disabled={unlockTimeLeft >= 0} onClick={unlockTokens}>
                 Unlock Omen
               </ButtonsLockUnlock>
             )}
@@ -415,7 +406,7 @@ const ModalLockTokens = (props: Props) => {
               </ApproveButton>
             )}
             <ButtonsLockUnlock
-              buttonType={ButtonType.primaryAlternative}
+              buttonType={ButtonType.primary}
               disabled={
                 (displayLockAmount.isZero() ||
                   omenBalance.isZero() ||
@@ -446,7 +437,6 @@ const ModalLockTokens = (props: Props) => {
         icon={<IconOmen size={24} style={{ marginLeft: '10px' }} />}
         isOpen={isTransactionModalOpen}
         message={transactionMessage}
-        netId={txNetId}
         onClose={onClose}
         txHash={txHash}
         txState={txState}

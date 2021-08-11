@@ -102,7 +102,7 @@ export const ModalCheckAddress = (props: Props) => {
           <AddressField error={error} onChange={updateAddress} placeholder="Wallet Address" value={address} />
           {error && <ErrorMessage>Address has no available claim</ErrorMessage>}
         </RecipientWrapper>
-        <ClaimButton buttonType={ButtonType.primaryAlternative} disabled={amount.isZero()} onClick={submitClaim}>
+        <ClaimButton buttonType={ButtonType.primary} disabled={amount.isZero()} onClick={submitClaim}>
           Claim OMN
         </ClaimButton>
       </ContentWrapper>

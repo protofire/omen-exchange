@@ -3,8 +3,8 @@ import React, { HTMLAttributes } from 'react'
 import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
-import { useConnectedWeb3Context } from '../../../hooks'
-import { formatBigNumber } from '../../../util/tools'
+import { useConnectedWeb3Context } from '../../../contexts'
+import { bigNumberToString } from '../../../util/tools'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconOmen } from '../../common/icons'
@@ -108,12 +108,12 @@ const AirdropCard = (props: Props) => {
             <TopSectionDetails>
               <TopSectionHeading>Claimable Amount</TopSectionHeading>
               <TopSectionSubHeading green={!claimIsDisabled}>
-                {formatBigNumber(displayAmount, STANDARD_DECIMALS)} OMN
+                {bigNumberToString(displayAmount, STANDARD_DECIMALS)} OMN
               </TopSectionSubHeading>
             </TopSectionDetails>
           </TopSectionLeft>
           {displayButtons && (
-            <AirdropButton buttonType={ButtonType.primaryAlternative} disabled={claimIsDisabled} onClick={submitClaim}>
+            <AirdropButton buttonType={ButtonType.primary} disabled={claimIsDisabled} onClick={submitClaim}>
               Claim
             </AirdropButton>
           )}

@@ -9,12 +9,10 @@ import { airdropAbi } from './abi'
 class AirdropService {
   airdrops?: Contract[]
   provider: any
-  relay: boolean
 
-  constructor(networkId: number, provider: any, signerAddress: Maybe<string>, relay: boolean) {
+  constructor(networkId: number, provider: any, signerAddress: Maybe<string>) {
     const signer: Wallet = provider.getSigner()
     this.provider = provider
-    this.relay = relay
     const airdrops = getAirdrops(networkId)
     if (airdrops && airdrops.length && signerAddress) {
       this.airdrops = airdrops.map(airdrop => new ethers.Contract(airdrop, airdropAbi, provider).connect(signer))
@@ -33,6 +31,7 @@ class AirdropService {
             if (claim && claim.amount) {
               try {
                 const claimed = await airdrop.isClaimed(claim.index)
+
                 if (!claimed) {
                   return { ...claim, airdrop: airdrop.address, recipient }
                 }

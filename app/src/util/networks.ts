@@ -287,7 +287,7 @@ export const networks: { [K in NetworkId]: Network } = {
     targetSafeImplementation: '0x9C75A217AEA76663a9A37687606f099945eb0742',
     blockExplorer: 'blockscout',
     blockExplorerURL: 'https://blockscout.com/poa/xdai',
-    airdropAddress: ['0xbDf378FE53B89e2c3Cd638c66A9017E5b6822141', '0x868fc6343bfeDbED13935AFa7580Ba5BcC4b1409'],
+    airdropAddress: ['0x1aDB23a6a48C4849168753b019b2A7D77C2C95d2', '0x868fc6343bfeDbED13935AFa7580Ba5BcC4b1409'],
   },
 }
 
@@ -340,7 +340,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     addresses: {
       [networkIds.MAINNET]: '0xa7370f2a5AFAa987492cD0f5c0fE14191C70aaA5',
       [networkIds.XDAI]: '0xF52eAbb903831E2026a6A50Ce813fc871B5578f4',
-      [networkIds.RINKEBY]: '0x8c38a7dbaf522478d046af4a40c45a37a54af9bb',
+      [networkIds.RINKEBY]: '0x0a08eca47c56c305f4feb4fa062aecd5807bebb8',
     },
     order: 22,
   },

@@ -1,9 +1,8 @@
 import { BigNumber } from 'ethers/utils'
 import { useEffect, useState } from 'react'
 
+import { useConnectedWeb3Context } from '../contexts/connectedWeb3'
 import { AirdropService } from '../services'
-
-import { useConnectedWeb3Context } from './connectedWeb3'
 
 interface Status {
   active: boolean
@@ -16,9 +15,9 @@ interface AirdropServiceParams {
 }
 
 export const useAirdropService = (): AirdropServiceParams => {
-  const { account, library: provider, networkId, relay } = useConnectedWeb3Context()
+  const { account, library: provider, networkId } = useConnectedWeb3Context()
 
-  const [airdrop, setAirdrop] = useState<AirdropService>(new AirdropService(networkId, provider, account, relay))
+  const [airdrop, setAirdrop] = useState<AirdropService>(new AirdropService(networkId, provider, account))
   const [claimAmount, setClaimAmount] = useState(new BigNumber('0'))
 
   const fetchClaimAmount = async (status?: Status) => {
@@ -37,14 +36,14 @@ export const useAirdropService = (): AirdropServiceParams => {
       status.active = false
     }
     // eslint-disable-next-line
-  }, [airdrop, airdrop.relay, account, relay, networkId])
+  }, [airdrop, account, networkId])
 
   useEffect(() => {
     if (account) {
-      setAirdrop(new AirdropService(networkId, provider, account, relay))
+      setAirdrop(new AirdropService(networkId, provider, account))
     }
     // eslint-disable-next-line
-  }, [networkId, account, relay])
+  }, [networkId, account])
 
   return { airdrop, claimAmount, fetchClaimAmount }
 }
