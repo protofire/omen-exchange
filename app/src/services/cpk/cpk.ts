@@ -6,7 +6,7 @@ import { verifyProxyAddress } from '../../util/cpk'
 import { getLogger } from '../../util/logger'
 import { bridgeTokensList, getTargetSafeImplementation } from '../../util/networks'
 import { getBySafeTx, signaturesFormatted, waitABit, waitForBlockToSync } from '../../util/tools'
-import { MarketData, Question, Token } from '../../util/types'
+import { MarketData, Question, Token, TransactionStep } from '../../util/types'
 import { ConditionalTokenService } from '../conditional_token'
 import { MarketMakerService } from '../market_maker'
 import { MarketMakerFactoryService } from '../market_maker_factory'
@@ -23,12 +23,15 @@ import {
   approve,
   approveConditionalTokens,
   buy,
+  claimAirdrop,
   claimWinnings,
   createMarket,
   createQuestion,
   deposit,
   exec,
   fee,
+  genericApproval,
+  lockTokens,
   pipe,
   prepareCondition,
   redeemPosition,
@@ -38,12 +41,14 @@ import {
   sendFromxDaiToBridge,
   setup,
   submitAnswer,
+  unlockTokens,
   unwrap,
   upgradeProxy,
   validateOracle,
   withdraw,
   withdrawRealitioBalance,
   wrangleCreateMarketParams,
+  wrangleLockParams,
   wrangleRemoveFundsParams,
   wrangleSellParams,
   wrap,
@@ -129,9 +134,17 @@ interface SendFromxDaiParams {
   symbol?: string
 }
 
+interface LockTokensParams {
+  amount: BigNumber
+}
+
 interface TransactionResult {
   hash?: string
   safeTxHash?: string
+}
+
+interface CPKClaimAirdropParams {
+  account: string
 }
 
 export interface TxOptions {
@@ -395,6 +408,36 @@ class CPKService {
     }
   }
 
+  lockTokens = async (params: LockTokensParams) => {
+    try {
+      const { transaction } = await this.pipe(wrangleLockParams, genericApproval, deposit, lockTokens)(params)
+      return transaction
+    } catch (e) {
+      logger.error(`Error while trying to lock Omen tokens : `, e.message)
+      throw e
+    }
+  }
+
+  unlockTokens = async (params: LockTokensParams) => {
+    try {
+      const { transaction } = await this.pipe(wrangleLockParams, unlockTokens, withdraw)(params)
+      return transaction
+    } catch (e) {
+      logger.error(`Error while trying to unlock Omen tokens : `, e.message)
+      throw e
+    }
+  }
+
+  claimAirdrop = async (params: CPKClaimAirdropParams) => {
+    try {
+      const { transaction } = await this.pipe(claimAirdrop)(params)
+      return transaction
+    } catch (e) {
+      logger.error(`Error while trying to claim airdrop : `, e.message)
+      throw e
+    }
+  }
+
   /**
    * Direct transactions
    */
@@ -459,8 +502,11 @@ class CPKService {
       const contractInstance = await ovm.createOvmContractInstance(signer, ovmAddress)
 
       const txObject = await ovm.generateTransaction(params, contractInstance, submissionDeposit)
-
-      return this.waitForTransaction(txObject)
+      this.context?.setTxState(TransactionStep.transactionSubmitted)
+      this.context?.setTxHash(txObject.hash)
+      const transaction = await this.waitForTransaction(txObject)
+      this.context?.setTxState(TransactionStep.transactionConfirmed)
+      return transaction
     } catch (err) {
       logger.error('Error while requesting market verification via Kleros!', err.message)
       throw err
