@@ -60,7 +60,7 @@ const App: React.FC = (props: any) => {
             <ContentWrapper>
               <ConnectionModalNavigation>
                 <ModalTitle>
-                  <span>Settings</span>
+                  <span style={{ fontFamily: 'Roboto' }}>Settings</span>
                 </ModalTitle>
               </ConnectionModalNavigation>
               <SettingsModalWrapper>
