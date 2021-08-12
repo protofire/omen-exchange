@@ -278,12 +278,12 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           </TransactionDetailsCard>
         </div>
       </GridTransactionDetails>
+
       {showUpgrade && (
         <SetAllowance
           finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
           loading={RemoteData.is.asking(proxyIsUpToDate)}
           onUnlock={upgradeProxy}
-          style={{ marginTop: 20 }}
         />
       )}
 
