@@ -264,6 +264,7 @@ const ModalLockTokens = (props: Props) => {
     setIsTransactionModalOpen(false)
     setCheckAddress(false)
     setIsLockAmountOpen(false)
+    setDisplayLockAmount(Zero)
     props.onClose()
   }
 
@@ -330,7 +331,7 @@ const ModalLockTokens = (props: Props) => {
                 }
                 onClickMaxButton={() => {
                   setDisplayLockAmount(omenBalance)
-                  setAmountToDisplay(bigNumberToString(omenBalance, STANDARD_DECIMALS, 2))
+                  setAmountToDisplay(bigNumberToString(omenBalance, STANDARD_DECIMALS, 2, true))
                 }}
                 shouldDisplayMaxButton={true}
                 symbol={'OMN'}
@@ -410,7 +411,7 @@ const ModalLockTokens = (props: Props) => {
               disabled={
                 (displayLockAmount.isZero() ||
                   omenBalance.isZero() ||
-                  displayLockAmount.gte(omenBalance) ||
+                  displayLockAmount.gt(omenBalance) ||
                   displayLockAmount.gt(omenAllowance)) &&
                 isLockAmountOpen
               }
@@ -420,7 +421,7 @@ const ModalLockTokens = (props: Props) => {
             </ButtonsLockUnlock>
           </ButtonSection>
         </ContentWrapper>
-        {!isLockAmountOpen && (
+        {!isLockAmountOpen && relay && (
           <>
             <Divider />
             <AirdropCardWrapper

@@ -7,8 +7,7 @@ import { checkRpcStatus, getNetworkFromChain, isValidHttpUrl } from '../../../ut
 import { ButtonRound } from '../../button'
 import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
 import { TextfieldCSS } from '../../common/form/textfield'
-import { IconBlockscout, IconCloudflare, IconInfura } from '../../common/icons'
-import { IconXdai } from '../../common/icons/IconXdai'
+import { IconBlockscout, IconCloudflare, IconInfura, IconPokt, IconXdai } from '../../common/icons'
 import { ModalCard } from '../../modal/common_styled'
 
 const Column = styled.div`
@@ -147,7 +146,9 @@ export const SettingsViewContainer = () => {
       return {
         title: item.name,
         image:
-          item.name === 'Infura' ? (
+          item.name === 'Pokt' ? (
+            <IconPokt />
+          ) : item.name === 'Infura' ? (
             <IconInfura />
           ) : item.name === 'Cloudflare' ? (
             <IconCloudflare />

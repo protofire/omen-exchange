@@ -104,6 +104,10 @@ export const networks: { [K in NetworkId]: Network } = {
         name: 'Infura',
       },
       { rpcUrl: 'https://cloudflare-eth.com/', name: 'Cloudflare' },
+      {
+        rpcUrl: `https://eth-mainnet.gateway.pokt.network/v1/lb/61116f89a585a200351491db`,
+        name: 'Pokt',
+      },
     ],
     graphHttpUri: GRAPH_MAINNET_HTTP,
     graphWsUri: GRAPH_MAINNET_WS,
@@ -150,6 +154,10 @@ export const networks: { [K in NetworkId]: Network } = {
       {
         rpcUrl: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
         name: 'Infura',
+      },
+      {
+        rpcUrl: `https://eth-rinkeby.gateway.pokt.network/v1/lb/61116c81a585a20035149067`,
+        name: 'Pokt',
       },
     ],
     graphHttpUri: GRAPH_RINKEBY_HTTP,
@@ -249,6 +257,10 @@ export const networks: { [K in NetworkId]: Network } = {
         rpcUrl: 'https://dai.poa.network/',
         name: 'Blockscout',
       },
+      {
+        rpcUrl: 'https://poa-xdai.gateway.pokt.network/v1/lb/6111748ba585a2003514997b',
+        name: 'Pokt',
+      },
     ],
     graphHttpUri: GRAPH_XDAI_HTTP,
     graphWsUri: GRAPH_XDAI_WS,
@@ -286,7 +298,7 @@ export const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x9C75A217AEA76663a9A37687606f099945eb0742',
     blockExplorer: 'blockscout',
-    blockExplorerURL: 'https://blockscout.com/poa/xdai',
+    blockExplorerURL: 'https://blockscout.com/xdai/mainnet',
     airdropAddress: ['0x1aDB23a6a48C4849168753b019b2A7D77C2C95d2', '0x868fc6343bfeDbED13935AFa7580Ba5BcC4b1409'],
   },
 }
