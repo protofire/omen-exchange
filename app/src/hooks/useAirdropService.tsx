@@ -15,7 +15,7 @@ interface AirdropServiceParams {
 }
 
 export const useAirdropService = (): AirdropServiceParams => {
-  const { account, library: provider, networkId } = useConnectedWeb3Context()
+  const { account, library: provider, networkId, relay } = useConnectedWeb3Context()
 
   const [airdrop, setAirdrop] = useState<AirdropService>(new AirdropService(networkId, provider, account))
   const [claimAmount, setClaimAmount] = useState(new BigNumber('0'))
@@ -29,7 +29,7 @@ export const useAirdropService = (): AirdropServiceParams => {
 
   useEffect(() => {
     const status = { active: true }
-    if (account) {
+    if (account && relay) {
       fetchClaimAmount(status)
     }
     return () => {
@@ -39,11 +39,11 @@ export const useAirdropService = (): AirdropServiceParams => {
   }, [airdrop, account, networkId])
 
   useEffect(() => {
-    if (account) {
+    if (account && relay) {
       setAirdrop(new AirdropService(networkId, provider, account))
     }
     // eslint-disable-next-line
-  }, [networkId, account])
+  }, [networkId, account, relay])
 
   return { airdrop, claimAmount, fetchClaimAmount }
 }
