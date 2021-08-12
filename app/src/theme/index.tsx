@@ -1,7 +1,7 @@
 import React from 'react'
 import styled, { ThemeProvider as StyledThemeProvider } from 'styled-components'
 
-import { Colors } from './types'
+import { Colors, TextProps } from './types'
 
 export function colors(darkMode: boolean): Colors {
   return {
@@ -387,6 +387,7 @@ function themeAggregator(darkMode: boolean) {
     ...colors(darkMode),
   }
 }
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   //this is temporary until we determine to use dark theme
   const darkMode = false
@@ -394,26 +395,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return <StyledThemeProvider theme={themeAggregator(darkMode)}>{children}</StyledThemeProvider>
 }
 
-interface TextProps {
-  color: keyof Colors
-  fontWeight: number
-  fontSize: string
-}
-
-// const TextWrapper = styled.div<TextProps>`
-//   color: ${({ color, theme }) => (theme as any)[color]};
-//   font-weight: ${({ fontWeight, theme }) => (theme as any)[fontWeight]};
-//   font-size: ${({ fontSize, theme }) => (theme as any)[fontSize]};
-//   font-family: Roboto;
-//   letter-spacing: 0.2px;
-// `
-
 const TextWrapper = styled.div<TextProps>`
   color: ${({ color, theme }) => (theme as any)[color]};
   font-family: Roboto;
-  letter-spacing: 0.2px;
+  font-size: ${props => props.fontSize};
+  font-weight: ${props => props.fontWeight};
+  letter-spacing: ${props => (props.letterSpacing ? props.letterSpacing : '0.2px')};
+  line-height: ${props => props.lineHeight};
 `
-// color: ${({ color, theme }) => (theme as any)[color]};
 
 export const TYPE = {
   heading1(props: any) {
