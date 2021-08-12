@@ -25,9 +25,14 @@ export interface Colors {
 }
 
 export interface TextProps {
+  display: string
   color: keyof Colors
   fontWeight: number
   fontSize: string
   letterSpacing: string
   lineHeight: string
+  margin: string
+  marginBottom: string
+  marginTop: string
+  marginLeft: string
 }

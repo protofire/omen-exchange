@@ -4,11 +4,12 @@ import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { useAirdropService } from '../../../hooks'
+import { TYPE } from '../../../theme'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
-import { FormLabel, Textfield } from '../../common'
+import { Textfield } from '../../common'
 import { IconArrowBack, IconClose } from '../../common/icons'
-import { ContentWrapper, ModalNavigation, ModalNavigationLeft, ModalTitle } from '../common_styled'
+import { ContentWrapper, ModalNavigation, ModalNavigationLeft } from '../common_styled'
 
 import { AirdropCardWrapper } from './airdrop_card'
 
@@ -21,11 +22,6 @@ const RecipientWrapper = styled.div`
   margin: 24px 0px;
 `
 
-const RecipientLabel = styled(FormLabel)`
-  display: inline-block;
-  margin-bottom: 12px;
-`
-
 const AddressField = styled(Textfield)<{ error: boolean }>`
   border-color: ${props => (props.error ? props.theme.red : props.theme.border1)};
   &:hover {
@@ -36,14 +32,6 @@ const AddressField = styled(Textfield)<{ error: boolean }>`
   &:focus {
     border-color: ${props => (props.error ? props.theme.red : props.theme.border3)};
   }
-`
-
-const ErrorMessage = styled.div`
-  color: ${props => props.theme.red};
-  margin-top: 12px;
-  font-size: ${props => props.theme.fonts.defaultSize};
-  line-height: 16px;
-  letter-spacing: 0.2px;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -92,15 +80,23 @@ export const ModalCheckAddress = (props: Props) => {
         <ModalNavigation>
           <ModalNavigationLeft>
             <IconArrowBack hoverEffect={true} onClick={onBack ? onBack : onClose} />
-            <ModalTitle style={{ marginLeft: '16px' }}>Check Address</ModalTitle>
+            <TYPE.heading3 color={'text1'} margin={'0'} style={{ marginLeft: '16px', marginTop: '2px' }}>
+              Check Address
+            </TYPE.heading3>
           </ModalNavigationLeft>
           <IconClose hoverEffect={true} onClick={onClose} />
         </ModalNavigation>
         <AirdropCardWrapper displayAmount={amount} displayButtons={false} />
         <RecipientWrapper>
-          <RecipientLabel>Recipient</RecipientLabel>
+          <TYPE.bodyRegular color={'text1'} display={'inline-block'} lineHeight={'1.2'} marginBottom={'12px'}>
+            Recipient
+          </TYPE.bodyRegular>
           <AddressField error={error} onChange={updateAddress} placeholder="Wallet Address" value={address} />
-          {error && <ErrorMessage>Address has no available claim</ErrorMessage>}
+          {error && (
+            <TYPE.bodyRegular color={'red'} marginTop={'12px'}>
+              Address has no available claim
+            </TYPE.bodyRegular>
+          )}
         </RecipientWrapper>
         <ClaimButton buttonType={ButtonType.primary} disabled={amount.isZero()} onClick={submitClaim}>
           Claim OMN

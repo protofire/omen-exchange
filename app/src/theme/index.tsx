@@ -402,6 +402,11 @@ const TextWrapper = styled.div<TextProps>`
   font-weight: ${props => props.fontWeight};
   letter-spacing: ${props => (props.letterSpacing ? props.letterSpacing : '0.2px')};
   line-height: ${props => props.lineHeight};
+  ${props => props.margin && `margin: ${props.margin}`};
+  ${props => props.marginBottom && `margin-bottom: ${props.marginBottom}`};
+  ${props => props.marginLeft && `margin-left: ${props.marginLeft}`};
+  ${props => props.marginTop && `margin-top: ${props.marginTop}`};
+  ${props => props.display && `display: ${props.display}`};
 `
 
 export const TYPE = {
