@@ -89,7 +89,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   const debugNetworkId = url.searchParams.get('debugNetworkId')
 
   useEffect(() => {
-    if (networkId) {
+    if (networkId && !error) {
       const enableRelay = context.connectorName !== 'Safe' || debugAddress !== ''
 
       checkRpcStatus(
