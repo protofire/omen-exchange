@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 
 import { IPFS_GATEWAY } from '../common/constants'
+import { ConnectedWeb3Context } from '../contexts'
 import {
   ConditionalTokenService,
   DxTCRService,
@@ -11,8 +12,6 @@ import {
   RealitioService,
 } from '../services'
 import { getContractAddress } from '../util/networks'
-
-import { ConnectedWeb3Context } from './connectedWeb3'
 
 export const useContracts = (context: ConnectedWeb3Context) => {
   const { account, library: provider, networkId } = context
@@ -38,6 +37,10 @@ export const useContracts = (context: ConnectedWeb3Context) => {
 
   const oracleAddress = getContractAddress(networkId, 'oracle')
   const oracle = useMemo(() => new OracleService(oracleAddress, provider, account), [oracleAddress, provider, account])
+  const buildOracle = useMemo(() => (address: string) => new OracleService(address, provider, account), [
+    provider,
+    account,
+  ])
 
   const klerosBadgeAddress = getContractAddress(networkId, 'klerosBadge')
   const klerosTokenViewAddress = getContractAddress(networkId, 'klerosTokenView')
@@ -72,10 +75,11 @@ export const useContracts = (context: ConnectedWeb3Context) => {
       realitio,
       oracle,
       buildMarketMaker,
+      buildOracle,
       kleros,
       dxTCR,
     }),
-    [conditionalTokens, marketMakerFactory, realitio, oracle, kleros, buildMarketMaker, dxTCR],
+    [conditionalTokens, marketMakerFactory, realitio, oracle, kleros, buildMarketMaker, buildOracle, dxTCR],
   )
 }
 

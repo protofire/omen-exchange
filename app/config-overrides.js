@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const GitRevisionPlugin = require('git-revision-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const RemovePlugin = require('remove-files-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const WorkboxWebpackPlugin = require('workbox-webpack-plugin')
 
@@ -28,6 +29,17 @@ module.exports = (config, env) => {
       chunkFilename: 'static/css/[name].chunk.css',
     }),
   )
+  config.plugins.push(
+    new RemovePlugin({
+      before: {
+        include: [
+          './node_modules/ethers/dist/ethers.min.js',
+          './node_modules/react-datepicker/dist/react-datepicker.min.js',
+        ],
+      },
+    }),
+  )
+
   config.module.rules[2].oneOf.find(rule => rule.loader === require.resolve('file-loader')).options.name =
     'static/media/[name].[ext]'
   config.module.rules[2].oneOf.find(rule => rule.loader === require.resolve('url-loader')).options.name =

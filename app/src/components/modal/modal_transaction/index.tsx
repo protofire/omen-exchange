@@ -4,7 +4,7 @@ import { TwitterShareButton } from 'react-share'
 import styled, { withTheme } from 'styled-components'
 
 import { CONFIRMATION_COUNT } from '../../../common/constants'
-import { useConnectedWeb3Context } from '../../../hooks'
+import { useConnectedWeb3Context } from '../../../contexts'
 import { getBlockExplorer, getTxHashBlockExplorerURL } from '../../../util/networks'
 import { isValidHttpUrl } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'

@@ -4,16 +4,22 @@ import { matchPath } from 'react-router-dom'
 import ReactTooltip from 'react-tooltip'
 import styled, { css } from 'styled-components'
 
-import { Network } from '../..'
 import { Logo, STANDARD_DECIMALS } from '../../../../common/constants'
-import { useConnectedWeb3Context } from '../../../../hooks'
+import { useConnectedWeb3Context } from '../../../../contexts'
 import { networkIds } from '../../../../util/networks'
-import { formatBigNumber } from '../../../../util/tools'
+import { bigNumberToString } from '../../../../util/tools'
 import { ExchangeType } from '../../../../util/types'
-import { ButtonCircle, ButtonConnectWallet, ButtonRound } from '../../../button'
-import { ModalConnectWalletWrapper, ModalDepositWithdrawWrapper, ModalYourConnectionWrapper } from '../../../modal'
+import { Button, ButtonCircle, ButtonRound } from '../../../button'
+import { ButtonType } from '../../../button/button_styling_types'
+import {
+  ModalConnectWalletWrapper,
+  ModalDepositWithdrawWrapper,
+  ModalLockYoTokens,
+  ModalYourConnectionWrapper,
+} from '../../../modal'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../form/dropdown'
 import { IconAdd, IconClose, IconOmen } from '../../icons'
+import { Network } from '../../network'
 
 export const HeaderWrapper = styled.div`
   align-items: center;
@@ -82,8 +88,8 @@ const ButtonCSS = css`
   }
 `
 
-const ButtonConnectWalletStyled = styled(ButtonConnectWallet)`
-  ${ButtonCSS}
+const ButtonConnectWalletStyled = styled(Button)`
+  margin-left: 12px;
 `
 
 export const ButtonSettings = styled(ButtonRound)`
@@ -182,6 +188,7 @@ const OmenIconWrapper = styled.div`
 
 const HeaderContainer: React.FC = (props: any) => {
   const context = useConnectedWeb3Context()
+
   const { relay, toggleRelay } = context
   const { account, active, connectorName, error, networkId } = context.rawWeb3Context
 
@@ -189,6 +196,7 @@ const HeaderContainer: React.FC = (props: any) => {
   const [isConnectWalletModalOpen, setConnectWalletModalState] = useState(false)
   const [isYourConnectionModalOpen, setYourConnectionModalState] = useState(false)
   const [isDepositWithdrawModalOpen, setDepositWithdrawModalState] = useState(false)
+  const [isModalLockTokensOpen, setModalLockTokensState] = useState<boolean>(false)
   const [depositWithdrawType, setDepositWithdrawType] = useState<ExchangeType>(ExchangeType.deposit)
   const [marketPage, setMarketPage] = useState(true)
 
@@ -315,12 +323,11 @@ const HeaderContainer: React.FC = (props: any) => {
               placeholder={networkPlacholder}
             />
           )}
-
           {account && (
-            <HeaderButton style={{ display: 'none' }}>
+            <HeaderButton onClick={() => setModalLockTokensState(!isModalLockTokensOpen)}>
               {relay
-                ? `${formatBigNumber(xOmenBalance, STANDARD_DECIMALS, 0)}`
-                : `${formatBigNumber(omenBalance, STANDARD_DECIMALS, 0)}`}
+                ? `${bigNumberToString(xOmenBalance, STANDARD_DECIMALS, 0)}`
+                : `${bigNumberToString(omenBalance, STANDARD_DECIMALS, 0)}`}
               <OmenIconWrapper>
                 <IconOmen size={24} />
               </OmenIconWrapper>
@@ -329,12 +336,14 @@ const HeaderContainer: React.FC = (props: any) => {
 
           {!account && (
             <ButtonConnectWalletStyled
-              disabled={disableConnectButton || !hasRouter}
-              modalState={isConnectWalletModalOpen}
+              buttonType={ButtonType.primary}
+              disabled={disableConnectButton || !hasRouter || isConnectWalletModalOpen}
               onClick={() => {
                 setConnectWalletModalState(true)
               }}
-            />
+            >
+              {isConnectWalletModalOpen ? 'Connecting' : 'Connect'}
+            </ButtonConnectWalletStyled>
           )}
           {disableConnectButton && <ReactTooltip id="connectButtonTooltip" />}
 
@@ -358,6 +367,12 @@ const HeaderContainer: React.FC = (props: any) => {
             </HeaderButton>
           )}
         </ContentsRight>
+        <ModalLockYoTokens
+          context={context}
+          isOpen={isModalLockTokensOpen}
+          onClose={() => setModalLockTokensState(false)}
+          setIsModalLockTokensOpen={setModalLockTokensState}
+        />
         <ModalYourConnectionWrapper
           arrayOfClaimableBalances={arrayOfClaimableTokenBalances}
           changeWallet={() => {

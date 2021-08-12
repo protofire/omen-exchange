@@ -7,7 +7,7 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import { Moment } from 'moment'
 
 import { REALITIO_TIMEOUT, SINGLE_SELECT_TEMPLATE_ID, UINT_TEMPLATE_ID } from '../common/constants'
-import { Outcome } from '../components/market/sections/market_create/steps/outcomes'
+import { Outcome } from '../components/market/market_create/steps/outcomes'
 import { getLogger } from '../util/logger'
 import { getEarliestBlockToCheck, getRealitioTimeout, networkIds } from '../util/networks'
 import { Question, QuestionLog, TransactionStep } from '../util/types'
