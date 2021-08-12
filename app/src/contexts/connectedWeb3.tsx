@@ -89,7 +89,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   const debugNetworkId = url.searchParams.get('debugNetworkId')
 
   useEffect(() => {
-    if (networkId) {
+    if (networkId && !error) {
       const enableRelay = context.connectorName !== 'Safe' || debugAddress !== ''
 
       checkRpcStatus(
@@ -136,7 +136,9 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
         context.setConnector('Safe')
       }
     } else if (connector && connector in connectors) {
-      context.setConnector(connector)
+      if (context.connectorName !== connector) {
+        context.setConnector(connector)
+      }
     } else {
       context.setConnector('Infura')
     }
