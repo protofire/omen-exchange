@@ -298,7 +298,7 @@ export const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x9C75A217AEA76663a9A37687606f099945eb0742',
     blockExplorer: 'blockscout',
-    blockExplorerURL: 'https://blockscout.com/poa/xdai',
+    blockExplorerURL: 'https://blockscout.com/xdai/mainnet',
     airdropAddress: ['0x1aDB23a6a48C4849168753b019b2A7D77C2C95d2', '0x868fc6343bfeDbED13935AFa7580Ba5BcC4b1409'],
   },
 }
