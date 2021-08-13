@@ -1,7 +1,7 @@
 import React from 'react'
 import styled, { ThemeProvider as StyledThemeProvider } from 'styled-components'
 
-import { Colors, TextProps } from './types'
+import { Colors } from './types'
 
 export function colors(darkMode: boolean): Colors {
   return {
@@ -395,7 +395,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return <StyledThemeProvider theme={themeAggregator(darkMode)}>{children}</StyledThemeProvider>
 }
 
-const TextWrapper = styled.div<TextProps>`
+const TextWrapper = styled.div<{ color: keyof Colors; letterSpacing: string }>`
   color: ${({ color, theme }) => (theme as any)[color]};
   font-family: Roboto;
   letter-spacing: ${props => (props.letterSpacing ? props.letterSpacing : '0.2px')};
@@ -403,19 +403,55 @@ const TextWrapper = styled.div<TextProps>`
 
 export const TYPE = {
   heading1(props: any) {
-    return <TextWrapper fontSize={'22px'} fontWeight={500} letterSpacing={'0.8px'} lineHeight={'26px'} {...props} />
+    const { style, ...restProps } = props
+    return (
+      <TextWrapper
+        {...restProps}
+        style={{
+          fontSize: '22px',
+          fontWeight: 500,
+          letterSpacing: '0.8px',
+          lineHeight: '26px',
+          ...restProps,
+          ...style,
+        }}
+      />
+    )
   },
   heading2(props: any) {
-    return <TextWrapper fontSize={'18px'} fontWeight={400} lineHeight={'21px'} {...props} />
+    const { style, ...restProps } = props
+    return (
+      <TextWrapper
+        {...restProps}
+        style={{ fontSize: '18px', fontWeight: 400, lineHeight: '21px', ...restProps, ...style }}
+      />
+    )
   },
   heading3(props: any) {
-    return <TextWrapper fontSize={'16px'} fontWeight={500} lineHeight={'19px'} {...props} />
+    const { style, ...restProps } = props
+    return (
+      <TextWrapper
+        {...restProps}
+        style={{ fontSize: '16px', fontWeight: 500, lineHeight: '19px', ...restProps, ...style }}
+      />
+    )
   },
   bodyMedium(props: any) {
-    const { style, ...rest } = props
-    return <TextWrapper {...rest} style={{ fontSize: 14, fontWeight: 500, lineHeight: '18px', ...style }} />
+    const { style, ...restProps } = props
+    return (
+      <TextWrapper
+        {...restProps}
+        style={{ fontSize: '14px', fontWeight: 500, lineHeight: '18px', ...restProps, ...style }}
+      />
+    )
   },
   bodyRegular(props: any) {
-    return <TextWrapper fontSize={'14px'} fontWeight={400} lineHeight={'18px'} {...props} />
+    const { style, ...restProps } = props
+    return (
+      <TextWrapper
+        {...restProps}
+        style={{ fontSize: '14px', fontWeight: 400, lineHeight: '18px', ...restProps, ...style }}
+      />
+    )
   },
 }
