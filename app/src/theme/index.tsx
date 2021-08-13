@@ -398,15 +398,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 const TextWrapper = styled.div<TextProps>`
   color: ${({ color, theme }) => (theme as any)[color]};
   font-family: Roboto;
-  font-size: ${props => props.fontSize};
-  font-weight: ${props => props.fontWeight};
   letter-spacing: ${props => (props.letterSpacing ? props.letterSpacing : '0.2px')};
-  line-height: ${props => props.lineHeight};
-  margin: ${props => props.margin};
-  margin-left: ${props => props.marginLeft};
-  margin-top: ${props => props.marginTop};
-  margin-bottom: ${props => props.marginBottom};
-  display: ${props => props.display};
 `
 
 export const TYPE = {
@@ -420,7 +412,8 @@ export const TYPE = {
     return <TextWrapper fontSize={'16px'} fontWeight={500} lineHeight={'19px'} {...props} />
   },
   bodyMedium(props: any) {
-    return <TextWrapper fontSize={'14px'} fontWeight={500} lineHeight={'18px'} {...props} />
+    const { style, ...rest } = props
+    return <TextWrapper {...rest} style={{ fontSize: 14, fontWeight: 500, lineHeight: '18px', ...style }} />
   },
   bodyRegular(props: any) {
     return <TextWrapper fontSize={'14px'} fontWeight={400} lineHeight={'18px'} {...props} />
