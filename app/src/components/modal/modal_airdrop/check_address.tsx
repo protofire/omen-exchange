@@ -80,7 +80,7 @@ export const ModalCheckAddress = (props: Props) => {
         <ModalNavigation>
           <ModalNavigationLeft>
             <IconArrowBack hoverEffect={true} onClick={onBack ? onBack : onClose} />
-            <TYPE.heading3 color={'text1'} margin={'0'} style={{ marginLeft: '16px', marginTop: '2px' }}>
+            <TYPE.heading3 color={'text1'} margin={'0'} marginLeft={'16px'} marginTop={'2px'}>
               Check Address
             </TYPE.heading3>
           </ModalNavigationLeft>
