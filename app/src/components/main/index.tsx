@@ -4,6 +4,7 @@ import { Redirect, Route, HashRouter as Router, Switch } from 'react-router-dom'
 import { useWeb3Context } from 'web3-react'
 
 import { DOCUMENT_TITLE } from '../../common/constants'
+import { GuildContainer } from '../../pages/guild_container'
 import { MarketHomeContainer } from '../../pages/market_sections/market_home_container'
 import { MarketWizardCreatorContainer } from '../../pages/market_sections/market_wizard_creator_container'
 import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
@@ -36,6 +37,7 @@ export const Main: React.FC = () => {
                   <Redirect to="/liquidity" />
                 </Route>
                 <Route component={SettingsViewContainer} exact path="/settings" />
+                <Route component={GuildContainer} exact path="/guild" />
                 <Route
                   component={MarketHomeContainer}
                   path={['/24h-volume', '/volume', '/newest', '/ending', '/liquidity']}

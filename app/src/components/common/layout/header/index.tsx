@@ -166,8 +166,6 @@ const HeaderDropdown = styled(Dropdown)`
 `
 
 const MarketAndGovernanceNav = styled.div<{ disabled?: boolean }>`
-  display: none;
-  background-color: ${props => (props.disabled ? props => props.theme.buttonSecondary.backgroundColor : 'transparent')};
   ${props => (props.disabled ? 'pointer-events:none;' : '')};
   border-radius: 32px;
   color: ${props => (!props.disabled ? props.theme.colors.clickable : props.theme.colors.primary)};
@@ -198,7 +196,6 @@ const HeaderContainer: React.FC = (props: any) => {
   const [isDepositWithdrawModalOpen, setDepositWithdrawModalState] = useState(false)
   const [isModalLockTokensOpen, setModalLockTokensState] = useState<boolean>(false)
   const [depositWithdrawType, setDepositWithdrawType] = useState<ExchangeType>(ExchangeType.deposit)
-  const [marketPage, setMarketPage] = useState(true)
 
   const hasRouter = props.history !== undefined
   const disableConnectButton = isConnectWalletModalOpen
@@ -265,6 +262,7 @@ const HeaderContainer: React.FC = (props: any) => {
     onClick: () => history && history.push('/'),
   }
 
+  const isMarketPage = history.location.pathname === '/liquidity'
   return (
     <HeaderWrapper {...restProps}>
       <HeaderInner>
@@ -273,21 +271,14 @@ const HeaderContainer: React.FC = (props: any) => {
             <Logo />
           </LogoWrapper>
           <MarketAndGovernanceNav
-            disabled={marketPage}
-            onClick={() => {
-              setMarketPage(!marketPage)
-            }}
+            disabled={isMarketPage}
+            onClick={() => history && history.push('/')}
             style={{ marginLeft: '48px' }}
           >
             Markets
           </MarketAndGovernanceNav>
-          <MarketAndGovernanceNav
-            disabled={!marketPage}
-            onClick={() => {
-              setMarketPage(!marketPage)
-            }}
-          >
-            Governance
+          <MarketAndGovernanceNav disabled={!isMarketPage} onClick={() => history && history.push('/guild')}>
+            Guild
           </MarketAndGovernanceNav>
         </ContentsLeft>
         <ContentsRight>
