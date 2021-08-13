@@ -395,10 +395,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return <StyledThemeProvider theme={themeAggregator(darkMode)}>{children}</StyledThemeProvider>
 }
 
-const TextWrapper = styled.div<{ color: keyof Colors; letterSpacing: string }>`
+const TextWrapper = styled.div<{ color: keyof Colors }>`
   color: ${({ color, theme }) => (theme as any)[color]};
   font-family: Roboto;
-  letter-spacing: ${props => (props.letterSpacing ? props.letterSpacing : '0.2px')};
 `
 
 export const TYPE = {
@@ -423,7 +422,14 @@ export const TYPE = {
     return (
       <TextWrapper
         {...restProps}
-        style={{ fontSize: '18px', fontWeight: 400, lineHeight: '21px', ...restProps, ...style }}
+        style={{
+          fontSize: '18px',
+          fontWeight: 400,
+          letterSpacing: '0.2px',
+          lineHeight: '21px',
+          ...restProps,
+          ...style,
+        }}
       />
     )
   },
@@ -432,7 +438,14 @@ export const TYPE = {
     return (
       <TextWrapper
         {...restProps}
-        style={{ fontSize: '16px', fontWeight: 500, lineHeight: '19px', ...restProps, ...style }}
+        style={{
+          fontSize: '16px',
+          fontWeight: 500,
+          letterSpacing: '0.2px',
+          lineHeight: '19px',
+          ...restProps,
+          ...style,
+        }}
       />
     )
   },
@@ -441,7 +454,14 @@ export const TYPE = {
     return (
       <TextWrapper
         {...restProps}
-        style={{ fontSize: '14px', fontWeight: 500, lineHeight: '18px', ...restProps, ...style }}
+        style={{
+          fontSize: '14px',
+          fontWeight: 500,
+          letterSpacing: '0.2px',
+          lineHeight: '18px',
+          ...restProps,
+          ...style,
+        }}
       />
     )
   },
@@ -450,7 +470,14 @@ export const TYPE = {
     return (
       <TextWrapper
         {...restProps}
-        style={{ fontSize: '14px', fontWeight: 400, lineHeight: '18px', ...restProps, ...style }}
+        style={{
+          fontSize: '14px',
+          fontWeight: 400,
+          letterSpacing: '0.2px',
+          lineHeight: '18px',
+          ...restProps,
+          ...style,
+        }}
       />
     )
   },
