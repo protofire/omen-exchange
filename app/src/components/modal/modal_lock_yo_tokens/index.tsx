@@ -322,8 +322,8 @@ const ModalLockTokens = (props: Props) => {
 
             <DataRow style={{ marginTop: !isLockAmountOpen ? '12px' : '' }}>
               <TYPE.bodyRegular color={'text2'}>{isLockAmountOpen && 'Your '}Vote Weight</TYPE.bodyRegular>
-              <TYPE.bodyMedium align-items={'center'} display={'flex'}>
-                <TYPE.bodyMedium color={'text2'} lightColor={!displayLockAmount.isZero()}>
+              <TYPE.bodyMedium align-items={'center'} color={'text1'} display={'flex'}>
+                <TYPE.bodyMedium color={!displayLockAmount.isZero() && 'text2'}>
                   {!totalLocked.isZero() && !userLocked.isZero()
                     ? (divBN(userLocked, totalLocked) * 100).toFixed(2)
                     : '0.00'}
