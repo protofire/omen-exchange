@@ -144,9 +144,9 @@ interface CPKDepositAndStakeParams {
 }
 
 interface CPKStakePoolTokensParams {
-  amount: BigNumber
   campaignAddress: string
-  marketMakerAddress: string
+  marketMaker: MarketMakerService
+  amountToStake: BigNumber
 }
 
 interface CPKUnstakePoolTokensParams {

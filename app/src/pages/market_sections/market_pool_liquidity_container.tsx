@@ -488,9 +488,9 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
       setIsTransactionModalOpen(true)
 
       await cpk.stakePoolTokens({
-        amount: fundingBalance,
+        amountToStake: fundingBalance,
         campaignAddress: liquidityMiningCampaign.id,
-        marketMakerAddress,
+        marketMaker,
       })
 
       await fetchGraphMarketMakerData()
