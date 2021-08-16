@@ -227,14 +227,14 @@ export const AdditionalMarketData: React.FC<Props> = props => {
             customColor={'#4B948F'}
             data-arrow-color="transparent"
             data-for="marketData"
-            data-tip={'Current liquidity mining rewards APY.'}
+            data-tip={'Current liquidity mining rewards APR.'}
             // Update if we change verified data section
             hasMarginRight={context.networkId === networkIds.XDAI}
             isSuccess={true}
           >
             <IconApy />
             <AdditionalMarketDataSectionTitle isSuccess={rewardApr > 0}>
-              {formatNumber(rewardApr.toString())}% APY
+              {formatNumber(rewardApr.toString())}% APR
             </AdditionalMarketDataSectionTitle>
           </AdditionalMarketDataSectionWrapper>
         )}
