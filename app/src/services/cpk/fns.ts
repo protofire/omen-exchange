@@ -1110,7 +1110,7 @@ export const wrangleRemoveFundsParams = async (params: WrangleRemoveFundsParams)
   const { amountToMerge, earnings, marketMaker, networkId } = params
   const collateralAddress = await marketMaker.getCollateralToken()
   const collateral = getTokenFromAddress(networkId, collateralAddress)
-  const amount = amountToMerge.add(earnings)
+  const amount = amountToMerge.add(earnings || new BigNumber(0))
 
   return { ...params, amount, collateral }
 }

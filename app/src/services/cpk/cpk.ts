@@ -157,12 +157,13 @@ interface CPKUnstakePoolTokensParams {
 interface CPKUnstakeClaimAndWithdrawParams {
   amountToMerge: BigNumber
   campaignAddress: string
-  collateralAddress: string
+  collateral: Token
   conditionId: string
   conditionalTokens: ConditionalTokenService
   marketMaker: MarketMakerService
   outcomesCount: number
   sharesToBurn: BigNumber
+  amount: BigNumber
 }
 
 interface TransactionResult {
@@ -594,6 +595,7 @@ class CPKService {
         fee,
         claim,
         unstake,
+        wrangleRemoveFundsParams,
         removeFunds,
         unwrap,
         withdraw,

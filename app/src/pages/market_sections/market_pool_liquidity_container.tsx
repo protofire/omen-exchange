@@ -383,7 +383,6 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
       const fundsAmount = bigNumberToString(depositedTokensTotal, collateral.decimals)
       setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
 
-      const collateralAddress = await marketMaker.getCollateralToken()
       const conditionId = await marketMaker.getConditionId()
 
       setTxState(TransactionStep.waitingConfirmation)
@@ -393,12 +392,13 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
       await cpk.unstakeClaimAndWithdraw({
         amountToMerge: depositedTokens,
         campaignAddress: liquidityMiningCampaign.id,
-        collateralAddress,
+        collateral,
         conditionId,
         conditionalTokens,
         marketMaker,
         outcomesCount: balances.length,
         sharesToBurn: amountToRemove || Zero,
+        amount: amountToRemove || Zero,
       })
 
       await fetchGraphMarketMakerData()
