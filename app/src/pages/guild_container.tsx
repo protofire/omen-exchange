@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { Button } from '../components/button'
 import { ButtonType } from '../components/button/button_styling_types'
+import { MarketCard } from '../components/market/market_card'
 // import { useConnectedWeb3Context } from '../contexts/connectedWeb3'
 // import { useMarkets } from '../hooks/market_data/useMarkets'
 // import { RemoteData } from '../util/remote_data'
@@ -13,32 +14,47 @@ type Props = {
   marketMakerData: MarketMakerData
 }
 
-const HeadingWrapper = styled.div`
+const GuildPageWrapper = styled.div`
+  width: 100%;
+  @media (max-width: ${props => props.theme.themeBreakPoints.xxl}) {
+    padding: 0 14px;
+  }
+`
+
+const ProposalHeadingWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
   align-items: center;
+  flex-wrap: wrap;
 `
 
 const ProposalTitle = styled.div`
-  font-family: Roboto;
   font-size: 22px;
-  font-style: normal;
   font-weight: 500;
   line-height: 26px;
-  text-align: left;
   margin-bottom: 8px;
 `
 
 const ProposalSubtitle = styled.div`
-  font-family: Roboto;
   font-size: 14px;
-  font-style: normal;
   font-weight: 400;
   line-height: 18px;
-  letter-spacing: 0.20000000298023224px;
-  text-align: left;
   color: #86909e;
+`
+
+const ProposalButton = styled(Button)`
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    margin-top: 24px;
+  }
+`
+
+const MarketCardsWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  width: 100%;
+  margin: 20px 0px;
 `
 
 // eslint-disable-next-line
@@ -74,15 +90,20 @@ const GuildContainer: React.FC<Props> = props => {
   // })
 
   return (
-    <>
-      <HeadingWrapper>
+    <GuildPageWrapper>
+      <ProposalHeadingWrapper>
         <div>
           <ProposalTitle>Proposed Liquidity Rewards</ProposalTitle>
           <ProposalSubtitle>Reward liquidity providers of popular omen markets with 500 OMN tokens</ProposalSubtitle>
         </div>
-        <Button buttonType={ButtonType.primary}>Propose Liq. Rewards</Button>
-      </HeadingWrapper>
-    </>
+        <ProposalButton buttonType={ButtonType.primary}>Propose Liq. Rewards</ProposalButton>
+      </ProposalHeadingWrapper>
+      <MarketCardsWrapper>
+        <MarketCard />
+        <MarketCard />
+        <MarketCard />
+      </MarketCardsWrapper>
+    </GuildPageWrapper>
   )
 }
 

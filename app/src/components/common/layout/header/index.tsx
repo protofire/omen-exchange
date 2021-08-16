@@ -263,6 +263,7 @@ const HeaderContainer: React.FC = (props: any) => {
   }
 
   const isMarketPage = history.location.pathname === '/liquidity'
+  const isGuildPage = history.location.pathname === '/guild'
   return (
     <HeaderWrapper {...restProps}>
       <HeaderInner>
@@ -277,7 +278,7 @@ const HeaderContainer: React.FC = (props: any) => {
           >
             Markets
           </MarketAndGovernanceNav>
-          <MarketAndGovernanceNav disabled={!isMarketPage} onClick={() => history && history.push('/guild')}>
+          <MarketAndGovernanceNav disabled={isGuildPage} onClick={() => history && history.push('/guild')}>
             Guild
           </MarketAndGovernanceNav>
         </ContentsLeft>
