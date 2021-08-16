@@ -19,7 +19,6 @@ import { Image } from '../../market/common_sections/message_text/token_item'
 import SettingsViewContainer from '../../settings/settings_view'
 import {
   BalanceItem,
-  BalanceItemBalance,
   BalanceItemSide,
   BalanceItems,
   BalanceSection,
@@ -71,13 +70,6 @@ const AccountInfo = styled.div`
   justify-contect: space-between;
   margin-left: 12px;
 `
-const StrongText = styled.div`
-  font-weight: ${props => props.theme.textfield.fontweight};
-  font-size: ${props => props.theme.fonts.defaultSize};
-  line-height: 14.06px;
-  color: ${props => props.theme.textfield.color};
-  margin-bottom: 5px;
-`
 
 const ClaimLeft = styled.div`
   display: flex;
@@ -92,19 +84,10 @@ const ClaimLeftSvg = styled.div`
   &:hover {
     .chevronDown {
       path {
-        fill: ${props => props.theme.colors.primaryLight};
+        fill: ${props => props.theme.primary1};
       }
     }
   }
-`
-
-const CardHeaderText = styled.p`
-  font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => props.theme.colors.textColorLighter};
-  margin: 0;
-  line-height: ${props => props.theme.fonts.defaultLineHeight};
-  letter-spacing: 0.2px;
-  white-space: nowrap;
 `
 
 const ClaimButton = styled(Button)`
@@ -388,11 +371,13 @@ export const ModalYourConnection = (props: Props) => {
                     }}
                   >
                     <ClaimLeft>
-                      <StrongText>Claimable Assets</StrongText>
+                      <TYPE.bodyMedium color={'text1'} marginBottom={'5px'}>
+                        Claimable Assets
+                      </TYPE.bodyMedium>
 
-                      <BalanceItemBalance as="div">
+                      <TYPE.bodyRegular as="div" color={'text2'} margin={'0px'}>
                         {arrayOfClaimableBalances.map(e => e.token.toUpperCase()).join(', ')}
-                      </BalanceItemBalance>
+                      </TYPE.bodyRegular>
                     </ClaimLeft>
                     <SvgWrap>
                       {displayClaim ? <IconChevronUp /> : <IconChevronDown color={theme.colors.tertiary} />}
@@ -411,7 +396,9 @@ export const ModalYourConnection = (props: Props) => {
               <ModalCard>
                 <>
                   <BalanceSection>
-                    <CardHeaderText>Omen Account</CardHeaderText>
+                    <TYPE.bodyRegular color={'text2'} margin={'0px'} whiteSpace={'nowrap'}>
+                      Omen Account
+                    </TYPE.bodyRegular>
                     <BalanceItems style={{ marginTop: '14px' }}>{tokenBalances(networkIds.XDAI)}</BalanceItems>
                   </BalanceSection>
                   <DepositWithdrawButtons>
