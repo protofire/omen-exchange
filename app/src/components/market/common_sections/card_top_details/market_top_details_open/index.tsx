@@ -127,6 +127,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   return (
     <>
       <SubsectionTitleWrapper>
+        <div>inside out</div>
         <SubsectionTitleLeftWrapper>
           {!relay && marketsRelatedQuestion.length > 1 && (
             <MarketCurrencySelector

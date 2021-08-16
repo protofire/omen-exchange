@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { ProposalDetailsView } from '../../components/guild/proposal_details_view'
+import { ProposalDetailsView } from '../../components/guild/proposal_details_view_container'
 
 interface Props {
   amount: any
