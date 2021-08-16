@@ -143,12 +143,12 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
         call: [getCallSig(marketMaker, 'totalSupply')],
         returns: [['totalPoolShares']],
       },
-      // get market marker total earnings
-      {
-        target: marketMakerAddress,
-        call: [getCallSig(marketMaker, 'collectedFees')],
-        returns: [['totalEarnings']],
-      },
+      // // get market marker total earnings
+      // {
+      //   target: marketMakerAddress,
+      //   call: [getCallSig(marketMaker, 'collectedFees')],
+      //   returns: [['totalEarnings']],
+      // },
       // get payout denominator to check if the condition is resolved
       {
         target: conditionalTokensAddress,
@@ -210,14 +210,14 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
           returns: [[`user-${i}`]],
         })
 
-        if (!totalPoolShares.isZero()) {
-          // get user earnings
-          calls.push({
-            target: marketMakerAddress,
-            call: [getCallSig(marketMaker, 'feesWithdrawableBy'), cpk.address],
-            returns: [['userEarnings']],
-          })
-        }
+        // if (!totalPoolShares.isZero()) {
+        //   // get user earnings
+        //   calls.push({
+        //     target: marketMakerAddress,
+        //     call: [getCallSig(marketMaker, 'feesWithdrawableBy'), cpk.address],
+        //     returns: [['userEarnings']],
+        //   })
+        // }
       }
     }
 
