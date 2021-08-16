@@ -122,20 +122,22 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
             <UserDataTitleValue
               title={currentApr > 0 ? 'Total Earnings' : 'Total Liquidity'}
               value={`${
-                currentApr > 0 && totalEarnings.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''
-              }${bigNumberToString(currentApr > 0 ? totalEarnings : totalPoolShares, baseCollateral.decimals)} ${
-                baseCollateral.symbol
-              }`}
+                currentApr > 0 && totalEarnings?.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''
+              }${bigNumberToString(
+                currentApr > 0 ? totalEarnings || new BigNumber(0) : totalPoolShares,
+                baseCollateral.decimals,
+              )} ${baseCollateral.symbol}`}
             />
           </UserDataWrapper>
           <UserDataWrapper style={currentApr > 0 ? { marginLeft: '0px' } : { marginLeft: '32px' }}>
             <UserDataTitleValue
               title={currentApr > 0 ? 'Your Liquidity' : 'Total Earnings'}
               value={`${
-                currentApr == 0 && totalEarnings.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''
-              }${bigNumberToString(currentApr > 0 ? totalUserLiquidity : totalEarnings, baseCollateral.decimals)} ${
-                baseCollateral.symbol
-              }`}
+                currentApr == 0 && totalEarnings?.gt(parseUnits('0.01', baseCollateral.decimals)) ? '+' : ''
+              }${bigNumberToString(
+                currentApr > 0 ? totalUserLiquidity : totalEarnings || new BigNumber(0),
+                baseCollateral.decimals,
+              )} ${baseCollateral.symbol}`}
             />
 
             <UserDataTitleValue
