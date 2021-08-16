@@ -580,7 +580,7 @@ class CPKService {
 
   claimRewardTokens = async (campaignAddress: string) => {
     try {
-      const { transaction } = await this.pipe(fee, claim, withdrawRewards)(campaignAddress)
+      const { transaction } = await this.pipe(fee, claim, withdrawRewards)({ campaignAddress })
       return transaction
     } catch (err) {
       logger.error('Failed to claim reward tokens', err.message)
@@ -608,7 +608,7 @@ class CPKService {
 
   unstakeAndClaim = async (campaignAddress: string) => {
     try {
-      const { transaction } = await this.pipe(fee, exitStaking, withdrawRewards)(campaignAddress)
+      const { transaction } = await this.pipe(fee, exitStaking, withdrawRewards)({ campaignAddress })
       return transaction
     } catch (err) {
       logger.error('There was an error unstaking, claiming and withdrawing funding', err.message)
