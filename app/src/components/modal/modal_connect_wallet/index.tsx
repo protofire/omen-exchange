@@ -3,6 +3,7 @@ import Modal from 'react-modal'
 import styled, { css, withTheme } from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
+import { TYPE } from '../../../theme'
 import connectors from '../../../util/connectors'
 import { getLogger } from '../../../util/logger'
 import { Wallet } from '../../../util/types'
@@ -17,14 +18,6 @@ import WalletConnectSVG from './img/wallet_connect.svg'
 
 const logger = getLogger('ModalConnectWallet::Index')
 
-const HeaderText = styled.p`
-  font-size: 16px;
-  font-weight: 500;
-  color: ${props => props.theme.colors.textColorDark};
-  margin-top: 16px;
-  margin-bottom: 48px;
-`
-
 const Buttons = styled.div`
   margin-top: auto;
   width: 100%;
@@ -37,7 +30,7 @@ const Buttons = styled.div`
 const ButtonStyled = styled(Button)`
   width: 100%;
   border: none;
-  border-bottom: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+  border-bottom: 1px solid ${props => props.theme.border1};
   border-radius: 0;
   height: 60px;
   display: flex;
@@ -54,19 +47,19 @@ const ButtonStyled = styled(Button)`
   }
 
   &:hover {
-    border-bottom: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+    border-bottom: 1px solid ${props => props.theme.border1};
     background: ${props => props.theme.colors.lightBackground};
 
     .arrow-path {
-      fill: ${props => props.theme.colors.primaryLight};
+      fill: ${props => props.theme.primary1};
     }
   }
 
   &:first-child {
-    border-top: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+    border-top: 1px solid ${props => props.theme.border1};
 
     &:hover {
-      border-top: 1px solid ${props => props.theme.buttonPrimaryLine.borderColor};
+      border-top: 1px solid ${props => props.theme.border1};
     }
   }
 `
@@ -96,25 +89,6 @@ const IconWalletConnect = styled.span`
   background-image: url('${WalletConnectSVG}');
 `
 
-const Text = styled.span`
-  color: ${props => props.theme.colors.textColorDark};
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.2;
-  margin: 0;
-`
-
-const ConnectingText = styled.p`
-  color: ${props => props.theme.colors.textColorLighter};
-  font-size: 14px;
-  font-weight: normal;
-  letter-spacing: 0.4px;
-  line-height: 1.5;
-  margin: 0;
-  padding: 30px 0 0;
-  text-align: center;
-`
-
 interface ButtonProps {
   disabled: boolean
   onClick: () => void
@@ -129,7 +103,9 @@ const ConnectButton = (props: ButtonProps) => {
     <ButtonStyled buttonType={ButtonType.secondaryLine} disabled={disabled} onClick={onClick}>
       <ButtonLeft>
         {icon}
-        <Text>{text}</Text>
+        <TYPE.bodyRegular color={'text1'} lineHeight={'1.2'} margin={'0px'}>
+          {text}
+        </TYPE.bodyRegular>
       </ButtonLeft>
       <IconArrowRightLong />
     </ButtonStyled>
@@ -225,11 +201,23 @@ export const ModalConnectWallet = (props: Props) => {
             <IconClose hoverEffect={true} onClick={onClickCloseButton} />
           </ModalNavigation>
           <IconOmen dropShadow id="connectWallet" size={56} />
-          <HeaderText>{isConnectingToWallet ? 'Unlock Wallet' : 'Connect a Wallet'}</HeaderText>
+          <TYPE.heading3 marginBottom={'48px'} marginTop={'16px'}>
+            {isConnectingToWallet ? 'Unlock Wallet' : 'Connect a Wallet'}
+          </TYPE.heading3>
           {isConnectingToWallet ? (
             <>
               <Spinner big={true} />
-              <ConnectingText>{connectingText}</ConnectingText>
+              <TYPE.bodyRegular
+                color={'text2'}
+                fontWeight={'normal'}
+                letterSpacing={'0.4px'}
+                lineHeight={'1.5'}
+                margin={'0px'}
+                padding={'30px 0 0'}
+                textAlign={'center'}
+              >
+                {connectingText}
+              </TYPE.bodyRegular>
             </>
           ) : (
             <>
