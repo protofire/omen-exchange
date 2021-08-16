@@ -156,7 +156,10 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   const feeFormatted = useMemo(() => `${bigNumberToString(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
   const collateralBalance = maybeCollateralBalance || Zero
   const walletBalance = bigNumberToString(collateralBalance, collateral.decimals, 5)
-  const sharesBalance = bigNumberToString(fundingBalance, collateral.decimals)
+  const sharesBalance = bigNumberToString(
+    userStakedTokens.gt(0) ? userStakedTokens : fundingBalance,
+    collateral.decimals,
+  )
 
   const totalUserShareAmounts = calcRemoveFundingSendAmounts(
     fundingBalance,
@@ -191,16 +194,16 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     ? null
     : maybeFundingBalance === null
     ? null
-    : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
+    : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance) && amountToRemove?.gt(userStakedTokens)
     ? `Insufficient balance`
-    : amountToRemove?.gt(fundingBalance)
+    : amountToRemove?.gt(fundingBalance) && amountToRemove?.gt(userStakedTokens)
     ? `Value must be less than or equal to ${sharesBalance} pool shares`
     : null
 
   const disableWithdrawButton =
     !amountToRemove ||
     amountToRemove?.isZero() ||
-    amountToRemove?.gt(fundingBalance) ||
+    (amountToRemove?.gt(fundingBalance) && amountToRemove?.gt(userStakedTokens)) ||
     sharesAmountError !== null ||
     isNegativeAmountToRemove
 
