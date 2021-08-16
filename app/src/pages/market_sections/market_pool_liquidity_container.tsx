@@ -133,7 +133,6 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   const [totalRewards, setTotalRewards] = useState(0)
   const [liquidityMiningCampaign, setLiquidityMiningCampaign] = useState<Maybe<GraphResponseLiquidityMiningCampaign>>()
   const [userStakedTokens, setUserStakedTokens] = useState(new BigNumber(0))
-  const [icon, setIcon] = useState<boolean>(false)
 
   const { allowance, unlock } = useCpkAllowance(signer, collateral.address)
   const hasEnoughAllowance = RemoteData.mapToTernary(allowance, allowance => allowance.gte(amountToFund || Zero))
@@ -447,7 +446,6 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
           getToken(networkId, 'omn').decimals,
         )} OMN`,
       )
-      setIcon(true)
 
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
@@ -461,11 +459,9 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
       await fetchBalances()
       await fetchStakingData()
 
-      setIcon(false)
       setMessage(`Successfully claimed OMN rewards`)
       setIsTransactionProcessing(false)
     } catch (err) {
-      setIcon(false)
       setTxState(TransactionStep.error)
       setMessage(`Error trying to claim OMN rewards.`)
       logger.error(`${message} - ${err.message}`)
