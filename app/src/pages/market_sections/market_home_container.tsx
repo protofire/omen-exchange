@@ -153,23 +153,32 @@ const MarketHomeContainer: React.FC = () => {
 
   let sortParam: Maybe<MarketsSortCriteria> = stateRoute === 'MY_MARKETS' ? 'openingTimestamp' : 'usdLiquidityParameter'
   let sortIndex: number = stateRoute === 'MY_MARKETS' ? 1 : 2
+
   if (stateRoute !== 'MY_MARKETS') {
-    if (sortRoute === '24h-volume') {
-      sortIndex = 0
-      sortParam = `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria
-    } else if (sortRoute === 'volume') {
-      sortIndex = 1
-      sortParam = 'usdVolume'
-    } else if (sortRoute === 'liquidity') {
-      sortIndex = 2
-      sortParam = 'usdLiquidityParameter'
-    } else if (sortRoute === 'newest') {
-      sortIndex = 3
-      sortParam = 'creationTimestamp'
-    } else if (sortRoute === 'ending') {
-      sortIndex = 4
-      sortParam = 'openingTimestamp'
-      sortDirection = 'asc'
+    switch (sortRoute) {
+      case '24h-volume':
+        sortIndex = 0
+        sortParam = `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria
+        break
+      case 'volume':
+        sortIndex = 1
+        sortParam = 'usdVolume'
+        break
+      case 'liquidity':
+        sortIndex = 2
+        sortParam = 'usdLiquidityParameter'
+        break
+      case 'newest':
+        sortIndex = 3
+        sortParam = 'creationTimestamp'
+        break
+      case 'ending':
+        sortIndex = 4
+        sortParam = 'openingTimestamp'
+        sortDirection = 'asc'
+        break
+      default:
+        console.warn('Unknown state route')
     }
   }
 
