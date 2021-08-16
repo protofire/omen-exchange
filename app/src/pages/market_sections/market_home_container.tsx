@@ -212,12 +212,28 @@ const MarketHomeContainer: React.FC = () => {
 
   let stateParam: MarketStates = MarketStates.open
   if (stateFilter) {
-    if (stateRoute === 'OPEN') stateParam = MarketStates.open
-    if (stateRoute === 'PENDING') stateParam = MarketStates.pending
-    if (stateRoute === 'FINALIZING') stateParam = MarketStates.finalizing
-    if (stateRoute === 'ARBITRATING') stateParam = MarketStates.arbitrating
-    if (stateRoute === 'CLOSED') stateParam = MarketStates.closed
-    if (stateRoute === 'MY_MARKETS') stateParam = MarketStates.myMarkets
+    switch (stateRoute) {
+      case 'OPEN':
+        stateParam = MarketStates.open
+        break
+      case 'PENDING':
+        stateParam = MarketStates.pending
+        break
+      case 'FINALIZING':
+        stateParam = MarketStates.finalizing
+        break
+      case 'ARBITRATING':
+        stateParam = MarketStates.arbitrating
+        break
+      case 'CLOSED':
+        stateParam = MarketStates.closed
+        break
+      case 'MY_MARKETS':
+        stateParam = MarketStates.myMarkets
+        break
+      default:
+        console.warn('Unknown stateRoute')
+    }
   } else {
     stateParam = MarketStates.open
   }
