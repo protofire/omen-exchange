@@ -27,6 +27,8 @@ interface MarketVariables {
 type Options = MarketVariables & MarketFilters
 
 const totalSuppyFnSig = 'totalSupply()(uint256)'
+const symbolFnSig = 'symbol()(string)'
+const decimalsFnSig = 'decimals()(uint8)'
 
 const normalizeFetchedData = (data: GraphResponseMyMarkets): GraphMarketMakerDataItem[] => {
   return data && data.account ? data.account.fpmmParticipations.map(fpmm => fpmm.fixedProductMarketMakers) : []
@@ -101,17 +103,39 @@ export const useMarkets = (options: Options): any => {
           fixedProductMarketMakers: [],
         })
       } else {
-        const calls = internalMarkets.map(({ id }) => ({
-          target: id,
-          call: [totalSuppyFnSig],
-          returns: [[`${id}-totalPoolShares`]],
-        }))
+        const calls = []
+
+        for (let i = 0; i < internalMarkets.length; i++) {
+          const { collateralToken, id } = internalMarkets[i]
+          calls.push(
+            {
+              target: id,
+              call: [totalSuppyFnSig],
+              returns: [[`${id}-totalPoolShares`]],
+            },
+            {
+              target: collateralToken,
+              call: [decimalsFnSig],
+              returns: [[`${id}-decimals`]],
+            },
+            {
+              target: collateralToken,
+              call: [symbolFnSig],
+              returns: [[`${id}-symbol`]],
+            },
+          )
+        }
 
         const response = await multicall(calls, networkId)
 
         internalMarkets = internalMarkets.map(market => ({
           ...market,
           totalPoolShares: response.results.transformed[`${market.id}-totalPoolShares`],
+          collateral: {
+            symbol: response.results.transformed[`${market.id}-symbol`],
+            decimals: response.results.transformed[`${market.id}-decimals`],
+            address: market.collateralToken,
+          },
         }))
 
         setMarkets({

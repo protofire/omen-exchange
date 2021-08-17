@@ -354,6 +354,7 @@ export type GraphMarketMakerDataItem = {
   collateralVolume: string
   lastActiveDay: number
   collateralToken: string
+  collateral: Token
   outcomeTokenAmounts: string[]
   title: string
   outcomes: Maybe<string[]>
@@ -389,6 +390,7 @@ export type MarketMakerDataItem = {
   creationTimestamp: string
   collateralVolume: BigNumber
   collateralToken: string
+  collateral: Token
   lastActiveDay: number
   outcomeTokenAmounts: BigNumber[]
   title: string

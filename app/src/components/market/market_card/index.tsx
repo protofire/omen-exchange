@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import moment from 'moment'
+import React from 'react'
 import styled from 'styled-components'
 
-import { Card } from '../../common/card'
+import { bigNumberToNumber, formatToShortNumber, limitDecimalPlaces } from '../../../util/tools'
+import { MarketMakerDataItem } from '../../../util/types'
 import { CurationRadioWrapper } from '../common_styled'
 
 const ClosingWrapper = styled.div`
@@ -26,14 +28,16 @@ const Title = styled.div`
   color: #37474f;
 `
 
-const StyledMarketCard = styled(Card)<{ selected?: boolean }>`
+const StyledMarketCard = styled.div<{ active?: boolean }>`
   flex-basis: calc(33.33% - 20px);
-  border-color: ${props => (props.selected ? props.theme.colors.borderColorDark : props.theme.colors.tertiary)};
-  padding: 28px 24px;
+  border: 1px solid ${props => (props.active ? props.theme.colors.borderColorDark : props.theme.colors.tertiary)};
+  padding: 28px;
   margin-top: 20px;
+  box-sizing: border-box;
+  border-radius: 12px;
 
   &:hover {
-    border-color: ${props => (props.selected ? props.theme.colors.borderColorDark : '#D2D6ED')};
+    border-color: ${props => (props.active ? props.theme.colors.borderColorDark : '#D2D6ED')};
     cursor: pointer;
   }
 
@@ -92,31 +96,45 @@ const OutcomeItem = styled.div`
   }
 `
 
-export const MarketCard = () => {
-  const [selected, setSelected] = useState(false)
+interface Props {
+  active: boolean
+  market: MarketMakerDataItem
+  onClick?: () => void
+}
+
+export const MarketCard = (props: Props) => {
+  const { active, market, onClick } = props
+
+  const resolutionDate = moment(market.openingTimestamp).format('Do MMMM YYYY')
+  const formattedLiquidity: string = formatToShortNumber(
+    bigNumberToNumber(market.totalPoolShares, market.collateral.decimals),
+  )
+  const formattedVolume: string = formatToShortNumber(
+    bigNumberToNumber(market.collateralVolume, market.collateral.decimals),
+  )
+
   return (
-    <StyledMarketCard onClick={() => setSelected(!selected)} selected={selected}>
+    <StyledMarketCard active={active} onClick={onClick}>
       <ClosingWrapper>
-        <Closing>Closing 1st September 2021</Closing>
-        <RadioWrapper selected={selected}>{selected && <Tick />}</RadioWrapper>
+        <Closing>Closing {resolutionDate}</Closing>
+        <RadioWrapper selected={active}>{active && <Tick />}</RadioWrapper>
       </ClosingWrapper>
-      <Title>
-        Will the Summer Olympics be completed successfully in Tokyo in 2021 with all planned events taking place before
-        the end of August 2021?
-      </Title>
+      <Title>{market.title}</Title>
       <OutcomeWrapper>
-        <OutcomeRow>
-          <OutcomeItem>Yes</OutcomeItem>
-          <OutcomeItem>67.55%</OutcomeItem>
-        </OutcomeRow>
-        <OutcomeRow>
-          <OutcomeItem>No</OutcomeItem>
-          <OutcomeItem>32.45%</OutcomeItem>
-        </OutcomeRow>
+        {market.outcomes?.map((outcome, index) => (
+          <OutcomeRow key={outcome}>
+            <OutcomeItem>{outcome}</OutcomeItem>
+            <OutcomeItem>{limitDecimalPlaces(market.outcomeTokenMarginalPrices[index], 2)}%</OutcomeItem>
+          </OutcomeRow>
+        ))}
       </OutcomeWrapper>
       <DetailsWrapper>
-        <Detail>3,534 DAI Liquidity</Detail>
-        <Detail>500 DAI Volume</Detail>
+        <Detail>
+          {formattedLiquidity} {market.collateral.symbol} Liquidity
+        </Detail>
+        <Detail>
+          {formattedVolume} {market.collateral.symbol} Volume
+        </Detail>
       </DetailsWrapper>
     </StyledMarketCard>
   )

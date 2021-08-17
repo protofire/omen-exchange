@@ -11,6 +11,7 @@ import useLocalStorageState from 'use-local-storage-state'
 import { MAX_MARKET_FEE } from '../../common/constants'
 import { ButtonCSS } from '../../components/button/button_styling_types'
 import { IconClose } from '../../components/common/icons'
+import { GuildWrapper } from '../../components/guild'
 import xDaiIntergation from '../../components/market/market_list/img/xDaiIntegration.svg'
 import { MarketHome } from '../../components/market/market_list/market_home'
 import { useConnectedWeb3Context } from '../../contexts'
@@ -88,6 +89,7 @@ const wrangleResponse = (data: GraphMarketMakerDataItem[], networkId: number): M
       curatedByDxDao: graphMarketMakerDataItem.curatedByDxDao,
       category: graphMarketMakerDataItem.category,
       collateralToken: graphMarketMakerDataItem.collateralToken,
+      collateral: graphMarketMakerDataItem.collateral,
       collateralVolume: bigNumberify(graphMarketMakerDataItem.collateralVolume),
       lastActiveDay: Number(graphMarketMakerDataItem.lastActiveDay),
       scaledLiquidityParameter: parseFloat(graphMarketMakerDataItem.scaledLiquidityParameter),
@@ -387,6 +389,25 @@ const MarketHomeContainer: React.FC = () => {
     setPageIndex(pageIndex - PAGE_SIZE)
   }
 
+  const isGuild = location.pathname === '/guild'
+
+  if (isGuild) {
+    return (
+      <GuildWrapper
+        count={fetchedMarkets ? fetchedMarkets.fixedProductMarketMakers.length : 0}
+        currentFilter={filter}
+        fetchMyMarkets={fetchMyMarkets}
+        isFiltering={isFiltering}
+        markets={markets}
+        moreMarkets={moreMarkets}
+        onFilterChange={onFilterChange}
+        onLoadNextPage={loadNextPage}
+        onLoadPrevPage={loadPrevPage}
+        pageIndex={pageIndex}
+      />
+    )
+  }
+
   return (
     <>
       {hasSeenBanner === undefined && (context.relay || context.networkId === networkIds.MAINNET) && (
@@ -415,7 +436,6 @@ const MarketHomeContainer: React.FC = () => {
           </CloseStyled>
         </Banner>
       )}
-
       <MarketHome
         categories={categories}
         context={context}
