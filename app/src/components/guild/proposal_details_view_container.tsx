@@ -3,7 +3,8 @@ import styled from 'styled-components'
 
 import { TYPE } from '../../theme'
 import { Card } from '../common/card'
-import { IconArrowBack, IconArrowRight } from '../common/icons'
+import { Table } from '../common/card/responsive_cards/table'
+import { IconArrowBack, IconArrowRight, IconOmen } from '../common/icons'
 import { SectionTitle, SectionTitleWrapper } from '../common/text/section_title'
 import { ViewCard } from '../market/common_sections/view_card'
 import ModalTitle from '../modal/modal_title'
@@ -60,6 +61,13 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     verified,
     volume,
   } = props
+
+  const object = [
+    ['Rewards', { text: amount, icon: <IconOmen /> }],
+    ['APY%', { text: apy }],
+    ['Duration', { text: duration }],
+  ]
+
   return (
     <Container>
       <NavigationSection>
@@ -74,6 +82,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
           <TYPE.heading2 borderBottom={'1px solid grey'} margin={'0 -24px'} padding={'0 24px 20px'}>
             Issue Liqudity Rewards
           </TYPE.heading2>
+          <Table valueObject={object} />
         </MainSection>
         <VoteSection>
           <TYPE.heading1>vote</TYPE.heading1>

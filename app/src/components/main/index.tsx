@@ -11,7 +11,7 @@ import { MainScroll, MainWrapper, WrongNetworkMessage } from '../common'
 import { Footer } from '../common/layout/footer'
 import { Header } from '../common/layout/header'
 import { ModalAirdropWrapper } from '../modal'
-import SettingsViewContainer from '../settings/settings_view'
+import SettingsViewContainer from '../modal/settings/settings_view'
 
 import { MarketRoutes } from './routes/market_routes'
 

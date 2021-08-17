@@ -15,7 +15,6 @@ import { IconChevronDown } from '../../common/icons/IconChevronDown'
 import { IconChevronUp } from '../../common/icons/IconChevronUp'
 import { IconJazz } from '../../common/icons/IconJazz'
 import { Image } from '../../market/common_sections/message_text/token_item'
-import SettingsViewContainer from '../../settings/settings_view'
 import {
   BalanceItem,
   BalanceItemBalance,
@@ -29,6 +28,7 @@ import {
   ModalTitle,
 } from '../common_styled'
 import { ModalTransactionWrapper } from '../modal_transaction'
+import SettingsViewContainer from '../settings/settings_view'
 
 const TopCardHeader = styled.div`
   display: flex;
