@@ -80,7 +80,7 @@ const AirdropCard = (props: Props) => {
             <IconOmen id="airdrop" size={38} />
             <TopSectionDetails>
               <TYPE.bodyMedium color={'text1'}>Claimable Amount</TYPE.bodyMedium>
-              <TYPE.bodyMedium color={!claimIsDisabled ? 'green' : 'text2'}>
+              <TYPE.bodyMedium color={!claimIsDisabled ? 'profit' : 'text2'}>
                 {bigNumberToString(displayAmount, STANDARD_DECIMALS)} OMN
               </TYPE.bodyMedium>
             </TopSectionDetails>

@@ -23,14 +23,14 @@ const RecipientWrapper = styled.div`
 `
 
 const AddressField = styled(Textfield)<{ error: boolean }>`
-  border-color: ${props => (props.error ? props.theme.red : props.theme.border1)};
+  border-color: ${props => (props.error ? props.theme.alert : props.theme.border1)};
   &:hover {
-    border-color: ${props => (props.error ? props.theme.red : props.theme.border2)};
+    border-color: ${props => (props.error ? props.theme.alert : props.theme.border2)};
   }
 
   &:active,
   &:focus {
-    border-color: ${props => (props.error ? props.theme.red : props.theme.border3)};
+    border-color: ${props => (props.error ? props.theme.alert : props.theme.border3)};
   }
 `
 
@@ -93,7 +93,7 @@ export const ModalCheckAddress = (props: Props) => {
           </TYPE.bodyRegular>
           <AddressField error={error} onChange={updateAddress} placeholder="Wallet Address" value={address} />
           {error && (
-            <TYPE.bodyRegular color={'red'} marginTop={'12px'}>
+            <TYPE.bodyRegular color={'alert'} marginTop={'12px'}>
               Address has no available claim
             </TYPE.bodyRegular>
           )}
