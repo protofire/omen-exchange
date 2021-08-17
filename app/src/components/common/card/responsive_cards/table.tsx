@@ -13,8 +13,27 @@ const CardStyled = styled.div`
   gap: 48px;
   margin-top: 22px;
   padding: 24px 32px;
+  //mobile
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+    padding: 20px;
+    margin-top: 24px;
+  }
 `
-const ItemWrapper = styled.div``
+const ItemWrapper = styled.div`
+  div:nth-child(2) {
+    margin-top: 8px;
+    @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+      margin-top: 0px;
+    }
+  }
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    display: flex;
+    justify-content: space-between;
+  }
+`
 
 interface Props {
   valueObject: any

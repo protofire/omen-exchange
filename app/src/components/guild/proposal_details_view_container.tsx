@@ -14,12 +14,21 @@ const MainWrapper = styled.div`
   flex-direction: row;
   width: 100%;
   column-gap: 48px;
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    flex-direction: column;
+  }
 `
 const MainSection = styled(Card)`
   width: 73%;
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    width: 100%;
+  }
 `
 const VoteSection = styled(Card)`
   width: 27%;
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    width: 100%;
+  }
 `
 const NavigationSection = styled.div`
   width: 100%;
@@ -79,7 +88,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
       </NavigationSection>
       <MainWrapper>
         <MainSection>
-          <TYPE.heading2 borderBottom={'1px solid grey'} margin={'0 -24px'} padding={'0 24px 20px'}>
+          <TYPE.heading2 borderBottom={'1px solid #E8EAF6'} margin={'0 -24px'} padding={'0 24px 20px'}>
             Issue Liqudity Rewards
           </TYPE.heading2>
           <Table valueObject={object} />
