@@ -421,7 +421,7 @@ const ModalLockTokens = (props: Props) => {
             </ButtonsLockUnlock>
           </ButtonSection>
         </ContentWrapper>
-        {!isLockAmountOpen && (
+        {!isLockAmountOpen && relay && (
           <>
             <Divider />
             <AirdropCardWrapper

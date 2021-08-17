@@ -209,14 +209,6 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           showBondChange
         />
       )}
-      {showUpgrade && (
-        <SetAllowance
-          finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
-          loading={RemoteData.is.asking(proxyIsUpToDate)}
-          onUnlock={upgradeProxy}
-          style={{ marginTop: 20 }}
-        />
-      )}
       <GridTransactionDetails>
         <div>
           <>
@@ -287,7 +279,15 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         </div>
       </GridTransactionDetails>
 
-      <BottomButtonWrapper borderTop>
+      {showUpgrade && (
+        <SetAllowance
+          finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
+          loading={RemoteData.is.asking(proxyIsUpToDate)}
+          onUnlock={upgradeProxy}
+        />
+      )}
+
+      <BottomButtonWrapper borderTop marginTop={showUpgrade}>
         <Button
           buttonType={ButtonType.secondaryLine}
           onClick={() => switchMarketTab(MarketDetailsTab.finalize)}
