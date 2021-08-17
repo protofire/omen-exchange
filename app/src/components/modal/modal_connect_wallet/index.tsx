@@ -201,7 +201,7 @@ export const ModalConnectWallet = (props: Props) => {
             <IconClose hoverEffect={true} onClick={onClickCloseButton} />
           </ModalNavigation>
           <IconOmen dropShadow id="connectWallet" size={56} />
-          <TYPE.heading3 marginBottom={'48px'} marginTop={'16px'}>
+          <TYPE.heading3 color={'text1'} marginBottom={'48px'} marginTop={'16px'}>
             {isConnectingToWallet ? 'Unlock Wallet' : 'Connect a Wallet'}
           </TYPE.heading3>
           {isConnectingToWallet ? (
