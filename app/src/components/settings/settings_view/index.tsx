@@ -55,6 +55,7 @@ const FiltersControls = styled.div<{ disabled?: boolean }>`
 
 const NodeDropdown = styled(Dropdown)`
   min-width: 170px;
+  height: 40px;
 `
 
 const CustomDropdownItem = styled.div`
