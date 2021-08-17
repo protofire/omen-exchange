@@ -3,6 +3,7 @@ import styled from 'styled-components'
 
 import { TYPE } from '../../theme'
 import { Card } from '../common/card'
+import { IconArrowBack, IconArrowRight } from '../common/icons'
 import { SectionTitle, SectionTitleWrapper } from '../common/text/section_title'
 import { ViewCard } from '../market/common_sections/view_card'
 import ModalTitle from '../modal/modal_title'
@@ -11,15 +12,18 @@ const MainWrapper = styled.div`
   display: flex;
   flex-direction: row;
   width: 100%;
+  column-gap: 48px;
 `
 const MainSection = styled(Card)`
-  width: 75%;
+  width: 73%;
 `
 const VoteSection = styled(Card)`
-  width: 25%;
+  width: 27%;
 `
 const NavigationSection = styled.div`
   width: 100%;
+  display: flex;
+  justify-content: space-between;
 `
 const Container = styled.div`
   flex-direction: row;
@@ -59,11 +63,17 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
   return (
     <Container>
       <NavigationSection>
-        <TYPE.heading1>Milan</TYPE.heading1>
+        <div style={{ display: 'flex' }}>
+          {/* can it be reused*/} <IconArrowBack></IconArrowBack>
+          <TYPE.heading3>Milan</TYPE.heading3>
+        </div>
+        <div>SOme other text</div>
       </NavigationSection>
       <MainWrapper>
         <MainSection>
-          <TYPE.heading2>Issue Liqudity Rewards</TYPE.heading2>
+          <TYPE.heading2 borderBottom={'1px solid grey'} margin={'0 -24px'} padding={'0 24px 20px'}>
+            Issue Liqudity Rewards
+          </TYPE.heading2>
         </MainSection>
         <VoteSection>
           <TYPE.heading1>vote</TYPE.heading1>
