@@ -33,7 +33,7 @@ export const formatNumber = (number: string, decimals = 2): string => {
   if (number.length < 1) {
     return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
   }
-  if (Number(number) < 0.001 && Number(number) > 0) {
+  if (Number(number) < 0.001 && Number(number) > 0 && decimals > 2) {
     return '<0.001'
   }
   if (Number(number) < 0.01 && Number(number) > 0) {
