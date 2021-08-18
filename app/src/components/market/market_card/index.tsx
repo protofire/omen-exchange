@@ -75,16 +75,16 @@ const OutcomeWrapper = styled.div`
   box-sizing: border-box;
   border-radius: 8px;
   margin-bottom: 16px;
+
+  & > div:not(:first-child) {
+    border-top: 1px solid ${props => props.theme.colors.verticalDivider};
+  }
 `
 
-const OutcomeRow = styled.div<{ border?: boolean }>`
+const OutcomeRow = styled.div`
   padding: 10px 16px;
   display: flex;
   justify-content: space-between;
-
-  &:last-child {
-    border-top: 1px solid ${props => props.theme.colors.verticalDivider};
-  }
 `
 
 const OutcomeItem = styled.div`

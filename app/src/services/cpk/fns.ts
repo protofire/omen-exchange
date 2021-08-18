@@ -934,6 +934,33 @@ export const unlockTokens = async (params: LockTokensParams) => {
 }
 
 /**
+ * Propose liquidity rewards
+ */
+
+interface LockTokensParams {
+  amount: BigNumber
+  guild: OmenGuildService
+  transactions: Transaction[]
+}
+
+export const proposeLiquidityRewards = async params => {
+  const { campaignAddress, transactions } = params
+
+  transactions.push({
+    to: guild.omenGuildAddress,
+    data: OmenGuildService.encodeCreateProposal(
+      campaignAddress,
+      StakingService.encodeAddRewards(omen, amount),
+      new BigNumber(0),
+      '',
+      '',
+    ),
+  })
+
+  return params
+}
+
+/**
  * Claim airdrop
  */
 

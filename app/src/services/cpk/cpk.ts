@@ -138,6 +138,10 @@ interface LockTokensParams {
   amount: BigNumber
 }
 
+interface ProposeLiquidityRewards {
+  campaignAddress: string
+}
+
 interface TransactionResult {
   hash?: string
   safeTxHash?: string
@@ -429,6 +433,16 @@ class CPKService {
   }
 
   claimAirdrop = async (params: CPKClaimAirdropParams) => {
+    try {
+      const { transaction } = await this.pipe(claimAirdrop)(params)
+      return transaction
+    } catch (e) {
+      logger.error(`Error while trying to claim airdrop : `, e.message)
+      throw e
+    }
+  }
+
+  proposeLiquidityRewards = async (params: ProposeLiquidityRewards) => {
     try {
       const { transaction } = await this.pipe(claimAirdrop)(params)
       return transaction

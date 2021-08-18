@@ -57,6 +57,33 @@ const GuildAbi = [
     stateMutability: 'nonpayable',
     type: 'function',
   },
+  {
+    inputs: [
+      { internalType: 'address[]', name: 'to', type: 'address[]' },
+      { internalType: 'bytes[]', name: 'data', type: 'bytes[]' },
+      { internalType: 'uint256[]', name: 'value', type: 'uint256[]' },
+      { internalType: 'string', name: 'description', type: 'string' },
+      { internalType: 'bytes', name: 'contentHash', type: 'bytes' },
+    ],
+    name: 'createProposal',
+    outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'votesForCreation',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'account', type: 'address' }],
+    name: 'votesOf',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
 ]
 
 class OmenGuildService {
@@ -89,6 +116,19 @@ class OmenGuildService {
   static encodeUnlockTokens = (amount: BigNumber) => {
     const guildInterface = new utils.Interface(GuildAbi)
     return guildInterface.functions.releaseTokens.encode([amount])
+  }
+
+  static encodeCreateProposal(to: string, data: string, amount: BigNumber, description: string, contentHash: string) {
+    const guildInterface = new utils.Interface(GuildAbi)
+    return guildInterface.functions.createProposal.encode([[to], [data], [amount], description, contentHash])
+  }
+
+  votesOf = async (address: string) => {
+    return this.contract?.votesOf(address)
+  }
+
+  votesForCreation = async () => {
+    return this.contract?.votesForCreation()
   }
 
   lockTokens = async (amount: BigNumber) => {

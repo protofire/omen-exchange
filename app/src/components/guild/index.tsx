@@ -1,14 +1,22 @@
-import React, { useState } from 'react'
+import { BigNumber } from 'ethers/utils'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import { ConnectedWeb3Context } from '../../contexts'
+import { OmenGuildService } from '../../services/guild'
+import { getLogger } from '../../util/logger'
 import { RemoteData } from '../../util/remote_data'
-import { MarketFilters, MarketMakerDataItem } from '../../util/types'
+import { MarketFilters, MarketMakerDataItem, TransactionStep } from '../../util/types'
 import { Button } from '../button'
 import { ButtonType } from '../button/button_styling_types'
 import { MarketCard } from '../market/market_card'
+import { ModalTransactionWrapper } from '../modal/modal_transaction'
+
+const logger = getLogger('Guild::Propose')
 
 interface Props {
   count: number
+  context: ConnectedWeb3Context
   currentFilter: any
   isFiltering?: boolean
   fetchMyMarkets: boolean
@@ -123,11 +131,34 @@ const NextButton = styled(Button)`
 `
 
 const GuildWrapper = (props: Props) => {
-  const { count, isFiltering, markets, moreMarkets } = props
+  const { context, count, isFiltering, markets, moreMarkets } = props
+  const { account, balances, cpk, library, networkId, setTxState, txHash, txState } = context
+
   const [propose, setPropose] = useState(false)
   const [selected, setSelected] = useState<string[]>([])
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
+  const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
+  const [votes, setVotes] = useState(new BigNumber(0))
+  const [votesRequired, setVotesRequired] = useState(new BigNumber(0))
 
-  const toggle = () => setPropose(!propose)
+  useEffect(() => {
+    const getVoteInfo = async () => {
+      if (!cpk || !account) {
+        return
+      }
+      const omen = new OmenGuildService(library, networkId)
+      const [votes, required] = await Promise.all([await omen.votesOf(account), await omen.votesForCreation()])
+      setVotes(votes)
+      setVotesRequired(required)
+    }
+
+    getVoteInfo()
+  }, [account, cpk, library, networkId])
+
+  const toggle = () => {
+    setPropose(!propose)
+    setSelected([])
+  }
 
   const select = (address: string) => {
     if (selected.includes(address)) {
@@ -136,6 +167,30 @@ const GuildWrapper = (props: Props) => {
       setSelected([...selected, address])
     }
   }
+
+  const proposeLiquidityRewards = async () => {
+    try {
+      if (!cpk) {
+        return
+      }
+
+      setIsTransactionProcessing(true)
+      setTxState(TransactionStep.waitingConfirmation)
+      setIsTransactionModalOpen(true)
+
+      // await cpk.proposeLiquidityRewards()
+      await new Promise(r => setTimeout(r, 3000))
+
+      await balances.fetchBalances()
+      setIsTransactionProcessing(false)
+    } catch (err) {
+      logger.error(err.message)
+      setIsTransactionProcessing(false)
+    }
+  }
+
+  const proposalButtonDisabled =
+    votes.isZero() || votes.lt(votesRequired) || (propose && !selected.length) || isTransactionProcessing
 
   return (
     <GuildPageWrapper>
@@ -156,7 +211,11 @@ const GuildWrapper = (props: Props) => {
             <ProposalSubtitle>Reward liquidity providers of popular omen markets with 500 OMN tokens</ProposalSubtitle>
           </div>
         )}
-        <ProposalButton buttonType={ButtonType.primary} disabled={propose && !selected.length} onClick={toggle}>
+        <ProposalButton
+          buttonType={ButtonType.primary}
+          disabled={proposalButtonDisabled}
+          onClick={propose ? proposeLiquidityRewards : toggle}
+        >
           Propose Liq. Rewards
         </ProposalButton>
       </ProposalHeadingWrapper>
@@ -189,6 +248,15 @@ const GuildWrapper = (props: Props) => {
           </ButtonNavWrapper>
         </ButtonWrapper>
       )}
+      <ModalTransactionWrapper
+        confirmations={0}
+        confirmationsRequired={0}
+        isOpen={isTransactionModalOpen}
+        message={'Propose Liquidity Rewards'}
+        onClose={() => setIsTransactionModalOpen(false)}
+        txHash={txHash}
+        txState={txState}
+      />
     </GuildPageWrapper>
   )
 }

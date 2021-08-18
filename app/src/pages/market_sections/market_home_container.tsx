@@ -394,6 +394,7 @@ const MarketHomeContainer: React.FC = () => {
   if (isGuild) {
     return (
       <GuildWrapper
+        context={context}
         count={fetchedMarkets ? fetchedMarkets.fixedProductMarketMakers.length : 0}
         currentFilter={filter}
         fetchMyMarkets={fetchMyMarkets}
