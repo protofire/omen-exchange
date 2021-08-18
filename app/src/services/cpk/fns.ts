@@ -16,8 +16,10 @@ import {
 } from '../../util/networks'
 import { calcDistributionHint, clampBigNumber, isContract } from '../../util/tools'
 import { MarketData, Question, Token, TransactionStep } from '../../util/types'
+import { AirdropService } from '../airdrop'
 import { ConditionalTokenService } from '../conditional_token'
 import { ERC20Service } from '../erc20'
+import { OmenGuildService } from '../guild'
 import { MarketMakerService } from '../market_maker'
 import { MarketMakerFactoryService } from '../market_maker_factory'
 import { OracleService } from '../oracle'
@@ -326,6 +328,25 @@ export const claim = async (params: ClaimParams) => {
   transactions.push({
     to: campaignAddress,
     data: StakingService.encodeClaimAll(service.cpk.address),
+  })
+}
+
+/**
+ * Set approval for spender on token
+ */
+
+interface GenericApprovalParams {
+  spender: string
+  collateral: Token
+  transactions: Transaction[]
+}
+
+export const genericApproval = async (params: GenericApprovalParams) => {
+  const { collateral, spender, transactions } = params
+
+  transactions.push({
+    to: collateral.address,
+    data: ERC20Service.encodeApproveUnlimited(spender),
   })
 
   return params
@@ -1058,10 +1079,73 @@ export const sendFromxDaiToBridge = async (params: SendFromxDaiParams) => {
 }
 
 /**
+ * Lock tokens in guild contract
+ */
+
+interface LockTokensParams {
+  amount: BigNumber
+  guild: OmenGuildService
+  transactions: Transaction[]
+}
+
+export const lockTokens = async (params: LockTokensParams) => {
+  const { amount, guild, transactions } = params
+
+  transactions.push({
+    to: guild.omenGuildAddress,
+    data: OmenGuildService.encodeLockTokens(amount),
+  })
+
+  return params
+}
+
+/**
+ * Unlock tokens in guild contract
+ */
+
+export const unlockTokens = async (params: LockTokensParams) => {
+  const { amount, guild, transactions } = params
+
+  transactions.push({
+    to: guild.omenGuildAddress,
+    data: OmenGuildService.encodeUnlockTokens(amount),
+  })
+
+  return params
+}
+
+/**
+ * Claim airdrop
+ */
+
+interface ClaimAirdropParams {
+  account: string
+  networkId: number
+  service: CPKService
+  transactions: Transaction[]
+  symbol?: string
+}
+
+export const claimAirdrop = async (params: ClaimAirdropParams) => {
+  const { account, networkId, service, transactions } = params
+
+  const airdrop = new AirdropService(networkId, service.provider, account)
+
+  const claims = await airdrop.encodeClaims(account)
+
+  if (claims) {
+    transactions.push(...claims)
+  }
+
+  return params
+}
+
+/**
  * Wrangle Functions
  * The purpose of wrangle functions is to transform params into common inputs other functions depend on
  * collateral: The collateral the market maker is using
  * amount: The amount being spent/withdrawn
+ * spender: Address to be approved by the CPK for a collateral type
  */
 
 /**
@@ -1113,4 +1197,22 @@ export const wrangleRemoveFundsParams = async (params: WrangleRemoveFundsParams)
   const amount = amountToMerge.add(earnings || new BigNumber(0))
 
   return { ...params, amount, collateral }
+}
+
+/**
+ * Wrangle lock tokens input data
+ */
+
+interface WrangleLockParams {
+  service: CPKService
+  networkId: number
+}
+
+export const wrangleLockParams = async (params: WrangleLockParams) => {
+  const { networkId, service } = params
+  const guild = new OmenGuildService(service.provider, networkId)
+  const collateral = getToken(networkId, 'omn')
+  const spender = await guild.tokenVault()
+
+  return { ...params, collateral, guild, spender }
 }

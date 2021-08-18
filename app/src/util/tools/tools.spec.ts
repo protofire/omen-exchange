@@ -13,8 +13,10 @@ import {
   calcXValue,
   calculateRewardApr,
   clampBigNumber,
+  daysUntil,
   formatHistoryDate,
   formatHistoryUser,
+  formatLockDate,
   formatNumber,
   formatTimestampToDate,
   formatToShortNumber,
@@ -46,6 +48,17 @@ describe('tools', () => {
         const stripped = strip0x(address)
         expect(stripped).toBe(testCase)
       })
+    }
+  })
+  describe('formatLockDate', () => {
+    const testCases: [number, string][] = [
+      [1610546486000, 'January 13th, 2021 - 14:01 UTC'],
+      [1610460714000, 'January 12th, 2021 - 14:11 UTC'],
+      [1609374633000, 'December 31st, 2020 - 00:30 UTC'],
+    ]
+    for (const [timestamp, result] of testCases) {
+      const unitResult = formatLockDate(timestamp)
+      expect(unitResult).toMatch(result)
     }
   })
   describe('getNetworkFromChain', () => {
@@ -165,6 +178,19 @@ describe('tools', () => {
     for (const [timestamp, result] of testCases) {
       const unitResult = formatHistoryDate(timestamp)
       expect(unitResult).toMatch(result)
+    }
+  })
+  describe('daysUntil', () => {
+    const testCases: [number, number][] = [
+      [1610546486000, 18621776],
+      [1610460714000, 18620784],
+      [1609374633000, 18608213],
+    ]
+
+    Date.now = jest.fn().mockReturnValue(new Date('2021-06-30T12:33:37.000Z'))
+    for (const [timestamp, result] of testCases) {
+      const unitResult = daysUntil(timestamp)
+      expect(unitResult).toStrictEqual(result)
     }
   })
 

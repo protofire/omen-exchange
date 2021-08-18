@@ -68,6 +68,7 @@ interface Network {
     dxTCR: string
     omenVerifiedMarkets: string
     stakingRewardsFactory: string
+    omenGuildProxy: string
   }
   cpk?: CPKAddresses
   relayProxyFactoryAddress?: string
@@ -78,6 +79,7 @@ interface Network {
   blockExplorer: string
   blockExplorerURL: string
   OMN?: Token
+  airdropAddress?: string[]
 }
 
 type KnownContracts = keyof Network['contracts']
@@ -105,6 +107,10 @@ export const networks: { [K in NetworkId]: Network } = {
         name: 'Infura',
       },
       { rpcUrl: 'https://cloudflare-eth.com/', name: 'Cloudflare' },
+      {
+        rpcUrl: `https://eth-mainnet.gateway.pokt.network/v1/lb/61116f89a585a200351491db`,
+        name: 'Pokt',
+      },
     ],
     graphHttpUri: GRAPH_MAINNET_HTTP,
     graphWsUri: GRAPH_MAINNET_WS,
@@ -126,6 +132,7 @@ export const networks: { [K in NetworkId]: Network } = {
       dxTCR: '0x93DB90445B76329e9ed96ECd74e76D8fbf2590d8',
       omenVerifiedMarkets: '0xb72103eE8819F2480c25d306eEAb7c3382fBA612',
       stakingRewardsFactory: '0x0000000000000000000000000000000000000000',
+      omenGuildProxy: '',
     },
     cpk: {
       masterCopyAddress: '0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F',
@@ -153,6 +160,10 @@ export const networks: { [K in NetworkId]: Network } = {
         rpcUrl: `https://rinkeby.infura.io/v3/${INFURA_PROJECT_ID}`,
         name: 'Infura',
       },
+      {
+        rpcUrl: `https://eth-rinkeby.gateway.pokt.network/v1/lb/61116c81a585a20035149067`,
+        name: 'Pokt',
+      },
     ],
     graphHttpUri: GRAPH_RINKEBY_HTTP,
     graphWsUri: GRAPH_RINKEBY_WS,
@@ -174,6 +185,7 @@ export const networks: { [K in NetworkId]: Network } = {
       dxTCR: '0x03165DF66d9448E45c2f5137486af3E7e752a352',
       omenVerifiedMarkets: '0x3b29096b7ab49428923d902cEC3dFEaa49993234',
       stakingRewardsFactory: '0xf50d900859da289a34204bC5FcA14c77575BD910',
+      omenGuildProxy: '0xa327ea1b9986d81750E9A6FdeAb1305589BFC260',
     },
     cpk: {
       masterCopyAddress: '0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F',
@@ -192,6 +204,7 @@ export const networks: { [K in NetworkId]: Network } = {
     defaultToken: 'dai',
     blockExplorer: 'etherscan',
     blockExplorerURL: 'https://rinkeby.etherscan.io',
+    airdropAddress: [],
   },
   [networkIds.SOKOL]: {
     label: 'Sokol',
@@ -222,6 +235,7 @@ export const networks: { [K in NetworkId]: Network } = {
       dxTCR: '0x5486a9050f2aC6f535a72526e37738A060508361',
       omenVerifiedMarkets: '0x0000000000000000000000000000000000000000',
       stakingRewardsFactory: '0x4A679ECefE7adD212f846BD86389E4278eC25d34',
+      omenGuildProxy: '',
     },
     cpk: {
       masterCopyAddress: '0x035000FC773f4a0e39FcdeD08A46aBBDBF196fd3',
@@ -252,6 +266,10 @@ export const networks: { [K in NetworkId]: Network } = {
         rpcUrl: 'https://dai.poa.network/',
         name: 'Blockscout',
       },
+      {
+        rpcUrl: 'https://poa-xdai.gateway.pokt.network/v1/lb/6111748ba585a2003514997b',
+        name: 'Pokt',
+      },
     ],
     graphHttpUri: GRAPH_XDAI_HTTP,
     graphWsUri: GRAPH_XDAI_WS,
@@ -273,6 +291,7 @@ export const networks: { [K in NetworkId]: Network } = {
       dxTCR: '0x85E001DfFF16F388Bc32Cd18009ceDF8F9b62C9E',
       omenVerifiedMarkets: '0x0000000000000000000000000000000000000000',
       stakingRewardsFactory: '0x0000000000000000000000000000000000000000',
+      omenGuildProxy: '',
     },
     cpk: {
       masterCopyAddress: '0x6851D6fDFAfD08c0295C392436245E5bc78B0185',
@@ -290,7 +309,8 @@ export const networks: { [K in NetworkId]: Network } = {
     },
     targetSafeImplementation: '0x9C75A217AEA76663a9A37687606f099945eb0742',
     blockExplorer: 'blockscout',
-    blockExplorerURL: 'https://blockscout.com/poa/xdai',
+    blockExplorerURL: 'https://blockscout.com/xdai/mainnet',
+    airdropAddress: ['0x1aDB23a6a48C4849168753b019b2A7D77C2C95d2', '0x868fc6343bfeDbED13935AFa7580Ba5BcC4b1409'],
   },
 }
 
@@ -341,8 +361,8 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     name: 'Omen',
     decimals: 18,
     addresses: {
-      [networkIds.MAINNET]: '0x543ff227f64aa17ea132bf9886cab5db55dcaddf',
-      [networkIds.XDAI]: '0x12daBe79cffC1fdE82FCd3B96DBE09FA4D8cd599',
+      [networkIds.MAINNET]: '0xa7370f2a5AFAa987492cD0f5c0fE14191C70aaA5',
+      [networkIds.XDAI]: '0xF52eAbb903831E2026a6A50Ce813fc871B5578f4',
       [networkIds.RINKEBY]: '0xa8b4b1dc4efc8f8c48e430a4faaaf36075670139',
     },
     order: 22,
@@ -726,6 +746,13 @@ export const getKnowArbitratorFromAddress = (networkId: number, address: string)
   }
 
   return 'unknown' as KnownArbitrator
+}
+
+export const getAirdrops = (networkId: number): string[] | undefined => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].airdropAddress
 }
 
 export const getRealitioTimeout = (networkId: number): number => {
