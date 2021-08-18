@@ -124,6 +124,7 @@ export const OutcomeTable = (props: Props) => {
 
   const TableCellsAlign = ['left', 'left', 'right', 'right', 'right', 'right', 'right']
   const symbol = useSymbol(collateral)
+  const bondCollateral = relay ? 'DAI' : 'ETH'
   const renderTableHeader = () => {
     return (
       <THead>
@@ -136,8 +137,8 @@ export const OutcomeTable = (props: Props) => {
                 style={isBond && index === 1 ? { width: '53%' } : {}}
                 textAlign={TableCellsAlign[index]}
               >
-                {value} {value === OutcomeTableValue.CurrentPrice && `(${symbol})`}
-                {value === OutcomeTableValue.Bonded && `(${symbol})`}
+                {value} {value === OutcomeTableValue.CurrentPrice && `(${bondCollateral})`}
+                {value === OutcomeTableValue.Bonded && `(${bondCollateral})`}
               </THStyled>
             ) : null
           })}
