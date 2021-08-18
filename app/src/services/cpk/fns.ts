@@ -157,6 +157,7 @@ interface UnwrapParams {
 
 export const unwrap = async (params: UnwrapParams) => {
   const { amount, collateral, transactions, wrapper } = params
+
   if (collateral.address.toLowerCase() === wrapper.address.toLowerCase() && !amount.isZero()) {
     const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateral.symbol, amount)
     transactions.push({
