@@ -937,20 +937,25 @@ export const unlockTokens = async (params: LockTokensParams) => {
  * Propose liquidity rewards
  */
 
-interface LockTokensParams {
-  amount: BigNumber
-  guild: OmenGuildService
+interface ProposeLiquidityRewardsParams {
+  campaignAddress: string
+  service: CPKService
   transactions: Transaction[]
+  networkId: number
 }
 
-export const proposeLiquidityRewards = async params => {
-  const { campaignAddress, transactions } = params
+export const proposeLiquidityRewards = async (params: ProposeLiquidityRewardsParams) => {
+  const { campaignAddress, networkId, service, transactions } = params
+
+  const guild = new OmenGuildService(service.provider, networkId)
+  const collateral = getToken(networkId, 'omn')
+  const rewardAmount = 0
 
   transactions.push({
     to: guild.omenGuildAddress,
     data: OmenGuildService.encodeCreateProposal(
       campaignAddress,
-      StakingService.encodeAddRewards(omen, amount),
+      StakingService.encodeAddRewards(collateral.address, rewardAmount),
       new BigNumber(0),
       '',
       '',
