@@ -252,6 +252,7 @@ interface Props {
   currentAnswerBond?: Maybe<BigNumber>
   isClosed?: boolean
   outcomePredictedByMarket?: Maybe<string>
+  style?: any
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
@@ -279,6 +280,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     startingPoint,
     startingPointTitle,
     status,
+    style,
     tradeAmount,
     trades,
     unit,
@@ -619,6 +621,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         borderBottom={isPositionTableDisabled}
         borderTop={borderTop}
         compressed={currentTab === MarketDetailsTab.sell}
+        style={style}
         valueBoxes={isAmountInputted}
       >
         <ScaleTitleWrapper>

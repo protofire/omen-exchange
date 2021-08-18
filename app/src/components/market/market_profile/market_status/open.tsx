@@ -13,7 +13,7 @@ import { MarketPoolLiquidityContainer } from '../../../../pages/market_sections/
 import { MarketSellContainer } from '../../../../pages/market_sections/market_sell_container'
 import { MarketVerifyContainer } from '../../../../pages/market_sections/market_verify_container'
 import { getNativeAsset, networkIds } from '../../../../util/networks'
-import { getUnit, isDust } from '../../../../util/tools'
+import { bigNumberToString, getUnit, isDust } from '../../../../util/tools'
 import { BalanceItem, MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../../util/types'
 import { Button, ButtonContainer } from '../../../button'
 import { ButtonType } from '../../../button/button_styling_types'

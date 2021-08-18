@@ -1,11 +1,15 @@
+import { BigNumber, bigNumberify } from 'ethers/utils'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { TYPE } from '../../theme'
 import { Card } from '../common/card'
 import { Table } from '../common/card/responsive_cards/table'
+import { FormStateButton } from '../common/form/form_state_button'
 import { IconArrowBack, IconArrowRight, IconOmen } from '../common/icons'
+import { RoundTag } from '../common/tag/round_tag'
 import { SectionTitle, SectionTitleWrapper } from '../common/text/section_title'
+import { MarketScale } from '../market/common_sections/card_bottom_details/market_scale'
 import { ViewCard } from '../market/common_sections/view_card'
 import ModalTitle from '../modal/modal_title'
 
@@ -28,6 +32,7 @@ const VoteSection = styled(Card)`
   width: 27%;
   @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
     width: 100%;
+    margin-top: 24px;
   }
 `
 const NavigationSection = styled.div`
@@ -54,6 +59,8 @@ interface Props {
   closingIn: any
   apyTwo: any
   verified: any
+  isScalar: any
+  setIsScalar: any
 }
 export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
   const {
@@ -63,9 +70,13 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     closingDate,
     closingIn,
     duration,
+    isScalar,
+
     liqudiity,
     marketDetails,
     scaleValue,
+    setIsScalar,
+
     totalVolume,
     verified,
     volume,
@@ -75,6 +86,13 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     ['Rewards', { text: amount, icon: <IconOmen /> }],
     ['APY%', { text: apy }],
     ['Duration', { text: duration }],
+  ]
+  const secondObject = [
+    ['Liqudity', { text: liqudiity }],
+    ['Total Volume', { text: totalVolume }],
+    ['24h Volume', { text: volume }],
+    ['Closing', { text: closingDate }],
+    ['Closing in', { text: closingIn }],
   ]
 
   return (
@@ -92,6 +110,31 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
             Issue Liqudity Rewards
           </TYPE.heading2>
           <Table valueObject={object} />
+          <TYPE.bodyRegular
+            color={'text2'}
+            marginTop={'24px'}
+            onClick={() => {
+              setIsScalar(!isScalar)
+            }}
+          >
+            Market Details
+          </TYPE.bodyRegular>
+          <TYPE.heading3 color={'text3'} marginTop={'16px'}>
+            {marketDetails}
+          </TYPE.heading3>
+          {isScalar ? (
+            <MarketScale
+              currentPrediction={scaleValue}
+              lowerBound={new BigNumber(0)}
+              startingPointTitle={'Current'}
+              style={{ marginTop: '24px' }}
+              unit={'%'}
+              upperBound={bigNumberify('100000000000000000000')}
+            ></MarketScale>
+          ) : (
+            <RoundTag>Cufta</RoundTag>
+          )}
+          <Table valueObject={secondObject} />
         </MainSection>
         <VoteSection>
           <TYPE.heading1>vote</TYPE.heading1>

@@ -18,7 +18,7 @@ interface Props {
 }
 
 export const ProposalDetailsPage = () => {
-  const [someState, setState] = useState('separation of concerns')
+  const [isScalar, setIsScalar] = useState(true)
   //logic
   const dummyDataPassed = {
     amount: '500.00 OMN',
@@ -26,7 +26,7 @@ export const ProposalDetailsPage = () => {
     duration: '32 days',
     marketDetails:
       'What will the June 2021 CME/Globex S&P500 e-mini terminate at? https://www.cmegroup.com/trading/equity-index/us-index/e-mini-sandp500_quotes_globex.html',
-    scaleValue: '90.54',
+    scaleValue: 0.94,
     liqudiity: '15,000.00 DAI',
     totalVolume: '4540.00 DAI',
     volume: '120.00 DAI',
@@ -34,6 +34,8 @@ export const ProposalDetailsPage = () => {
     closingIn: '32 days',
     apyTwo: '24.53%',
     verified: true,
+    isScalar: isScalar,
+    setIsScalar: setIsScalar,
   }
   return <ProposalDetailsView {...dummyDataPassed} />
 }
