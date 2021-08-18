@@ -342,16 +342,24 @@ const MarketHomeContainer: React.FC = () => {
       const routeQueryArray: string[] = []
 
       if (filter.state !== 'MY_MARKETS') {
-        if (filter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}`) {
-          route += '/24h-volume'
-        } else if (filter.sortBy === 'usdVolume') {
-          route += '/volume'
-        } else if (filter.sortBy === 'creationTimestamp') {
-          route += '/newest'
-        } else if (filter.sortBy === 'openingTimestamp') {
-          route += '/ending'
-        } else if (filter.sortBy === 'usdLiquidityParameter') {
-          route += '/liquidity'
+        switch (filter.sortBy) {
+          case `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}`:
+            route += '/24h-volume'
+            break
+          case 'usdVolume':
+            route += '/volume'
+            break
+          case 'creationTimestamp':
+            route += '/newest'
+            break
+          case 'openingTimestamp':
+            route += '/ending'
+            break
+          case 'usdLiquidityParameter':
+            route += '/liquidity'
+            break
+          default:
+            console.warn('Unknown sortBy filter')
         }
       }
 
