@@ -3,7 +3,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../contexts'
-import { bigNumberToString, getInitialCollateral } from '../../../util/tools'
+import { bigNumberToString, formatNumber, getInitialCollateral } from '../../../util/tools'
 import { Token } from '../../../util/types'
 import { TitleValue } from '../../common'
 import { ValueStates } from '../common_sections/user_transactions_tokens/transaction_details_row'
@@ -152,14 +152,14 @@ export const UserPoolData: React.FC<Props> = (props: Props) => {
         </FlexBoxColumnOrRow>
         {currentApr > 0 && (
           <LpRewardsWrapper>
-            <UserDataTitleValue title="Current APR" value={`${currentApr.toFixed(2)}%`} />
-            <UserDataTitleValue title="Total Rewards" value={`${totalRewards.toFixed(2)} OMN`} />
-            <UserDataTitleValue title="Rewards left" value={`${remainingRewards.toFixed(2)} OMN`} />
+            <UserDataTitleValue title="Current APR" value={`${formatNumber(String(currentApr))}%`} />
+            <UserDataTitleValue title="Total Rewards" value={`${formatNumber(String(totalRewards))} OMN`} />
+            <UserDataTitleValue title="Rewards left" value={`${formatNumber(String(remainingRewards))} OMN`} />
 
             <UserDataTitleValue
               state={earnedRewards > 0 ? ValueStates.success : undefined}
               title="Your Rewards"
-              value={`${earnedRewards.toFixed(2)} OMN`}
+              value={`${formatNumber(String(earnedRewards))} OMN`}
             />
           </LpRewardsWrapper>
         )}
