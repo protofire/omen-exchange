@@ -149,9 +149,11 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     balances.map(b => b.holdings),
     totalPoolShares,
   )
-  const depositedTokens = sendAmountsAfterRemovingFunding.reduce((min: BigNumber, amount: BigNumber) =>
-    amount.lt(min) ? amount : min,
-  )
+  const depositedTokens = sendAmountsAfterRemovingFunding
+    .map((amount, i) => {
+      return amount.add(balances[i].shares)
+    })
+    .reduce((min: BigNumber, amount: BigNumber) => (amount.lt(min) ? amount : min))
   const depositedTokensTotal = depositedTokens.add(userEarnings)
   const feeFormatted = useMemo(() => `${bigNumberToString(fee.mul(Math.pow(10, 2)), STANDARD_DECIMALS)}%`, [fee])
   const collateralBalance = maybeCollateralBalance || Zero
