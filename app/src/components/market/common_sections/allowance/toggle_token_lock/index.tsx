@@ -11,12 +11,12 @@ export interface ToggleTokenLockProps {
 }
 
 export const ToggleTokenLock = (props: ToggleTokenLockProps) => {
-  const { collateral, finished, loading, onUnlock, ...restProps } = props
+  const { collateral, finished, loading, onUnlock } = props
 
   const state = loading ? ButtonStates.working : finished ? ButtonStates.finished : ButtonStates.idle
 
   return (
-    <ButtonStateful disabled={loading || finished} onClick={onUnlock} state={state} {...restProps}>
+    <ButtonStateful disabled={loading || finished} onClick={onUnlock} state={state}>
       {collateral ? 'Set' : 'Upgrade'}
     </ButtonStateful>
   )
