@@ -23,16 +23,3 @@ export interface Colors {
   border3: Color
   border4: Color
 }
-
-export interface TextProps {
-  color: keyof Colors
-  display: string
-  fontWeight: number
-  fontSize: string
-  letterSpacing: string
-  lineHeight: string
-  margin: string
-  marginBottom: string
-  marginTop: string
-  marginLeft: string
-}

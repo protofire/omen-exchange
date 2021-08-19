@@ -18,7 +18,7 @@ interface Props {
 }
 
 export const ProposalDetailsPage = () => {
-  const [isScalar, setIsScalar] = useState(true)
+  const [isScalar, setIsScalar] = useState(false)
   //logic
   const dummyDataPassed = {
     amount: '500.00 OMN',

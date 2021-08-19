@@ -123,12 +123,10 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     closingIn,
     duration,
     isScalar,
-
     liqudiity,
     marketDetails,
     scaleValue,
     setIsScalar,
-
     totalVolume,
     verified,
     volume,
@@ -145,6 +143,13 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     ['24h Volume', { text: volume }],
     ['Closing', { text: closingDate }],
     ['Closing in', { text: closingIn }],
+  ]
+  const Outcomes = [
+    ['Violet', 22],
+    ['Nasdd', 43],
+    ['Drkso', 33],
+    ['Sfhrs', 55],
+    ['Uno more', 78],
   ]
   const submissions: KlerosSubmission[] = []
   return (
@@ -181,18 +186,21 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
           <TYPE.heading3 color={'text3'} marginTop={'16px'}>
             {marketDetails}
           </TYPE.heading3>
-          {isScalar ? (
-            <MarketScale
-              currentPrediction={scaleValue}
-              lowerBound={new BigNumber(0)}
-              startingPointTitle={'Current'}
-              style={{ marginTop: '24px', border: 'none' }}
-              unit={'%'}
-              upperBound={bigNumberify('100000000000000000000')}
-            ></MarketScale>
-          ) : (
-            <RoundTag>Cufta</RoundTag>
-          )}
+          <div style={{ marginTop: '24px' }}>
+            {isScalar ? (
+              <MarketScale
+                currentPrediction={scaleValue}
+                lowerBound={new BigNumber(0)}
+                startingPointTitle={'Current'}
+                style={{ border: 'none' }}
+                unit={'%'}
+                upperBound={bigNumberify('100000000000000000000')}
+              ></MarketScale>
+            ) : (
+              <RoundTag outcomes={Outcomes} />
+            )}
+          </div>
+
           <Table valueObject={secondObject} />
           <AdditionalData
             address={'42'}
