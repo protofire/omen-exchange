@@ -115,7 +115,17 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { address, arbitrator, category, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
+  const {
+    address,
+    arbitrator,
+    category,
+    curatedByDxDaoOrKleros,
+    id,
+    oracle,
+    submissionIDs,
+    title,
+    ...restProps
+  } = props
 
   const context = useConnectedWeb3Context()
   const { relay } = context
@@ -137,7 +147,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   queryParams.append('col2', `https://omen.eth.link/#/${address}`)
 
   return (
-    <AdditionalMarketDataWrapper>
+    <AdditionalMarketDataWrapper {...restProps}>
       <AdditionalMarketDataLeft>
         <AdditionalMarketDataSectionWrapper
           href={`/#/24h-volume/category/${encodeURI(category)}`}

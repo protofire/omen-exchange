@@ -3,6 +3,8 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 
 import { TYPE } from '../../theme'
+import { getArbitrator, getToken } from '../../util/networks'
+import { Arbitrator, KlerosSubmission } from '../../util/types'
 import { Card } from '../common/card'
 import { Table } from '../common/card/responsive_cards/table'
 import { FormStateButton } from '../common/form/form_state_button'
@@ -10,6 +12,7 @@ import { IconArrowBack, IconArrowRight, IconOmen } from '../common/icons'
 import { RoundTag } from '../common/tag/round_tag'
 import { SectionTitle, SectionTitleWrapper } from '../common/text/section_title'
 import { MarketScale } from '../market/common_sections/card_bottom_details/market_scale'
+import { AdditionalMarketData } from '../market/common_sections/card_top_details/additional_market_data'
 import { ViewCard } from '../market/common_sections/view_card'
 import ModalTitle from '../modal/modal_title'
 
@@ -18,19 +21,19 @@ const MainWrapper = styled.div`
   flex-direction: row;
   width: 100%;
   column-gap: 48px;
-  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+  @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
     flex-direction: column;
   }
 `
 const MainSection = styled(Card)`
   width: 73%;
-  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+  @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
     width: 100%;
   }
 `
 const VoteSection = styled(Card)`
   width: 27%;
-  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+  @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
     width: 100%;
     margin-top: 24px;
   }
@@ -44,6 +47,10 @@ const Container = styled.div`
   flex-direction: row;
   width: 100%;
   padding: 0;
+`
+const AdditionalData = styled(AdditionalMarketData)`
+  border: none;
+  margin-top: 10px;
 `
 
 interface Props {
@@ -94,7 +101,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     ['Closing', { text: closingDate }],
     ['Closing in', { text: closingIn }],
   ]
-
+  const submissions: KlerosSubmission[] = []
   return (
     <Container>
       <NavigationSection>
@@ -127,7 +134,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
               currentPrediction={scaleValue}
               lowerBound={new BigNumber(0)}
               startingPointTitle={'Current'}
-              style={{ marginTop: '24px' }}
+              style={{ marginTop: '24px', border: 'none' }}
               unit={'%'}
               upperBound={bigNumberify('100000000000000000000')}
             ></MarketScale>
@@ -135,6 +142,19 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
             <RoundTag>Cufta</RoundTag>
           )}
           <Table valueObject={secondObject} />
+          <AdditionalData
+            address={'42'}
+            arbitrator={getArbitrator(100, 'dxdao')}
+            category={'Politics'}
+            collateral={getToken(1, 'dai')}
+            curatedByDxDao={true}
+            curatedByDxDaoOrKleros={true}
+            id={'111'}
+            oracle={'DxDao'}
+            ovmAddress={'22554'}
+            submissionIDs={submissions}
+            title={'hell'}
+          />
         </MainSection>
         <VoteSection>
           <TYPE.heading1>vote</TYPE.heading1>

@@ -13,8 +13,9 @@ const CardStyled = styled.div`
   gap: 48px;
   margin-top: 22px;
   padding: 24px 32px;
+  justify-content: space-between;
   //mobile
-  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+  @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
     flex-direction: column;
     width: 100%;
     gap: 10px;
@@ -25,11 +26,11 @@ const CardStyled = styled.div`
 const ItemWrapper = styled.div`
   div:nth-child(2) {
     margin-top: 8px;
-    @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
       margin-top: 0px;
     }
   }
-  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+  @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
     display: flex;
     justify-content: space-between;
   }
@@ -39,10 +40,10 @@ interface Props {
   valueObject: any
 }
 export const Table: React.FC<Props> = (props: Props) => {
-  const { valueObject } = props
+  const { valueObject, ...restProps } = props
 
   return (
-    <CardStyled>
+    <CardStyled {...restProps}>
       {valueObject.map((item: any) => {
         return (
           <ItemWrapper key={item}>
