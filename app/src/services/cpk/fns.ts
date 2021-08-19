@@ -325,10 +325,17 @@ interface ClaimParams {
 export const claim = async (params: ClaimParams) => {
   const { campaignAddress, service, transactions } = params
 
-  transactions.push({
-    to: campaignAddress,
-    data: StakingService.encodeClaimAll(service.cpk.address),
-  })
+  const stakingService = new StakingService(service.provider, service.cpk.address, campaignAddress)
+  const claimAmounts = await stakingService.getClaimableRewards(service.cpk.address)
+
+  const claimableRewards = claimAmounts.filter(amount => amount.gt(Zero))
+
+  if (claimableRewards.length > 0) {
+    transactions.push({
+      to: campaignAddress,
+      data: StakingService.encodeClaimAll(service.cpk.address),
+    })
+  }
 
   return params
 }
