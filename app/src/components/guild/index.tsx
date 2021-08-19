@@ -9,6 +9,7 @@ import { RemoteData } from '../../util/remote_data'
 import { MarketFilters, MarketMakerDataItem, TransactionStep } from '../../util/types'
 import { Button } from '../button'
 import { ButtonType } from '../button/button_styling_types'
+import { IconBack } from '../common/icons'
 import { MarketCard } from '../market/market_card'
 import { ModalTransactionWrapper } from '../modal/modal_transaction'
 
@@ -40,27 +41,30 @@ const ProposalHeadingWrapper = styled.div`
   justify-content: space-between;
   width: 100%;
   align-items: center;
-  flex-wrap: wrap;
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    flex-wrap: wrap;
+  }
 `
 
 const ProposalTitle = styled.div`
   font-size: 22px;
   font-weight: 500;
   line-height: 26px;
-  margin-bottom: 8px;
   color: ${props => props.theme.text3};
 `
 
 const ProposalSubtitle = styled.div`
-  font-size: 14px;
+  font-size: ${props => props.theme.defaultSize};
   font-weight: 400;
   line-height: 18px;
-  color: #86909e;
+  margin-top: 8px;
+  color: ${props => props.theme.text2};
 `
 
 const ProposalButton = styled(Button)`
   @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
     margin-top: 24px;
+    width: 100%;
   }
 `
 
@@ -69,13 +73,15 @@ const MarketCardsWrapper = styled.div`
   justify-content: space-between;
   flex-wrap: wrap;
   width: 100%;
-  margin: 20px 0px;
+  margin-top: 12px;
+  margin-bottom: 32px;
 `
 
 const OverviewWrapper = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 16px;
+  cursor: pointer;
 
   &:hover svg {
     path {
@@ -88,16 +94,9 @@ const OverviewWrapper = styled.div`
   }
 `
 
-const IconBack = () => (
-  <svg fill="none" height="12" viewBox="0 0 18 12" width="18" xmlns="http://www.w3.org/2000/svg">
-    <path d="M18 5H3.83L7.41 1.41L6 0L0 6L6 12L7.41 10.59L3.83 7H18V5Z" />
-  </svg>
-)
-
 const StyledSvg = styled.svg`
   height: 12px;
   width: 18px;
-  cursor: pointer;
   path {
     fill: ${props => props.theme.primary2};
   }
@@ -113,7 +112,6 @@ const OverviewTitle = styled.div`
   align-items: center;
   letter-spacing: 0.2px;
   margin-left: 16px;
-  cursor: pointer;
   color: ${props => props.theme.primary2};
 `
 
@@ -131,14 +129,17 @@ const NextButton = styled(Button)`
 `
 
 const GuildWrapper = (props: Props) => {
-  const { context, count, isFiltering, markets, moreMarkets } = props
+  const { context, count, isFiltering, markets, moreMarkets, onLoadNextPage, onLoadPrevPage, pageIndex } = props
   const { account, balances, cpk, library, networkId, setTxState, txHash, txState } = context
 
   const [propose, setPropose] = useState(false)
   const [selected, setSelected] = useState<string[]>([])
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
+
+  // eslint-disable-next-line
   const [votes, setVotes] = useState(new BigNumber(0))
+  // eslint-disable-next-line
   const [votesRequired, setVotesRequired] = useState(new BigNumber(0))
 
   useEffect(() => {
@@ -189,28 +190,29 @@ const GuildWrapper = (props: Props) => {
     }
   }
 
-  const proposalButtonDisabled =
-    votes.isZero() || votes.lt(votesRequired) || (propose && !selected.length) || isTransactionProcessing
-
+  const proposalButtonDisabled = (propose && !selected.length) || isTransactionProcessing // || votes.isZero() || votes.lt(votesRequired)
+  const isPrevDisabled = pageIndex === 0
+  const isNextDisabled = !moreMarkets
   return (
     <GuildPageWrapper>
+      {propose && (
+        <OverviewWrapper onClick={toggle}>
+          <StyledSvg>
+            <IconBack />
+          </StyledSvg>
+          <OverviewTitle>Guild Overview</OverviewTitle>
+        </OverviewWrapper>
+      )}
       <ProposalHeadingWrapper>
         {propose ? (
-          <div>
-            <OverviewWrapper onClick={toggle}>
-              <StyledSvg>
-                <IconBack />
-              </StyledSvg>
-              <OverviewTitle>Guild Overview</OverviewTitle>
-            </OverviewWrapper>
-            <ProposalTitle>Choose Market for liquidity rewards</ProposalTitle>
-          </div>
+          <ProposalTitle>Choose Market for liquidity rewards</ProposalTitle>
         ) : (
           <div>
             <ProposalTitle>Proposed Liquidity Rewards</ProposalTitle>
             <ProposalSubtitle>Reward liquidity providers of popular omen markets with 500 OMN tokens</ProposalSubtitle>
           </div>
         )}
+
         <ProposalButton
           buttonType={ButtonType.primary}
           disabled={proposalButtonDisabled}
@@ -241,8 +243,18 @@ const GuildWrapper = (props: Props) => {
         <ButtonWrapper>
           <Button onClick={toggle}>Back</Button>
           <ButtonNavWrapper>
-            <Button>Prev</Button>
-            <NextButton buttonType={ButtonType.primary} disabled={!moreMarkets}>
+            <Button
+              buttonType={isPrevDisabled ? ButtonType.primary : ButtonType.primaryLine}
+              disabled={pageIndex === 0}
+              onClick={onLoadPrevPage}
+            >
+              Prev
+            </Button>
+            <NextButton
+              buttonType={isNextDisabled ? ButtonType.primary : ButtonType.primaryLine}
+              disabled={!moreMarkets}
+              onClick={onLoadNextPage}
+            >
               Next
             </NextButton>
           </ButtonNavWrapper>

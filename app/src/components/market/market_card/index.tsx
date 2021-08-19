@@ -2,7 +2,7 @@ import moment from 'moment'
 import React from 'react'
 import styled from 'styled-components'
 
-import { bigNumberToNumber, formatToShortNumber, limitDecimalPlaces } from '../../../util/tools'
+import { bigNumberToString, limitDecimalPlaces } from '../../../util/tools'
 import { MarketMakerDataItem } from '../../../util/types'
 import { CurationRadioWrapper } from '../common_styled'
 
@@ -29,7 +29,7 @@ const Title = styled.div`
 `
 
 const StyledMarketCard = styled.div<{ active?: boolean }>`
-  flex-basis: calc(33.33% - 20px);
+  flex-basis: calc(33.33% - 12.5px);
   border: 1px solid ${props => (props.active ? props.theme.colors.borderColorDark : props.theme.colors.tertiary)};
   padding: 28px;
   margin-top: 20px;
@@ -106,12 +106,8 @@ export const MarketCard = (props: Props) => {
   const { active, market, onClick } = props
 
   const resolutionDate = moment(market.openingTimestamp).format('Do MMMM YYYY')
-  const formattedLiquidity: string = formatToShortNumber(
-    bigNumberToNumber(market.totalPoolShares, market.collateral.decimals),
-  )
-  const formattedVolume: string = formatToShortNumber(
-    bigNumberToNumber(market.collateralVolume, market.collateral.decimals),
-  )
+  const formattedLiquidity: string = bigNumberToString(market.totalPoolShares, market.collateral.decimals)
+  const formattedVolume: string = bigNumberToString(market.collateralVolume, market.collateral.decimals)
 
   return (
     <StyledMarketCard active={active} onClick={onClick}>

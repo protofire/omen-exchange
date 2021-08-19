@@ -945,22 +945,22 @@ interface ProposeLiquidityRewardsParams {
 }
 
 export const proposeLiquidityRewards = async (params: ProposeLiquidityRewardsParams) => {
-  const { campaignAddress, networkId, service, transactions } = params
+  // const { campaignAddress, networkId, service, transactions } = params
 
-  const guild = new OmenGuildService(service.provider, networkId)
-  const collateral = getToken(networkId, 'omn')
-  const rewardAmount = 0
+  // const guild = new OmenGuildService(service.provider, networkId)
+  // const collateral = getToken(networkId, 'omn')
+  // const rewardAmount = 0
 
-  transactions.push({
-    to: guild.omenGuildAddress,
-    data: OmenGuildService.encodeCreateProposal(
-      campaignAddress,
-      StakingService.encodeAddRewards(collateral.address, rewardAmount),
-      new BigNumber(0),
-      '',
-      '',
-    ),
-  })
+  // transactions.push({
+  //   to: guild.omenGuildAddress,
+  //   data: OmenGuildService.encodeCreateProposal(
+  //     campaignAddress,
+  //     StakingService.encodeAddRewards(collateral.address, rewardAmount),
+  //     new BigNumber(0),
+  //     '',
+  //     '',
+  //   ),
+  // })
 
   return params
 }

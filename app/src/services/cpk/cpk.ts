@@ -34,6 +34,7 @@ import {
   lockTokens,
   pipe,
   prepareCondition,
+  proposeLiquidityRewards,
   redeemPosition,
   removeFunds,
   resolveCondition,
@@ -444,7 +445,7 @@ class CPKService {
 
   proposeLiquidityRewards = async (params: ProposeLiquidityRewards) => {
     try {
-      const { transaction } = await this.pipe(claimAirdrop)(params)
+      const { transaction } = await this.pipe(proposeLiquidityRewards)(params)
       return transaction
     } catch (e) {
       logger.error(`Error while trying to claim airdrop : `, e.message)
