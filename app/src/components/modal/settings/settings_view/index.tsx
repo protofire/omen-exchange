@@ -29,6 +29,7 @@ const StatusSection = styled(Row as any)`
 const TextLighter = styled.p`
   color: ${props => props.theme.colors.textColorLighter};
   font-size: 12px;
+  font-family: Roboto;
   line-height: 14.06px;
   margin: 0;
 `
@@ -54,6 +55,7 @@ const FiltersControls = styled.div<{ disabled?: boolean }>`
 
 const NodeDropdown = styled(Dropdown)`
   min-width: 170px;
+  height: 40px;
 `
 
 const CustomDropdownItem = styled.div`
@@ -63,6 +65,7 @@ const CustomDropdownItem = styled.div`
   white-space: nowrap;
   width: 100%;
   font-size: ${props => props.theme.fonts.defaultSize};
+  font-family: Roboto;
   line-height: ${props => props.theme.fonts.defaultLineHeight};
   display: flex;
   align-items: center;
@@ -88,6 +91,7 @@ const Input = styled.input`
   ${TextfieldCSS};
   padding: 12px 20px;
   width: 100%;
+  font-family: Roboto;
 `
 
 const ImageWrap = styled.div`
@@ -105,6 +109,8 @@ const TopCardHeader = styled.div<{ borderTop?: boolean }>`
 
 const RPCTextWrapper = styled.span`
   line-height: ${props => props.theme.fonts.defaultLineHeight};
+  font-size: ${props => props.theme.fonts.defaultSize};
+  font-family: Roboto;
 `
 
 const SettingsButtonWrapper = styled.div`
