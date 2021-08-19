@@ -329,6 +329,8 @@ export const claim = async (params: ClaimParams) => {
     to: campaignAddress,
     data: StakingService.encodeClaimAll(service.cpk.address),
   })
+
+  return params
 }
 
 /**
