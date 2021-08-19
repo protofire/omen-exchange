@@ -155,6 +155,7 @@ export const ProgressBar: React.FC<Props> = props => {
   return (
     <ProgressBarWrapper>
       <ProgressBarContainer>
+        <div>This is the begginging</div>
         <ProgressBarDot className="progress-bar-dot__0" fill={true}></ProgressBarDot>
         <ProgressBarLine>
           <ProgressBarFill

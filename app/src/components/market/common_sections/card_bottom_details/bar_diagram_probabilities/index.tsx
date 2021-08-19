@@ -40,14 +40,14 @@ const OutcomeValue = styled.p`
   white-space: nowrap;
 `
 
-const ProgressBar = styled.div`
+export const ProgressBare = styled.div`
   background-color: #f5f5f5;
   border-radius: 4px;
   height: 6px;
   overflow: hidden;
 `
 
-const Progress = styled.div<{ width: number; outcomeIndex: number; selected?: boolean }>`
+export const Progress = styled.div<{ width: number; outcomeIndex: number; selected?: boolean }>`
   background-color: ${props =>
     getOutcomeColor(props.outcomeIndex).medium
       ? props.selected
@@ -85,9 +85,10 @@ export const BarDiagram: React.FC<Props> = (props: Props) => {
           {winningBadge}
           <OutcomeValue>{probability.toFixed(2)}%</OutcomeValue>
         </OutcomeText>
-        <ProgressBar>
+
+        <ProgressBare>
           <Progress outcomeIndex={outcomeIndex} selected={selected} width={probability} />
-        </ProgressBar>
+        </ProgressBare>
       </Outcome>
     </BarDiagramWrapper>
   )

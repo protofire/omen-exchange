@@ -1,20 +1,19 @@
 import { BigNumber, bigNumberify } from 'ethers/utils'
-import React, { useState } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
 import { TYPE } from '../../theme'
 import { getArbitrator, getToken } from '../../util/networks'
-import { Arbitrator, KlerosSubmission } from '../../util/types'
+import { KlerosSubmission } from '../../util/types'
+import { Button } from '../button/button'
+import { ButtonType } from '../button/button_styling_types'
 import { Card } from '../common/card'
 import { Table } from '../common/card/responsive_cards/table'
-import { FormStateButton } from '../common/form/form_state_button'
-import { IconArrowBack, IconArrowRight, IconOmen } from '../common/icons'
+import { IconArrowBack, IconOmen } from '../common/icons'
 import { RoundTag } from '../common/tag/round_tag'
-import { SectionTitle, SectionTitleWrapper } from '../common/text/section_title'
+import { BarDiagram } from '../market/common_sections/card_bottom_details/bar_diagram_probabilities'
 import { MarketScale } from '../market/common_sections/card_bottom_details/market_scale'
 import { AdditionalMarketData } from '../market/common_sections/card_top_details/additional_market_data'
-import { ViewCard } from '../market/common_sections/view_card'
-import ModalTitle from '../modal/modal_title'
 
 const MainWrapper = styled.div`
   display: flex;
@@ -33,6 +32,7 @@ const MainSection = styled(Card)`
 `
 const VoteSection = styled(Card)`
   width: 27%;
+  height: fit-content;
   @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
     width: 100%;
     margin-top: 24px;
@@ -51,6 +51,19 @@ const Container = styled.div`
 const AdditionalData = styled(AdditionalMarketData)`
   border: none;
   margin-top: 10px;
+`
+const VotesBar = styled.div`
+  margin: 16px 0;
+`
+const VoteButtons = styled.div`
+  border-top: 1px solid #e8eaf6;
+  flex-direction: row;
+  display: flex;
+  justify-content: space-between;
+  column-gap: 16px;
+  button {
+    flex: 1;
+  }
 `
 
 interface Props {
@@ -157,7 +170,17 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
           />
         </MainSection>
         <VoteSection>
-          <TYPE.heading1>vote</TYPE.heading1>
+          <TYPE.heading2 borderBottom={'1px solid #E8EAF6'} color={'text3'} margin={'0 -24px'} padding={'0 24px 20px'}>
+            Vote
+          </TYPE.heading2>
+          <VotesBar>
+            <BarDiagram outcomeIndex={22} outcomeName={'Yes'} probability={22} />
+            <BarDiagram outcomeIndex={22} outcomeName={'No'} probability={22} />
+          </VotesBar>
+          <VoteButtons>
+            <Button buttonType={ButtonType.primary}>Yes</Button>
+            <Button buttonType={ButtonType.primary}>No</Button>
+          </VoteButtons>
         </VoteSection>
       </MainWrapper>
     </Container>

@@ -154,6 +154,7 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
 
         <MoreMenu items={marketsRelatedQuestion.length > 1 && isMobile ? moreMenuItems : new Array(moreMenuItems[0])} />
       </SubsectionTitleWrapper>
+      <div>Below progress</div>
       {showingProgressBar && (
         <ProgressBar
           answerFinalizedTimestamp={answerFinalizedTimestamp}
