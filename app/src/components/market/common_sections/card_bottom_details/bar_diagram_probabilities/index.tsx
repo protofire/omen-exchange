@@ -1,6 +1,7 @@
 import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
+import { TYPE } from '../../../../../theme'
 import { getOutcomeColor } from '../../../../../theme/utils'
 
 const BarDiagramWrapper = styled.div`
@@ -40,7 +41,7 @@ const OutcomeValue = styled.p`
   white-space: nowrap;
 `
 
-export const ProgressBare = styled.div`
+const ProgressBar = styled.div`
   background-color: #f5f5f5;
   border-radius: 4px;
   height: 6px;
@@ -72,23 +73,40 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   probability: number
   selected?: boolean
   winningBadge?: React.ReactNode
+  additionalTextLeft?: string
+  additionalTextRight?: string
+  style?: any
 }
 
 export const BarDiagram: React.FC<Props> = (props: Props) => {
-  const { outcomeIndex, outcomeName, probability, selected, winningBadge } = props
+  const {
+    additionalTextLeft,
+    additionalTextRight,
+    outcomeIndex,
+    outcomeName,
+    probability,
+    selected,
+    winningBadge,
+    ...restProps
+  } = props
 
   return (
-    <BarDiagramWrapper>
+    <BarDiagramWrapper {...restProps}>
       <Outcome>
         <OutcomeText>
           {outcomeName && <OutcomeName>{outcomeName}</OutcomeName>}
           {winningBadge}
           <OutcomeValue>{probability.toFixed(2)}%</OutcomeValue>
         </OutcomeText>
-
-        <ProgressBare>
+        <ProgressBar>
           <Progress outcomeIndex={outcomeIndex} selected={selected} width={probability} />
-        </ProgressBare>
+        </ProgressBar>
+        {additionalTextLeft && additionalTextRight && (
+          <OutcomeText style={{ marginTop: '10px' }}>
+            <TYPE.bodyRegular color={'text2'}>{additionalTextLeft}</TYPE.bodyRegular>
+            <TYPE.bodyRegular color={'text2'}>{additionalTextRight}</TYPE.bodyRegular>
+          </OutcomeText>
+        )}
       </Outcome>
     </BarDiagramWrapper>
   )

@@ -32,6 +32,7 @@ const MainSection = styled(Card)`
 `
 const VoteSection = styled(Card)`
   width: 27%;
+  padding: 20px;
   height: fit-content;
   @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
     width: 100%;
@@ -54,9 +55,14 @@ const AdditionalData = styled(AdditionalMarketData)`
 `
 const VotesBar = styled.div`
   margin: 16px 0;
+  row-gap: 16px;
+  display: flex;
+  flex-direction: column;
 `
 const VoteButtons = styled.div`
   border-top: 1px solid #e8eaf6;
+  margin: 0 -20px;
+  padding: 20px 20px 0;
   flex-direction: row;
   display: flex;
   justify-content: space-between;
@@ -170,12 +176,25 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
           />
         </MainSection>
         <VoteSection>
-          <TYPE.heading2 borderBottom={'1px solid #E8EAF6'} color={'text3'} margin={'0 -24px'} padding={'0 24px 20px'}>
+          <TYPE.heading2 borderBottom={'1px solid #E8EAF6'} color={'text3'} margin={'0 -20px'} padding={'0 20px 20px'}>
             Vote
           </TYPE.heading2>
           <VotesBar>
-            <BarDiagram outcomeIndex={22} outcomeName={'Yes'} probability={22} />
-            <BarDiagram outcomeIndex={22} outcomeName={'No'} probability={22} />
+            <BarDiagram
+              additionalTextLeft={'454 votes'}
+              additionalTextRight={'454 OMEN'}
+              outcomeIndex={22}
+              outcomeName={'Yes'}
+              probability={22}
+            />
+            <BarDiagram
+              additionalTextLeft={'454 votes'}
+              additionalTextRight={'454 OMEN'}
+              outcomeIndex={22}
+              outcomeName={'No'}
+              probability={42}
+              style={{ borderTop: '1px solid #E8EAF6', margin: '0 -20px', padding: '20px 20px 0px' }}
+            />
           </VotesBar>
           <VoteButtons>
             <Button buttonType={ButtonType.primary}>Yes</Button>
