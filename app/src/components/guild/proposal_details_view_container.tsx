@@ -150,6 +150,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     ['Drkso', 33],
     ['Sfhrs', 55],
     ['Uno more', 78],
+    // ['Uno more', 78],
   ]
   const submissions: KlerosSubmission[] = []
   return (
