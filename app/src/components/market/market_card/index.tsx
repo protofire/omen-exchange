@@ -2,6 +2,7 @@ import moment from 'moment'
 import React from 'react'
 import styled from 'styled-components'
 
+import { TYPE } from '../../../theme'
 import { bigNumberToString, limitDecimalPlaces } from '../../../util/tools'
 import { MarketMakerDataItem } from '../../../util/types'
 import { CurationRadioWrapper } from '../common_styled'
@@ -13,23 +14,8 @@ const ClosingWrapper = styled.div`
   margin-bottom: 16px;
 `
 
-const Closing = styled.div`
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 18px;
-  color: #86909e;
-`
-
-const Title = styled.div`
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 18px;
-  margin-bottom: 16px;
-  color: #37474f;
-`
-
 const StyledMarketCard = styled.div<{ active?: boolean }>`
-  flex-basis: calc(33.33% - 12.5px);
+  flex-basis: calc(33.33% - 13.3px);
   border: 1px solid ${props => (props.active ? props.theme.colors.borderColorDark : props.theme.colors.tertiary)};
   padding: 28px;
   margin-top: 20px;
@@ -43,6 +29,7 @@ const StyledMarketCard = styled.div<{ active?: boolean }>`
 
   @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
     flex-basis: 100%;
+    margin-left: 0 !important;
   }
 `
 
@@ -61,13 +48,20 @@ const Tick = () => (
   </svg>
 )
 
+const TitleWrapper = styled.div`
+  height: 54px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
+    height: auto;
+  }
+`
+
 const DetailsWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-`
-
-const Detail = styled.div`
-  color: ${props => props.theme.colors.textColorLighter};
 `
 
 const OutcomeWrapper = styled.div`
@@ -87,15 +81,6 @@ const OutcomeRow = styled.div`
   justify-content: space-between;
 `
 
-const OutcomeItem = styled.div`
-  color: ${props => props.theme.colors.textColorLighter};
-  font-weight: 400;
-
-  &:last-child {
-    font-weight: 500;
-  }
-`
-
 interface Props {
   active: boolean
   market: MarketMakerDataItem
@@ -112,25 +97,29 @@ export const MarketCard = (props: Props) => {
   return (
     <StyledMarketCard active={active} onClick={onClick}>
       <ClosingWrapper>
-        <Closing>Closing {resolutionDate}</Closing>
+        <TYPE.bodyRegular color="text2">Closing {resolutionDate}</TYPE.bodyRegular>
         <RadioWrapper selected={active}>{active && <Tick />}</RadioWrapper>
       </ClosingWrapper>
-      <Title>{market.title}</Title>
+      <TitleWrapper>
+        <TYPE.bodyMedium color="text1">{market.title}</TYPE.bodyMedium>
+      </TitleWrapper>
       <OutcomeWrapper>
         {market.outcomes?.map((outcome, index) => (
           <OutcomeRow key={outcome}>
-            <OutcomeItem>{outcome}</OutcomeItem>
-            <OutcomeItem>{limitDecimalPlaces(market.outcomeTokenMarginalPrices[index], 2)}%</OutcomeItem>
+            <TYPE.bodyRegular color="text2">{outcome}</TYPE.bodyRegular>
+            <TYPE.bodyMedium color="text2">
+              {limitDecimalPlaces(market.outcomeTokenMarginalPrices[index], 2)}%
+            </TYPE.bodyMedium>
           </OutcomeRow>
         ))}
       </OutcomeWrapper>
       <DetailsWrapper>
-        <Detail>
+        <TYPE.bodyRegular color="text2">
           {formattedLiquidity} {market.collateral.symbol} Liquidity
-        </Detail>
-        <Detail>
+        </TYPE.bodyRegular>
+        <TYPE.bodyRegular color="text2">
           {formattedVolume} {market.collateral.symbol} Volume
-        </Detail>
+        </TYPE.bodyRegular>
       </DetailsWrapper>
     </StyledMarketCard>
   )

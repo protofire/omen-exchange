@@ -57,6 +57,7 @@ export const useMarkets = (options: Options): any => {
 
   const fetchMyMarkets = state === MarketStates.myMarkets
   const queryOptions: BuildQueryType = {
+    first,
     whitelistedCreators: false,
     whitelistedTemplateIds: true,
     networkId,

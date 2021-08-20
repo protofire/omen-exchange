@@ -262,7 +262,7 @@ const HeaderContainer: React.FC = (props: any) => {
     onClick: () => history && history.push('/'),
   }
 
-  const isMarketPage = history.location.pathname === '/liquidity'
+  const isMarketPage = history.location.pathname.startsWith('/liquidity')
   const isGuildPage = history.location.pathname === '/guild'
   return (
     <HeaderWrapper {...restProps}>

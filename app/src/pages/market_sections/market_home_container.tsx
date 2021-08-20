@@ -11,7 +11,6 @@ import useLocalStorageState from 'use-local-storage-state'
 import { MAX_MARKET_FEE } from '../../common/constants'
 import { ButtonCSS } from '../../components/button/button_styling_types'
 import { IconClose } from '../../components/common/icons'
-import { GuildWrapper } from '../../components/guild'
 import xDaiIntergation from '../../components/market/market_list/img/xDaiIntegration.svg'
 import { MarketHome } from '../../components/market/market_list/market_home'
 import { useConnectedWeb3Context } from '../../contexts'
@@ -29,6 +28,7 @@ import {
   MarketStates,
   MarketsSortCriteria,
 } from '../../util/types'
+import { ProposedRewardsPage } from '../guild/proposed_rewards_page'
 
 const Banner = styled.div`
   ${ButtonCSS};
@@ -218,7 +218,10 @@ const MarketHomeContainer: React.FC = () => {
     typeParam = null
   }
 
+  const PAGE_SIZE = 12
+
   const [filter, setFilter] = useState<MarketFilters>({
+    first: PAGE_SIZE,
     state: stateParam,
     category: categoryParam,
     title: searchParam,
@@ -235,7 +238,6 @@ const MarketHomeContainer: React.FC = () => {
 
   const cpkAddress = context.cpk?.address
 
-  const PAGE_SIZE = 12
   const [pageIndex, setPageIndex] = useState(0)
 
   const calcNow = useCallback(() => (Date.now() / 1000).toFixed(0), [])
@@ -247,7 +249,6 @@ const MarketHomeContainer: React.FC = () => {
   const fetchMyMarkets = filter.state === MarketStates.myMarkets
 
   const marketsQueryVariables = {
-    first: PAGE_SIZE,
     skip: pageIndex,
     accounts: cpkAddress ? [cpkAddress] : null,
     account: (cpkAddress && cpkAddress.toLowerCase()) || '',
@@ -350,7 +351,8 @@ const MarketHomeContainer: React.FC = () => {
       const routeQuery = routeQueryString ? routeQueryStart.concat(routeQueryString) : ''
 
       const path = `${route}${routeQuery}`
-      if (window.location.hash.replace('#', '') !== path) {
+
+      if (window.location.hash.startsWith('#/liquidity') && window.location.hash.replace('#', '') !== path) {
         history.push(path)
       }
     },
@@ -373,27 +375,27 @@ const MarketHomeContainer: React.FC = () => {
     onFilterChange(newFilter)
   }, [filter, onFilterChange])
 
-  const loadNextPage = () => {
+  const loadNextPage = (size: number = PAGE_SIZE) => {
     if (!moreMarkets) {
       return
     }
 
-    setPageIndex(pageIndex + PAGE_SIZE)
+    setPageIndex(pageIndex + size)
   }
 
-  const loadPrevPage = () => {
+  const loadPrevPage = (size: number = PAGE_SIZE) => {
     if (pageIndex === 0) {
       return
     }
 
-    setPageIndex(pageIndex - PAGE_SIZE)
+    setPageIndex(pageIndex - size)
   }
 
   const isGuild = location.pathname === '/guild'
 
   if (isGuild) {
     return (
-      <GuildWrapper
+      <ProposedRewardsPage
         context={context}
         count={fetchedMarkets ? fetchedMarkets.fixedProductMarketMakers.length : 0}
         currentFilter={filter}

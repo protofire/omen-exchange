@@ -269,6 +269,7 @@ export enum CurationSource {
 }
 
 export interface MarketFilters {
+  first: number
   state: MarketStates
   category: string
   title: Maybe<string>
