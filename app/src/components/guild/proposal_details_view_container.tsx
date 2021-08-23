@@ -10,7 +10,7 @@ import { ButtonType } from '../button/button_styling_types'
 import { Card } from '../common/card'
 import { Table } from '../common/card/responsive_cards/table'
 import { IconArrowBack, IconOmen } from '../common/icons'
-import { RoundTag } from '../common/tag/round_tag'
+import { ResponsiveTableSimple } from '../common/table/responsive_table_simple'
 import { BarDiagram } from '../market/common_sections/card_bottom_details/bar_diagram_probabilities'
 import { MarketScale } from '../market/common_sections/card_bottom_details/market_scale'
 import { AdditionalMarketData } from '../market/common_sections/card_top_details/additional_market_data'
@@ -257,7 +257,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
                 upperBound={bigNumberify('100000000000000000000')}
               ></MarketScale>
             ) : (
-              <RoundTag outcomes={Outcomes} />
+              <ResponsiveTableSimple outcomes={Outcomes} />
             )}
           </OutcomeStyleWrapper>
 

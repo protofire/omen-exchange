@@ -148,7 +148,7 @@ const MarketHomeContainer: React.FC = () => {
   if (typeRoute) typeRoute = typeRoute.split('/')[0]
 
   const searchFilter = location.search.includes('tag')
-  let searchRoute = location.search.split('tag=')[1]
+  let searchRoute = location.search.split('table=')[1]
   if (searchRoute) searchRoute = searchRoute.split('&')[0]
 
   let sortParam: Maybe<MarketsSortCriteria> = stateRoute === 'MY_MARKETS' ? 'openingTimestamp' : 'usdLiquidityParameter'
