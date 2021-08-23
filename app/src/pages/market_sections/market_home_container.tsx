@@ -242,8 +242,8 @@ const MarketHomeContainer: React.FC = () => {
   const feeBN = ethers.utils.parseEther('' + MAX_MARKET_FEE / Math.pow(10, 2))
 
   const knownArbitrators = getArbitratorsByNetwork(context.networkId).map(x => x.address)
-  const realitioScalarAdapterAddress = getContractAddress(context.networkId, 'realitioScalarAdapter')
-  const oracleAddress = getContractAddress(context.networkId, 'oracle')
+  const realitioScalarAdapterAddress = getContractAddress(context.networkId, 'realitioScalarAdapter').toLowerCase()
+  const oracleAddress = getContractAddress(context.networkId, 'oracle').toLowerCase()
   const knownOracles = [oracleAddress, realitioScalarAdapterAddress]
   const fetchMyMarkets = filter.state === MarketStates.myMarkets
 
