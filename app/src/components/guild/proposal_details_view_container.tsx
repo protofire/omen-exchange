@@ -98,6 +98,51 @@ const BackNavigation = styled.div`
   align-items: center;
 `
 
+const Heading = styled(TYPE.heading2)`
+  border-bottom: ${props => props.theme.borders.borderLineDisabled};
+  margin: 0 -24px;
+  padding: 0 24px 20px;
+`
+const MarketDetails = styled(TYPE.bodyRegular)`
+  margin-top: 32px;
+  @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
+    margin-top: 24px;
+  }
+`
+const OutcomeStyleWrapper = styled.div`
+  margin-top: 32px;
+  @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
+    margin-top: 16px;
+  }
+`
+const StyledTable = styled(Table)`
+  margin-top: 32px;
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
+    margin-top: 24px;
+  }
+`
+const AdditionalDataWrapper = styled(AdditionalMarketData)`
+  border: none;
+  margin-left: -20px;
+
+  div {
+    padding-top: 32px;
+  }
+  a {
+    margin-bottom: 16px;
+  }
+  @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
+    div {
+      padding-top: 16px;
+      padding-bottom: 4px;
+    }
+    a {
+      margin-bottom: -4px !important;
+    }
+  }
+`
+
 interface Props {
   amount: any
   apy: any
@@ -171,23 +216,20 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
       </NavigationSection>
       <MainWrapper>
         <MainSection>
-          <TYPE.heading2 borderBottom={'1px solid #E8EAF6'} margin={'0 -24px'} padding={'0 24px 20px'}>
-            Issue Liqudity Rewards
-          </TYPE.heading2>
-          <Table valueObject={object} />
-          <TYPE.bodyRegular
+          <Heading color={'text3'}>Issue Liqudity Rewards</Heading>
+          <StyledTable valueObject={object} />
+          <MarketDetails
             color={'text2'}
-            marginTop={'24px'}
             onClick={() => {
               setIsScalar(!isScalar)
             }}
           >
             Market Details
-          </TYPE.bodyRegular>
-          <TYPE.heading3 color={'text3'} marginTop={'16px'}>
+          </MarketDetails>
+          <TYPE.heading3 color={'text3'} marginTop={'12px'}>
             {marketDetails}
           </TYPE.heading3>
-          <div style={{ marginTop: '24px' }}>
+          <OutcomeStyleWrapper>
             {isScalar ? (
               <MarketScale
                 currentPrediction={scaleValue}
@@ -200,10 +242,10 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
             ) : (
               <RoundTag outcomes={Outcomes} />
             )}
-          </div>
+          </OutcomeStyleWrapper>
 
-          <Table valueObject={secondObject} />
-          <AdditionalData
+          <StyledTable valueObject={secondObject} />
+          <AdditionalDataWrapper
             address={'42'}
             arbitrator={getArbitrator(100, 'dxdao')}
             category={'Politics'}
