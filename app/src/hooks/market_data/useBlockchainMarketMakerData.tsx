@@ -7,7 +7,7 @@ import { useConnectedWeb3Context } from '../../contexts'
 import { ERC20Service, MarketMakerService, OracleService } from '../../services'
 import { getLogger } from '../../util/logger'
 import { getCallSig, multicall } from '../../util/multicall'
-import { getArbitratorFromAddress } from '../../util/networks'
+import { getArbitratorFromAddress, getContractAddress } from '../../util/networks'
 import { isScalarMarket } from '../../util/tools'
 import { BalanceItem, MarketMakerData, Status } from '../../util/types'
 import { GraphMarketMakerData } from '../graph/useGraphMarketMakerData'
@@ -143,12 +143,6 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
         call: [getCallSig(marketMaker, 'totalSupply')],
         returns: [['totalPoolShares']],
       },
-      // // get market marker total earnings
-      // {
-      //   target: marketMakerAddress,
-      //   call: [getCallSig(marketMaker, 'collectedFees')],
-      //   returns: [['totalEarnings']],
-      // },
       // get payout denominator to check if the condition is resolved
       {
         target: conditionalTokensAddress,
@@ -156,6 +150,19 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
         returns: [['payoutDenominator']],
       },
     )
+
+    if (
+      graphMarketMakerData.factory.toLowerCase() === getContractAddress(networkId, 'marketMakerFactory').toLowerCase()
+    ) {
+      calls.push(
+        // get market marker total earnings
+        {
+          target: marketMakerAddress,
+          call: [getCallSig(marketMaker, 'collectedFees')],
+          returns: [['totalEarnings']],
+        },
+      )
+    }
 
     if (cpk && cpk.address) {
       calls.push(
@@ -210,14 +217,18 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
           returns: [[`user-${i}`]],
         })
 
-        // if (!totalPoolShares.isZero()) {
-        //   // get user earnings
-        //   calls.push({
-        //     target: marketMakerAddress,
-        //     call: [getCallSig(marketMaker, 'feesWithdrawableBy'), cpk.address],
-        //     returns: [['userEarnings']],
-        //   })
-        // }
+        if (
+          !totalPoolShares.isZero() &&
+          graphMarketMakerData.factory.toLowerCase() ===
+            getContractAddress(networkId, 'marketMakerFactory').toLowerCase()
+        ) {
+          // get user earnings
+          calls.push({
+            target: marketMakerAddress,
+            call: [getCallSig(marketMaker, 'feesWithdrawableBy'), cpk.address],
+            returns: [['userEarnings']],
+          })
+        }
       }
     }
 
