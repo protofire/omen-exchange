@@ -26,14 +26,11 @@ const MainScrollInner = styled.div`
   margin: 0 auto;
   max-width: 100%;
   align-items: center;
-  padding-left: 10px;
-  padding-right: 10px;
+
   width: ${props => props.theme.themeBreakPoints.xxl};
 
-  // @media (min-width: ${props => props.theme.themeBreakPoints.xl}) {
-  //   padding-left: ${props => props.theme.paddings.mainPadding};
-  //   padding-right: ${props => props.theme.paddings.mainPadding};
-  // }
+  padding-left: ${props => props.theme.paddings.mainPadding};
+  padding-right: ${props => props.theme.paddings.mainPadding};
 `
 
 export const MainScroll: React.FC = props => {
