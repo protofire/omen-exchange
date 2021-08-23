@@ -127,7 +127,6 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
   return (
     <>
       <SubsectionTitleWrapper>
-        <div>inside out</div>
         <SubsectionTitleLeftWrapper>
           {!relay && marketsRelatedQuestion.length > 1 && (
             <MarketCurrencySelector
@@ -154,7 +153,6 @@ const MarketTopDetailsOpen: React.FC<Props> = (props: Props) => {
 
         <MoreMenu items={marketsRelatedQuestion.length > 1 && isMobile ? moreMenuItems : new Array(moreMenuItems[0])} />
       </SubsectionTitleWrapper>
-      <div>Below progress</div>
       {showingProgressBar && (
         <ProgressBar
           answerFinalizedTimestamp={answerFinalizedTimestamp}
