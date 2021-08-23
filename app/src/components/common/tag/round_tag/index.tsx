@@ -19,7 +19,6 @@ const TableData = styled.div`
   justify-content: space-between;
   padding: 10px 16px;
   text-align: center;
-  //border: 1px solid #e8eaf6;
   margin: 0 -1px -1px 0;
   @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
     :not(:last-child) {
@@ -29,11 +28,9 @@ const TableData = styled.div`
 
   @media (min-width: ${props => props.theme.themeBreakPoints.xl}) {
     &:nth-child(odd) {
-      //border: 1px solid red;
       border-width: 0px 1px 1px 0; /* top right bottom left */
       border-style: solid;
       border-color: #e8eaf6;
-      //border-color: red;
     }
 
     &:nth-child(even) {
@@ -41,12 +38,10 @@ const TableData = styled.div`
       border-style: solid;
       border-color: #e8eaf6;
     }
-    &:last-child:nth-child(even) {
-      border-width: 0 0 0 0;
-    }
 
-    &:nth-last-child(2) {
-      border-width: 0 1px 0 0;
+    :last-child,
+    :nth-last-child(2):nth-child(odd) {
+      border-bottom: none;
     }
   }
 `
