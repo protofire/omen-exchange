@@ -74,6 +74,7 @@ export const ScalarMarketBuy = (props: Props) => {
     potentialProfitFormatted,
     probabilitiesOrNewPrediction: newPrediction,
     proxyIsUpToDate,
+    relayFeeGreaterThanAmount,
     setAmount,
     setAmountDisplay,
     setCollateral,
@@ -269,6 +270,16 @@ export const ScalarMarketBuy = (props: Props) => {
           description={`Your buy amount should not be negative.`}
           href={''}
           hyperlinkDescription={''}
+        />
+      )}
+      {relayFeeGreaterThanAmount && (
+        <WarningMessage
+          additionalDescription={''}
+          danger={true}
+          description="Relay fee is greater than buy amount."
+          href={''}
+          hyperlinkDescription={''}
+          marginBottom={!showSetAllowance}
         />
       )}
       {showSetAllowance && (

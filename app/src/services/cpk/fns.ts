@@ -103,14 +103,22 @@ export const exec = async (params: ExecParams) => {
  */
 
 interface FeeParams {
-  service: CPKService
   amount: BigNumber
+  collateral: Token
+  service: CPKService
+  native: Token
 }
 
 export const fee = async (params: FeeParams) => {
-  const { service } = params
-  const amount = await service.subRelayFee(params.amount)
-  return { ...params, amount }
+  const { collateral, native, service } = params
+  if (service.cpk.relay && collateral.address === native.address) {
+    const amount = await service.subRelayFee(params.amount)
+    if (amount.lte(0)) {
+      throw new Error('Purchase amount is too small')
+    }
+    return { ...params, amount }
+  }
+  return params
 }
 
 /**

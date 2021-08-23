@@ -6,7 +6,14 @@ import { STANDARD_DECIMALS } from '../../common/constants'
 import { MarketPoolLiquidity } from '../../components/market/market_pooling/market_pool_liquidity'
 import { ScalarMarketPoolLiquidity } from '../../components/market/market_pooling/scalar_market_pool_liquidity'
 import { useConnectedWeb3Context } from '../../contexts'
-import { useCollateralBalance, useContracts, useCpkAllowance, useCpkProxy, useFundingBalance } from '../../hooks'
+import {
+  useCollateralBalance,
+  useContracts,
+  useCpkAllowance,
+  useCpkProxy,
+  useFundingBalance,
+  useRelay,
+} from '../../hooks'
 import { getLogger } from '../../util/logger'
 import { pseudoNativeAssetAddress } from '../../util/networks'
 import { RemoteData } from '../../util/remote_data'
@@ -80,6 +87,7 @@ export type SharedPropsInterface = {
   setAmountToRemoveDisplay: any
   amountToRemove: Maybe<BigNumber>
   setAmountToRemove: any
+  relayFeeGreaterThanAmount: boolean
 }
 
 const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
@@ -125,6 +133,8 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   const walletBalance = bigNumberToString(collateralBalance, collateral.decimals, 5)
   const sharesBalance = bigNumberToString(fundingBalance, collateral.decimals)
 
+  const { relayFeeGreaterThanAmount } = useRelay(amountToFund || new BigNumber(0), collateral)
+
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
@@ -161,7 +171,8 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
     collateralAmountError !== null ||
     currentDate > resolutionDate ||
-    isNegativeAmountToFund
+    isNegativeAmountToFund ||
+    relayFeeGreaterThanAmount
 
   const totalUserShareAmounts = calcRemoveFundingSendAmounts(
     fundingBalance,
@@ -374,6 +385,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     setAmountToRemove,
     amountToRemoveDisplay,
     setAmountToRemoveDisplay,
+    relayFeeGreaterThanAmount,
   }
 
   return (

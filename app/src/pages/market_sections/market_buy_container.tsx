@@ -6,7 +6,14 @@ import { STANDARD_DECIMALS } from '../../common/constants'
 import { MarketBuy } from '../../components/market/market_buy/market_buy'
 import { ScalarMarketBuy } from '../../components/market/market_buy/scalar_market_buy'
 import { ConnectedWeb3Context, useConnectedWeb3Context } from '../../contexts'
-import { useAsyncDerivedValue, useCollateralBalance, useContracts, useCpkAllowance, useCpkProxy } from '../../hooks'
+import {
+  useAsyncDerivedValue,
+  useCollateralBalance,
+  useContracts,
+  useCpkAllowance,
+  useCpkProxy,
+  useRelay,
+} from '../../hooks'
 import { CPKService, MarketMakerService } from '../../services'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../util/networks'
 import { RemoteData } from '../../util/remote_data'
@@ -84,6 +91,7 @@ export type SharedPropsInterface = {
   txHash: string
   setTxState: any
   txState: TransactionStep
+  relayFeeGreaterThanAmount: boolean
 }
 
 const MarketBuyContainer: React.FC<Props> = (props: Props) => {
@@ -116,6 +124,8 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     collateral,
     context,
   )
+
+  const { relayFeeGreaterThanAmount } = useRelay(amount, collateral)
 
   useEffect(() => {
     setIsNegativeAmount((amount || Zero).lt(Zero))
@@ -244,7 +254,8 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
       hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount ||
-    !isUpdated
+    !isUpdated ||
+    relayFeeGreaterThanAmount
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
   const sharesTotal = bigNumberToString(tradedShares, collateral.decimals)
@@ -312,6 +323,7 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     txHash: context.txHash,
     setTxState: context.setTxState,
     txState: context.txState,
+    relayFeeGreaterThanAmount,
   }
 
   return (

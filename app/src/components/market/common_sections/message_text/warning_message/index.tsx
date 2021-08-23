@@ -11,7 +11,7 @@ const Wrapper = styled.div<{ margin?: boolean }>`
   border: ${({ theme }) => theme.borders.borderLineDisabled};
   align-content: center;
   padding: 4px 20px;
-  margin-bottom: ${props => (!props.margin ? '20px' : '0')};
+  margin-bottom: ${props => (props.margin ? '20px' : '0')};
 `
 
 const AlertWrapper = styled.div`
