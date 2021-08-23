@@ -2,8 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { TYPE } from '../../../../theme'
-import { ViewCard } from '../../../market/common_sections/view_card'
-import { Card, CardCSS } from '../index'
+import { CardCSS } from '../index'
 
 const CardStyled = styled.div`
   ${CardCSS};

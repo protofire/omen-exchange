@@ -2,21 +2,6 @@ import React, { useState } from 'react'
 
 import { ProposalDetailsView } from '../../components/guild/proposal_details_view_container'
 
-interface Props {
-  amount: any
-  apy: any
-  duration: any
-  marketDetails: any
-  scaleValue: any
-  liqudiity: any
-  totalVolume: any
-  volume: any
-  closingDate: any
-  closingIn: any
-  apyTwo: any
-  verified: any
-}
-
 export const ProposalDetailsPage = () => {
   const [isScalar, setIsScalar] = useState(false)
   //logic

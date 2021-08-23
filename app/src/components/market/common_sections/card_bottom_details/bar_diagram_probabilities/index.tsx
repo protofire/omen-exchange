@@ -75,7 +75,6 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   winningBadge?: React.ReactNode
   additionalTextLeft?: string
   additionalTextRight?: string
-  style?: any
 }
 
 export const BarDiagram: React.FC<Props> = (props: Props) => {

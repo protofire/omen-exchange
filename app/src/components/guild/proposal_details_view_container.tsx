@@ -6,15 +6,13 @@ import { TYPE } from '../../theme'
 import { getArbitrator, getToken } from '../../util/networks'
 import { KlerosSubmission } from '../../util/types'
 import { Button } from '../button/button'
-import { ButtonSelectable } from '../button/button_selectable'
-import { ButtonCSS, ButtonType } from '../button/button_styling_types'
+import { ButtonType } from '../button/button_styling_types'
 import { Card } from '../common/card'
 import { Table } from '../common/card/responsive_cards/table'
 import { IconArrowBack, IconOmen } from '../common/icons'
 import { RoundTag } from '../common/tag/round_tag'
 import { BarDiagram } from '../market/common_sections/card_bottom_details/bar_diagram_probabilities'
 import { MarketScale } from '../market/common_sections/card_bottom_details/market_scale'
-import { ValueBox } from '../market/common_sections/card_bottom_details/market_scale/value_box'
 import { AdditionalMarketData } from '../market/common_sections/card_top_details/additional_market_data'
 
 const MainWrapper = styled.div`
@@ -34,10 +32,11 @@ const MainSection = styled(Card)`
 `
 const VoteSection = styled(Card)`
   width: 27%;
-  padding: 20px;
+  padding: 20px 24px;
   height: fit-content;
   @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
     width: 100%;
+    padding: 20px;
     margin-top: 24px;
   }
 `
@@ -55,10 +54,7 @@ const Container = styled.div`
   width: 100%;
   padding: 0;
 `
-const AdditionalData = styled(AdditionalMarketData)`
-  border: none;
-  margin-top: 10px;
-`
+
 const VotesBar = styled.div`
   margin: 16px 0;
   row-gap: 16px;
@@ -67,12 +63,16 @@ const VotesBar = styled.div`
 `
 const VoteButtons = styled.div`
   border-top: 1px solid #e8eaf6;
-  margin: 0 -20px;
-  padding: 20px 20px 0;
+  margin: 0 -24px;
+  padding: 20px 24px 0;
   flex-direction: row;
   display: flex;
   justify-content: space-between;
   column-gap: 16px;
+  @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
+    margin: 0 -20px;
+    padding: 20px 20px 0;
+  }
   button {
     flex: 1;
   }
@@ -142,6 +142,25 @@ const AdditionalDataWrapper = styled(AdditionalMarketData)`
     }
   }
 `
+const VoteHeading = styled(TYPE.heading2)`
+  padding: 0 24px 20px;
+  margin: 0 -24px;
+  border-bottom: 1px solid #e8eaf6;
+
+  @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
+    padding: 0 20px 20px;
+    margin: 0 -20px;
+  }
+`
+
+const BarDiagramStyled = styled(BarDiagram)`
+  border-top: ${props => props.theme.borders.borderLineDisabled};
+  margin: 0 -24px;
+  padding: 20px 24px 0px;
+  @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
+    margin: 0 -20px;
+  }
+`
 
 interface Props {
   amount: any
@@ -163,7 +182,6 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
   const {
     amount,
     apy,
-    apyTwo,
     closingDate,
     closingIn,
     duration,
@@ -173,7 +191,6 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     scaleValue,
     setIsScalar,
     totalVolume,
-    verified,
     volume,
   } = props
 
@@ -202,7 +219,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     <Container>
       <NavigationSection>
         <BackNavigation>
-          <IconArrowBack color={'#7986CB'}></IconArrowBack>
+          <IconArrowBack color={'primary2'}></IconArrowBack>
           <TYPE.heading3 color={'primary2'} marginLeft={'12px'}>
             Guild Overview
           </TYPE.heading3>
@@ -260,9 +277,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
           />
         </MainSection>
         <VoteSection>
-          <TYPE.heading2 borderBottom={'1px solid #E8EAF6'} color={'text3'} margin={'0 -20px'} padding={'0 20px 20px'}>
-            Vote
-          </TYPE.heading2>
+          <VoteHeading color={'text3'}>Vote</VoteHeading>
           <VotesBar>
             <BarDiagram
               additionalTextLeft={'454 votes'}
@@ -271,13 +286,12 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
               outcomeName={'Yes'}
               probability={22}
             />
-            <BarDiagram
+            <BarDiagramStyled
               additionalTextLeft={'454 votes'}
               additionalTextRight={'454 OMEN'}
               outcomeIndex={22}
               outcomeName={'No'}
               probability={42}
-              style={{ borderTop: '1px solid #E8EAF6', margin: '0 -20px', padding: '20px 20px 0px' }}
             />
           </VotesBar>
           <VoteButtons>
