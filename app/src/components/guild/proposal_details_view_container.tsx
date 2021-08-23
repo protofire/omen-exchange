@@ -163,9 +163,9 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
           </TYPE.heading3>
         </BackNavigation>
         <MarketStatus>
-          <TYPE.bodyMedium color={'green'}>5 days, 54 mins left</TYPE.bodyMedium>
+          <TYPE.bodyMedium color={'profit'}>5 days, 54 mins left</TYPE.bodyMedium>
           <StateButton>
-            <TYPE.bodyMedium color={'green'}>Active</TYPE.bodyMedium>
+            <TYPE.bodyMedium color={'profit'}>Active</TYPE.bodyMedium>
           </StateButton>
         </MarketStatus>
       </NavigationSection>

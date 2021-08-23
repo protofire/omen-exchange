@@ -16,6 +16,7 @@ export interface Colors {
   white: Color
   green: Color
   red: Color
+  profit: Color
   link: Color
 
   border1: Color

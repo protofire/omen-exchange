@@ -11,7 +11,7 @@ const CardStyled = styled.div`
   display: flex;
   flex-direction: row;
   gap: 48px;
-  margin-top: 22px;
+  margin-top: 32px;
   padding: 24px 32px;
   justify-content: space-between;
   //mobile
@@ -24,7 +24,7 @@ const CardStyled = styled.div`
   }
 `
 const ItemWrapper = styled.div`
-  div:nth-child(2) {
+  > div:nth-child(2) {
     margin-top: 8px;
     @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
       margin-top: 0px;
@@ -34,6 +34,10 @@ const ItemWrapper = styled.div`
     display: flex;
     justify-content: space-between;
   }
+`
+const DataWrapper = styled.div`
+  display: flex;
+  align-items: center;
 `
 
 interface Props {
@@ -48,9 +52,10 @@ export const Table: React.FC<Props> = (props: Props) => {
         return (
           <ItemWrapper key={item}>
             <TYPE.bodyRegular color={'text2'}>{item[0]}</TYPE.bodyRegular>
-            <TYPE.bodyMedium color={'text1'}>
-              {item[1].text} {item[1]['icon'] !== undefined && item[1].icon}
-            </TYPE.bodyMedium>
+            <DataWrapper>
+              <TYPE.bodyMedium color={'text1'}>{item[1].text} </TYPE.bodyMedium>
+              {item[1]['icon'] !== undefined && <div style={{ marginLeft: '8px' }}> {item[1].icon}</div>}
+            </DataWrapper>
           </ItemWrapper>
         )
       })}
