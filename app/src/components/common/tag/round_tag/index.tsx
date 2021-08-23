@@ -44,9 +44,10 @@ const TableData = styled.div`
     &:last-child:nth-child(even) {
       border-width: 0 0 0 0;
     }
-    //&:nth-last-child(2) {
-    //  border-width: 0 1px 0 0;
-    //}
+
+    &:nth-last-child(2) {
+      border-width: 0 1px 0 0;
+    }
   }
 `
 
