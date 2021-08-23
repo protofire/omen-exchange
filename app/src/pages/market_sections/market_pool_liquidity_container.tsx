@@ -514,7 +514,8 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     }
   }
 
-  const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address)
+  const { tokenPrice: omnPrice } = useTokenPrice(getToken(networkId, 'omn').address)
+  const { tokenPrice: collateralPrice } = useTokenPrice(collateral.address)
 
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
@@ -542,8 +543,8 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
       omnToken,
       cpk.address,
-      1, // Assume pool token value is 1 DAI
-      tokenPrice,
+      collateralPrice, // Assume pool token value is 1 DAI
+      omnPrice,
       Number(liquidityMiningCampaign.endsAt),
       liquidityMiningCampaign.rewardAmounts[0],
       Number(liquidityMiningCampaign.duration),
