@@ -5,6 +5,7 @@ import styled, { withTheme } from 'styled-components'
 
 import { CONFIRMATION_COUNT } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../contexts'
+import { TYPE } from '../../../theme'
 import { getBlockExplorer, getTxHashBlockExplorerURL } from '../../../util/networks'
 import { isValidHttpUrl } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
@@ -13,25 +14,6 @@ import { ButtonType } from '../../button/button_styling_types'
 import { Spinner } from '../../common'
 import { IconClose, IconDone, IconFail, IconTwitter } from '../../common/icons'
 import { ContentWrapper, ModalNavigation, ModalNavigationLeft } from '../common_styled'
-
-const ModalMainText = styled.p`
-  font-size: 16px;
-  color: ${props => props.theme.colors.textColorDark};
-  margin: 0;
-  font-weight: 500;
-  margin-top: 28px
-  margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  text-align: center;
-`
-
-const ModalSubText = styled.p`
-  font-size: ${props => props.theme.fonts.defaultFontSize};
-  color: ${props => props.theme.colors.textColorLighter};
-  margin: 0;
-  text-align: center;
-`
 
 const ButtonContainer = styled.div`
   display: flex;
@@ -122,11 +104,18 @@ export const ModalTransaction = (props: Props) => {
         ) : (
           <Spinner big={true} style={{ marginTop: '10px' }} />
         )}
-        <ModalMainText>
+        <TYPE.heading3
+          alignItems={'center'}
+          color={'text1'}
+          display={'flex'}
+          marginBottom={'8px'}
+          marginTop={'28px'}
+          textAlign={'center'}
+        >
           {message}
           {isValidHttpUrl(icon) ? <ModalTokenIcon src={icon} /> : icon}
-        </ModalMainText>
-        <ModalSubText>
+        </TYPE.heading3>
+        <TYPE.bodyRegular color={'text2'} margin={'0px'} textAlign={'center'}>
           {txState === TransactionStep.waitingConfirmation
             ? 'Confirm Transaction'
             : txState === TransactionStep.transactionSubmitted
@@ -138,7 +127,7 @@ export const ModalTransaction = (props: Props) => {
             : txState === TransactionStep.error
             ? 'Transaction Failed'
             : ''}
-        </ModalSubText>
+        </TYPE.bodyRegular>
         <ButtonContainer>
           {shareOnTwitter && (
             <TwitterShareButton style={{ width: '100%', marginTop: '12px' }} title={tweet} url={shareUrl}>
