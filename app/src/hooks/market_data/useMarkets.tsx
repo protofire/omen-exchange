@@ -44,6 +44,7 @@ export const useMarkets = (options: Options): any => {
     skip: skipFromOptions,
     sortBy,
     sortByDirection,
+    sortIndex,
     state,
     templateId,
     title,
@@ -63,6 +64,7 @@ export const useMarkets = (options: Options): any => {
     title,
     sortBy,
     sortByDirection,
+    sortIndex,
     arbitrator,
     templateId,
     currency,
@@ -137,7 +139,7 @@ export const useMarkets = (options: Options): any => {
     setMarkets({
       fixedProductMarketMakers: [],
     })
-  }, [arbitrator, currency, curationSource, category, state, sortBy, templateId])
+  }, [arbitrator, currency, curationSource, category, state, sortIndex, templateId, loading])
 
   return { markets, error, fetchMore, loading: internalLoading, moreMarkets }
 }
