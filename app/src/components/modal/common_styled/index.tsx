@@ -25,7 +25,7 @@ export const ModalNavigationLeft = styled.div`
 
 export const ModalTitle = styled.p`
   font-size: ${props => props.theme.switchNetworkModal.primaryFontSize};
-  color: ${props => props.theme.colors.textColorDark};
+  color: ${props => props.theme.text1};
   font-weight: ${props => props.theme.textfield.fontWeight};
   margin: 0;
   line-height: 19px;
@@ -70,15 +70,16 @@ export const BalanceItemSide = styled.div`
 
 export const BalanceItemTitle = styled.p<{ notSelected?: boolean }>`
   font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => (props.notSelected ? props.theme.colors.textColorLighter : props.theme.colors.textColorDark)};
+  color: ${props => (props.notSelected ? props.theme.text2 : props.theme.text1)};
   margin: 0;
 `
 
 export const BalanceItemBalance = styled.p`
   font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => props.theme.colors.textColorLighter};
+  color: ${props => props.theme.text2};
   margin: 0;
 `
+
 export const BalanceItem = styled.div<{ hover?: boolean }>`
   display: flex;
   align-items: center;
@@ -96,7 +97,7 @@ export const BalanceItem = styled.div<{ hover?: boolean }>`
     
    ${BalanceItemSide}{
    ${BalanceItemTitle}{
-   color: ${props => props.theme.colors.textColorDark}; !important;
+   color: ${props => props.theme.text1}; !important;
    }
  
    }
