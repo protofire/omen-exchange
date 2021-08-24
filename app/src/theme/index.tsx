@@ -24,6 +24,7 @@ export function colors(darkMode: boolean): Colors {
     green: darkMode ? '' : '#4B9E98',
     red: darkMode ? '' : '#E57373',
     link: darkMode ? '' : '#1E88E5',
+    dai: darkMode ? '' : '#FBCC5F',
 
     //border
     border1: darkMode ? '' : '#DCDFF2',
