@@ -14,8 +14,8 @@ export interface Colors {
 
   //other
   white: Color
-  green: Color
-  red: Color
+  profit: Color
+  alert: Color
   link: Color
   dai: Color
 
