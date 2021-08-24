@@ -5,7 +5,7 @@ import { TYPE } from '../../../../theme'
 
 const Table = styled.div`
   width: 100%;
-
+  box-shadow: 0px 2px 4px rgb(0 0 0 / 5%);
   grid-template-columns: 1fr 1fr;
   border: ${props => props.theme.borders.borderLineDisabled};
   border-radius: 6px;

@@ -91,6 +91,9 @@ const StateButton = styled.div`
   width: fit-content;
   border-radius: 6px;
   margin-left: 16px;
+  @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
+    padding: 5px 9px;
+  }
 `
 
 const BackNavigation = styled.div`
