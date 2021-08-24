@@ -17,7 +17,7 @@ interface RelayServiceResponse {
   relayFeeGreaterThanBalance: boolean
 }
 
-export const useRelay = (amount: BigNumber, collateral: Token): RelayServiceResponse => {
+export const useRelay = (amount?: BigNumber, collateral?: Token): RelayServiceResponse => {
   const { account, balances, networkId, relay } = useConnectedWeb3Context()
 
   const [relayAddress, setRelayAddress] = useState('')
@@ -53,7 +53,7 @@ export const useRelay = (amount: BigNumber, collateral: Token): RelayServiceResp
   }, [account, networkId, relay])
 
   useEffect(() => {
-    if (account && relay) {
+    if (account && relay && collateral && amount) {
       const native = getNativeAsset(networkId, relay)
       const feeGreaterThanAmount =
         relay && amount && !amount.isZero() && relayFee.gt(amount) && collateral.address === native.address

@@ -52,6 +52,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
     outcomeIndex,
     potentialValue,
     probabilitiesOrNewPrediction: probabilities,
+    relayFeeGreaterThanBalance,
     selectedOutcomeBalance,
     setAmountSharesFromInput,
     setAmountSharesToDisplay,
@@ -160,6 +161,15 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           href={''}
           hyperlinkDescription={''}
           marginBottom={true}
+        />
+      )}
+      {relayFeeGreaterThanBalance && (
+        <WarningMessage
+          additionalDescription={''}
+          danger={true}
+          description="Relay fee is greater than your DAI balance, please top up your Omen account."
+          href={''}
+          hyperlinkDescription={''}
         />
       )}
       <StyledButtonContainer borderTop={true} marginTop={isNegativeAmountShares}>

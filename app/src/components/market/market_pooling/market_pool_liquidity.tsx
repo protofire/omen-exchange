@@ -84,6 +84,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     poolTokens,
     proxyIsUpToDate,
     relayFeeGreaterThanAmount,
+    relayFeeGreaterThanBalance,
     removeFunding,
     setActiveTab,
     setAmountToFund,
@@ -311,6 +312,16 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
           description="Relay fee is greater than deposit amount."
           href=""
           hyperlinkDescription=""
+          marginBottom
+        />
+      )}
+      {relayFeeGreaterThanBalance && (
+        <WarningMessage
+          additionalDescription={''}
+          danger={true}
+          description="Relay fee is greater than your DAI balance, please top up your Omen account."
+          href={''}
+          hyperlinkDescription={''}
           marginBottom
         />
       )}

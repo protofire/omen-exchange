@@ -88,6 +88,7 @@ export type SharedPropsInterface = {
   amountToRemove: Maybe<BigNumber>
   setAmountToRemove: any
   relayFeeGreaterThanAmount: boolean
+  relayFeeGreaterThanBalance: boolean
 }
 
 const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
@@ -133,7 +134,10 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
   const walletBalance = bigNumberToString(collateralBalance, collateral.decimals, 5)
   const sharesBalance = bigNumberToString(fundingBalance, collateral.decimals)
 
-  const { relayFeeGreaterThanAmount } = useRelay(amountToFund || new BigNumber(0), collateral)
+  const { relayFeeGreaterThanAmount, relayFeeGreaterThanBalance } = useRelay(
+    amountToFund || new BigNumber(0),
+    collateral,
+  )
 
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
@@ -386,6 +390,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     amountToRemoveDisplay,
     setAmountToRemoveDisplay,
     relayFeeGreaterThanAmount,
+    relayFeeGreaterThanBalance,
   }
 
   return (

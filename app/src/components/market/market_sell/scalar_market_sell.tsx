@@ -59,6 +59,7 @@ export const ScalarMarketSell = (props: Props) => {
     positionIndex,
     potentialValue,
     probabilitiesOrNewPrediction: newPrediction,
+    relayFeeGreaterThanBalance,
     setAmountShares,
     setAmountSharesFromInput,
     setAmountSharesToDisplay,
@@ -172,6 +173,15 @@ export const ScalarMarketSell = (props: Props) => {
           additionalDescription={''}
           danger={true}
           description={`Your sell amount should not be negative.`}
+          href={''}
+          hyperlinkDescription={''}
+        />
+      )}
+      {relayFeeGreaterThanBalance && (
+        <WarningMessage
+          additionalDescription={''}
+          danger={true}
+          description="Relay fee is greater than your DAI balance, please top up your Omen account."
           href={''}
           hyperlinkDescription={''}
         />

@@ -12,7 +12,7 @@ import {
   MAX_MARKET_FEE,
 } from '../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../contexts'
-import { useCollateralBalance, useCpkAllowance, useCpkProxy } from '../../../../../hooks'
+import { useCollateralBalance, useCpkAllowance, useCpkProxy, useRelay } from '../../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../../hooks/graph/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../util/market_creation_status_data'
@@ -251,6 +251,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const [upgradeFinished, setUpgradeFinished] = useState(false)
   const { proxyIsUpToDate, updateProxy } = useCpkProxy(collateral.address === pseudoNativeAssetAddress)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
+
+  const { relayFeeGreaterThanAmount, relayFeeGreaterThanBalance } = useRelay(amount || new BigNumber(0), collateral)
 
   useEffect(() => {
     dispatch(fetchAccountBalance(account, provider, collateral))
@@ -544,6 +546,24 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             loading={RemoteData.is.asking(proxyIsUpToDate)}
             onUnlock={upgradeProxy}
             style={{ marginBottom: 20 }}
+          />
+        )}
+        {relayFeeGreaterThanAmount && (
+          <WarningMessage
+            additionalDescription=""
+            danger={true}
+            description="Relay fee is greater than deposit amount."
+            href=""
+            hyperlinkDescription=""
+          />
+        )}
+        {relayFeeGreaterThanBalance && (
+          <WarningMessage
+            additionalDescription={''}
+            danger={true}
+            description="Relay fee is greater than your DAI balance, please top up your Omen account."
+            href={''}
+            hyperlinkDescription={''}
           />
         )}
         <WarningMessage

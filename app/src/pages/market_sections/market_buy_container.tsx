@@ -92,6 +92,7 @@ export type SharedPropsInterface = {
   setTxState: any
   txState: TransactionStep
   relayFeeGreaterThanAmount: boolean
+  relayFeeGreaterThanBalance: boolean
 }
 
 const MarketBuyContainer: React.FC<Props> = (props: Props) => {
@@ -125,7 +126,7 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     context,
   )
 
-  const { relayFeeGreaterThanAmount } = useRelay(amount, collateral)
+  const { relayFeeGreaterThanAmount, relayFeeGreaterThanBalance } = useRelay(amount, collateral)
 
   useEffect(() => {
     setIsNegativeAmount((amount || Zero).lt(Zero))
@@ -255,7 +256,8 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     amountError !== null ||
     isNegativeAmount ||
     !isUpdated ||
-    relayFeeGreaterThanAmount
+    relayFeeGreaterThanAmount ||
+    relayFeeGreaterThanBalance
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
   const sharesTotal = bigNumberToString(tradedShares, collateral.decimals)
@@ -324,6 +326,7 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     setTxState: context.setTxState,
     txState: context.txState,
     relayFeeGreaterThanAmount,
+    relayFeeGreaterThanBalance,
   }
 
   return (

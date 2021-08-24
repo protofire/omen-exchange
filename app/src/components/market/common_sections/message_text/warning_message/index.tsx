@@ -59,7 +59,7 @@ export const WarningMessage = (props: Props) => {
     grayscale,
     href,
     hyperlinkDescription,
-    marginBottom,
+    marginBottom = true,
     ...restProps
   } = props
   return (

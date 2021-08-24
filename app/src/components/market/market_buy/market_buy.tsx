@@ -77,6 +77,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     probabilitiesOrNewPrediction: probabilities,
     proxyIsUpToDate,
     relayFeeGreaterThanAmount,
+    relayFeeGreaterThanBalance,
     setAmount,
     setAmountDisplay,
     setCollateral,
@@ -267,6 +268,16 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           additionalDescription={''}
           danger={true}
           description="Relay fee is greater than buy amount."
+          href={''}
+          hyperlinkDescription={''}
+          marginBottom={!showSetAllowance}
+        />
+      )}
+      {relayFeeGreaterThanBalance && (
+        <WarningMessage
+          additionalDescription={''}
+          danger={true}
+          description="Relay fee is greater than your DAI balance, please top up your Omen account."
           href={''}
           hyperlinkDescription={''}
           marginBottom={!showSetAllowance}
