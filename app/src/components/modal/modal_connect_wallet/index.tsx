@@ -103,7 +103,7 @@ const ConnectButton = (props: ButtonProps) => {
     <ButtonStyled buttonType={ButtonType.secondaryLine} disabled={disabled} onClick={onClick}>
       <ButtonLeft>
         {icon}
-        <TYPE.bodyRegular color={'text1'} lineHeight={'1.2'} margin={'0px'}>
+        <TYPE.bodyRegular color={'text1'} margin={'0px'}>
           {text}
         </TYPE.bodyRegular>
       </ButtonLeft>
@@ -207,15 +207,7 @@ export const ModalConnectWallet = (props: Props) => {
           {isConnectingToWallet ? (
             <>
               <Spinner big={true} />
-              <TYPE.bodyRegular
-                color={'text2'}
-                fontWeight={'normal'}
-                letterSpacing={'0.4px'}
-                lineHeight={'1.5'}
-                margin={'0px'}
-                padding={'30px 0 0'}
-                textAlign={'center'}
-              >
+              <TYPE.bodyRegular color={'text2'} margin={'0px'} padding={'30px 0 0'} textAlign={'center'}>
                 {connectingText}
               </TYPE.bodyRegular>
             </>
