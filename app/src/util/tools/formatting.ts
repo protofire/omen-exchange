@@ -34,12 +34,16 @@ export const formatNumber = (number: string, decimals = 2): string => {
     return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
   }
 
-  if (Number(number) > 0) {
-    for (let i = 1; i < 10; i++) {
-      if (Number(number) < Number('0.' + '0'.repeat(i) + '1') && decimals === i + 1) {
-        return '<0.' + '0'.repeat(i) + '1'
-      }
-    }
+  // if (Number(number) > 0) {
+  //   for (let i = 1; i < 10; i++) {
+  //     if (Number(number) < Number('0.' + '0'.repeat(i) + '1') && decimals === i + 1) {
+  //       return '<0.' + '0'.repeat(i) + '1'
+  //     }
+  //   }
+  // }
+
+  if (Number(number) > 0 && Number(number) < Number('0.' + '0'.repeat(decimals - 1) + '1')) {
+    return '<0.' + '0'.repeat(decimals - 1) + '1'
   }
 
   return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
