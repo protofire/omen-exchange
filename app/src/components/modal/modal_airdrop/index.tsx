@@ -6,6 +6,7 @@ import { withTheme } from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../contexts'
 import { useAirdropService } from '../../../hooks'
+import { TYPE } from '../../../theme'
 import { bigNumberToString } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { IconClose, IconOmen } from '../../common/icons'
@@ -74,6 +75,12 @@ export const ModalAirdrop = (props: Props) => {
             <IconClose hoverEffect={true} onClick={onClose} />
           </ModalNavigation>
           <Graphic />
+          <TYPE.heading2 alignItems={'center'} color={'text1'} display={'flex'} fontWeight={500} margin={'12px 0px'}>
+            OMN has arrived!
+          </TYPE.heading2>
+          <TYPE.bodyRegular alignItems={'center'} color={'text2'} display={'flex'} margin={'12px 0px'}>
+            Thanks for being part of the Omen Community.
+          </TYPE.bodyRegular>
           <AirdropCardWrapper claim={claim} displayAmount={claimAmount} showCheckAddress={false} />
         </ContentWrapper>
       </Modal>
