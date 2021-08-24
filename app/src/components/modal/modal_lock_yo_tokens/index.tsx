@@ -264,7 +264,7 @@ const ModalLockTokens = (props: Props) => {
                   style={{ marginRight: '12px' }}
                 />
               )}
-              <TYPE.heading3 color={'text1'} fontStyle={'normal'} textAlign={'left'}>
+              <TYPE.heading3 color={'text1'} textAlign={'left'}>
                 {isLockAmountOpen ? 'Lock Omen Token' : 'Omen Guild Membership'}
               </TYPE.heading3>
             </NavLeft>
@@ -274,7 +274,7 @@ const ModalLockTokens = (props: Props) => {
             <ConditionalWrapper hideWrapper={!isLockAmountOpen}>
               <DataRow>
                 <TYPE.bodyRegular color={'text2'}>Wallet Balance</TYPE.bodyRegular>
-                <TYPE.bodyMedium alignItems={'center'} color={'text1'} display={'flex'}>
+                <TYPE.bodyMedium alignItems={'center'} color={'text1'}>
                   {bigNumberToString(omenBalance, STANDARD_DECIMALS, 2)} OMN
                   {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
                 </TYPE.bodyMedium>
@@ -282,7 +282,7 @@ const ModalLockTokens = (props: Props) => {
               {relay && (
                 <DataRow>
                   <TYPE.bodyRegular color={'text2'}>Omen Account</TYPE.bodyRegular>
-                  <TYPE.bodyMedium alignItems={'center'} color={'text1'} display={'flex'}>
+                  <TYPE.bodyMedium alignItems={'center'} color={'text1'}>
                     {bigNumberToString(xOmenBalance, STANDARD_DECIMALS, 2)} OMN
                     {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
                   </TYPE.bodyMedium>
@@ -290,7 +290,7 @@ const ModalLockTokens = (props: Props) => {
               )}
               <DataRow>
                 <TYPE.bodyRegular color={'text2'}>Locked in Guild</TYPE.bodyRegular>
-                <TYPE.bodyMedium alignItems={'center'} color={'text1'} display={'flex'}>
+                <TYPE.bodyMedium alignItems={'center'} color={'text1'}>
                   {bigNumberToString(userLocked, 18, 2)} OMN
                   {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
                 </TYPE.bodyMedium>
@@ -322,7 +322,7 @@ const ModalLockTokens = (props: Props) => {
 
             <DataRow style={{ marginTop: !isLockAmountOpen ? '12px' : '' }}>
               <TYPE.bodyRegular color={'text2'}>{isLockAmountOpen && 'Your '}Vote Weight</TYPE.bodyRegular>
-              <TYPE.bodyMedium align-items={'center'} color={'text1'} display={'flex'}>
+              <TYPE.bodyMedium align-items={'center'} color={'text1'}>
                 <TYPE.bodyMedium color={!displayLockAmount.isZero() && 'text2'}>
                   {!totalLocked.isZero() && !userLocked.isZero()
                     ? (divBN(userLocked, totalLocked) * 100).toFixed(2)
@@ -341,7 +341,7 @@ const ModalLockTokens = (props: Props) => {
 
             <DataRow>
               <TYPE.bodyRegular color={'text2'}>Unlock Date</TYPE.bodyRegular>
-              <TYPE.bodyMedium align-items={'center'} color={'text1'} display={'flex'}>
+              <TYPE.bodyMedium align-items={'center'} color={'text1'}>
                 {timestamp !== 0 ? (
                   <>
                     {formatLockDate(timestamp * 1000)}

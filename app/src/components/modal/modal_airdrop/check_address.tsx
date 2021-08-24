@@ -88,7 +88,7 @@ export const ModalCheckAddress = (props: Props) => {
         </ModalNavigation>
         <AirdropCardWrapper displayAmount={amount} displayButtons={false} />
         <RecipientWrapper>
-          <TYPE.bodyRegular color={'text1'} display={'inline-block'} lineHeight={'1.2'} marginBottom={'12px'}>
+          <TYPE.bodyRegular color={'text1'} marginBottom={'12px'}>
             Recipient
           </TYPE.bodyRegular>
           <AddressField error={error} onChange={updateAddress} placeholder="Wallet Address" value={address} />
