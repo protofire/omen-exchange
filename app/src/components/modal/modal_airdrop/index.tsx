@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { BigNumber } from 'ethers/utils'
 import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
@@ -25,6 +26,9 @@ export const ModalAirdrop = (props: Props) => {
   const { theme } = props
 
   const { balances, cpk, setTxState, txHash, txState } = useConnectedWeb3Context()
+  // console.log('balances: ', balances)
+  console.log('balances: ', balances.formattedxDaiBalance)
+  console.log('balances: ', parseFloat(balances.formattedxDaiBalance) === 0)
 
   const initialIsOpenState = localStorage.getItem('airdrop')
   const [isOpen, setIsOpen] = useState(!initialIsOpenState)
@@ -63,8 +67,8 @@ export const ModalAirdrop = (props: Props) => {
   return (
     <>
       <Modal
-        isOpen={true}
-        // isOpen={isOpen && !claimAmount.isZero() && !isTransactionModalOpen && !checkAddress}
+        // isOpen={true}
+        isOpen={isOpen && !claimAmount.isZero() && !isTransactionModalOpen && !checkAddress}
         onRequestClose={onClose}
         shouldCloseOnOverlayClick={true}
         style={theme.fluidHeightModal}
