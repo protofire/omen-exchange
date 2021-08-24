@@ -62,7 +62,8 @@ export const ModalAirdrop = (props: Props) => {
   return (
     <>
       <Modal
-        isOpen={isOpen && !claimAmount.isZero() && !isTransactionModalOpen && !checkAddress}
+        isOpen={true}
+        // isOpen={isOpen && !claimAmount.isZero() && !isTransactionModalOpen && !checkAddress}
         onRequestClose={onClose}
         shouldCloseOnOverlayClick={true}
         style={theme.fluidHeightModal}
@@ -73,7 +74,7 @@ export const ModalAirdrop = (props: Props) => {
             <IconClose hoverEffect={true} onClick={onClose} />
           </ModalNavigation>
           <Graphic />
-          <AirdropCardWrapper claim={claim} displayAmount={claimAmount} onCheckAddress={() => setCheckAddress(true)} />
+          <AirdropCardWrapper claim={claim} displayAmount={claimAmount} showCheckAddress={false} />
         </ContentWrapper>
       </Modal>
       <ModalTransactionWrapper
@@ -84,12 +85,6 @@ export const ModalAirdrop = (props: Props) => {
         onClose={onClose}
         txHash={txHash}
         txState={txState}
-      />
-      <ModalCheckAddressWrapper
-        claim={claim}
-        isOpen={checkAddress && !isTransactionModalOpen}
-        onBack={() => setCheckAddress(false)}
-        onClose={onClose}
       />
     </>
   )

@@ -84,10 +84,11 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   displayAmount: BigNumber
   claim?: (account: string, amount: BigNumber) => Promise<void>
   onCheckAddress?: () => void
+  showCheckAddress?: boolean
 }
 
 const AirdropCard = (props: Props) => {
-  const { claim, displayAmount, displayButtons = true, onCheckAddress } = props
+  const { claim, displayAmount, displayButtons = true, onCheckAddress, showCheckAddress = true } = props
 
   const { account } = useConnectedWeb3Context()
 
@@ -118,24 +119,26 @@ const AirdropCard = (props: Props) => {
             </AirdropButton>
           )}
         </TopSection>
-        <BottomSection>
-          <BottomSectionTextWrapper>
-            {displayButtons ? (
-              <BottomSectionTextWrapper>
-                <BottomSectionHeading>Claim OMN token</BottomSectionHeading>
-                <BottomSectionSubheading>check address for claimable OMN</BottomSectionSubheading>
-              </BottomSectionTextWrapper>
-            ) : (
-              <BottomSectionTextWrapper>
-                <BottomSectionDescription>
-                  Enter an address to trigger a OMN claim. If the address has any claimable OMN it will be sent to them
-                  on submission.
-                </BottomSectionDescription>
-              </BottomSectionTextWrapper>
-            )}
-          </BottomSectionTextWrapper>
-          {displayButtons && <AirdropButton onClick={onCheckAddress}>Check</AirdropButton>}
-        </BottomSection>
+        {showCheckAddress && (
+          <BottomSection>
+            <BottomSectionTextWrapper>
+              {displayButtons ? (
+                <BottomSectionTextWrapper>
+                  <BottomSectionHeading>Claim OMN token</BottomSectionHeading>
+                  <BottomSectionSubheading>check address for claimable OMN</BottomSectionSubheading>
+                </BottomSectionTextWrapper>
+              ) : (
+                <BottomSectionTextWrapper>
+                  <BottomSectionDescription>
+                    Enter an address to trigger a OMN claim. If the address has any claimable OMN it will be sent to
+                    them on submission.
+                  </BottomSectionDescription>
+                </BottomSectionTextWrapper>
+              )}
+            </BottomSectionTextWrapper>
+            {displayButtons && <AirdropButton onClick={onCheckAddress}>Check</AirdropButton>}
+          </BottomSection>
+        )}
       </ModalCard>
     </>
   )
