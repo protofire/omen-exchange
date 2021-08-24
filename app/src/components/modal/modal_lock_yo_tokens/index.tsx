@@ -9,7 +9,6 @@ import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useAirdropService } from '../../../hooks'
 import { ERC20Service, OmenGuildService } from '../../../services'
 import { TYPE } from '../../../theme'
-import { Colors } from '../../../theme/types'
 import { getToken, networkIds } from '../../../util/networks'
 import { bigNumberToString, daysUntil, divBN, formatLockDate } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
@@ -47,10 +46,10 @@ const DataRow = styled.div`
   line-height: ${props => props.theme.fonts.defaultLineHeight};
 `
 
-const LightDataItem = styled(TYPE.bodyRegular)<{ color: keyof Colors }>`
+const LightDataItem = styled(TYPE.bodyRegular)`
   color: ${props => props.theme.text2};
 `
-const DarkDataItem = styled(TYPE.bodyMedium)<{ color: keyof Colors }>`
+const DarkDataItem = styled(TYPE.bodyMedium)`
   display: flex;
   align-items: center;
   color: ${props => props.theme.text1};
