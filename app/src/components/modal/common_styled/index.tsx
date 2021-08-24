@@ -90,6 +90,9 @@ export const BalanceItem = styled.div<{ hover?: boolean }>`
   }
 
   &:hover {
+    .hover {
+      color: ${props => props.theme.colors.textColorDark}; !important;
+    }
     
    ${BalanceItemSide}{
    ${BalanceItemTitle}{

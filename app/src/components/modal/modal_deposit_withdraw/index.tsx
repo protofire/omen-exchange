@@ -248,7 +248,6 @@ export const ModalDepositWithdraw = (props: Props) => {
 
     return (
       <BalanceItem
-        hover
         key={index}
         onClick={() => {
           setCurrencySelected(item)
@@ -257,7 +256,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         <BalanceItemSide>
           <RadioInput checked={currencySelected === item} name={item} outcomeIndex={-1} readOnly />
           <Image size={'24'} src={getImageUrl(address)} style={{ marginLeft: '12px', marginRight: '12px' }} />
-          <TYPE.bodyRegular color={currencySelected !== item ? 'text2' : 'text1'} margin={'0px'}>
+          <TYPE.bodyRegular className="hover" color={currencySelected !== item ? 'text2' : 'text1'} margin={'0px'}>
             {name ? name : symbol.toLowerCase()}
           </TYPE.bodyRegular>
         </BalanceItemSide>
