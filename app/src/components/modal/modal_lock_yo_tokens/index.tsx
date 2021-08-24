@@ -9,6 +9,7 @@ import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useAirdropService } from '../../../hooks'
 import { ERC20Service, OmenGuildService } from '../../../services'
 import { TYPE } from '../../../theme'
+import { Colors } from '../../../theme/types'
 import { getToken, networkIds } from '../../../util/networks'
 import { bigNumberToString, daysUntil, divBN, formatLockDate } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
@@ -45,6 +46,16 @@ const DataRow = styled.div`
   width: 100%;
   line-height: ${props => props.theme.fonts.defaultLineHeight};
 `
+
+const LightDataItem = styled(TYPE.bodyRegular)<{ color: keyof Colors }>`
+  color: ${props => props.theme.text2};
+`
+const DarkDataItem = styled(TYPE.bodyMedium)<{ color: keyof Colors }>`
+  display: flex;
+  align-items: center;
+  color: ${props => props.theme.text1};
+`
+
 const ModalMain = styled.div`
   width: 100%;
 
@@ -273,27 +284,27 @@ const ModalLockTokens = (props: Props) => {
           <ModalMain>
             <ConditionalWrapper hideWrapper={!isLockAmountOpen}>
               <DataRow>
-                <TYPE.bodyRegular color={'text2'}>Wallet Balance</TYPE.bodyRegular>
-                <TYPE.bodyMedium alignItems={'center'} color={'text1'} display={'flex'}>
+                <LightDataItem>Wallet Balance</LightDataItem>
+                <DarkDataItem>
                   {bigNumberToString(omenBalance, STANDARD_DECIMALS, 2)} OMN
                   {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
-                </TYPE.bodyMedium>
+                </DarkDataItem>
               </DataRow>
               {relay && (
                 <DataRow>
-                  <TYPE.bodyRegular color={'text2'}>Omen Account</TYPE.bodyRegular>
-                  <TYPE.bodyMedium alignItems={'center'} color={'text1'} display={'flex'}>
+                  <LightDataItem>Omen Account</LightDataItem>
+                  <DarkDataItem>
                     {bigNumberToString(xOmenBalance, STANDARD_DECIMALS, 2)} OMN
                     {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
-                  </TYPE.bodyMedium>
+                  </DarkDataItem>
                 </DataRow>
               )}
               <DataRow>
-                <TYPE.bodyRegular color={'text2'}>Locked in Guild</TYPE.bodyRegular>
-                <TYPE.bodyMedium alignItems={'center'} color={'text1'} display={'flex'}>
+                <LightDataItem>Locked in Guild</LightDataItem>
+                <DarkDataItem>
                   {bigNumberToString(userLocked, 18, 2)} OMN
                   {isLockAmountOpen && <IconOmen size={24} style={{ marginLeft: '10px' }} />}
-                </TYPE.bodyMedium>
+                </DarkDataItem>
               </DataRow>
             </ConditionalWrapper>
             {isLockAmountOpen && (
@@ -321,8 +332,8 @@ const ModalLockTokens = (props: Props) => {
             {isLockAmountOpen && <Divider />}
 
             <DataRow style={{ marginTop: !isLockAmountOpen ? '12px' : '' }}>
-              <TYPE.bodyRegular color={'text2'}>{isLockAmountOpen && 'Your '}Vote Weight</TYPE.bodyRegular>
-              <TYPE.bodyMedium align-items={'center'} color={'text1'} display={'flex'}>
+              <LightDataItem>{isLockAmountOpen && 'Your '}Vote Weight</LightDataItem>
+              <DarkDataItem>
                 <TYPE.bodyMedium color={!displayLockAmount.isZero() && 'text2'}>
                   {!totalLocked.isZero() && !userLocked.isZero()
                     ? (divBN(userLocked, totalLocked) * 100).toFixed(2)
@@ -336,12 +347,12 @@ const ModalLockTokens = (props: Props) => {
                     {(divBN(userLocked.add(displayLockAmount), totalLocked) * 100).toFixed(2)}%
                   </>
                 )}
-              </TYPE.bodyMedium>
+              </DarkDataItem>
             </DataRow>
 
             <DataRow>
-              <TYPE.bodyRegular color={'text2'}>Unlock Date</TYPE.bodyRegular>
-              <TYPE.bodyMedium align-items={'center'} color={'text1'} display={'flex'}>
+              <LightDataItem>Unlock Date</LightDataItem>
+              <DarkDataItem>
                 {timestamp !== 0 ? (
                   <>
                     {formatLockDate(timestamp * 1000)}
@@ -358,7 +369,7 @@ const ModalLockTokens = (props: Props) => {
                 ) : (
                   '-'
                 )}
-              </TYPE.bodyMedium>
+              </DarkDataItem>
             </DataRow>
           </ModalMain>
           <ReactTooltip
