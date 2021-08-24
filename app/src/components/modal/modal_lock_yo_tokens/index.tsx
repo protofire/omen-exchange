@@ -341,7 +341,7 @@ const ModalLockTokens = (props: Props) => {
 
             <DataRow>
               <TYPE.bodyRegular color={'text2'}>Unlock Date</TYPE.bodyRegular>
-              <TYPE.bodyMedium align-items={'center'} display={'flex'}>
+              <TYPE.bodyMedium align-items={'center'} color={'text1'} display={'flex'}>
                 {timestamp !== 0 ? (
                   <>
                     {formatLockDate(timestamp * 1000)}
