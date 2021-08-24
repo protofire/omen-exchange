@@ -4,6 +4,7 @@ import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../contexts'
+import { TYPE } from '../../../theme'
 import { bigNumberToString } from '../../../util/tools'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -33,20 +34,6 @@ const TopSectionDetails = styled.div`
   margin-left: 16px;
 `
 
-const TopSectionHeading = styled.div`
-  color: ${props => props.theme.colors.textColorDark};
-  font-weight: ${props => props.theme.textfield.fontWeight};
-`
-
-interface Subheading {
-  green: boolean
-}
-
-const TopSectionSubHeading = styled.div<Subheading>`
-  color: ${props => (props.green ? props.theme.colors.green : props.theme.colors.textColorLighter)};
-  font-weight: ${props => props.theme.textfield.fontWeight};
-`
-
 const BottomSection = styled(BalanceSection as any)`
   display: flex;
   align-items: center;
@@ -58,20 +45,6 @@ const BottomSectionTextWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-`
-
-const BottomSectionHeading = styled.div`
-  color: ${props => props.theme.colors.textColorDark};
-  font-weight: ${props => props.theme.textfield.fontWeight};
-`
-
-const BottomSectionSubheading = styled.div`
-  color: ${props => props.theme.colors.textColorLighter};
-  font-size: ${props => props.theme.fonts.defaultSize};
-`
-
-const BottomSectionDescription = styled.div`
-  color: ${props => props.theme.colors.textColorLighter};
 `
 
 const AirdropButton = styled(Button)`
@@ -107,10 +80,10 @@ const AirdropCard = (props: Props) => {
           <TopSectionLeft>
             <IconOmen id="airdrop" size={38} />
             <TopSectionDetails>
-              <TopSectionHeading>Claimable Amount</TopSectionHeading>
-              <TopSectionSubHeading green={!claimIsDisabled}>
+              <TYPE.bodyMedium color={'text1'}>Claimable Amount</TYPE.bodyMedium>
+              <TYPE.bodyMedium color={!claimIsDisabled ? 'profit' : 'text2'}>
                 {bigNumberToString(displayAmount, STANDARD_DECIMALS)} OMN
-              </TopSectionSubHeading>
+              </TYPE.bodyMedium>
             </TopSectionDetails>
           </TopSectionLeft>
           {displayButtons && (
@@ -120,24 +93,24 @@ const AirdropCard = (props: Props) => {
           )}
         </TopSection>
         {showCheckAddress && (
-          <BottomSection>
-            <BottomSectionTextWrapper>
-              {displayButtons ? (
-                <BottomSectionTextWrapper>
-                  <BottomSectionHeading>Claim OMN token</BottomSectionHeading>
-                  <BottomSectionSubheading>check address for claimable OMN</BottomSectionSubheading>
-                </BottomSectionTextWrapper>
-              ) : (
-                <BottomSectionTextWrapper>
-                  <BottomSectionDescription>
-                    Enter an address to trigger a OMN claim. If the address has any claimable OMN it will be sent to
-                    them on submission.
-                  </BottomSectionDescription>
-                </BottomSectionTextWrapper>
-              )}
-            </BottomSectionTextWrapper>
-            {displayButtons && <AirdropButton onClick={onCheckAddress}>Check</AirdropButton>}
-          </BottomSection>
+        <BottomSection>
+          <BottomSectionTextWrapper>
+            {displayButtons ? (
+              <BottomSectionTextWrapper>
+                <TYPE.bodyMedium color={'text1'}>Claim OMN token</TYPE.bodyMedium>
+                <TYPE.bodyRegular color={'text2'}>check address for claimable OMN</TYPE.bodyRegular>
+              </BottomSectionTextWrapper>
+            ) : (
+              <BottomSectionTextWrapper>
+                <TYPE.bodyRegular color={'text2'}>
+                  Enter an address to trigger a OMN claim. If the address has any claimable OMN it will be sent to them
+                  on submission.
+                </TYPE.bodyRegular>
+              </BottomSectionTextWrapper>
+            )}
+          </BottomSectionTextWrapper>
+          {displayButtons && <AirdropButton onClick={onCheckAddress}>Check</AirdropButton>}
+        </BottomSection>
         )}
       </ModalCard>
     </>

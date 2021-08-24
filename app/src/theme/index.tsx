@@ -21,8 +21,8 @@ export function colors(darkMode: boolean): Colors {
 
     //other
     white: darkMode ? '' : '#fff',
-    green: darkMode ? '' : '#4B9E98',
-    red: darkMode ? '' : '#E57373',
+    profit: darkMode ? '' : '#4B9E98',
+    alert: darkMode ? '' : '#E57373',
     link: darkMode ? '' : '#1E88E5',
     dai: darkMode ? '' : '#FBCC5F',
 
@@ -388,6 +388,7 @@ function themeAggregator(darkMode: boolean) {
     ...colors(darkMode),
   }
 }
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
   //this is temporary until we determine to use dark theme
   const darkMode = false
