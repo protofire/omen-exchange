@@ -385,8 +385,6 @@ export const withdrawRewards = async (params: WithdrawRewardsParams) => {
     const rewardTokens = await stakingService.getRewardTokens()
     const claimableRewards = await stakingService.getClaimableRewards(service.cpk.address)
 
-    console.log(await service.provider.getBlockNumber())
-
     for (let i = 0; i < rewardTokens.length; i++) {
       const erc20Service = new ERC20Service(service.provider, service.cpk.address, rewardTokens[i])
       const unclaimedRewards = bigNumberify(await erc20Service.getCollateral(service.cpk.address))
