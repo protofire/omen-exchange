@@ -24,6 +24,7 @@ export function colors(darkMode: boolean): Colors {
     profit: darkMode ? '' : '#4B9E98',
     alert: darkMode ? '' : '#E57373',
     link: darkMode ? '' : '#1E88E5',
+    dai: darkMode ? '' : '#F9A606',
 
     //border
     border1: darkMode ? '' : '#DCDFF2',

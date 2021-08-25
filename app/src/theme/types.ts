@@ -17,6 +17,7 @@ export interface Colors {
   profit: Color
   alert: Color
   link: Color
+  dai: Color
 
   border1: Color
   border2: Color
