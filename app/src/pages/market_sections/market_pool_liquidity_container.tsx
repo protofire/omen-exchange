@@ -339,7 +339,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
         return
       }
 
-      const fundsAmount = bigNumberToString(depositedTokensTotal, collateral.decimals, collateral.decimals)
+      const fundsAmount = bigNumberToString(depositedTokensTotal, collateral.decimals)
       setMessage(`Withdrawing funds: ${fundsAmount} ${collateral.symbol}...`)
 
       const conditionId = await marketMaker.getConditionId()
@@ -444,13 +444,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
       const stakingService = new StakingService(provider, cpk.address, liquidityMiningCampaign.id)
       const claimableRewards = await stakingService.getClaimableRewards(cpk.address)
 
-      setMessage(
-        `Claiming ${bigNumberToString(
-          claimableRewards[0],
-          getToken(networkId, 'omn').decimals,
-          getToken(networkId, 'omn').decimals,
-        )} OMN`,
-      )
+      setMessage(`Claiming ${bigNumberToString(claimableRewards[0], getToken(networkId, 'omn').decimals)} OMN`)
 
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionProcessing(true)
