@@ -46,6 +46,10 @@ const TableData = styled.div`
   }
 `
 
+const TextData = styled(TYPE.bodyRegular)`
+  color: ${props => props.theme.text2};
+`
+
 interface Props {
   outcomes: (string | number)[][]
 }
@@ -58,8 +62,8 @@ export const ResponsiveTableSimple = (props: Props) => {
       {outcomes.map((item: any) => {
         return (
           <TableData key={item}>
-            <TYPE.bodyRegular color={'text2'}>{item[0]}</TYPE.bodyRegular>
-            <TYPE.bodyRegular color={'text2'}>{item[1]}</TYPE.bodyRegular>
+            <TextData>{item[0]}</TextData>
+            <TextData>{item[1]}</TextData>
           </TableData>
         )
       })}

@@ -103,10 +103,12 @@ const BackNavigation = styled.div`
 
 const Heading = styled(TYPE.heading2)`
   border-bottom: ${props => props.theme.borders.borderLineDisabled};
+  color: ${props => props.theme.text3};
   margin: 0 -24px;
   padding: 0 24px 20px;
 `
 const MarketDetails = styled(TYPE.bodyRegular)`
+  color: ${props => props.theme.text2};
   margin-top: 32px;
   @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
     margin-top: 24px;
@@ -149,7 +151,7 @@ const VoteHeading = styled(TYPE.heading2)`
   padding: 0 24px 20px;
   margin: 0 -24px;
   border-bottom: 1px solid #e8eaf6;
-
+  color: ${props => props.theme.text3};
   @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
     padding: 0 20px 20px;
     margin: 0 -20px;
@@ -163,6 +165,9 @@ const BarDiagramStyled = styled(BarDiagram)`
   @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
     margin: 0 -20px;
   }
+`
+const MarketStatusText = styled(TYPE.bodyMedium)`
+  color: ${props => props.theme.profit};
 `
 
 interface Props {
@@ -228,18 +233,17 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
           </TYPE.heading3>
         </BackNavigation>
         <MarketStatus>
-          <TYPE.bodyMedium color={'profit'}>5 days, 54 mins left</TYPE.bodyMedium>
+          <MarketStatusText>5 days, 54 mins left</MarketStatusText>
           <StateButton>
-            <TYPE.bodyMedium color={'profit'}>Active</TYPE.bodyMedium>
+            <MarketStatusText>Active</MarketStatusText>
           </StateButton>
         </MarketStatus>
       </NavigationSection>
       <MainWrapper>
         <MainSection>
-          <Heading color={'text3'}>Issue Liqudity Rewards</Heading>
+          <Heading>Issue Liqudity Rewards</Heading>
           <StyledTable valueObject={object} />
           <MarketDetails
-            color={'text2'}
             onClick={() => {
               setIsScalar(!isScalar)
             }}
@@ -280,7 +284,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
           />
         </MainSection>
         <VoteSection>
-          <VoteHeading color={'text3'}>Vote</VoteHeading>
+          <VoteHeading>Vote</VoteHeading>
           <VotesBar>
             <BarDiagram
               additionalTextLeft={'454 votes'}

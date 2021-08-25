@@ -60,6 +60,9 @@ export const Progress = styled.div<{ width: number; outcomeIndex: number; select
   transition: width 0.25s ease-out, background-color 0.25s ease-out;
   width: ${props => props.width}%;
 `
+const AdditionalTextStyle = styled(TYPE.bodyRegular)`
+  color: ${props => props.theme.text2};
+`
 
 Progress.defaultProps = {
   outcomeIndex: 0,
@@ -101,9 +104,9 @@ export const BarDiagram: React.FC<Props> = (props: Props) => {
           <Progress outcomeIndex={outcomeIndex} selected={selected} width={probability} />
         </ProgressBar>
         {additionalTextLeft && additionalTextRight && (
-          <OutcomeText style={{ marginTop: '10px' }}>
-            <TYPE.bodyRegular color={'text2'}>{additionalTextLeft}</TYPE.bodyRegular>
-            <TYPE.bodyRegular color={'text2'}>{additionalTextRight}</TYPE.bodyRegular>
+          <OutcomeText style={{ marginTop: '10px', marginBottom: '0px' }}>
+            <AdditionalTextStyle>{additionalTextLeft}</AdditionalTextStyle>
+            <AdditionalTextStyle>{additionalTextRight}</AdditionalTextStyle>
           </OutcomeText>
         )}
       </Outcome>
