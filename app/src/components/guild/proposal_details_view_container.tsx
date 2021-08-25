@@ -131,14 +131,14 @@ const AdditionalDataWrapper = styled(AdditionalMarketData)`
   border: none;
   margin-left: -20px;
 
-  div {
+  div:first-child {
     padding-top: 32px;
   }
   a {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
   @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
-    div {
+    div:first-child {
       padding-top: 16px;
       padding-bottom: 4px;
     }

@@ -6,6 +6,7 @@ import { CardCSS } from '../index'
 
 const CardStyled = styled.div`
   ${CardCSS};
+  box-shadow: none;
   width: fit-content;
   display: flex;
   flex-direction: row;
