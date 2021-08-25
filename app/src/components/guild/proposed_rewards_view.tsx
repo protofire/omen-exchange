@@ -119,7 +119,7 @@ const ProposedRewardsView = (props: Props) => {
     setIsTransactionModalOpen,
     toggle,
   } = props
-  const { txHash, txState } = context
+  const { networkId, txHash, txState } = context
 
   const proposalButtonDisabled = (propose && !selected.length) || isTransactionProcessing // || votes.isZero() || votes.lt(votesRequired)
   const isPrevDisabled = pageIndex === 0
@@ -165,6 +165,7 @@ const ProposedRewardsView = (props: Props) => {
                   active={selected === item.address}
                   key={item.address}
                   market={item}
+                  networkId={networkId}
                   onClick={() => select(item.address)}
                 />
               )

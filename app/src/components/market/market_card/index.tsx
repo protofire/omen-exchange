@@ -3,7 +3,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { TYPE } from '../../../theme'
-import { bigNumberToString, limitDecimalPlaces } from '../../../util/tools'
+import { bigNumberToString, isScalarMarket, limitDecimalPlaces } from '../../../util/tools'
 import { MarketMakerDataItem } from '../../../util/types'
 import { CurationRadioWrapper } from '../common_styled'
 
@@ -84,15 +84,26 @@ const OutcomeRow = styled.div`
 interface Props {
   active: boolean
   market: MarketMakerDataItem
+  networkId: number
   onClick?: () => void
 }
 
 export const MarketCard = (props: Props) => {
-  const { active, market, onClick } = props
+  const { active, market, networkId, onClick } = props
 
   const resolutionDate = moment(market.openingTimestamp).format('Do MMMM YYYY')
   const formattedLiquidity: string = bigNumberToString(market.totalPoolShares, market.collateral.decimals)
   const formattedVolume: string = bigNumberToString(market.collateralVolume, market.collateral.decimals)
+
+  const isScalar = isScalarMarket(market.oracle || '', networkId || 0)
+
+  const firstOutcome = market.outcomes && market.outcomes[0]
+  const firstOutcomePerc = limitDecimalPlaces(market.outcomeTokenMarginalPrices[0], 2) * 100
+  const secondOutcome =
+    market.outcomes && market.outcomes.length > 2
+      ? `+${market.outcomes.length - 1} Outcomes`
+      : market.outcomes && market.outcomes[1]
+  const compressedPerc = limitDecimalPlaces(String(100 - firstOutcomePerc), 2)
 
   return (
     <StyledMarketCard active={active} onClick={onClick}>
@@ -103,16 +114,18 @@ export const MarketCard = (props: Props) => {
       <TitleWrapper>
         <TYPE.bodyMedium color="text1">{market.title}</TYPE.bodyMedium>
       </TitleWrapper>
-      <OutcomeWrapper>
-        {market.outcomes?.map((outcome, index) => (
-          <OutcomeRow key={outcome}>
-            <TYPE.bodyRegular color="text2">{outcome}</TYPE.bodyRegular>
-            <TYPE.bodyMedium color="text2">
-              {limitDecimalPlaces(market.outcomeTokenMarginalPrices[index], 2)}%
-            </TYPE.bodyMedium>
+      {!isScalar && (
+        <OutcomeWrapper>
+          <OutcomeRow>
+            <TYPE.bodyRegular color="text2">{firstOutcome}</TYPE.bodyRegular>
+            <TYPE.bodyMedium color="text2">{firstOutcomePerc}%</TYPE.bodyMedium>
           </OutcomeRow>
-        ))}
-      </OutcomeWrapper>
+          <OutcomeRow>
+            <TYPE.bodyRegular color="text2">{secondOutcome}</TYPE.bodyRegular>
+            <TYPE.bodyMedium color="text2">{compressedPerc}%</TYPE.bodyMedium>
+          </OutcomeRow>
+        </OutcomeWrapper>
+      )}
       <DetailsWrapper>
         <TYPE.bodyRegular color="text2">
           {formattedLiquidity} {market.collateral.symbol} Liquidity
