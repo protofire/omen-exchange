@@ -99,6 +99,7 @@ const StateButton = styled.div`
 const BackNavigation = styled.div`
   display: flex;
   align-items: center;
+  cursor: pointer;
   &:hover {
     .path {
       fill: ${props => props.theme.primary1}!important;
