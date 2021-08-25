@@ -129,7 +129,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { address, arbitrator, category, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
+  const { address, arbitrator, category, collateral, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
 
   const context = useConnectedWeb3Context()
   const { cpk, library: provider, networkId, relay } = context
@@ -154,6 +154,8 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   const [liquidityMiningCampaign, setLiquidityMiningCampaign] = useState<Maybe<GraphResponseLiquidityMiningCampaign>>()
 
   const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address)
+  const { tokenPrice: collateralPrice } = useTokenPrice(collateral.address)
+
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
   useEffect(() => {
@@ -176,7 +178,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
       const { rewardApr } = await stakingService.getStakingData(
         getToken(networkId, 'omn'),
         cpk?.address || '',
-        1, // Assume pool token value is 1 DAI
+        collateralPrice, // Assume pool token value is 1 unit of collateral
         tokenPrice,
         Number(liquidityMiningCampaign.endsAt),
         liquidityMiningCampaign.rewardAmounts[0],
@@ -187,7 +189,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
     }
 
     cpk && liquidityMiningCampaign && fetchStakingData()
-  }, [cpk, cpk?.address, liquidityMiningCampaign, networkId, provider, tokenPrice])
+  }, [cpk, cpk?.address, liquidityMiningCampaign, networkId, provider, tokenPrice, collateralPrice])
 
   return (
     <AdditionalMarketDataWrapper>

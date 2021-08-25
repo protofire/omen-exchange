@@ -163,6 +163,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   }, [account, collateralToken, collateralVolume, provider, context.networkId, token])
 
   const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address)
+  const { tokenPrice: collateralPrice } = useTokenPrice(collateralToken)
 
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
@@ -186,7 +187,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
       const { rewardApr } = await stakingService.getStakingData(
         getToken(networkId, 'omn'),
         cpk?.address || '',
-        1, // Assume pool token value is 1 DAI
+        collateralPrice, // Assume pool token value is 1 unit of collateral
         tokenPrice,
         Number(liquidityMiningCampaign.endsAt),
         liquidityMiningCampaign.rewardAmounts[0],
@@ -197,7 +198,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
     }
 
     cpk && liquidityMiningCampaign && fetchStakingData()
-  }, [cpk, cpk?.address, liquidityMiningCampaign, networkId, provider, tokenPrice])
+  }, [cpk, cpk?.address, liquidityMiningCampaign, networkId, provider, tokenPrice, collateralPrice])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
