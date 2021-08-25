@@ -23,14 +23,14 @@ const RecipientWrapper = styled.div`
 `
 
 const AddressField = styled(Textfield)<{ error: boolean }>`
-  border-color: ${props => (props.error ? props.theme.red : props.theme.border1)};
+  border-color: ${props => (props.error ? props.theme.alert : props.theme.border1)};
   &:hover {
-    border-color: ${props => (props.error ? props.theme.red : props.theme.border2)};
+    border-color: ${props => (props.error ? props.theme.alert : props.theme.border2)};
   }
 
   &:active,
   &:focus {
-    border-color: ${props => (props.error ? props.theme.red : props.theme.border3)};
+    border-color: ${props => (props.error ? props.theme.alert : props.theme.border3)};
   }
 `
 
@@ -80,7 +80,7 @@ export const ModalCheckAddress = (props: Props) => {
         <ModalNavigation>
           <ModalNavigationLeft>
             <IconArrowBack hoverEffect={true} onClick={onBack ? onBack : onClose} />
-            <TYPE.heading3 color={'text1'} margin={'0'} style={{ marginLeft: '16px', marginTop: '2px' }}>
+            <TYPE.heading3 color={'text1'} margin={'0'} marginLeft={'16px'} marginTop={'2px'}>
               Check Address
             </TYPE.heading3>
           </ModalNavigationLeft>
@@ -88,12 +88,12 @@ export const ModalCheckAddress = (props: Props) => {
         </ModalNavigation>
         <AirdropCardWrapper displayAmount={amount} displayButtons={false} />
         <RecipientWrapper>
-          <TYPE.bodyRegular color={'text1'} display={'inline-block'} lineHeight={'1.2'} marginBottom={'12px'}>
+          <TYPE.bodyRegular color={'text1'} marginBottom={'12px'}>
             Recipient
           </TYPE.bodyRegular>
           <AddressField error={error} onChange={updateAddress} placeholder="Wallet Address" value={address} />
           {error && (
-            <TYPE.bodyRegular color={'red'} marginTop={'12px'}>
+            <TYPE.bodyRegular color={'alert'} marginTop={'12px'}>
               Address has no available claim
             </TYPE.bodyRegular>
           )}
