@@ -99,6 +99,29 @@ const StateButton = styled.div`
 const BackNavigation = styled.div`
   display: flex;
   align-items: center;
+  &:hover {
+    .path {
+      fill: ${props => props.theme.primary1}!important;
+    }
+    div {
+      color: ${props => props.theme.primary1};
+    }
+  }
+  :active {
+    .path {
+      fill: ${props => props.theme.primary3}!important;
+    }
+    div {
+      color: ${props => props.theme.primary3};
+    }
+  }
+
+  .path {
+    fill: ${props => props.theme.primary2}!important;
+  }
+  div {
+    color: ${props => props.theme.primary2};
+  }
 `
 
 const Heading = styled(TYPE.heading2)`
@@ -227,10 +250,8 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     <Container>
       <NavigationSection>
         <BackNavigation>
-          <IconArrowBack color={'primary2'}></IconArrowBack>
-          <TYPE.heading3 color={'primary2'} marginLeft={'12px'}>
-            Guild Overview
-          </TYPE.heading3>
+          <IconArrowBack />
+          <TYPE.heading3 marginLeft={'12px'}>Guild Overview</TYPE.heading3>
         </BackNavigation>
         <MarketStatus>
           <MarketStatusText>5 days, 54 mins left</MarketStatusText>
