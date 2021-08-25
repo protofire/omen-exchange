@@ -232,7 +232,7 @@ export const ListItem: React.FC<Props> = (props: Props) => {
         {rewardApr > 0 && (
           <>
             <IconApySmall />
-            <ApyIndicator>{formatNumber(rewardApr.toString())}% APR</ApyIndicator>
+            <ApyIndicator>{rewardApr === Infinity ? '--' : formatNumber(rewardApr.toString())}% APR</ApyIndicator>
             <Separator>|</Separator>
           </>
         )}

@@ -236,7 +236,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           >
             <IconApy />
             <AdditionalMarketDataSectionTitle isSuccess={rewardApr > 0}>
-              {formatNumber(rewardApr.toString())}% APR
+              {rewardApr === Infinity ? '--' : formatNumber(rewardApr.toString())}% APR
             </AdditionalMarketDataSectionTitle>
           </AdditionalMarketDataSectionWrapper>
         )}
