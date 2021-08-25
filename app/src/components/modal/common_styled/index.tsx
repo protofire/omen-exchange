@@ -41,11 +41,10 @@ export const ModalCard = styled.div<{ marginTop?: boolean }>`
   align-items: center;
   border: ${props => props.theme.borders.borderLineDisabled};
   border-radius: ${props => props.theme.cards.borderRadius};
-  ${props => props.marginTop && `margin-top: 16px;`};
 
   &:nth-child(3),
   &:nth-child(4) {
-    margin-top: 16px;
+    margin-top: ${props => (props.marginTop ? `0px` : '16px')};
   }
 `
 

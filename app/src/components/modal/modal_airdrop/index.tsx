@@ -16,6 +16,14 @@ import { ModalTransactionWrapper } from '../modal_transaction'
 import { AirdropCardWrapper } from './airdrop_card'
 import Graphic from './graphic'
 
+const TextSection = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 32px 0px;
+`
+
 const DaiBanner = styled.div`
   display: flex;
   flex-direction: row;
@@ -24,7 +32,7 @@ const DaiBanner = styled.div`
   border: 1px solid ${props => props.theme.dai};
   border-radius: ${props => props.theme.cards.borderRadius};
   width: 100%;
-  margin: 16px 0px;
+  margin-bottom: 16px;
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -85,16 +93,24 @@ export const ModalAirdrop = (props: Props) => {
             <IconClose hoverEffect={true} onClick={onClose} />
           </ModalNavigation>
           <Graphic />
-          <TYPE.heading2 alignItems={'center'} color={'text1'} display={'flex'} fontWeight={500} margin={'12px 0px'}>
-            OMN has arrived!
-          </TYPE.heading2>
-          <TYPE.bodyRegular alignItems={'center'} color={'text2'} display={'flex'} margin={'12px 0px'}>
-            Thanks for being part of the Omen Community.
-          </TYPE.bodyRegular>
+          <TextSection>
+            <TYPE.heading2
+              alignItems={'center'}
+              color={'text1'}
+              display={'flex'}
+              fontWeight={500}
+              marginBottom={'12px'}
+            >
+              OMN has arrived!
+            </TYPE.heading2>
+            <TYPE.bodyRegular alignItems={'center'} color={'text2'} display={'flex'}>
+              Thanks for being part of the Omen Community.
+            </TYPE.bodyRegular>
+          </TextSection>
           {displayDaiBanner && (
             <DaiBanner>
               <IconExclamation color={theme.dai} />
-              <TYPE.bodyRegular color={'dai'} margin={'0px 16px'} textAlign={'center'}>
+              <TYPE.bodyRegular color={'dai'} margin={'0px 12px'} textAlign={'center'}>
                 Deposit Dai in order to claim OMN tokens.
               </TYPE.bodyRegular>
             </DaiBanner>
