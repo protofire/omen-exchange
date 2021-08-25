@@ -310,6 +310,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
             <BarDiagram
               additionalTextLeft={'454 votes'}
               additionalTextRight={'454 OMEN'}
+              color={'primary1'}
               outcomeIndex={22}
               outcomeName={'Yes'}
               probability={22}
@@ -317,6 +318,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
             <BarDiagramStyled
               additionalTextLeft={'454 votes'}
               additionalTextRight={'454 OMEN'}
+              color={'primary1'}
               outcomeIndex={22}
               outcomeName={'No'}
               probability={42}

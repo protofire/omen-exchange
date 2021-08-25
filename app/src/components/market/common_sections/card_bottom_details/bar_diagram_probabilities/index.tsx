@@ -2,6 +2,7 @@ import React, { DOMAttributes } from 'react'
 import styled from 'styled-components'
 
 import { TYPE } from '../../../../../theme'
+import { Colors } from '../../../../../theme/types'
 import { getOutcomeColor } from '../../../../../theme/utils'
 
 const BarDiagramWrapper = styled.div`
@@ -48,9 +49,11 @@ const ProgressBar = styled.div`
   overflow: hidden;
 `
 
-export const Progress = styled.div<{ width: number; outcomeIndex: number; selected?: boolean }>`
+export const Progress = styled.div<{ width: number; outcomeIndex: number; selected?: boolean; color?: keyof Colors }>`
   background-color: ${props =>
-    getOutcomeColor(props.outcomeIndex).medium
+    props.color
+      ? props.theme[props.color]
+      : getOutcomeColor(props.outcomeIndex).medium
       ? props.selected
         ? getOutcomeColor(props.outcomeIndex).darker
         : getOutcomeColor(props.outcomeIndex).medium
@@ -78,12 +81,14 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   winningBadge?: React.ReactNode
   additionalTextLeft?: string
   additionalTextRight?: string
+  color?: keyof Colors
 }
 
 export const BarDiagram: React.FC<Props> = (props: Props) => {
   const {
     additionalTextLeft,
     additionalTextRight,
+    color,
     outcomeIndex,
     outcomeName,
     probability,
@@ -101,7 +106,7 @@ export const BarDiagram: React.FC<Props> = (props: Props) => {
           <OutcomeValue>{probability.toFixed(2)}%</OutcomeValue>
         </OutcomeText>
         <ProgressBar>
-          <Progress outcomeIndex={outcomeIndex} selected={selected} width={probability} />
+          <Progress color={color} outcomeIndex={outcomeIndex} selected={selected} width={probability} />
         </ProgressBar>
         {additionalTextLeft && additionalTextRight && (
           <OutcomeText style={{ marginTop: '10px', marginBottom: '0px' }}>
