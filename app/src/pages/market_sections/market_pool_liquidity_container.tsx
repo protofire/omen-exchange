@@ -543,7 +543,7 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     const { earnedRewards, remainingRewards, rewardApr, totalRewards } = await stakingService.getStakingData(
       omnToken,
       cpk.address,
-      collateralPrice, // Assume pool token value is 1 DAI
+      collateralPrice, // Assume pool token value is 1 unit of collateral
       omnPrice,
       Number(liquidityMiningCampaign.endsAt),
       liquidityMiningCampaign.rewardAmounts[0],
