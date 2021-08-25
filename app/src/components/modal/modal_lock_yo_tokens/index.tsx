@@ -17,7 +17,7 @@ import { ButtonStateful, ButtonStates } from '../../button/button_stateful'
 import { ButtonType } from '../../button/button_styling_types'
 import { TextfieldCustomPlaceholder } from '../../common'
 import { BigNumberInput, BigNumberInputReturn } from '../../common/form/big_number_input'
-import { IconArrowBack, IconClose, IconOmen } from '../../common/icons'
+import { IconArrowBack, IconClose, IconExclamation, IconOmen } from '../../common/icons'
 import { IconAlertInverted } from '../../common/icons/IconAlertInverted'
 import { ArrowIcon } from '../../market/common_sections/tables/new_value/img/ArrowIcon'
 import { ContentWrapper, ModalNavigation } from '../common_styled'
@@ -88,11 +88,22 @@ const Divider = styled.div`
   margin: 24px 0;
 `
 
+const DaiBanner = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid ${props => props.theme.dai};
+  border-radius: ${props => props.theme.cards.borderRadius};
+  width: 100%;
+  margin-bottom: 16px;
+`
+
 const ModalLockTokens = (props: Props) => {
   const { context, isOpen, setIsModalLockTokensOpen, theme } = props
   const { account, balances, cpk, library: provider, networkId, relay, setTxState, txHash, txState } = context
 
-  const { fetchBalances, omenBalance, xOmenBalance } = balances
+  const { fetchBalances, formattedxDaiBalance, omenBalance, xOmenBalance } = balances
 
   const { claimAmount, fetchClaimAmount } = useAirdropService()
 
@@ -109,6 +120,7 @@ const ModalLockTokens = (props: Props) => {
   const [omenAllowance, setOmenAllowance] = useState<BigNumber>(Zero)
   const [allowanceState, setAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
   const [checkAddress, setCheckAddress] = useState(false)
+  const displayDaiBanner = parseFloat(formattedxDaiBalance) === 0
 
   const isApproveVisible =
     (omenAllowance.isZero() && isLockAmountOpen) ||
@@ -415,6 +427,14 @@ const ModalLockTokens = (props: Props) => {
         {!isLockAmountOpen && relay && (
           <>
             <Divider />
+            {displayDaiBanner && (
+              <DaiBanner>
+                <IconExclamation color={theme.dai} />
+                <TYPE.bodyRegular color={'dai'} margin={'0px 12px'} textAlign={'center'}>
+                  Deposit Dai in order to claim OMN tokens.
+                </TYPE.bodyRegular>
+              </DaiBanner>
+            )}
             <AirdropCardWrapper
               claim={claim}
               displayAmount={claimAmount}
