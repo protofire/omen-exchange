@@ -1,8 +1,7 @@
-/* eslint-disable no-console */
 import { BigNumber } from 'ethers/utils'
 import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
-import { withTheme } from 'styled-components'
+import styled, { withTheme } from 'styled-components'
 
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../contexts'
@@ -10,13 +9,23 @@ import { useAirdropService } from '../../../hooks'
 import { TYPE } from '../../../theme'
 import { bigNumberToString } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
-import { IconClose, IconOmen } from '../../common/icons'
+import { IconClose, IconExclamation, IconOmen } from '../../common/icons'
 import { ContentWrapper, ModalNavigation, ModalNavigationLeft } from '../common_styled'
 import { ModalTransactionWrapper } from '../modal_transaction'
 
 import { AirdropCardWrapper } from './airdrop_card'
-import { ModalCheckAddressWrapper } from './check_address'
 import Graphic from './graphic'
+
+const DaiBanner = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid ${props => props.theme.dai};
+  border-radius: ${props => props.theme.cards.borderRadius};
+  width: 100%;
+  margin: 16px 0px;
+`
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
   theme: any
@@ -26,15 +35,13 @@ export const ModalAirdrop = (props: Props) => {
   const { theme } = props
 
   const { balances, cpk, setTxState, txHash, txState } = useConnectedWeb3Context()
-  // console.log('balances: ', balances)
-  console.log('balances: ', balances.formattedxDaiBalance)
-  console.log('balances: ', parseFloat(balances.formattedxDaiBalance) === 0)
 
   const initialIsOpenState = localStorage.getItem('airdrop')
   const [isOpen, setIsOpen] = useState(!initialIsOpenState)
   const [checkAddress, setCheckAddress] = useState(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [message, setMessage] = useState('')
+  const displayDaiBanner = parseFloat(balances.formattedxDaiBalance) === 0
 
   Modal.setAppElement('#root')
 
@@ -67,7 +74,6 @@ export const ModalAirdrop = (props: Props) => {
   return (
     <>
       <Modal
-        // isOpen={true}
         isOpen={isOpen && !claimAmount.isZero() && !isTransactionModalOpen && !checkAddress}
         onRequestClose={onClose}
         shouldCloseOnOverlayClick={true}
@@ -85,7 +91,20 @@ export const ModalAirdrop = (props: Props) => {
           <TYPE.bodyRegular alignItems={'center'} color={'text2'} display={'flex'} margin={'12px 0px'}>
             Thanks for being part of the Omen Community.
           </TYPE.bodyRegular>
-          <AirdropCardWrapper claim={claim} displayAmount={claimAmount} showCheckAddress={false} />
+          {displayDaiBanner && (
+            <DaiBanner>
+              <IconExclamation color={theme.dai} />
+              <TYPE.bodyRegular color={'dai'} margin={'0px 16px'} textAlign={'center'}>
+                Deposit Dai in order to claim OMN tokens.
+              </TYPE.bodyRegular>
+            </DaiBanner>
+          )}
+          <AirdropCardWrapper
+            claim={claim}
+            displayAmount={claimAmount}
+            displayCheckAddress={false}
+            marginTop={!displayDaiBanner}
+          />
         </ContentWrapper>
       </Modal>
       <ModalTransactionWrapper

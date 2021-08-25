@@ -52,18 +52,19 @@ const AirdropButton = styled(Button)`
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
-  theme: any
-  displayButtons?: boolean
-  displayAmount: BigNumber
   claim?: (account: string, amount: BigNumber) => Promise<void>
+  displayAmount: BigNumber
+  displayButtons?: boolean
+  displayCheckAddress?: boolean
   onCheckAddress?: () => void
-  showCheckAddress?: boolean
+  marginTop?: boolean
+  theme: any
 }
 
 const AirdropCard = (props: Props) => {
-  const { claim, displayAmount, displayButtons = true, onCheckAddress, showCheckAddress = true } = props
+  const { claim, displayAmount, displayButtons = true, displayCheckAddress = true, marginTop, onCheckAddress } = props
 
-  const { account } = useConnectedWeb3Context()
+  const { account, balances } = useConnectedWeb3Context()
 
   const submitClaim = () => {
     if (claim && account && displayAmount) {
@@ -71,11 +72,11 @@ const AirdropCard = (props: Props) => {
     }
   }
 
-  const claimIsDisabled = !displayAmount || displayAmount.isZero()
+  const claimIsDisabled = !displayAmount || displayAmount.isZero() || parseFloat(balances.formattedxDaiBalance) === 0
 
   return (
     <>
-      <ModalCard>
+      <ModalCard marginTop={marginTop}>
         <TopSection>
           <TopSectionLeft>
             <IconOmen id="airdrop" size={38} />
@@ -92,7 +93,7 @@ const AirdropCard = (props: Props) => {
             </AirdropButton>
           )}
         </TopSection>
-        {showCheckAddress && (
+        {displayCheckAddress && (
           <BottomSection>
             <BottomSectionTextWrapper>
               {displayButtons ? (

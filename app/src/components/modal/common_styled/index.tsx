@@ -33,7 +33,7 @@ export const ModalTitle = styled.p`
   margin-top: 2px;
 `
 
-export const ModalCard = styled.div`
+export const ModalCard = styled.div<{ marginTop?: boolean }>`
   width: 100%;
 
   display: flex;
@@ -41,6 +41,7 @@ export const ModalCard = styled.div`
   align-items: center;
   border: ${props => props.theme.borders.borderLineDisabled};
   border-radius: ${props => props.theme.cards.borderRadius};
+  ${props => props.marginTop && `margin-top: 16px;`};
 
   &:nth-child(3),
   &:nth-child(4) {
