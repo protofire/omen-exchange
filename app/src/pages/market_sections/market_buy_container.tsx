@@ -91,7 +91,6 @@ export type SharedPropsInterface = {
   txHash: string
   setTxState: any
   txState: TransactionStep
-  relayFeeGreaterThanAmount: boolean
   relayFeeGreaterThanBalance: boolean
 }
 
@@ -215,6 +214,8 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
       ? `Insufficient balance`
       : amount?.gt(maybeCollateralBalance)
       ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
+      : relayFeeGreaterThanAmount
+      ? 'Relay fee is greater than buy amount'
       : null
 
   const unlockCollateral = async () => {
@@ -325,7 +326,6 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     txHash: context.txHash,
     setTxState: context.setTxState,
     txState: context.txState,
-    relayFeeGreaterThanAmount,
     relayFeeGreaterThanBalance,
   }
 

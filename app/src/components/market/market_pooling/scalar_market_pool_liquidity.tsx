@@ -85,7 +85,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     message,
     poolTokens,
     proxyIsUpToDate,
-    relayFeeGreaterThanAmount,
     relayFeeGreaterThanBalance,
     removeFunding,
     setActiveTab,
@@ -265,7 +264,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 shouldDisplayMaxButton
                 symbol="Shares"
               />
-
               {sharesAmountError && <GenericError>{sharesAmountError}</GenericError>}
             </>
           )}
@@ -333,16 +331,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         href={DOCUMENT_FAQ}
         hyperlinkDescription="More Info"
       />
-      {activeTab === Tabs.deposit && relayFeeGreaterThanAmount && (
-        <WarningMessage
-          additionalDescription=""
-          danger={true}
-          description="Relay fee is greater than deposit amount."
-          href=""
-          hyperlinkDescription=""
-          marginBottom
-        />
-      )}
       {relayFeeGreaterThanBalance && (
         <WarningMessage
           additionalDescription={''}

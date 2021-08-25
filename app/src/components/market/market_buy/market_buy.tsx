@@ -76,7 +76,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     potentialProfitFormatted,
     probabilitiesOrNewPrediction: probabilities,
     proxyIsUpToDate,
-    relayFeeGreaterThanAmount,
     relayFeeGreaterThanBalance,
     setAmount,
     setAmountDisplay,
@@ -258,16 +257,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           additionalDescription={''}
           danger={true}
           description={`Your buy amount should not be negative.`}
-          href={''}
-          hyperlinkDescription={''}
-          marginBottom={!showSetAllowance}
-        />
-      )}
-      {relayFeeGreaterThanAmount && (
-        <WarningMessage
-          additionalDescription={''}
-          danger={true}
-          description="Relay fee is greater than buy amount."
           href={''}
           hyperlinkDescription={''}
           marginBottom={!showSetAllowance}

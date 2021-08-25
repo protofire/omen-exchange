@@ -290,6 +290,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       ? `Insufficient balance`
       : funding.gt(maybeCollateralBalance)
       ? `Value must be less than or equal to ${collateralBalanceFormatted} ${collateral.symbol}`
+      : relayFeeGreaterThanAmount
+      ? 'Relay fee is greater than buy amount'
       : null
 
   const isCreateMarketbuttonDisabled =
@@ -546,15 +548,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             loading={RemoteData.is.asking(proxyIsUpToDate)}
             onUnlock={upgradeProxy}
             style={{ marginBottom: 20 }}
-          />
-        )}
-        {relayFeeGreaterThanAmount && (
-          <WarningMessage
-            additionalDescription=""
-            danger={true}
-            description="Relay fee is greater than deposit amount."
-            href=""
-            hyperlinkDescription=""
           />
         )}
         {relayFeeGreaterThanBalance && (

@@ -87,7 +87,6 @@ export type SharedPropsInterface = {
   setAmountToRemoveDisplay: any
   amountToRemove: Maybe<BigNumber>
   setAmountToRemove: any
-  relayFeeGreaterThanAmount: boolean
   relayFeeGreaterThanBalance: boolean
 }
 
@@ -150,6 +149,8 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     ? `Insufficient balance`
     : amountToFund?.gt(maybeCollateralBalance)
     ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
+    : relayFeeGreaterThanAmount
+    ? 'Relay fee is greater than buy amount'
     : null
 
   const sharesAmountError = isTransactionProcessing

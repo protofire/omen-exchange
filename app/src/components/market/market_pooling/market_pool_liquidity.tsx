@@ -83,7 +83,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     message,
     poolTokens,
     proxyIsUpToDate,
-    relayFeeGreaterThanAmount,
     relayFeeGreaterThanBalance,
     removeFunding,
     setActiveTab,
@@ -305,16 +304,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         href={DOCUMENT_FAQ}
         hyperlinkDescription="More Info"
       />
-      {activeTab === Tabs.deposit && relayFeeGreaterThanAmount && (
-        <WarningMessage
-          additionalDescription=""
-          danger={true}
-          description="Relay fee is greater than deposit amount."
-          href=""
-          hyperlinkDescription=""
-          marginBottom
-        />
-      )}
       {relayFeeGreaterThanBalance && (
         <WarningMessage
           additionalDescription={''}
