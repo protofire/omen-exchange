@@ -62,7 +62,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 const AirdropCard = (props: Props) => {
   const { claim, displayAmount, displayButtons = true, onCheckAddress } = props
 
-  const { account } = useConnectedWeb3Context()
+  const { account, balances } = useConnectedWeb3Context()
 
   const submitClaim = () => {
     if (claim && account && displayAmount) {
@@ -70,7 +70,7 @@ const AirdropCard = (props: Props) => {
     }
   }
 
-  const claimIsDisabled = !displayAmount || displayAmount.isZero()
+  const claimIsDisabled = !displayAmount || displayAmount.isZero() || parseFloat(balances.formattedxDaiBalance) === 0
 
   return (
     <>
@@ -80,7 +80,7 @@ const AirdropCard = (props: Props) => {
             <IconOmen id="airdrop" size={38} />
             <TopSectionDetails>
               <TYPE.bodyMedium color={'text1'}>Claimable Amount</TYPE.bodyMedium>
-              <TYPE.bodyMedium color={!claimIsDisabled ? 'profit' : 'text2'}>
+              <TYPE.bodyMedium color={displayAmount.isZero() ? 'text2' : 'profit'}>
                 {bigNumberToString(displayAmount, STANDARD_DECIMALS)} OMN
               </TYPE.bodyMedium>
             </TopSectionDetails>
