@@ -10,8 +10,7 @@ import { useContracts, useCpkProxy } from '../../../hooks'
 import { getLogger } from '../../../util/logger'
 import { getNativeAsset } from '../../../util/networks'
 import { RemoteData } from '../../../util/remote_data'
-import { getUnit, numberToByte32 } from '../../../util/tools'
-import { bigNumberToString } from '../../../util/tools/formatting'
+import { bigNumberToString, getUnit, mulBN, numberToByte32 } from '../../../util/tools'
 import {
   INVALID_ANSWER_ID,
   MarketDetailsTab,
@@ -265,6 +264,12 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
               value={`${bigNumberToString(bondNativeAssetAmount, nativeAsset.decimals)} ${symbol}`}
             />
             <TransactionDetailsLine />
+            <TransactionDetailsRow
+              state={ValueStates.normal}
+              title="Potential Fee"
+              tooltip="A 2.5% fee is applied and burned on bonds which are not the final bond."
+              value={`${bigNumberToString(mulBN(bondNativeAssetAmount, 0.0025), nativeAsset.decimals, 3)} ${symbol}`}
+            />
             <TransactionDetailsRow
               state={ValueStates.normal}
               title="Potential Profit"
