@@ -3,12 +3,13 @@ import React, { HTMLAttributes, useState } from 'react'
 import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
+import { useConnectedWeb3Context } from '../../../contexts'
 import { useAirdropService } from '../../../hooks'
 import { TYPE } from '../../../theme'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Textfield } from '../../common'
-import { IconArrowBack, IconClose } from '../../common/icons'
+import { IconArrowBack, IconClose, IconExclamation } from '../../common/icons'
 import { ContentWrapper, ModalNavigation, ModalNavigationLeft } from '../common_styled'
 
 import { AirdropCardWrapper } from './airdrop_card'
@@ -34,6 +35,16 @@ const AddressField = styled(Textfield)<{ error: boolean }>`
   }
 `
 
+const DaiBanner = styled.div`
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border: 1px solid ${props => props.theme.dai};
+  border-radius: ${props => props.theme.cards.borderRadius};
+  width: 100%;
+  margin-top: 16px;
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   isOpen: boolean
   claim?: (account: string, amount: BigNumber) => Promise<void>
@@ -46,10 +57,12 @@ export const ModalCheckAddress = (props: Props) => {
   const { claim, isOpen, onBack, onClose, theme } = props
 
   const { airdrop } = useAirdropService()
+  const { balances } = useConnectedWeb3Context()
 
   const [address, setAddress] = useState('')
   const [amount, setAmount] = useState(new BigNumber('0'))
   const [loading, setLoading] = useState(false)
+  const displayDaiBanner = balances.xDaiBalance.isZero()
 
   const updateAddress = async (e: any) => {
     const newAddress = e.target.value
@@ -87,6 +100,14 @@ export const ModalCheckAddress = (props: Props) => {
           <IconClose hoverEffect={true} onClick={onClose} />
         </ModalNavigation>
         <AirdropCardWrapper displayAmount={amount} displayButtons={false} />
+        {displayDaiBanner && (
+          <DaiBanner>
+            <IconExclamation color={theme.dai} />
+            <TYPE.bodyRegular color={'dai'} marginLeft={'12px'}>
+              Deposit Dai in order to claim OMN tokens.
+            </TYPE.bodyRegular>
+          </DaiBanner>
+        )}
         <RecipientWrapper>
           <TYPE.bodyRegular color={'text1'} marginBottom={'12px'}>
             Recipient
