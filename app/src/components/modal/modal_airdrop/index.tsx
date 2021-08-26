@@ -72,8 +72,7 @@ export const ModalAirdrop = (props: Props) => {
   return (
     <>
       <Modal
-        isOpen={true}
-        // isOpen={isOpen && !claimAmount.isZero() && !isTransactionModalOpen && !checkAddress}
+        isOpen={isOpen && !claimAmount.isZero() && !isTransactionModalOpen && !checkAddress}
         onRequestClose={onClose}
         shouldCloseOnOverlayClick={true}
         style={theme.fluidHeightModal}
