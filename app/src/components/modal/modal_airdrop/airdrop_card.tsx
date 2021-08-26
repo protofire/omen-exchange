@@ -57,12 +57,11 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
   displayButtons?: boolean
   displayCheckAddress?: boolean
   onCheckAddress?: () => void
-  marginTop?: boolean
   theme: any
 }
 
 const AirdropCard = (props: Props) => {
-  const { claim, displayAmount, displayButtons = true, displayCheckAddress = true, marginTop, onCheckAddress } = props
+  const { claim, displayAmount, displayButtons = true, displayCheckAddress = true, onCheckAddress } = props
 
   const { account, balances } = useConnectedWeb3Context()
 
@@ -72,11 +71,11 @@ const AirdropCard = (props: Props) => {
     }
   }
 
-  const claimIsDisabled = !displayAmount || displayAmount.isZero() || parseFloat(balances.formattedxDaiBalance) === 0
+  const claimIsDisabled = !displayAmount || displayAmount.isZero() || balances.xDaiBalance.isZero()
 
   return (
     <>
-      <ModalCard marginTop={marginTop}>
+      <ModalCard>
         <TopSection>
           <TopSectionLeft>
             <IconOmen id="airdrop" size={38} />
