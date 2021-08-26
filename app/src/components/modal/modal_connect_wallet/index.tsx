@@ -201,13 +201,13 @@ export const ModalConnectWallet = (props: Props) => {
             <IconClose hoverEffect={true} onClick={onClickCloseButton} />
           </ModalNavigation>
           <IconOmen dropShadow id="connectWallet" size={56} />
-          <TYPE.heading3 color={'text1'} marginBottom={'48px'} marginTop={'16px'}>
+          <TYPE.heading3 color={'text1'} margin={'16px 0px 48px'}>
             {isConnectingToWallet ? 'Unlock Wallet' : 'Connect a Wallet'}
           </TYPE.heading3>
           {isConnectingToWallet ? (
             <>
               <Spinner big={true} />
-              <TYPE.bodyRegular color={'text2'} margin={'0px'} padding={'30px 0 0'} textAlign={'center'}>
+              <TYPE.bodyRegular color={'text2'} padding={'30px 0 0'} textAlign={'center'}>
                 {connectingText}
               </TYPE.bodyRegular>
             </>
