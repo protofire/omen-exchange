@@ -263,12 +263,9 @@ export const ModalDepositWithdraw = (props: Props) => {
           <BalanceItemTitle notSelected={currencySelected !== item}>
             {name ? name : symbol.toLowerCase()}
           </BalanceItemTitle>
-          {/* <TYPE.bodyRegular className="hover" color={currencySelected !== item ? 'text2' : 'text1'} margin={'0px'}>
-            {name ? name : symbol.toLowerCase()}
-          </TYPE.bodyRegular> */}
         </BalanceItemSide>
         <BalanceItemSide>
-          <TYPE.bodyRegular color={'text2'} margin={'0px'}>
+          <TYPE.bodyRegular color={'text2'}>
             {token?.balance
               ? bigNumberToString(new BigNumber(token?.balance), decimals, symbol === 'DAI' ? 2 : 3)
               : '0.00'}{' '}
@@ -301,7 +298,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                   setAmountToDisplay('')
                 }}
               />
-              <TYPE.heading3 color={'text1'} margin={'0px'} marginLeft={'16px'} marginTop={'2px'}>
+              <TYPE.heading3 color={'text1'} margin={'2px 0px 0px 16px'}>
                 {exchangeType} Asset
               </TYPE.heading3>
             </ModalNavigationLeft>
@@ -316,7 +313,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           </ModalNavigation>
           <ModalCard style={{ marginBottom: '20px', marginTop: '10px' }}>
             <BalanceSection>
-              <TYPE.bodyRegular color={'text2'} lineHeight={'16.41px'} marginBottom={'14px'}>
+              <TYPE.bodyRegular color={'text2'} marginBottom={'14px'}>
                 Wallet
               </TYPE.bodyRegular>
               <BalanceItems>{bridgeItems}</BalanceItems>
@@ -345,17 +342,15 @@ export const ModalDepositWithdraw = (props: Props) => {
           {exchangeType === ExchangeType.withdraw && currencySelected !== 'dai' && xDaiBalance?.isZero() ? (
             <InputInfo>
               <IconAlertInverted />
-              <TYPE.bodyRegular color={'text2'} style={{ marginLeft: '12px' }}>
+              <TYPE.bodyRegular color={'text2'} marginLeft={'12px'}>
                 Fund your Omen Account with Dai to proceed with the withdrawal.
               </TYPE.bodyRegular>
             </InputInfo>
           ) : (
             <>
               <ExchangeDataItem style={{ marginTop: '24px' }}>
-                <TYPE.bodyRegular color={'text2'} lineHeight={'16px'}>
-                  Min amount
-                </TYPE.bodyRegular>
-                <TYPE.bodyRegular color={'text2'} lineHeight={'16px'}>
+                <TYPE.bodyRegular color={'text2'}>Min amount</TYPE.bodyRegular>
+                <TYPE.bodyRegular color={'text2'}>
                   {currencySelected === 'dai'
                     ? `${bigNumberToString(minDaiBridgeExchange, decimals, 2)} DAI`
                     : `${bigNumberToString(minOmniBridgeExchange, decimals, 3)} ${symbol}`}
@@ -394,10 +389,8 @@ export const ModalDepositWithdraw = (props: Props) => {
               </ExchangeDataItem>
               <Divider />
               <ExchangeDataItem>
-                <TYPE.bodyRegular color={'text2'} lineHeight={'16px'}>
-                  Total
-                </TYPE.bodyRegular>
-                <TYPE.bodyRegular color={'text2'} lineHeight={'16px'}>
+                <TYPE.bodyRegular color={'text2'}>Total</TYPE.bodyRegular>
+                <TYPE.bodyRegular color={'text2'}>
                   {currencySelected !== 'dai' && exchangeType === ExchangeType.withdraw
                     ? `${bigNumberToString(displayFundAmount.sub(displayFundAmount.div(1000)), decimals, 3)} ${symbol}`
                     : `${bigNumberToString(displayFundAmount, decimals)} ${symbol === 'xDAI' ? 'DAI' : symbol}`}
