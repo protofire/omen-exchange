@@ -72,7 +72,8 @@ export const ModalAirdrop = (props: Props) => {
   return (
     <>
       <Modal
-        isOpen={isOpen && !claimAmount.isZero() && !isTransactionModalOpen && !checkAddress}
+        isOpen={true}
+        // isOpen={isOpen && !claimAmount.isZero() && !isTransactionModalOpen && !checkAddress}
         onRequestClose={onClose}
         shouldCloseOnOverlayClick={true}
         style={theme.fluidHeightModal}
@@ -83,7 +84,7 @@ export const ModalAirdrop = (props: Props) => {
             <IconClose hoverEffect={true} onClick={onClose} />
           </ModalNavigation>
           <Graphic />
-          <TYPE.heading2 color={'text1'} fontWeight={500} margin={'32px 0px 12px'}>
+          <TYPE.heading2 color={'text1'} fontWeight={500} margin={'24px 0px 12px'}>
             OMN has arrived!
           </TYPE.heading2>
           <TYPE.bodyRegular color={'text2'} marginBottom={'32px'}>
