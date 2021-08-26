@@ -11,13 +11,13 @@ import { ButtonType } from '../../button/button_styling_types'
 import { IconOmen } from '../../common/icons'
 import { BalanceSection, ModalCard } from '../common_styled'
 
-const TopSection = styled.div`
+const TopSection = styled.div<{ displayCheckAddress?: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 20px;
   width: 100%;
-  border-bottom: ${props => props.theme.borders.borderLineDisabled};
+  border-bottom: ${props => (props.displayCheckAddress ? props.theme.borders.borderLineDisabled : '')};
 `
 
 const TopSectionLeft = styled.div`
@@ -76,7 +76,7 @@ const AirdropCard = (props: Props) => {
   return (
     <>
       <ModalCard>
-        <TopSection>
+        <TopSection displayCheckAddress={displayCheckAddress}>
           <TopSectionLeft>
             <IconOmen id="airdrop" size={38} />
             <TopSectionDetails>
