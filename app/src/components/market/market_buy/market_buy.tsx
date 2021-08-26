@@ -76,7 +76,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
     potentialProfitFormatted,
     probabilitiesOrNewPrediction: probabilities,
     proxyIsUpToDate,
-    relayFeeGreaterThanBalance,
     setAmount,
     setAmountDisplay,
     setCollateral,
@@ -206,6 +205,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           <ReactTooltip id="walletBalanceTooltip" />
 
           <TextfieldCustomPlaceholder
+            error={!!amountError}
             formField={
               <BigNumberInput
                 decimals={collateral.decimals}
@@ -257,16 +257,6 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           additionalDescription={''}
           danger={true}
           description={`Your buy amount should not be negative.`}
-          href={''}
-          hyperlinkDescription={''}
-          marginBottom={!showSetAllowance}
-        />
-      )}
-      {relayFeeGreaterThanBalance && (
-        <WarningMessage
-          additionalDescription={''}
-          danger={true}
-          description="Relay fee is greater than your DAI balance, please top up your Omen account."
           href={''}
           hyperlinkDescription={''}
           marginBottom={!showSetAllowance}

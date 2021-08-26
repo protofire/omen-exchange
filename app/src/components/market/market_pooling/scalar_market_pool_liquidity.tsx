@@ -85,7 +85,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
     message,
     poolTokens,
     proxyIsUpToDate,
-    relayFeeGreaterThanBalance,
     removeFunding,
     setActiveTab,
     setAmountToFund,
@@ -215,6 +214,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
               </CurrenciesWrapper>
 
               <TextfieldCustomPlaceholder
+                error={!!collateralAmountError}
                 formField={
                   <BigNumberInput
                     decimals={collateral.decimals}
@@ -331,16 +331,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
         href={DOCUMENT_FAQ}
         hyperlinkDescription="More Info"
       />
-      {relayFeeGreaterThanBalance && (
-        <WarningMessage
-          additionalDescription={''}
-          danger={true}
-          description="Relay fee is greater than your DAI balance, please top up your Omen account."
-          href={''}
-          hyperlinkDescription={''}
-          marginBottom
-        />
-      )}
       {isNegativeAmountToFund && (
         <WarningMessage
           additionalDescription=""

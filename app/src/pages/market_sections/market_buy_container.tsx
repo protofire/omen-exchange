@@ -91,7 +91,6 @@ export type SharedPropsInterface = {
   txHash: string
   setTxState: any
   txState: TransactionStep
-  relayFeeGreaterThanBalance: boolean
 }
 
 const MarketBuyContainer: React.FC<Props> = (props: Props) => {
@@ -210,6 +209,8 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
       ? null
       : maybeCollateralBalance === null
       ? null
+      : relayFeeGreaterThanBalance
+      ? 'Insufficient Dai in your Omen Account'
       : maybeCollateralBalance.isZero() && amount?.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : amount?.gt(maybeCollateralBalance)
@@ -326,7 +327,6 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     txHash: context.txHash,
     setTxState: context.setTxState,
     txState: context.txState,
-    relayFeeGreaterThanBalance,
   }
 
   return (

@@ -83,7 +83,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
     message,
     poolTokens,
     proxyIsUpToDate,
-    relayFeeGreaterThanBalance,
     removeFunding,
     setActiveTab,
     setAmountToFund,
@@ -187,6 +186,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               </CurrenciesWrapper>
 
               <TextfieldCustomPlaceholder
+                error={!!collateralAmountError}
                 formField={
                   <BigNumberInput
                     decimals={collateral.decimals}
@@ -216,6 +216,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               <TokenBalance text="Pool Tokens" value={sharesBalance} />
 
               <TextfieldCustomPlaceholder
+                error={!!collateralAmountError}
                 formField={
                   <BigNumberInput
                     decimals={collateral.decimals}
@@ -304,16 +305,6 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
         href={DOCUMENT_FAQ}
         hyperlinkDescription="More Info"
       />
-      {relayFeeGreaterThanBalance && (
-        <WarningMessage
-          additionalDescription={''}
-          danger={true}
-          description="Relay fee is greater than your DAI balance, please top up your Omen account."
-          href={''}
-          hyperlinkDescription={''}
-          marginBottom
-        />
-      )}
       {isNegativeAmountToFund && (
         <WarningMessage
           additionalDescription=""

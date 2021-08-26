@@ -87,7 +87,6 @@ export type SharedPropsInterface = {
   setAmountToRemoveDisplay: any
   amountToRemove: Maybe<BigNumber>
   setAmountToRemove: any
-  relayFeeGreaterThanBalance: boolean
 }
 
 const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
@@ -145,6 +144,8 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     ? null
     : maybeCollateralBalance === null
     ? null
+    : relayFeeGreaterThanBalance
+    ? 'Insufficient Dai in your Omen Account'
     : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
     ? `Insufficient balance`
     : amountToFund?.gt(maybeCollateralBalance)
@@ -390,8 +391,6 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     setAmountToRemove,
     amountToRemoveDisplay,
     setAmountToRemoveDisplay,
-    relayFeeGreaterThanAmount,
-    relayFeeGreaterThanBalance,
   }
 
   return (

@@ -74,7 +74,6 @@ export const ScalarMarketBuy = (props: Props) => {
     potentialProfitFormatted,
     probabilitiesOrNewPrediction: newPrediction,
     proxyIsUpToDate,
-    relayFeeGreaterThanBalance,
     setAmount,
     setAmountDisplay,
     setCollateral,
@@ -221,6 +220,7 @@ export const ScalarMarketBuy = (props: Props) => {
           </CurrenciesWrapper>
           <ReactTooltip id="walletBalanceTooltip" />
           <TextfieldCustomPlaceholder
+            error={!!amountError}
             formField={
               <BigNumberInput
                 decimals={collateral.decimals}
@@ -270,16 +270,6 @@ export const ScalarMarketBuy = (props: Props) => {
           description={`Your buy amount should not be negative.`}
           href={''}
           hyperlinkDescription={''}
-        />
-      )}
-      {relayFeeGreaterThanBalance && (
-        <WarningMessage
-          additionalDescription={''}
-          danger={true}
-          description="Relay fee is greater than your DAI balance, please top up your Omen account."
-          href={''}
-          hyperlinkDescription={''}
-          marginBottom={!showSetAllowance}
         />
       )}
       {showSetAllowance && (

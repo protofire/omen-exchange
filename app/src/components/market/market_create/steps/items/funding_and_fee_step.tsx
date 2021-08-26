@@ -286,6 +286,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       ? null
       : !maybeCollateralBalance.eq(collateralBalance)
       ? null
+      : relayFeeGreaterThanBalance
+      ? 'Insufficient Dai in your Omen Account'
       : maybeCollateralBalance.isZero() && funding.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : funding.gt(maybeCollateralBalance)
@@ -475,6 +477,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               />
             </CurrenciesWrapper>
             <TextfieldCustomPlaceholder
+              error={!!amountError}
               formField={
                 <BigNumberInput
                   decimals={collateral.decimals}
@@ -548,15 +551,6 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
             loading={RemoteData.is.asking(proxyIsUpToDate)}
             onUnlock={upgradeProxy}
             style={{ marginBottom: 20 }}
-          />
-        )}
-        {relayFeeGreaterThanBalance && (
-          <WarningMessage
-            additionalDescription={''}
-            danger={true}
-            description="Relay fee is greater than your DAI balance, please top up your Omen account."
-            href={''}
-            hyperlinkDescription={''}
           />
         )}
         <WarningMessage
