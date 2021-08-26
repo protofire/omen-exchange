@@ -109,6 +109,7 @@ export const ScalarMarketSell = (props: Props) => {
           />
 
           <TextfieldCustomPlaceholder
+            error={!!amountError}
             formField={
               <BigNumberInput
                 decimals={collateral.decimals}

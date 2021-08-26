@@ -244,6 +244,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
               <TokenBalance text="Pool Tokens" value={sharesBalance} />
 
               <TextfieldCustomPlaceholder
+                error={!!sharesAmountError}
                 formField={
                   <BigNumberInput
                     decimals={collateral.decimals}

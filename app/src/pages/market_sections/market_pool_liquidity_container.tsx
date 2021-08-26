@@ -158,6 +158,8 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     ? null
     : maybeFundingBalance === null
     ? null
+    : relayFeeGreaterThanBalance
+    ? 'Insufficient Dai in your Omen Account'
     : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance)
     ? `Insufficient balance`
     : amountToRemove?.gt(fundingBalance)
