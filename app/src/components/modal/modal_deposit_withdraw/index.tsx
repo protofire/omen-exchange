@@ -86,6 +86,10 @@ const Divider = styled.div`
   margin: 24px 0;
 `
 
+export const BalanceItemTitle = styled(TYPE.bodyRegular)<{ notSelected: boolean }>`
+  color: ${props => (props.notSelected ? props.theme.text2 : props.theme.text1)};
+`
+
 interface Props extends HTMLAttributes<HTMLDivElement> {
   exchangeType: ExchangeType
   isOpen: boolean
@@ -256,9 +260,12 @@ export const ModalDepositWithdraw = (props: Props) => {
         <BalanceItemSide>
           <RadioInput checked={currencySelected === item} name={item} outcomeIndex={-1} readOnly />
           <Image size={'24'} src={getImageUrl(address)} style={{ marginLeft: '12px', marginRight: '12px' }} />
-          <TYPE.bodyRegular className="hover" color={currencySelected !== item ? 'text2' : 'text1'} margin={'0px'}>
+          <BalanceItemTitle notSelected={currencySelected !== item}>
             {name ? name : symbol.toLowerCase()}
-          </TYPE.bodyRegular>
+          </BalanceItemTitle>
+          {/* <TYPE.bodyRegular className="hover" color={currencySelected !== item ? 'text2' : 'text1'} margin={'0px'}>
+            {name ? name : symbol.toLowerCase()}
+          </TYPE.bodyRegular> */}
         </BalanceItemSide>
         <BalanceItemSide>
           <TYPE.bodyRegular color={'text2'} margin={'0px'}>
