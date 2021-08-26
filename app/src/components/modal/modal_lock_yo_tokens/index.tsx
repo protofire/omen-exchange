@@ -90,20 +90,18 @@ const Divider = styled.div`
 
 const DaiBanner = styled.div`
   display: flex;
-  flex-direction: row;
   align-items: center;
   padding: 12px 16px;
   border: 1px solid ${props => props.theme.dai};
   border-radius: ${props => props.theme.cards.borderRadius};
   width: 100%;
-  margin-bottom: 16px;
 `
 
 const ModalLockTokens = (props: Props) => {
   const { context, isOpen, setIsModalLockTokensOpen, theme } = props
   const { account, balances, cpk, library: provider, networkId, relay, setTxState, txHash, txState } = context
 
-  const { fetchBalances, formattedxDaiBalance, omenBalance, xOmenBalance } = balances
+  const { fetchBalances, omenBalance, xDaiBalance, xOmenBalance } = balances
 
   const { claimAmount, fetchClaimAmount } = useAirdropService()
 
@@ -120,7 +118,7 @@ const ModalLockTokens = (props: Props) => {
   const [omenAllowance, setOmenAllowance] = useState<BigNumber>(Zero)
   const [allowanceState, setAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
   const [checkAddress, setCheckAddress] = useState(false)
-  const displayDaiBanner = parseFloat(formattedxDaiBalance) === 0
+  const displayDaiBanner = xDaiBalance.isZero()
 
   const isApproveVisible =
     (omenAllowance.isZero() && isLockAmountOpen) ||
@@ -430,7 +428,7 @@ const ModalLockTokens = (props: Props) => {
             {displayDaiBanner && (
               <DaiBanner>
                 <IconExclamation color={theme.dai} />
-                <TYPE.bodyRegular color={'dai'} margin={'0px 12px'} textAlign={'center'}>
+                <TYPE.bodyRegular color={'dai'} marginLeft={'12px'}>
                   Deposit Dai in order to claim OMN tokens.
                 </TYPE.bodyRegular>
               </DaiBanner>

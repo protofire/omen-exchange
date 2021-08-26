@@ -70,7 +70,7 @@ const AirdropCard = (props: Props) => {
     }
   }
 
-  const claimIsDisabled = !displayAmount || displayAmount.isZero() || parseFloat(balances.formattedxDaiBalance) === 0
+  const claimIsDisabled = !displayAmount || displayAmount.isZero() || balances.xDaiBalance.isZero()
 
   return (
     <>
