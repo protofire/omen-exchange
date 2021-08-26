@@ -280,7 +280,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
               <MarketScale
                 currentPrediction={scaleValue}
                 lowerBound={new BigNumber(0)}
-                startingPointTitle={'Current'}
+                startingPointTitle={'Current prediction'}
                 style={{ border: 'none' }}
                 unit={'%'}
                 upperBound={bigNumberify('100000000000000000000')}
