@@ -11,7 +11,7 @@ import { ButtonType } from '../../button/button_styling_types'
 import { IconOmen } from '../../common/icons'
 import { BalanceSection, ModalCard } from '../common_styled'
 
-const TopSection = styled.div<{ displayCheckAddress?: boolean }>`
+const TopSection = styled.div<{ displayCheckAddress: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
