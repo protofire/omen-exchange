@@ -207,7 +207,7 @@ export const ModalConnectWallet = (props: Props) => {
           {isConnectingToWallet ? (
             <>
               <Spinner big={true} />
-              <TYPE.bodyRegular color={'text2'} padding={'30px 0 0'} textAlign={'center'}>
+              <TYPE.bodyRegular color={'text2'} padding={'30px 0 0'}>
                 {connectingText}
               </TYPE.bodyRegular>
             </>
