@@ -15,7 +15,8 @@ import { MarketSellContainer } from '../../../../pages/market_sections/market_se
 import { ERC20Service, RealitioService } from '../../../../services'
 import { getLogger } from '../../../../util/logger'
 import { getContractAddress, getNativeAsset } from '../../../../util/networks'
-import { bigNumberToNumber, bigNumberToString, getUnit, isDust } from '../../../../util/tools'
+import { getUnit, isDust } from '../../../../util/tools'
+import { bigNumberToNumber, bigNumberToString } from '../../../../util/tools/formatting'
 import {
   INVALID_ANSWER_ID,
   MarketDetailsTab,

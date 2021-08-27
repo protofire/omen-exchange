@@ -6,7 +6,8 @@ import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../../contexts'
 import { useTokens } from '../../../../../hooks'
-import { bigNumberToNumber, formatDate, formatToShortNumber } from '../../../../../util/tools'
+import { formatDate, formatToShortNumber } from '../../../../../util/tools'
+import { bigNumberToNumber } from '../../../../../util/tools/formatting'
 import { Token } from '../../../../../util/types'
 import { TextToggle } from '../../message_text/TextToggle'
 

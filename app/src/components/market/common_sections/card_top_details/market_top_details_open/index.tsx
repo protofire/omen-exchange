@@ -9,12 +9,12 @@ import { useTheme } from '../../../../../hooks/useTheme'
 import { useWindowDimensions } from '../../../../../hooks/useWindowDimensions'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../../../../../util/networks'
 import {
-  bigNumberToNumber,
   formatToShortNumber,
   getInitialCollateral,
   getMarketRelatedQuestionFilter,
   onChangeMarketCurrency,
 } from '../../../../../util/tools'
+import { bigNumberToNumber } from '../../../../../util/tools/formatting'
 import { MarketMakerData, MarketState, Token } from '../../../../../util/types'
 import { CurrencySelector } from '../../user_transactions_tokens/currency_selector'
 import { AdditionalMarketData } from '../additional_market_data'

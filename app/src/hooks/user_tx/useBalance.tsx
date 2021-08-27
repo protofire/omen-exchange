@@ -6,7 +6,7 @@ import { STANDARD_DECIMALS } from '../../common/constants'
 import { XdaiService } from '../../services'
 import { getLogger } from '../../util/logger'
 import { bridgeTokensList, getNativeAsset, networkIds } from '../../util/networks'
-import { bigNumberToString } from '../../util/tools'
+import { bigNumberToString } from '../../util/tools/formatting'
 import { KnownTokenValue, Token } from '../../util/types'
 import { useTokens } from '../index'
 
