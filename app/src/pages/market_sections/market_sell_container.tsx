@@ -10,14 +10,13 @@ import { useAsyncDerivedValue, useContracts } from '../../hooks'
 import { MarketMakerService } from '../../services'
 import { getLogger } from '../../util/logger'
 import {
-  bigNumberToNumber,
-  bigNumberToString,
   calcPrediction,
   calcSellAmountInCollateral,
   computeBalanceAfterTrade,
   getInitialCollateral,
   mulBN,
 } from '../../util/tools'
+import { bigNumberToNumber, bigNumberToString } from '../../util/tools/formatting'
 import { BalanceItem, MarketDetailsTab, MarketMakerData, Status, Token, TransactionStep } from '../../util/types'
 
 const logger = getLogger('Market::Sell')
