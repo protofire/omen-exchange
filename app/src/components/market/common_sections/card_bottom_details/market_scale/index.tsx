@@ -75,7 +75,7 @@ const ScaleTitle = styled.p`
   margin: 0;
 `
 
-const Scale = styled.div`
+export const Scale = styled.div`
   position: relative;
   height: ${SCALE_HEIGHT};
   width: 100%;
@@ -127,13 +127,13 @@ const HorizontalBarRight = styled.div<{ positive: boolean | null; width: number 
   z-index: 2;
 `
 
-const HorizontalBarChange = styled.div<{ start: number; width: number }>`
+export const HorizontalBarChange = styled.div<{ start: number; width: number; height?: number; color?: string }>`
   position: absolute;
   top: calc(50% - ${BAR_WIDTH} / 2);
   left: ${props => props.start * 100}%;
   width: ${props => props.width * 100}%;
-  background: ${props => props.theme.scale.neutral};
-  height: ${BAR_WIDTH};
+  background: ${props => (props.color ? props.theme[props.color] : props.theme.scale.neutral)};
+  height: ${props => (props.height ? `${props.height}px` : BAR_WIDTH)};
   z-index: 2;
 `
 
@@ -179,7 +179,7 @@ const ScaleSlider = styled.input`
   }
 `
 
-const ScaleDot = styled.div<{ xValue: number; positive?: Maybe<boolean> }>`
+export const ScaleDot = styled.div<{ xValue: number; positive?: Maybe<boolean> }>`
   position: absolute;
   height: ${DOT_SIZE};
   width: ${DOT_SIZE};
@@ -196,7 +196,7 @@ const ScaleDot = styled.div<{ xValue: number; positive?: Maybe<boolean> }>`
   margin-top: calc((${SCALE_HEIGHT} - ${DOT_SIZE}) / 2);
 `
 
-const ScaleTooltip = styled.div<{ static: boolean | undefined; xValue: number }>`
+export const ScaleTooltip = styled.div<{ static: boolean | undefined; xValue: number }>`
   position: absolute;
   padding: 5px 8px;
   top: -42px;
@@ -213,7 +213,7 @@ const ScaleTooltip = styled.div<{ static: boolean | undefined; xValue: number }>
   color: ${props => (props.static ? props.theme.colors.textColorDark : props.theme.colors.black)};
 `
 
-const ScaleTooltipMessage = styled.p`
+export const ScaleTooltipMessage = styled.p`
   font-size: ${({ theme }) => theme.fonts.defaultSize};
   font-style: normal;
   font-weight: 500;

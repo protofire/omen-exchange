@@ -5,6 +5,13 @@ import styled from 'styled-components'
 import { TYPE } from '../../../theme'
 import { bigNumberToString, isScalarMarket, limitDecimalPlaces } from '../../../util/tools'
 import { MarketMakerDataItem } from '../../../util/types'
+import {
+  HorizontalBarChange,
+  Scale,
+  ScaleDot,
+  ScaleTooltip,
+  ScaleTooltipMessage,
+} from '../common_sections/card_bottom_details/market_scale'
 import { CurationRadioWrapper } from '../common_styled'
 
 const ClosingWrapper = styled.div`
@@ -81,6 +88,26 @@ const OutcomeRow = styled.div`
   justify-content: space-between;
 `
 
+const ScaleWrapper = styled.div`
+  border: 1px solid ${props => props.theme.colors.verticalDivider};
+  box-sizing: border-box;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  padding: 13px 0px;
+  height: 76px;
+`
+
+const PercWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 29px;
+`
+
+const Tooltip = styled(ScaleTooltip as any)`
+  margin-top: 10px;
+`
+
 interface Props {
   active: boolean
   market: MarketMakerDataItem
@@ -105,6 +132,18 @@ export const MarketCard = (props: Props) => {
       : market.outcomes && market.outcomes[1]
   const compressedPerc = limitDecimalPlaces(String(100 - firstOutcomePerc), 2)
 
+  let xValue
+  let currentPrediction
+  if (isScalar && market.scalarLow && market.scalarHigh) {
+    currentPrediction = market.outcomeTokenMarginalPrices[1]
+    xValue =
+      Number(currentPrediction) * 100 > 100
+        ? 100
+        : Number(currentPrediction) * 100 < 0
+        ? 0
+        : Number(currentPrediction) * 100
+  }
+
   return (
     <StyledMarketCard active={active} onClick={onClick}>
       <ClosingWrapper>
@@ -114,7 +153,25 @@ export const MarketCard = (props: Props) => {
       <TitleWrapper>
         <TYPE.bodyMedium color="text1">{market.title}</TYPE.bodyMedium>
       </TitleWrapper>
-      {!isScalar && (
+      {isScalar ? (
+        <ScaleWrapper>
+          <PercWrapper>
+            <TYPE.bodyRegular color="text2" marginLeft={16}>
+              0%
+            </TYPE.bodyRegular>
+            <TYPE.bodyRegular color="text2" marginRight={16}>
+              1%
+            </TYPE.bodyRegular>
+          </PercWrapper>
+          <Scale>
+            <Tooltip id="scale-tooltip" static={true} xValue={xValue}>
+              <ScaleTooltipMessage>90.54%</ScaleTooltipMessage>
+            </Tooltip>
+            <ScaleDot positive={undefined} xValue={Number(market.outcomeTokenMarginalPrices[1])} />
+            <HorizontalBarChange color="primary4" height={1} start={0} width={1} />
+          </Scale>
+        </ScaleWrapper>
+      ) : (
         <OutcomeWrapper>
           <OutcomeRow>
             <TYPE.bodyRegular color="text2">{firstOutcome}</TYPE.bodyRegular>
