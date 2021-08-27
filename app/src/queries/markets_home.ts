@@ -44,6 +44,7 @@ export const DEFAULT_OPTIONS = {
   templateId: null as Maybe<string>,
   currency: null as Maybe<string>,
   curationSource: CurationSource.ALL_SOURCES,
+  sortIndex: null as Maybe<number>,
   sortBy: null as Maybe<MarketsSortCriteria>,
   sortByDirection: 'desc' as 'asc' | 'desc',
   networkId: 1 as Maybe<number>,
@@ -51,10 +52,10 @@ export const DEFAULT_OPTIONS = {
 }
 
 export const buildQueryMyMarkets = (options: BuildQueryType = DEFAULT_OPTIONS) => {
-  const { arbitrator, category, currency, sortBy, title } = options
+  const { arbitrator, category, currency, sortIndex, title } = options
 
   const myMarketsWhereClause = [
-    sortBy === 'openingTimestamp' ? 'openingTimestamp_gt: $now' : '',
+    sortIndex === 1 ? 'openingTimestamp_lt: $now, ' : sortIndex === 2 ? 'openingTimestamp_gt: $now, ' : '',
     category === 'All' ? '' : 'category: $category',
     arbitrator ? 'arbitrator: $arbitrator' : 'arbitrator_in: $knownArbitrators',
     currency ? 'collateralToken: $currency' : '',
