@@ -29,22 +29,21 @@ export const formatNumber = (number: string, decimals = 2): string => {
   const fixedInt = parseFloat(number.split(',').join('')).toFixed(decimals)
   const splitFixedInt = fixedInt.split('.')[0]
   const formattedSubstring = splitFixedInt.replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,')
+  const inputDecimalsLenght = number.split('.')[1].length
 
   if (number.length < 1) {
     return `0${decimals > 0 ? '.' + '0'.repeat(decimals) : ''}`
   }
 
-  // if (Number(number) > 0) {
-  //   for (let i = 1; i < 10; i++) {
-  //     if (Number(number) < Number('0.' + '0'.repeat(i) + '1') && decimals === i + 1) {
-  //       return '<0.' + '0'.repeat(i) + '1'
-  //     }
-  //   }
-  // }
-
-  if (Number(number) > 0 && Number(number) < Number('0.' + '0'.repeat(decimals - 1) + '1')) {
-    return '<0.' + '0'.repeat(decimals - 1) + '1'
+  if (
+    inputDecimalsLenght > 3 &&
+    Number(number) < Number('0.' + '0'.repeat(inputDecimalsLenght - 2) + '1') &&
+    Number(number) > 0
+  ) {
+    return '<0.' + '0'.repeat(inputDecimalsLenght - 2) + '1'
   }
+
+  if (Number(number) < 0.01 && Number(number) > 0) return '<0.01'
 
   return `${formattedSubstring}${decimals > 0 ? '.' + fixedInt.split('.')[1] : ''}`
 }
