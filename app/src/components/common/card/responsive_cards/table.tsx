@@ -11,7 +11,6 @@ const CardStyled = styled.div`
   display: flex;
   flex-direction: row;
   gap: 48px;
-  margin-top: 32px;
   padding: 24px 32px;
   justify-content: space-between;
   //mobile
@@ -20,7 +19,6 @@ const CardStyled = styled.div`
     width: 100%;
     gap: 10px;
     padding: 20px;
-    margin-top: 24px;
   }
 `
 const ItemWrapper = styled.div`
