@@ -25,7 +25,9 @@ import { IconInfo } from '../../common/icons/IconInfo'
 import { Image } from '../../market/common_sections/message_text/token_item'
 import {
   BalanceItem,
+  BalanceItemBalance,
   BalanceItemSide,
+  BalanceItemTitle,
   BalanceItems,
   BalanceSection,
   ContentWrapper,
@@ -84,10 +86,6 @@ const Divider = styled.div`
   border-bottom: ${props => props.theme.borders.borderLineDisabled};
   width: 100%;
   margin: 24px 0;
-`
-
-export const BalanceItemTitle = styled(TYPE.bodyRegular)<{ notSelected: boolean }>`
-  color: ${props => (props.notSelected ? props.theme.text2 : props.theme.text1)};
 `
 
 interface Props extends HTMLAttributes<HTMLDivElement> {
@@ -265,12 +263,12 @@ export const ModalDepositWithdraw = (props: Props) => {
           </BalanceItemTitle>
         </BalanceItemSide>
         <BalanceItemSide>
-          <TYPE.bodyRegular color={'text2'}>
+          <BalanceItemBalance>
             {token?.balance
               ? bigNumberToString(new BigNumber(token?.balance), decimals, symbol === 'DAI' ? 2 : 3)
               : '0.00'}{' '}
             {symbol}
-          </TYPE.bodyRegular>
+          </BalanceItemBalance>
         </BalanceItemSide>
       </BalanceItem>
     )
@@ -313,9 +311,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           </ModalNavigation>
           <ModalCard style={{ marginBottom: '20px', marginTop: '10px' }}>
             <BalanceSection>
-              <TYPE.bodyRegular color={'text2'} marginBottom={'14px'}>
-                Wallet
-              </TYPE.bodyRegular>
+              <BalanceItemBalance marginBottom={'14px'}>Wallet</BalanceItemBalance>
               <BalanceItems>{bridgeItems}</BalanceItems>
             </BalanceSection>
           </ModalCard>
@@ -342,19 +338,19 @@ export const ModalDepositWithdraw = (props: Props) => {
           {exchangeType === ExchangeType.withdraw && currencySelected !== 'dai' && xDaiBalance?.isZero() ? (
             <InputInfo>
               <IconAlertInverted />
-              <TYPE.bodyRegular color={'text2'} marginLeft={'12px'}>
+              <BalanceItemBalance marginLeft={'12px'}>
                 Fund your Omen Account with Dai to proceed with the withdrawal.
-              </TYPE.bodyRegular>
+              </BalanceItemBalance>
             </InputInfo>
           ) : (
             <>
               <ExchangeDataItem style={{ marginTop: '24px' }}>
-                <TYPE.bodyRegular color={'text2'}>Min amount</TYPE.bodyRegular>
-                <TYPE.bodyRegular color={'text2'}>
+                <BalanceItemBalance>Min amount</BalanceItemBalance>
+                <BalanceItemBalance>
                   {currencySelected === 'dai'
                     ? `${bigNumberToString(minDaiBridgeExchange, decimals, 2)} DAI`
                     : `${bigNumberToString(minOmniBridgeExchange, decimals, 3)} ${symbol}`}
-                </TYPE.bodyRegular>
+                </BalanceItemBalance>
               </ExchangeDataItem>
               <ExchangeDataItem style={{ marginTop: '12px' }}>
                 <div style={{ display: 'flex' }}>
@@ -389,12 +385,12 @@ export const ModalDepositWithdraw = (props: Props) => {
               </ExchangeDataItem>
               <Divider />
               <ExchangeDataItem>
-                <TYPE.bodyRegular color={'text2'}>Total</TYPE.bodyRegular>
-                <TYPE.bodyRegular color={'text2'}>
+                <BalanceItemBalance>Total</BalanceItemBalance>
+                <BalanceItemBalance>
                   {currencySelected !== 'dai' && exchangeType === ExchangeType.withdraw
                     ? `${bigNumberToString(displayFundAmount.sub(displayFundAmount.div(1000)), decimals, 3)} ${symbol}`
                     : `${bigNumberToString(displayFundAmount, decimals)} ${symbol === 'xDAI' ? 'DAI' : symbol}`}
-                </TYPE.bodyRegular>
+                </BalanceItemBalance>
               </ExchangeDataItem>
             </>
           )}

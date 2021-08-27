@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-import { BalanceItemTitle } from '../modal_deposit_withdraw/index'
+import { TYPE } from '../../../theme'
 
 export const ContentWrapper = styled.div`
   align-items: center;
@@ -70,10 +70,8 @@ export const BalanceItemSide = styled.div`
   align-items: center;
 `
 
-export const BalanceItemBalance = styled.p`
-  font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => props.theme.text2};
-  margin: 0;
+export const BalanceItemTitle = styled(TYPE.bodyRegular)<{ notSelected: boolean }>`
+  color: ${props => (props.notSelected ? props.theme.text2 : props.theme.text1)};
 `
 
 export const BalanceItem = styled.div<{ hover?: boolean }>`
@@ -95,4 +93,8 @@ export const BalanceItem = styled.div<{ hover?: boolean }>`
  
    }
   }
+`
+
+export const BalanceItemBalance = styled(TYPE.bodyRegular)`
+  color: ${props => props.theme.text2};
 `
