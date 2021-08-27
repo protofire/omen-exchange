@@ -59,9 +59,7 @@ const App: React.FC = (props: any) => {
           >
             <ContentWrapper>
               <ConnectionModalNavigation>
-                <ModalTitle>
-                  <span style={{ fontFamily: 'Roboto' }}>Settings</span>
-                </ModalTitle>
+                <ModalTitle marginTop={'2px'}>Settings</ModalTitle>
               </ConnectionModalNavigation>
               <SettingsModalWrapper>
                 <SettingsViewContainer />

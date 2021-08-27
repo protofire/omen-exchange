@@ -25,14 +25,8 @@ export const ModalNavigationLeft = styled.div`
   align-items: center;
 `
 
-export const ModalTitle = styled.p`
-  font-size: ${props => props.theme.switchNetworkModal.primaryFontSize};
+export const ModalTitle = styled(TYPE.heading3)`
   color: ${props => props.theme.text1};
-  font-weight: ${props => props.theme.textfield.fontWeight};
-  margin: 0;
-  line-height: 19px;
-  letter-spacing: 0.2px;
-  margin-top: 2px;
 `
 
 export const ModalCard = styled.div`
