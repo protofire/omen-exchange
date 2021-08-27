@@ -3,6 +3,7 @@ import { BigNumber } from 'ethers/utils'
 
 import marketMakerAbi from '../abi/marketMaker.json'
 import { getLogger } from '../util/logger'
+import { getContractAddress } from '../util/networks'
 import { calcDistributionHint, calcPrice } from '../util/tools'
 import { Market, MarketStatus, MarketWithExtraData } from '../util/types'
 
@@ -65,11 +66,17 @@ class MarketMakerService {
     return this.contract.totalSupply()
   }
 
-  getCollectedFees = async (): Promise<BigNumber> => {
+  getCollectedFees = async (networkId: number, factory: string): Promise<BigNumber> => {
+    if (factory.toLowerCase() !== getContractAddress(networkId, 'marketMakerFactory').toLowerCase()) {
+      return new BigNumber(0)
+    }
     return this.contract.collectedFees()
   }
 
-  getFeesWithdrawableBy = async (account: string): Promise<BigNumber> => {
+  getFeesWithdrawableBy = async (account: string, networkId: number, factory: string): Promise<BigNumber> => {
+    if (factory.toLowerCase() !== getContractAddress(networkId, 'marketMakerFactory').toLowerCase()) {
+      return new BigNumber(0)
+    }
     return this.contract.feesWithdrawableBy(account)
   }
 

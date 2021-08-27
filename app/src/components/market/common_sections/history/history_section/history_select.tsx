@@ -14,12 +14,8 @@ import {
 } from '../../../../../hooks/graph/useGraphFpmmTransactionsFromQuestion'
 import { SafeService } from '../../../../../services/safe'
 import { getContractAddress } from '../../../../../util/networks'
-import {
-  bigNumberToNumber,
-  calcPrice,
-  calcSellAmountInCollateral,
-  formatTimestampToDate,
-} from '../../../../../util/tools'
+import { calcPrice, calcSellAmountInCollateral, formatTimestampToDate } from '../../../../../util/tools'
+import { bigNumberToNumber } from '../../../../../util/tools/formatting'
 import { HistoricData, Period } from '../../../../../util/types'
 import { ButtonRound, ButtonSelectable } from '../../../../button'
 import { Dropdown, DropdownPosition } from '../../../../common/form/dropdown'
