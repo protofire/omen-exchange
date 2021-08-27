@@ -138,7 +138,7 @@ export const OutcomeTable = (props: Props) => {
                 textAlign={TableCellsAlign[index]}
               >
                 {value} {value === OutcomeTableValue.CurrentPrice && `(${symbol})`}
-                {value === OutcomeTableValue.Bonded && `(${symbol})`}
+                {value === OutcomeTableValue.Bonded && `(${nativeAsset.symbol})`}
               </THStyled>
             ) : null
           })}
