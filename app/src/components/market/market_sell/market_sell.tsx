@@ -5,7 +5,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { SharedPropsInterface } from '../../../pages/market_sections/market_sell_container'
-import { bigNumberToString } from '../../../util/tools'
+import { bigNumberToString } from '../../../util/tools/formatting'
 import { MarketDetailsTab, MarketMakerData, OutcomeTableValue } from '../../../util/types'
 import { Button, ButtonContainer } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
