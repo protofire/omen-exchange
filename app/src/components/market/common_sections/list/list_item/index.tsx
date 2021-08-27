@@ -6,11 +6,16 @@ import styled from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../contexts'
 import { useSymbol } from '../../../../../hooks'
-import { ERC20Service } from '../../../../../services'
-import { getLogger } from '../../../../../util/logger'
-import { getTokenFromAddress } from '../../../../../util/networks'
 import {
-  bigNumberToNumber,
+  GraphResponseLiquidityMiningCampaign,
+  useGraphLiquidityMiningCampaigns,
+} from '../../../../../hooks/useGraphLiquidityMiningCampaigns'
+import { useTokenPrice } from '../../../../../hooks/useTokenPrice'
+import { ERC20Service } from '../../../../../services'
+import { StakingService } from '../../../../../services/staking'
+import { getLogger } from '../../../../../util/logger'
+import { getToken, getTokenFromAddress } from '../../../../../util/networks'
+import {
   calcPrediction,
   calcPrice,
   formatNumber,
@@ -19,8 +24,9 @@ import {
   getUnit,
   isScalarMarket,
 } from '../../../../../util/tools'
+import { bigNumberToNumber } from '../../../../../util/tools/formatting'
 import { MarketMakerDataItem, Token } from '../../../../../util/types'
-import { IconStar } from '../../../../common/icons/IconStar'
+import { IconApySmall, IconStar } from '../../../../common/icons'
 
 const Wrapper = styled(NavLink)`
   border-bottom: 1px solid ${props => props.theme.borders.borderColor};
@@ -73,6 +79,12 @@ const Outcome = styled.span`
   max-width: 200px;
 `
 
+const ApyIndicator = styled.span`
+  color: ${props => props.theme.colors.green};
+  margin-left: 6px;
+  font-weight: 500;
+`
+
 const Separator = styled.span`
   font-size: 18px;
   margin: 0 8px;
@@ -88,7 +100,7 @@ const logger = getLogger('Market::ListItem')
 
 export const ListItem: React.FC<Props> = (props: Props) => {
   const context = useConnectedWeb3Context()
-  const { account, library: provider } = context
+  const { account, cpk, library: provider, networkId } = context
 
   const { currentFilter, market } = props
   const {
@@ -120,6 +132,8 @@ export const ListItem: React.FC<Props> = (props: Props) => {
   }
 
   const [details, setDetails] = useState(token || { decimals: STANDARD_DECIMALS, symbol: '', volume: 0 })
+  const [rewardApr, setRewardApr] = useState(0)
+  const [liquidityMiningCampaign, setLiquidityMiningCampaign] = useState<Maybe<GraphResponseLiquidityMiningCampaign>>()
 
   const { decimals, volume } = details
   const symbol = useSymbol(details as Token)
@@ -147,6 +161,44 @@ export const ListItem: React.FC<Props> = (props: Props) => {
 
     setToken()
   }, [account, collateralToken, collateralVolume, provider, context.networkId, token])
+
+  const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address)
+  const { tokenPrice: collateralPrice } = useTokenPrice(collateralToken)
+
+  const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
+
+  useEffect(() => {
+    if (liquidityMiningCampaigns) {
+      const marketLiquidityMiningCampaign = liquidityMiningCampaigns.filter(campaign => {
+        return campaign.fpmm.id === address
+      })[0]
+      setLiquidityMiningCampaign(marketLiquidityMiningCampaign)
+    }
+  }, [liquidityMiningCampaigns, address])
+
+  useEffect(() => {
+    const fetchStakingData = async () => {
+      if (!liquidityMiningCampaign) {
+        throw 'No liquidity mining campaign'
+      }
+
+      const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
+
+      const { rewardApr } = await stakingService.getStakingData(
+        getToken(networkId, 'omn'),
+        cpk?.address || '',
+        collateralPrice, // Assume pool token value is 1 unit of collateral
+        tokenPrice,
+        Number(liquidityMiningCampaign.endsAt),
+        liquidityMiningCampaign.rewardAmounts[0],
+        Number(liquidityMiningCampaign.duration),
+      )
+
+      setRewardApr(rewardApr)
+    }
+
+    cpk && liquidityMiningCampaign && fetchStakingData()
+  }, [cpk, cpk?.address, liquidityMiningCampaign, networkId, provider, tokenPrice, collateralPrice])
 
   const percentages = calcPrice(outcomeTokenAmounts)
   const indexMax = percentages.indexOf(Math.max(...percentages))
@@ -177,6 +229,13 @@ export const ListItem: React.FC<Props> = (props: Props) => {
             : outcomes && `${outcomes[indexMax]} (${(percentages[indexMax] * 100).toFixed(2)}%)`}
         </Outcome>
         <Separator>|</Separator>
+        {rewardApr > 0 && (
+          <>
+            <IconApySmall />
+            <ApyIndicator>{rewardApr === Infinity ? '--' : formatNumber(rewardApr.toString())}% APR</ApyIndicator>
+            <Separator>|</Separator>
+          </>
+        )}
         <span>{moment(endDate).isAfter(now) ? `${endsText} remaining` : `Closed ${endsText} ago`}</span>
         <Separator>|</Separator>
         <span>

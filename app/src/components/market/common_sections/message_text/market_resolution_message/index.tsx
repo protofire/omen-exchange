@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { bigNumberToString } from '../../../../../util/tools'
+import { bigNumberToString } from '../../../../../util/tools/formatting'
 import { Arbitrator, Token } from '../../../../../util/types'
 
 import { Invalid } from './img/Invalid'
