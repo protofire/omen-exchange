@@ -1,12 +1,19 @@
-import React, { DOMAttributes } from 'react'
+import React, { DOMAttributes, useEffect, useState } from 'react'
 import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../../../contexts'
 import { useRealityLink } from '../../../../../hooks'
-import { networkIds } from '../../../../../util/networks'
+import {
+  GraphResponseLiquidityMiningCampaign,
+  useGraphLiquidityMiningCampaigns,
+} from '../../../../../hooks/useGraphLiquidityMiningCampaigns'
+import { useTokenPrice } from '../../../../../hooks/useTokenPrice'
+import { StakingService } from '../../../../../services/staking'
+import { getToken, networkIds } from '../../../../../util/networks'
+import { formatNumber } from '../../../../../util/tools'
 import { Arbitrator, KlerosItemStatus, KlerosSubmission, Token } from '../../../../../util/types'
-import { IconAlert, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../../common/icons'
+import { IconAlert, IconApy, IconArbitrator, IconCategory, IconOracle, IconVerified } from '../../../../common/icons'
 
 const AdditionalMarketDataWrapper = styled.div`
   border-top: ${({ theme }) => theme.borders.borderLineDisabled};
@@ -41,13 +48,15 @@ const AdditionalMarketDataLeft = styled.div`
   }
 `
 
-const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean }>`
+const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean; isSuccess?: boolean }>`
   margin: 0;
   margin-left: 8px;
   font-size: ${props => props.theme.textfield.fontSize};
   line-height: 16px;
   white-space: nowrap;
-  color: ${({ isError, theme }) => (isError ? theme.colors.alert : theme.colors.clickable)};
+  color: ${({ isError, isSuccess, theme }) =>
+    isError ? theme.colors.alert : isSuccess ? theme.colors.green : theme.colors.clickable};
+  font-weight: ${({ isSuccess }) => (isSuccess ? '500' : '400')};
   &:first-letter {
     text-transform: capitalize;
   }
@@ -56,7 +65,7 @@ const AdditionalMarketDataSectionTitle = styled.p<{ isError?: boolean }>`
 const AdditionalMarketDataSectionWrapper = styled.a<{
   noColorChange?: boolean
   isError?: boolean
-  customColorChange?: boolean
+  isSuccess?: boolean
   customColor?: string
   noMarginLeft?: boolean
   hasMarginRight?: boolean
@@ -70,15 +79,20 @@ const AdditionalMarketDataSectionWrapper = styled.a<{
   text-transform: capitalize;
   &:hover {
     p {
-      color: ${props => (props.isError ? props.theme.colors.alertHover : props.theme.colors.primaryLight)};
+      color: ${props =>
+        props.isError
+          ? props.theme.colors.alertHover
+          : props.isSuccess
+          ? props.theme.colors.darkGreen
+          : props.theme.colors.primaryLight};
     }
     svg {
       circle {
-        stroke: ${props => props.theme.colors.primaryLight};
+        stroke: ${props => (props.customColor ? props.customColor : props.theme.colors.primaryLight)};
       }
       path {
         fill: ${props =>
-          props.customColorChange
+          props.customColor
             ? props.customColor
             : props.noColorChange
             ? ''
@@ -88,7 +102,7 @@ const AdditionalMarketDataSectionWrapper = styled.a<{
       }
 
       path:nth-child(even) {
-        fill: ${props => props.theme.colors.primaryLight};
+        fill: ${props => (props.customColor ? props.customColor : props.theme.colors.primaryLight)};
       }
     }
   }
@@ -119,6 +133,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
     address,
     arbitrator,
     category,
+    collateral,
     curatedByDxDaoOrKleros,
     id,
     oracle,
@@ -128,7 +143,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   } = props
 
   const context = useConnectedWeb3Context()
-  const { relay } = context
+  const { cpk, library: provider, networkId, relay } = context
 
   const realitioBaseUrl = useRealityLink(!!relay)
   const realitioUrl = id ? `${realitioBaseUrl}/#!/question/${id}` : `${realitioBaseUrl}/`
@@ -145,6 +160,47 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   const queryParams = new URLSearchParams()
   queryParams.append('col1', title)
   queryParams.append('col2', `https://omen.eth.link/#/${address}`)
+
+  const [rewardApr, setRewardApr] = useState(0)
+  const [liquidityMiningCampaign, setLiquidityMiningCampaign] = useState<Maybe<GraphResponseLiquidityMiningCampaign>>()
+
+  const { tokenPrice } = useTokenPrice(getToken(networkId, 'omn').address)
+  const { tokenPrice: collateralPrice } = useTokenPrice(collateral.address)
+
+  const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
+
+  useEffect(() => {
+    if (liquidityMiningCampaigns) {
+      const marketLiquidityMiningCampaign = liquidityMiningCampaigns.filter(campaign => {
+        return campaign.fpmm.id === address
+      })[0]
+      setLiquidityMiningCampaign(marketLiquidityMiningCampaign)
+    }
+  }, [liquidityMiningCampaigns, address])
+
+  useEffect(() => {
+    const fetchStakingData = async () => {
+      if (!liquidityMiningCampaign) {
+        throw 'No liquidity mining campaign'
+      }
+
+      const stakingService = new StakingService(provider, cpk && cpk.address, liquidityMiningCampaign.id)
+
+      const { rewardApr } = await stakingService.getStakingData(
+        getToken(networkId, 'omn'),
+        cpk?.address || '',
+        collateralPrice, // Assume pool token value is 1 unit of collateral
+        tokenPrice,
+        Number(liquidityMiningCampaign.endsAt),
+        liquidityMiningCampaign.rewardAmounts[0],
+        Number(liquidityMiningCampaign.duration),
+      )
+
+      setRewardApr(rewardApr)
+    }
+
+    cpk && liquidityMiningCampaign && fetchStakingData()
+  }, [cpk, cpk?.address, liquidityMiningCampaign, networkId, provider, tokenPrice, collateralPrice])
 
   return (
     <AdditionalMarketDataWrapper {...restProps}>
@@ -179,6 +235,22 @@ export const AdditionalMarketData: React.FC<Props> = props => {
           <IconArbitrator size={'24'} />
           <AdditionalMarketDataSectionTitle>{arbitrator.name}</AdditionalMarketDataSectionTitle>
         </AdditionalMarketDataSectionWrapper>
+        {rewardApr > 0 && (
+          <AdditionalMarketDataSectionWrapper
+            customColor={'#4B948F'}
+            data-arrow-color="transparent"
+            data-for="marketData"
+            data-tip={'Current liquidity mining rewards APR.'}
+            // Update if we change verified data section
+            hasMarginRight={context.networkId === networkIds.XDAI}
+            isSuccess={true}
+          >
+            <IconApy />
+            <AdditionalMarketDataSectionTitle isSuccess={rewardApr > 0}>
+              {rewardApr === Infinity ? '--' : formatNumber(rewardApr.toString())}% APR
+            </AdditionalMarketDataSectionTitle>
+          </AdditionalMarketDataSectionWrapper>
+        )}
         {context.networkId !== networkIds.XDAI && (
           <AdditionalMarketDataSectionWrapper
             data-arrow-color="transparent"

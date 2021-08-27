@@ -6,15 +6,8 @@ import styled from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../contexts'
 import { getNativeAsset } from '../../../../../util/networks'
-import {
-  bigNumberToNumber,
-  bigNumberToString,
-  calcPrediction,
-  calcXValue,
-  formatNumber,
-  getInitialCollateral,
-  isDust,
-} from '../../../../../util/tools'
+import { calcPrediction, calcXValue, formatNumber, getInitialCollateral, isDust } from '../../../../../util/tools'
+import { bigNumberToNumber, bigNumberToString } from '../../../../../util/tools/formatting'
 import {
   AdditionalSharesType,
   BalanceItem,
