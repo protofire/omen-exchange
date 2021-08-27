@@ -118,7 +118,7 @@ const ModalLockTokens = (props: Props) => {
   const [omenAllowance, setOmenAllowance] = useState<BigNumber>(Zero)
   const [allowanceState, setAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
   const [checkAddress, setCheckAddress] = useState(false)
-  const displayDaiBanner = xDaiBalance.isZero()
+  const displayDaiBanner = xDaiBalance.isZero() && !claimAmount.isZero()
 
   const isApproveVisible =
     (omenAllowance.isZero() && isLockAmountOpen) ||
