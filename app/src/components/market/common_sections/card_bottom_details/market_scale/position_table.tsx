@@ -2,7 +2,8 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
-import { bigNumberToString, formatNumber, isDust } from '../../../../../util/tools'
+import { formatNumber, isDust } from '../../../../../util/tools'
+import { bigNumberToString } from '../../../../../util/tools/formatting'
 import { BalanceItem, PositionTableValue, Token } from '../../../../../util/types'
 import { TD, THead, TR, Table } from '../../../../common'
 import {

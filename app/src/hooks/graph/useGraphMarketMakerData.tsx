@@ -66,11 +66,12 @@ const query = gql`
       }
       scalarLow
       scalarHigh
+      factory
     }
   }
 `
 
-type GraphResponseFixedProductMarketMaker = {
+export type GraphResponseFixedProductMarketMaker = {
   id: string
   answerFinalizedTimestamp: Maybe<string>
   arbitrator: string
@@ -118,6 +119,7 @@ type GraphResponseFixedProductMarketMaker = {
   submissionIDs: KlerosSubmission[]
   scalarLow: Maybe<string>
   scalarHigh: Maybe<string>
+  factory: string
 }
 
 type GraphResponse = {
@@ -149,6 +151,7 @@ export type GraphMarketMakerData = {
   scalarHigh: Maybe<BigNumber>
   outcomeTokenMarginalPrices: string[]
   outcomeTokenAmounts: string[]
+  factory: string
 }
 
 type Result = {
@@ -186,7 +189,10 @@ const getBondedItems = (outcomes: string[], answers: AnswerItem[]): BondItem[] =
   return bondedItems
 }
 
-const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: number): GraphMarketMakerData => {
+export const wrangleMarketDataResponse = (
+  data: GraphResponseFixedProductMarketMaker,
+  networkId: number,
+): GraphMarketMakerData => {
   const outcomes = data.outcomes ? data.outcomes : getOutcomes(networkId, +data.templateId)
 
   return {
@@ -230,6 +236,7 @@ const wrangleResponse = (data: GraphResponseFixedProductMarketMaker, networkId: 
     scalarHigh: data.scalarHigh ? bigNumberify(data.scalarHigh || 0) : null,
     outcomeTokenMarginalPrices: data.outcomeTokenMarginalPrices,
     outcomeTokenAmounts: data.outcomeTokenAmounts,
+    factory: data.factory,
   }
 }
 
@@ -248,7 +255,7 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
 
   useEffect(() => {
     if (!loading && data && data.fixedProductMarketMaker && data.fixedProductMarketMaker.id === marketMakerAddress) {
-      const rangledValue = wrangleResponse(data.fixedProductMarketMaker, networkId)
+      const rangledValue = wrangleMarketDataResponse(data.fixedProductMarketMaker, networkId)
       setMarketMakerData(rangledValue)
     }
     // eslint-disable-next-line
