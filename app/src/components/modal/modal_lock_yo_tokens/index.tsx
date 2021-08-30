@@ -8,6 +8,7 @@ import styled, { withTheme } from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useAirdropService } from '../../../hooks'
 import { ERC20Service, OmenGuildService } from '../../../services'
+import { TYPE } from '../../../theme'
 import { getToken, networkIds } from '../../../util/networks'
 import { bigNumberToString, daysUntil, divBN, formatLockDate } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
@@ -36,16 +37,6 @@ const NavLeft = styled.div`
   display: flex;
   align-items: center;
 `
-const HeaderText = styled.div`
-  font-family: Roboto;
-  font-size: 16px;
-  font-style: normal;
-  font-weight: 500;
-  line-height: 19px;
-  letter-spacing: 0.2px;
-  text-align: left;
-  color: #37474f;
-`
 
 const DataRow = styled.div`
   display: flex;
@@ -54,21 +45,22 @@ const DataRow = styled.div`
   width: 100%;
   line-height: ${props => props.theme.fonts.defaultLineHeight};
 `
+
+const LightDataItem = styled(TYPE.bodyRegular)`
+  color: ${props => props.theme.text2};
+`
+const DarkDataItem = styled(TYPE.bodyMedium)`
+  display: flex;
+  align-items: center;
+  color: ${props => props.theme.text1};
+`
+
 const ModalMain = styled.div`
   width: 100%;
 
   & ${DataRow}:not(:last-child) {
     margin-bottom: 12px;
   }
-`
-const LightDataItem = styled.div`
-  color: ${props => props.theme.textfield.placeholderColor};
-`
-const DarkDataItem = styled.div`
-  display: flex;
-  align-items: center;
-  color: ${props => props.theme.colors.textColorDark};
-  font-weight: ${props => props.theme.textfield.fontWeight};
 `
 const ButtonSection = styled.div`
   display: flex;
@@ -94,9 +86,6 @@ const ConditionalWrapper = styled.div<{ hideWrapper: boolean }>`
 const Divider = styled.div`
   border-top: ${props => props.theme.borders.borderLineDisabled};
   margin: 24px 0;
-`
-const PercentageText = styled.span<{ lightColor?: boolean }>`
-  ${props => props.lightColor && `color:${props.theme.colors.textColorLighter}`};
 `
 
 const ModalLockTokens = (props: Props) => {
@@ -285,7 +274,9 @@ const ModalLockTokens = (props: Props) => {
                   style={{ marginRight: '12px' }}
                 />
               )}
-              <HeaderText>{isLockAmountOpen ? 'Lock Omen Token' : 'Omen Guild Membership'}</HeaderText>
+              <TYPE.heading3 color={'text1'} textAlign={'left'}>
+                {isLockAmountOpen ? 'Lock Omen Token' : 'Omen Guild Membership'}
+              </TYPE.heading3>
             </NavLeft>
             <IconClose hoverEffect={true} onClick={onClose} />
           </ModalNavigation>
@@ -342,16 +333,16 @@ const ModalLockTokens = (props: Props) => {
             <DataRow style={{ marginTop: !isLockAmountOpen ? '12px' : '' }}>
               <LightDataItem>{isLockAmountOpen && 'Your '}Vote Weight</LightDataItem>
               <DarkDataItem>
-                <PercentageText lightColor={!displayLockAmount.isZero()}>
+                <TYPE.bodyMedium color={!displayLockAmount.isZero() && 'text2'}>
                   {!totalLocked.isZero() && !userLocked.isZero()
                     ? (divBN(userLocked, totalLocked) * 100).toFixed(2)
                     : '0.00'}
                   %
-                </PercentageText>
+                </TYPE.bodyMedium>
 
                 {!displayLockAmount.isZero() && (
                   <>
-                    <ArrowIcon color={theme.colors.textColorDark} style={{ margin: '0 10px' }} />
+                    <ArrowIcon color={theme.text1} style={{ margin: '0 10px' }} />
                     {(divBN(userLocked.add(displayLockAmount), totalLocked) * 100).toFixed(2)}%
                   </>
                 )}
@@ -421,7 +412,7 @@ const ModalLockTokens = (props: Props) => {
             </ButtonsLockUnlock>
           </ButtonSection>
         </ContentWrapper>
-        {!isLockAmountOpen && (
+        {!isLockAmountOpen && relay && (
           <>
             <Divider />
             <AirdropCardWrapper

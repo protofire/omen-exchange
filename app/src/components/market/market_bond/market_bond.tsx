@@ -10,7 +10,7 @@ import { useContracts, useCpkProxy } from '../../../hooks'
 import { getLogger } from '../../../util/logger'
 import { getNativeAsset } from '../../../util/networks'
 import { RemoteData } from '../../../util/remote_data'
-import { bigNumberToString, getUnit, numberToByte32 } from '../../../util/tools'
+import { bigNumberToString, getUnit, mulBN, numberToByte32 } from '../../../util/tools'
 import {
   INVALID_ANSWER_ID,
   MarketDetailsTab,
@@ -209,14 +209,6 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
           showBondChange
         />
       )}
-      {showUpgrade && (
-        <SetAllowance
-          finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
-          loading={RemoteData.is.asking(proxyIsUpToDate)}
-          onUnlock={upgradeProxy}
-          style={{ marginTop: 20 }}
-        />
-      )}
       <GridTransactionDetails>
         <div>
           <>
@@ -274,6 +266,12 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
             <TransactionDetailsLine />
             <TransactionDetailsRow
               state={ValueStates.normal}
+              title="Potential Fee"
+              tooltip="A 2.5% fee is applied and burned on bonds which are not the final bond."
+              value={`${bigNumberToString(mulBN(bondNativeAssetAmount, 0.0025), nativeAsset.decimals, 3)} ${symbol}`}
+            />
+            <TransactionDetailsRow
+              state={ValueStates.normal}
               title="Potential Profit"
               value={`${bigNumberToString(currentAnswerBond || new BigNumber(0), STANDARD_DECIMALS)} ${symbol}`}
             />
@@ -287,7 +285,15 @@ const MarketBondWrapper: React.FC<Props> = (props: Props) => {
         </div>
       </GridTransactionDetails>
 
-      <BottomButtonWrapper borderTop>
+      {showUpgrade && (
+        <SetAllowance
+          finished={upgradeFinished && RemoteData.is.success(proxyIsUpToDate)}
+          loading={RemoteData.is.asking(proxyIsUpToDate)}
+          onUnlock={upgradeProxy}
+        />
+      )}
+
+      <BottomButtonWrapper borderTop marginTop={showUpgrade}>
         <Button
           buttonType={ButtonType.secondaryLine}
           onClick={() => switchMarketTab(MarketDetailsTab.finalize)}

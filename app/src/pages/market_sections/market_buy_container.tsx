@@ -10,7 +10,8 @@ import { useAsyncDerivedValue, useCollateralBalance, useContracts, useCpkAllowan
 import { CPKService, MarketMakerService } from '../../services'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../util/networks'
 import { RemoteData } from '../../util/remote_data'
-import { bigNumberToNumber, bigNumberToString, getInitialCollateral, mulBN } from '../../util/tools'
+import { getInitialCollateral, mulBN } from '../../util/tools'
+import { bigNumberToNumber, bigNumberToString } from '../../util/tools/formatting'
 import { calcPrediction, computeBalanceAfterTrade } from '../../util/tools/fpmm/trading'
 import { MarketDetailsTab, MarketMakerData, Status, Ternary, Token, TransactionStep } from '../../util/types'
 

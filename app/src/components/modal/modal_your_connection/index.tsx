@@ -4,9 +4,11 @@ import Modal from 'react-modal'
 import styled, { withTheme } from 'styled-components'
 
 import { useConnectedWeb3Context } from '../../../contexts'
+import { TYPE } from '../../../theme'
 import { bridgeTokensList, getNativeAsset, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
-import { bigNumberToString, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
+import { truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
+import { bigNumberToString } from '../../../util/tools/formatting'
 import { KnownTokenValue, Token, TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -18,15 +20,12 @@ import { Image } from '../../market/common_sections/message_text/token_item'
 import SettingsViewContainer from '../../settings/settings_view'
 import {
   BalanceItem,
-  BalanceItemBalance,
   BalanceItemSide,
-  BalanceItemTitle,
   BalanceItems,
   BalanceSection,
   ContentWrapper,
   ModalCard,
   ModalNavigation,
-  ModalTitle,
 } from '../common_styled'
 import { ModalTransactionWrapper } from '../modal_transaction'
 
@@ -72,13 +71,6 @@ const AccountInfo = styled.div`
   justify-contect: space-between;
   margin-left: 12px;
 `
-const StrongText = styled.div`
-  font-weight: ${props => props.theme.textfield.fontweight};
-  font-size: ${props => props.theme.fonts.defaultSize};
-  line-height: 14.06px;
-  color: ${props => props.theme.textfield.color};
-  margin-bottom: 5px;
-`
 
 const ClaimLeft = styled.div`
   display: flex;
@@ -93,36 +85,10 @@ const ClaimLeftSvg = styled.div`
   &:hover {
     .chevronDown {
       path {
-        fill: ${props => props.theme.colors.primaryLight};
+        fill: ${props => props.theme.primary1};
       }
     }
   }
-`
-
-const AccountInfoAddress = styled.p`
-  font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => props.theme.colors.textColorDark};
-  margin: 0;
-  line-height: ${props => props.theme.fonts.defaultLineHeight}
-  letter-spacing: 0.2px;
-  
-`
-
-const AccountInfoWallet = styled.p`
-  font-size: 12px;
-  color: ${props => props.theme.colors.textColorLighter};
-  margin: 0;
-  line-height: 14px;
-  margin: 4px 0px;
-`
-
-const CardHeaderText = styled.p`
-  font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => props.theme.colors.textColorLighter};
-  margin: 0;
-  line-height: ${props => props.theme.fonts.defaultLineHeight};
-  letter-spacing: 0.2px;
-  white-space: nowrap;
 `
 
 const ClaimButton = styled(Button)`
@@ -259,11 +225,13 @@ export const ModalYourConnection = (props: Props) => {
       <BalanceItem key={index + token}>
         <BalanceItemSide>
           <Image size={'24'} src={getImageUrl(address)} />
-          <BalanceItemTitle style={{ marginLeft: '4px' }}>{name ? name : token}</BalanceItemTitle>
+          <TYPE.bodyRegular color={displayClaim ? 'text1' : 'text2'} marginLeft={'12px'}>
+            {name ? name : token}
+          </TYPE.bodyRegular>
         </BalanceItemSide>
-        <BalanceItemBalance>
+        <TYPE.bodyRegular color={'text2'} margin={'0px'}>
           {bigNumberToString(value, decimals)} {token.toUpperCase()}
-        </BalanceItemBalance>
+        </TYPE.bodyRegular>
       </BalanceItem>
     )
   })
@@ -288,14 +256,14 @@ export const ModalYourConnection = (props: Props) => {
         <BalanceItem key={index + address}>
           <BalanceItemSide>
             <Image size={'24'} src={image ? image : getImageUrl(address)} />
-            <BalanceItemTitle style={{ marginLeft: '12px' }}>
+            <TYPE.bodyRegular color={'text1'} marginLeft={'12px'}>
               {symbol === 'xDAI' ? 'Dai' : name ? name : symbol}
-            </BalanceItemTitle>
+            </TYPE.bodyRegular>
           </BalanceItemSide>
-          <BalanceItemBalance>
+          <TYPE.bodyRegular color={'text2'}>
             {bigNumberToString(balance, decimals, symbol === 'DAI' ? 2 : 3)}{' '}
             {symbol === 'xDAI' ? 'DAI' : symbol.toUpperCase()}
-          </BalanceItemBalance>
+          </TYPE.bodyRegular>
         </BalanceItem>
       )
     })
@@ -335,10 +303,12 @@ export const ModalYourConnection = (props: Props) => {
         {isSettingsModalOpen ? (
           <ContentWrapper>
             <ConnectionModalNavigation>
-              <ModalTitle>
+              <TYPE.heading3 color={'text1'} margin={'0px'} marginTop={'2px'}>
                 <IconArrowBack hoverEffect={true} onClick={() => setIsSettingsModalOpen(false)} />
-                <span style={{ marginLeft: '15px' }}>Settings</span>
-              </ModalTitle>
+                <TYPE.heading3 color={'text1'} display={'inline-block'} marginLeft={'15px'} marginTop={'2px'}>
+                  Settings
+                </TYPE.heading3>
+              </TYPE.heading3>
 
               <IconClose
                 hoverEffect={true}
@@ -355,7 +325,9 @@ export const ModalYourConnection = (props: Props) => {
         ) : (
           <ContentWrapper>
             <ConnectionModalNavigation>
-              <ModalTitle>Your Connection</ModalTitle>
+              <TYPE.heading3 color={'text1'} margin={'0px'} marginTop={'2px'}>
+                Your Connection
+              </TYPE.heading3>
               <IconClose hoverEffect={true} onClick={onClose} />
             </ConnectionModalNavigation>
 
@@ -367,8 +339,12 @@ export const ModalYourConnection = (props: Props) => {
                     <IconJazz account={owner || ''} size={28} />
                   </ConnectionIconWrapper>
                   <AccountInfo>
-                    <AccountInfoAddress>{truncateStringInTheMiddle(owner || '', 5, 3)}</AccountInfoAddress>
-                    <AccountInfoWallet>{context.rawWeb3Context.connectorName}</AccountInfoWallet>
+                    <TYPE.bodyRegular color={'text1'} margin={'0px'}>
+                      {truncateStringInTheMiddle(owner || '', 5, 3)}
+                    </TYPE.bodyRegular>
+                    <TYPE.bodyRegular color={'text2'} fontSize={'12px'} lineHeight={'14px'} margin={'4px 0px'}>
+                      {context.rawWeb3Context.connectorName}
+                    </TYPE.bodyRegular>
                   </AccountInfo>
                 </TopCardHeaderLeft>
                 <IconSettingsWrapper>
@@ -379,7 +355,9 @@ export const ModalYourConnection = (props: Props) => {
                 </ChangeWalletButton>
               </TopCardHeader>
               <BalanceSection>
-                <CardHeaderText>Wallet</CardHeaderText>
+                <TYPE.bodyRegular color={'text2'} margin={'0px'} whiteSpace={'nowrap'}>
+                  Wallet
+                </TYPE.bodyRegular>
                 <BalanceItems style={{ marginTop: '14px' }}>
                   {tokenBalances(relay ? networkIds.MAINNET : networkId)}
                 </BalanceItems>
@@ -394,11 +372,13 @@ export const ModalYourConnection = (props: Props) => {
                     }}
                   >
                     <ClaimLeft>
-                      <StrongText>Claimable Assets</StrongText>
+                      <TYPE.bodyMedium color={'text1'} marginBottom={'5px'}>
+                        Claimable Assets
+                      </TYPE.bodyMedium>
 
-                      <BalanceItemBalance as="div">
+                      <TYPE.bodyRegular as="div" color={'text2'} margin={'0px'}>
                         {arrayOfClaimableBalances.map(e => e.token.toUpperCase()).join(', ')}
-                      </BalanceItemBalance>
+                      </TYPE.bodyRegular>
                     </ClaimLeft>
                     <SvgWrap>
                       {displayClaim ? <IconChevronUp /> : <IconChevronDown color={theme.colors.tertiary} />}
@@ -417,7 +397,9 @@ export const ModalYourConnection = (props: Props) => {
               <ModalCard>
                 <>
                   <BalanceSection>
-                    <CardHeaderText>Omen Account</CardHeaderText>
+                    <TYPE.bodyRegular color={'text2'} margin={'0px'} whiteSpace={'nowrap'}>
+                      Omen Account
+                    </TYPE.bodyRegular>
                     <BalanceItems style={{ marginTop: '14px' }}>{tokenBalances(networkIds.XDAI)}</BalanceItems>
                   </BalanceSection>
                   <DepositWithdrawButtons>

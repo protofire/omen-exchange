@@ -1,7 +1,8 @@
 import React from 'react'
 import styled from 'styled-components'
 
-import { bigNumberToString, isDust, reverseArray } from '../../../../util/tools'
+import { isDust, reverseArray } from '../../../../util/tools'
+import { bigNumberToString } from '../../../../util/tools/formatting'
 import { BalanceItem } from '../../../../util/types'
 import { RadioInput } from '../../../common'
 
