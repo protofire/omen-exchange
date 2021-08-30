@@ -5,7 +5,7 @@ import styled, { withTheme } from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../contexts'
 import { TYPE } from '../../../theme'
-import { bigNumberToString, isDust } from '../../../util/tools'
+import { bigNumberToString, isDustxDai } from '../../../util/tools'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconOmen } from '../../common/icons'
@@ -70,9 +70,8 @@ const AirdropCard = (props: Props) => {
       claim(account, displayAmount)
     }
   }
-  const noDustInDaiBalance = !isDust(balances.xDaiBalance, 18)
   const claimIsDisabled =
-    !displayAmount || displayAmount.isZero() || balances.xDaiBalance.isZero() || !noDustInDaiBalance
+    !displayAmount || displayAmount.isZero() || balances.xDaiBalance.isZero() || !isDustxDai(balances.xDaiBalance, 18)
 
   return (
     <>
