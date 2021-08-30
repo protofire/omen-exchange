@@ -1,5 +1,5 @@
 import { MaxUint256, Zero } from 'ethers/constants'
-import { BigNumber, bigNumberify, defaultAbiCoder, keccak256 } from 'ethers/utils'
+import { BigNumber, bigNumberify, defaultAbiCoder, keccak256, parseUnits } from 'ethers/utils'
 import moment from 'moment'
 
 import { DAY_IN_SECONDS, OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../../common/constants'
@@ -1138,22 +1138,21 @@ interface ProposeLiquidityRewardsParams {
 }
 
 export const proposeLiquidityRewards = async (params: ProposeLiquidityRewardsParams) => {
-  // const { campaignAddress, networkId, service, transactions } = params
+  const { campaignAddress, networkId, service, transactions } = params
 
-  // const guild = new OmenGuildService(service.provider, networkId)
-  // const collateral = getToken(networkId, 'omn')
-  // const rewardAmount = 0
-
-  // transactions.push({
-  //   to: guild.omenGuildAddress,
-  //   data: OmenGuildService.encodeCreateProposal(
-  //     campaignAddress,
-  //     StakingService.encodeAddRewards(collateral.address, rewardAmount),
-  //     new BigNumber(0),
-  //     '',
-  //     '',
-  //   ),
-  // })
+  const guild = new OmenGuildService(service.provider, networkId)
+  const collateral = getToken(networkId, 'omn')
+  const reward = parseUnits('500')
+  transactions.push({
+    to: guild.omenGuildAddress,
+    data: OmenGuildService.encodeCreateProposal(
+      campaignAddress,
+      StakingService.encodeAddRewards(collateral.address, reward),
+      new BigNumber(0),
+      '',
+      '0x0',
+    ),
+  })
 
   return params
 }

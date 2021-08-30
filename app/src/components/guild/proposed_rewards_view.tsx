@@ -118,10 +118,13 @@ const ProposedRewardsView = (props: Props) => {
     selected,
     setIsTransactionModalOpen,
     toggle,
+    votes,
+    votesRequired,
   } = props
   const { networkId, txHash, txState } = context
 
-  const proposalButtonDisabled = (propose && !selected.length) || isTransactionProcessing // || votes.isZero() || votes.lt(votesRequired)
+  const proposalButtonDisabled =
+    (propose && !selected.length) || isTransactionProcessing || votes.isZero() || votes.lt(votesRequired)
   const isPrevDisabled = pageIndex === 0
   const isNextDisabled = !moreMarkets
 

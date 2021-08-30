@@ -2,6 +2,7 @@ import { Contract, ethers, utils } from 'ethers'
 import { Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
+import { getMultiCallConfig, multicall } from '../util/multicall'
 import { getContractAddress } from '../util/networks'
 
 const GuildAbi = [
@@ -84,7 +85,54 @@ const GuildAbi = [
     stateMutability: 'view',
     type: 'function',
   },
+  {
+    inputs: [{ internalType: 'bytes32', name: 'proposalId', type: 'bytes32' }],
+    name: 'getProposal',
+    outputs: [
+      { internalType: 'address', name: 'creator', type: 'address' },
+      { internalType: 'uint256', name: 'startTime', type: 'uint256' },
+      { internalType: 'uint256', name: 'endTime', type: 'uint256' },
+      { internalType: 'address[]', name: 'to', type: 'address[]' },
+      { internalType: 'bytes[]', name: 'data', type: 'bytes[]' },
+      { internalType: 'uint256[]', name: 'value', type: 'uint256[]' },
+      { internalType: 'string', name: 'description', type: 'string' },
+      { internalType: 'bytes', name: 'contentHash', type: 'bytes' },
+      { internalType: 'uint256', name: 'totalVotes', type: 'uint256' },
+      { internalType: 'enum ERC20Guild.ProposalState', name: 'state', type: 'uint8' },
+      { internalType: 'uint256', name: 'snapshotId', type: 'uint256' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getProposalsIdsLength',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    name: 'proposalsIds',
+    outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
 ]
+
+export interface Proposal {
+  address: string
+  startTime: BigNumber
+  endTime: BigNumber
+  to: string[]
+  data: string
+  value: BigNumber[]
+  description: string
+  contentHash: string
+  totalVotes: BigNumber
+  state: BigNumber
+  snapshotId: BigNumber
+}
 
 class OmenGuildService {
   user: ethers.providers.JsonRpcSigner
@@ -157,6 +205,54 @@ class OmenGuildService {
 
   lockTime = async () => {
     return this.contract?.lockTime()
+  }
+
+  getProposalsIdsLength = async () => {
+    return this.contract?.getProposalsIdsLength()
+  }
+
+  getProposal = async (id: number) => {
+    return this.contract?.getProposal(id)
+  }
+
+  getProposals = async (): Promise<Proposal[]> => {
+    const ids = await this.contract?.getProposalsIdsLength()
+    if (ids === 0) {
+      return []
+    }
+
+    let calls = []
+    for (let i = 0; i < ids; i++) {
+      calls.push({
+        target: getMultiCallConfig(this.network).multicallAddress,
+        call: ['proposalsIds(uint256)(bytes32)', i],
+        returns: [[`id-${i}`]],
+      })
+    }
+
+    let response = await multicall(calls, this.network)
+
+    calls = []
+    for (let i = 0; i < ids; i++) {
+      const id = response.results.transformed[`id-${i}`]
+      calls.push({
+        target: getMultiCallConfig(this.network).multicallAddress,
+        call: [
+          'getProposal(bytes32)(address,uint256,uint256,address[],bytes[],uint256[],string,bytes,uint256,uint8,uint256)',
+          id,
+        ],
+        returns: [[`proposal-${id}`]],
+      })
+    }
+
+    response = await multicall(calls, this.network)
+
+    const proposals = []
+    for (let i = 0; i < ids; i++) {
+      proposals.push(response.results.transformed[`proposal-${i}`])
+    }
+
+    return proposals
   }
 }
 

@@ -109,6 +109,23 @@ const abi = [
         type: 'address',
       },
       {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'addRewards',
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+      {
         internalType: 'address',
         name: '',
         type: 'address',
@@ -270,6 +287,11 @@ class StakingService {
   static encodeExit = (address: string) => {
     const stakingInterface = new utils.Interface(abi)
     return stakingInterface.functions.exit.encode([address])
+  }
+
+  static encodeAddRewards = (address: string, amount: BigNumber) => {
+    const stakingInterface = new utils.Interface(abi)
+    return stakingInterface.functions.addRewards.encode([address, amount])
   }
 
   getStakingData = async (

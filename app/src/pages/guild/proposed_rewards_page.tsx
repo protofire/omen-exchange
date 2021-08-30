@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 
 import { ProposedRewardsView } from '../../components/guild/proposed_rewards_view'
 import { ConnectedWeb3Context } from '../../contexts'
+import { useGraphLiquidityMiningCampaigns, useGuildProposals } from '../../hooks'
 import { OmenGuildService } from '../../services/guild'
 import { getLogger } from '../../util/logger'
 import { RemoteData } from '../../util/remote_data'
@@ -35,6 +36,10 @@ const ProposedRewardsPage = (props: Props) => {
 
   const [votes, setVotes] = useState(new BigNumber(0))
   const [votesRequired, setVotesRequired] = useState(new BigNumber(0))
+
+  const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
+
+  useGuildProposals()
 
   const PAGE_SIZE = 6
   useEffect(() => {
@@ -73,11 +78,18 @@ const ProposedRewardsPage = (props: Props) => {
         return
       }
 
+      const campaignAddress =
+        liquidityMiningCampaigns && liquidityMiningCampaigns.find(campaign => campaign.fpmm.id)?.id
+
+      if (!campaignAddress) {
+        return
+      }
+
       setIsTransactionProcessing(true)
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
-      // await cpk.proposeLiquidityRewards()
+      await cpk.proposeLiquidityRewards({ campaignAddress })
       await new Promise(r => setTimeout(r, 3000))
 
       await balances.fetchBalances()
