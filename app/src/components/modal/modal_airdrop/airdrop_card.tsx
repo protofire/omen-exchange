@@ -94,24 +94,20 @@ const AirdropCard = (props: Props) => {
         </TopSection>
         {displayCheckAddress && (
           <BottomSection>
-            {' '}
             {displayButtons ? (
               <>
-                {' '}
                 <BottomSectionTextWrapper>
-                  {' '}
-                  <TYPE.bodyMedium color={'text1'}>Claim OMN token</TYPE.bodyMedium>{' '}
-                  <TYPE.bodyRegular color={'text2'}>check address for claimable OMN</TYPE.bodyRegular>{' '}
-                </BottomSectionTextWrapper>{' '}
-                <AirdropButton onClick={onCheckAddress}>Check</AirdropButton>{' '}
+                  <TYPE.bodyMedium color={'text1'}>Claim OMN token</TYPE.bodyMedium>
+                  <TYPE.bodyRegular color={'text2'}>check address for claimable OMN</TYPE.bodyRegular>
+                </BottomSectionTextWrapper>
+                <AirdropButton onClick={onCheckAddress}>Check</AirdropButton>
               </>
             ) : (
               <TYPE.bodyRegular color={'text2'}>
-                {' '}
                 Enter an address to trigger a OMN claim. If the address has any claimable OMN it will be sent to them on
-                submission.{' '}
+                submission.
               </TYPE.bodyRegular>
-            )}{' '}
+            )}
           </BottomSection>
         )}
       </ModalCard>
