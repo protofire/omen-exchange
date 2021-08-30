@@ -53,7 +53,7 @@ export const SetAllowance: React.FC<SetAllowanceProps> = (props: SetAllowancePro
                 collateral.symbol}. This has to be done for each new token.`
             : `A new version of the Omen account smart contract is available. Upgrade your Omen account now.`}
         </Description>
-        <ToggleTokenLock finished={finished} loading={loading} onUnlock={onUnlock} />
+        <ToggleTokenLock collateral={collateral} finished={finished} loading={loading} onUnlock={onUnlock} />
       </DescriptionWrapper>
     </Wrapper>
   )

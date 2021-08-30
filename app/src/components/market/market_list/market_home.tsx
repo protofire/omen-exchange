@@ -210,6 +210,52 @@ const FiltersLeftWrapper = styled.div`
   }
 `
 
+export const sortOptions = [
+  {
+    title: '24h volume',
+    sortBy: `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria,
+    direction: 'desc',
+  },
+  {
+    title: 'Total volume',
+    sortBy: 'usdVolume',
+    direction: 'desc',
+  },
+  {
+    title: 'Highest liquidity',
+    sortBy: 'usdLiquidityParameter',
+    direction: 'desc',
+  },
+  {
+    title: 'Newest',
+    sortBy: 'creationTimestamp',
+    direction: 'desc',
+  },
+  {
+    title: 'Closing soon',
+    sortBy: 'openingTimestamp',
+    direction: 'asc',
+  },
+] as const
+
+export const myMarketsSortOptions = [
+  {
+    title: 'Newest',
+    sortBy: 'creationTimestamp',
+    direction: 'desc',
+  },
+  {
+    title: 'Ended recently',
+    sortBy: 'openingTimestamp',
+    direction: 'desc',
+  },
+  {
+    title: 'Ending soon',
+    sortBy: 'openingTimestamp',
+    direction: 'asc',
+  },
+] as const
+
 interface Props {
   context: ConnectedWeb3Context
   count: number
@@ -250,6 +296,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [state, setState] = useState<MarketStates>(currentFilter.state)
   const [category, setCategory] = useState(currentFilter.category)
   const [title, setTitle] = useState(currentFilter.title)
+  const [sortIndex, setSortIndex] = useState(currentFilter.sortIndex)
   const [sortBy, setSortBy] = useState<Maybe<MarketsSortCriteria>>(currentFilter.sortBy)
   const [sortByDirection, setSortByDirection] = useState<'asc' | 'desc'>(currentFilter.sortByDirection)
   const [showSearch, setShowSearch] = useState<boolean>(currentFilter.title.length > 0 ? true : false)
@@ -271,7 +318,11 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       state: MarketStates.open,
       title: 'Open',
       active: state === MarketStates.open,
-      onClick: () => setState(MarketStates.open),
+      onClick: () => {
+        setState(MarketStates.open)
+        setSortIndex(2)
+        setSortBy('usdLiquidityParameter')
+      },
     },
     {
       state: MarketStates.pending,
@@ -328,8 +379,9 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       active: state === MarketStates.myMarkets,
       onClick: () => {
         setState(MarketStates.myMarkets)
+        setSortIndex(1)
         setSortBy('openingTimestamp')
-        setSortByDirection('asc')
+        setSortByDirection('desc')
       },
     })
   }
@@ -358,6 +410,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       templateId,
       currency,
       category,
+      sortIndex,
       sortBy,
       sortByDirection,
       state,
@@ -370,6 +423,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     templateId,
     currency,
     category,
+    sortIndex,
     sortBy,
     sortByDirection,
     state,
@@ -400,61 +454,22 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
     setShowAdvancedFilters(!showAdvancedFilters)
   }, [showAdvancedFilters])
 
-  const sortOptions = [
-    {
-      title: '24h volume',
-      sortBy: `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria,
-      direction: 'desc',
-    },
-    {
-      title: 'Total volume',
-      sortBy: 'usdVolume',
-      direction: 'desc',
-    },
-    {
-      title: 'Highest liquidity',
-      sortBy: 'usdLiquidityParameter',
-      direction: 'desc',
-    },
-    {
-      title: 'Newest',
-      sortBy: 'creationTimestamp',
-      direction: 'desc',
-    },
-    {
-      title: 'Closing soon',
-      sortBy: 'openingTimestamp',
-      direction: 'asc',
-    },
-  ] as const
-
-  const myMarketsSortOptions = [
-    {
-      title: 'Newest',
-      sortBy: 'creationTimestamp',
-      direction: 'desc',
-    },
-    {
-      title: 'Ending soon',
-      sortBy: 'openingTimestamp',
-      direction: 'asc',
-    },
-  ] as const
-
-  const sortItems: Array<DropdownItemProps> = sortOptions.map(item => {
+  const sortItems: Array<DropdownItemProps> = sortOptions.map((item, i) => {
     return {
       content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
       onClick: () => {
+        setSortIndex(i)
         setSortBy(item.sortBy)
         setSortByDirection(item.direction)
       },
     }
   })
 
-  const myMarketsSortItems: Array<DropdownItemProps> = myMarketsSortOptions.map(item => {
+  const myMarketsSortItems: Array<DropdownItemProps> = myMarketsSortOptions.map((item, i) => {
     return {
       content: <CustomDropdownItem>{item.title}</CustomDropdownItem>,
       onClick: () => {
+        setSortIndex(i)
         setSortBy(item.sortBy)
         setSortByDirection(item.direction)
       },
@@ -558,8 +573,8 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
               <SortDropdown
                 currentItem={
                   fetchMyMarkets
-                    ? myMarketsSortOptions.findIndex(i => i.sortBy === sortBy)
-                    : sortOptions.findIndex(i => i.sortBy === sortBy)
+                    ? myMarketsSortOptions.findIndex((item, i) => i == sortIndex)
+                    : sortOptions.findIndex((item, i) => i == sortIndex)
                 }
                 dirty={true}
                 dropdownPosition={DropdownPosition.center}

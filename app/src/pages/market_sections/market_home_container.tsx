@@ -12,7 +12,7 @@ import { MAX_MARKET_FEE } from '../../common/constants'
 import { ButtonCSS } from '../../components/button/button_styling_types'
 import { IconClose } from '../../components/common/icons'
 import xDaiIntergation from '../../components/market/market_list/img/xDaiIntegration.svg'
-import { MarketHome } from '../../components/market/market_list/market_home'
+import { MarketHome, myMarketsSortOptions } from '../../components/market/market_list/market_home'
 import { useConnectedWeb3Context } from '../../contexts'
 import { useMarkets } from '../../hooks/market_data/useMarkets'
 import { queryCategories } from '../../queries/markets_home'
@@ -119,8 +119,15 @@ const MarketHomeContainer: React.FC = () => {
 
   const location = useLocation()
 
-  const sortRoute = location.pathname.split('/')[1]
+  const stateFilter = location.search.includes('state')
+  let stateRoute = location.search.split('state=')[1]
+  if (stateRoute) stateRoute = stateRoute.split('&')[0]
+
+  let sortRoute
   let sortDirection: 'desc' | 'asc' = 'desc'
+  if (stateRoute !== 'MY_MARKETS') {
+    sortRoute = location.pathname.split('/')[1]
+  }
 
   const currencyFilter = location.pathname.includes('currency')
   let currencyRoute = location.pathname.split('/currency/')[1]
@@ -142,26 +149,39 @@ const MarketHomeContainer: React.FC = () => {
   let typeRoute = location.pathname.split('/type/')[1]
   if (typeRoute) typeRoute = typeRoute.split('/')[0]
 
-  const stateFilter = location.search.includes('state')
-  let stateRoute = location.search.split('state=')[1]
-  if (stateRoute) stateRoute = stateRoute.split('&')[0]
-
   const searchFilter = location.search.includes('tag')
   let searchRoute = location.search.split('tag=')[1]
   if (searchRoute) searchRoute = searchRoute.split('&')[0]
 
   let sortParam: Maybe<MarketsSortCriteria> = stateRoute === 'MY_MARKETS' ? 'openingTimestamp' : 'usdLiquidityParameter'
-  if (sortRoute === '24h-volume') {
-    sortParam = `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria
-  } else if (sortRoute === 'volume') {
-    sortParam = 'usdVolume'
-  } else if (sortRoute === 'newest') {
-    sortParam = 'creationTimestamp'
-  } else if (sortRoute === 'ending') {
-    sortParam = 'openingTimestamp'
-    sortDirection = 'asc'
-  } else if (sortRoute === 'liquidity') {
-    sortParam = 'usdLiquidityParameter'
+  let sortIndex: number = stateRoute === 'MY_MARKETS' ? 1 : 2
+
+  if (stateRoute !== 'MY_MARKETS') {
+    switch (sortRoute) {
+      case '24h-volume':
+        sortIndex = 0
+        sortParam = `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}` as MarketsSortCriteria
+        break
+      case 'volume':
+        sortIndex = 1
+        sortParam = 'usdVolume'
+        break
+      case 'liquidity':
+        sortIndex = 2
+        sortParam = 'usdLiquidityParameter'
+        break
+      case 'newest':
+        sortIndex = 3
+        sortParam = 'creationTimestamp'
+        break
+      case 'ending':
+        sortIndex = 4
+        sortParam = 'openingTimestamp'
+        sortDirection = 'asc'
+        break
+      default:
+        console.warn('Unknown state route')
+    }
   }
 
   let currencyParam: string | null
@@ -194,12 +214,28 @@ const MarketHomeContainer: React.FC = () => {
 
   let stateParam: MarketStates = MarketStates.open
   if (stateFilter) {
-    if (stateRoute === 'OPEN') stateParam = MarketStates.open
-    if (stateRoute === 'PENDING') stateParam = MarketStates.pending
-    if (stateRoute === 'FINALIZING') stateParam = MarketStates.finalizing
-    if (stateRoute === 'ARBITRATING') stateParam = MarketStates.arbitrating
-    if (stateRoute === 'CLOSED') stateParam = MarketStates.closed
-    if (stateRoute === 'MY_MARKETS') stateParam = MarketStates.myMarkets
+    switch (stateRoute) {
+      case 'OPEN':
+        stateParam = MarketStates.open
+        break
+      case 'PENDING':
+        stateParam = MarketStates.pending
+        break
+      case 'FINALIZING':
+        stateParam = MarketStates.finalizing
+        break
+      case 'ARBITRATING':
+        stateParam = MarketStates.arbitrating
+        break
+      case 'CLOSED':
+        stateParam = MarketStates.closed
+        break
+      case 'MY_MARKETS':
+        stateParam = MarketStates.myMarkets
+        break
+      default:
+        console.warn('Unknown stateRoute')
+    }
   } else {
     stateParam = MarketStates.open
   }
@@ -225,6 +261,7 @@ const MarketHomeContainer: React.FC = () => {
     state: stateParam,
     category: categoryParam,
     title: searchParam,
+    sortIndex: sortIndex,
     sortBy: sortParam,
     sortByDirection: sortDirection,
     arbitrator: arbitratorParam,
@@ -307,16 +344,26 @@ const MarketHomeContainer: React.FC = () => {
       const routeQueryStart = '?'
       const routeQueryArray: string[] = []
 
-      if (filter.sortBy === `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}`) {
-        route += '/24h-volume'
-      } else if (filter.sortBy === 'usdVolume') {
-        route += '/volume'
-      } else if (filter.sortBy === 'creationTimestamp') {
-        route += '/newest'
-      } else if (filter.sortBy === 'openingTimestamp') {
-        route += '/ending'
-      } else if (filter.sortBy === 'usdLiquidityParameter') {
-        route += '/liquidity'
+      if (filter.state !== 'MY_MARKETS') {
+        switch (filter.sortBy) {
+          case `sort24HourVolume${Math.floor(Date.now() / (1000 * 60 * 60)) % 24}`:
+            route += '/24h-volume'
+            break
+          case 'usdVolume':
+            route += '/volume'
+            break
+          case 'creationTimestamp':
+            route += '/newest'
+            break
+          case 'openingTimestamp':
+            route += '/ending'
+            break
+          case 'usdLiquidityParameter':
+            route += '/liquidity'
+            break
+          default:
+            console.warn('Unknown sortBy filter')
+        }
       }
 
       if (filter.currency) {
@@ -363,12 +410,12 @@ const MarketHomeContainer: React.FC = () => {
     let newFilter = filter
     if (
       filter.state === MarketStates.myMarkets &&
-      filter.sortBy !== 'openingTimestamp' &&
-      filter.sortBy !== 'creationTimestamp'
+      filter.sortIndex &&
+      filter.sortIndex >= myMarketsSortOptions.length
     ) {
       newFilter = {
         ...filter,
-        sortBy: 'openingTimestamp',
+        sortIndex: 1,
       }
     }
 
