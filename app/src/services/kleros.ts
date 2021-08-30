@@ -6,6 +6,8 @@ import { Contract, ethers } from 'ethers'
 import { Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
+import klerosBadgeAbi from '../abi/klerosBadge.json'
+import klerosTokensViewAbi from '../abi/klerosTokensView.json'
 import { STANDARD_DECIMALS } from '../common/constants'
 import { getGraphUris, getKlerosCurateGraphUris, getTokensByNetwork, networkIds } from '../util/networks'
 import { waitABit } from '../util/tools'
@@ -18,15 +20,6 @@ import {
   MarketVerificationState,
   Token,
 } from '../util/types'
-
-const klerosBadgeAbi = [
-  'function queryAddresses(address _cursor, uint _count, bool[8] _filter, bool _oldestFirst) external view returns (address[] values, bool hasMore)',
-]
-
-const klerosTokensViewAbi = [
-  'function getTokensIDsForAddresses(address _t2crAddress, address[] _tokenAddresses ) external view returns (bytes32[] result)',
-  'function getTokens(address _t2crAddress, bytes32[] _tokenIDs ) external view returns (tuple(bytes32 ID, string name, string ticker, address addr, string symbolMultihash, uint8 status, uint256 decimals)[] result)',
-]
 
 interface MetaEvidence {
   fileURI: string
