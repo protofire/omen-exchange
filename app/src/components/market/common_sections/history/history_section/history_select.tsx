@@ -3,6 +3,7 @@ import { BigNumber, Interface, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
+import realitioAbi from '../../../../../abi/realitio.json'
 import { STANDARD_DECIMALS } from '../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../contexts'
 import { useContracts } from '../../../../../hooks'
@@ -11,7 +12,6 @@ import {
   HistoryType,
   useGraphFpmmTransactionsFromQuestion,
 } from '../../../../../hooks/graph/useGraphFpmmTransactionsFromQuestion'
-import { realitioAbi } from '../../../../../services/realitio'
 import { SafeService } from '../../../../../services/safe'
 import { getContractAddress } from '../../../../../util/networks'
 import { calcPrice, calcSellAmountInCollateral, formatTimestampToDate } from '../../../../../util/tools'

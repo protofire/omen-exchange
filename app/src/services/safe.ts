@@ -1,14 +1,7 @@
 import { ethers } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
-const proxyAbi = [
-  'function masterCopy() external view returns (address)',
-  'function changeMasterCopy(address _masterCopy) external',
-  'function swapOwner(address prevOwner, address oldOwner, address newOwner) external',
-  'function getOwners() public view returns (address[] memory)',
-  'function getThreshold() public view returns (uint256)',
-  'function nonce() public view returns (uint256)',
-]
+import proxyAbi from '../abi/gnosisSafe.json'
 
 class SafeService {
   safe: any

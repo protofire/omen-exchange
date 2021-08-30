@@ -3,16 +3,10 @@ import { Contract, Wallet, ethers, utils } from 'ethers'
 import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
+import oracleAbi from '../abi/realitionProxyOracle.json'
 import { getLogger } from '../util/logger'
 import { INVALID_ANSWER_ID, Question, TransactionStep } from '../util/types'
-
 const logger = getLogger('Services::Oracle')
-
-const oracleAbi = [
-  'function resolve(bytes32 questionId, uint256 templateId, string question, uint256 numOutcomes) external',
-  'function conditionalTokens() public view returns (address)',
-  'function realitio() public view returns (address)',
-]
 
 export class OracleService {
   contract: Contract
