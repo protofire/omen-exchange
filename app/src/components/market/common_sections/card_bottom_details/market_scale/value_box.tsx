@@ -48,7 +48,7 @@ const ValueBoxSingle = styled.div<{ xValue?: number }>`
               ? `${props.xValue * 100}%; transform: translateX(-50%);`
               : ``
           }`
-        : `left: 83%;`
+        : `margin-left:auto;`
       : ''};
   background: ${props => props.theme.colors.mainBodyBackground};
   position: relative;
