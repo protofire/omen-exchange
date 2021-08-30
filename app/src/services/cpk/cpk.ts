@@ -21,14 +21,17 @@ import {
   addFunds,
   announceCondition,
   approve,
+  approveCampaign,
   approveConditionalTokens,
   buy,
+  claim,
   claimAirdrop,
   claimWinnings,
   createMarket,
   createQuestion,
   deposit,
   exec,
+  exitStaking,
   fee,
   genericApproval,
   lockTokens,
@@ -40,13 +43,16 @@ import {
   sell,
   sendFromxDaiToBridge,
   setup,
+  stake,
   submitAnswer,
   unlockTokens,
+  unstake,
   unwrap,
   upgradeProxy,
   validateOracle,
   withdraw,
   withdrawRealitioBalance,
+  withdrawRewards,
   wrangleCreateMarketParams,
   wrangleLockParams,
   wrangleRemoveFundsParams,
@@ -132,6 +138,37 @@ interface SendFromxDaiParams {
   amount: BigNumber
   address: string
   symbol?: string
+}
+
+interface CPKDepositAndStakeParams {
+  amount: BigNumber
+  campaignAddress: string
+  collateral: Token
+  marketMaker: MarketMakerService
+  amountToStake: BigNumber
+}
+
+interface CPKStakePoolTokensParams {
+  campaignAddress: string
+  marketMaker: MarketMakerService
+  amountToStake: BigNumber
+}
+
+interface CPKUnstakePoolTokensParams {
+  amount: BigNumber
+  campaignAddress: string
+}
+
+interface CPKUnstakeClaimAndWithdrawParams {
+  amountToMerge: BigNumber
+  campaignAddress: string
+  collateral: Token
+  conditionId: string
+  conditionalTokens: ConditionalTokenService
+  marketMaker: MarketMakerService
+  outcomesCount: number
+  sharesToBurn: BigNumber
+  amount: BigNumber
 }
 
 interface LockTokensParams {
@@ -556,6 +593,75 @@ class CPKService {
       return false
     }
     return true
+  }
+
+  depositAndStake = async (params: CPKDepositAndStakeParams) => {
+    try {
+      const { transaction } = await this.pipe(fee, wrap, approve, deposit, addFunds, approveCampaign, stake)(params)
+      return transaction
+    } catch (err) {
+      logger.error(`There was an error depositing and staking liquidity`, err.message)
+      throw err
+    }
+  }
+
+  stakePoolTokens = async (params: CPKStakePoolTokensParams) => {
+    try {
+      const { transaction } = await this.pipe(fee, approveCampaign, stake)(params)
+      return transaction
+    } catch (err) {
+      logger.error('Failed to stake pool tokens', err.message)
+      throw err
+    }
+  }
+
+  unstakePoolTokens = async (params: CPKUnstakePoolTokensParams) => {
+    try {
+      const { transaction } = await this.pipe(fee, unstake)(params)
+      return transaction
+    } catch (err) {
+      logger.error('Failed to withdraw staked pool tokens', err.message)
+      throw err
+    }
+  }
+
+  claimRewardTokens = async (campaignAddress: string) => {
+    try {
+      const { transaction } = await this.pipe(fee, claim, withdrawRewards)({ campaignAddress })
+      return transaction
+    } catch (err) {
+      logger.error('Failed to claim reward tokens', err.message)
+      throw err
+    }
+  }
+
+  unstakeClaimAndWithdraw = async (params: CPKUnstakeClaimAndWithdrawParams) => {
+    try {
+      const { transaction } = await this.pipe(
+        fee,
+        claim,
+        unstake,
+        wrangleRemoveFundsParams,
+        removeFunds,
+        unwrap,
+        withdraw,
+        withdrawRewards,
+      )(params)
+      return transaction
+    } catch (err) {
+      logger.error('There was an error unstaking, claiming and withdrawing funding', err.message)
+      throw err
+    }
+  }
+
+  unstakeAndClaim = async (campaignAddress: string) => {
+    try {
+      const { transaction } = await this.pipe(fee, exitStaking, withdrawRewards)({ campaignAddress })
+      return transaction
+    } catch (err) {
+      logger.error('There was an error unstaking, claiming and withdrawing funding', err.message)
+      throw err
+    }
   }
 }
 
