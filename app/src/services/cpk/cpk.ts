@@ -475,6 +475,75 @@ class CPKService {
     }
   }
 
+  depositAndStake = async (params: CPKDepositAndStakeParams) => {
+    try {
+      const { transaction } = await this.pipe(fee, wrap, approve, deposit, addFunds, approveCampaign, stake)(params)
+      return transaction
+    } catch (err) {
+      logger.error(`There was an error depositing and staking liquidity`, err.message)
+      throw err
+    }
+  }
+
+  stakePoolTokens = async (params: CPKStakePoolTokensParams) => {
+    try {
+      const { transaction } = await this.pipe(fee, approveCampaign, stake)(params)
+      return transaction
+    } catch (err) {
+      logger.error('Failed to stake pool tokens', err.message)
+      throw err
+    }
+  }
+
+  unstakePoolTokens = async (params: CPKUnstakePoolTokensParams) => {
+    try {
+      const { transaction } = await this.pipe(fee, unstake)(params)
+      return transaction
+    } catch (err) {
+      logger.error('Failed to withdraw staked pool tokens', err.message)
+      throw err
+    }
+  }
+
+  claimRewardTokens = async (campaignAddress: string) => {
+    try {
+      const { transaction } = await this.pipe(fee, claim, withdrawRewards)({ campaignAddress })
+      return transaction
+    } catch (err) {
+      logger.error('Failed to claim reward tokens', err.message)
+      throw err
+    }
+  }
+
+  unstakeClaimAndWithdraw = async (params: CPKUnstakeClaimAndWithdrawParams) => {
+    try {
+      const { transaction } = await this.pipe(
+        fee,
+        claim,
+        unstake,
+        wrangleRemoveFundsParams,
+        removeFunds,
+        unwrap,
+        withdraw,
+        withdrawRewards,
+      )(params)
+      return transaction
+    } catch (err) {
+      logger.error('There was an error unstaking, claiming and withdrawing funding', err.message)
+      throw err
+    }
+  }
+
+  unstakeAndClaim = async (campaignAddress: string) => {
+    try {
+      const { transaction } = await this.pipe(fee, exitStaking, withdrawRewards)({ campaignAddress })
+      return transaction
+    } catch (err) {
+      logger.error('There was an error unstaking, claiming and withdrawing funding', err.message)
+      throw err
+    }
+  }
+
   /**
    * Direct transactions
    */
@@ -593,75 +662,6 @@ class CPKService {
       return false
     }
     return true
-  }
-
-  depositAndStake = async (params: CPKDepositAndStakeParams) => {
-    try {
-      const { transaction } = await this.pipe(fee, wrap, approve, deposit, addFunds, approveCampaign, stake)(params)
-      return transaction
-    } catch (err) {
-      logger.error(`There was an error depositing and staking liquidity`, err.message)
-      throw err
-    }
-  }
-
-  stakePoolTokens = async (params: CPKStakePoolTokensParams) => {
-    try {
-      const { transaction } = await this.pipe(fee, approveCampaign, stake)(params)
-      return transaction
-    } catch (err) {
-      logger.error('Failed to stake pool tokens', err.message)
-      throw err
-    }
-  }
-
-  unstakePoolTokens = async (params: CPKUnstakePoolTokensParams) => {
-    try {
-      const { transaction } = await this.pipe(fee, unstake)(params)
-      return transaction
-    } catch (err) {
-      logger.error('Failed to withdraw staked pool tokens', err.message)
-      throw err
-    }
-  }
-
-  claimRewardTokens = async (campaignAddress: string) => {
-    try {
-      const { transaction } = await this.pipe(fee, claim, withdrawRewards)({ campaignAddress })
-      return transaction
-    } catch (err) {
-      logger.error('Failed to claim reward tokens', err.message)
-      throw err
-    }
-  }
-
-  unstakeClaimAndWithdraw = async (params: CPKUnstakeClaimAndWithdrawParams) => {
-    try {
-      const { transaction } = await this.pipe(
-        fee,
-        claim,
-        unstake,
-        wrangleRemoveFundsParams,
-        removeFunds,
-        unwrap,
-        withdraw,
-        withdrawRewards,
-      )(params)
-      return transaction
-    } catch (err) {
-      logger.error('There was an error unstaking, claiming and withdrawing funding', err.message)
-      throw err
-    }
-  }
-
-  unstakeAndClaim = async (campaignAddress: string) => {
-    try {
-      const { transaction } = await this.pipe(fee, exitStaking, withdrawRewards)({ campaignAddress })
-      return transaction
-    } catch (err) {
-      logger.error('There was an error unstaking, claiming and withdrawing funding', err.message)
-      throw err
-    }
   }
 }
 
