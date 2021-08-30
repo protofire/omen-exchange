@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../../../../contexts'
 import { useTokens } from '../../../../../hooks'
-import { bigNumberToString } from '../../../../../util/tools'
+import { bigNumberToString } from '../../../../../util/tools/formatting'
 import { Token } from '../../../../../util/types'
 import { Dropdown, DropdownItemProps, DropdownPosition } from '../../../../common/form/dropdown'
 import { Spinner } from '../../../../common/spinner'
