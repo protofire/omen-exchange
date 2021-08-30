@@ -545,7 +545,9 @@ class CPKService {
   }
 
   /**
-   * Direct transactions
+   * ===================
+   * DIRECT TRANSACTIONS
+   * ===================
    */
 
   sendMainnetTokenToBridge = async (amount: BigNumber, address: string, symbol?: string) => {
@@ -620,7 +622,9 @@ class CPKService {
   }
 
   /**
-   * Getters
+   * =======
+   * GETTERS
+   * =======
    */
 
   fetchLatestUnclaimedTransactions = async () => {
