@@ -34,6 +34,7 @@ import {
   ModalCard,
   ModalNavigation,
   ModalNavigationLeft,
+  ModalSubtitle,
 } from '../common_styled'
 import { ModalTransactionWrapper } from '../modal_transaction'
 
@@ -296,7 +297,7 @@ export const ModalDepositWithdraw = (props: Props) => {
                   setAmountToDisplay('')
                 }}
               />
-              <TYPE.heading3 color={'text1'} margin={'2px 0px 0px 16px'}>
+              <TYPE.heading3 color={'text1'} marginLeft={'16px'}>
                 {exchangeType} Asset
               </TYPE.heading3>
             </ModalNavigationLeft>

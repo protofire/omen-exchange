@@ -64,7 +64,7 @@ export const BalanceItemSide = styled.div`
   align-items: center;
 `
 
-export const BalanceItemTitle = styled(TYPE.bodyRegular)<{ notSelected: boolean }>`
+export const BalanceItemTitle = styled(TYPE.bodyRegular)<{ notSelected?: boolean }>`
   color: ${props => (props.notSelected ? props.theme.text2 : props.theme.text1)};
 `
 
@@ -90,5 +90,9 @@ export const BalanceItem = styled.div<{ hover?: boolean }>`
 `
 
 export const BalanceItemBalance = styled(TYPE.bodyRegular)`
+  color: ${props => props.theme.text2};
+`
+
+export const ModalSubtitle = styled(TYPE.bodyRegular)`
   color: ${props => props.theme.text2};
 `

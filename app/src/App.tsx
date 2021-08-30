@@ -59,7 +59,7 @@ const App: React.FC = (props: any) => {
           >
             <ContentWrapper>
               <ConnectionModalNavigation>
-                <ModalTitle marginTop={'2px'}>Settings</ModalTitle>
+                <ModalTitle>Settings</ModalTitle>
               </ConnectionModalNavigation>
               <SettingsModalWrapper>
                 <SettingsViewContainer />
