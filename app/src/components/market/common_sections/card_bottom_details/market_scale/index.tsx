@@ -692,8 +692,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
             </>
           )}
-          {showSingleValueBox && !isClosed && <ValueBoxes valueBoxData={singleValueBoxData} />}
         </Scale>
+        {showSingleValueBox && !isClosed && <ValueBoxes valueBoxData={singleValueBoxData} />}
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
         {showLiquidityBox && <ValueBoxes valueBoxData={liquidityValueBoxData} />}
         {(isBonded || isClosed) && <ValueBoxes valueBoxData={bondedValueBoxData} />}

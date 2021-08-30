@@ -48,11 +48,11 @@ const ValueBoxSingle = styled.div<{ xValue?: number }>`
               ? `${props.xValue * 100}%; transform: translateX(-50%);`
               : ``
           }`
-        : `right: 83%;`
+        : `left: 83%;`
       : ''};
   background: ${props => props.theme.colors.mainBodyBackground};
   position: relative;
-  top: ${SCALE_HEIGHT} ;
+  top: ${VALUE_BOXES_MARGIN} ;
   border-radius: 4px;
 `
 
