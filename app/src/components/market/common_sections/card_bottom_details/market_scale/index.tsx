@@ -38,7 +38,6 @@ const ScaleWrapper = styled.div<{
 }>`
   display: flex;
   flex-direction: column;
-  height: 174px;
   border-bottom: ${props => (!props.borderBottom ? 'none' : `1px solid ${props.theme.scale.bar}`)};
   margin-left: -25px;
   margin-right: -25px;
