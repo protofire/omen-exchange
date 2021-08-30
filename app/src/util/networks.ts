@@ -59,6 +59,7 @@ interface Network {
     realitio: string
     realitioScalarAdapter: string
     marketMakerFactory: string
+    marketMakerFactoryV2: string
     conditionalTokens: string
     oracle: string
     klerosBadge: string
@@ -66,6 +67,7 @@ interface Network {
     klerosTCR: string
     dxTCR: string
     omenVerifiedMarkets: string
+    stakingRewardsFactory: string
     omenGuildProxy: string
   }
   cpk?: CPKAddresses
@@ -76,6 +78,7 @@ interface Network {
   defaultToken?: string
   blockExplorer: string
   blockExplorerURL: string
+  OMN?: Token
   airdropAddress?: string[]
 }
 
@@ -120,6 +123,7 @@ export const networks: { [K in NetworkId]: Network } = {
       realitio: '0x325a2e0f3cca2ddbaebb4dfc38df8d19ca165b47',
       realitioScalarAdapter: '0xaa548EfBb0972e0c4b9551dcCfb6B787A1B90082',
       marketMakerFactory: '0x89023DEb1d9a9a62fF3A5ca8F23Be8d87A576220',
+      marketMakerFactoryV2: '0x0000000000000000000000000000000000000000',
       conditionalTokens: '0xC59b0e4De5F1248C1140964E0fF287B192407E0C',
       oracle: '0x0e414d014a77971f4eaa22ab58e6d84d16ea838e',
       klerosBadge: '0xcb4aae35333193232421e86cd2e9b6c91f3b125f',
@@ -127,6 +131,7 @@ export const networks: { [K in NetworkId]: Network } = {
       klerosTCR: '0xebcf3bca271b26ae4b162ba560e243055af0e679',
       dxTCR: '0x93DB90445B76329e9ed96ECd74e76D8fbf2590d8',
       omenVerifiedMarkets: '0xb72103eE8819F2480c25d306eEAb7c3382fBA612',
+      stakingRewardsFactory: '0x0000000000000000000000000000000000000000',
       omenGuildProxy: '',
     },
     cpk: {
@@ -171,6 +176,7 @@ export const networks: { [K in NetworkId]: Network } = {
       realitio: '0x3D00D77ee771405628a4bA4913175EcC095538da',
       realitioScalarAdapter: '0x0e8Db8caD541C0Bf5b611636e81fEc0828bc7902',
       marketMakerFactory: '0x0fB4340432e56c014fa96286de17222822a9281b',
+      marketMakerFactoryV2: '0x9dd6eB146D7fb98614487617DE608560321E15BE',
       conditionalTokens: '0x36bede640D19981A82090519bC1626249984c908',
       oracle: '0x17174dC1b62add32a1DE477A357e75b0dcDEed6E',
       klerosBadge: '0x0000000000000000000000000000000000000000',
@@ -178,6 +184,7 @@ export const networks: { [K in NetworkId]: Network } = {
       klerosTCR: '0x0000000000000000000000000000000000000000',
       dxTCR: '0x03165DF66d9448E45c2f5137486af3E7e752a352',
       omenVerifiedMarkets: '0x3b29096b7ab49428923d902cEC3dFEaa49993234',
+      stakingRewardsFactory: '0xf50d900859da289a34204bC5FcA14c77575BD910',
       omenGuildProxy: '0xa327ea1b9986d81750E9A6FdeAb1305589BFC260',
     },
     cpk: {
@@ -219,6 +226,7 @@ export const networks: { [K in NetworkId]: Network } = {
       realitio: '0x90a617ed516ab7fAaBA56CcEDA0C5D952f294d03',
       realitioScalarAdapter: '0x1D369EEC97cF2E62c8DBB804b3998Bf15bcb67dB',
       marketMakerFactory: '0x2fb8cc057946DCFA32D8eA8115A1Dd630f6efea5',
+      marketMakerFactoryV2: '0x9540F19d947204e424c2d7959cF932E47Ab75B3e',
       conditionalTokens: '0x0Db8C35045a830DC7F2A4dd87ef90e7A9Cd0534f',
       oracle: '0x9E6bd63aEbFb2E858B6111cea9C389f7664F7108',
       klerosBadge: '0x0000000000000000000000000000000000000000',
@@ -226,6 +234,7 @@ export const networks: { [K in NetworkId]: Network } = {
       klerosTCR: '0x0000000000000000000000000000000000000000',
       dxTCR: '0x5486a9050f2aC6f535a72526e37738A060508361',
       omenVerifiedMarkets: '0x0000000000000000000000000000000000000000',
+      stakingRewardsFactory: '0x4A679ECefE7adD212f846BD86389E4278eC25d34',
       omenGuildProxy: '',
     },
     cpk: {
@@ -273,6 +282,7 @@ export const networks: { [K in NetworkId]: Network } = {
       realitio: '0x79e32aE03fb27B07C89c0c568F80287C01ca2E57',
       realitioScalarAdapter: '0xcA75aaC320089c9fb077E86857fF6e954Df06a6B',
       marketMakerFactory: '0x9083A2B699c0a4AD06F63580BDE2635d26a3eeF0',
+      marketMakerFactoryV2: '0x0000000000000000000000000000000000000000',
       conditionalTokens: '0xCeAfDD6bc0bEF976fdCd1112955828E00543c0Ce',
       oracle: '0xAB16D643bA051C11962DA645f74632d3130c81E2',
       klerosBadge: '0x0000000000000000000000000000000000000000',
@@ -280,6 +290,7 @@ export const networks: { [K in NetworkId]: Network } = {
       klerosTCR: '0x0000000000000000000000000000000000000000',
       dxTCR: '0x85E001DfFF16F388Bc32Cd18009ceDF8F9b62C9E',
       omenVerifiedMarkets: '0x0000000000000000000000000000000000000000',
+      stakingRewardsFactory: '0x0000000000000000000000000000000000000000',
       omenGuildProxy: '',
     },
     cpk: {
@@ -352,7 +363,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     addresses: {
       [networkIds.MAINNET]: '0xa7370f2a5AFAa987492cD0f5c0fE14191C70aaA5',
       [networkIds.XDAI]: '0xF52eAbb903831E2026a6A50Ce813fc871B5578f4',
-      [networkIds.RINKEBY]: '0x0a08eca47c56c305f4feb4fa062aecd5807bebb8',
+      [networkIds.RINKEBY]: '0xa8b4b1dc4efc8f8c48e430a4faaaf36075670139',
     },
     order: 22,
   },
@@ -362,6 +373,7 @@ export const knownTokens: { [name in KnownToken]: KnownTokenData } = {
     addresses: {
       [networkIds.MAINNET]: '0x0Ae055097C6d159879521C384F1D2123D1f195e6',
       [networkIds.XDAI]: '0xb7D311E2Eb55F2f68a9440da38e7989210b9A05e',
+      [networkIds.RINKEBY]: '0xA8b4B1Dc4EfC8f8c48e430A4faaaF36075670139',
     },
     order: 22,
   },
@@ -861,6 +873,13 @@ export const getNativeAsset = (networkId: number, relay = false): Token => {
     return { ...asset, symbol }
   }
   return asset
+}
+
+export const getOMNToken = (networkId: number): Token => {
+  if (!validNetworkId(networkId)) {
+    throw new Error(`Unsupported network id: '${networkId}'`)
+  }
+  return networks[networkId].OMN as Token
 }
 
 export const getTargetSafeImplementation = (networkId: number): string => {

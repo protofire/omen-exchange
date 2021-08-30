@@ -18,7 +18,8 @@ import { BalanceState, fetchAccountBalance } from '../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../util/market_creation_status_data'
 import { pseudoNativeAssetAddress } from '../../../../../util/networks'
 import { RemoteData } from '../../../../../util/remote_data'
-import { bigNumberToString, formatDate } from '../../../../../util/tools'
+import { formatDate } from '../../../../../util/tools'
+import { bigNumberToString } from '../../../../../util/tools/formatting'
 import { Arbitrator, Ternary, Token } from '../../../../../util/types'
 import { Button, ButtonContainer } from '../../../../button'
 import { ButtonType } from '../../../../button/button_styling_types'
@@ -430,22 +431,22 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
         <FlexRowWrapper>
           <TitleValueVertical
             date={resolution instanceof Date ? resolution : undefined}
-            invertedColors={true}
             title={'Closing Date (UTC)'}
             tooltip={true}
             value={resolutionDate}
+            vertical={true}
           />
-          <TitleValueVertical invertedColors={true} title={'Category'} value={category} />
+          <TitleValueVertical title={'Category'} value={category} vertical={true} />
           <TitleValueVertical
-            invertedColors={true}
             title={'Arbitrator'}
             value={<DisplayArbitrator arbitrator={arbitrator} />}
+            vertical={true}
           />
           {!!loadedQuestionId && (
             <TitleValueVertical
-              invertedColors={true}
               title={'Verified by'}
               value={<VerifiedRow label={values.verifyLabel} />}
+              vertical={true}
             />
           )}
         </FlexRowWrapper>

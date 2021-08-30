@@ -9,7 +9,7 @@ import { ERC20Service } from '../../services'
 import { getLogger } from '../../util/logger'
 import { MarketCreationStatus } from '../../util/market_creation_status_data'
 import { pseudoNativeAssetAddress } from '../../util/networks'
-import { waitUntilContractDeployed } from '../../util/tools'
+import { waitUntilContractDeployed } from '../../util/tools/web3'
 import { MarketData, TransactionStep } from '../../util/types'
 
 const logger = getLogger('Market::MarketWizardCreatorContainer')
@@ -21,7 +21,7 @@ const MarketWizardCreatorContainer: FC = () => {
   const history = useHistory()
 
   const [isModalOpen, setModalState] = useState(false)
-  const { conditionalTokens, marketMakerFactory, realitio } = useContracts(context)
+  const { conditionalTokens, marketMakerFactoryV2, realitio } = useContracts(context)
 
   const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(MarketCreationStatus.ready())
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
@@ -59,7 +59,7 @@ const MarketWizardCreatorContainer: FC = () => {
             marketData,
             conditionalTokens,
             realitio,
-            marketMakerFactory,
+            marketMakerFactory: marketMakerFactoryV2,
           })
           await waitUntilContractDeployed(provider, marketMakerAddress)
           await fetchBalances()
@@ -72,7 +72,7 @@ const MarketWizardCreatorContainer: FC = () => {
             marketData,
             conditionalTokens,
             realitio,
-            marketMakerFactory,
+            marketMakerFactory: marketMakerFactoryV2,
           })
           await waitUntilContractDeployed(provider, marketMakerAddress)
           await fetchBalances()
