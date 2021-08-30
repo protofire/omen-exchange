@@ -25,10 +25,6 @@ export const ModalNavigationLeft = styled.div`
   align-items: center;
 `
 
-export const ModalTitle = styled(TYPE.heading3)`
-  color: ${props => props.theme.text1};
-`
-
 export const ModalCard = styled.div`
   width: 100%;
 
@@ -64,8 +60,20 @@ export const BalanceItemSide = styled.div`
   align-items: center;
 `
 
-export const BalanceItemTitle = styled(TYPE.bodyRegular)<{ notSelected?: boolean }>`
-  color: ${props => (props.notSelected ? props.theme.text2 : props.theme.text1)};
+export const ModalTitle = styled(TYPE.heading3)`
+  color: ${props => props.theme.text1};
+`
+
+export const ModalSubtitle = styled(TYPE.bodyRegular)`
+  color: ${props => props.theme.text2};
+`
+
+export const BalanceItemTitle = styled(TYPE.bodyRegular)<{ selected?: boolean }>`
+  color: ${props => (props.selected ? props.theme.text1 : props.theme.text2)};
+`
+
+export const BalanceItemBalance = styled(TYPE.bodyRegular)`
+  color: ${props => props.theme.text2};
 `
 
 export const BalanceItem = styled.div<{ hover?: boolean }>`
@@ -74,25 +82,15 @@ export const BalanceItem = styled.div<{ hover?: boolean }>`
   justify-content: space-between;
   width: 100%;
 
-  &:not(:first-child){
+  &:not(:first-child) {
     margin-top: 14px;
   }
 
   &:hover {
-    
    ${BalanceItemSide}{
    ${BalanceItemTitle}{
-   color: ${props => props.theme.text1}; !important;
+    color: ${props => props.theme.text1}; !important;
    }
- 
    }
   }
-`
-
-export const BalanceItemBalance = styled(TYPE.bodyRegular)`
-  color: ${props => props.theme.text2};
-`
-
-export const ModalSubtitle = styled(TYPE.bodyRegular)`
-  color: ${props => props.theme.text2};
 `

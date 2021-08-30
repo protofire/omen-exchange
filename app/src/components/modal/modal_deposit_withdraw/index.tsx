@@ -260,9 +260,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         <BalanceItemSide>
           <RadioInput checked={currencySelected === item} name={item} outcomeIndex={-1} readOnly />
           <Image size={'24'} src={getImageUrl(address)} style={{ marginLeft: '12px', marginRight: '12px' }} />
-          <BalanceItemTitle notSelected={currencySelected !== item}>
-            {name ? name : symbol.toLowerCase()}
-          </BalanceItemTitle>
+          <BalanceItemTitle selected={currencySelected == item}>{name ? name : symbol.toLowerCase()}</BalanceItemTitle>
         </BalanceItemSide>
         <BalanceItemSide>
           <BalanceItemBalance>
@@ -313,7 +311,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           </ModalNavigation>
           <ModalCard style={{ marginBottom: '20px', marginTop: '10px' }}>
             <BalanceSection>
-              <BalanceItemBalance marginBottom={'14px'}>Wallet</BalanceItemBalance>
+              <ModalSubtitle marginBottom={'14px'}>Wallet</ModalSubtitle>
               <BalanceItems>{bridgeItems}</BalanceItems>
             </BalanceSection>
           </ModalCard>
@@ -340,14 +338,14 @@ export const ModalDepositWithdraw = (props: Props) => {
           {exchangeType === ExchangeType.withdraw && currencySelected !== 'dai' && xDaiBalance?.isZero() ? (
             <InputInfo>
               <IconAlertInverted />
-              <BalanceItemBalance marginLeft={'12px'}>
+              <ModalSubtitle marginLeft={'12px'}>
                 Fund your Omen Account with Dai to proceed with the withdrawal.
-              </BalanceItemBalance>
+              </ModalSubtitle>
             </InputInfo>
           ) : (
             <>
               <ExchangeDataItem style={{ marginTop: '24px' }}>
-                <BalanceItemBalance>Min amount</BalanceItemBalance>
+                <ModalSubtitle>Min amount</ModalSubtitle>
                 <BalanceItemBalance>
                   {currencySelected === 'dai'
                     ? `${bigNumberToString(minDaiBridgeExchange, decimals, 2)} DAI`
