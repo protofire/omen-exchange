@@ -5,7 +5,7 @@ import styled from 'styled-components'
 
 import { DOCUMENT_VALIDITY_RULES, STANDARD_DECIMALS } from '../../../../../common/constants'
 import { ConnectedWeb3Context } from '../../../../../contexts'
-import { bigNumberToNumber } from '../../../../../util/tools'
+import { bigNumberToNumber } from '../../../../../util/tools/formatting'
 import { Arbitrator } from '../../../../../util/types'
 import { ButtonType } from '../../../../button/button_styling_types'
 import { DateField, FormRow, Textfield } from '../../../../common'

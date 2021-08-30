@@ -7,7 +7,8 @@ import { useConnectedWeb3Context } from '../../../../../contexts'
 import { useSymbol } from '../../../../../hooks'
 import { getOutcomeColor } from '../../../../../theme/utils'
 import { getNativeAsset } from '../../../../../util/networks'
-import { bigNumberToString, mulBN } from '../../../../../util/tools'
+import { mulBN } from '../../../../../util/tools'
+import { bigNumberToString } from '../../../../../util/tools/formatting'
 import { BalanceItem, BondItem, OutcomeTableValue, Token } from '../../../../../util/types'
 import { RadioInput, TD, THead, TR, Table } from '../../../../common'
 import {
@@ -137,7 +138,7 @@ export const OutcomeTable = (props: Props) => {
                 textAlign={TableCellsAlign[index]}
               >
                 {value} {value === OutcomeTableValue.CurrentPrice && `(${symbol})`}
-                {value === OutcomeTableValue.Bonded && `(${symbol})`}
+                {value === OutcomeTableValue.Bonded && `(${nativeAsset.symbol})`}
               </THStyled>
             ) : null
           })}
