@@ -7,7 +7,7 @@ import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../contexts'
 import { useAirdropService } from '../../../hooks'
 import { TYPE } from '../../../theme'
-import { bigNumberToString } from '../../../util/tools'
+import { bigNumberToString, isDust } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { IconClose, IconExclamation, IconOmen } from '../../common/icons'
 import { ContentWrapper, ModalNavigation, ModalNavigationLeft } from '../common_styled'
@@ -39,11 +39,13 @@ export const ModalAirdrop = (props: Props) => {
   const [checkAddress, setCheckAddress] = useState(false)
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [message, setMessage] = useState('')
-  const displayDaiBanner = balances.xDaiBalance.isZero()
-
-  Modal.setAppElement('#root')
 
   const { claimAmount, fetchClaimAmount } = useAirdropService()
+
+  const noDustInDaiBalance = !isDust(balances.xDaiBalance, 18)
+  const displayDaiBanner = balances.xDaiBalance.isZero() && !noDustInDaiBalance && !claimAmount.isZero()
+
+  Modal.setAppElement('#root')
 
   const onClose = () => {
     localStorage.setItem('airdrop', 'displayed')
