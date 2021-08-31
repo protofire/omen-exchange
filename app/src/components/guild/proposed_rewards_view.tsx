@@ -8,6 +8,7 @@ import { RemoteData } from '../../util/remote_data'
 import { MarketFilters, MarketMakerDataItem } from '../../util/types'
 import { Button } from '../button'
 import { ButtonType } from '../button/button_styling_types'
+import { Table } from '../common/card/responsive_cards/table'
 import { IconArrowBack } from '../common/icons'
 import { MarketCard } from '../market/market_card'
 import { ModalTransactionWrapper } from '../modal/modal_transaction'
@@ -128,15 +129,31 @@ const ProposedRewardsView = (props: Props) => {
   const isPrevDisabled = pageIndex === 0
   const isNextDisabled = !moreMarkets
 
+  const guildOverviewData = [
+    ['Members', { text: '60' }],
+    ['Total Locked', { text: '564,453 OMN' }],
+    ['Total Rewards', { text: '54,000 OMN' }],
+    ['Voting Power', { text: '0.64%' }],
+    ['You Locked', { text: '643 OMN' }],
+    ['Claimable Rewards', { text: '250 OMN' }],
+  ]
+
   return (
     <GuildPageWrapper>
-      {propose && (
+      {propose ? (
         <OverviewWrapper onClick={toggle}>
-          <IconArrowBack color="#7986CB" />
+          <IconArrowBack color={'#7986CB'} />
           <TYPE.heading3 color="primary2" marginLeft={16}>
             Guild Overview
           </TYPE.heading3>
         </OverviewWrapper>
+      ) : (
+        <>
+          <TYPE.heading1 color="text3" marginBottom={'32px'}>
+            Guild Overview
+          </TYPE.heading1>
+          <Table hasButton style={{ marginBottom: '64px' }} valueObject={guildOverviewData} />
+        </>
       )}
       <ProposalHeadingWrapper>
         {propose ? (
