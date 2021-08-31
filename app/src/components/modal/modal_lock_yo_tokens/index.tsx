@@ -10,7 +10,7 @@ import { useAirdropService } from '../../../hooks'
 import { ERC20Service, OmenGuildService } from '../../../services'
 import { TYPE } from '../../../theme'
 import { getToken, networkIds } from '../../../util/networks'
-import { bigNumberToString, daysUntil, divBN, formatLockDate } from '../../../util/tools'
+import { bigNumberToString, daysUntil, divBN, formatLockDate, isDustxDai } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonStateful, ButtonStates } from '../../button/button_stateful'
@@ -118,7 +118,7 @@ const ModalLockTokens = (props: Props) => {
   const [omenAllowance, setOmenAllowance] = useState<BigNumber>(Zero)
   const [allowanceState, setAllowanceState] = useState<ButtonStates>(ButtonStates.idle)
   const [checkAddress, setCheckAddress] = useState(false)
-  const displayDaiBanner = xDaiBalance.isZero() && !claimAmount.isZero()
+  const displayDaiBanner = isDustxDai(xDaiBalance, 18) && !claimAmount.isZero()
 
   const isApproveVisible =
     (omenAllowance.isZero() && isLockAmountOpen) ||
