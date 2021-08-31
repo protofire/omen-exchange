@@ -2,23 +2,12 @@ import { Contract, Wallet, ethers, utils } from 'ethers'
 import { TransactionReceipt } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
+import erc20Abi from '../abi/erc20.json'
 import { STANDARD_DECIMALS } from '../common/constants'
 import { getLogger } from '../util/logger'
 import { isAddress, isContract } from '../util/tools'
 import { Token } from '../util/types'
-
 const logger = getLogger('Services::Erc20')
-
-const erc20Abi = [
-  'function allowance(address owner, address spender) external view returns (uint256)',
-  'function approve(address spender, uint256 amount) external returns (bool)',
-  'function balanceOf(address marketMaker) external view returns (uint256)',
-  'function symbol() external view returns (string)',
-  'function name() external view returns (string)',
-  'function decimals() external view returns (uint8)',
-  'function transferFrom(address sender, address recipient, uint256 amount) public returns (bool)',
-  'function transfer(address to, uint256 value) public returns (bool)',
-]
 
 class ERC20Service {
   provider: any
