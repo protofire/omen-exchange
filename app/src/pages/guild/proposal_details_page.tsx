@@ -11,7 +11,7 @@ export const ProposalDetailsPage = () => {
     duration: '32 days',
     marketDetails:
       'What will the June 2021 CME/Globex S&P500 e-mini terminate at? https://www.cmegroup.com/trading/equity-index/us-index/e-mini-sandp500_quotes_globex.html',
-    scaleValue: 0.1,
+    scaleValue: 0.9,
     liqudiity: '15,000.00 DAI',
     totalVolume: '4540.00 DAI',
     volume: '120.00 DAI',
