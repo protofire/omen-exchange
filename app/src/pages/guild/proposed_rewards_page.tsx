@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 
 import { ProposedRewardsView } from '../../components/guild/proposed_rewards_view'
 import { ConnectedWeb3Context } from '../../contexts'
-import { useGraphLiquidityMiningCampaigns, useGuildProposals } from '../../hooks'
+import { useGraphLiquidityMiningCampaigns } from '../../hooks'
 import { OmenGuildService } from '../../services/guild'
 import { getLogger } from '../../util/logger'
 import { RemoteData } from '../../util/remote_data'
@@ -39,8 +39,6 @@ const ProposedRewardsPage = (props: Props) => {
 
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
-  useGuildProposals()
-
   const PAGE_SIZE = 6
   useEffect(() => {
     if (currentFilter.first !== PAGE_SIZE) {
@@ -55,7 +53,8 @@ const ProposedRewardsPage = (props: Props) => {
         return
       }
       const omen = new OmenGuildService(library, networkId)
-      const [votes, required] = await Promise.all([await omen.votesOf(account), await omen.votesForCreation()])
+      const [votes, required] = await Promise.all([await omen.votesOf(cpk.address), await omen.votesForCreation()])
+
       setVotes(votes)
       setVotesRequired(required)
     }
@@ -89,7 +88,7 @@ const ProposedRewardsPage = (props: Props) => {
       setTxState(TransactionStep.waitingConfirmation)
       setIsTransactionModalOpen(true)
 
-      await cpk.proposeLiquidityRewards({ campaignAddress })
+      await cpk.proposeLiquidityRewards({ campaignAddress, marketMakerAddress: selected })
       await new Promise(r => setTimeout(r, 3000))
 
       await balances.fetchBalances()

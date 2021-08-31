@@ -178,6 +178,7 @@ interface LockTokensParams {
 
 interface ProposeLiquidityRewards {
   campaignAddress: string
+  marketMakerAddress: string
 }
 
 interface TransactionResult {

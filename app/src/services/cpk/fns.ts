@@ -1132,26 +1132,36 @@ export const unlockTokens = async (params: LockTokensParams) => {
 
 interface ProposeLiquidityRewardsParams {
   campaignAddress: string
+  marketMakerAddress: string
   service: CPKService
   transactions: Transaction[]
   networkId: number
 }
 
 export const proposeLiquidityRewards = async (params: ProposeLiquidityRewardsParams) => {
-  const { campaignAddress, networkId, service, transactions } = params
+  const { campaignAddress, marketMakerAddress, networkId, service, transactions } = params
 
   const guild = new OmenGuildService(service.provider, networkId)
   const collateral = getToken(networkId, 'omn')
   const reward = parseUnits('500')
+
+  const to = []
+  const data = []
+  const amount = []
+
+  // approve the campaign address
+  to.push(collateral.address)
+  data.push(ERC20Service.encodeApprove(campaignAddress, reward))
+  amount.push(new BigNumber(0))
+
+  // add rewards
+  to.push(campaignAddress)
+  data.push(StakingService.encodeAddRewards(collateral.address, reward))
+  amount.push(new BigNumber(0))
+
   transactions.push({
     to: guild.omenGuildAddress,
-    data: OmenGuildService.encodeCreateProposal(
-      campaignAddress,
-      StakingService.encodeAddRewards(collateral.address, reward),
-      new BigNumber(0),
-      '',
-      '0x0',
-    ),
+    data: OmenGuildService.encodeCreateProposal(to, data, amount, marketMakerAddress, '0x0'),
   })
 
   return params

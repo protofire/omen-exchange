@@ -2,7 +2,7 @@ import { Contract, ethers, utils } from 'ethers'
 import { Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
-import { getMultiCallConfig, multicall } from '../util/multicall'
+import { multicall } from '../util/multicall'
 import { getContractAddress } from '../util/networks'
 
 const GuildAbi = [
@@ -166,9 +166,15 @@ class OmenGuildService {
     return guildInterface.functions.releaseTokens.encode([amount])
   }
 
-  static encodeCreateProposal(to: string, data: string, amount: BigNumber, description: string, contentHash: string) {
+  static encodeCreateProposal(
+    to: string[],
+    data: string[],
+    amount: BigNumber[],
+    description: string,
+    contentHash: string,
+  ) {
     const guildInterface = new utils.Interface(GuildAbi)
-    return guildInterface.functions.createProposal.encode([[to], [data], [amount], description, contentHash])
+    return guildInterface.functions.createProposal.encode([to, data, amount, description, contentHash])
   }
 
   votesOf = async (address: string) => {
@@ -217,14 +223,16 @@ class OmenGuildService {
 
   getProposals = async (): Promise<Proposal[]> => {
     const ids = await this.contract?.getProposalsIdsLength()
+
     if (ids === 0) {
       return []
     }
 
+    // get all proposal ids
     let calls = []
     for (let i = 0; i < ids; i++) {
       calls.push({
-        target: getMultiCallConfig(this.network).multicallAddress,
+        target: this.omenGuildAddress,
         call: ['proposalsIds(uint256)(bytes32)', i],
         returns: [[`id-${i}`]],
       })
@@ -232,24 +240,34 @@ class OmenGuildService {
 
     let response = await multicall(calls, this.network)
 
+    // get all proposal data
+    const fn = GuildAbi.find(fns => fns.name === 'getProposal')
+    if (!fn) {
+      return []
+    }
+    const sig = `${fn?.name}(${fn?.inputs.map((input: any) => input.type)})(${fn?.outputs.map(
+      (output: any) => output.type,
+    )})`
+
     calls = []
     for (let i = 0; i < ids; i++) {
       const id = response.results.transformed[`id-${i}`]
       calls.push({
-        target: getMultiCallConfig(this.network).multicallAddress,
-        call: [
-          'getProposal(bytes32)(address,uint256,uint256,address[],bytes[],uint256[],string,bytes,uint256,uint8,uint256)',
-          id,
-        ],
-        returns: [[`proposal-${id}`]],
+        target: this.omenGuildAddress,
+        call: [sig, id],
+        returns: fn?.outputs.map((output: any) => [`${output.name}-${i}`]),
       })
     }
 
     response = await multicall(calls, this.network)
 
+    // format proposal data
     const proposals = []
     for (let i = 0; i < ids; i++) {
-      proposals.push(response.results.transformed[`proposal-${i}`])
+      const proposal = fn.outputs.reduce((prev, output: any) => {
+        return { ...prev, [output.name]: response.results.transformed[`${output.name}-${i}`] }
+      }, {})
+      proposals.push(proposal as Proposal)
     }
 
     return proposals
