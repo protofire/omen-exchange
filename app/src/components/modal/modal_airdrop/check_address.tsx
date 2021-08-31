@@ -6,6 +6,7 @@ import styled, { withTheme } from 'styled-components'
 import { useConnectedWeb3Context } from '../../../contexts'
 import { useAirdropService } from '../../../hooks'
 import { TYPE } from '../../../theme'
+import { isDustxDai } from '../../../util/tools'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { Textfield } from '../../common'
@@ -62,7 +63,7 @@ export const ModalCheckAddress = (props: Props) => {
   const [address, setAddress] = useState('')
   const [amount, setAmount] = useState(new BigNumber('0'))
   const [loading, setLoading] = useState(false)
-  const displayDaiBanner = balances.xDaiBalance.isZero()
+  const displayDaiBanner = isDustxDai(balances.xDaiBalance, 18)
 
   const updateAddress = async (e: any) => {
     const newAddress = e.target.value

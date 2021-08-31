@@ -95,6 +95,10 @@ export const isDust = (amount: BigNumber, decimals: number): boolean => {
   return amount.lt(parseUnits('0.00001', decimals))
 }
 
+export const isDustxDai = (amount: BigNumber, decimals: number): boolean => {
+  return amount.lt(parseUnits('0.01', decimals))
+}
+
 export const clampBigNumber = (x: BigNumber, min: BigNumber, max: BigNumber): BigNumber => {
   if (x.lt(min)) return min
   if (x.gt(max)) return max

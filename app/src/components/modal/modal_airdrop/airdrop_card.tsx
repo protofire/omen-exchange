@@ -5,7 +5,7 @@ import styled, { withTheme } from 'styled-components'
 import { STANDARD_DECIMALS } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../contexts'
 import { TYPE } from '../../../theme'
-import { bigNumberToString } from '../../../util/tools'
+import { bigNumberToString, isDustxDai } from '../../../util/tools'
 import { Button } from '../../button'
 import { ButtonType } from '../../button/button_styling_types'
 import { IconOmen } from '../../common/icons'
@@ -70,7 +70,7 @@ const AirdropCard = (props: Props) => {
     }
   }
 
-  const claimIsDisabled = !displayAmount || displayAmount.isZero() || balances.xDaiBalance.isZero()
+  const claimIsDisabled = !displayAmount || displayAmount.isZero() || isDustxDai(balances.xDaiBalance, 18)
 
   return (
     <>
