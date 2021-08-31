@@ -60,20 +60,8 @@ export const BalanceItemSide = styled.div`
   align-items: center;
 `
 
-export const ModalTitle = styled(TYPE.heading3)`
-  color: ${props => props.theme.text1};
-`
-
-export const ModalSubtitle = styled(TYPE.bodyRegular)`
-  color: ${props => props.theme.text2};
-`
-
 export const BalanceItemTitle = styled(TYPE.bodyRegular)<{ selected?: boolean }>`
   color: ${props => (props.selected ? props.theme.text1 : props.theme.text2)};
-`
-
-export const BalanceItemBalance = styled(TYPE.bodyRegular)`
-  color: ${props => props.theme.text2};
 `
 
 export const BalanceItem = styled.div<{ hover?: boolean }>`

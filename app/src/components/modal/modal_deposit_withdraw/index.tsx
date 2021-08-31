@@ -26,7 +26,6 @@ import { IconInfo } from '../../common/icons/IconInfo'
 import { Image } from '../../market/common_sections/message_text/token_item'
 import {
   BalanceItem,
-  BalanceItemBalance,
   BalanceItemSide,
   BalanceItemTitle,
   BalanceItems,
@@ -35,7 +34,6 @@ import {
   ModalCard,
   ModalNavigation,
   ModalNavigationLeft,
-  ModalSubtitle,
 } from '../common_styled'
 import { ModalTransactionWrapper } from '../modal_transaction'
 
@@ -58,6 +56,9 @@ const InputInfo = styled.div`
 const DepositWithdrawButton = styled(Button)`
   flex: 1;
 `
+const BalanceItemBalance = styled(TYPE.bodyRegular)`
+  color: ${props => props.theme.text2};
+`
 const ApproveButton = styled(ButtonStateful)`
   flex: 1;
   border-color: ${props => props.theme.primary4};
@@ -66,6 +67,10 @@ const ApproveButton = styled(ButtonStateful)`
   &:hover {
     background-color: ${props => props.theme.primary1};
   }
+`
+
+const ModalSubtitle = styled(TYPE.bodyRegular)`
+  color: ${props => props.theme.text2};
 `
 
 const ExchangeDataItem = styled.div`
