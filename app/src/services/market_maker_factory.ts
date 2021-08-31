@@ -2,6 +2,7 @@ import { Contract, Wallet, ethers, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 import { LogDescription } from 'ethers/utils/interface'
 
+import marketMakerFactoryAbi from '../abi/marketMakerFactory.json'
 import { MARKET_FEE } from '../common/constants'
 import { getLogger } from '../util/logger'
 import { getContractAddress } from '../util/networks'
@@ -10,39 +11,12 @@ import { Log, Market, MarketWithExtraData } from '../util/types'
 import { ConditionalTokenService } from './conditional_token'
 import { MarketMakerService } from './market_maker'
 import { RealitioService } from './realitio'
-
 const logger = getLogger('Services::MarketMakerFactory')
 
 interface GetMarketsOptions {
   from: number
   to: number
 }
-
-const marketMakerFactoryAbi = [
-  `function create2FixedProductMarketMaker(
-     uint saltNonce,
-     address conditionalTokens,
-     address collateralToken,
-     bytes32[] conditionIds,
-     uint fee,
-     uint initialFunds,
-     uint[] distributionHint
-  ) public returns (address)`,
-  'function implementationMaster() public constant returns (address)',
-  `event FixedProductMarketMakerCreation(address indexed creator, address fixedProductMarketMaker, address conditionalTokens, address collateralToken, bytes32[] conditionIds, uint fee)`,
-]
-
-const marketMakerFactoryCallAbi = [
-  `function create2FixedProductMarketMaker(
-     uint saltNonce,
-     address conditionalTokens,
-     address collateralToken,
-     bytes32[] conditionIds,
-     uint fee,
-     uint initialFunds,
-     uint[] distributionHint
-  ) public constant returns (address)`,
-]
 
 class MarketMakerFactoryService {
   contract: Contract
@@ -59,7 +33,7 @@ class MarketMakerFactoryService {
       this.contract = new ethers.Contract(address, marketMakerFactoryAbi, provider)
     }
 
-    this.constantContract = new ethers.Contract(address, marketMakerFactoryCallAbi, provider)
+    this.constantContract = new ethers.Contract(address, marketMakerFactoryAbi, provider)
     this.signerAddress = signerAddress
     this.provider = provider
   }

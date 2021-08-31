@@ -2,6 +2,11 @@ import axios from 'axios'
 import { Contract, ethers, utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
+import erc20 from '../abi/erc20.json'
+import multiClaimAbi from '../abi/multiClaim.json'
+import omniBridgeXdai from '../abi/omniBridgeXdai.json'
+import xDaiForeignBridge from '../abi/xDaiForeignBridge.json'
+import xDaiMainnetBridge from '../abi/xDaiMainnetBridge.json'
 import {
   DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS,
   DEFAULT_TOKEN_ADDRESS,
@@ -20,110 +25,6 @@ import { waitABit } from '../util/tools'
 
 import { ERC20Service } from './erc20'
 
-const abi = [
-  {
-    constant: false,
-    inputs: [
-      { name: 'message', type: 'bytes' },
-      { name: 'signatures', type: 'bytes' },
-    ],
-    name: 'executeSignatures',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: false,
-    inputs: [
-      { name: '_sender', type: 'address' },
-      { name: '_receiver', type: 'address' },
-      { name: '_amount', type: 'uint256' },
-    ],
-    name: 'relayTokens',
-    outputs: [],
-    payable: false,
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    constant: true,
-    inputs: [{ name: '_txHash', type: 'bytes32' }],
-    name: 'relayedMessages',
-    outputs: [{ name: '', type: 'bool' }],
-    payable: false,
-    stateMutability: 'view',
-    type: 'function',
-  },
-]
-
-const omniBridgeAbi = [
-  {
-    type: 'function',
-    stateMutability: 'view',
-    payable: false,
-    outputs: [{ type: 'bool', name: '' }],
-    name: 'messageCallStatus',
-    inputs: [{ type: 'bytes32', name: '_messageId' }],
-    constant: true,
-  },
-]
-
-const xdaiBridgeAbi = [
-  {
-    type: 'function',
-    stateMutability: 'payable',
-    payable: true,
-    outputs: [],
-    name: 'relayTokens',
-    inputs: [{ type: 'address', name: '_receiver' }],
-    constant: false,
-  },
-]
-
-const multiClaimAbi = [
-  {
-    inputs: [
-      { internalType: 'address[]', name: 'bridges', type: 'address[]' },
-      { internalType: 'bytes[]', name: 'messages', type: 'bytes[]' },
-      { internalType: 'bytes[]', name: 'signatures', type: 'bytes[]' },
-    ],
-    name: 'claim',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
-  },
-]
-const omenAbi = [
-  {
-    type: 'function',
-    stateMutability: 'nonpayable',
-    payable: false,
-    outputs: [{ type: 'bool', name: '' }],
-    name: 'transferAndCall',
-    inputs: [
-      { type: 'address', name: '_to' },
-      { type: 'uint256', name: '_value' },
-      { type: 'bytes', name: '_data' },
-    ],
-    constant: false,
-  },
-]
-const approveAbi = [
-  {
-    type: 'function',
-    stateMutability: 'nonpayable',
-    payable: false,
-    outputs: [{ type: 'bool', name: '' }],
-    name: 'approve',
-    inputs: [
-      { type: 'address', name: '_spender' },
-      { type: 'uint256', name: '_value' },
-    ],
-    constant: false,
-  },
-]
-
 class XdaiService {
   provider: any
   abi: any
@@ -131,7 +32,7 @@ class XdaiService {
 
   constructor(provider: any) {
     this.provider = provider
-    this.abi = abi
+    this.abi = xDaiMainnetBridge
   }
 
   generateErc20ContractInstance = async (address: string) => {
@@ -193,15 +94,15 @@ class XdaiService {
   }
 
   static encodeRelayTokens = (receiver: string): string => {
-    const transferFromInterface = new utils.Interface(xdaiBridgeAbi)
+    const transferFromInterface = new utils.Interface(xDaiForeignBridge)
     return transferFromInterface.functions.relayTokens.encode([receiver])
   }
   static encodeApprove = (address: any, value: any) => {
-    const transferFromInterface = new utils.Interface(approveAbi)
+    const transferFromInterface = new utils.Interface(erc20)
     return transferFromInterface.functions.approve.encode([address, value])
   }
   static encodeTokenBridgeTransfer = (receiver: string, amount: BigNumber, data: any) => {
-    const transferFromInterface = new utils.Interface(omenAbi)
+    const transferFromInterface = new utils.Interface(omniBridgeXdai)
     return transferFromInterface.functions.transferAndCall.encode([receiver, amount, data])
   }
 
@@ -215,7 +116,7 @@ class XdaiService {
         const log = transaction.logs[transaction.logs.length - 1]
         const messageId = log.topics[log.topics.length - 1]
         // check if the message has been processed
-        const xdaiOmni = new ethers.Contract(OMNI_BRIDGE_VALIDATORS, omniBridgeAbi, provider.signer)
+        const xdaiOmni = new ethers.Contract(OMNI_BRIDGE_VALIDATORS, omniBridgeXdai, provider.signer)
         status = await xdaiOmni.messageCallStatus(messageId)
       }
       await waitABit()
@@ -249,7 +150,7 @@ class XdaiService {
   }
 
   encodeClaimDaiTokens = (message: string, signatures: string): string => {
-    const transferFromInterface = new utils.Interface(abi)
+    const transferFromInterface = new utils.Interface(xDaiMainnetBridge)
     return transferFromInterface.functions.executeSignatures.encode([message, signatures])
   }
 
@@ -408,7 +309,7 @@ class XdaiService {
       )
 
       // double check if txs have been executed
-      const bridge = new ethers.Contract(OMNI_CLAIM_ADDRESS, omniBridgeAbi, this.provider.signer.signer)
+      const bridge = new ethers.Contract(OMNI_CLAIM_ADDRESS, omniBridgeXdai, this.provider.signer.signer)
       const executed = await Promise.all(
         results.map(async ({ messageId }: any) => await bridge.messageCallStatus(messageId)),
       )
