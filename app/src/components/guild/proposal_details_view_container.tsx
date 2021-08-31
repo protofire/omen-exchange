@@ -276,15 +276,17 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
             {marketDetails}
           </TYPE.heading3>
           <OutcomeStyleWrapper>
-            {isScalar ? (
-              <MarketScale
-                currentPrediction={scaleValue}
-                lowerBound={new BigNumber(0)}
-                startingPointTitle={'Current prediction'}
-                style={{ border: 'none' }}
-                unit={'%'}
-                upperBound={bigNumberify('100000000000000000000')}
-              ></MarketScale>
+            {!isScalar ? (
+              <>
+                <MarketScale
+                  currentPrediction={scaleValue}
+                  lowerBound={new BigNumber(0)}
+                  startingPointTitle={'Current prediction'}
+                  style={{ border: 'none' }}
+                  unit={'%'}
+                  upperBound={bigNumberify('100000000000000000000')}
+                />
+              </>
             ) : (
               <ResponsiveTableSimple outcomes={Outcomes} />
             )}
