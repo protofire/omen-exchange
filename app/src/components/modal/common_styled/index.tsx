@@ -1,5 +1,7 @@
 import styled from 'styled-components'
 
+import { TYPE } from '../../../theme'
+
 export const ContentWrapper = styled.div`
   align-items: center;
   display: flex;
@@ -21,16 +23,6 @@ export const ModalNavigation = styled.div`
 export const ModalNavigationLeft = styled.div`
   display: flex;
   align-items: center;
-`
-
-export const ModalTitle = styled.p`
-  font-size: ${props => props.theme.switchNetworkModal.primaryFontSize};
-  color: ${props => props.theme.text1};
-  font-weight: ${props => props.theme.textfield.fontWeight};
-  margin: 0;
-  line-height: 19px;
-  letter-spacing: 0.2px;
-  margin-top: 2px;
 `
 
 export const ModalCard = styled.div`
@@ -68,16 +60,8 @@ export const BalanceItemSide = styled.div`
   align-items: center;
 `
 
-export const BalanceItemTitle = styled.p<{ notSelected?: boolean }>`
-  font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => (props.notSelected ? props.theme.text2 : props.theme.text1)};
-  margin: 0;
-`
-
-export const BalanceItemBalance = styled.p`
-  font-size: ${props => props.theme.fonts.defaultSize};
-  color: ${props => props.theme.text2};
-  margin: 0;
+export const BalanceItemTitle = styled(TYPE.bodyRegular)<{ selected?: boolean }>`
+  color: ${props => (props.selected ? props.theme.text1 : props.theme.text2)};
 `
 
 export const BalanceItem = styled.div<{ hover?: boolean }>`
@@ -86,17 +70,15 @@ export const BalanceItem = styled.div<{ hover?: boolean }>`
   justify-content: space-between;
   width: 100%;
 
-  &:not(:first-child){
+  &:not(:first-child) {
     margin-top: 14px;
   }
 
   &:hover {
-    
    ${BalanceItemSide}{
    ${BalanceItemTitle}{
-   color: ${props => props.theme.text1}; !important;
+    color: ${props => props.theme.text1}; !important;
    }
- 
    }
   }
 `

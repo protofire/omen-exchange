@@ -9,6 +9,7 @@ import styled, { withTheme } from 'styled-components'
 import { DAI_TO_XDAI_TOKEN_BRIDGE_ADDRESS, OMNI_BRIDGE_MAINNET_ADDRESS } from '../../../common/constants'
 import { useConnectedWeb3Context } from '../../../contexts'
 import { ERC20Service, XdaiService } from '../../../services'
+import { TYPE } from '../../../theme'
 import { bridgeTokensList, getNativeAsset, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
 import { waitForConfirmations } from '../../../util/tools'
@@ -25,7 +26,6 @@ import { IconInfo } from '../../common/icons/IconInfo'
 import { Image } from '../../market/common_sections/message_text/token_item'
 import {
   BalanceItem,
-  BalanceItemBalance,
   BalanceItemSide,
   BalanceItemTitle,
   BalanceItems,
@@ -34,7 +34,6 @@ import {
   ModalCard,
   ModalNavigation,
   ModalNavigationLeft,
-  ModalTitle,
 } from '../common_styled'
 import { ModalTransactionWrapper } from '../modal_transaction'
 
@@ -53,15 +52,12 @@ const InputInfo = styled.div`
   line-height: 20px;
   letter-spacing: 0.2px;
 `
-const WalletText = styled.div`
-  margin-bottom: 14px;
-  color: ${props => props.theme.text2};
-  line-height: 16.41px;
-  letter-spacing: 0.2px;
-`
 
 const DepositWithdrawButton = styled(Button)`
   flex: 1;
+`
+const BalanceItemBalance = styled(TYPE.bodyRegular)`
+  color: ${props => props.theme.text2};
 `
 const ApproveButton = styled(ButtonStateful)`
   flex: 1;
@@ -71,6 +67,10 @@ const ApproveButton = styled(ButtonStateful)`
   &:hover {
     background-color: ${props => props.theme.primary1};
   }
+`
+
+const ModalSubtitle = styled(TYPE.bodyRegular)`
+  color: ${props => props.theme.text2};
 `
 
 const ExchangeDataItem = styled.div`
@@ -257,7 +257,6 @@ export const ModalDepositWithdraw = (props: Props) => {
 
     return (
       <BalanceItem
-        hover
         key={index}
         onClick={() => {
           setCurrencySelected(item)
@@ -266,9 +265,7 @@ export const ModalDepositWithdraw = (props: Props) => {
         <BalanceItemSide>
           <RadioInput checked={currencySelected === item} name={item} outcomeIndex={-1} readOnly />
           <Image size={'24'} src={getImageUrl(address)} style={{ marginLeft: '12px', marginRight: '12px' }} />
-          <BalanceItemTitle notSelected={currencySelected !== item}>
-            {name ? name : symbol.toLowerCase()}
-          </BalanceItemTitle>
+          <BalanceItemTitle selected={currencySelected == item}>{name ? name : symbol.toLowerCase()}</BalanceItemTitle>
         </BalanceItemSide>
         <BalanceItemSide>
           <BalanceItemBalance>
@@ -304,7 +301,9 @@ export const ModalDepositWithdraw = (props: Props) => {
                   setAmountToDisplay('')
                 }}
               />
-              <ModalTitle style={{ marginLeft: '16px' }}>{exchangeType} Asset</ModalTitle>
+              <TYPE.heading3 color={'text1'} marginLeft={'16px'}>
+                {exchangeType} Asset
+              </TYPE.heading3>
             </ModalNavigationLeft>
             <IconClose
               hoverEffect={true}
@@ -317,7 +316,7 @@ export const ModalDepositWithdraw = (props: Props) => {
           </ModalNavigation>
           <ModalCard style={{ marginBottom: '20px', marginTop: '10px' }}>
             <BalanceSection>
-              <WalletText>Wallet</WalletText>
+              <ModalSubtitle marginBottom={'14px'}>Wallet</ModalSubtitle>
               <BalanceItems>{bridgeItems}</BalanceItems>
             </BalanceSection>
           </ModalCard>
@@ -344,17 +343,19 @@ export const ModalDepositWithdraw = (props: Props) => {
           {exchangeType === ExchangeType.withdraw && currencySelected !== 'dai' && xDaiBalance?.isZero() ? (
             <InputInfo>
               <IconAlertInverted />
-              <div style={{ marginLeft: '12px' }}>Fund your Omen Account with Dai to proceed with the withdrawal.</div>
+              <ModalSubtitle marginLeft={'12px'}>
+                Fund your Omen Account with Dai to proceed with the withdrawal.
+              </ModalSubtitle>
             </InputInfo>
           ) : (
             <>
               <ExchangeDataItem style={{ marginTop: '24px' }}>
-                <span>Min amount</span>
-                <span>
+                <ModalSubtitle>Min amount</ModalSubtitle>
+                <BalanceItemBalance>
                   {currencySelected === 'dai'
                     ? `${bigNumberToString(minDaiBridgeExchange, decimals, 2)} DAI`
                     : `${bigNumberToString(minOmniBridgeExchange, decimals, 3)} ${symbol}`}
-                </span>
+                </BalanceItemBalance>
               </ExchangeDataItem>
               <ExchangeDataItem style={{ marginTop: '12px' }}>
                 <div style={{ display: 'flex' }}>
@@ -389,12 +390,12 @@ export const ModalDepositWithdraw = (props: Props) => {
               </ExchangeDataItem>
               <Divider />
               <ExchangeDataItem>
-                <span>Total</span>
-                <span>
+                <BalanceItemBalance>Total</BalanceItemBalance>
+                <BalanceItemBalance>
                   {currencySelected !== 'dai' && exchangeType === ExchangeType.withdraw
                     ? `${bigNumberToString(displayFundAmount.sub(displayFundAmount.div(1000)), decimals, 3)} ${symbol}`
                     : `${bigNumberToString(displayFundAmount, decimals)} ${symbol === 'xDAI' ? 'DAI' : symbol}`}
-                </span>
+                </BalanceItemBalance>
               </ExchangeDataItem>
             </>
           )}
