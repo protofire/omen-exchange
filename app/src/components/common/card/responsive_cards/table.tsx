@@ -6,22 +6,23 @@ import { ButtonStateful } from '../../../button/button_stateful'
 import { ButtonType } from '../../../button/button_styling_types'
 import { CardCSS } from '../index'
 
-const CardStyled = styled.div`
+const CardStyled = styled.div<{ hasButton: boolean }>`
   ${CardCSS};
   box-shadow: none;
-  width: fit-content;
+  width: ${props => (props.hasButton ? '100%' : 'fit-content')};
   display: flex;
   flex-direction: row;
-  gap: 48px;
+  gap: ${props => (props.hasButton ? '64px' : '48px')};
   margin-top: 32px;
-  padding: 24px 32px;
+  padding: ${props => (props.hasButton ? '32px' : '24px 32px')};
   justify-content: space-between;
-  //div:nth-child(3) {
-  //  border-right: 1px solid #e8eaf6;
-  //  padding-right: 64px;
-  //  margin-right: 16px;
-  //  gap: 0;
-  //}
+
+  @media (min-width: ${props => props.theme.themeBreakPoints.xl}) {
+    div:nth-child(3) {
+      ${props =>
+        props.hasButton && `border-right: 1px solid #e8eaf6;padding-right: 64px;margin: -32px 0;padding-top: 32px;`};
+    }
+  }
   //mobile
   @media (max-width: ${props => props.theme.themeBreakPoints.xl}) {
     flex-direction: column;
@@ -57,11 +58,11 @@ export const Table: React.FC<Props> = (props: Props) => {
   const { hasButton = false, valueObject, ...restProps } = props
 
   return (
-    <CardStyled {...restProps}>
+    <CardStyled hasButton={hasButton} {...restProps}>
       {valueObject.map((item: any) => {
         return (
           <ItemWrapper key={item}>
-            <TYPE.bodyRegular color={'text2'}>{item[0]}</TYPE.bodyRegular>
+            <TYPE.bodyMedium color={'text2'}>{item[0]}</TYPE.bodyMedium>
             <DataWrapper>
               <TYPE.bodyMedium color={'text1'}>{item[1].text} </TYPE.bodyMedium>
               {item[1]['icon'] !== undefined && <div style={{ marginLeft: '8px' }}> {item[1].icon}</div>}
