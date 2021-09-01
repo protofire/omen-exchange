@@ -38,7 +38,6 @@ const ScaleWrapper = styled.div<{
 }>`
   display: flex;
   flex-direction: column;
-  height: 174px;
   border-bottom: ${props => (!props.borderBottom ? 'none' : `1px solid ${props.theme.scale.bar}`)};
   margin-left: -25px;
   margin-right: -25px;
@@ -245,6 +244,7 @@ interface Props {
   currentAnswerBond?: Maybe<BigNumber>
   isClosed?: boolean
   outcomePredictedByMarket?: Maybe<string>
+  style?: any
 }
 
 export const MarketScale: React.FC<Props> = (props: Props) => {
@@ -272,6 +272,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
     startingPoint,
     startingPointTitle,
     status,
+    style,
     tradeAmount,
     trades,
     unit,
@@ -612,6 +613,7 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
         borderBottom={isPositionTableDisabled}
         borderTop={borderTop}
         compressed={currentTab === MarketDetailsTab.sell}
+        style={style}
         valueBoxes={isAmountInputted}
       >
         <ScaleTitleWrapper>
@@ -690,8 +692,8 @@ export const MarketScale: React.FC<Props> = (props: Props) => {
               <HorizontalBarRight positive={long || null} width={1 - (newPrediction || 0)} />
             </>
           )}
-          {showSingleValueBox && !isClosed && <ValueBoxes valueBoxData={singleValueBoxData} />}
         </Scale>
+        {showSingleValueBox && !isClosed && <ValueBoxes valueBoxData={singleValueBoxData} />}
         {isAmountInputted && <ValueBoxes valueBoxData={amountValueBoxData} />}
         {showLiquidityBox && <ValueBoxes valueBoxData={liquidityValueBoxData} />}
         {(isBonded || isClosed) && <ValueBoxes valueBoxData={bondedValueBoxData} />}
