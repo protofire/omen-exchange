@@ -42,7 +42,7 @@ export const ModalAirdrop = (props: Props) => {
 
   const { claimAmount, fetchClaimAmount } = useAirdropService()
 
-  const displayDaiBanner = !isDustxDai(balances.xDaiBalance, 18)
+  const displayDaiBanner = isDustxDai(balances.xDaiBalance, 18)
 
   Modal.setAppElement('#root')
 

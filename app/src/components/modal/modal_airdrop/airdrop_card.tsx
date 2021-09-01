@@ -70,8 +70,7 @@ const AirdropCard = (props: Props) => {
       claim(account, displayAmount)
     }
   }
-  const claimIsDisabled =
-    !displayAmount || displayAmount.isZero() || balances.xDaiBalance.isZero() || !isDustxDai(balances.xDaiBalance, 18)
+  const claimIsDisabled = !displayAmount || displayAmount.isZero() || isDustxDai(balances.xDaiBalance, 18)
 
   return (
     <>
