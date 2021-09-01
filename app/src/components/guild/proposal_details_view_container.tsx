@@ -209,11 +209,13 @@ interface Props {
   verified: any
   isScalar: any
   setIsScalar: any
+  back: () => void
 }
 export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
   const {
     amount,
     apy,
+    back,
     closingDate,
     closingIn,
     duration,
@@ -232,7 +234,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     ['Duration', { text: duration }],
   ]
   const secondObject = [
-    ['Liqudity', { text: liqudiity }],
+    ['Liquidity', { text: liqudiity }],
     ['Total Volume', { text: totalVolume }],
     ['24h Volume', { text: volume }],
     ['Closing', { text: closingDate }],
@@ -250,7 +252,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
   return (
     <Container>
       <NavigationSection>
-        <BackNavigation>
+        <BackNavigation onClick={back}>
           <IconArrowBack />
           <TYPE.heading3 marginLeft={'12px'}>Guild Overview</TYPE.heading3>
         </BackNavigation>
@@ -263,7 +265,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
       </NavigationSection>
       <MainWrapper>
         <MainSection>
-          <Heading>Issue Liqudity Rewards</Heading>
+          <Heading>Issue Liquidity Rewards</Heading>
           <StyledTable valueObject={object} />
           <MarketDetails
             onClick={() => {

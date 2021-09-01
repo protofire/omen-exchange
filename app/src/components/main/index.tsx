@@ -37,7 +37,7 @@ export const Main: React.FC = () => {
                   <Redirect to="/liquidity" />
                 </Route>
                 <Route component={SettingsViewContainer} exact path="/settings" />
-                <Route component={ProposalDetailsPage} exact path="/proposal-details-page" />
+                <Route component={ProposalDetailsPage} exact path="/proposals/:id" />
                 <Route
                   component={MarketHomeContainer}
                   path={['/24h-volume', '/volume', '/newest', '/ending', '/liquidity', '/guild']}

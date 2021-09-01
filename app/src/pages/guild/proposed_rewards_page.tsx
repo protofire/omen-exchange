@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 
 import { ProposedRewardsView } from '../../components/guild/proposed_rewards_view'
 import { ConnectedWeb3Context } from '../../contexts'
-import { useGraphLiquidityMiningCampaigns } from '../../hooks'
+import { useGraphLiquidityMiningCampaigns, useGuildProposals } from '../../hooks'
 import { OmenGuildService } from '../../services/guild'
 import { getLogger } from '../../util/logger'
 import { RemoteData } from '../../util/remote_data'
@@ -38,6 +38,8 @@ const ProposedRewardsPage = (props: Props) => {
   const [votesRequired, setVotesRequired] = useState(new BigNumber(0))
 
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
+
+  const { proposals } = useGuildProposals()
 
   const PAGE_SIZE = 6
   useEffect(() => {
@@ -116,6 +118,7 @@ const ProposedRewardsPage = (props: Props) => {
       isTransactionProcessing={isTransactionProcessing}
       onLoadNextPage={next}
       onLoadPrevPage={prev}
+      proposals={proposals}
       propose={propose}
       proposeLiquidityRewards={proposeLiquidityRewards}
       select={select}

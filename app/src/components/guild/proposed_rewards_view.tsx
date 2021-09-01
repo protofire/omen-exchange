@@ -3,13 +3,14 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { ConnectedWeb3Context } from '../../contexts'
+import { Proposal } from '../../services/guild'
 import { TYPE } from '../../theme'
 import { RemoteData } from '../../util/remote_data'
 import { MarketFilters, MarketMakerDataItem } from '../../util/types'
 import { Button } from '../button'
 import { ButtonType } from '../button/button_styling_types'
 import { IconArrowBack } from '../common/icons'
-import { MarketCard } from '../market/market_card'
+import { MarketCard, ProposalMarketCard } from '../market/market_card'
 import { ModalTransactionWrapper } from '../modal/modal_transaction'
 
 const GuildPageWrapper = styled.div`
@@ -96,6 +97,7 @@ interface Props {
   isTransactionProcessing: boolean
   selected: string
   propose: boolean
+  proposals: Proposal[]
   toggle: () => void
   select: (address: string) => void
   setIsTransactionModalOpen: (open: boolean) => void
@@ -112,6 +114,7 @@ const ProposedRewardsView = (props: Props) => {
     onLoadNextPage,
     onLoadPrevPage,
     pageIndex,
+    proposals,
     propose,
     proposeLiquidityRewards,
     select,
@@ -132,7 +135,7 @@ const ProposedRewardsView = (props: Props) => {
     <GuildPageWrapper>
       {propose && (
         <OverviewWrapper onClick={toggle}>
-          <IconArrowBack color="#7986CB" />
+          <IconArrowBack color="primary2" />
           <TYPE.heading3 color="primary2" marginLeft={16}>
             Guild Overview
           </TYPE.heading3>
@@ -157,7 +160,7 @@ const ProposedRewardsView = (props: Props) => {
           Propose Liq. Rewards
         </ProposalButton>
       </ProposalHeadingWrapper>
-      {propose && (
+      {propose ? (
         <MarketCardsWrapper>
           {RemoteData.hasData(markets) &&
             RemoteData.is.success(markets) &&
@@ -173,6 +176,12 @@ const ProposedRewardsView = (props: Props) => {
                 />
               )
             })}
+        </MarketCardsWrapper>
+      ) : (
+        <MarketCardsWrapper>
+          {proposals.map(proposal => (
+            <ProposalMarketCard key={proposal.id} networkId={networkId} proposal={proposal} />
+          ))}
         </MarketCardsWrapper>
       )}
       {propose && (

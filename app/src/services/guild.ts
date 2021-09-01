@@ -121,6 +121,7 @@ const GuildAbi = [
 ]
 
 export interface Proposal {
+  id: string
   address: string
   startTime: BigNumber
   endTime: BigNumber
@@ -249,9 +250,12 @@ class OmenGuildService {
       (output: any) => output.type,
     )})`
 
+    const proposalIds = []
+
     calls = []
     for (let i = 0; i < ids; i++) {
       const id = response.results.transformed[`id-${i}`]
+      proposalIds.push(id)
       calls.push({
         target: this.omenGuildAddress,
         call: [sig, id],
@@ -262,13 +266,16 @@ class OmenGuildService {
     response = await multicall(calls, this.network)
 
     // format proposal data
-    const proposals = []
+    let proposals = []
     for (let i = 0; i < ids; i++) {
+      const id = proposalIds[i]
       const proposal = fn.outputs.reduce((prev, output: any) => {
         return { ...prev, [output.name]: response.results.transformed[`${output.name}-${i}`] }
       }, {})
-      proposals.push(proposal as Proposal)
+      proposals.push({ ...proposal, id } as Proposal)
     }
+
+    proposals = proposals.filter(proposal => proposal.description)
 
     return proposals
   }
