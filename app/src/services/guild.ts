@@ -3,7 +3,7 @@ import { Web3Provider } from 'ethers/providers'
 import { BigNumber } from 'ethers/utils'
 
 import { multicall } from '../util/multicall'
-import { getContractAddress } from '../util/networks'
+import { getContractAddress, networkIds } from '../util/networks'
 
 const GuildAbi = [
   {
@@ -145,7 +145,9 @@ class OmenGuildService {
     const signer = provider.getSigner()
     this.user = signer
     this.network = network
+
     this.provider = provider
+
     this.omenGuildAddress = getContractAddress(network, 'omenGuildProxy')
     if (this.omenGuildAddress) {
       this.contract = new ethers.Contract(this.omenGuildAddress, GuildAbi, provider.getSigner()).connect(signer)
@@ -187,6 +189,13 @@ class OmenGuildService {
 
   lockTokens = async (amount: BigNumber) => {
     return await this.contract?.lockTokens(amount)
+  }
+  getUserAddress = async (cpkAddress: string, relay: boolean) => {
+    if (this.network === networkIds.MAINNET && !relay) {
+      return await this.tokenVault()
+    } else {
+      return cpkAddress
+    }
   }
 
   unlockTokens = async (amount: BigNumber) => {

@@ -1,3 +1,4 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 
@@ -27,10 +28,13 @@ interface Props {
 
 const ProposedRewardsPage = (props: Props) => {
   const { context, currentFilter, markets, onFilterChange, onLoadNextPage, onLoadPrevPage } = props
-  const { account, balances, cpk, library, networkId, setTxState } = context
+  const { account, balances, cpk, library, networkId, relay, setTxState } = context
 
   const [propose, setPropose] = useState(false)
   const [selected, setSelected] = useState('')
+  const [totalLocked, setTotalLocked] = useState(Zero)
+  const [userLocked, setUserLocked] = useState(Zero)
+
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState<boolean>(false)
   const [isTransactionProcessing, setIsTransactionProcessing] = useState<boolean>(false)
 
@@ -48,18 +52,26 @@ const ProposedRewardsPage = (props: Props) => {
   }, [currentFilter, markets])
 
   useEffect(() => {
-    const getVoteInfo = async () => {
+    const getGuildInfo = async () => {
       if (!cpk || !account) {
         return
       }
       const omen = new OmenGuildService(library, networkId)
       const [votes, required] = await Promise.all([await omen.votesOf(cpk.address), await omen.votesForCreation()])
+      const fetchLockAddress = await omen.getUserAddress(cpk.address, relay)
 
+      const locked = await omen.tokensLocked(fetchLockAddress)
+
+      setUserLocked(locked.amount)
+      const totalLocked = await omen.totalLocked()
+
+      setTotalLocked(totalLocked)
       setVotes(votes)
       setVotesRequired(required)
     }
 
-    getVoteInfo()
+    getGuildInfo()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [account, cpk, library, networkId])
 
   const toggle = () => {
@@ -122,6 +134,8 @@ const ProposedRewardsPage = (props: Props) => {
       selected={selected}
       setIsTransactionModalOpen={setIsTransactionModalOpen}
       toggle={toggle}
+      totalLocked={totalLocked}
+      userLocked={userLocked}
       votes={votes}
       votesRequired={votesRequired}
     />

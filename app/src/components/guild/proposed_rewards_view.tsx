@@ -2,9 +2,11 @@ import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
+import { STANDARD_DECIMALS } from '../../common/constants'
 import { ConnectedWeb3Context } from '../../contexts'
 import { TYPE } from '../../theme'
 import { RemoteData } from '../../util/remote_data'
+import { bigNumberToNumber, calculatePercentageOfWhole } from '../../util/tools'
 import { MarketFilters, MarketMakerDataItem } from '../../util/types'
 import { Button } from '../button'
 import { ButtonType } from '../button/button_styling_types'
@@ -101,6 +103,8 @@ interface Props {
   select: (address: string) => void
   setIsTransactionModalOpen: (open: boolean) => void
   proposeLiquidityRewards: () => Promise<void>
+  totalLocked: BigNumber
+  userLocked: BigNumber
 }
 
 const ProposedRewardsView = (props: Props) => {
@@ -119,6 +123,8 @@ const ProposedRewardsView = (props: Props) => {
     selected,
     setIsTransactionModalOpen,
     toggle,
+    totalLocked,
+    userLocked,
     votes,
     votesRequired,
   } = props
@@ -131,10 +137,10 @@ const ProposedRewardsView = (props: Props) => {
 
   const guildOverviewData = [
     ['Members', { text: '60' }],
-    ['Total Locked', { text: '564,453 OMN' }],
+    ['Total Locked', { text: `${bigNumberToNumber(totalLocked, STANDARD_DECIMALS)} OMN` }],
     ['Total Rewards', { text: '54,000 OMN' }],
-    ['Voting Power', { text: '0.64%' }],
-    ['You Locked', { text: '643 OMN' }],
+    ['Voting Power', { text: `${calculatePercentageOfWhole(totalLocked, userLocked)}%` }],
+    ['You Locked', { text: `${bigNumberToNumber(userLocked, STANDARD_DECIMALS)} OMN` }],
     ['Claimable Rewards', { text: '250 OMN' }],
   ]
 

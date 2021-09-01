@@ -10,7 +10,7 @@ import { useAirdropService } from '../../../hooks'
 import { ERC20Service, OmenGuildService } from '../../../services'
 import { TYPE } from '../../../theme'
 import { getToken, networkIds } from '../../../util/networks'
-import { bigNumberToString, daysUntil, divBN, formatLockDate } from '../../../util/tools'
+import { bigNumberToString, calculatePercentageOfWhole, daysUntil, formatLockDate } from '../../../util/tools'
 import { TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonStateful, ButtonStates } from '../../button/button_stateful'
@@ -128,12 +128,7 @@ const ModalLockTokens = (props: Props) => {
   const getTokenLockInfo = async () => {
     try {
       if (cpk?.address && omen.omenGuildAddress) {
-        let address
-        if (context.networkId === networkIds.MAINNET && !context.relay) {
-          address = await omen.tokenVault()
-        } else {
-          address = cpk.address
-        }
+        const address = await omen.getUserAddress(cpk.address, relay)
 
         const locked = await omen.tokensLocked(address)
         const total = await omen.totalLocked()
@@ -334,16 +329,13 @@ const ModalLockTokens = (props: Props) => {
               <LightDataItem>{isLockAmountOpen && 'Your '}Vote Weight</LightDataItem>
               <DarkDataItem>
                 <TYPE.bodyMedium color={!displayLockAmount.isZero() && 'text2'}>
-                  {!totalLocked.isZero() && !userLocked.isZero()
-                    ? (divBN(userLocked, totalLocked) * 100).toFixed(2)
-                    : '0.00'}
-                  %
+                  {calculatePercentageOfWhole(totalLocked, userLocked)}%
                 </TYPE.bodyMedium>
 
                 {!displayLockAmount.isZero() && (
                   <>
                     <ArrowIcon color={theme.text1} style={{ margin: '0 10px' }} />
-                    {(divBN(userLocked.add(displayLockAmount), totalLocked) * 100).toFixed(2)}%
+                    {calculatePercentageOfWhole(totalLocked, userLocked.add(displayLockAmount))}%
                   </>
                 )}
               </DarkDataItem>
