@@ -1,7 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const Wrapper = styled.svg<{ hoverEffect: boolean }>`
+import { Colors } from '../../../theme/types'
+
+const Wrapper = styled.svg<{ hoverEffect: boolean; color?: keyof Colors }>`
   cursor: pointer;
 
   &:hover {
@@ -11,6 +13,7 @@ const Wrapper = styled.svg<{ hoverEffect: boolean }>`
   }
 
   .path {
+    fill: ${({ color, theme }) => color && (theme as any)[color]}
     transition: 0.2s fill;
   }
 `
@@ -19,13 +22,15 @@ interface Props {
   hoverEffect?: boolean
   onClick?: () => void
   style?: any
+  color?: keyof Colors
 }
 
 export const IconArrowBack = (props: Props) => {
-  const { hoverEffect = false, ...restProps } = props
+  const { color, hoverEffect = false, ...restProps } = props
 
   return (
     <Wrapper
+      color={color}
       fill="none"
       height="24"
       hoverEffect={hoverEffect}

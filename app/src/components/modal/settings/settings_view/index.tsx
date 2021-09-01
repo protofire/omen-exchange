@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useWeb3Context } from 'web3-react'
 
-import { getChainSpecificAlternativeUrls, getInfuraUrl, networkIds } from '../../../util/networks'
-import { checkRpcStatus, getNetworkFromChain, isValidHttpUrl } from '../../../util/tools'
-import { ButtonRound } from '../../button'
-import { Dropdown, DropdownPosition } from '../../common/form/dropdown/index'
-import { TextfieldCSS } from '../../common/form/textfield'
-import { IconBlockscout, IconCloudflare, IconInfura, IconPokt, IconXdai } from '../../common/icons'
-import { ModalCard } from '../../modal/common_styled'
+import { getChainSpecificAlternativeUrls, getInfuraUrl, networkIds } from '../../../../util/networks'
+import { checkRpcStatus, getNetworkFromChain, isValidHttpUrl } from '../../../../util/tools'
+import { ButtonRound } from '../../../button'
+import { Dropdown, DropdownPosition } from '../../../common/form/dropdown'
+import { TextfieldCSS } from '../../../common/form/textfield'
+import { IconBlockscout, IconCloudflare, IconInfura, IconPokt, IconXdai } from '../../../common/icons'
+import { ModalCard } from '../../common_styled'
 
 const Column = styled.div`
   width: 100%;
