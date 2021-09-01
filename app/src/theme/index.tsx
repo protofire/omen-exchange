@@ -198,7 +198,7 @@ export const theme = {
     active: '#9FA8DA',
   },
   paddings: {
-    mainPadding: '15px',
+    mainPadding: '30px',
   },
   textfield: {
     backgroundColor: 'transparent',

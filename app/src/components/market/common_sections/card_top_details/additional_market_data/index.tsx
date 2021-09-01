@@ -129,7 +129,18 @@ interface Props extends DOMAttributes<HTMLDivElement> {
 }
 
 export const AdditionalMarketData: React.FC<Props> = props => {
-  const { address, arbitrator, category, collateral, curatedByDxDaoOrKleros, id, oracle, submissionIDs, title } = props
+  const {
+    address,
+    arbitrator,
+    category,
+    collateral,
+    curatedByDxDaoOrKleros,
+    id,
+    oracle,
+    submissionIDs,
+    title,
+    ...restProps
+  } = props
 
   const context = useConnectedWeb3Context()
   const { cpk, library: provider, networkId, relay } = context
@@ -192,7 +203,7 @@ export const AdditionalMarketData: React.FC<Props> = props => {
   }, [cpk, cpk?.address, liquidityMiningCampaign, networkId, provider, tokenPrice, collateralPrice])
 
   return (
-    <AdditionalMarketDataWrapper>
+    <AdditionalMarketDataWrapper {...restProps}>
       <AdditionalMarketDataLeft>
         <AdditionalMarketDataSectionWrapper
           href={`/#/24h-volume/category/${encodeURI(category)}`}
