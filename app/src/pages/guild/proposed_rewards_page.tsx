@@ -40,6 +40,7 @@ const ProposedRewardsPage = (props: Props) => {
 
   const [votes, setVotes] = useState(new BigNumber(0))
   const [votesRequired, setVotesRequired] = useState(new BigNumber(0))
+  const [totalRewards, setTotalRewards] = useState(Zero)
 
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
@@ -56,6 +57,18 @@ const ProposedRewardsPage = (props: Props) => {
       if (!cpk || !account) {
         return
       }
+      if (liquidityMiningCampaigns) {
+        setTotalRewards(
+          liquidityMiningCampaigns.reduce(
+            (prev: BigNumber, { rewardAmounts }: any) => prev.add(rewardAmounts[0]),
+            Zero,
+          ),
+        )
+      }
+
+      // const stakingService = new StakingService(library, cpk.address, liquidityMiningCampaign.id)
+      // const claimableRewards = await stakingService.getClaimableRewards(cpk.address)
+
       const omen = new OmenGuildService(library, networkId)
       const [votes, required] = await Promise.all([await omen.votesOf(cpk.address), await omen.votesForCreation()])
       const fetchLockAddress = await omen.getUserAddress(cpk.address, relay)
@@ -72,7 +85,7 @@ const ProposedRewardsPage = (props: Props) => {
 
     getGuildInfo()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [account, cpk, library, networkId])
+  }, [account, cpk, library, networkId, liquidityMiningCampaigns])
 
   const toggle = () => {
     setPropose(!propose)
@@ -135,6 +148,7 @@ const ProposedRewardsPage = (props: Props) => {
       setIsTransactionModalOpen={setIsTransactionModalOpen}
       toggle={toggle}
       totalLocked={totalLocked}
+      totalRewards={totalRewards}
       userLocked={userLocked}
       votes={votes}
       votesRequired={votesRequired}

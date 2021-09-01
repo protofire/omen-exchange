@@ -105,6 +105,7 @@ interface Props {
   proposeLiquidityRewards: () => Promise<void>
   totalLocked: BigNumber
   userLocked: BigNumber
+  totalRewards: BigNumber
 }
 
 const ProposedRewardsView = (props: Props) => {
@@ -124,6 +125,7 @@ const ProposedRewardsView = (props: Props) => {
     setIsTransactionModalOpen,
     toggle,
     totalLocked,
+    totalRewards,
     userLocked,
     votes,
     votesRequired,
@@ -138,7 +140,7 @@ const ProposedRewardsView = (props: Props) => {
   const guildOverviewData = [
     ['Members', { text: '60' }],
     ['Total Locked', { text: `${bigNumberToNumber(totalLocked, STANDARD_DECIMALS)} OMN` }],
-    ['Total Rewards', { text: '54,000 OMN' }],
+    ['Total Rewards', { text: `${bigNumberToNumber(totalRewards, STANDARD_DECIMALS)} OMN` }],
     ['Voting Power', { text: `${calculatePercentageOfWhole(totalLocked, userLocked)}%` }],
     ['You Locked', { text: `${bigNumberToNumber(userLocked, STANDARD_DECIMALS)} OMN` }],
     ['Claimable Rewards', { text: '250 OMN' }],
