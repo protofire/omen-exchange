@@ -5,71 +5,73 @@ import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
 import { getLogger } from '../../util/logger'
-import { getOutcomes } from '../../util/networks'
+import { getOutcomes, networkIds } from '../../util/networks'
 import { AnswerItem, BondItem, INVALID_ANSWER_ID, KlerosSubmission, Question, Status } from '../../util/types'
 
 const logger = getLogger('useGraphMarketMakerData')
 
-const query = gql`
-  query GetMarket($id: ID!) {
-    fixedProductMarketMaker(id: $id) {
-      id
-      creator
-      collateralToken
-      fee
-      collateralVolume
-      outcomeTokenAmounts
-      outcomeTokenMarginalPrices
-      condition {
+const getQuery = (networkId: number) => {
+  return gql`
+    query GetMarket($id: ID!) {
+      fixedProductMarketMaker(id: $id) {
         id
-        payouts
-        oracle
-      }
-      templateId
-      title
-      outcomes
-      category
-      language
-      lastActiveDay
-      runningDailyVolume
-      arbitrator
-      creationTimestamp
-      openingTimestamp
-      timeout
-      resolutionTimestamp
-      currentAnswer
-      currentAnswerTimestamp
-      currentAnswerBond
-      answerFinalizedTimestamp
-      scaledLiquidityParameter
-      runningDailyVolumeByHour
-      isPendingArbitration
-      arbitrationOccurred
-      runningDailyVolumeByHour
-      curatedByDxDao
-      curatedByDxDaoOrKleros
-      question {
-        id
-        data
-        currentAnswer
-        answers {
-          answer
-          bondAggregate
+        creator
+        collateralToken
+        fee
+        collateralVolume
+        outcomeTokenAmounts
+        outcomeTokenMarginalPrices
+        condition {
+          id
+          payouts
+          oracle
         }
+        templateId
+        title
+        outcomes
+        category
+        language
+        lastActiveDay
+        runningDailyVolume
+        arbitrator
+        creationTimestamp
+        openingTimestamp
+        timeout
+        resolutionTimestamp
+        currentAnswer
+        currentAnswerTimestamp
+        currentAnswerBond
+        answerFinalizedTimestamp
+        scaledLiquidityParameter
+        runningDailyVolumeByHour
+        isPendingArbitration
+        arbitrationOccurred
+        runningDailyVolumeByHour
+        curatedByDxDao
+        curatedByDxDaoOrKleros
+        question {
+          id
+          data
+          currentAnswer
+          answers {
+            answer
+            bondAggregate
+          }
+        }
+        klerosTCRregistered
+        curatedByDxDaoOrKleros
+        curatedByDxDao
+        submissionIDs {
+          id
+          status
+        }
+        scalarLow
+        scalarHigh
+        ${networkId === networkIds.RINKEBY ? 'factory' : ''}
       }
-      klerosTCRregistered
-      curatedByDxDaoOrKleros
-      curatedByDxDao
-      submissionIDs {
-        id
-        status
-      }
-      scalarLow
-      scalarHigh
-      factory
     }
-  }
-`
+  `
+}
 
 export type GraphResponseFixedProductMarketMaker = {
   id: string
@@ -246,7 +248,7 @@ export const wrangleMarketDataResponse = (
  */
 export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: number): Result => {
   const [marketMakerData, setMarketMakerData] = useState<Maybe<GraphMarketMakerData>>(null)
-
+  const query = getQuery(networkId)
   const { data, error, loading, refetch } = useQuery<GraphResponse>(query, {
     notifyOnNetworkStatusChange: true,
     skip: false,
