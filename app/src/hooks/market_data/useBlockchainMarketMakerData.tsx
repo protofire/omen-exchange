@@ -152,6 +152,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
     )
 
     if (
+      graphMarketMakerData.factory &&
       graphMarketMakerData.factory.toLowerCase() === getContractAddress(networkId, 'marketMakerFactory').toLowerCase()
     ) {
       calls.push(
@@ -219,6 +220,7 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
 
         if (
           !totalPoolShares.isZero() &&
+          graphMarketMakerData.factory &&
           graphMarketMakerData.factory.toLowerCase() ===
             getContractAddress(networkId, 'marketMakerFactory').toLowerCase()
         ) {
