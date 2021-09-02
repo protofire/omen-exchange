@@ -321,13 +321,16 @@ export const getChainSpecificAlternativeUrls = (networkId: any) => {
 
   return networks[networkId].alternativeUrls
 }
+export const supportedNetworkIds = Object.keys(networks).map(Number) as NetworkId[]
+
 if (localStorage.getItem('rpcAddress')) {
   const data = JSON.parse(<string>localStorage.getItem('rpcAddress'))
-  const network: NetworkId = data.network
-  networks[network].url = data.url
+  supportedNetworkIds.forEach(value => {
+    if (data[value] != null) {
+      networks[value].url = data[value].url
+    }
+  })
 }
-
-export const supportedNetworkIds = Object.keys(networks).map(Number) as NetworkId[]
 
 export const supportedNetworkURLs = entries(networks).reduce<{
   [networkId: number]: string

@@ -211,18 +211,30 @@ export const SettingsViewContainer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url])
   useEffect(() => {
-    if (localStorage.getItem('rpcAddress')) {
-      const data = JSON.parse(localStorage.getItem('rpcAddress') as string)
-      setUrl(data.url)
-      if (data.network === getNetworkFromChain(networkId.toString())) {
-        setCurrent(data.index)
-        if (data.index === dropdownItems.length - 1) {
-          setCustomUrl(data.url)
+    const data = JSON.parse(localStorage.getItem('rpcAddress') as string)
+    if (data[networkId] != null) {
+      const networkSpecificData = data[networkId]
+      setUrl(networkSpecificData.url)
+      if (networkSpecificData.network === getNetworkFromChain(networkId.toString())) {
+        setCurrent(networkSpecificData.index)
+        if (networkSpecificData.index === dropdownItems.length - 1) {
+          setCustomUrl(networkSpecificData.url)
         }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  const setFunction = () => {
+    const array = JSON.parse(localStorage.getItem('rpcAddress') || '[]')
+    array[networkId] = {
+      url: url,
+      network: networkId,
+      index: current,
+    }
+
+    localStorage.setItem('rpcAddress', JSON.stringify(array))
+  }
 
   return (
     <>
@@ -284,14 +296,7 @@ export const SettingsViewContainer = () => {
           onClick={async () => {
             if (!(await checkRpcStatus(url, setOnlineStatus, networkId))) return
 
-            localStorage.setItem(
-              'rpcAddress',
-              JSON.stringify({
-                url: url,
-                network: networkId,
-                index: current,
-              }),
-            )
+            setFunction()
             window.location.reload()
           }}
           style={{ marginLeft: '8px' }}
