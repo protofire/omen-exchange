@@ -7,13 +7,13 @@ import Web3Provider from 'web3-react'
 import 'react-datepicker/dist/react-datepicker.css'
 import 'sanitize.css'
 import { Main } from './components/main'
-import { ContentWrapper, ModalTitle } from './components/modal/common_styled'
+import { ContentWrapper } from './components/modal/common_styled'
 import { ConnectionModalNavigation, SettingsModalWrapper } from './components/modal/modal_your_connection'
-import SettingsViewContainer from './components/settings/settings_view'
+import SettingsViewContainer from './components/modal/settings/settings_view'
 import { ConnectedWeb3 } from './contexts'
 import { ApolloProviderWrapper } from './contexts/Apollo'
 import balanceReducer from './store/reducer'
-import { ThemeProvider, theme } from './theme'
+import { TYPE, ThemeProvider, theme } from './theme'
 import { GlobalStyle } from './theme/global_style'
 import connectors from './util/connectors'
 import { getInfuraUrl, networkIds } from './util/networks'
@@ -59,9 +59,7 @@ const App: React.FC = (props: any) => {
           >
             <ContentWrapper>
               <ConnectionModalNavigation>
-                <ModalTitle>
-                  <span style={{ fontFamily: 'Roboto' }}>Settings</span>
-                </ModalTitle>
+                <TYPE.heading3 color={'text1'}>Settings</TYPE.heading3>
               </ConnectionModalNavigation>
               <SettingsModalWrapper>
                 <SettingsViewContainer />

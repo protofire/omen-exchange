@@ -7,7 +7,8 @@ import { useConnectedWeb3Context } from '../../../contexts'
 import { TYPE } from '../../../theme'
 import { bridgeTokensList, getNativeAsset, getToken, networkIds } from '../../../util/networks'
 import { getImageUrl } from '../../../util/token'
-import { bigNumberToString, truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
+import { truncateStringInTheMiddle, waitForConfirmations } from '../../../util/tools'
+import { bigNumberToString } from '../../../util/tools/formatting'
 import { KnownTokenValue, Token, TransactionStep } from '../../../util/types'
 import { Button } from '../../button/button'
 import { ButtonType } from '../../button/button_styling_types'
@@ -16,7 +17,6 @@ import { IconChevronDown } from '../../common/icons/IconChevronDown'
 import { IconChevronUp } from '../../common/icons/IconChevronUp'
 import { IconJazz } from '../../common/icons/IconJazz'
 import { Image } from '../../market/common_sections/message_text/token_item'
-import SettingsViewContainer from '../../settings/settings_view'
 import {
   BalanceItem,
   BalanceItemSide,
@@ -27,6 +27,7 @@ import {
   ModalNavigation,
 } from '../common_styled'
 import { ModalTransactionWrapper } from '../modal_transaction'
+import SettingsViewContainer from '../settings/settings_view'
 
 const TopCardHeader = styled.div`
   display: flex;

@@ -1,8 +1,8 @@
-import { Zero } from 'ethers/constants'
-import { BigNumber, defaultAbiCoder, keccak256 } from 'ethers/utils'
+import { MaxUint256, Zero } from 'ethers/constants'
+import { BigNumber, bigNumberify, defaultAbiCoder, keccak256 } from 'ethers/utils'
 import moment from 'moment'
 
-import { OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../../common/constants'
+import { DAY_IN_SECONDS, OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../../common/constants'
 import { Transaction } from '../../util/cpk'
 import { getLogger } from '../../util/logger'
 import {
@@ -24,6 +24,8 @@ import { MarketMakerService } from '../market_maker'
 import { MarketMakerFactoryService } from '../market_maker_factory'
 import { OracleService } from '../oracle'
 import { RealitioService } from '../realitio'
+import { StakingService } from '../staking'
+import { StakingFactoryService } from '../staking_factory'
 import { UnwrapTokenService } from '../unwrap_token'
 import { XdaiService } from '../xdai'
 
@@ -165,6 +167,7 @@ interface UnwrapParams {
 
 export const unwrap = async (params: UnwrapParams) => {
   const { amount, collateral, transactions, wrapper } = params
+
   if (collateral.address.toLowerCase() === wrapper.address.toLowerCase() && !amount.isZero()) {
     const encodedWithdrawFunction = UnwrapTokenService.withdrawAmount(collateral.symbol, amount)
     transactions.push({
@@ -229,6 +232,124 @@ export const approveConditionalTokens = async (params: ApproveConditionalTokensP
 }
 
 /**
+ * Set approval for the staking campaign to access pool tokens
+ */
+
+interface ApproveCampaignParams {
+  amountToStake: BigNumber
+  campaignAddress: string
+  marketMaker: MarketMakerService
+  service: CPKService
+  transactions: Transaction[]
+}
+
+export const approveCampaign = async (params: ApproveCampaignParams) => {
+  const { amountToStake, campaignAddress, marketMaker, service, transactions } = params
+  const erc20Service = new ERC20Service(service.provider, service.cpk.address, marketMaker.address)
+  const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(service.cpk.address, campaignAddress, amountToStake)
+
+  if (!hasEnoughAllowance) {
+    transactions.push({
+      to: marketMaker.address,
+      data: ERC20Service.encodeApproveUnlimited(campaignAddress),
+    })
+  }
+
+  return params
+}
+
+/**
+ * Stake pool tokens
+ */
+
+interface StakeParams {
+  amountToStake: BigNumber
+  campaignAddress: string
+  transactions: Transaction[]
+}
+
+export const stake = async (params: StakeParams) => {
+  const { amountToStake, campaignAddress, transactions } = params
+
+  transactions.push({
+    to: campaignAddress,
+    data: StakingService.encodeStakePoolTokens(amountToStake),
+  })
+
+  return params
+}
+
+/**
+ * Unstake pool tokens
+ */
+
+interface UnstakeParams {
+  amount: BigNumber
+  campaignAddress: string
+  transactions: Transaction[]
+}
+
+export const unstake = async (params: UnstakeParams) => {
+  const { amount, campaignAddress, transactions } = params
+
+  transactions.push({
+    to: campaignAddress,
+    data: StakingService.encodeWithdrawStakedPoolTokens(amount),
+  })
+
+  return params
+}
+
+/**
+ * Exit staking pool
+ */
+
+interface ExitStakingParams {
+  campaignAddress: string
+  transactions: Transaction[]
+  service: CPKService
+}
+
+export const exitStaking = async (params: ExitStakingParams) => {
+  const { campaignAddress, service, transactions } = params
+
+  transactions.push({
+    to: campaignAddress,
+    data: StakingService.encodeExit(service.cpk.address),
+  })
+
+  return params
+}
+
+/**
+ * Claim reward tokens
+ */
+
+interface ClaimParams {
+  campaignAddress: string
+  transactions: Transaction[]
+  service: CPKService
+}
+
+export const claim = async (params: ClaimParams) => {
+  const { campaignAddress, service, transactions } = params
+
+  const stakingService = new StakingService(service.provider, service.cpk.address, campaignAddress)
+  const claimAmounts = await stakingService.getClaimableRewards(service.cpk.address)
+
+  const claimableRewards = claimAmounts.filter(amount => amount.gt(Zero))
+
+  if (claimableRewards.length > 0) {
+    transactions.push({
+      to: campaignAddress,
+      data: StakingService.encodeClaimAll(service.cpk.address),
+    })
+  }
+
+  return params
+}
+
+/**
  * Set approval for spender on token
  */
 
@@ -245,6 +366,59 @@ export const genericApproval = async (params: GenericApprovalParams) => {
     to: collateral.address,
     data: ERC20Service.encodeApproveUnlimited(spender),
   })
+
+  return params
+}
+
+/**
+ * Withdraw reward tokens
+ */
+
+interface WithdrawRewardsParams {
+  campaignAddress: string
+  transactions: Transaction[]
+  service: CPKService
+}
+
+export const withdrawRewards = async (params: WithdrawRewardsParams) => {
+  const { campaignAddress, service, transactions } = params
+
+  const signer = service.provider.getSigner()
+  const account = await signer.getAddress()
+
+  // If relay used, keep reward tokens in relay
+  if (!service.cpk.relay) {
+    // Calculate amount to send from CPK to EOA
+    // claimable rewards + unclaimed rewards (if any)
+    const stakingService = new StakingService(service.provider, service.cpk.address, campaignAddress)
+    const rewardTokens = await stakingService.getRewardTokens()
+    const claimableRewards = await stakingService.getClaimableRewards(service.cpk.address)
+
+    for (let i = 0; i < rewardTokens.length; i++) {
+      const erc20Service = new ERC20Service(service.provider, service.cpk.address, rewardTokens[i])
+      const unclaimedRewards = bigNumberify(await erc20Service.getCollateral(service.cpk.address))
+      const totalRewardsAmount = claimableRewards[i]
+        .add(unclaimedRewards)
+        .mul(99999999)
+        .div(100000000)
+
+      const hasEnoughAllowance = await erc20Service.hasEnoughAllowance(service.cpk.address, account, totalRewardsAmount)
+
+      // Approve unlimited if not already done
+      if (!hasEnoughAllowance) {
+        transactions.push({
+          to: rewardTokens[i],
+          data: ERC20Service.encodeApproveUnlimited(account),
+        })
+      }
+
+      // Transfer all rewards from cpk to EOA
+      transactions.push({
+        to: rewardTokens[i],
+        data: ERC20Service.encodeTransfer(account, totalRewardsAmount),
+      })
+    }
+  }
 
   return params
 }
@@ -781,6 +955,7 @@ export const createMarket = async (params: CreateMarketParams) => {
     conditionId,
     service.cpk.address,
     spread,
+    networkId,
   )
   logger.log(`Predicted market maker address: ${predictedMarketMakerAddress}`)
 
@@ -806,6 +981,25 @@ export const createMarket = async (params: CreateMarketParams) => {
       spread,
       amount,
       distributionHint,
+    ),
+  })
+
+  const stakingRewardsFactoryAddress = getContractAddress(networkId, 'stakingRewardsFactory')
+  const omnTokenAddress = getToken(networkId, 'omn').address
+  const startingTimestamp = Math.floor(new Date().getTime() / 1000)
+  const endingTimestamp = Math.floor((marketData.resolution?.getTime() || 1) / 1000 - DAY_IN_SECONDS)
+
+  // Step 6: Create staking distribution contract
+  transactions.push({
+    to: stakingRewardsFactoryAddress || '',
+    data: StakingFactoryService.encodeCreateDistribution(
+      [omnTokenAddress],
+      predictedMarketMakerAddress,
+      [new BigNumber(0)],
+      startingTimestamp,
+      endingTimestamp,
+      false,
+      MaxUint256,
     ),
   })
 
@@ -1021,7 +1215,7 @@ export const wrangleRemoveFundsParams = async (params: WrangleRemoveFundsParams)
   const { amountToMerge, earnings, marketMaker, networkId } = params
   const collateralAddress = await marketMaker.getCollateralToken()
   const collateral = getTokenFromAddress(networkId, collateralAddress)
-  const amount = amountToMerge.add(earnings)
+  const amount = amountToMerge.add(earnings || new BigNumber(0))
 
   return { ...params, amount, collateral }
 }

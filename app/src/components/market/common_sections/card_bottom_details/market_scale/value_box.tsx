@@ -3,7 +3,7 @@ import ReactTooltip from 'react-tooltip'
 import styled from 'styled-components'
 
 import { IconInfo } from '../../../../common/icons'
-import { Circle, SCALE_HEIGHT, VALUE_BOXES_MARGIN } from '../../../common_styled'
+import { Circle } from '../../../common_styled'
 
 const ValueBoxSegment = styled.div<{ threeBoxes?: boolean }>`
   font-size: ${props => props.theme.fonts.defaultSize};
@@ -48,11 +48,10 @@ const ValueBoxSingle = styled.div<{ xValue?: number }>`
               ? `${props.xValue * 100}%; transform: translateX(-50%);`
               : ``
           }`
-        : `right: 0;`
+        : `margin-left:auto;`
       : ''};
   background: ${props => props.theme.colors.mainBodyBackground};
-  position: absolute;
-  top: calc(${SCALE_HEIGHT} + ${VALUE_BOXES_MARGIN});
+  position: relative;
   border-radius: 4px;
 `
 

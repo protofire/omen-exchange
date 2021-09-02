@@ -1,27 +1,12 @@
 import { utils } from 'ethers'
 import { BigNumber } from 'ethers/utils'
 
-import { wETHabi, wsPOAabi, wxDaiabi } from '../abi/wrapped_asset'
+import wrappedAsset from '../abi/wrappedAsset.json'
 
 class UnwrapTokenService {
   static withdrawAmount = (symbol: string, amount: BigNumber): string => {
-    const contractABI = UnwrapTokenService.getABI(symbol.toLowerCase())
-    const withdrawInterface = new utils.Interface(contractABI)
+    const withdrawInterface = new utils.Interface(wrappedAsset)
     return withdrawInterface.functions.withdraw.encode([amount.toString()])
-  }
-
-  static getABI = (symbol: string) => {
-    const symbolLowerCase = symbol.toLowerCase()
-    switch (symbolLowerCase) {
-      case 'wxdai':
-        return wxDaiabi
-      case 'wspoa':
-        return wsPOAabi
-      case 'weth':
-        return wETHabi
-      default:
-        return []
-    }
   }
 }
 
