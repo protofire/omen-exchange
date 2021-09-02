@@ -11,7 +11,7 @@ const Wrapper = styled.div<{ margin?: boolean }>`
   border: ${({ theme }) => theme.borders.borderLineDisabled};
   align-content: center;
   padding: 4px 20px;
-  margin-bottom: ${props => (props.margin ? '20px' : '0')};
+  margin-bottom: ${props => (!props.margin ? '20px' : '0')};
 `
 
 const AlertWrapper = styled.div`
@@ -32,7 +32,7 @@ const Description = styled.p`
   width: 100%;
 
   &.danger {
-    color: ${props => props.theme.message.colors.error};
+    color: ${props => props.theme.alert};
   }
 `
 
@@ -59,7 +59,7 @@ export const WarningMessage = (props: Props) => {
     grayscale,
     href,
     hyperlinkDescription,
-    marginBottom = true,
+    marginBottom,
     ...restProps
   } = props
   return (
