@@ -200,7 +200,7 @@ interface Props {
   duration: any
   marketDetails: any
   scaleValue: any
-  liqudiity: any
+  liquidity: any
   totalVolume: any
   volume: any
   closingDate: any
@@ -209,6 +209,8 @@ interface Props {
   verified: any
   isScalar: any
   setIsScalar: any
+  proposalTimeLeft: string
+  yesVotes: string
   back: () => void
 }
 export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
@@ -220,12 +222,14 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     closingIn,
     duration,
     isScalar,
-    liqudiity,
+    liquidity,
     marketDetails,
+    proposalTimeLeft,
     scaleValue,
     setIsScalar,
     totalVolume,
     volume,
+    yesVotes,
   } = props
 
   const object = [
@@ -234,7 +238,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     ['Duration', { text: duration }],
   ]
   const secondObject = [
-    ['Liquidity', { text: liqudiity }],
+    ['Liquidity', { text: liquidity }],
     ['Total Volume', { text: totalVolume }],
     ['24h Volume', { text: volume }],
     ['Closing', { text: closingDate }],
@@ -257,7 +261,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
           <TYPE.heading3 marginLeft={'12px'}>Guild Overview</TYPE.heading3>
         </BackNavigation>
         <MarketStatus>
-          <MarketStatusText>5 days, 54 mins left</MarketStatusText>
+          <MarketStatusText>{proposalTimeLeft}</MarketStatusText>
           <StateButton>
             <MarketStatusText>Active</MarketStatusText>
           </StateButton>
@@ -313,8 +317,8 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
           <VoteHeading>Vote</VoteHeading>
           <VotesBar>
             <BarDiagram
-              additionalTextLeft={'454 votes'}
-              additionalTextRight={'454 OMEN'}
+              additionalTextLeft={`${yesVotes} votes`}
+              additionalTextRight={`${yesVotes} OMEN`}
               color={'primary1'}
               outcomeIndex={22}
               outcomeName={'Yes'}

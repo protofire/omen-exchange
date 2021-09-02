@@ -1,12 +1,14 @@
+import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import { RouteComponentProps, useHistory } from 'react-router'
 
+import { STANDARD_DECIMALS } from '../../common/constants'
 import { ProposalDetailsView } from '../../components/guild/proposal_details_view_container'
 import { useConnectedWeb3Context } from '../../contexts'
 import { useGraphMarketMakerData, useGuildProposals } from '../../hooks'
 import { Proposal } from '../../services/guild'
-
+import { bigNumberToString } from '../../util/tools/formatting'
 interface RouteParams {
   id: string
 }
@@ -32,10 +34,27 @@ export const ProposalDetailsPage = (props: RouteComponentProps<RouteParams>) => 
     }
   }, [proposals, proposalId])
 
-  const proposalEndDate = proposal && new Date(proposal.endTime.toNumber() * 1000)
-  // eslint-disable-next-line
-  const formattedProposalEndDate = moment(proposalEndDate).fromNow(true)
+  if (!proposal || !marketMakerData) {
+    return <div />
+  }
 
+  const proposalEndDate = proposal && new Date(proposal.endTime.toNumber() * 1000)
+  const proposalTimeLeft = `${moment(proposalEndDate).fromNow(true)} left`
+
+  const yesVotes = bigNumberToString(proposal.totalVotes || new BigNumber(0), STANDARD_DECIMALS)
+  const liquidity = `${bigNumberToString(marketMakerData.totalPoolShares, marketMakerData.collateral.decimals)} ${
+    marketMakerData.collateral.symbol
+  }`
+  const totalVolume = `${bigNumberToString(marketMakerData.collateralVolume, marketMakerData.collateral.decimals)} ${
+    marketMakerData.collateral.symbol
+  }`
+  const volume = `${bigNumberToString(marketMakerData.dailyVolume, marketMakerData.collateral.decimals)} ${
+    marketMakerData.collateral.symbol
+  }`
+  const marketDetails = marketMakerData.title
+  const closingDate = `${moment(marketMakerData.openingTimestamp).format('DD MMM YYYY')} at ${moment(
+    marketMakerData.openingTimestamp,
+  ).format('H:mm zz')}`
   const back = () => history.push('/guild')
 
   //logic
@@ -44,17 +63,18 @@ export const ProposalDetailsPage = (props: RouteComponentProps<RouteParams>) => 
     apy: '360%',
     back,
     duration: '32 days',
-    marketDetails:
-      'What will the June 2021 CME/Globex S&P500 e-mini terminate at? https://www.cmegroup.com/trading/equity-index/us-index/e-mini-sandp500_quotes_globex.html',
+    marketDetails,
     scaleValue: 0.9,
-    liqudiity: '15,000.00 DAI',
-    totalVolume: '4540.00 DAI',
-    volume: '120.00 DAI',
-    closingDate: '12th January 2021 at 00:00 UTC',
+    liquidity,
+    totalVolume,
+    volume,
+    closingDate,
     closingIn: '32 days',
     apyTwo: '24.53%',
     verified: true,
     isScalar: isScalar,
+    proposalTimeLeft,
+    yesVotes,
     setIsScalar: setIsScalar,
   }
   return <ProposalDetailsView {...dummyDataPassed} />
