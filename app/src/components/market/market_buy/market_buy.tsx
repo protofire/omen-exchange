@@ -205,6 +205,7 @@ const MarketBuyWrapper: React.FC<Props> = (props: Props) => {
           <ReactTooltip id="walletBalanceTooltip" />
 
           <TextfieldCustomPlaceholder
+            error={!!amountError}
             formField={
               <BigNumberInput
                 decimals={collateral.decimals}

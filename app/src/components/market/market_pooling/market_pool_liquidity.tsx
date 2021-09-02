@@ -204,6 +204,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               </CurrenciesWrapper>
 
               <TextfieldCustomPlaceholder
+                error={!!collateralAmountError}
                 formField={
                   <BigNumberInput
                     decimals={collateral.decimals}
@@ -233,6 +234,7 @@ const MarketPoolLiquidityWrapper: React.FC<Props> = (props: Props) => {
               <TokenBalance text="Pool Tokens" value={sharesBalance} />
 
               <TextfieldCustomPlaceholder
+                error={!!sharesAmountError}
                 formField={
                   <BigNumberInput
                     decimals={collateral.decimals}

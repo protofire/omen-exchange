@@ -13,6 +13,7 @@ import {
   useCpkProxy,
   useFundingBalance,
   useGraphLiquidityMiningCampaigns,
+  useRelay,
 } from '../../hooks'
 import { GraphResponseLiquidityMiningCampaign } from '../../hooks/useGraphLiquidityMiningCampaigns'
 import { useTokenPrice } from '../../hooks/useTokenPrice'
@@ -179,6 +180,11 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
 
   const totalUserLiquidity = totalDepositedTokens.add(userEarnings).add(userStakedTokens)
 
+  const { relayFeeGreaterThanAmount, relayFeeGreaterThanBalance } = useRelay(
+    amountToFund || new BigNumber(0),
+    collateral,
+  )
+
   const { proxyIsUpToDate, updateProxy } = useCpkProxy()
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
@@ -186,16 +192,22 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     ? null
     : maybeCollateralBalance === null
     ? null
+    : relayFeeGreaterThanBalance
+    ? 'Insufficient Dai in your Omen Account'
     : maybeCollateralBalance.isZero() && amountToFund?.gt(maybeCollateralBalance)
     ? `Insufficient balance`
     : amountToFund?.gt(maybeCollateralBalance)
     ? `Value must be less than or equal to ${walletBalance} ${collateral.symbol}`
+    : relayFeeGreaterThanAmount
+    ? 'Relay fee is greater than buy amount'
     : null
 
   const sharesAmountError = isTransactionProcessing
     ? null
     : maybeFundingBalance === null
     ? null
+    : relayFeeGreaterThanBalance
+    ? 'Insufficient Dai in your Omen Account'
     : maybeFundingBalance.isZero() && amountToRemove?.gt(maybeFundingBalance) && amountToRemove?.gt(userStakedTokens)
     ? `Insufficient balance`
     : amountToRemove?.gt(fundingBalance) && amountToRemove?.gt(userStakedTokens)
@@ -215,7 +227,8 @@ const MarketPoolLiquidityContainer: React.FC<Props> = (props: Props) => {
     (!cpk?.isSafeApp && collateral.address !== pseudoNativeAssetAddress && hasEnoughAllowance !== Ternary.True) ||
     collateralAmountError !== null ||
     currentDate > resolutionDate ||
-    isNegativeAmountToFund
+    isNegativeAmountToFund ||
+    relayFeeGreaterThanAmount
 
   const upgradeProxy = async () => {
     if (!cpk) {

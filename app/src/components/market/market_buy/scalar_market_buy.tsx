@@ -221,6 +221,7 @@ export const ScalarMarketBuy = (props: Props) => {
           </CurrenciesWrapper>
           <ReactTooltip id="walletBalanceTooltip" />
           <TextfieldCustomPlaceholder
+            error={!!amountError}
             formField={
               <BigNumberInput
                 decimals={collateral.decimals}

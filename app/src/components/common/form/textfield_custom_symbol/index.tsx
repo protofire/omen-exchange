@@ -5,6 +5,7 @@ import { CommonDisabledCSS } from '../common_styled'
 
 interface Props {
   disabled?: boolean
+  error?: boolean
   formField: any
   symbol: any
   shouldDisplayMaxButton?: boolean
@@ -12,10 +13,10 @@ interface Props {
   style?: CSSProperties | undefined
 }
 
-const FieldWrapper = styled.div`
+const FieldWrapper = styled.div<{ error?: boolean }>`
   align-items: center;
   background-color: ${props => props.theme.textfield.backgroundColor};
-  border-color: ${props => props.theme.textfield.borderColor};
+  border-color: ${props => (props.error ? props.theme.alert : props.theme.border1)};
   border-style: ${props => props.theme.textfield.borderStyle};
   border-width: ${props => props.theme.textfield.borderWidth};
   border-radius: ${props => props.theme.textfield.borderRadius};
@@ -26,16 +27,16 @@ const FieldWrapper = styled.div`
   width: 100%;
 
   &:hover {
-    border-color: ${props => props.theme.textfield.borderColorOnHover};
+    border-color: ${props => (props.error ? props.theme.alert : props.theme.border2)};
     .btn--max {
-      border-color: ${props => props.theme.textfield.borderColorOnHover};
+      border-color: ${props => (props.error ? props.theme.alert : props.theme.border2)};
     }
   }
 
   &:focus-within {
-    border-color: ${props => props.theme.textfield.borderColorActive};
+    border-color: ${props => (props.error ? props.theme.alert : props.theme.border3)};
     .btn--max {
-      border-color: ${props => props.theme.textfield.borderColorActive};
+      border-color: ${props => (props.error ? props.theme.alert : props.theme.border3)};
     }
   }
 
@@ -44,12 +45,12 @@ const FieldWrapper = styled.div`
   > input {
     background-color: transparent;
     border: none;
-    color: ${props => props.theme.textfield.color};
+    color: ${props => props.theme.text2};
     flex-grow: 1;
     font-family: ${props => props.theme.fonts.fontFamily};
     font-size: ${props => props.theme.textfield.fontSize};
-    font-weight: ${props => props.theme.textfield.fontWeight};
-    line-height: 1.2;
+    font-weight: 400;
+    line-height: 18px;
     margin: 0 5px 0 0;
     min-width: 0;
     outline: ${props => props.theme.textfield.outline};
@@ -91,7 +92,7 @@ const FieldWrapper = styled.div`
 `
 
 const Symbol = styled.span<{ marginRight?: boolean }>`
-  color: ${props => props.theme.colors.primary};
+  color: ${props => props.theme.text2};
   flex-shrink: 0;
   font-size: 14px;
   font-weight: 500;
@@ -124,7 +125,6 @@ const MaxButton = styled.span`
 
 export const TextfieldCustomSymbol = (props: Props) => {
   const { disabled, formField, onClickMaxButton, shouldDisplayMaxButton, symbol, ...restProps } = props
-
   // eslint-disable-next-line no-warning-comments
   //TODO: use a input[text] instead of passing a <Textfield />
   return (

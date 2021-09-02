@@ -98,6 +98,7 @@ const MarketSellWrapper: React.FC<Props> = (props: Props) => {
           <TokenBalance text="Your Shares" value={selectedOutcomeBalance} />
           <ReactTooltip id="walletBalanceTooltip" />
           <TextfieldCustomPlaceholder
+            error={!!amountError}
             formField={
               <BigNumberInput
                 decimals={collateral.decimals}

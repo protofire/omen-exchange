@@ -32,7 +32,7 @@ const Description = styled.p`
   width: 100%;
 
   &.danger {
-    color: ${props => props.theme.message.colors.error};
+    color: ${props => props.theme.alert};
   }
 `
 

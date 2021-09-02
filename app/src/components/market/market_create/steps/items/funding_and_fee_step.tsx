@@ -12,7 +12,7 @@ import {
   MAX_MARKET_FEE,
 } from '../../../../../common/constants'
 import { useConnectedWeb3Context } from '../../../../../contexts'
-import { useCollateralBalance, useCpkAllowance, useCpkProxy } from '../../../../../hooks'
+import { useCollateralBalance, useCpkAllowance, useCpkProxy, useRelay } from '../../../../../hooks'
 import { useGraphMarketsFromQuestion } from '../../../../../hooks/graph/useGraphMarketsFromQuestion'
 import { BalanceState, fetchAccountBalance } from '../../../../../store/reducer'
 import { MarketCreationStatus } from '../../../../../util/market_creation_status_data'
@@ -253,6 +253,8 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
   const { proxyIsUpToDate, updateProxy } = useCpkProxy(collateral.address === pseudoNativeAssetAddress)
   const isUpdated = RemoteData.hasData(proxyIsUpToDate) ? proxyIsUpToDate.data : true
 
+  const { relayFeeGreaterThanAmount, relayFeeGreaterThanBalance } = useRelay(amount || new BigNumber(0), collateral)
+
   useEffect(() => {
     dispatch(fetchAccountBalance(account, provider, collateral))
   }, [dispatch, account, provider, collateral])
@@ -285,10 +287,14 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
       ? null
       : !maybeCollateralBalance.eq(collateralBalance)
       ? null
+      : relayFeeGreaterThanBalance
+      ? 'Insufficient Dai in your Omen Account'
       : maybeCollateralBalance.isZero() && funding.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : funding.gt(maybeCollateralBalance)
       ? `Value must be less than or equal to ${collateralBalanceFormatted} ${collateral.symbol}`
+      : relayFeeGreaterThanAmount
+      ? 'Relay fee is greater than buy amount'
       : null
 
   const isCreateMarketbuttonDisabled =
@@ -472,6 +478,7 @@ const FundingAndFeeStep: React.FC<Props> = (props: Props) => {
               />
             </CurrenciesWrapper>
             <TextfieldCustomPlaceholder
+              error={!!amountError}
               formField={
                 <BigNumberInput
                   decimals={collateral.decimals}

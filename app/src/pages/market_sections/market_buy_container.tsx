@@ -6,7 +6,14 @@ import { STANDARD_DECIMALS } from '../../common/constants'
 import { MarketBuy } from '../../components/market/market_buy/market_buy'
 import { ScalarMarketBuy } from '../../components/market/market_buy/scalar_market_buy'
 import { ConnectedWeb3Context, useConnectedWeb3Context } from '../../contexts'
-import { useAsyncDerivedValue, useCollateralBalance, useContracts, useCpkAllowance, useCpkProxy } from '../../hooks'
+import {
+  useAsyncDerivedValue,
+  useCollateralBalance,
+  useContracts,
+  useCpkAllowance,
+  useCpkProxy,
+  useRelay,
+} from '../../hooks'
 import { CPKService, MarketMakerService } from '../../services'
 import { getNativeAsset, pseudoNativeAssetAddress } from '../../util/networks'
 import { RemoteData } from '../../util/remote_data'
@@ -118,6 +125,8 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
     context,
   )
 
+  const { relayFeeGreaterThanAmount, relayFeeGreaterThanBalance } = useRelay(amount, collateral)
+
   useEffect(() => {
     setIsNegativeAmount((amount || Zero).lt(Zero))
   }, [amount, collateral.decimals])
@@ -201,10 +210,14 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
       ? null
       : maybeCollateralBalance === null
       ? null
+      : relayFeeGreaterThanBalance
+      ? 'Insufficient Dai in your Omen Account'
       : maybeCollateralBalance.isZero() && amount?.gt(maybeCollateralBalance)
       ? `Insufficient balance`
       : amount?.gt(maybeCollateralBalance)
       ? `Value must be less than or equal to ${currentBalance} ${collateral.symbol}`
+      : relayFeeGreaterThanAmount
+      ? 'Relay fee is greater than buy amount'
       : null
 
   const unlockCollateral = async () => {
@@ -245,7 +258,9 @@ const MarketBuyContainer: React.FC<Props> = (props: Props) => {
       hasEnoughAllowance !== Ternary.True) ||
     amountError !== null ||
     isNegativeAmount ||
-    !isUpdated
+    !isUpdated ||
+    relayFeeGreaterThanAmount ||
+    relayFeeGreaterThanBalance
 
   const shouldDisplayMaxButton = collateral.address !== pseudoNativeAssetAddress
   const sharesTotal = bigNumberToString(tradedShares, collateral.decimals)

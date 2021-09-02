@@ -233,6 +233,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
               </CurrenciesWrapper>
 
               <TextfieldCustomPlaceholder
+                error={!!collateralAmountError}
                 formField={
                   <BigNumberInput
                     decimals={collateral.decimals}
@@ -262,6 +263,7 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
               <TokenBalance text="Pool Tokens" value={sharesBalance} />
 
               <TextfieldCustomPlaceholder
+                error={!!sharesAmountError}
                 formField={
                   <BigNumberInput
                     decimals={collateral.decimals}
@@ -289,7 +291,6 @@ export const ScalarMarketPoolLiquidity = (props: Props) => {
                 shouldDisplayMaxButton
                 symbol="Shares"
               />
-
               {sharesAmountError && <GenericError>{sharesAmountError}</GenericError>}
             </>
           )}

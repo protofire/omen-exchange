@@ -168,7 +168,7 @@ export const ErrorsWrapper = styled.div`
 `
 
 export const GenericError = styled.p<{ margin?: string }>`
-  color: ${props => props.theme.colors.error};
+  color: ${props => props.theme.alert};
   font-size: 13px;
   font-weight: 500;
   line-height: 1.5;

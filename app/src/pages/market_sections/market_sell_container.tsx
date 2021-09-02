@@ -6,7 +6,7 @@ import { STANDARD_DECIMALS } from '../../common/constants'
 import { MarketSell } from '../../components/market/market_sell/market_sell'
 import { ScalarMarketSell } from '../../components/market/market_sell/scalar_market_sell'
 import { useConnectedWeb3Context } from '../../contexts'
-import { useAsyncDerivedValue, useContracts } from '../../hooks'
+import { useAsyncDerivedValue, useContracts, useRelay } from '../../hooks'
 import { MarketMakerService } from '../../services'
 import { getLogger } from '../../util/logger'
 import {
@@ -81,6 +81,8 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
   const [amountSharesToDisplay, setAmountSharesToDisplay] = useState<string>('')
   const [message, setMessage] = useState<string>('')
 
+  const { relayFeeGreaterThanBalance } = useRelay()
+
   let defaultOutcomeIndex = 0
   for (let i = 0; i < balances.length; i++) {
     const shares = bigNumberToNumber(balances[i].shares, collateral.decimals)
@@ -122,6 +124,8 @@ const MarketSellContainer: React.FC<Props> = (props: Props) => {
     ? null
     : balanceItem.shares === null
     ? null
+    : relayFeeGreaterThanBalance
+    ? 'Insufficient Dai in your Omen Account'
     : balanceItem.shares.isZero() && amountShares?.gt(balanceItem.shares)
     ? `Insufficient balance`
     : amountShares?.gt(balanceItem.shares)
