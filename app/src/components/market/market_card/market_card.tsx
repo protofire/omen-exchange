@@ -91,7 +91,7 @@ const ScaleWrapper = styled.div`
   border-radius: 8px;
   margin-bottom: 16px;
   padding: 13px 0px;
-  height: 76px;
+  height: 79px;
 `
 
 const PercWrapper = styled.div`
