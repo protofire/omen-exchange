@@ -189,7 +189,13 @@ export const MarketCard = (props: Props) => {
               Voting ends in {moment(new Date(proposal.endTime.toNumber() * 1000)).fromNow(true)}
             </TYPE.heading3>
           </BarHeadingWrapper>
-          <BarDiagram color={'primary1'} displayText={false} probability={progress || 0} progressBarHeight={4} />
+          <BarDiagram
+            color={'primary1'}
+            displayText={false}
+            probability={progress || 0}
+            progressBarHeight={4}
+            quorum={16}
+          />
         </BarWrapper>
       )}
       <StyledMarketCard active={active} onClick={onClick} proposal={!!proposal}>
