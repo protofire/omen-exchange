@@ -5,10 +5,12 @@ import { RouteComponentProps, useHistory } from 'react-router'
 
 import { STANDARD_DECIMALS } from '../../common/constants'
 import { ProposalDetailsView } from '../../components/guild/proposal_details_view_container'
+import { InlineLoading } from '../../components/loading'
 import { useConnectedWeb3Context } from '../../contexts'
 import { useGraphMarketMakerData, useGuildProposals } from '../../hooks'
 import { Proposal } from '../../services/guild'
-import { bigNumberToString } from '../../util/tools/formatting'
+import { bigNumberToString, isScalarMarket } from '../../util/tools'
+
 interface RouteParams {
   id: string
 }
@@ -21,11 +23,9 @@ export const ProposalDetailsPage = (props: RouteComponentProps<RouteParams>) => 
   const { proposals } = useGuildProposals()
 
   const proposalId = props.match.params.id
-  const [isScalar, setIsScalar] = useState(false)
   const [proposal, setProposal] = useState<Proposal>()
 
-  // eslint-disable-next-line
-  const { marketMakerData } = useGraphMarketMakerData(proposal ? proposal.description : '', networkId)
+  const { fetchData, marketMakerData } = useGraphMarketMakerData(proposal ? proposal.description : '', networkId)
 
   useEffect(() => {
     if (proposals.length) {
@@ -34,8 +34,15 @@ export const ProposalDetailsPage = (props: RouteComponentProps<RouteParams>) => 
     }
   }, [proposals, proposalId])
 
+  useEffect(() => {
+    if (proposal && proposal.description) {
+      fetchData()
+    }
+    // eslint-disable-next-line
+  }, [proposal, proposal && proposal.description])
+
   if (!proposal || !marketMakerData) {
-    return <div />
+    return <InlineLoading />
   }
 
   const proposalEndDate = proposal && new Date(proposal.endTime.toNumber() * 1000)
@@ -55,6 +62,8 @@ export const ProposalDetailsPage = (props: RouteComponentProps<RouteParams>) => 
   const closingDate = `${moment(marketMakerData.openingTimestamp).format('DD MMM YYYY')} at ${moment(
     marketMakerData.openingTimestamp,
   ).format('H:mm zz')}`
+  const isScalar = isScalarMarket(marketMakerData.oracle || '', networkId)
+
   const back = () => history.push('/guild')
 
   //logic
@@ -72,10 +81,9 @@ export const ProposalDetailsPage = (props: RouteComponentProps<RouteParams>) => 
     closingIn: '32 days',
     apyTwo: '24.53%',
     verified: true,
-    isScalar: isScalar,
+    isScalar,
     proposalTimeLeft,
     yesVotes,
-    setIsScalar: setIsScalar,
   }
   return <ProposalDetailsView {...dummyDataPassed} />
 }

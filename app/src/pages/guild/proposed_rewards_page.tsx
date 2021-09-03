@@ -2,6 +2,7 @@ import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 
 import { ProposedRewardsView } from '../../components/guild/proposed_rewards_view'
+import { InlineLoading } from '../../components/loading'
 import { ConnectedWeb3Context } from '../../contexts'
 import { useGraphLiquidityMiningCampaigns, useGuildProposals } from '../../hooks'
 import { OmenGuildService } from '../../services/guild'
@@ -39,7 +40,7 @@ const ProposedRewardsPage = (props: Props) => {
 
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
-  const { proposals } = useGuildProposals()
+  const { loadingProposals, proposals } = useGuildProposals()
 
   const PAGE_SIZE = 6
   useEffect(() => {
@@ -109,6 +110,10 @@ const ProposedRewardsPage = (props: Props) => {
   const prev = () => {
     onLoadPrevPage(PAGE_SIZE)
     setSelected('')
+  }
+
+  if (loadingProposals || RemoteData.is.loading(markets) || RemoteData.is.reloading(markets)) {
+    return <InlineLoading />
   }
 
   return (

@@ -85,6 +85,7 @@ const MarketStatus = styled.div`
     margin-top: 16px;
   }
 `
+
 const StateButton = styled.div`
   border: 1px solid #4b9e98;
   padding: 9px 14px;
@@ -208,7 +209,6 @@ interface Props {
   apyTwo: any
   verified: any
   isScalar: any
-  setIsScalar: any
   proposalTimeLeft: string
   yesVotes: string
   back: () => void
@@ -226,7 +226,6 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     marketDetails,
     proposalTimeLeft,
     scaleValue,
-    setIsScalar,
     totalVolume,
     volume,
     yesVotes,
@@ -271,18 +270,12 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
         <MainSection>
           <Heading>Issue Liquidity Rewards</Heading>
           <StyledTable valueObject={object} />
-          <MarketDetails
-            onClick={() => {
-              setIsScalar(!isScalar)
-            }}
-          >
-            Market Details
-          </MarketDetails>
+          <MarketDetails>Market Details</MarketDetails>
           <TYPE.heading3 color={'text3'} marginTop={'12px'}>
             {marketDetails}
           </TYPE.heading3>
           <OutcomeStyleWrapper>
-            {!isScalar ? (
+            {isScalar ? (
               <>
                 <MarketScale
                   currentPrediction={scaleValue}

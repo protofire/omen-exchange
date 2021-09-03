@@ -6,6 +6,7 @@ import { Proposal } from '../../../services/guild'
 import { TYPE } from '../../../theme'
 import { bigNumberToString, isScalarMarket, limitDecimalPlaces } from '../../../util/tools'
 import { MarketMakerDataItem } from '../../../util/types'
+import { BarDiagram } from '../common_sections/card_bottom_details/bar_diagram_probabilities'
 import {
   HorizontalBarChange,
   Scale,
@@ -22,22 +23,17 @@ const ClosingWrapper = styled.div`
   margin-bottom: 16px;
 `
 
-const StyledMarketCard = styled.div<{ active?: boolean }>`
-  flex-basis: calc(33.33% - 13.3px);
-  border: 1px solid ${props => (props.active ? props.theme.colors.borderColorDark : props.theme.colors.tertiary)};
-  padding: 28px;
-  margin-top: 20px;
+const StyledMarketCard = styled.div<{ active?: boolean; proposal?: boolean }>`
+  border-style: solid;
+  border-color: ${props => (props.active ? props.theme.colors.borderColorDark : props.theme.colors.tertiary)};
+  border-width: ${props => (props.proposal ? '0 1px 1px 1px' : '1px')};
+  padding: ${props => (props.proposal ? '24px 28px 28px 28px' : '28px')};
   box-sizing: border-box;
-  border-radius: 12px;
+  border-radius: ${props => (props.proposal ? '0 0 12px 12px' : '12px')};
 
   &:hover {
     border-color: ${props => (props.active ? props.theme.colors.borderColorDark : '#D2D6ED')};
     cursor: pointer;
-  }
-
-  @media (max-width: ${props => props.theme.themeBreakPoints.sm}) {
-    flex-basis: 100%;
-    margin-left: 0 !important;
   }
 `
 
@@ -109,6 +105,34 @@ const Tooltip = styled(ScaleTooltip as any)`
   margin-top: 10px;
 `
 
+const BarWrapper = styled.div<{ active?: boolean }>`
+  padding: 28px 28px 24px 28px;
+  border: 1px solid ${props => props.theme.colors.verticalDivider};
+  border-color: ${props => (props.active ? props.theme.colors.borderColorDark : props.theme.colors.tertiary)};
+  border-radius: 12px 12px 0 0;
+
+  &:hover {
+    border-color: ${props => (props.active ? props.theme.colors.borderColorDark : '#D2D6ED')};
+    cursor: pointer;
+  }
+`
+
+const BarHeadingWrapper = styled.div`
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`
+
+const CardWrapper = styled.div`
+  flex-basis: calc(33.33% - 13.3px);
+  margin-top: 20px;
+  @media (max-width: ${props => props.theme.themeBreakPoints.md}) {
+    flex-basis: 100%;
+    margin-left: 0 !important;
+  }
+`
+
 interface Props {
   active: boolean
   market: MarketMakerDataItem
@@ -118,7 +142,7 @@ interface Props {
 }
 
 export const MarketCard = (props: Props) => {
-  const { active, market, networkId, onClick } = props
+  const { active, market, networkId, onClick, proposal } = props
 
   const resolutionDate = moment(market.openingTimestamp).format('Do MMMM YYYY')
   const formattedLiquidity: string = bigNumberToString(market.totalPoolShares, market.collateral.decimals)
@@ -146,53 +170,75 @@ export const MarketCard = (props: Props) => {
         : Number(currentPrediction) * 100
   }
 
+  let progress
+  if (proposal) {
+    // total time range
+    const total = proposal.endTime.toNumber() - proposal.startTime.toNumber()
+    // where we are in the range
+    const now = proposal.endTime.toNumber() - new Date().getTime() / 1000
+    // progress percentage
+    progress = limitDecimalPlaces(String(proposal && (now / total) * 100), 2)
+  }
+
   return (
-    <StyledMarketCard active={active} onClick={onClick}>
-      <ClosingWrapper>
-        <TYPE.bodyRegular color="text2">Closing {resolutionDate}</TYPE.bodyRegular>
-        <RadioWrapper selected={active}>{active && <Tick />}</RadioWrapper>
-      </ClosingWrapper>
-      <TitleWrapper>
-        <TYPE.bodyMedium color="text1">{market.title}</TYPE.bodyMedium>
-      </TitleWrapper>
-      {isScalar ? (
-        <ScaleWrapper>
-          <PercWrapper>
-            <TYPE.bodyRegular color="text2" marginLeft={16}>
-              0%
-            </TYPE.bodyRegular>
-            <TYPE.bodyRegular color="text2" marginRight={16}>
-              1%
-            </TYPE.bodyRegular>
-          </PercWrapper>
-          <Scale>
-            <Tooltip id="scale-tooltip" static={true} xValue={xValue}>
-              <ScaleTooltipMessage>90.54%</ScaleTooltipMessage>
-            </Tooltip>
-            <ScaleDot positive={undefined} xValue={Number(market.outcomeTokenMarginalPrices[1])} />
-            <HorizontalBarChange color="primary4" height={1} start={0} width={1} />
-          </Scale>
-        </ScaleWrapper>
-      ) : (
-        <OutcomeWrapper>
-          <OutcomeRow>
-            <TYPE.bodyRegular color="text2">{firstOutcome}</TYPE.bodyRegular>
-            <TYPE.bodyMedium color="text2">{firstOutcomePerc}%</TYPE.bodyMedium>
-          </OutcomeRow>
-          <OutcomeRow>
-            <TYPE.bodyRegular color="text2">{secondOutcome}</TYPE.bodyRegular>
-            <TYPE.bodyMedium color="text2">{compressedPerc}%</TYPE.bodyMedium>
-          </OutcomeRow>
-        </OutcomeWrapper>
+    <CardWrapper>
+      {proposal && (
+        <BarWrapper active={active}>
+          <BarHeadingWrapper>
+            <TYPE.heading3 color="text1">
+              Voting ends in {moment(new Date(proposal.endTime.toNumber() * 1000)).fromNow(true)}
+            </TYPE.heading3>
+          </BarHeadingWrapper>
+          <BarDiagram color={'primary1'} displayText={false} probability={progress || 0} progressBarHeight={4} />
+        </BarWrapper>
       )}
-      <DetailsWrapper>
-        <TYPE.bodyRegular color="text2">
-          {formattedLiquidity} {market.collateral.symbol} Liquidity
-        </TYPE.bodyRegular>
-        <TYPE.bodyRegular color="text2">
-          {formattedVolume} {market.collateral.symbol} Volume
-        </TYPE.bodyRegular>
-      </DetailsWrapper>
-    </StyledMarketCard>
+      <StyledMarketCard active={active} onClick={onClick} proposal={!!proposal}>
+        <ClosingWrapper>
+          <TYPE.bodyRegular color="text2">Closing {resolutionDate}</TYPE.bodyRegular>
+          <RadioWrapper selected={active}>{active && <Tick />}</RadioWrapper>
+        </ClosingWrapper>
+        <TitleWrapper>
+          <TYPE.bodyMedium color="text1">{market.title}</TYPE.bodyMedium>
+        </TitleWrapper>
+        {isScalar ? (
+          <ScaleWrapper>
+            <PercWrapper>
+              <TYPE.bodyRegular color="text2" marginLeft={16}>
+                0%
+              </TYPE.bodyRegular>
+              <TYPE.bodyRegular color="text2" marginRight={16}>
+                100%
+              </TYPE.bodyRegular>
+            </PercWrapper>
+            <Scale>
+              <Tooltip id="scale-tooltip" static={true} xValue={xValue}>
+                <ScaleTooltipMessage>{limitDecimalPlaces(String(xValue), 2)}%</ScaleTooltipMessage>
+              </Tooltip>
+              <ScaleDot positive={undefined} xValue={Number(market.outcomeTokenMarginalPrices[1])} />
+              <HorizontalBarChange color="primary4" height={1} start={0} width={1} />
+            </Scale>
+          </ScaleWrapper>
+        ) : (
+          <OutcomeWrapper>
+            <OutcomeRow>
+              <TYPE.bodyRegular color="text2">{firstOutcome}</TYPE.bodyRegular>
+              <TYPE.bodyMedium color="text2">{firstOutcomePerc}%</TYPE.bodyMedium>
+            </OutcomeRow>
+            <OutcomeRow>
+              <TYPE.bodyRegular color="text2">{secondOutcome}</TYPE.bodyRegular>
+              <TYPE.bodyMedium color="text2">{compressedPerc}%</TYPE.bodyMedium>
+            </OutcomeRow>
+          </OutcomeWrapper>
+        )}
+        <DetailsWrapper>
+          <TYPE.bodyRegular color="text2">
+            {formattedLiquidity} {market.collateral.symbol} Liquidity
+          </TYPE.bodyRegular>
+          <TYPE.bodyRegular color="text2">
+            {formattedVolume} {market.collateral.symbol} Volume
+          </TYPE.bodyRegular>
+        </DetailsWrapper>
+      </StyledMarketCard>
+    </CardWrapper>
   )
 }

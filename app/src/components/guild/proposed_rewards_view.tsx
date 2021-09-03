@@ -160,7 +160,7 @@ const ProposedRewardsView = (props: Props) => {
           Propose Liq. Rewards
         </ProposalButton>
       </ProposalHeadingWrapper>
-      {propose ? (
+      {propose && (
         <MarketCardsWrapper>
           {RemoteData.hasData(markets) &&
             RemoteData.is.success(markets) &&
@@ -177,7 +177,8 @@ const ProposedRewardsView = (props: Props) => {
               )
             })}
         </MarketCardsWrapper>
-      ) : (
+      )}
+      {!propose && proposals.length > 0 && (
         <MarketCardsWrapper>
           {proposals.map(proposal => (
             <ProposalMarketCard key={proposal.id} networkId={networkId} proposal={proposal} />

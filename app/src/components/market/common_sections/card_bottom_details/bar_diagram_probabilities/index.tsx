@@ -42,18 +42,18 @@ const OutcomeValue = styled.p`
   white-space: nowrap;
 `
 
-const ProgressBar = styled.div`
+const ProgressBar = styled.div<{ height?: number }>`
   background-color: #f5f5f5;
   border-radius: 4px;
-  height: 6px;
+  height: ${props => (props.height ? props.height : 6)}px;
   overflow: hidden;
 `
 
-export const Progress = styled.div<{ width: number; outcomeIndex: number; selected?: boolean; color?: keyof Colors }>`
+export const Progress = styled.div<{ width: number; outcomeIndex?: number; selected?: boolean; color?: keyof Colors }>`
   background-color: ${props =>
     props.color
       ? props.theme[props.color]
-      : getOutcomeColor(props.outcomeIndex).medium
+      : props.outcomeIndex && getOutcomeColor(props.outcomeIndex).medium
       ? props.selected
         ? getOutcomeColor(props.outcomeIndex).darker
         : getOutcomeColor(props.outcomeIndex).medium
@@ -74,7 +74,7 @@ Progress.defaultProps = {
 }
 
 interface Props extends DOMAttributes<HTMLDivElement> {
-  outcomeIndex: number
+  outcomeIndex?: number
   outcomeName?: string
   probability: number
   selected?: boolean
@@ -82,6 +82,8 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   additionalTextLeft?: string
   additionalTextRight?: string
   color?: keyof Colors
+  progressBarHeight?: number
+  displayText?: boolean
 }
 
 export const BarDiagram: React.FC<Props> = (props: Props) => {
@@ -89,9 +91,11 @@ export const BarDiagram: React.FC<Props> = (props: Props) => {
     additionalTextLeft,
     additionalTextRight,
     color,
+    displayText = true,
     outcomeIndex,
     outcomeName,
     probability,
+    progressBarHeight,
     selected,
     winningBadge,
     ...restProps
@@ -100,12 +104,14 @@ export const BarDiagram: React.FC<Props> = (props: Props) => {
   return (
     <BarDiagramWrapper {...restProps}>
       <Outcome>
-        <OutcomeText>
-          {outcomeName && <OutcomeName>{outcomeName}</OutcomeName>}
-          {winningBadge}
-          <OutcomeValue>{probability.toFixed(2)}%</OutcomeValue>
-        </OutcomeText>
-        <ProgressBar>
+        {displayText && (
+          <OutcomeText>
+            {outcomeName && <OutcomeName>{outcomeName}</OutcomeName>}
+            {winningBadge}
+            <OutcomeValue>{probability.toFixed(2)}%</OutcomeValue>
+          </OutcomeText>
+        )}
+        <ProgressBar height={progressBarHeight}>
           <Progress color={color} outcomeIndex={outcomeIndex} selected={selected} width={probability} />
         </ProgressBar>
         {additionalTextLeft && additionalTextRight && (
