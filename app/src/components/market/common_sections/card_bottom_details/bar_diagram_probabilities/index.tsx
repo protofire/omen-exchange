@@ -63,9 +63,9 @@ export const Progress = styled.div<{ width: number; outcomeIndex?: number; selec
   transition: width 0.25s ease-out, background-color 0.25s ease-out;
   width: ${props => props.width}%;
 `
-const Relative = styled.div<{ color: keyof Colors }>`
+const Relative = styled.div<{ color: keyof Colors; quorum: number }>`
   position: relative;
-  left: 16%;
+  left:${props => `${props.quorum}%`};
   border-radius: 4px 4px 0 0;
   background-color: ${({ color, theme }) => color && (theme as any)[color]}
 
@@ -122,7 +122,7 @@ export const BarDiagram: React.FC<Props> = (props: Props) => {
             <OutcomeValue>{probability.toFixed(2)}%</OutcomeValue>
           </OutcomeText>
         )}
-        {quorum && <Relative color={probability > quorum ? 'primary1' : 'primary4'} />}
+        {quorum && <Relative color={probability > quorum ? 'primary1' : 'primary4'} quorum={quorum} />}
 
         <ProgressBar height={progressBarHeight}>
           <Progress color={color} outcomeIndex={outcomeIndex} selected={selected} width={probability}></Progress>
