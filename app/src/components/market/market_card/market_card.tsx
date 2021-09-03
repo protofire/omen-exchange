@@ -1,8 +1,10 @@
+import { Zero } from 'ethers/constants'
 import moment from 'moment'
-import React from 'react'
+import React, { useEffect } from 'react'
 import styled from 'styled-components'
 
-import { Proposal } from '../../../services/guild'
+import { STANDARD_DECIMALS } from '../../../common/constants'
+import { OmenGuildService, Proposal } from '../../../services/guild'
 import { TYPE } from '../../../theme'
 import { bigNumberToString, isScalarMarket, limitDecimalPlaces } from '../../../util/tools'
 import { MarketMakerDataItem } from '../../../util/types'
@@ -147,7 +149,7 @@ export const MarketCard = (props: Props) => {
   const resolutionDate = moment(market.openingTimestamp).format('Do MMMM YYYY')
   const formattedLiquidity: string = bigNumberToString(market.totalPoolShares, market.collateral.decimals)
   const formattedVolume: string = bigNumberToString(market.collateralVolume, market.collateral.decimals)
-
+  console.log(bigNumberToString(proposal?.totalVotes || Zero, STANDARD_DECIMALS))
   const isScalar = isScalarMarket(market.oracle || '', networkId || 0)
 
   const firstOutcome = market.outcomes && market.outcomes[0]

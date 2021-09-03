@@ -274,7 +274,7 @@ class OmenGuildService {
       }, {})
       proposals.push({ ...proposal, id } as Proposal)
     }
-
+    console.log(proposals)
     proposals = proposals.filter(proposal => proposal.description)
 
     return proposals

@@ -1,6 +1,7 @@
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 
+import { STANDARD_DECIMALS } from '../../common/constants'
 import { ProposedRewardsView } from '../../components/guild/proposed_rewards_view'
 import { InlineLoading } from '../../components/loading'
 import { ConnectedWeb3Context } from '../../contexts'
@@ -8,6 +9,7 @@ import { useGraphLiquidityMiningCampaigns, useGuildProposals } from '../../hooks
 import { OmenGuildService } from '../../services/guild'
 import { getLogger } from '../../util/logger'
 import { RemoteData } from '../../util/remote_data'
+import { bigNumberToString } from '../../util/tools'
 import { MarketFilters, MarketMakerDataItem, TransactionStep } from '../../util/types'
 
 const logger = getLogger('Guild::ProposedRewardsPage')
@@ -57,6 +59,9 @@ const ProposedRewardsPage = (props: Props) => {
       }
       const omen = new OmenGuildService(library, networkId)
       const [votes, required] = await Promise.all([await omen.votesOf(cpk.address), await omen.votesForCreation()])
+      const totalLocked = await omen.totalLocked()
+      console.log(bigNumberToString(totalLocked, STANDARD_DECIMALS))
+      console.log(bigNumberToString(votes, STANDARD_DECIMALS))
 
       setVotes(votes)
       setVotesRequired(required)
