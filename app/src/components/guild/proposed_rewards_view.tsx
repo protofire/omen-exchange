@@ -102,6 +102,8 @@ interface Props {
   select: (address: string) => void
   setIsTransactionModalOpen: (open: boolean) => void
   proposeLiquidityRewards: () => Promise<void>
+  votesForExecution: BigNumber
+  totalLocked: BigNumber
 }
 
 const ProposedRewardsView = (props: Props) => {
@@ -121,7 +123,9 @@ const ProposedRewardsView = (props: Props) => {
     selected,
     setIsTransactionModalOpen,
     toggle,
+    totalLocked,
     votes,
+    votesForExecution,
     votesRequired,
   } = props
   const { networkId, txHash, txState } = context
@@ -173,6 +177,8 @@ const ProposedRewardsView = (props: Props) => {
                   market={item}
                   networkId={networkId}
                   onClick={() => select(item.address)}
+                  totalLocked={totalLocked}
+                  votesForExecution={votesForExecution}
                 />
               )
             })}
@@ -181,7 +187,13 @@ const ProposedRewardsView = (props: Props) => {
       {!propose && proposals.length > 0 && (
         <MarketCardsWrapper>
           {proposals.map(proposal => (
-            <ProposalMarketCard key={proposal.id} networkId={networkId} proposal={proposal} />
+            <ProposalMarketCard
+              key={proposal.id}
+              networkId={networkId}
+              proposal={proposal}
+              totalLocked={totalLocked}
+              votesForExecution={votesForExecution}
+            />
           ))}
         </MarketCardsWrapper>
       )}

@@ -1,12 +1,11 @@
-import { Zero } from 'ethers/constants'
+import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
-import React, { useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components'
 
-import { STANDARD_DECIMALS } from '../../../common/constants'
-import { OmenGuildService, Proposal } from '../../../services/guild'
+import { Proposal } from '../../../services/guild'
 import { TYPE } from '../../../theme'
-import { bigNumberToString, isScalarMarket, limitDecimalPlaces } from '../../../util/tools'
+import { bigNumberToString, calculatePercentageOfWhole, isScalarMarket, limitDecimalPlaces } from '../../../util/tools'
 import { MarketMakerDataItem } from '../../../util/types'
 import { BarDiagram } from '../common_sections/card_bottom_details/bar_diagram_probabilities'
 import {
@@ -141,15 +140,17 @@ interface Props {
   networkId: number
   proposal?: Proposal
   onClick?: () => void
+  totalLocked: BigNumber
+  votesForExecution: BigNumber
 }
 
 export const MarketCard = (props: Props) => {
-  const { active, market, networkId, onClick, proposal } = props
+  const { active, market, networkId, onClick, proposal, totalLocked, votesForExecution } = props
 
   const resolutionDate = moment(market.openingTimestamp).format('Do MMMM YYYY')
   const formattedLiquidity: string = bigNumberToString(market.totalPoolShares, market.collateral.decimals)
   const formattedVolume: string = bigNumberToString(market.collateralVolume, market.collateral.decimals)
-  console.log(bigNumberToString(proposal?.totalVotes || Zero, STANDARD_DECIMALS))
+
   const isScalar = isScalarMarket(market.oracle || '', networkId || 0)
 
   const firstOutcome = market.outcomes && market.outcomes[0]
@@ -196,7 +197,7 @@ export const MarketCard = (props: Props) => {
             displayText={false}
             probability={progress || 0}
             progressBarHeight={4}
-            quorum={16}
+            quorum={Number(calculatePercentageOfWhole(totalLocked, votesForExecution))}
           />
         </BarWrapper>
       )}

@@ -1,3 +1,4 @@
+import { BigNumber } from 'ethers/utils'
 import React from 'react'
 import { useHistory } from 'react-router'
 
@@ -10,10 +11,12 @@ interface Props {
   proposal: Proposal
   networkId: number
   onClick?: () => void
+  totalLocked: BigNumber
+  votesForExecution: BigNumber
 }
 
 export const ProposalMarketCard = (props: Props) => {
-  const { networkId, proposal } = props
+  const { networkId, proposal, totalLocked, votesForExecution } = props
   const { marketMakerData } = useGraphMarketMakerData(proposal.description, networkId)
   const history = useHistory()
 
@@ -25,6 +28,15 @@ export const ProposalMarketCard = (props: Props) => {
     history.push(`/proposals/${proposal.id}`)
   }
 
-  // @ts-expect-error ignore
-  return <MarketCard market={marketMakerData} networkId={networkId} onClick={onClick} proposal={proposal} />
+  return (
+    <MarketCard
+      // @ts-expect-error ignore
+      market={marketMakerData}
+      networkId={networkId}
+      onClick={onClick}
+      proposal={proposal}
+      totalLocked={totalLocked}
+      votesForExecution={votesForExecution}
+    />
+  )
 }

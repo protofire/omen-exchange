@@ -123,7 +123,6 @@ export const BarDiagram: React.FC<Props> = (props: Props) => {
           </OutcomeText>
         )}
         {quorum && <Relative color={probability > quorum ? 'primary1' : 'primary4'} quorum={quorum} />}
-
         <ProgressBar height={progressBarHeight}>
           <Progress color={color} outcomeIndex={outcomeIndex} selected={selected} width={probability}></Progress>
         </ProgressBar>
