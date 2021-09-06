@@ -173,16 +173,6 @@ export const MarketCard = (props: Props) => {
         : Number(currentPrediction) * 100
   }
 
-  let progress
-  if (proposal) {
-    // total time range
-    const total = proposal.endTime.toNumber() - proposal.startTime.toNumber()
-    // where we are in the range
-    const now = proposal.endTime.toNumber() - new Date().getTime() / 1000
-    // progress percentage
-    progress = limitDecimalPlaces(String(proposal && (now / total) * 100), 2)
-  }
-
   return (
     <CardWrapper>
       {proposal && (
