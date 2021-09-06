@@ -64,10 +64,7 @@ const ProposedRewardsPage = (props: Props) => {
       const [votes, required] = await Promise.all([await omen.votesOf(cpk.address), await omen.votesForCreation()])
       const totalLocked = await omen.totalLocked()
       const votesForExecution = await omen.getVotesForExecution()
-      console.log(bigNumberToString(votesForExecution, STANDARD_DECIMALS))
-      console.log(bigNumberToString(totalLocked, STANDARD_DECIMALS))
-      console.log('above votes')
-      console.log(bigNumberToString(votes, STANDARD_DECIMALS))
+
       setTotalLocked(totalLocked)
       setVotesForExecution(votesForExecution)
       setVotes(votes)
