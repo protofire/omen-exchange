@@ -195,7 +195,7 @@ export const MarketCard = (props: Props) => {
           <BarDiagram
             color={'primary1'}
             displayText={false}
-            probability={progress || 0}
+            probability={Number(calculatePercentageOfWhole(totalLocked, proposal.totalVotes))}
             progressBarHeight={4}
             quorum={Number(calculatePercentageOfWhole(totalLocked, votesForExecution))}
           />

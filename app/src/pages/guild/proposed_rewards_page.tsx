@@ -2,7 +2,6 @@ import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 
-import { STANDARD_DECIMALS } from '../../common/constants'
 import { ProposedRewardsView } from '../../components/guild/proposed_rewards_view'
 import { InlineLoading } from '../../components/loading'
 import { ConnectedWeb3Context } from '../../contexts'
@@ -10,7 +9,6 @@ import { useGraphLiquidityMiningCampaigns, useGuildProposals } from '../../hooks
 import { OmenGuildService } from '../../services/guild'
 import { getLogger } from '../../util/logger'
 import { RemoteData } from '../../util/remote_data'
-import { bigNumberToString } from '../../util/tools'
 import { MarketFilters, MarketMakerDataItem, TransactionStep } from '../../util/types'
 
 const logger = getLogger('Guild::ProposedRewardsPage')
