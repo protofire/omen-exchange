@@ -1,6 +1,5 @@
 import CPK, { OperationType } from 'contract-proxy-kit/lib/esm'
 import multiSendAbi from 'contract-proxy-kit/lib/esm/abis/MultiSendAbi.json'
-import safeAbi from 'contract-proxy-kit/lib/esm/abis/SafeAbi.json'
 import EthersAdapter from 'contract-proxy-kit/lib/esm/ethLibAdapters/EthersAdapter'
 import CpkTransactionManager from 'contract-proxy-kit/lib/esm/transactionManagers/CpkTransactionManager'
 import { getHexDataLength, joinHexData } from 'contract-proxy-kit/lib/esm/utils/hexData'
@@ -35,11 +34,6 @@ export interface Transaction {
   data?: string
 }
 
-interface TransactionResult {
-  hash?: string
-  safeTxHash?: string
-}
-
 const defaultTxOperation = OperationType.Call
 const defaultTxValue = '0'
 const defaultTxData = '0x'
@@ -57,107 +51,8 @@ function standardizeTransaction(tx: Transaction): StandardTransaction {
 const predeterminedSaltNonce = '0xcfe33a586323e7325be6aa6ecd8b4600d232a9037e83c8ece69413b777dabe65'
 
 // Omen CPK monkey patch
-// @ts-expect-error ignore
+// // @ts-expect-error ignore
 class OCPK extends CPK {
-  transactionManager: any
-  relay: boolean
-  owner?: string
-
-  constructor(opts?: any) {
-    super(opts)
-    this.transactionManager = opts.transactionManager
-    this.relay = this.transactionManager.config.name === 'RelayTransactionManager'
-  }
-
-  async init() {
-    await super.init()
-    if (this.ethLibAdapter) {
-      this.owner = await this.ethLibAdapter?.getAccount()
-    }
-  }
-
-  get contract(): any {
-    if (this.relay && this.owner) {
-      return this.ethLibAdapter?.getContract(safeAbi, this.owner)
-    }
-    // @ts-expect-error ignore
-    return super.contract
-  }
-
-  get address(): string {
-    if (this.relay && this.owner) {
-      return this.owner
-    }
-    // @ts-expect-error ignore
-    return super.address
-  }
-
-  async execTransactions(transactions: Transaction[], options?: any): Promise<TransactionResult> {
-    if (!this.address) {
-      throw new Error('CPK address uninitialized')
-    }
-    if (!this.contract) {
-      throw new Error('CPK contract uninitialized')
-    }
-    if (!this.masterCopyAddress) {
-      throw new Error('CPK masterCopyAddress uninitialized')
-    }
-    if (!this.fallbackHandlerAddress) {
-      throw new Error('CPK fallbackHandlerAddress uninitialized')
-    }
-    if (!this.ethLibAdapter) {
-      throw new Error('CPK ethLibAdapter uninitialized')
-    }
-    if (!this.transactionManager) {
-      throw new Error('CPK transactionManager uninitialized')
-    }
-
-    const ownerAccount = await this.getOwnerAccount()
-    if (!ownerAccount) {
-      throw new Error('CPK ownerAccount uninitialized')
-    }
-
-    const safeExecTxParams = this.getSafeExecTxParams(transactions)
-    const sendOptions = { ...options, from: ownerAccount } // normalizeGasLimit({ ...options, from: ownerAccount })
-
-    const codeAtAddress = await this.ethLibAdapter.getCode(this.address)
-    const isDeployed = codeAtAddress !== '0x'
-
-    const txManager = this.transactionManager
-
-    const cpkContracts = {
-      safeContract: this.contract,
-      proxyFactory: this.proxyFactory,
-      masterCopyAddress: this.masterCopyAddress,
-      fallbackHandlerAddress: this.fallbackHandlerAddress,
-    }
-
-    return txManager.execTransactions({
-      ownerAccount,
-      safeExecTxParams,
-      transactions,
-      contracts: cpkContracts,
-      ethLibAdapter: this.ethLibAdapter,
-      saltNonce: this.saltNonce,
-      isDeployed,
-      isConnectedToSafe: this.isConnectedToSafe,
-      sendOptions,
-    })
-  }
-
-  private getSafeExecTxParams(transactions: Transaction[]): StandardTransaction {
-    if (!this.multiSend) {
-      throw new Error('CPK MultiSend uninitialized')
-    }
-
-    return {
-      to: this.multiSend.address,
-      value: '0',
-      data: this.encodeMultiSendCallData(transactions),
-      operation: CPK.DelegateCall,
-    }
-  }
-
   encodeMultiSendCallData(transactions: Transaction[]): string {
     if (!this.ethLibAdapter) {
       throw new Error('CPK ethLibAdapter uninitialized')
