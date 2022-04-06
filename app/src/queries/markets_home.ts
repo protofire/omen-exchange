@@ -34,6 +34,7 @@ export const MarketDataFragment = gql`
 `
 
 export const DEFAULT_OPTIONS = {
+  first: 12,
   state: MarketStates.open,
   whitelistedCreators: false,
   whitelistedTemplateIds: true,

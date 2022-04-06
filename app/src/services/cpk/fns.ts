@@ -1,5 +1,5 @@
 import { MaxUint256, Zero } from 'ethers/constants'
-import { BigNumber, bigNumberify, defaultAbiCoder, keccak256 } from 'ethers/utils'
+import { BigNumber, bigNumberify, defaultAbiCoder, keccak256, parseUnits } from 'ethers/utils'
 import moment from 'moment'
 
 import { DAY_IN_SECONDS, OMNI_BRIDGE_XDAI_ADDRESS, XDAI_TO_DAI_TOKEN_BRIDGE_ADDRESS } from '../../common/constants'
@@ -1122,6 +1122,47 @@ export const unlockTokens = async (params: LockTokensParams) => {
   transactions.push({
     to: guild.omenGuildAddress,
     data: OmenGuildService.encodeUnlockTokens(amount),
+  })
+
+  return params
+}
+
+/**
+ * Propose liquidity rewards
+ */
+
+interface ProposeLiquidityRewardsParams {
+  campaignAddress: string
+  marketMakerAddress: string
+  service: CPKService
+  transactions: Transaction[]
+  networkId: number
+}
+
+export const proposeLiquidityRewards = async (params: ProposeLiquidityRewardsParams) => {
+  const { campaignAddress, marketMakerAddress, networkId, service, transactions } = params
+
+  const guild = new OmenGuildService(service.provider, networkId)
+  const collateral = getToken(networkId, 'omn')
+  const reward = parseUnits('500')
+
+  const to = []
+  const data = []
+  const amount = []
+
+  // approve the campaign address
+  to.push(collateral.address)
+  data.push(ERC20Service.encodeApprove(campaignAddress, reward))
+  amount.push(new BigNumber(0))
+
+  // add rewards
+  to.push(campaignAddress)
+  data.push(StakingService.encodeAddRewards(collateral.address, reward))
+  amount.push(new BigNumber(0))
+
+  transactions.push({
+    to: guild.omenGuildAddress,
+    data: OmenGuildService.encodeCreateProposal(to, data, amount, marketMakerAddress, '0x0'),
   })
 
   return params

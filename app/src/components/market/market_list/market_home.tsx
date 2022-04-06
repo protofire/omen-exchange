@@ -307,6 +307,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
   const [currency, setCurrency] = useState<Maybe<string> | null>(currentFilter.currency)
   const [templateId, setTemplateId] = useState<Maybe<string>>(currentFilter.templateId)
   const [curationSource, setCurationSource] = useState<CurationSource>(currentFilter.curationSource)
+  const { first } = currentFilter
 
   const advancedFilterSelectedCount = [currency, arbitrator, curationSource !== CurationSource.ALL_SOURCES].filter(
     element => element,
@@ -403,6 +404,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
 
   useEffect(() => {
     onFilterChange({
+      first,
       arbitrator,
       curationSource,
       templateId,
@@ -415,6 +417,7 @@ export const MarketHome: React.FC<Props> = (props: Props) => {
       title,
     })
   }, [
+    first,
     arbitrator,
     curationSource,
     templateId,

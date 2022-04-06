@@ -85,6 +85,7 @@ const MarketStatus = styled.div`
     margin-top: 16px;
   }
 `
+
 const StateButton = styled.div`
   border: 1px solid #4b9e98;
   padding: 9px 14px;
@@ -200,7 +201,7 @@ interface Props {
   duration: any
   marketDetails: any
   scaleValue: any
-  liqudiity: any
+  liquidity: any
   totalVolume: any
   volume: any
   closingDate: any
@@ -208,22 +209,26 @@ interface Props {
   apyTwo: any
   verified: any
   isScalar: any
-  setIsScalar: any
+  proposalTimeLeft: string
+  yesVotes: string
+  back: () => void
 }
 export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
   const {
     amount,
     apy,
+    back,
     closingDate,
     closingIn,
     duration,
     isScalar,
-    liqudiity,
+    liquidity,
     marketDetails,
+    proposalTimeLeft,
     scaleValue,
-    setIsScalar,
     totalVolume,
     volume,
+    yesVotes,
   } = props
 
   const object = [
@@ -232,7 +237,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     ['Duration', { text: duration }],
   ]
   const secondObject = [
-    ['Liqudity', { text: liqudiity }],
+    ['Liquidity', { text: liquidity }],
     ['Total Volume', { text: totalVolume }],
     ['24h Volume', { text: volume }],
     ['Closing', { text: closingDate }],
@@ -250,12 +255,12 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
   return (
     <Container>
       <NavigationSection>
-        <BackNavigation>
+        <BackNavigation onClick={back}>
           <IconArrowBack />
           <TYPE.heading3 marginLeft={'12px'}>Guild Overview</TYPE.heading3>
         </BackNavigation>
         <MarketStatus>
-          <MarketStatusText>5 days, 54 mins left</MarketStatusText>
+          <MarketStatusText>{proposalTimeLeft}</MarketStatusText>
           <StateButton>
             <MarketStatusText>Active</MarketStatusText>
           </StateButton>
@@ -263,20 +268,14 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
       </NavigationSection>
       <MainWrapper>
         <MainSection>
-          <Heading>Issue Liqudity Rewards</Heading>
+          <Heading>Issue Liquidity Rewards</Heading>
           <StyledTable valueObject={object} />
-          <MarketDetails
-            onClick={() => {
-              setIsScalar(!isScalar)
-            }}
-          >
-            Market Details
-          </MarketDetails>
+          <MarketDetails>Market Details</MarketDetails>
           <TYPE.heading3 color={'text3'} marginTop={'12px'}>
             {marketDetails}
           </TYPE.heading3>
           <OutcomeStyleWrapper>
-            {!isScalar ? (
+            {isScalar ? (
               <>
                 <MarketScale
                   currentPrediction={scaleValue}
@@ -311,8 +310,8 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
           <VoteHeading>Vote</VoteHeading>
           <VotesBar>
             <BarDiagram
-              additionalTextLeft={'454 votes'}
-              additionalTextRight={'454 OMEN'}
+              additionalTextLeft={`${yesVotes} votes`}
+              additionalTextRight={`${yesVotes} OMEN`}
               color={'primary1'}
               outcomeIndex={22}
               outcomeName={'Yes'}

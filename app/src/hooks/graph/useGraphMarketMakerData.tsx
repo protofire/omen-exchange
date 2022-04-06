@@ -5,8 +5,9 @@ import gql from 'graphql-tag'
 import { useEffect, useState } from 'react'
 
 import { getLogger } from '../../util/logger'
+import { multicall } from '../../util/multicall'
 import { getOutcomes } from '../../util/networks'
-import { AnswerItem, BondItem, INVALID_ANSWER_ID, KlerosSubmission, Question, Status } from '../../util/types'
+import { AnswerItem, BondItem, INVALID_ANSWER_ID, KlerosSubmission, Question, Status, Token } from '../../util/types'
 
 const logger = getLogger('useGraphMarketMakerData')
 
@@ -78,6 +79,7 @@ export type GraphResponseFixedProductMarketMaker = {
   category: string
   collateralToken: string
   collateralVolume: string
+  collateral: Token
   condition: {
     id: string
     payouts: Maybe<string[]>
@@ -120,6 +122,7 @@ export type GraphResponseFixedProductMarketMaker = {
   scalarLow: Maybe<string>
   scalarHigh: Maybe<string>
   factory: string
+  totalPoolShares: BigNumber
 }
 
 type GraphResponse = {
@@ -131,6 +134,7 @@ export type GraphMarketMakerData = {
   answerFinalizedTimestamp: Maybe<BigNumber>
   arbitratorAddress: string
   collateralAddress: string
+  collateral: Token
   creationTimestamp: string
   collateralVolume: BigNumber
   creator: string
@@ -152,6 +156,10 @@ export type GraphMarketMakerData = {
   outcomeTokenMarginalPrices: string[]
   outcomeTokenAmounts: string[]
   factory: string
+  totalPoolShares: BigNumber
+  title: string
+  openingTimestamp: Date
+  outcomes: string[]
 }
 
 type Result = {
@@ -200,6 +208,7 @@ export const wrangleMarketDataResponse = (
     answerFinalizedTimestamp: data.answerFinalizedTimestamp ? bigNumberify(data.answerFinalizedTimestamp) : null,
     arbitratorAddress: data.arbitrator,
     collateralAddress: data.collateralToken,
+    collateral: data.collateral,
     creationTimestamp: data.creationTimestamp,
     collateralVolume: bigNumberify(data.collateralVolume),
     creator: data.creator,
@@ -211,6 +220,9 @@ export const wrangleMarketDataResponse = (
     fee: bigNumberify(data.fee),
     scaledLiquidityParameter: parseFloat(data.scaledLiquidityParameter),
     runningDailyVolumeByHour: data.runningDailyVolumeByHour,
+    title: data.title,
+    openingTimestamp: new Date(1000 * +data.openingTimestamp),
+    outcomes: data.outcomes ? data.outcomes : [],
     question: {
       id: data.question.id,
       templateId: +data.templateId,
@@ -237,6 +249,7 @@ export const wrangleMarketDataResponse = (
     outcomeTokenMarginalPrices: data.outcomeTokenMarginalPrices,
     outcomeTokenAmounts: data.outcomeTokenAmounts,
     factory: data.factory,
+    totalPoolShares: data.totalPoolShares,
   }
 }
 
@@ -255,8 +268,50 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
 
   useEffect(() => {
     if (!loading && data && data.fixedProductMarketMaker && data.fixedProductMarketMaker.id === marketMakerAddress) {
-      const rangledValue = wrangleMarketDataResponse(data.fixedProductMarketMaker, networkId)
-      setMarketMakerData(rangledValue)
+      const fetchAdditional = async () => {
+        const calls = []
+
+        const market = data.fixedProductMarketMaker
+        if (market) {
+          const totalSuppyFnSig = 'totalSupply()(uint256)'
+          const symbolFnSig = 'symbol()(string)'
+          const decimalsFnSig = 'decimals()(uint8)'
+
+          calls.push(
+            {
+              target: market.id,
+              call: [totalSuppyFnSig],
+              returns: [[`${market.id}-totalPoolShares`]],
+            },
+            {
+              target: market.collateralToken,
+              call: [decimalsFnSig],
+              returns: [[`${market.id}-decimals`]],
+            },
+            {
+              target: market.collateralToken,
+              call: [symbolFnSig],
+              returns: [[`${market.id}-symbol`]],
+            },
+          )
+
+          const response = await multicall(calls, networkId)
+
+          const fixedProductMarketMaker = {
+            ...market,
+            totalPoolShares: response.results.transformed[`${market.id}-totalPoolShares`],
+            collateral: {
+              symbol: response.results.transformed[`${market.id}-symbol`],
+              decimals: response.results.transformed[`${market.id}-decimals`],
+              address: market.collateralToken,
+            },
+          }
+          const rangledValue = wrangleMarketDataResponse(fixedProductMarketMaker, networkId)
+          setMarketMakerData(rangledValue)
+        }
+      }
+
+      fetchAdditional()
     }
     // eslint-disable-next-line
   }, [loading])

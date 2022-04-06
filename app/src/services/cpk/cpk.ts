@@ -37,6 +37,7 @@ import {
   lockTokens,
   pipe,
   prepareCondition,
+  proposeLiquidityRewards,
   redeemPosition,
   removeFunds,
   resolveCondition,
@@ -173,6 +174,11 @@ interface CPKUnstakeClaimAndWithdrawParams {
 
 interface LockTokensParams {
   amount: BigNumber
+}
+
+interface ProposeLiquidityRewards {
+  campaignAddress: string
+  marketMakerAddress: string
 }
 
 interface TransactionResult {
@@ -471,6 +477,16 @@ class CPKService {
       return transaction
     } catch (e) {
       logger.error(`Error while trying to claim airdrop : `, e.message)
+      throw e
+    }
+  }
+
+  proposeLiquidityRewards = async (params: ProposeLiquidityRewards) => {
+    try {
+      const { transaction } = await this.pipe(proposeLiquidityRewards)(params)
+      return transaction
+    } catch (e) {
+      logger.error(`Error while trying to propose rewards : `, e.message)
       throw e
     }
   }

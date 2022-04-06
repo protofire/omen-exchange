@@ -1,26 +1,89 @@
-import React, { useState } from 'react'
+import { BigNumber } from 'ethers/utils'
+import moment from 'moment'
+import React, { useEffect, useState } from 'react'
+import { RouteComponentProps, useHistory } from 'react-router'
 
+import { STANDARD_DECIMALS } from '../../common/constants'
 import { ProposalDetailsView } from '../../components/guild/proposal_details_view_container'
+import { InlineLoading } from '../../components/loading'
+import { useConnectedWeb3Context } from '../../contexts'
+import { useGraphMarketMakerData, useGuildProposals } from '../../hooks'
+import { Proposal } from '../../services/guild'
+import { bigNumberToString, isScalarMarket } from '../../util/tools'
 
-export const ProposalDetailsPage = () => {
-  const [isScalar, setIsScalar] = useState(false)
+interface RouteParams {
+  id: string
+}
+
+export const ProposalDetailsPage = (props: RouteComponentProps<RouteParams>) => {
+  const { networkId } = useConnectedWeb3Context()
+
+  const history = useHistory()
+
+  const { proposals } = useGuildProposals()
+
+  const proposalId = props.match.params.id
+  const [proposal, setProposal] = useState<Proposal>()
+
+  const { fetchData, marketMakerData } = useGraphMarketMakerData(proposal ? proposal.description : '', networkId)
+
+  useEffect(() => {
+    if (proposals.length) {
+      const proposal = proposals.find(proposal => proposal.id === proposalId)
+      setProposal(proposal)
+    }
+  }, [proposals, proposalId])
+
+  useEffect(() => {
+    if (proposal && proposal.description) {
+      fetchData()
+    }
+    // eslint-disable-next-line
+  }, [proposal, proposal && proposal.description])
+
+  if (!proposal || !marketMakerData) {
+    return <InlineLoading />
+  }
+
+  const proposalEndDate = proposal && new Date(proposal.endTime.toNumber() * 1000)
+  const proposalTimeLeft = `${moment(proposalEndDate).fromNow(true)} left`
+
+  const yesVotes = bigNumberToString(proposal.totalVotes || new BigNumber(0), STANDARD_DECIMALS)
+  const liquidity = `${bigNumberToString(marketMakerData.totalPoolShares, marketMakerData.collateral.decimals)} ${
+    marketMakerData.collateral.symbol
+  }`
+  const totalVolume = `${bigNumberToString(marketMakerData.collateralVolume, marketMakerData.collateral.decimals)} ${
+    marketMakerData.collateral.symbol
+  }`
+  const volume = `${bigNumberToString(marketMakerData.dailyVolume, marketMakerData.collateral.decimals)} ${
+    marketMakerData.collateral.symbol
+  }`
+  const marketDetails = marketMakerData.title
+  const closingDate = `${moment(marketMakerData.openingTimestamp).format('DD MMM YYYY')} at ${moment(
+    marketMakerData.openingTimestamp,
+  ).format('H:mm zz')}`
+  const isScalar = isScalarMarket(marketMakerData.oracle || '', networkId)
+
+  const back = () => history.push('/guild')
+
   //logic
   const dummyDataPassed = {
     amount: '500.00 OMN',
     apy: '360%',
+    back,
     duration: '32 days',
-    marketDetails:
-      'What will the June 2021 CME/Globex S&P500 e-mini terminate at? https://www.cmegroup.com/trading/equity-index/us-index/e-mini-sandp500_quotes_globex.html',
+    marketDetails,
     scaleValue: 0.9,
-    liqudiity: '15,000.00 DAI',
-    totalVolume: '4540.00 DAI',
-    volume: '120.00 DAI',
-    closingDate: '12th January 2021 at 00:00 UTC',
+    liquidity,
+    totalVolume,
+    volume,
+    closingDate,
     closingIn: '32 days',
     apyTwo: '24.53%',
     verified: true,
-    isScalar: isScalar,
-    setIsScalar: setIsScalar,
+    isScalar,
+    proposalTimeLeft,
+    yesVotes,
   }
   return <ProposalDetailsView {...dummyDataPassed} />
 }
