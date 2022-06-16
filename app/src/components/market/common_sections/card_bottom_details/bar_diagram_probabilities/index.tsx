@@ -63,6 +63,15 @@ export const Progress = styled.div<{ width: number; outcomeIndex?: number; selec
   transition: width 0.25s ease-out, background-color 0.25s ease-out;
   width: ${props => props.width}%;
 `
+const Relative = styled.div<{ color: keyof Colors; quorum: number }>`
+  position: relative;
+  left:${props => `${props.quorum}%`};
+  border-radius: 4px 4px 0 0;
+  background-color: ${({ color, theme }) => color && (theme as any)[color]}
+
+  width: 4px;
+  height: 4px;
+`
 const AdditionalTextStyle = styled(TYPE.bodyRegular)`
   color: ${props => props.theme.text2};
 `
@@ -84,6 +93,7 @@ interface Props extends DOMAttributes<HTMLDivElement> {
   color?: keyof Colors
   progressBarHeight?: number
   displayText?: boolean
+  quorum?: number
 }
 
 export const BarDiagram: React.FC<Props> = (props: Props) => {
@@ -96,6 +106,7 @@ export const BarDiagram: React.FC<Props> = (props: Props) => {
     outcomeName,
     probability,
     progressBarHeight,
+    quorum,
     selected,
     winningBadge,
     ...restProps
@@ -111,8 +122,9 @@ export const BarDiagram: React.FC<Props> = (props: Props) => {
             <OutcomeValue>{probability.toFixed(2)}%</OutcomeValue>
           </OutcomeText>
         )}
+        {quorum && <Relative color={probability > quorum ? 'primary1' : 'primary4'} quorum={quorum} />}
         <ProgressBar height={progressBarHeight}>
-          <Progress color={color} outcomeIndex={outcomeIndex} selected={selected} width={probability} />
+          <Progress color={color} outcomeIndex={outcomeIndex} selected={selected} width={probability}></Progress>
         </ProgressBar>
         {additionalTextLeft && additionalTextRight && (
           <OutcomeText style={{ marginTop: '10px', marginBottom: '0px' }}>

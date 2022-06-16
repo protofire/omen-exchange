@@ -1,3 +1,4 @@
+import { Zero } from 'ethers/constants'
 import { BigNumber } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
 
@@ -37,6 +38,8 @@ const ProposedRewardsPage = (props: Props) => {
 
   const [votes, setVotes] = useState(new BigNumber(0))
   const [votesRequired, setVotesRequired] = useState(new BigNumber(0))
+  const [votesForExecution, setVotesForExecution] = useState(Zero)
+  const [totalLocked, setTotalLocked] = useState(Zero)
 
   const { liquidityMiningCampaigns } = useGraphLiquidityMiningCampaigns()
 
@@ -57,7 +60,11 @@ const ProposedRewardsPage = (props: Props) => {
       }
       const omen = new OmenGuildService(library, networkId)
       const [votes, required] = await Promise.all([await omen.votesOf(cpk.address), await omen.votesForCreation()])
+      const totalLocked = await omen.totalLocked()
+      const votesForExecution = await omen.getVotesForExecution()
 
+      setTotalLocked(totalLocked)
+      setVotesForExecution(votesForExecution)
       setVotes(votes)
       setVotesRequired(required)
     }
@@ -130,7 +137,9 @@ const ProposedRewardsPage = (props: Props) => {
       selected={selected}
       setIsTransactionModalOpen={setIsTransactionModalOpen}
       toggle={toggle}
+      totalLocked={totalLocked}
       votes={votes}
+      votesForExecution={votesForExecution}
       votesRequired={votesRequired}
     />
   )

@@ -5,6 +5,7 @@ import { getLogger } from '../logger'
 import { getContractAddress, getNativeAsset, getWrapToken } from '../networks'
 import { Token } from '../types'
 
+import { divBN } from './maths'
 import { waitABit } from './other'
 import { strip0x } from './string_manipulation'
 
@@ -35,6 +36,11 @@ export const signatureToVRS = (rawSignature: string) => {
 
 export const signaturesFormatted = (signatures: string[]) => {
   return packSignatures(signatures.map(s => signatureToVRS(s)))
+}
+
+export const calculatePercentageOfWhole = (whole: BigNumber, part: BigNumber): string => {
+  if (whole.isZero() || part.isZero()) return '0.00'
+  return (divBN(part, whole) * 100).toFixed(2)
 }
 
 export const isContract = async (provider: any, address: string): Promise<boolean> => {

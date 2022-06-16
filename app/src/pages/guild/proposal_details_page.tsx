@@ -84,6 +84,7 @@ export const ProposalDetailsPage = (props: RouteComponentProps<RouteParams>) => 
     isScalar,
     proposalTimeLeft,
     yesVotes,
+    proposalState: proposal && proposal.state,
   }
   return <ProposalDetailsView {...dummyDataPassed} />
 }

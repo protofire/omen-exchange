@@ -7,6 +7,13 @@ import { getContractAddress } from '../util/networks'
 
 const GuildAbi = [
   {
+    inputs: [],
+    name: 'getVotesForExecution',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
     inputs: [{ internalType: 'uint256', name: 'amount', type: 'uint256' }],
     name: 'lockTokens',
     outputs: [],
@@ -212,6 +219,9 @@ class OmenGuildService {
 
   lockTime = async () => {
     return this.contract?.lockTime()
+  }
+  getVotesForExecution = async () => {
+    return this.contract?.getVotesForExecution()
   }
 
   getProposalsIdsLength = async () => {

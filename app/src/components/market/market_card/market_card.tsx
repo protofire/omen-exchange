@@ -1,10 +1,11 @@
+import { BigNumber } from 'ethers/utils'
 import moment from 'moment'
 import React from 'react'
 import styled from 'styled-components'
 
 import { Proposal } from '../../../services/guild'
 import { TYPE } from '../../../theme'
-import { bigNumberToString, isScalarMarket, limitDecimalPlaces } from '../../../util/tools'
+import { bigNumberToString, calculatePercentageOfWhole, isScalarMarket, limitDecimalPlaces } from '../../../util/tools'
 import { MarketMakerDataItem } from '../../../util/types'
 import { BarDiagram } from '../common_sections/card_bottom_details/bar_diagram_probabilities'
 import {
@@ -91,7 +92,7 @@ const ScaleWrapper = styled.div`
   border-radius: 8px;
   margin-bottom: 16px;
   padding: 13px 0px;
-  height: 76px;
+  height: 79px;
 `
 
 const PercWrapper = styled.div`
@@ -139,10 +140,12 @@ interface Props {
   networkId: number
   proposal?: Proposal
   onClick?: () => void
+  totalLocked: BigNumber
+  votesForExecution: BigNumber
 }
 
 export const MarketCard = (props: Props) => {
-  const { active, market, networkId, onClick, proposal } = props
+  const { active, market, networkId, onClick, proposal, totalLocked, votesForExecution } = props
 
   const resolutionDate = moment(market.openingTimestamp).format('Do MMMM YYYY')
   const formattedLiquidity: string = bigNumberToString(market.totalPoolShares, market.collateral.decimals)
@@ -170,16 +173,6 @@ export const MarketCard = (props: Props) => {
         : Number(currentPrediction) * 100
   }
 
-  let progress
-  if (proposal) {
-    // total time range
-    const total = proposal.endTime.toNumber() - proposal.startTime.toNumber()
-    // where we are in the range
-    const now = proposal.endTime.toNumber() - new Date().getTime() / 1000
-    // progress percentage
-    progress = limitDecimalPlaces(String(proposal && (now / total) * 100), 2)
-  }
-
   return (
     <CardWrapper>
       {proposal && (
@@ -189,7 +182,13 @@ export const MarketCard = (props: Props) => {
               Voting ends in {moment(new Date(proposal.endTime.toNumber() * 1000)).fromNow(true)}
             </TYPE.heading3>
           </BarHeadingWrapper>
-          <BarDiagram color={'primary1'} displayText={false} probability={progress || 0} progressBarHeight={4} />
+          <BarDiagram
+            color={'primary1'}
+            displayText={false}
+            probability={Number(calculatePercentageOfWhole(totalLocked, proposal.totalVotes))}
+            progressBarHeight={4}
+            quorum={Number(calculatePercentageOfWhole(totalLocked, votesForExecution))}
+          />
         </BarWrapper>
       )}
       <StyledMarketCard active={active} onClick={onClick} proposal={!!proposal}>

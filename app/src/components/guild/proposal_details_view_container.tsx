@@ -2,6 +2,7 @@ import { BigNumber, bigNumberify } from 'ethers/utils'
 import React from 'react'
 import styled from 'styled-components'
 
+import { useTheme } from '../../hooks/useTheme'
 import { TYPE } from '../../theme'
 import { getArbitrator, getToken } from '../../util/networks'
 import { KlerosSubmission } from '../../util/types'
@@ -86,8 +87,8 @@ const MarketStatus = styled.div`
   }
 `
 
-const StateButton = styled.div`
-  border: 1px solid #4b9e98;
+const StateButton = styled.div<{ color: string }>`
+  border: 1px solid ${props => props.color};
   padding: 9px 14px;
   width: fit-content;
   border-radius: 6px;
@@ -191,8 +192,8 @@ const BarDiagramStyled = styled(BarDiagram)`
     margin: 0 -20px;
   }
 `
-const MarketStatusText = styled(TYPE.bodyMedium)`
-  color: ${props => props.theme.profit};
+const MarketStatusText = styled(TYPE.bodyMedium)<{ proposalState: number }>`
+  color: ${props => (props.proposalState === 0 ? props.theme.profit : props.theme.alert)};
 `
 
 interface Props {
@@ -212,6 +213,7 @@ interface Props {
   proposalTimeLeft: string
   yesVotes: string
   back: () => void
+  proposalState: any
 }
 export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
   const {
@@ -224,6 +226,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     isScalar,
     liquidity,
     marketDetails,
+    proposalState,
     proposalTimeLeft,
     scaleValue,
     totalVolume,
@@ -231,6 +234,7 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
     yesVotes,
   } = props
 
+  const theme = useTheme()
   const object = [
     ['Rewards', { text: amount, icon: <IconOmen /> }],
     ['APY%', { text: apy }],
@@ -260,9 +264,11 @@ export const ProposalDetailsView: React.FC<Props> = (props: Props) => {
           <TYPE.heading3 marginLeft={'12px'}>Guild Overview</TYPE.heading3>
         </BackNavigation>
         <MarketStatus>
-          <MarketStatusText>{proposalTimeLeft}</MarketStatusText>
-          <StateButton>
-            <MarketStatusText>Active</MarketStatusText>
+          <MarketStatusText proposalState={proposalState}>{proposalTimeLeft}</MarketStatusText>
+          <StateButton color={proposalState === 0 ? theme.profit : theme.alert}>
+            <MarketStatusText proposalState={proposalState}>
+              {proposalState === 0 ? 'Active' : 'Inactive'}
+            </MarketStatusText>
           </StateButton>
         </MarketStatus>
       </NavigationSection>
