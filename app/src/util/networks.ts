@@ -255,20 +255,20 @@ export const networks: { [K in NetworkId]: Network } = {
     blockExplorerURL: 'https://blockscout.com/poa/sokol',
   },
   [networkIds.XDAI]: {
-    label: 'xDai',
-    url: 'https://rpc.xdaichain.com/',
+    label: 'Gnosis',
+    url: 'https://rpc.gnosischain.com/',
     alternativeUrls: [
       {
-        rpcUrl: 'https://rpc.xdaichain.com/',
+        rpcUrl: 'https://rpc.gnosischain.com/',
         name: 'xDai',
+      },
+      {
+        rpcUrl: 'https://gnosischain-rpc.gateway.pokt.network/',
+        name: 'Pokt',
       },
       {
         rpcUrl: 'https://dai.poa.network/',
         name: 'Blockscout',
-      },
-      {
-        rpcUrl: 'https://poa-xdai.gateway.pokt.network/v1/lb/6111748ba585a2003514997b',
-        name: 'Pokt',
       },
     ],
     graphHttpUri: GRAPH_XDAI_HTTP,
