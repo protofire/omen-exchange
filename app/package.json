@@ -63,7 +63,7 @@
     "lint-staged": "^10.0.8",
     "lodash.unionby": "^4.8.0",
     "logdown": "^3.2.8",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "moment-timezone": "^0.5.31",
     "polished": "^3.4.1",
     "react": "^16.9.0",
