@@ -1,4 +1,5 @@
 [![Netlify Status](https://api.netlify.com/api/v1/badges/2da38309-7dbe-43bb-bb2a-ba3186bc3556/deploy-status)](https://app.netlify.com/sites/conditional/deploys)
+[![GitPOAP Badge](https://public-api.gitpoap.io/v1/repo/protofire/omen-exchange/badge)](https://www.gitpoap.io/gh/protofire/omen-exchange)
 
 # Omen
 
