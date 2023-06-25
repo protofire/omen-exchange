@@ -151,18 +151,18 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
       },
     )
 
-    if (
-      graphMarketMakerData.factory.toLowerCase() === getContractAddress(networkId, 'marketMakerFactory').toLowerCase()
-    ) {
-      calls.push(
-        // get market marker total earnings
-        {
-          target: marketMakerAddress,
-          call: [getCallSig(marketMaker, 'collectedFees')],
-          returns: [['totalEarnings']],
-        },
-      )
-    }
+    // if (
+    //   graphMarketMakerData.factory.toLowerCase() === getContractAddress(networkId, 'marketMakerFactory').toLowerCase()
+    // ) {
+    //   calls.push(
+    //     // get market marker total earnings
+    //     {
+    //       target: marketMakerAddress,
+    //       call: [getCallSig(marketMaker, 'collectedFees')],
+    //       returns: [['totalEarnings']],
+    //     },
+    //   )
+    // }
 
     if (cpk && cpk.address) {
       calls.push(
@@ -217,18 +217,18 @@ export const useBlockchainMarketMakerData = (graphMarketMakerData: Maybe<GraphMa
           returns: [[`user-${i}`]],
         })
 
-        if (
-          !totalPoolShares.isZero() &&
-          graphMarketMakerData.factory.toLowerCase() ===
-            getContractAddress(networkId, 'marketMakerFactory').toLowerCase()
-        ) {
-          // get user earnings
-          calls.push({
-            target: marketMakerAddress,
-            call: [getCallSig(marketMaker, 'feesWithdrawableBy'), cpk.address],
-            returns: [['userEarnings']],
-          })
-        }
+        // if (
+        //   !totalPoolShares.isZero() &&
+        //   graphMarketMakerData.factory.toLowerCase() ===
+        //     getContractAddress(networkId, 'marketMakerFactory').toLowerCase()
+        // ) {
+        //   // get user earnings
+        //   calls.push({
+        //     target: marketMakerAddress,
+        //     call: [getCallSig(marketMaker, 'feesWithdrawableBy'), cpk.address],
+        //     returns: [['userEarnings']],
+        //   })
+        // }
       }
     }
 

@@ -66,7 +66,6 @@ const query = gql`
       }
       scalarLow
       scalarHigh
-      factory
     }
   }
 `
@@ -151,7 +150,6 @@ export type GraphMarketMakerData = {
   scalarHigh: Maybe<BigNumber>
   outcomeTokenMarginalPrices: string[]
   outcomeTokenAmounts: string[]
-  factory: string
 }
 
 type Result = {
@@ -236,7 +234,6 @@ export const wrangleMarketDataResponse = (
     scalarHigh: data.scalarHigh ? bigNumberify(data.scalarHigh || 0) : null,
     outcomeTokenMarginalPrices: data.outcomeTokenMarginalPrices,
     outcomeTokenAmounts: data.outcomeTokenAmounts,
-    factory: data.factory,
   }
 }
 
@@ -252,8 +249,10 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
     skip: false,
     variables: { id: marketMakerAddress },
   })
+  console.log('data', data)
 
   useEffect(() => {
+    console.log('data', data)
     if (!loading && data && data.fixedProductMarketMaker && data.fixedProductMarketMaker.id === marketMakerAddress) {
       const rangledValue = wrangleMarketDataResponse(data.fixedProductMarketMaker, networkId)
       setMarketMakerData(rangledValue)
