@@ -1,6 +1,5 @@
 import { configureStore } from '@reduxjs/toolkit'
-import React, { useEffect, useState } from 'react'
-import Modal from 'react-modal'
+import React from 'react'
 import { Provider } from 'react-redux'
 import Web3Provider from 'web3-react'
 

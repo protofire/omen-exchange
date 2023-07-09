@@ -249,10 +249,8 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
     skip: false,
     variables: { id: marketMakerAddress },
   })
-  console.log('data', data)
 
   useEffect(() => {
-    console.log('data', data)
     if (!loading && data && data.fixedProductMarketMaker && data.fixedProductMarketMaker.id === marketMakerAddress) {
       const rangledValue = wrangleMarketDataResponse(data.fixedProductMarketMaker, networkId)
       setMarketMakerData(rangledValue)
@@ -264,7 +262,7 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
     try {
       await refetch()
     } catch (error) {
-      logger.log(error.message)
+      logger.log(error?.message)
     }
   }
 

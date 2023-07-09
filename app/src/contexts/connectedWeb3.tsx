@@ -1,5 +1,5 @@
 import { providers } from 'ethers'
-import React, { PropsWithChildren, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
 import { ConnectedBalance, useBalance } from '../hooks'
@@ -9,8 +9,8 @@ import { CPKService } from '../services'
 import connectors from '../util/connectors'
 import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
-import { getInfuraUrl, networkIds } from '../util/networks'
-import { checkRpcStatus, getNetworkFromChain } from '../util/tools'
+import { networkIds } from '../util/networks'
+import { getNetworkFromChain } from '../util/tools'
 import { TransactionStep } from '../util/types'
 
 const logger = getLogger('Hooks::ConnectedWeb3')
@@ -52,7 +52,6 @@ interface Props {
  * `useConnectedWeb3Context` safely to get web3 stuff without having to null check it.
  */
 export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
-  console.log('children', props.children)
   const [connection, setConnection] = useState<ConnectedWeb3Context | null>(null)
   const [networkId, setNetworkId] = useState<number | null>(null)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
@@ -87,8 +86,6 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   const url = new URL(window.location.href.replace('#', ''))
   const debugAddress = url.searchParams.get('debugAddress')
   const debugNetworkId = url.searchParams.get('debugNetworkId')
-
-  console.log('debugAddress', debugAddress)
 
   useEffect(() => {
     if (networkId && !error) {

@@ -19,7 +19,6 @@ const RedirectToHome = () => <Redirect to="/" />
 
 export const Main: React.FC = () => {
   const context = useWeb3Context()
-  console.log('wtf context', context)
 
   return (
     <>
