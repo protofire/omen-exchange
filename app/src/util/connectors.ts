@@ -61,7 +61,8 @@ class WalletConnectConnector extends Connectors.Connector {
           localStorage.setItem('CONNECTOR', '')
           this.activating = false
           if (this.onError) {
-            this.onError(e.message)
+            console.error(e)
+            // this.onError(e.message)
           }
         }
       }

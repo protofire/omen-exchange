@@ -262,7 +262,9 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
     try {
       await refetch()
     } catch (error) {
-      logger.log(error?.message)
+      if (error) {
+        logger.log(error)
+      }
     }
   }
 
