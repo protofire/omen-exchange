@@ -1,5 +1,5 @@
 import { providers } from 'ethers'
-import React, { useEffect, useState } from 'react'
+import React, { PropsWithChildren, useEffect, useState } from 'react'
 import { useWeb3Context } from 'web3-react'
 
 import { ConnectedBalance, useBalance } from '../hooks'
@@ -46,13 +46,13 @@ export const useConnectedWeb3Context = () => {
 }
 interface Props {
   children?: React.ReactNode
-  setStatus?: any
 }
 /**
  * Component used to render components that depend on Web3 being available. These components can then
  * `useConnectedWeb3Context` safely to get web3 stuff without having to null check it.
  */
 export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
+  console.log('children', props.children)
   const [connection, setConnection] = useState<ConnectedWeb3Context | null>(null)
   const [networkId, setNetworkId] = useState<number | null>(null)
   const [txState, setTxState] = useState<TransactionStep>(TransactionStep.idle)
@@ -88,20 +88,15 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   const debugAddress = url.searchParams.get('debugAddress')
   const debugNetworkId = url.searchParams.get('debugNetworkId')
 
+  console.log('debugAddress', debugAddress)
+
   useEffect(() => {
     if (networkId && !error) {
       const enableRelay = context.connectorName !== 'Safe' || debugAddress !== ''
 
-      checkRpcStatus(
-        getInfuraUrl(relay ? networkIds.XDAI : networkId),
-        props.setStatus,
-        relay ? networkIds.XDAI : networkId,
-      )
-
       const { address, isRelay, netId, provider } = getRelayProvider(relay && enableRelay, networkId, library, account)
 
       const value = {
-        setStatus: props.setStatus,
         account: address || null,
         library: provider,
         networkId: netId,
@@ -184,7 +179,6 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     (connection.account && connection.networkId !== cpk?.provider?.network?.chainId) ||
     !balances.fetched
   ) {
-    props.setStatus(true)
     return null
   }
 
@@ -192,9 +186,8 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     ...connection,
     cpk,
     balances,
-    setStatus: props.setStatus,
   }
-  props.setStatus(true)
+
   return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
 }
 

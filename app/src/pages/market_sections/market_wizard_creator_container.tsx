@@ -67,6 +67,7 @@ const MarketWizardCreatorContainer: FC = () => {
           setMarketCreationStatus(MarketCreationStatus.done())
           history.replace(`/${marketMakerAddress}`)
         } else {
+          console.log('Creating categorical market...', marketMakerFactoryV2)
           setMessage('Creating categorical market...')
           const { marketMakerAddress } = await cpk.createMarket({
             marketData,

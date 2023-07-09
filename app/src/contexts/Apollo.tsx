@@ -8,6 +8,7 @@ import { useConnectedWeb3Context } from './connectedWeb3'
 export const ApolloProviderWrapper: React.FC = ({ children }) => {
   const { networkId } = useConnectedWeb3Context()
   const client = React.useMemo(() => getApolloClient(networkId), [networkId])
+  console.log('client', client)
 
   return <ApolloProvider client={client}>{children}</ApolloProvider>
 }

@@ -87,8 +87,7 @@ class WalletConnectConnector extends Connectors.Connector {
 const WalletConnect = new WalletConnectConnector()
 
 const Infura = new NetworkOnlyConnector({
-  providerURL:
-    localStorage.getItem('relay') === 'true' ? networks[networkIds.XDAI].url : networks[networkIds.MAINNET].url,
+  providerURL: networks[networkIds.XDAI].url,
 })
 
 class SafeConnector extends Connectors.Connector {
