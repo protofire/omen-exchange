@@ -18,7 +18,7 @@ const MarketWizardCreatorContainer: FC = () => {
   const history = useHistory()
 
   const [isModalOpen, setModalState] = useState(false)
-  const { conditionalTokens, marketMakerFactoryV2, realitio } = useContracts(context)
+  const { conditionalTokens, marketMakerFactory, realitio } = useContracts(context)
 
   const [marketCreationStatus, setMarketCreationStatus] = useState<MarketCreationStatus>(MarketCreationStatus.ready())
   const [marketMakerAddress, setMarketMakerAddress] = useState<string | null>(null)
@@ -56,7 +56,7 @@ const MarketWizardCreatorContainer: FC = () => {
             marketData,
             conditionalTokens,
             realitio,
-            marketMakerFactory: marketMakerFactoryV2,
+            marketMakerFactory: marketMakerFactory,
           })
           await waitUntilContractDeployed(provider, marketMakerAddress)
           await fetchBalances()
@@ -69,7 +69,7 @@ const MarketWizardCreatorContainer: FC = () => {
             marketData,
             conditionalTokens,
             realitio,
-            marketMakerFactory: marketMakerFactoryV2,
+            marketMakerFactory: marketMakerFactory,
           })
           await waitUntilContractDeployed(provider, marketMakerAddress)
           await fetchBalances()
