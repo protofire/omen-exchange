@@ -10,7 +10,6 @@ import connectors from '../util/connectors'
 import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
 import { networkIds } from '../util/networks'
-import { getNetworkFromChain } from '../util/tools'
 import { TransactionStep } from '../util/types'
 
 const logger = getLogger('Hooks::ConnectedWeb3')
@@ -64,21 +63,43 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   const cpk = useCpk(connection)
   const balances = useBalance(connection)
 
+  useEffect(() => {
+    async function switchNetwork() {
+      if (library && account && connection?.networkId === 1) {
+        try {
+          await library.send('wallet_switchEthereumChain', [{ chainId: '0x64' }])
+        } catch (switchError) {
+          // This error code indicates that the chain has not been added to MetaMask.
+          if ('code' in (switchError as any) && (switchError as any).code === 4902) {
+            try {
+              await library.send('wallet_addEthereumChain', [
+                {
+                  chainId: '0x64',
+                  rpcUrls: ['https://rpc.gnosischain.com/'],
+                  chainName: 'Gnosis Chain',
+                  nativeCurrency: {
+                    name: 'xDAI',
+                    symbol: 'xDAI',
+                    decimals: 18,
+                  },
+                  blockExplorerUrls: ['https://gnosis.blockscout.com/'],
+                },
+              ])
+            } catch (addError) {
+              console.error(addError)
+            }
+          }
+        }
+      }
+    }
+
+    switchNetwork()
+  }, [library, account, connection])
+
   const rpcAddress: string | null = localStorage.getItem('rpcAddress')
 
-  const windowObj: any = window
-  const ethereum = windowObj.ethereum
-  const network = ethereum && ethereum.chainId
-  const injectedNetworkId = getNetworkFromChain(network)
-
-  const initialRelayState =
-    localStorage.getItem('relay') === 'false' || (injectedNetworkId !== -1 && injectedNetworkId !== networkIds.MAINNET)
-      ? false
-      : true
-
-  const [relay, setRelay] = useState(initialRelayState)
+  const [relay, setRelay] = useState(false)
   const toggleRelay = () => {
-    localStorage.setItem('relay', String(!relay))
     setRelay(!relay)
   }
 
@@ -116,6 +137,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
+
     if (error) {
       logger.log(error.message)
       localStorage.removeItem('CONNECTOR')

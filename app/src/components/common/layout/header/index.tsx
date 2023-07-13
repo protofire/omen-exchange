@@ -219,7 +219,7 @@ const HeaderContainer: React.FC = (props: any) => {
     <DropdownWrapper>
       <DropdownText>
         <Dot color="greenLight" size={8} />
-        {relay ? 'xDai' : 'Mainnet'}
+        {relay ? 'Gnosis' : 'Mainnet'}
       </DropdownText>
     </DropdownWrapper>
   )
@@ -236,7 +236,7 @@ const HeaderContainer: React.FC = (props: any) => {
       onClick: toggle,
       content: (
         <DropdownWrapper>
-          <DropdownText>{relay ? 'Mainnet' : 'xDai'}</DropdownText>
+          <DropdownText>{relay ? 'Mainnet' : 'Gnosis'}</DropdownText>
         </DropdownWrapper>
       ),
     },
