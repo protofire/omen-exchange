@@ -27,10 +27,8 @@ export const useRealityLink = (relay?: boolean): string => {
   let realityLink
   if (chainId === '0x64' || chainId === '0x4d' || relay) {
     realityLink = 'https://realitio.github.io'
-  } else if (connected) {
-    realityLink = 'https://reality.eth/app'
   } else {
-    realityLink = 'https://reality.eth.link/app'
+    realityLink = 'https://reality.eth.limo/app'
   }
 
   return realityLink
