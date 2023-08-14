@@ -3,7 +3,7 @@ import styled, { css } from 'styled-components'
 
 import { CommonDisabledCSS } from '../../common/form/common_styled'
 
-const ActiveCSS = css`
+export const ActiveCSS = css`
   &,
   &:hover {
     border-color: ${props => props.theme.colors.borderColorDark};
@@ -14,7 +14,7 @@ const ActiveCSS = css`
   }
 `
 
-const Wrapper = styled.button<{ active?: boolean }>`
+export const Wrapper = styled.button<{ active?: boolean }>`
   align-items: center;
   background-color: ${({ theme }) => theme.colors.mainBodyBackground};
   border-radius: ${({ theme }) => theme.buttonRound.borderRadius};
