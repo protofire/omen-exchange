@@ -5,6 +5,7 @@ import { useBlockchainMarketMakerData } from './useBlockchainMarketMakerData'
 
 export const useMarketMakerData = (marketMakerAddress: string) => {
   const { networkId } = useConnectedWeb3Context()
+
   const { fetchData: fetchGraphMarketMakerData, marketMakerData: graphMarketMakerData } = useGraphMarketMakerData(
     marketMakerAddress,
     networkId,

@@ -189,7 +189,7 @@ const Wrapper = (props: Props) => {
       <Button
         buttonType={ButtonType.secondaryLine}
         onClick={() => {
-          window.open(`${realitioBaseUrl}/#!/question/${question.id}`)
+          window.open(`${realitioBaseUrl}/#!/question/${question.id}/contract/v2.1/`)
         }}
       >
         Call Arbitrator

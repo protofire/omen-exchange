@@ -29,6 +29,7 @@ export const useContracts = (context: ConnectedWeb3Context) => {
   )
 
   const marketMakerFactoryV2Address = getContractAddress(networkId, 'marketMakerFactoryV2')
+
   const marketMakerFactoryV2 = useMemo(
     () => new MarketMakerFactoryService(marketMakerFactoryV2Address, provider, account),
     [marketMakerFactoryV2Address, provider, account],

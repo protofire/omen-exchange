@@ -18,6 +18,7 @@ import { calcPrice, calcSellAmountInCollateral, formatTimestampToDate } from '..
 import { bigNumberToNumber } from '../../../../../util/tools/formatting'
 import { HistoricData, Period } from '../../../../../util/types'
 import { ButtonRound, ButtonSelectable } from '../../../../button'
+import { CommonDisabledCSS } from '../../../../common/form/common_styled'
 import { Dropdown, DropdownPosition } from '../../../../common/form/dropdown'
 import { commonWrapperCSS } from '../../../common_styled'
 import { HistoryChart } from '../history_chart'
@@ -95,6 +96,8 @@ export const History_select: React.FC<Props> = ({
 }) => {
   const context = useConnectedWeb3Context()
 
+  const [manuelAddress, setManuelAddress] = useState<string>('')
+
   const contracts = useContracts(context)
   const { buildMarketMaker } = contracts
   const marketMaker = buildMarketMaker(marketMakerAddress)
@@ -144,6 +147,7 @@ export const History_select: React.FC<Props> = ({
     pageIndex,
     type,
     decimals,
+    manuelAddress,
   )
 
   useEffect(() => {
@@ -307,6 +311,7 @@ export const History_select: React.FC<Props> = ({
           <ButtonSelect active={!toggleSelect} onClick={() => setToggleSelect(false)}>
             Graph
           </ButtonSelect>
+          <StyledInput onChange={e => setManuelAddress(e.target.value)} placeholder="Manual Address Search" />
         </SelectWrapper>
 
         {toggleSelect ? (
@@ -323,6 +328,7 @@ export const History_select: React.FC<Props> = ({
           </ButtonsWrapper>
         )}
       </TitleWrapper>
+
       {toggleSelect ? (
         <HistoryTable
           currency={currency}
@@ -350,3 +356,33 @@ export const History_select: React.FC<Props> = ({
     </ChartWrapper>
   )
 }
+
+const StyledInput = styled.input<{ active?: boolean }>`
+  align-items: center;
+  background-color: ${({ theme }) => theme.colors.mainBodyBackground};
+  border-radius: ${({ theme }) => theme.buttonRound.borderRadius};
+  border: 1px solid ${props => props.theme.colors.tertiary};
+  cursor: pointer;
+  display: flex;
+  flex-shrink: 0;
+  height: ${props => props.theme.buttonRound.height};
+  justify-content: center;
+  outline: none;
+  padding: ${props => props.theme.buttonRound.padding};
+  font-family: Roboto;
+  font-size: ${props => props.theme.buttonRound.fontSize};
+  line-height: ${props => props.theme.buttonRound.lineHeight};
+  color: ${({ theme }) => theme.colors.textColorDark};
+  transition: border-color 0.15s linear;
+  user-select: none;
+
+  &:hover {
+    border-color: ${props => props.theme.colors.tertiaryDark};
+  }
+
+  &:focus {
+    border-color: ${props => props.theme.colors.borderColorDark};
+  }
+
+  ${CommonDisabledCSS}
+`

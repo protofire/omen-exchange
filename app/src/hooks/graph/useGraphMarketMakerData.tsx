@@ -66,7 +66,6 @@ const query = gql`
       }
       scalarLow
       scalarHigh
-      factory
     }
   }
 `
@@ -151,7 +150,6 @@ export type GraphMarketMakerData = {
   scalarHigh: Maybe<BigNumber>
   outcomeTokenMarginalPrices: string[]
   outcomeTokenAmounts: string[]
-  factory: string
 }
 
 type Result = {
@@ -236,7 +234,6 @@ export const wrangleMarketDataResponse = (
     scalarHigh: data.scalarHigh ? bigNumberify(data.scalarHigh || 0) : null,
     outcomeTokenMarginalPrices: data.outcomeTokenMarginalPrices,
     outcomeTokenAmounts: data.outcomeTokenAmounts,
-    factory: data.factory,
   }
 }
 
@@ -265,7 +262,9 @@ export const useGraphMarketMakerData = (marketMakerAddress: string, networkId: n
     try {
       await refetch()
     } catch (error) {
-      logger.log(error.message)
+      if (error) {
+        logger.log(error)
+      }
     }
   }
 

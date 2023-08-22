@@ -9,8 +9,7 @@ import { CPKService } from '../services'
 import connectors from '../util/connectors'
 import { getRelayProvider } from '../util/cpk'
 import { getLogger } from '../util/logger'
-import { getInfuraUrl, networkIds } from '../util/networks'
-import { checkRpcStatus, getNetworkFromChain } from '../util/tools'
+import { networkIds } from '../util/networks'
 import { TransactionStep } from '../util/types'
 
 const logger = getLogger('Hooks::ConnectedWeb3')
@@ -46,7 +45,6 @@ export const useConnectedWeb3Context = () => {
 }
 interface Props {
   children?: React.ReactNode
-  setStatus?: any
 }
 /**
  * Component used to render components that depend on Web3 being available. These components can then
@@ -65,21 +63,43 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   const cpk = useCpk(connection)
   const balances = useBalance(connection)
 
+  useEffect(() => {
+    async function switchNetwork() {
+      if (library && account && connection?.networkId === 1) {
+        try {
+          await library.send('wallet_switchEthereumChain', [{ chainId: '0x64' }])
+        } catch (switchError) {
+          // This error code indicates that the chain has not been added to MetaMask.
+          if ('code' in (switchError as any) && (switchError as any).code === 4902) {
+            try {
+              await library.send('wallet_addEthereumChain', [
+                {
+                  chainId: '0x64',
+                  rpcUrls: ['https://rpc.gnosischain.com/'],
+                  chainName: 'Gnosis Chain',
+                  nativeCurrency: {
+                    name: 'xDAI',
+                    symbol: 'xDAI',
+                    decimals: 18,
+                  },
+                  blockExplorerUrls: ['https://gnosis.blockscout.com/'],
+                },
+              ])
+            } catch (addError) {
+              console.error(addError)
+            }
+          }
+        }
+      }
+    }
+
+    switchNetwork()
+  }, [library, account, connection])
+
   const rpcAddress: string | null = localStorage.getItem('rpcAddress')
 
-  const windowObj: any = window
-  const ethereum = windowObj.ethereum
-  const network = ethereum && ethereum.chainId
-  const injectedNetworkId = getNetworkFromChain(network)
-
-  const initialRelayState =
-    localStorage.getItem('relay') === 'false' || (injectedNetworkId !== -1 && injectedNetworkId !== networkIds.MAINNET)
-      ? false
-      : true
-
-  const [relay, setRelay] = useState(initialRelayState)
+  const [relay, setRelay] = useState(false)
   const toggleRelay = () => {
-    localStorage.setItem('relay', String(!relay))
     setRelay(!relay)
   }
 
@@ -92,16 +112,9 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     if (networkId && !error) {
       const enableRelay = context.connectorName !== 'Safe' || debugAddress !== ''
 
-      checkRpcStatus(
-        getInfuraUrl(relay ? networkIds.XDAI : networkId),
-        props.setStatus,
-        relay ? networkIds.XDAI : networkId,
-      )
-
       const { address, isRelay, netId, provider } = getRelayProvider(relay && enableRelay, networkId, library, account)
 
       const value = {
-        setStatus: props.setStatus,
         account: address || null,
         library: provider,
         networkId: netId,
@@ -124,6 +137,7 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
   useEffect(() => {
     let isSubscribed = true
     const connector = localStorage.getItem('CONNECTOR')
+
     if (error) {
       logger.log(error.message)
       localStorage.removeItem('CONNECTOR')
@@ -184,7 +198,6 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     (connection.account && connection.networkId !== cpk?.provider?.network?.chainId) ||
     !balances.fetched
   ) {
-    props.setStatus(true)
     return null
   }
 
@@ -192,9 +205,8 @@ export const ConnectedWeb3: React.FC<Props> = (props: Props) => {
     ...connection,
     cpk,
     balances,
-    setStatus: props.setStatus,
   }
-  props.setStatus(true)
+
   return <ConnectedWeb3Context.Provider value={value}>{props.children}</ConnectedWeb3Context.Provider>
 }
 

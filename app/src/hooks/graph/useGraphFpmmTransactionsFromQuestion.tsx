@@ -24,7 +24,7 @@ const fragment = gql`
   }
 `
 const withFpmmType = gql`
-  query fpmmTransactions($id: ID!, $pageSize: Int, $pageIndex: Int, $fpmmType: String) {
+  query fpmmTransactions($id: ID!, $pageSize: Int, $pageIndex: Int, $fpmmType: String, $address: String) {
     fpmmTransactions(
       where: { fpmm: $id, fpmmType: $fpmmType }
       first: $pageSize
@@ -37,10 +37,39 @@ const withFpmmType = gql`
   }
   ${fragment}
 `
+const withFpmmTypeAndAddress = gql`
+  query fpmmTransactions($id: ID!, $pageSize: Int, $pageIndex: Int, $fpmmType: String, $address: String) {
+    fpmmTransactions(
+      where: { fpmm: $id, fpmmType: $fpmmType, user: $address }
+      first: $pageSize
+      skip: $pageIndex
+      orderBy: creationTimestamp
+      orderDirection: desc
+    ) {
+      ...TransactionFields
+    }
+  }
+  ${fragment}
+`
 const withoutFpmmType = gql`
-  query fpmmTransactions($id: ID!, $pageSize: Int, $pageIndex: Int) {
+  query fpmmTransactions($id: ID!, $pageSize: Int, $pageIndex: Int, $address: String) {
     fpmmTransactions(
       where: { fpmm: $id }
+      first: $pageSize
+      skip: $pageIndex
+      orderBy: creationTimestamp
+      orderDirection: desc
+    ) {
+      ...TransactionFields
+    }
+  }
+  ${fragment}
+`
+
+const withoutFpmmTypeAndAddress = gql`
+  query fpmmTransactions($id: ID!, $pageSize: Int, $pageIndex: Int, $address: String) {
+    fpmmTransactions(
+      where: { fpmm: $id, user: $address }
       first: $pageSize
       skip: $pageIndex
       orderBy: creationTimestamp
@@ -130,29 +159,52 @@ export const useGraphFpmmTransactionsFromQuestion = (
   pageIndex: number,
   type: HistoryType,
   decimals: number,
+  manuelAddress: string,
 ): Result => {
   const [fpmmTradeData, setFpmmTradeData] = useState<Maybe<FpmmTradeData[]>>(null)
   const [morePagination, setMorePagination] = useState<boolean>(true)
 
-  const { data, error, loading, refetch } = useQuery(type === HistoryType.All ? withoutFpmmType : withFpmmType, {
-    notifyOnNetworkStatusChange: true,
-    skip: false,
-    variables: {
-      id: questionID,
-      pageSize: pageSize + 1,
-      pageIndex: pageIndex,
-      fpmmType: type === HistoryType.All || type === HistoryType.Liquidity ? 'Liquidity' : 'Trade',
-    },
-    onCompleted: ({ fpmmTransactions }: any) => {
-      let internalArray = fpmmTransactions
+  const hasAddress = manuelAddress.length > 0
+  const variables: {
+    id: string
+    pageSize: number
+    pageIndex: number
+    fpmmType: string
 
-      setMorePagination(internalArray.length === pageSize + 1)
-      if (internalArray.length === pageSize + 1) {
-        internalArray = internalArray.slice(0, pageSize)
-      }
-      setFpmmTradeData(wrangleResponse(internalArray, decimals))
+    address?: string
+  } = {
+    id: questionID,
+    pageSize: pageSize + 1,
+    pageIndex: pageIndex,
+    fpmmType: type === HistoryType.All || type === HistoryType.Liquidity ? 'Liquidity' : 'Trade',
+  }
+  if (hasAddress) {
+    variables.address = manuelAddress.toLocaleLowerCase()
+  }
+
+  const { data, error, loading, refetch } = useQuery(
+    type === HistoryType.All && hasAddress
+      ? withoutFpmmTypeAndAddress
+      : type === HistoryType.All
+      ? withoutFpmmType
+      : hasAddress
+      ? withFpmmTypeAndAddress
+      : withFpmmType,
+    {
+      notifyOnNetworkStatusChange: true,
+      skip: false,
+      variables,
+      onCompleted: ({ fpmmTransactions }: any) => {
+        let internalArray = fpmmTransactions
+
+        setMorePagination(internalArray.length === pageSize + 1)
+        if (internalArray.length === pageSize + 1) {
+          internalArray = internalArray.slice(0, pageSize)
+        }
+        setFpmmTradeData(wrangleResponse(internalArray, decimals))
+      },
     },
-  })
+  )
 
   useEffect(() => {
     setFpmmTradeData(null)

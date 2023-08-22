@@ -18,6 +18,7 @@ interface Props {
 
 const MarketView: React.FC<Props> = (props: Props) => {
   const { marketMakerData } = props
+  // console.log('marketMakerDatra', marketMakerData)
 
   const { isQuestionFinalized, oracle, question } = marketMakerData
 
