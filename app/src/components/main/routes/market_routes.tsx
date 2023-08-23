@@ -55,6 +55,7 @@ const MarketValidation: React.FC<Props> = (props: Props) => {
 
 const MarketRoutes = (props: RouteComponentProps<RouteParams>) => {
   const marketMakerAddress = props.match.params.address
+
   if (!isAddress(marketMakerAddress)) {
     logger.log(`Contract address not valid`)
     return <Redirect to="/" />

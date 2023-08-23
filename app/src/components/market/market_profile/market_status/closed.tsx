@@ -164,6 +164,9 @@ const Wrapper = (props: Props) => {
   const history = useHistory()
   const location = useLocation()
 
+  const queryParams = new URLSearchParams(location.search)
+  const addressFilter = queryParams.get('addressFilter')
+
   const [status, setStatus] = useState<Status>(Status.Ready)
   const [message, setMessage] = useState('')
 
@@ -360,8 +363,20 @@ const Wrapper = (props: Props) => {
   }
 
   useEffect(() => {
-    history.replace(`/${marketMakerAddress}/${currentTab.toLowerCase()}`)
-    if (currentTab === MarketDetailsTab.swap) return history.replace(`/${marketMakerAddress}/finalize`)
+    let url = `/${marketMakerAddress}`
+
+    if (currentTab === MarketDetailsTab.swap) {
+      url += `/finalize`
+    } else {
+      url += `/${currentTab.toLowerCase()}`
+    }
+
+    // If addressFilter is present, append it to the URL
+    if (addressFilter && addressFilter.length > 0) {
+      url += `?addressFilter=${addressFilter}`
+    }
+
+    history.replace(url)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTab])
 

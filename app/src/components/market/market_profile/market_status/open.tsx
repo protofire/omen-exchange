@@ -77,6 +77,10 @@ const Wrapper = (props: Props) => {
   const realitioBaseUrl = useRealityLink()
   const history = useHistory()
   const location = useLocation()
+
+  const queryParams = new URLSearchParams(location.search)
+  const addressFilter = queryParams.get('addressFilter')
+
   const context = useConnectedWeb3Context()
   const cpk = context.cpk
 
@@ -266,8 +270,19 @@ const Wrapper = (props: Props) => {
   }, [])
 
   useEffect(() => {
-    if (currentTab === MarketDetailsTab.swap) return history.replace(`/${marketMakerAddress}`)
-    return history.replace(`/${marketMakerAddress}/${currentTab.toLowerCase()}`)
+    // Base URL construction
+    let url = `/${marketMakerAddress}`
+
+    if (currentTab !== MarketDetailsTab.swap) {
+      url += `/${currentTab.toLowerCase()}`
+    }
+
+    // If addressFilter is present, append it to the URL
+    if (addressFilter && addressFilter.length > 0) {
+      url += `?addressFilter=${addressFilter}`
+    }
+
+    history.replace(url)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTab])
 

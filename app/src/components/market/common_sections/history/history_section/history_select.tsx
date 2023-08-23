@@ -1,6 +1,7 @@
 import { Zero } from 'ethers/constants'
 import { BigNumber, Interface, bigNumberify } from 'ethers/utils'
 import React, { useEffect, useState } from 'react'
+import { useLocation } from 'react-router'
 import styled from 'styled-components'
 
 import realitioAbi from '../../../../../abi/realitio.json'
@@ -95,9 +96,16 @@ export const History_select: React.FC<Props> = ({
   value,
 }) => {
   const context = useConnectedWeb3Context()
+  const location = useLocation()
+
+  const queryParams = new URLSearchParams(location.search)
+  const addressFilter = queryParams.get('addressFilter')
 
   const [manuelAddress, setManuelAddress] = useState<string>('')
-
+  useEffect(() => {
+    if (addressFilter) setManuelAddress(addressFilter)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   const contracts = useContracts(context)
   const { buildMarketMaker } = contracts
   const marketMaker = buildMarketMaker(marketMakerAddress)
@@ -311,7 +319,11 @@ export const History_select: React.FC<Props> = ({
           <ButtonSelect active={!toggleSelect} onClick={() => setToggleSelect(false)}>
             Graph
           </ButtonSelect>
-          <StyledInput onChange={e => setManuelAddress(e.target.value)} placeholder="Manual Address Search" />
+          <StyledInput
+            onChange={e => setManuelAddress(e.target.value)}
+            placeholder="Manual Address Search"
+            value={manuelAddress}
+          />
         </SelectWrapper>
 
         {toggleSelect ? (
