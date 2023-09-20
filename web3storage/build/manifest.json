@@ -1,0 +1,11 @@
+{
+  "name": "Omen",
+  "description": "Decentralized prediction markets on Ethereum",
+  "iconPath": "omen_logo_thumbnail.png",
+  "providedBy": { "name": "DXdao", "url": "https://dxdao.eth/" },
+  "orientation": "portrait",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#00be95",
+  "background_color": "#fff"
+}
